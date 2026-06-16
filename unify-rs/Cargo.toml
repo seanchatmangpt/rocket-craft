@@ -13,6 +13,8 @@ members = [
     "unify-mcp",
     "unify-bp",
     "unify-integration-tests",
+    "unify-ocel",
+    "unify-pm",
     "unify-rocket",
     "unify",
 ]
