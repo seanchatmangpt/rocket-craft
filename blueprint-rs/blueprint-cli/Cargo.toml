@@ -2,6 +2,11 @@
 name = "blueprint-cli"
 version = "0.1.0"
 edition = "2021"
+description = "CLI tool for the blueprint-rs toolchain"
+
+[[bin]]
+name = "blueprint"
+path = "src/main.rs"
 
 [dependencies]
 blueprint-core = { path = "../blueprint-core" }

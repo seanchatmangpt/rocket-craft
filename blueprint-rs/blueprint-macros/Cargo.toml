@@ -2,8 +2,15 @@
 name = "blueprint-macros"
 version = "0.1.0"
 edition = "2021"
+description = "Procedural macros for writing UE4 Blueprints in Rust syntax"
 
 [lib]
 proc-macro = true
 
 [dependencies]
+syn = { version = "2", features = ["full"] }
+quote = "1"
+proc-macro2 = "1"
+
+[dev-dependencies]
+blueprint-core = { path = "../blueprint-core" }
