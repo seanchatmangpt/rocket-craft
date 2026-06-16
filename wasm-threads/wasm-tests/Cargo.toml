@@ -8,5 +8,11 @@ crate-type = ["rlib"]
 
 [dependencies]
 wasm-core = { path = "../wasm-core" }
-wasm-bindgen = { workspace = true }
+wasm-game-logic = { path = "../wasm-game-logic" }
+wasm-ui = { path = "../wasm-ui" }
+wasm-patterns = { path = "../wasm-patterns" }
 serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
