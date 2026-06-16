@@ -1,8 +1,10 @@
 pub mod types;
 pub mod ast;
 pub mod nodes;
-pub mod t3d;
+pub mod builder;
+pub mod serializer;
 
 pub use types::*;
 pub use ast::*;
-pub use t3d::T3dSerializer;
+pub use builder::{BlueprintBuilder, NodeHandle};
+pub use serializer::{T3dSerializer, JsonSerializer};
