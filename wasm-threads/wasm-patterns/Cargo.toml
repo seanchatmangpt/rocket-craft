@@ -1,0 +1,12 @@
+[package]
+name = "wasm-patterns"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-core = { path = "../wasm-core" }
+wasm-bindgen = { workspace = true }
+serde = { workspace = true }
