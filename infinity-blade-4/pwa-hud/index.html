@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Mobile-first: fullscreen, no bounce, lock to landscape -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover,
+                   user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Infinity Blade IV" />
+    <meta name="theme-color" content="#1a0a00" />
+    <meta name="description" content="Infinity Blade IV — immersive mobile fantasy combat RPG" />
+
+    <title>Infinity Blade IV</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- Apple touch icon fallback -->
+    <link rel="apple-touch-icon" href="icons/ib4-icon-180.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/ib4-icon-192.png" />
+
+    <!-- IB4 base stylesheet -->
+    <link rel="stylesheet" href="styles/ib4.css" />
+
+    <style>
+      /* -----------------------------------------------
+         FOUNDATION — dark medieval canvas layout
+         ----------------------------------------------- */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+        color: #e8d9b0;
+        touch-action: none; /* prevent default swipe navigation */
+        -webkit-tap-highlight-color: transparent;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* -----------------------------------------------
+         GAME CANVAS — full-screen game surface
+         ----------------------------------------------- */
+      #ib4-game-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        background: radial-gradient(ellipse at 50% 60%,
+          #2a1205 0%, #150800 40%, #000000 100%);
+        z-index: 1;
+      }
+
+      /* -----------------------------------------------
+         PLACEHOLDER SCENE (shown when no game engine loaded)
+         ----------------------------------------------- */
+      #ib4-scene-placeholder {
+        position: fixed;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        pointer-events: none;
+        user-select: none;
+      }
+      .scene-placeholder-title {
+        font-size: 2.4em;
+        letter-spacing: 8px;
+        color: #c9a227;
+        text-shadow: 0 0 24px rgba(201, 162, 39, 0.5),
+                     2px 2px 0 rgba(0, 0, 0, 0.7);
+        opacity: 0.9;
+      }
+      .scene-placeholder-sub {
+        font-size: 0.85em;
+        letter-spacing: 3px;
+        color: rgba(232, 217, 176, 0.4);
+      }
+      .scene-rune {
+        font-size: 6em;
+        color: rgba(201, 162, 39, 0.08);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        font-size: 40vmin;
+        line-height: 1;
+        animation: scene-rune-breathe 6s ease-in-out infinite alternate;
+      }
+      @keyframes scene-rune-breathe {
+        from { opacity: 0.05; transform: translate(-50%, -50%) scale(0.97); }
+        to   { opacity: 0.12; transform: translate(-50%, -50%) scale(1.03); }
+      }
+
+      /* -----------------------------------------------
+         HUD ROOT LAYER — sits above game canvas
+         ----------------------------------------------- */
+      #ib4-hud-root {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 8000;
+      }
+
+      /* -----------------------------------------------
+         DEMO CONTROLS (bottom bar — for testing HUD events)
+         ----------------------------------------------- */
+      #ib4-demo-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 44px;
+        background: rgba(5, 3, 1, 0.92);
+        border-top: 1px solid rgba(201, 162, 39, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        z-index: 9800;
+        padding: 0 12px;
+        overflow-x: auto;
+        pointer-events: auto;
+      }
+      .demo-btn {
+        background: transparent;
+        border: 1px solid rgba(201, 162, 39, 0.4);
+        color: rgba(232, 217, 176, 0.75);
+        font-family: inherit;
+        font-size: 0.65em;
+        letter-spacing: 1px;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+        white-space: nowrap;
+        transition: background 0.15s, color 0.15s, border-color 0.15s;
+        flex-shrink: 0;
+      }
+      .demo-btn:hover, .demo-btn:active {
+        background: rgba(201, 162, 39, 0.12);
+        color: #c9a227;
+        border-color: #c9a227;
+      }
+      .demo-btn.danger {
+        border-color: rgba(139, 0, 0, 0.5);
+        color: rgba(204, 17, 17, 0.8);
+      }
+      .demo-btn.danger:hover {
+        background: rgba(139, 0, 0, 0.15);
+        color: #cc1111;
+        border-color: #cc1111;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Game canvas surface (game engine renders here) -->
+    <canvas id="ib4-game-canvas" aria-label="Infinity Blade IV game canvas"></canvas>
+
+    <!-- Decorative placeholder scene (replace with engine output) -->
+    <div id="ib4-scene-placeholder" aria-hidden="true">
+      <div class="scene-rune">✦</div>
+      <div class="scene-placeholder-title">INFINITY BLADE IV</div>
+      <div class="scene-placeholder-sub">INITIALIZING COMBAT SYSTEM</div>
+    </div>
+
+    <!-- HUD root overlay — injected by ib4-hud.ts at runtime -->
+    <div id="ib4-hud-root" role="region" aria-label="Combat HUD"></div>
+
+    <!-- Demo control bar for testing HUD event methods -->
+    <nav id="ib4-demo-bar" aria-label="HUD demo controls">
+      <button class="demo-btn" id="demo-dmg">Take Damage</button>
+      <button class="demo-btn" id="demo-heal">Heal</button>
+      <button class="demo-btn" id="demo-magic">Use Magic</button>
+      <button class="demo-btn" id="demo-combo">+Combo</button>
+      <button class="demo-btn" id="demo-parry">Parry Window</button>
+      <button class="demo-btn" id="demo-perfect">Perfect Parry</button>
+      <button class="demo-btn" id="demo-xp">+XP</button>
+      <button class="demo-btn" id="demo-equip">Equipment</button>
+      <button class="demo-btn" id="demo-magic-type">Toggle Magic</button>
+      <button class="demo-btn danger" id="demo-death">Death</button>
+      <button class="demo-btn" id="demo-victory">Titan Slain</button>
+    </nav>
+
+    <!-- TS modules loaded as ES modules -->
+    <script type="module">
+      // Import HUD modules
+      import { InfinityBladeHud } from './src/ib4-hud.js';
+      import { EquipmentPanel }   from './src/ib4-equipment.js';
+      import { BloodlineScreen }  from './src/ib4-bloodline.js';
+
+      // ---- Instantiate ----
+      const hud = new InfinityBladeHud();
+      hud.init();
+
+      const equipment = new EquipmentPanel();
+      const bloodline = new BloodlineScreen();
+
+      // Expose for console debugging
+      window.ib4 = { hud, equipment, bloodline };
+
+      // ---- Wire up death/rebirth flow ----
+      window.addEventListener('ib4:rebirth', () => {
+        bloodline.show('');
+      });
+
+      // ---- Demo bar wiring ----
+      let hp    = 100, maxHp   = 100;
+      let mp    = 50,  maxMp   = 50;
+      let enemyHp = 100;
+      let combo = 0;
+      let xp    = 0, xpMax = 100, level = 1;
+      const magicCycle = ['fire', 'lightning', 'ice'];
+      let magicIdx = 0;
+
+      document.getElementById('demo-dmg').addEventListener('click', () => {
+        hp = Math.max(0, hp - 15);
+        hud.onPlayerHealthChanged(hp, maxHp);
+        if (hp <= 0) hud.onDeath();
+      });
+
+      document.getElementById('demo-heal').addEventListener('click', () => {
+        hp = Math.min(maxHp, hp + 20);
+        hud.onPlayerHealthChanged(hp, maxHp);
+      });
+
+      document.getElementById('demo-magic').addEventListener('click', () => {
+        mp = Math.max(0, mp - 12);
+        hud.onPlayerMagicChanged(mp, maxMp);
+        // Restore a bit
+        setTimeout(() => { mp = Math.min(maxMp, mp + 6); hud.onPlayerMagicChanged(mp, maxMp); }, 800);
+      });
+
+      document.getElementById('demo-combo').addEventListener('click', () => {
+        combo++;
+        enemyHp = Math.max(0, enemyHp - 8);
+        hud.onEnemyHealthChanged(enemyHp);
+        const mult = combo < 5 ? 1.0 : combo < 10 ? 1.5 : combo < 20 ? 2.0 : 3.0;
+        hud.onComboUpdated(combo, mult);
+      });
+
+      document.getElementById('demo-parry').addEventListener('click', () => {
+        hud.onParryWindowOpen();
+        setTimeout(() => hud.onParryWindowClose(), 1200);
+      });
+
+      document.getElementById('demo-perfect').addEventListener('click', () => {
+        hud.onParryWindowOpen();
+        setTimeout(() => hud.onPerfectParry(), 200);
+      });
+
+      document.getElementById('demo-xp').addEventListener('click', () => {
+        xp += 25;
+        if (xp >= xpMax) {
+          xp -= xpMax;
+          level++;
+          xpMax = Math.round(xpMax * 1.4);
+          hud.onBloodlineLevelUp(level, xp);
+          bloodline.setLevel(level, xp, xpMax, level);
+        } else {
+          hud.onXPGained(25, xp, xpMax);
+        }
+        bloodline.animateXPGain(25);
+      });
+
+      document.getElementById('demo-equip').addEventListener('click', () => {
+        equipment.toggle();
+      });
+
+      document.getElementById('demo-magic-type').addEventListener('click', () => {
+        magicIdx = (magicIdx + 1) % magicCycle.length;
+        const t = magicCycle[magicIdx];
+        hud.onMagicTypeChanged(t);
+      });
+
+      document.getElementById('demo-death').addEventListener('click', () => {
+        hp = 0;
+        hud.onPlayerHealthChanged(0, maxHp);
+        hud.onDeath();
+        combo = 0;
+        hud.onComboBreak();
+        // Show bloodline after short delay
+        setTimeout(() => bloodline.show('The God-King'), 1800);
+      });
+
+      document.getElementById('demo-victory').addEventListener('click', () => {
+        hud.onTitanDefeated('The God-King', [
+          'Infinity Blade',
+          'Ring of Ethereal Power',
+          '2500 Gold',
+        ]);
+      });
+
+      // Restore after death/victory
+      window.addEventListener('ib4:continue-after-victory', () => {
+        hp = maxHp; mp = maxMp; enemyHp = 100; combo = 0;
+        hud.onPlayerHealthChanged(hp, maxHp);
+        hud.onPlayerMagicChanged(mp, maxMp);
+        hud.onEnemyHealthChanged(enemyHp);
+        hud.onComboUpdated(0, 1.0);
+        hud.setEnemyName('TITAN');
+      });
+
+      window.addEventListener('ib4:rebirth', () => {
+        hp = maxHp; mp = maxMp; enemyHp = 100; combo = 0;
+        hud.onPlayerHealthChanged(hp, maxHp);
+        hud.onPlayerMagicChanged(mp, maxMp);
+        hud.onEnemyHealthChanged(enemyHp);
+        hud.onComboUpdated(0, 1.0);
+      });
+    </script>
+
+    <!-- Service Worker registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((reg) => {
+              console.log('[IB4] Service Worker registered, scope:', reg.scope);
+            })
+            .catch((err) => {
+              console.warn('[IB4] Service Worker registration failed:', err);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

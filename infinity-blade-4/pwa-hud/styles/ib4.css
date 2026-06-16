@@ -1,0 +1,361 @@
+/* ib4.css — Infinity Blade IV PWA HUD Stylesheet
+   Medieval fantasy combat UI — dark gold / blood / arcane palette
+*/
+
+/* =====================================================
+   CSS CUSTOM PROPERTIES
+   ===================================================== */
+:root {
+  --ib-gold:         #c9a227;
+  --ib-gold-bright:  #f0c040;
+  --ib-gold-dim:     rgba(201, 162, 39, 0.35);
+  --ib-blood:        #8b0000;
+  --ib-blood-bright: #cc1111;
+  --ib-magic:        #1a3a5c;
+  --ib-magic-fire:   #ff6600;
+  --ib-magic-light:  #4488ff;
+  --ib-magic-ice:    #00cccc;
+  --ib-dark:         #0d0a07;
+  --ib-panel:        rgba(13, 10, 7, 0.88);
+  --ib-border:       rgba(201, 162, 39, 0.35);
+  --ib-text:         #e8d9b0;
+  --ib-text-dim:     rgba(232, 217, 176, 0.5);
+  --ib-common:       #9e9e9e;
+  --ib-uncommon:     #4caf50;
+  --ib-rare:         #2196f3;
+  --ib-epic:         #9c27b0;
+  --ib-infinity:     #c9a227;
+}
+
+/* =====================================================
+   GLOBAL RESET (scoped to IB4 overlay)
+   ===================================================== */
+#ib4-hud-root *,
+#ib4-bloodline-screen *,
+#ib4-equipment-panel * {
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   HEALTH ORB  (.ib4-health-orb)
+   Large circular SVG health display, bottom-left.
+   ===================================================== */
+.ib4-health-orb {
+  position: absolute;
+  bottom: 28px;
+  left: 28px;
+  width: 110px;
+  height: 110px;
+  pointer-events: auto;
+  filter: drop-shadow(0 0 12px rgba(139, 0, 0, 0.55));
+  transition: filter 0.3s ease;
+}
+
+.ib4-health-orb.low-health {
+  animation: ib4-orb-danger 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes ib4-orb-danger {
+  from { filter: drop-shadow(0 0 12px rgba(200, 30, 30, 0.6)); }
+  to   { filter: drop-shadow(0 0 30px rgba(255, 60, 0, 1));    }
+}
+
+/* =====================================================
+   MAGIC BAR  (.ib4-magic-bar)
+   Horizontal gradient bar, bottom-center.
+   ===================================================== */
+.ib4-magic-bar-wrap {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.ib4-magic-bar-label {
+  font-size: 0.7em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ib-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Palatino Linotype', Palatino, serif;
+}
+
+.ib4-magic-bar-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--ib-border);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.8), 0 0 8px rgba(26, 58, 92, 0.4);
+}
+
+.ib4-magic-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+              background 0.4s ease;
+}
+
+.ib4-magic-bar-fill.fire {
+  background: linear-gradient(90deg, #991100, var(--ib-magic-fire));
+  box-shadow: 0 0 10px rgba(255, 102, 0, 0.6);
+}
+.ib4-magic-bar-fill.lightning {
+  background: linear-gradient(90deg, #112266, var(--ib-magic-light));
+  box-shadow: 0 0 10px rgba(68, 136, 255, 0.6);
+}
+.ib4-magic-bar-fill.ice {
+  background: linear-gradient(90deg, #006666, var(--ib-magic-ice));
+  box-shadow: 0 0 10px rgba(0, 204, 204, 0.6);
+}
+
+/* =====================================================
+   ENEMY HP BAR  (.ib4-enemy-hp)
+   Red bar with titan name label, top-center.
+   ===================================================== */
+.ib4-enemy-hp {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.ib4-enemy-hp-label {
+  font-size: 0.9em;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ib-gold);
+  text-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
+  font-family: 'Palatino Linotype', Palatino, serif;
+}
+
+.ib4-enemy-hp-track {
+  width: 100%;
+  height: 16px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(139, 0, 0, 0.45);
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(139, 0, 0, 0.4),
+              inset 0 1px 5px rgba(0, 0, 0, 0.8);
+}
+
+.ib4-enemy-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ib-blood), var(--ib-blood-bright));
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 0 8px rgba(204, 17, 17, 0.55);
+}
+
+/* =====================================================
+   COMBO COUNTER  (.ib4-combo)
+   Large bold counter, top-right. Animates on increment.
+   ===================================================== */
+.ib4-combo {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  text-align: right;
+  line-height: 1;
+  pointer-events: none;
+  font-family: 'Palatino Linotype', Palatino, serif;
+}
+
+.ib4-combo-count {
+  display: block;
+  font-size: 3.5em;
+  font-weight: bold;
+  color: var(--ib-gold);
+  text-shadow: 0 0 18px rgba(201, 162, 39, 0.7),
+               2px 2px 0 rgba(0, 0, 0, 0.8);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  letter-spacing: -1px;
+}
+
+.ib4-combo-count.bump {
+  transform: scale(1.35);
+}
+
+.ib4-combo-multiplier {
+  font-size: 1em;
+  color: var(--ib-text);
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(201, 162, 39, 0.35);
+}
+
+/* =====================================================
+   PARRY RING OVERLAY  (.ib4-parry-ring)
+   Pulsing gold ring, center-screen, shown during parry window.
+   ===================================================== */
+.ib4-parry-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px solid var(--ib-gold);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 0 30px rgba(201, 162, 39, 0.4),
+              inset 0 0 20px rgba(201, 162, 39, 0.1);
+}
+
+.ib4-parry-ring.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: ib4-parry-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes ib4-parry-pulse {
+  from {
+    box-shadow: 0 0 20px rgba(201, 162, 39, 0.4),
+                inset 0 0 10px rgba(201, 162, 39, 0.1);
+  }
+  to {
+    box-shadow: 0 0 55px rgba(201, 162, 39, 1),
+                inset 0 0 30px rgba(201, 162, 39, 0.35);
+  }
+}
+
+/* =====================================================
+   PERFECT PARRY  (.ib4-perfect-parry)
+   Full-screen gold flash + bold text on perfect parry.
+   ===================================================== */
+.ib4-perfect-parry {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.ib4-perfect-parry.active {
+  animation: ib4-perfect-bg-flash 0.9s ease forwards;
+}
+
+@keyframes ib4-perfect-bg-flash {
+  0%   { opacity: 0; background: rgba(201, 162, 39, 0); }
+  10%  { opacity: 1; background: rgba(201, 162, 39, 0.55); }
+  30%  { opacity: 1; background: rgba(201, 162, 39, 0.3); }
+  80%  { opacity: 1; background: rgba(201, 162, 39, 0.05); }
+  100% { opacity: 0; background: rgba(201, 162, 39, 0); }
+}
+
+.ib4-perfect-parry-text {
+  font-size: 3.2em;
+  font-weight: bold;
+  color: #ffffff;
+  font-family: 'Palatino Linotype', Palatino, serif;
+  text-shadow:
+    0 0 20px rgba(201, 162, 39, 1),
+    0 0 45px rgba(255, 200, 0, 0.8),
+    3px 3px 0 rgba(0, 0, 0, 0.6);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  animation: ib4-perfect-text-pop 0.9s ease forwards;
+}
+
+@keyframes ib4-perfect-text-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  15%  { transform: scale(1.3); opacity: 1; }
+  30%  { transform: scale(1.0); }
+  80%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+
+/* =====================================================
+   EQUIPMENT PANEL  (.ib4-equipment-panel)
+   Slide-in right panel with slot cards.
+   ===================================================== */
+.ib4-equipment-panel {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  max-width: 100vw;
+  height: 100vh;
+  background: rgba(10, 7, 4, 0.97);
+  border-left: 2px solid var(--ib-gold);
+  box-shadow: -8px 0 36px rgba(0, 0, 0, 0.9);
+  z-index: 9000;
+  overflow-y: auto;
+  padding: 24px;
+  transition: right 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
+  color: var(--ib-text);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ib4-equipment-panel.open {
+  right: 0;
+}
+
+.ib4-equip-card {
+  border: 1px solid var(--ib-border);
+  border-radius: 6px;
+  padding: 14px;
+  background: rgba(18, 12, 6, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.25s, border-color 0.25s;
+}
+
+/* =====================================================
+   BLOODLINE SCREEN  (.ib4-bloodline-screen)
+   Full-screen rebirth & skill progression.
+   ===================================================== */
+.ib4-bloodline-screen {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, #1a0800 0%, #000000 70%);
+  z-index: 9500;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 32px;
+  overflow-y: auto;
+  gap: 18px;
+  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
+  color: var(--ib-text);
+}
+
+.ib4-bloodline-screen.active {
+  display: flex;
+}
+
+/* =====================================================
+   UTILITY ANIMATIONS
+   ===================================================== */
+@keyframes ib4-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ib4-scale-in {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
