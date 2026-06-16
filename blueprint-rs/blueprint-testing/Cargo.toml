@@ -1,0 +1,11 @@
+[package]
+name = "blueprint-testing"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+blueprint-core = { path = "../blueprint-core" }
+serde_json = "1"
+
+[dev-dependencies]
+blueprint-core = { path = "../blueprint-core" }
