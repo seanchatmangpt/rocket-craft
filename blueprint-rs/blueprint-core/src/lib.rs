@@ -16,6 +16,8 @@ pub mod builder;
 pub mod serializer;
 pub mod render;
 pub mod layout;
+pub mod diff;
+pub mod validator;
 pub mod patterns;
 
 pub use types::*;
