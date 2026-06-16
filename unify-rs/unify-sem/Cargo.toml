@@ -1,0 +1,5 @@
+[package]
+name = "unify-sem"
+version = "0.1.0"
+edition = "2021"
+description = "Semantic types for the unify workspace"

@@ -1,0 +1,16 @@
+[package]
+name = "unify-integration-tests"
+version = "0.1.0"
+edition = "2021"
+description = "Cross-crate integration tests for the unify-rs abstraction layer"
+
+[dependencies]
+unify-core      = { path = "../unify-core" }
+unify-receipts  = { path = "../unify-receipts" }
+unify-admission = { path = "../unify-admission" }
+unify-ocel      = { path = "../unify-ocel" }
+unify-pm        = { path = "../unify-pm" }
+unify-rdf       = { path = "../unify-rdf" }
+serde           = { version = "1", features = ["derive"] }
+serde_json      = "1"
+thiserror       = "1"
