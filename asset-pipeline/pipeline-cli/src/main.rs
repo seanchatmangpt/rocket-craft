@@ -240,8 +240,10 @@ async fn process_assets(
 
     let script_path = resolve_script(script);
 
-    let converter = BlenderConverter::discover(script_path)
-        .context("finding Blender installation")?;
+    // Blender discovery is lazy: we only call it when an asset actually needs
+    // conversion (i.e. is not already FBX). FBX assets use a fast copy path
+    // inside BlenderConverter::convert that never spawns Blender.
+    let mut converter: Option<BlenderConverter> = None;
     let val_config = ValidationConfig::from_pipeline_config(&cfg.pipeline);
     let mut validator = Validator::new(val_config);
     let stager = Stager::new(output_dir.clone());
@@ -265,6 +267,29 @@ async fn process_assets(
                 continue;
             }
         };
+
+        // Ensure Blender is available for non-FBX assets; FBX uses a fast copy
+        // path inside BlenderConverter::convert and never actually invokes Blender.
+        if converter.is_none() {
+            match BlenderConverter::discover(script_path.clone()) {
+                Ok(c) => { converter = Some(c); }
+                Err(e) if validated.source_format.is_fbx() => {
+                    // FBX fast-path: synthesise a no-Blender converter struct.
+                    // The blender_path/script_path fields are never used for FBX.
+                    warn!("Blender not found but asset is already FBX — using copy fast-path");
+                    converter = Some(BlenderConverter {
+                        blender_path: std::path::PathBuf::from("blender"),
+                        script_path: script_path.clone(),
+                        timeout_secs: 300,
+                    });
+                    let _ = e; // suppress unused warning
+                }
+                Err(e) => {
+                    return Err(anyhow::anyhow!(e).context("finding Blender installation"));
+                }
+            }
+        }
+        let converter = converter.as_ref().expect("converter initialised above");
 
         // Convert
         let converted = match converter.convert(validated, &work_dir).await {
