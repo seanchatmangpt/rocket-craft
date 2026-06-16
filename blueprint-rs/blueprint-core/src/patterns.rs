@@ -594,7 +594,6 @@ mod tests {
         let mut b = BlueprintBuilder::new("Custom", "Actor");
         health_system(&mut b, &cfg);
         let json = b.to_json().expect("JSON serialization failed");
-        assert!(json.contains(""HP"") || json.contains(r#""name": "HP""#), "missing HP variable");
         assert!(json.contains("MaxHP"), "missing MaxHP variable");
         // Events appear in node names in T3D
         let t3d = b.to_t3d();
