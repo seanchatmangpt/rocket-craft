@@ -1,3 +1,4 @@
+use unify_mcp::rocket_tools;
 use unify_mcp::server::{McpServer, ServerInfo};
 use unify_mcp::tools;
 
@@ -7,6 +8,7 @@ fn main() {
         version: env!("CARGO_PKG_VERSION").into(),
     });
     let server = tools::register_server_tools(server);
+    let server = rocket_tools::attach_rocket_tools(server);
 
     // Read JSON-RPC requests from stdin, one per line; write responses to stdout
     use std::io::BufRead;
