@@ -14,7 +14,9 @@ pub mod ast;
 pub mod nodes;
 pub mod builder;
 pub mod serializer;
+pub mod render;
 pub mod layout;
+pub mod patterns;
 
 pub use types::*;
 pub use ast::*;
