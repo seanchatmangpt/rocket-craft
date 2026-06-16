@@ -1,0 +1,10 @@
+[package]
+name = "unify-ocel"
+version = "0.1.0"
+edition = "2021"
+description = "OCEL 2.0 Object-Centric Event Log implementation for process mining"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
