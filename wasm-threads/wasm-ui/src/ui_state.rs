@@ -31,7 +31,16 @@ impl UiState<Unloaded> {
     }
 
     pub fn start_loading(self) -> UiState<Loading> {
-        UiState { _phase: PhantomData, ..self }
+        UiState {
+            frame: self.frame,
+            last_game_tick: self.last_game_tick,
+            player_health: self.player_health,
+            player_health_max: self.player_health_max,
+            player_score: self.player_score,
+            entity_count: self.entity_count,
+            messages_received: self.messages_received,
+            _phase: PhantomData,
+        }
     }
 }
 
@@ -43,11 +52,29 @@ impl Default for UiState<Unloaded> {
 
 impl UiState<Loading> {
     pub fn ready(self) -> UiState<Ready> {
-        UiState { _phase: PhantomData, ..self }
+        UiState {
+            frame: self.frame,
+            last_game_tick: self.last_game_tick,
+            player_health: self.player_health,
+            player_health_max: self.player_health_max,
+            player_score: self.player_score,
+            entity_count: self.entity_count,
+            messages_received: self.messages_received,
+            _phase: PhantomData,
+        }
     }
 
     pub fn fail(self, _reason: &str) -> UiState<Error> {
-        UiState { _phase: PhantomData, ..self }
+        UiState {
+            frame: self.frame,
+            last_game_tick: self.last_game_tick,
+            player_health: self.player_health,
+            player_health_max: self.player_health_max,
+            player_score: self.player_score,
+            entity_count: self.entity_count,
+            messages_received: self.messages_received,
+            _phase: PhantomData,
+        }
     }
 }
 
@@ -86,6 +113,15 @@ impl UiState<Ready> {
 
 impl UiState<Error> {
     pub fn retry(self) -> UiState<Unloaded> {
-        UiState { _phase: PhantomData, ..self }
+        UiState {
+            frame: self.frame,
+            last_game_tick: self.last_game_tick,
+            player_health: self.player_health,
+            player_health_max: self.player_health_max,
+            player_score: self.player_score,
+            entity_count: self.entity_count,
+            messages_received: self.messages_received,
+            _phase: PhantomData,
+        }
     }
 }
