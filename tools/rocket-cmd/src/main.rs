@@ -1,3 +1,13 @@
+// wasmer 4.4.0 references __rust_probestack from wasmer-vm; Rust 1.85+ no
+// longer emits it automatically. On Linux x86_64 the OS handles guard pages,
+// so a no-op stub is safe for debug/development builds.
+#[cfg(target_arch = "x86_64")]
+core::arch::global_asm!(
+    ".globl __rust_probestack",
+    "__rust_probestack:",
+    "ret",
+);
+
 use rocket_sdk::crypto;
 use rocket_sdk::manifest;
 use rocket_sdk::setup;

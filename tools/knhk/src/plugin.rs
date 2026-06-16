@@ -3,7 +3,7 @@ use wasmer::{Instance, Module, Store, imports, Value};
 use crate::{Law, LawError};
 use anyhow::{Result, Context};
 use std::sync::Mutex;
-use wasm4pm_compat::receipt::Receipt;
+use crate::receipt::Receipt;
 
 pub struct PluginHost {
     receipts: Vec<Receipt>,
