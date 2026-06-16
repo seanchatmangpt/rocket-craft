@@ -1,1 +1,1 @@
-// nexus-integration stub
+pub mod game_loop;
