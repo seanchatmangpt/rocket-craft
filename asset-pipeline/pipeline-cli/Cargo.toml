@@ -1,0 +1,16 @@
+[package]
+name = "pipeline-cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "pipeline-cli"
+path = "src/main.rs"
+
+[dependencies]
+pipeline-core = { path = "../pipeline-core" }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
