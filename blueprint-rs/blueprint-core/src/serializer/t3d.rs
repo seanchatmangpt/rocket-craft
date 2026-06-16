@@ -62,7 +62,7 @@ fn serialize_node(node: &BpNode) -> String {
     out
 }
 
-fn serialize_pin(pin: &Pin, index: usize) -> String {
+fn serialize_pin(pin: &Pin, _index: usize) -> String {
     let mut parts = Vec::new();
 
     parts.push(format!("PinId={}", pin.id));
