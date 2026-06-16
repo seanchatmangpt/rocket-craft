@@ -1,0 +1,13 @@
+GemID,GemType,BonusValue,DisplayName,Description
+SmallFireGem,Fire,10,Small Fire Gem,A tiny shard of volcanic glass that channels raw fire energy into the blade.
+LargeFireGem,Fire,25,Large Fire Gem,A polished ember crystal that causes wounds to smoulder on impact.
+PerfectFireGem,Fire,50,Perfect Fire Gem,A flawless sun-stone that engulfs each strike in a column of flame.
+SmallIceGem,Ice,10,Small Ice Gem,A sliver of eternal frost that chills incoming blows and slows attackers.
+LargeIceGem,Ice,25,Large Ice Gem,A frozen teardrop gem that encases deflected strikes in a thin sheet of ice.
+PerfectIceGem,Ice,50,Perfect Ice Gem,A faultless glacier shard that freezes everything it touches for an instant.
+SmallLightningGem,Lightning,10,Small Lightning Gem,A crackling amber stone that discharges a static spark with each hit.
+LargeLightningGem,Lightning,25,Large Lightning Gem,A storm-forged crystal that causes arcing lightning to leap between foes.
+PerfectLightningGem,Lightning,50,Perfect Lightning Gem,A singularity of pure storm energy that calls thunder with every blow.
+SmallDarkGem,Dark,10,Small Dark Gem,A void-touched obsidian shard that drains vitality from enemies struck.
+LargeDarkGem,Dark,25,Large Dark Gem,A shadow-core crystal that shrouds attacks in fell energy, bypassing light armour.
+PerfectLightGem,Light,50,Perfect Light Gem,A radiant celestial gem so pure it scorches dark-touched enemies for extra damage.

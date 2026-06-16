@@ -1,0 +1,23 @@
+ItemID,DisplayName,WeaponClass,AttackBonus,MagicBonus,CritChance,GemSlots,Rarity,MasteryXP,PurchaseCost,SpecialMove
+SteelSword,Steel Sword,OneHanded,12,0,0.05,0,Common,500,200,
+BronzeAxe,Bronze Axe,TwoHanded,15,0,0.05,0,Common,500,250,
+TalonBlade,Talon Blade,OneHanded,18,2,0.08,1,Uncommon,1000,600,
+IronCleaver,Iron Cleaver,TwoHanded,22,0,0.08,1,Uncommon,1000,700,
+TwinFangs,Twin Fangs,Dual,16,0,0.10,1,Uncommon,1000,750,
+DawnBlade,Dawn Blade,OneHanded,28,8,0.10,1,Rare,2000,1800,
+FrostEdge,Frost Edge,OneHanded,25,12,0.10,1,Rare,2000,2000,
+ChromeDuals,Chrome Duals,Dual,24,4,0.10,1,Rare,2000,2200,
+SwordOfStorms,Sword of Storms,OneHanded,35,18,0.15,2,Epic,5000,6000,
+VoidBlade,Void Blade,TwoHanded,45,10,0.15,2,Epic,5000,7500,
+ThunderKleve,Thunder Kleve,TwoHanded,40,22,0.15,2,Epic,5000,8000,
+GeminiSword,Gemini Sword,Dual,32,14,0.15,2,Epic,5000,7000,
+CorruptedBlades,Corrupted Blades,Dual,38,20,0.15,2,Epic,5000,8500,
+LegacySword,Legacy Sword,OneHanded,52,8,0.20,2,Legendary,10000,18000,VoidStrike
+DarkEdge,Dark Edge,OneHanded,48,28,0.20,2,Legendary,10000,20000,ShadowRend
+QuantumBlade,Quantum Blade,TwoHanded,60,20,0.20,2,Legendary,10000,25000,QuantumBlade
+PhoenixSword,Phoenix Sword,OneHanded,55,30,0.20,2,Legendary,10000,22000,PhoenixFlare
+TitanKleve,Titan Kleve,TwoHanded,65,15,0.20,2,Legendary,10000,28000,TitanCrush
+InfinityBlade_I,Infinity Blade I,OneHanded,40,15,0.15,1,Rare,2000,5000,
+InfinityBlade_III,Infinity Blade III,OneHanded,60,25,0.20,2,Legendary,10000,30000,InfinitySlash
+InfinityBlade_IV,Infinity Blade IV,OneHanded,80,40,0.25,3,Infinity,25000,0,InfinitySlash
+AbyssalEdge,Abyssal Edge,Dual,75,50,0.25,3,Infinity,25000,0,AbyssalTide

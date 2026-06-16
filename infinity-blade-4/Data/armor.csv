@@ -1,0 +1,16 @@
+ItemID,DisplayName,ArmorRating,MagicResistance,SetBonusTag,GemSlots,Rarity,MasteryXP,PurchaseCost
+IronHelm,Iron Helm,8,0.00,IronSet,0,Common,500,150
+IronArmor,Iron Armor,10,0.00,IronSet,0,Common,500,200
+LeatherCap,Leather Cap,5,0.02,,0,Common,500,120
+AshHelm,Ash Helm,14,0.05,AshSet,1,Uncommon,1000,500
+AshArmor,Ash Armor,18,0.05,AshSet,1,Uncommon,1000,650
+SteelCrown,Steel Crown,20,0.08,,1,Uncommon,1000,700
+GoldenHelm,Golden Helm,28,0.12,GoldenSet,1,Rare,2000,2000
+GoldenArmor,Golden Armor,35,0.12,GoldenSet,1,Rare,2000,2500
+ShadowCowl,Shadow Cowl,24,0.15,,1,Rare,2000,2200
+QuantumHelm,Quantum Helm,42,0.20,QuantumSet,2,Epic,5000,7000
+QuantumArmor,Quantum Armor,50,0.20,QuantumSet,2,Epic,5000,9000
+VoidHelm,Void Helm,48,0.22,,2,Epic,5000,8000
+AbyssalCrown,Abyssal Crown,60,0.25,AbyssalSet,2,Legendary,10000,20000
+AbyssalPlate,Abyssal Plate,70,0.25,AbyssalSet,2,Legendary,10000,25000
+InfinityHelm,Infinity Helm,85,0.30,InfinitySet,3,Infinity,25000,0

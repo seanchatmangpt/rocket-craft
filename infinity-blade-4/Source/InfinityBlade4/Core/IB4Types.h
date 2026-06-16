@@ -19,13 +19,16 @@ enum class EAttackDirection : uint8
 
 /**
  * Elemental magic types available via bloodline progression.
+ * Dark and Light are advanced types unlocked through high bloodline cycles.
  */
 UENUM(BlueprintType)
 enum class EMagicType : uint8
 {
     Fire        UMETA(DisplayName = "Fire"),
     Lightning   UMETA(DisplayName = "Lightning"),
-    Ice         UMETA(DisplayName = "Ice")
+    Ice         UMETA(DisplayName = "Ice"),
+    Dark        UMETA(DisplayName = "Dark"),
+    Light       UMETA(DisplayName = "Light")
 };
 
 /**
