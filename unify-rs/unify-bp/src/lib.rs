@@ -3,6 +3,8 @@ pub mod receipt;
 pub mod codegen;
 pub mod ocel;
 pub mod classify;
+pub mod pwa_export;
+pub use pwa_export::{BlueprintPwaMetadata, BlueprintPwaExporter, PwaBundle};
 
 #[cfg(test)]
 mod tests {
