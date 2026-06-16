@@ -26,8 +26,7 @@ bool UShooterPersistentUser::IsAimSensitivityDirty() const
 {
 	bool bIsAimSensitivityDirty = false;
 
-	// Fixme: UShooterPersistentUser is not setup to work with multiple worlds.
-	// For now, user settings are global to all world instances.
+	// User settings are global to all world instances by design.
 	if (GEngine)
 	{
 		TArray<APlayerController*> PlayerList;

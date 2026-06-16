@@ -1,0 +1,38 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "files.associations": {
+    "*.uproject": "json",
+    "*.uasset": "ignore",
+    "*.umap": "ignore"
+  },
+  "search.exclude": {
+    "**/Intermediate": true,
+    "**/Saved": true,
+    "**/Binaries": true,
+    "**/Build": true,
+    "**/.git": true,
+    "**/node_modules": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/Intermediate": true,
+    "**/Saved": true
+  },
+  "C_Cpp.clang_format_fallbackStyle": "Visual Studio",
+  "C_Cpp.intelliSenseEngine": "Default",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}

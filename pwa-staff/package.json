@@ -1,0 +1,41 @@
+{
+  "name": "pwa-staff",
+  "version": "1.0.0",
+  "description": "Service worker and PWA registration for Rocket Craft",
+  "main": "worker.js",
+  "scripts": {
+    "start": "local-web-server --port 3000",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "build:css": "postcss css/style.css -o dist/style.css",
+    "build": "npm run build:css && npm run build:ts",
+    "build:ts": "esbuild src/*.ts --bundle --outdir=dist && esbuild worker.ts --outfile=worker.js && esbuild cache.ts --outfile=cache.js"
+  },
+  "keywords": [
+    "pwa",
+    "service-worker",
+    "unreal-engine"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0",
+    "@types/node": "^25.9.3",
+    "autoprefixer": "^10.5.0",
+    "esbuild": "^0.20.2",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "local-web-server": "^5.3.0",
+    "postcss": "^8.5.15",
+    "postcss-cli": "^11.0.1",
+    "prettier": "^3.2.5",
+    "typescript": "^6.0.3",
+    "vitest": "^2.1.9"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "axios": "^1.18.0"
+  }
+}

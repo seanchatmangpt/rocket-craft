@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="dist/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Player Management</h1>
+      <div id="player-list"></div>
+    </div>
+
+    <div class="container">
+      <h1>Game State Viewer</h1>
+      <div id="game-state-viewer"></div>
+    </div>
+
+    <!-- View Player Modal -->
+    <div id="view-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2 id="view-player-name"></h2>
+        <p><strong>Email:</strong> <span id="view-player-email"></span></p>
+      </div>
+    </div>
+
+    <!-- Edit Player Modal -->
+    <div id="edit-modal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Edit Player</h2>
+        <form id="edit-form">
+          <input type="hidden" id="edit-player-id" />
+          <label for="edit-player-name">Name:</label>
+          <input type="text" id="edit-player-name" required />
+          <label for="edit-player-email">Email:</label>
+          <input type="email" id="edit-player-email" required />
+          <button type="submit">Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="dist/admin.js"></script>
+    <script src="/dist/hud.js"></script>
+    <script src="/cache.js"></script>
+  </body>
+</html>

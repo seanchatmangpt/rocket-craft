@@ -191,7 +191,7 @@ FSlateColor SShooterMenuItem::GetButtonBgColor() const
 	ULocalPlayer* const Player = PlayerOwner.Get();
 	if (Player)
 	{
-		// @fixme, need a world get delta time?
+		// Use real time seconds to calculate pulse animation state.
 		UWorld* const World = Player->GetWorld();
 		if (World)
 		{

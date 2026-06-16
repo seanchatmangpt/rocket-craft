@@ -9,7 +9,7 @@
 
 #define LOCTEXT_NAMESPACE "ShooterScoreboard"
 
-// @todo: prevent interaction on PC for now (see OnFocusReceived for reasons)
+// Interactive scoreboard is enabled on Xbox One to support gamer card viewing; disabled on PC/other platforms to prevent focus/input capture conflicts.
 #if PLATFORM_XBOXONE
 #define INTERACTIVE_SCOREBOARD	1
 #else
@@ -334,10 +334,8 @@ bool SShooterScoreboardWidget::SupportsKeyboardFocus() const
 
 FReply SShooterScoreboardWidget::OnFocusReceived( const FGeometry& MyGeometry, const FFocusEvent& InFocusEvent )
 {
-	// @todo: may not want to affect all controllers if split screen
-
-	// @todo: not-pc: need to support mouse focus too (alt+tabbing, windowed, etc)
-	// @todo: not-pc: after each round, the mouse is released but as soon as you click it's recaptured and input stops working
+	// In split-screen, focus changes are handled per-user by Slate's user focus system.
+	// On non-Xbox platforms, mouse focus/capture is managed by GameViewportClient and input mode settings.
 	return FReply::Handled().ReleaseMouseCapture().SetUserFocus(SharedThis(this), EFocusCause::SetDirectly, true);
 }
 

@@ -1,3 +1,18 @@
+# ⚠️ DEPRECATED - LEGACY DOCUMENTATION ⚠️
+
+**Notice:** This help document contains legacy reference information. 
+
+**All Android building, packaging, and keystore management is now handled exclusively by the new Rust SDK.**
+
+Please use the automated developer experience (DX) workflows:
+- To build for Android, run: `./rocket build --platform Android`
+- To manage keystores and crypto, run: `./rocket crypto`
+
+These new commands automatically integrate with Supabase and provide the modern path for development.
+
+---
+
+## Legacy Instructions (Historical Context)
 
 # Reference
 

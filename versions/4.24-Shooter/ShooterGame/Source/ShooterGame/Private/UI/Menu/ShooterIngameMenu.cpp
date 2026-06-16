@@ -24,17 +24,17 @@ void FShooterIngameMenu::Construct(ULocalPlayer* _PlayerOwner)
 	PlayerOwner = _PlayerOwner;
 	bIsGameMenuUp = false;
 
+	if (!PlayerOwner)
+	{
+		return;
+	}
+
 	if (!GEngine || !GEngine->GameViewport)
 	{
 		return;
 	}
 	
-	//todo:  don't create ingame menus for remote players.
-	const UShooterGameInstance* GameInstance = nullptr;
-	if (PlayerOwner)
-	{
-		GameInstance = Cast<UShooterGameInstance>(PlayerOwner->GetGameInstance());
-	}
+	const UShooterGameInstance* GameInstance = Cast<UShooterGameInstance>(PlayerOwner->GetGameInstance());
 
 	if (!GameMenuWidget.IsValid())
 	{

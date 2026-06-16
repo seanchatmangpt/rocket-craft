@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "ms-vscode.cpptools",
+    "ms-dotnettools.csharp",
+    "adam-steblowksi.ue4-snippets",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ritwickdey.LiveServer",
+    "octref.vetur",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense"
+  ]
+}

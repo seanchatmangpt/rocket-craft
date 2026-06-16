@@ -1,6 +1,8 @@
 Epic Survival Game Series
 -------------------------
 
+> **Note:** This project is built and managed using the `./rocket` CLI tool.
+
 **Last updated for 4.24!**
 
 Third-person survival game for Unreal Engine 4 made entirely in C++. Originally built as a 6 section tutorial series, now available as open-source C++ sample project.

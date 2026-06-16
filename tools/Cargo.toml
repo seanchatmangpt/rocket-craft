@@ -1,0 +1,3 @@
+[workspace]
+members = ["knhk", "rocket-cmd", "rocket-sdk", "unrdf", "un-test-utils"]
+resolver = "3"
