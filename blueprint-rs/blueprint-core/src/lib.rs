@@ -14,8 +14,10 @@ pub mod ast;
 pub mod nodes;
 pub mod builder;
 pub mod serializer;
+pub mod layout;
 
 pub use types::*;
 pub use ast::*;
 pub use builder::{BlueprintBuilder, NodeHandle, VarType, EventBodyBuilder, Statement};
 pub use serializer::{T3dSerializer, JsonSerializer};
+pub use layout::auto_layout_blueprint;
