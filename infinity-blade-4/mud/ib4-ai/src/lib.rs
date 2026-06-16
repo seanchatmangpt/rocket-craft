@@ -1,1 +1,3 @@
-// placeholder — implemented by agent 4
+pub mod roster;
+pub mod titan;
+pub mod godking;
