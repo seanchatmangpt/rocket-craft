@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use tracing::{info, debug};
 use crate::{ConvertedAsset, StagedAsset, PipelineError};
 
