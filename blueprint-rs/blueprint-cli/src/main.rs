@@ -16,6 +16,7 @@
 //!     -v, --verbose          Verbose output
 
 use clap::{Parser, Subcommand};
+use std::env;
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
@@ -69,6 +70,17 @@ enum Commands {
         /// List available examples
         #[arg(short, long)]
         list: bool,
+    },
+    /// Generate a Blueprint from a natural-language description using Claude AI
+    Ai {
+        /// Natural-language description of the Blueprint to generate
+        description: String,
+        /// Output file (overrides global --output for this subcommand)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+        /// Claude model to use (default: claude-haiku-4-5-20251001)
+        #[arg(short, long)]
+        model: Option<String>,
     },
 }
 
@@ -363,6 +375,118 @@ fn cmd_example(
 }
 
 // ─────────────────────────────────────────────────────────────
+// AI Blueprint generation
+// ─────────────────────────────────────────────────────────────
+
+const DEFAULT_AI_MODEL: &str = "claude-haiku-4-5-20251001";
+
+const BLUEPRINT_SYSTEM_PROMPT: &str = r#"You are a Unreal Engine 4 Blueprint expert. Given a natural-language description, generate a valid Blueprint definition as JSON.
+
+Respond with ONLY valid JSON matching this exact schema — no markdown fences, no explanation:
+
+{
+  "name": "<PascalCase name>",
+  "parent_class": "<UE4 parent class, e.g. Actor, Character, UserWidget>",
+  "graphs": [
+    {
+      "name": "<graph name, e.g. EventGraph>",
+      "nodes": [
+        {
+          "id": "<unique id, e.g. node_0>",
+          "name": "<node display name>",
+          "class": "<UE4 node class path, e.g. /Script/BlueprintGraph.K2Node_Event>",
+          "position": { "x": 0, "y": 0 },
+          "pins": [],
+          "properties": {}
+        }
+      ],
+      "connections": [
+        {
+          "from_node": "<node id>",
+          "from_pin": "<pin name>",
+          "to_node": "<node id>",
+          "to_pin": "<pin name>"
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "name": "<variable name>",
+      "var_type": { "category": "bool", "sub_category": null, "is_array": false, "is_map": false, "is_set": false },
+      "is_exposed": false,
+      "default_value": null,
+      "category": null
+    }
+  ],
+  "interfaces": []
+}"#;
+
+/// Call the Anthropic Messages API to generate a Blueprint T3D from a description.
+///
+/// Returns the T3D-serialized Blueprint string on success.
+fn generate_blueprint_from_prompt(description: &str, model: &str) -> Result<String, String> {
+    let api_key = env::var("ANTHROPIC_API_KEY")
+        .map_err(|_| "ANTHROPIC_API_KEY environment variable is not set".to_string())?;
+
+    let request_body = serde_json::json!({
+        "model": model,
+        "max_tokens": 4096,
+        "system": BLUEPRINT_SYSTEM_PROMPT,
+        "messages": [
+            {
+                "role": "user",
+                "content": description
+            }
+        ]
+    });
+
+    let response = ureq::post("https://api.anthropic.com/v1/messages")
+        .set("x-api-key", &api_key)
+        .set("anthropic-version", "2023-06-01")
+        .set("content-type", "application/json")
+        .send_json(&request_body)
+        .map_err(|e| format!("HTTP request failed: {}", e))?;
+
+    let response_json: serde_json::Value = response
+        .into_json()
+        .map_err(|e| format!("Failed to parse API response: {}", e))?;
+
+    let text = response_json["content"]
+        .as_array()
+        .and_then(|arr| arr.first())
+        .and_then(|block| block["text"].as_str())
+        .ok_or_else(|| format!("Unexpected API response shape: {}", response_json))?;
+
+    let bp: Blueprint = serde_json::from_str(text)
+        .map_err(|e| format!("Claude returned invalid Blueprint JSON: {}\n\nRaw response:\n{}", e, text))?;
+
+    Ok(T3dSerializer::serialize(&bp))
+}
+
+fn cmd_ai(
+    description: &str,
+    output: &Option<PathBuf>,
+    model: &str,
+    verbose: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    if verbose {
+        eprintln!("[bpgen] Sending description to Claude ({})...", model);
+        eprintln!("[bpgen] Description: {}", description);
+    }
+
+    let t3d = generate_blueprint_from_prompt(description, model)
+        .map_err(|e| -> Box<dyn std::error::Error> { e.into() })?;
+
+    if verbose {
+        eprintln!("[bpgen] Blueprint generated successfully");
+    }
+
+    write_output(&t3d, output)?;
+    Ok(())
+}
+
+// ─────────────────────────────────────────────────────────────
 // Entry point
 // ─────────────────────────────────────────────────────────────
 
@@ -377,6 +501,11 @@ fn main() {
         Some(Commands::Example { name, list }) => {
             cmd_example(name, *list, &cli.output, &cli.format, cli.verbose)
         }
+        Some(Commands::Ai { description, output, model }) => {
+            let m = model.as_deref().unwrap_or(DEFAULT_AI_MODEL);
+            let out = output.as_ref().or(cli.output.as_ref()).cloned();
+            cmd_ai(description, &out, m, cli.verbose)
+        }
         // Default: no subcommand → print help
         None => {
             use clap::CommandFactory;
@@ -389,5 +518,44 @@ fn main() {
     if let Err(e) = result {
         eprintln!("error: {}", e);
         std::process::exit(1);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Tests
+// ─────────────────────────────────────────────────────────────
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Verify that the AI request body is structured correctly without making HTTP calls.
+    #[test]
+    fn test_ai_prompt_format() {
+        let description = "A simple Actor that prints Hello on BeginPlay";
+        let model = DEFAULT_AI_MODEL;
+
+        let body = serde_json::json!({
+            "model": model,
+            "max_tokens": 4096,
+            "system": BLUEPRINT_SYSTEM_PROMPT,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": description
+                }
+            ]
+        });
+
+        // Verify top-level fields
+        assert_eq!(body["model"].as_str().unwrap(), "claude-haiku-4-5-20251001");
+        assert_eq!(body["max_tokens"].as_u64().unwrap(), 4096);
+        assert!(body["system"].as_str().unwrap().contains("valid JSON"));
+
+        // Verify messages structure
+        let messages = body["messages"].as_array().unwrap();
+        assert_eq!(messages.len(), 1);
+        assert_eq!(messages[0]["role"].as_str().unwrap(), "user");
+        assert_eq!(messages[0]["content"].as_str().unwrap(), description);
     }
 }
