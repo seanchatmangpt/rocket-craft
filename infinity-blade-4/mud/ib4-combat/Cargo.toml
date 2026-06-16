@@ -1,0 +1,10 @@
+[package]
+name = "ib4-combat"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ib4-core = { path = "../ib4-core" }
+serde = { workspace = true }
+thiserror = { workspace = true }
+rand = { workspace = true }
