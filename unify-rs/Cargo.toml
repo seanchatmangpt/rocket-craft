@@ -7,7 +7,6 @@ members = [
     "unify-rdf",
     "unify-lsp",
     "unify-test",
-    "unify-pm",
     "unify-ffi",
     "unify-config",
     "unify-mcp",
