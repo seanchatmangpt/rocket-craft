@@ -8,7 +8,8 @@
 
 UIB4AttackChain::UIB4AttackChain()
 {
-    // Default chain: Right → Left → Right → Up  (can be overridden per weapon in the editor)
+    // Default chain: Right → Left → Right → Overhead  (can be overridden per weapon in the editor)
+    // EAttackDirection uses the 3-value canonical enum: Overhead / Left / Right
 
     // Hit 1 — entry hit from the right
     {
@@ -18,7 +19,7 @@ UIB4AttackChain::UIB4AttackChain()
         Node.DamageMultiplier = 1.0f;
         Node.WindowDuration   = 0.6f;
         Node.ValidFollowUps   = { EAttackDirection::Left, EAttackDirection::Right,
-                                  EAttackDirection::Up,   EAttackDirection::Down };
+                                  EAttackDirection::Overhead };
         Chain.Add(Node);
     }
 
@@ -29,8 +30,7 @@ UIB4AttackChain::UIB4AttackChain()
         Node.MontageSection   = FName(TEXT("Attack_L_02"));
         Node.DamageMultiplier = 1.3f;
         Node.WindowDuration   = 0.55f;
-        Node.ValidFollowUps   = { EAttackDirection::Right, EAttackDirection::Up,
-                                  EAttackDirection::Down };
+        Node.ValidFollowUps   = { EAttackDirection::Right, EAttackDirection::Overhead };
         Chain.Add(Node);
     }
 
@@ -41,15 +41,15 @@ UIB4AttackChain::UIB4AttackChain()
         Node.MontageSection   = FName(TEXT("Attack_R_03"));
         Node.DamageMultiplier = 1.6f;
         Node.WindowDuration   = 0.5f;
-        Node.ValidFollowUps   = { EAttackDirection::Up, EAttackDirection::Down };
+        Node.ValidFollowUps   = { EAttackDirection::Overhead };
         Chain.Add(Node);
     }
 
     // Hit 4 — overhead finisher
     {
         FAttackChainNode Node;
-        Node.Direction        = EAttackDirection::Up;
-        Node.MontageSection   = FName(TEXT("Attack_U_04"));
+        Node.Direction        = EAttackDirection::Overhead;
+        Node.MontageSection   = FName(TEXT("Attack_O_04"));
         Node.DamageMultiplier = 2.0f;
         Node.WindowDuration   = 0.4f;
         Node.ValidFollowUps   = {}; // Chain terminates here

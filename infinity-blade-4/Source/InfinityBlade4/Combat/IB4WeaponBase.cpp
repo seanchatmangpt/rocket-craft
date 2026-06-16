@@ -2,7 +2,7 @@
 
 #include "Combat/IB4WeaponBase.h"
 #include "Combat/IB4CombatComponent.h"
-#include "Character/IB4Character.h"
+#include "Characters/IB4Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"

@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Combat/IB4CombatComponent.h" // EAttackDirection
+// EAttackDirection is defined in IB4Types.h — the canonical shared enum source
+#include "Core/IB4Types.h"
 #include "IB4AttackChain.generated.h"
 
 /**

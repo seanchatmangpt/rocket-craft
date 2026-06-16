@@ -278,3 +278,31 @@ void AIB4MagicProjectile::SpawnHitFX(const FVector& Location, const FVector& Nor
         UGameplayStatics::PlaySoundAtLocation(World, ExplosionSound, Location);
     }
 }
+
+//-----------------------------------------------------------------------------
+// SetMagicTypeFromShared — bridge between EMagicType (IB4Types.h) and
+// the local EMagicProjectileType.  Called by UIB4CombatComponent::CastMagic().
+//-----------------------------------------------------------------------------
+
+void AIB4MagicProjectile::SetMagicTypeFromShared(EMagicType SharedType)
+{
+    // Map the 3-value canonical enum to the projectile's internal enum.
+    // EMagicProjectileType has a 4th value (Dark) that has no IB4Types.h counterpart;
+    // it remains accessible via SetMagicType(EMagicProjectileType::Dark) from code
+    // that works directly with projectile classes.
+    switch (SharedType)
+    {
+        case EMagicType::Fire:
+            SetMagicType(EMagicProjectileType::Fire);
+            break;
+        case EMagicType::Lightning:
+            SetMagicType(EMagicProjectileType::Lightning);
+            break;
+        case EMagicType::Ice:
+            SetMagicType(EMagicProjectileType::Ice);
+            break;
+        default:
+            SetMagicType(EMagicProjectileType::Fire);
+            break;
+    }
+}

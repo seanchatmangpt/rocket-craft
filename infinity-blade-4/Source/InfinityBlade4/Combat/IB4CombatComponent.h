@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+// EAttackDirection, EMagicType, and supporting types are defined centrally in IB4Types.h
+#include "Core/IB4Types.h"
 #include "IB4CombatComponent.generated.h"
 
 class AIB4Character;
@@ -20,24 +22,6 @@ enum class ECombatState : uint8
     Dodging     UMETA(DisplayName = "Dodging"),
     Stunned     UMETA(DisplayName = "Stunned"),
     Dead        UMETA(DisplayName = "Dead")
-};
-
-UENUM(BlueprintType)
-enum class EAttackDirection : uint8
-{
-    Left        UMETA(DisplayName = "Left"),
-    Right       UMETA(DisplayName = "Right"),
-    Up          UMETA(DisplayName = "Up"),
-    Down        UMETA(DisplayName = "Down")
-};
-
-UENUM(BlueprintType)
-enum class EMagicType : uint8
-{
-    Fire        UMETA(DisplayName = "Fire"),
-    Ice         UMETA(DisplayName = "Ice"),
-    Lightning   UMETA(DisplayName = "Lightning"),
-    Dark        UMETA(DisplayName = "Dark")
 };
 
 /** Delegate broadcast when combat state changes */
@@ -229,7 +213,8 @@ protected:
     /**
      * 3 directions × 3 combo levels = 9 unique attack montage slots.
      * Array layout: [Direction][ComboLevel] → montage asset.
-     * Direction index: Left=0, Right=1, Up=2, Down=3 (4 directions × 3 = 12 slots)
+     * Direction index: Overhead=0, Left=1, Right=2 (EAttackDirection enum order)
+     * Total = 3 directions × 3 combo levels = 9 slots.
      */
     UPROPERTY(EditDefaultsOnly, Category = "Combat|Animation")
     TArray<UAnimMontage*> AttackMontages;

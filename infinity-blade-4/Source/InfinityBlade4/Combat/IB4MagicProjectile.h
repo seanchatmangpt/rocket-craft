@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+// EMagicType is the canonical type used across IB4 — EMagicProjectileType is local
+#include "Core/IB4Types.h"
 #include "IB4MagicProjectile.generated.h"
 
 class UProjectileMovementComponent;
@@ -169,6 +171,14 @@ public:
      */
     UFUNCTION(BlueprintCallable, Category = "Magic")
     void SetMagicType(EMagicProjectileType NewType);
+
+    /**
+     * Convenience overload that accepts the canonical EMagicType from IB4Types.h.
+     * Converts to EMagicProjectileType before delegating to SetMagicType.
+     * Called by UIB4CombatComponent::CastMagic().
+     */
+    UFUNCTION(BlueprintCallable, Category = "Magic")
+    void SetMagicTypeFromShared(EMagicType SharedType);
 
     /** Assign a homing target (usually the locked-on enemy) */
     UFUNCTION(BlueprintCallable, Category = "Magic|Homing")

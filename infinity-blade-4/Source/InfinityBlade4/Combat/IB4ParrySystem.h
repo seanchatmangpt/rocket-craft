@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "Combat/IB4CombatComponent.h" // EAttackDirection
+// EAttackDirection is the canonical shared type from IB4Types.h
+#include "Core/IB4Types.h"
 #include "IB4ParrySystem.generated.h"
 
 /**

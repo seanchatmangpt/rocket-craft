@@ -5,7 +5,7 @@
 #include "Combat/IB4AttackChain.h"
 #include "Combat/IB4ParrySystem.h"
 #include "Combat/IB4MagicProjectile.h"
-#include "Character/IB4Character.h"
+#include "Characters/IB4Character.h"
 #include "Animation/AnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -94,9 +94,10 @@ float UIB4CombatComponent::GetComboMultiplier() const
 
 UAnimMontage* UIB4CombatComponent::SelectAttackMontage(EAttackDirection Dir, int32 ComboLevel) const
 {
-    // Layout: 4 directions × 3 combo levels = 12 slots
+    // Layout: 3 directions × 3 combo levels = 9 slots
+    // EAttackDirection: Overhead=0, Left=1, Right=2
     // Index = DirectionIndex * 3 + clamp(ComboLevel, 0, 2)
-    const int32 DirectionIndex = static_cast<int32>(Dir); // Left=0, Right=1, Up=2, Down=3
+    const int32 DirectionIndex = static_cast<int32>(Dir); // Overhead=0, Left=1, Right=2
     const int32 ClampedLevel   = FMath::Clamp(ComboLevel, 0, 2);
     const int32 MontageIndex   = DirectionIndex * 3 + ClampedLevel;
 
@@ -348,7 +349,7 @@ void UIB4CombatComponent::CastMagic(EMagicType Type)
     if (AIB4MagicProjectile* Proj = GetWorld()->SpawnActor<AIB4MagicProjectile>(
             MagicProjectileClass, SpawnLocation, SpawnRotation, SpawnParams))
     {
-        Proj->SetMagicType(Type);
+        Proj->SetMagicTypeFromShared(Type);
     }
 }
 
