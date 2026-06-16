@@ -3,5 +3,6 @@ members = [
     "blueprint-core",
     "blueprint-cli",
     "blueprint-macros",
+    "blueprint-testing",
 ]
 resolver = "2"
