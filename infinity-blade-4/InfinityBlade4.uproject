@@ -1,0 +1,21 @@
+{
+    "FileVersion": 3,
+    "EngineAssociation": "4.24",
+    "Category": "AAA Mobile",
+    "Description": "Infinity Blade 4 — Open Source AAA Mobile Action Game built on UE4.24 SurvivalGame base",
+    "Modules": [
+        {
+            "Name": "InfinityBlade4",
+            "Type": "Runtime",
+            "LoadingPhase": "Default",
+            "AdditionalDependencies": ["Engine", "CoreUObject"]
+        }
+    ],
+    "Plugins": [
+        {"Name": "Paper2D", "Enabled": false},
+        {"Name": "AndroidMoviePlayer", "Enabled": true},
+        {"Name": "OnlineSubsystem", "Enabled": true},
+        {"Name": "OnlineSubsystemNull", "Enabled": true}
+    ],
+    "TargetPlatforms": ["IOS", "Android", "Win64"]
+}

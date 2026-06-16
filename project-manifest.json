@@ -37,6 +37,13 @@
         "ShooterGame",
         "ShooterServer"
       ]
+    },
+    {
+      "name": "InfinityBlade4",
+      "uproject_path": "infinity-blade-4/InfinityBlade4.uproject",
+      "targets": ["InfinityBlade4", "InfinityBlade4Editor"],
+      "platforms": ["IOS", "Android", "Win64"],
+      "description": "AAA mobile action game — open source UE4 Infinity Blade spiritual successor"
     }
   ]
 }

@@ -1,0 +1,15 @@
+[package]
+name = "unify-rocket"
+version = "0.1.0"
+edition = "2021"
+description = "Bridge crate connecting rocket-sdk patterns with the unify trait system"
+
+[dependencies]
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+thiserror   = { workspace = true }
+anyhow      = { workspace = true }
+blake3      = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"

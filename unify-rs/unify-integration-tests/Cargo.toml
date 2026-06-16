@@ -8,8 +8,6 @@ description = "Cross-crate integration tests for the unify-rs abstraction layer"
 unify-core      = { path = "../unify-core" }
 unify-receipts  = { path = "../unify-receipts" }
 unify-admission = { path = "../unify-admission" }
-unify-ocel      = { path = "../unify-ocel" }
-unify-pm        = { path = "../unify-pm" }
 unify-rdf       = { path = "../unify-rdf" }
 serde           = { version = "1", features = ["derive"] }
 serde_json      = "1"

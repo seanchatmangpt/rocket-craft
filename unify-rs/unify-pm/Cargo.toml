@@ -1,0 +1,10 @@
+[package]
+name = "unify-pm"
+version = "0.1.0"
+edition = "2021"
+description = "Process mining over event logs — DFG discovery, Petri nets, conformance checking"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

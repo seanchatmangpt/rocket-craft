@@ -1,0 +1,53 @@
+{
+  "name": "Infinity Blade IV",
+  "short_name": "IB4",
+  "description": "Infinity Blade IV — immersive mobile fantasy combat RPG",
+  "theme_color": "#1a0a00",
+  "background_color": "#000000",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["games"],
+  "icons": [
+    {
+      "src": "icons/ib4-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/ib4-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/ib4-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/combat.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Combat HUD"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "New Run",
+      "short_name": "Play",
+      "description": "Start a new Infinity Blade run",
+      "url": "/?action=newrun",
+      "icons": [{ "src": "icons/ib4-icon-96.png", "sizes": "96x96" }]
+    }
+  ]
+}

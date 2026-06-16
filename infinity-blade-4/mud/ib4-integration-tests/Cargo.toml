@@ -1,0 +1,10 @@
+[package]
+name = "ib4-integration-tests"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ib4-mud = { path = "../ib4-mud" }
+ib4-core = { path = "../ib4-core" }
+ib4-ai = { path = "../ib4-ai" }
+rand = { workspace = true }
