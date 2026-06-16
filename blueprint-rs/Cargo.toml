@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "blueprint-core",
+    "blueprint-cli",
+    "blueprint-macros",
+]
+resolver = "2"
