@@ -1,5 +1,5 @@
 [workspace]
-members = ["ib4-core", "ib4-combat", "ib4-progression", "ib4-ai", "ib4-mud"]
+members = ["ib4-core", "ib4-combat", "ib4-progression", "ib4-ai", "ib4-mud", "ib4-integration-tests"]
 resolver = "2"
 
 [workspace.dependencies]
