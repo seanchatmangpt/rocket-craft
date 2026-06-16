@@ -81,3 +81,27 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Android Keystores
+*.keystore
+
+# Supabase
+supabase/
+*.env
+.env
+.env.*
+!.env.example
+
+# Rust
+target/
+Cargo.lock
+
+# Node.js & PWA
+node_modules/
+dist/
+.vite/
+playwright-report/
+test-results/
+
+# Agent Framework
+.agents/

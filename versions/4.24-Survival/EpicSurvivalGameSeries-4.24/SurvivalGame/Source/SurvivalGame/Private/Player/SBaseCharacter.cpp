@@ -177,15 +177,18 @@ void ASBaseCharacter::OnDeath(float KillingDamage, FDamageEvent const& DamageEve
 	{
 		FPointDamageEvent PointDmg = *((FPointDamageEvent*)(&DamageEvent));
 		{
-			// TODO: Use DamageTypeClass->DamageImpulse
-			Mesh3P->AddImpulseAtLocation(PointDmg.ShotDirection * 12000, PointDmg.HitInfo.ImpactPoint, PointDmg.HitInfo.BoneName);
+			UDamageType const* const DamageType = PointDmg.DamageTypeClass ? PointDmg.DamageTypeClass->GetDefaultObject<UDamageType>() : nullptr;
+			float Impulse = DamageType ? DamageType->DamageImpulse : 12000.f;
+			Mesh3P->AddImpulseAtLocation(PointDmg.ShotDirection * Impulse, PointDmg.HitInfo.ImpactPoint, PointDmg.HitInfo.BoneName);
 		}
 	}
 	if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
 	{
 		FRadialDamageEvent RadialDmg = *((FRadialDamageEvent const*)(&DamageEvent));
 		{
-			Mesh3P->AddRadialImpulse(RadialDmg.Origin, RadialDmg.Params.GetMaxRadius(), 100000 /*RadialDmg.DamageTypeClass->DamageImpulse*/, ERadialImpulseFalloff::RIF_Linear);
+			UDamageType const* const DamageType = RadialDmg.DamageTypeClass ? RadialDmg.DamageTypeClass->GetDefaultObject<UDamageType>() : nullptr;
+			float Impulse = DamageType ? DamageType->DamageImpulse : 100000.f;
+			Mesh3P->AddRadialImpulse(RadialDmg.Origin, RadialDmg.Params.GetMaxRadius(), Impulse, ERadialImpulseFalloff::RIF_Linear);
 		}
 	}
 }

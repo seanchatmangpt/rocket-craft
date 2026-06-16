@@ -77,7 +77,7 @@ protected:
 
 	bool IsEquipped() const;
 
-	bool IsAttachedToPawn() const;
+	bool IsEquippedOrPending() const;
 
 public:
 

@@ -1,0 +1,96 @@
+[config]
+skip_core_tasks = true
+workspace = false
+
+[tasks.default]
+alias = "help"
+
+[tasks.help]
+description = "Show help"
+command = "cargo"
+args = ["make", "--list-all-steps"]
+
+[tasks.ci]
+description = "Main CI pipeline"
+dependencies = [
+    "fmt-check",
+    "clippy",
+    "test",
+    "audit"
+]
+
+[tasks.fmt-check]
+description = "Check code formatting"
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--all", "--", "--check"]
+
+[tasks.fmt]
+description = "Format code"
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--all"]
+
+[tasks.clippy]
+description = "Run Clippy lints"
+install_crate = "clippy"
+command = "cargo"
+args = ["clippy", "--all-targets", "--all-features", "--", "-D", "warnings"]
+
+[tasks.test]
+description = "Run all tests"
+command = "cargo"
+args = ["test", "--all", "--all-features"]
+
+[tasks.build]
+description = "Build all members in release mode"
+command = "cargo"
+args = ["build", "--release", "--workspace"]
+
+[tasks.audit]
+description = "Audit dependencies for vulnerabilities"
+install_crate = "cargo-audit"
+command = "cargo"
+args = ["audit"]
+ignore_errors = true
+
+[tasks.outdated]
+description = "Check for outdated dependencies"
+install_crate = "cargo-outdated"
+command = "cargo"
+args = ["outdated"]
+
+[tasks.clean]
+description = "Clean build artifacts"
+command = "cargo"
+args = ["clean"]
+
+[tasks.doc]
+description = "Generate documentation"
+command = "cargo"
+args = ["doc", "--no-deps", "--all-features", "--workspace"]
+
+[tasks.watch]
+description = "Watch and run tests"
+install_crate = "cargo-watch"
+command = "cargo"
+args = ["watch", "-x", "test"]
+
+[tasks.rocket-audit]
+description = "Run Rocket Audit command"
+command = "cargo"
+args = ["run", "-p", "rocket-cmd", "--", "audit"]
+
+[tasks.rocket-doctor]
+description = "Run Rocket Doctor command"
+command = "cargo"
+args = ["run", "-p", "rocket-cmd", "--", "doctor"]
+
+[tasks.rocket-setup]
+description = "Run Rocket Setup command"
+command = "cargo"
+args = ["run", "-p", "rocket-cmd", "--", "setup"]
+
+[tasks.dev]
+description = "Development cycle: fmt -> clippy -> test"
+dependencies = ["fmt", "clippy", "test"]

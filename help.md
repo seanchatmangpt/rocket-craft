@@ -1,44 +1,85 @@
+# Rocket Craft Help & Troubleshooting
 
-## PUBLISHING
+Welcome to the Rocket Craft troubleshooting and help guide. With our migration to a **Rust SDK (`rocket-sdk`)** and the unified `./rocket` CLI wrapper, many of the legacy build and deployment issues have been streamlined.
 
+## Unified Developer Experience (DX)
 
-Hang3d is based on Shooter UE4 template project. With great 4.24.x version.
-Hang3d is multiplatform project. For now win32 , win64 , linux, web, android. 
-Game avaible also like web application at the link: http://maximumroulette.com/apps/shooter/hang3d-nightmare.html
+If you are having trouble building or managing the projects, **always use the `./rocket` CLI** rather than trying to invoke legacy bash scripts directly. The Rust orchestrator automatically manages dependencies, environment paths, and engine build steps for you.
 
-Added features:
- - Background sound
- - Doors BP
- - Elevators BP
- - Apex destruction mesh [not success for now - only on HTML5]
- - Procedural mesh possible replace for not working on web apex destruction plugin.
- - Map edited
-
-Game play is classic area type of FPS.
-
-## Procedural mesh
-
-  - Add AllowCPU true from static mesh editor.
-   Success modify projectice BP for luancher weapon to make trigger procedural mesh slice operation.
-
-## Problems
-
-From source: https://forums.unrealengine.com/t/destructible-mesh-spawning-in-broken-in-packaged-build-wont-respond-to-damage-or-simulate/459848/2
-
-```
-SavvyIndoorsman Jan '20 
-
-Finally figured out what was going on. Some new ways of searching the web yielded the clues I needed.
-
-The problem turned out to be related to this question 3 and this question 1, where the original posters figured out that, in packaged builds, the Apex Destruction module is sometimes loaded after the destructible asset is loaded during engine startup. This, in a sense, causes the loaded asset to be improperly initialized, preventing it from being able to be shattered and simulate during gameplay.
-
-One of the previous posters found a solution by modifying the engine code (rebuilding from source) to force the Apex Destruction module to load before any Apex assets are loaded during engine startup. The other poster found a workaround by eliminating all “normal” references to the troublesome destructible asset throughout the project and instead loading the asset later during runtime by feeding the engine with a string to the asset’s path.
-
-Thankfully I found an easier way to work around the problem, by replacing all references to the destructible mesh asset in my project (there was actually only one anyway) with soft object references. This ensured that the destructible mesh asset wasn’t loaded in at the same time its “owning” asset (the goal actor, in my case) was during engine startup. This allows for the Apex Destruction module to load first while the game boots up, and the soft reference allows me to choose when the destructible mesh asset gets loaded (when it’s needed — when the goal asset runs its BeginPlay).
-
-So to sum up: use soft object references if you’re experiencing strange issues with Apex destructibles!
+```bash
+# Access the built-in help manual for the CLI
+./rocket help
 ```
 
+*Note: Do not run legacy scripts like `setup.sh` or `HTML5Setup.sh` manually. These are now orchestrated by the Rust SDK.*
 
-https://forums.unrealengine.com/t/destructible-mesh-spawning-in-broken-in-packaged-build-wont-respond-to-damage-or-simulate/459848/4
+## Supabase & Web Platform (PWA)
+
+If you are experiencing issues with authentication, leaderboards, or the TypeScript PWA:
+
+- **TypeScript PWA (`pwa-staff/`):** Ensure your Node.js environment is configured correctly. The PWA communicates directly with the Supabase backend.
+- **Supabase Connectivity:** Check your local environment variables and Supabase project settings if the game client fails to register sessions, authenticate users, or upload leaderboard scores.
+
+## Unreal Engine C++ Template Projects
+
+If you are building dedicated servers or modifying the C++ source projects (e.g., Shooter Game, Survival Game) and encounter build cache issues, the Rust SDK should handle clean rebuilds.
+
+### Cleaning C++ Projects
+
+If you need to manually perform a deep clean because of build system issues without triggering a full Engine rebuild:
+1. Navigate to the specific project folder.
+2. Delete the `Binaries`, `Build`, `DerivedDataCache`, and `Intermediate` folders.
+3. Use the `./rocket` CLI to regenerate project files and trigger a clean build.
+
+## Known Engine Quirks (UE 4.24 HTML5)
+
+### Apex Destruction on WebGL
+Apex destructible meshes can sometimes fail to initialize properly in packaged HTML5 builds. If you encounter assets that won't respond to damage or simulate physics in the browser:
+
+**Workaround:** Replace hard references to the destructible mesh with **Soft Object References**. This ensures the destructible mesh asset is loaded *after* the Apex Destruction module during engine startup, allowing it to properly initialize when needed at runtime.
+
+### Procedural Mesh Alternatives
+For web targets where Apex destruction completely fails, consider using the `ProceduralMeshComponent` to perform runtime slice operations as a lightweight alternative to full destructibles.
+
+## Android Keystores & Cryptographic Signing
+
+Rocket Craft projects require cryptographic keystores for building Android targets. To secure the repository, actual `.keystore` files are excluded from git via `.gitignore`, and only `.placeholder` files are committed.
+
+### Automated Management
+
+The Rust SDK provides commands to check and guide keystore status:
+```bash
+# Check the status of project keystores
+./rocket crypto status
+
+# Print instructions for generating missing keystores and creating placeholders
+./rocket crypto
+```
+
+### Keystore Generation Script
+
+You can run the provided `generate-keystores.sh` script to generate fresh, valid keystores and place them in the correct directories for each project:
+```bash
+./generate-keystores.sh
+```
+
+This script generates and configures the following keystores:
+
+1. **Barbarian Road Machines (BRM)**
+   - Keystore: `barbarian-road-mashines-key.keystore`
+   - Alias: `barbarian-road-mashines`
+   - Password: `barbar12` (Configured in `versions/4.24.0/Config/DefaultEngine.ini`)
+   - Target Path: `versions/4.24.0/Build/Android/barbarian-road-mashines-key.keystore`
+
+2. **Epic Survival Game Series (SurvivalGame)**
+   - Keystore: `zombie-key.keystore`
+   - Alias: `zombie`
+   - Password: `123456654321` (Configured in `versions/4.24-Survival/EpicSurvivalGameSeries-4.24/SurvivalGame/Config/DefaultEngine.ini`)
+   - Target Path: `versions/4.24-Survival/EpicSurvivalGameSeries-4.24/SurvivalGame/Build/Android/zombie-key.keystore`
+
+3. **Shooter Game**
+   - Keystore: `hang3d-nightmare-keystore.keystore`
+   - Alias: `NIGHTMARE` (listed as `nightmare` in keytool list output)
+   - Password: `NIKOLALUKIC` (Configured in `versions/4.24-Shooter/ShooterGame/Config/DefaultEngine.ini`)
+   - Target Path: `versions/4.24-Shooter/ShooterGame/Build/Android/hang3d-nightmare-keystore.keystore` (Also copies `zombie-key.keystore` to this directory)
 

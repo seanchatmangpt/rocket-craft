@@ -3,17 +3,21 @@
 #include "ShooterGame.h"
 #include "ShooterUIHelpers.h"
 #include "OnlineSubsystemUtils.h"
+#include "OnlineSubsystem.h"
 
 FText ShooterUIHelpers::GetProfileOpenText() const
 {
-	// @todo: replace button with icon
-	// @todo: replace 'GamerCard' with distribution specific terminology (Steam, Origin, UPlay, etc)
 #if PLATFORM_XBOXONE
 	return NSLOCTEXT("Network", "XB1OpenProfile", "Press A for GamerCard");
 #elif PLATFORM_PS4
 	return NSLOCTEXT("Network", "PS4OpenProfile", "Press cross button for GamerCard");
 #else
-	return NSLOCTEXT("Network", "PCOpenProfile", "Press Enter for GamerCard");
+	FName SubSystemName = IOnlineSubsystem::Get() ? IOnlineSubsystem::Get()->GetSubsystemName() : NAME_None;
+	if (SubSystemName == FName(TEXT("Steam")))
+	{
+		return NSLOCTEXT("Network", "SteamOpenProfile", "Press Enter for Steam Profile");
+	}
+	return NSLOCTEXT("Network", "PCOpenProfile", "Press Enter for Profile");
 #endif
 }
 
@@ -42,14 +46,13 @@ bool ShooterUIHelpers::ProfileOpenedUI(UWorld* World, const FUniqueNetId& Reques
 
 FText ShooterUIHelpers::GetProfileSwapText() const
 {
-	// @todo: replace button with icon
-//#if PLATFORM_XBOXONE
+#if PLATFORM_XBOXONE
 	return NSLOCTEXT("Network", "XB1SwapProfile", "Y Switch User");
-/*#elif PLATFORM_PS4
+#elif PLATFORM_PS4
 	return NSLOCTEXT("Network", "PS4SwapProfile", "Triangle button Switch User");
 #else
 	return NSLOCTEXT("Network", "PCSwapProfile", "Space Switch User");
-#endif*/
+#endif
 }
 
 bool ShooterUIHelpers::ProfileSwapUI(UWorld* World, const int ControllerIndex, bool bShowOnlineOnly, const FOnLoginUIClosedDelegate* Delegate) const

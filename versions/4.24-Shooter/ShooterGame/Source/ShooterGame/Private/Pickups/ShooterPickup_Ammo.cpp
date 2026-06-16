@@ -58,11 +58,14 @@ void AShooterPickup_Ammo::GivePickupTo(class AShooterCharacter* Pawn)
 
 							FOnlineEventParms Params;		
 
+							AShooterGameState* const MyGameState = GetWorld() ? GetWorld()->GetGameState<AShooterGameState>() : nullptr;
+							const int32 GameplayModeId = (MyGameState && MyGameState->NumTeams > 0) ? 1 : 0;
+
 							Params.Add( TEXT( "SectionId" ), FVariantData( (int32)0 ) ); // unused
-							Params.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
+							Params.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
 							Params.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 
-							Params.Add( TEXT( "ItemId" ), FVariantData( (int32)Weapon->GetAmmoType() + 1 ) ); // @todo come up with a better way to determine item id, currently health is 0 and ammo counts from 1
+							Params.Add( TEXT( "ItemId" ), FVariantData( (int32)Weapon->GetAmmoType() + 1 ) ); // health is 0, ammo counts from 1
 							Params.Add( TEXT( "AcquisitionMethodId" ), FVariantData( (int32)0 ) ); // unused
 							Params.Add( TEXT( "LocationX" ), FVariantData( Location.X ) );
 							Params.Add( TEXT( "LocationY" ), FVariantData( Location.Y ) );

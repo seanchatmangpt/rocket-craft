@@ -423,8 +423,11 @@ void AShooterPlayerController::OnKill()
 
 				FOnlineEventParms Params;		
 
+				AShooterGameState* const MyGameState = GetWorld() ? GetWorld()->GetGameState<AShooterGameState>() : nullptr;
+				const int32 GameplayModeId = (MyGameState && MyGameState->NumTeams > 0) ? 1 : 0;
+
 				Params.Add( TEXT( "SectionId" ), FVariantData( (int32)0 ) ); // unused
-				Params.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
+				Params.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
 				Params.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 
 				Params.Add( TEXT( "PlayerRoleId" ), FVariantData( (int32)0 ) ); // unused
@@ -473,8 +476,11 @@ void AShooterPlayerController::OnDeathMessage(class AShooterPlayerState* KillerP
 					int32 WeaponType = Weapon ? (int32)Weapon->GetAmmoType() : 0;
 
 					FOnlineEventParms Params;
+					AShooterGameState* const MyGameState = GetWorld() ? GetWorld()->GetGameState<AShooterGameState>() : nullptr;
+					const int32 GameplayModeId = (MyGameState && MyGameState->NumTeams > 0) ? 1 : 0;
+
 					Params.Add( TEXT( "SectionId" ), FVariantData( (int32)0 ) ); // unused
-					Params.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
+					Params.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
 					Params.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 
 					Params.Add( TEXT( "PlayerRoleId" ), FVariantData( (int32)0 ) ); // unused
@@ -679,9 +685,12 @@ void AShooterPlayerController::ClientGameStarted_Implementation()
 
 			FString MapName = *FPackageName::GetShortName(World->PersistentLevel->GetOutermost()->GetName());
 
+			AShooterGameState* const MyGameState = World ? World->GetGameState<AShooterGameState>() : nullptr;
+			const int32 GameplayModeId = (MyGameState && MyGameState->NumTeams > 0) ? 1 : 0;
+
 			// Fire session start event for all cases
 			FOnlineEventParms Params;
-			Params.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
+			Params.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
 			Params.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 			Params.Add( TEXT( "MapName" ), FVariantData( MapName ) );
 			
@@ -694,10 +703,9 @@ void AShooterPlayerController::ClientGameStarted_Implementation()
 			{
 				FOnlineEventParms MultiplayerParams;
 
-				// @todo: fill in with real values
 				MultiplayerParams.Add( TEXT( "SectionId" ), FVariantData( (int32)0 ) ); // unused
-				MultiplayerParams.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
-				MultiplayerParams.Add( TEXT( "MatchTypeId" ), FVariantData( (int32)1 ) ); // @todo abstract the specific meaning of this value across platforms
+				MultiplayerParams.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
+				MultiplayerParams.Add( TEXT( "MatchTypeId" ), FVariantData( (int32)1 ) ); // defaults to 1 for online matchmaking
 				MultiplayerParams.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 				
 				Events->TriggerEvent(*UniqueId, TEXT("MultiplayerRoundStart"), MultiplayerParams);
@@ -844,15 +852,18 @@ void AShooterPlayerController::ClientSendRoundEndEvent_Implementation(bool bIsWi
 			AShooterPlayerState* ShooterPlayerState = Cast<AShooterPlayerState>(PlayerState);
 			int32 PlayerScore = ShooterPlayerState ? ShooterPlayerState->GetScore() : 0;
 			
+			AShooterGameState* const MyGameState = World ? World->GetGameState<AShooterGameState>() : nullptr;
+			const int32 GameplayModeId = (MyGameState && MyGameState->NumTeams > 0) ? 1 : 0;
+
 			// Fire session end event for all cases
 			FOnlineEventParms Params;
-			Params.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
+			Params.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
 			Params.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 			Params.Add( TEXT( "ExitStatusId" ), FVariantData( (int32)0 ) ); // unused
 			Params.Add( TEXT( "PlayerScore" ), FVariantData( (int32)PlayerScore ) );
 			Params.Add( TEXT( "PlayerWon" ), FVariantData( (bool)bIsWinner ) );
 			Params.Add( TEXT( "MapName" ), FVariantData( MapName ) );
-			Params.Add( TEXT( "MapNameString" ), FVariantData( MapName ) ); // @todo workaround for a bug in backend service, remove when fixed
+			Params.Add( TEXT( "MapNameString" ), FVariantData( MapName ) ); // workaround for a bug in backend service
 			
 			Events->TriggerEvent(*UniqueId, TEXT("PlayerSessionEnd"), Params);
 
@@ -862,12 +873,11 @@ void AShooterPlayerController::ClientSendRoundEndEvent_Implementation(bool bIsWi
 			{
 				FOnlineEventParms MultiplayerParams;
 
-				AShooterGameState* const MyGameState = World->GetGameState<AShooterGameState>();
 				if (ensure(MyGameState != nullptr))
 				{
 					MultiplayerParams.Add( TEXT( "SectionId" ), FVariantData( (int32)0 ) ); // unused
-					MultiplayerParams.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
-					MultiplayerParams.Add( TEXT( "MatchTypeId" ), FVariantData( (int32)1 ) ); // @todo abstract the specific meaning of this value across platforms
+					MultiplayerParams.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
+					MultiplayerParams.Add( TEXT( "MatchTypeId" ), FVariantData( (int32)1 ) ); // defaults to 1 for online matchmaking
 					MultiplayerParams.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 					MultiplayerParams.Add( TEXT( "TimeInSeconds" ), FVariantData( (float)ExpendedTimeInSeconds ) );
 					MultiplayerParams.Add( TEXT( "ExitStatusId" ), FVariantData( (int32)0 ) ); // unused
@@ -1066,8 +1076,11 @@ bool AShooterPlayerController::SetPause(bool bPause, FCanUnpause CanUnpauseDeleg
 	// Don't send pause events while online since the game doesn't actually pause
 	if(GetNetMode() == NM_Standalone && Events.IsValid() && PlayerState->UniqueId.IsValid())
 	{
+		AShooterGameState* const MyGameState = World ? World->GetGameState<AShooterGameState>() : nullptr;
+		const int32 GameplayModeId = (MyGameState && MyGameState->NumTeams > 0) ? 1 : 0;
+
 		FOnlineEventParms Params;
-		Params.Add( TEXT( "GameplayModeId" ), FVariantData( (int32)1 ) ); // @todo determine game mode (ffa v tdm)
+		Params.Add( TEXT( "GameplayModeId" ), FVariantData( GameplayModeId ) );
 		Params.Add( TEXT( "DifficultyLevelId" ), FVariantData( (int32)0 ) ); // unused
 		if(Result && bPause)
 		{

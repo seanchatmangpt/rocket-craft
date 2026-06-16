@@ -1,3 +1,19 @@
+# ⚠️ DEPRECATED - LEGACY DOCUMENTATION ⚠️
+
+**Notice:** This document contains deprecated Android build logs and legacy workflows. 
+
+**All Android building, packaging, and keystore management is now handled exclusively by the new Rust SDK.** 
+
+Please use the automated developer experience (DX) workflows:
+- To build for Android, run: `./rocket build --platform Android`
+- To manage keystores and crypto, run: `./rocket crypto`
+
+These new commands automatically integrate with Supabase and handle the entire modern pipeline, completely replacing the manual Unreal Engine packaging steps documented below.
+
+---
+
+## Legacy Instructions (Historical Context)
+
 UATHelper: Packaging (Android (ETC1)): Parsing command line: -ScriptsForProject=C:/Zlatnaspirala/active-projects/rocket-craft/rocket-craft/versions/4.24-Shooter/ShooterGame/ShooterGame.uproject BuildCookRun -nocompileeditor -nop4 -project=C:/Zlatnaspirala/active-projects/rocket-craft/rocket-craft/versions/4.24-Shooter/ShooterGame/ShooterGame.uproject -cook -
 stage -archive -archivedirectory=G:/TEST_BUILDS/SHOOTER/android -package -ue4exe=D:\ue-engines\4.24-html\myengine\Engine\Binaries\Win64\UE4Editor-Cmd.exe -clean -pak -prereqs -nodebuginfo -targetplatform=Android -cookflavor=ETC1 -build -target=ShooterGame -clientconfig=Development -utf8output -compile
 UATHelper: Packaging (Android (ETC1)): Dependencies are up to date. Skipping compile.

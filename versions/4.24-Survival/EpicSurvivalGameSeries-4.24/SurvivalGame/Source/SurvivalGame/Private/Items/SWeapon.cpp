@@ -195,7 +195,7 @@ void ASWeapon::OnLeaveInventory()
 		SetOwningPawn(nullptr);
 	}
 
-	if (IsAttachedToPawn())
+	if (IsEquippedOrPending())
 	{
 		OnUnEquip();
 	}
@@ -210,7 +210,7 @@ bool ASWeapon::IsEquipped() const
 }
 
 
-bool ASWeapon::IsAttachedToPawn() const // TODO: Review name to more accurately specify meaning.
+bool ASWeapon::IsEquippedOrPending() const
 {
 	return bIsEquipped || bPendingEquip;
 }

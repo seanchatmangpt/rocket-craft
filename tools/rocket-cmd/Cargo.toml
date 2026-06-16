@@ -1,0 +1,36 @@
+[package]
+name = "rocket-cmd"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.6.1", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+clap_complete = "4.5"
+ratatui = "0.29.0"
+crossterm = { version = "0.28.1", features = ["events"] }
+rayon = "1.10"
+rust-ini = "0.21"
+walkdir = "2.5"
+colored = "2.1"
+anyhow = "1.0"
+thiserror = "1.0"
+chrono = "0.4"
+dialoguer = "0.11"
+rcgen = "0.13"
+p12-keystore = "0.2"
+indicatif = "0.17"
+ignore = "0.4"
+color-eyre = "0.6"
+cargo_metadata = "0.19.1"
+rocket-sdk = { path = "../rocket-sdk" }
+knhk = { path = "../knhk" }
+unrdf = { path = "../unrdf" }
+wasm4pm-compat = { path = "/Users/sac/wasm4pm-compat" }
+wasmer = "4.4.0"
+clap-noun-verb = { path = "../../../clap-noun-verb" }
+
+[dev-dependencies]
+un-test-utils = { path = "../un-test-utils" }
+mockall = "0.12"

@@ -5,6 +5,7 @@
 #include "ShooterStyle.h"
 #include "ShooterUIHelpers.h"
 #include "OnlineSubsystemUtils.h"
+#include "ShooterGameViewportClient.h"
 
 #if PLATFORM_XBOXONE
 #define INTERACTIVE_LEADERBOARD	1
@@ -135,7 +136,24 @@ void SShooterLeaderboard::ReadStats()
 		}
 		else
 		{
-			// TODO: message the user?
+			if (GEngine && GEngine->GameViewport)
+			{
+				UShooterGameViewportClient* ShooterViewport = Cast<UShooterGameViewportClient>(GEngine->GameViewport);
+				if (ShooterViewport)
+				{
+					FText ErrorMessage = NSLOCTEXT("Leaderboards", "LeaderboardsUnsupported", "Leaderboards are not supported on this platform.");
+					FText OKButton = NSLOCTEXT("DialogButtons", "OKAY", "OK");
+					ShooterViewport->ShowDialog(
+						PlayerOwner,
+						EShooterDialogType::Generic,
+						ErrorMessage,
+						OKButton,
+						FText::GetEmpty(),
+						FOnClicked(),
+						FOnClicked()
+					);
+				}
+			}
 		}
 	}
 }

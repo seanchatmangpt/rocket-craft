@@ -1,0 +1,42 @@
+{
+  "projects": [
+    {
+      "name": "SurvivalGame",
+      "uproject_path": "versions/4.24-Survival/EpicSurvivalGameSeries-4.24/SurvivalGame/SurvivalGame.uproject",
+      "targets": [
+        "SurvivalGameEditor",
+        "SurvivalGameServer",
+        "SurvivalGame"
+      ]
+    },
+    {
+      "name": "RealisticRendering",
+      "uproject_path": "versions/Realistic/RealisticRendering/RealisticRendering.uproject",
+      "targets": []
+    },
+    {
+      "name": "FullSpectrum",
+      "uproject_path": "versions/Template/FullSpectrum/FullSpectrum.uproject",
+      "targets": []
+    },
+    {
+      "name": "Brm",
+      "uproject_path": "versions/4.24.0/Brm.uproject",
+      "targets": [
+        "BrmServer",
+        "BrmEditor",
+        "Brm"
+      ]
+    },
+    {
+      "name": "ShooterGame",
+      "uproject_path": "versions/4.24-Shooter/ShooterGame/ShooterGame.uproject",
+      "targets": [
+        "ShooterGameEditor",
+        "ShooterClient",
+        "ShooterGame",
+        "ShooterServer"
+      ]
+    }
+  ]
+}

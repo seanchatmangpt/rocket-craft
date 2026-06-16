@@ -709,8 +709,17 @@ void ASCharacter::OnNextWeapon()
 		return;
 	}
 
-	if (Inventory.Num() >= 2) // TODO: Check for weaponstate.
+	if (Inventory.Num() >= 2)
 	{
+		if (CurrentWeapon)
+		{
+			EWeaponState State = CurrentWeapon->GetCurrentState();
+			if (State == EWeaponState::Equipping || State == EWeaponState::Reloading)
+			{
+				return;
+			}
+		}
+
 		const int32 CurrentWeaponIndex = Inventory.IndexOfByKey(CurrentWeapon);
 		ASWeapon* NextWeapon = Inventory[(CurrentWeaponIndex + 1) % Inventory.Num()];
 		EquipWeapon(NextWeapon);
@@ -726,8 +735,17 @@ void ASCharacter::OnPrevWeapon()
 		return;
 	}
 
-	if (Inventory.Num() >= 2) // TODO: Check for weaponstate.
+	if (Inventory.Num() >= 2)
 	{
+		if (CurrentWeapon)
+		{
+			EWeaponState State = CurrentWeapon->GetCurrentState();
+			if (State == EWeaponState::Equipping || State == EWeaponState::Reloading)
+			{
+				return;
+			}
+		}
+
 		const int32 CurrentWeaponIndex = Inventory.IndexOfByKey(CurrentWeapon);
 		ASWeapon* PrevWeapon = Inventory[(CurrentWeaponIndex - 1 + Inventory.Num()) % Inventory.Num()];
 		EquipWeapon(PrevWeapon);

@@ -190,46 +190,67 @@ void ASWeaponInstant::ServerNotifyHit_Implementation(const FHitResult Impact, FV
 		const float ViewDotHitDir = FVector::DotProduct(GetInstigator()->GetViewRotation().Vector(), ViewDir);
 		if (ViewDotHitDir > AllowedViewDotHitDir)
 		{
-			// TODO: Check for weapon state
-
-			if (Impact.GetActor() == nullptr)
+			if (GetCurrentState() == EWeaponState::Firing)
 			{
-				if (Impact.bBlockingHit)
+				if (Impact.GetActor() == nullptr)
+				{
+					if (Impact.bBlockingHit)
+					{
+						ProcessInstantHitConfirmed(Impact, Origin, ShootDir);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("ServerNotifyHit rejected: HitResult lacks actor and is not a blocking hit."));
+					}
+				}
+				// Assume it told the truth about static things because we don't move and the hit
+				// usually doesn't have significant gameplay implications
+				else if (Impact.GetActor()->IsRootComponentStatic() || Impact.GetActor()->IsRootComponentStationary())
 				{
 					ProcessInstantHitConfirmed(Impact, Origin, ShootDir);
 				}
-			}
-			// Assume it told the truth about static things because we don't move and the hit
-			// usually doesn't have significant gameplay implications
-			else if (Impact.GetActor()->IsRootComponentStatic() || Impact.GetActor()->IsRootComponentStationary())
-			{
-				ProcessInstantHitConfirmed(Impact, Origin, ShootDir);
+				else
+				{
+					const FBox HitBox = Impact.GetActor()->GetComponentsBoundingBox();
+
+					FVector BoxExtent = 0.5 * (HitBox.Max - HitBox.Min);
+					BoxExtent *= ClientSideHitLeeway;
+
+					BoxExtent.X = FMath::Max(20.0f, BoxExtent.X);
+					BoxExtent.Y = FMath::Max(20.0f, BoxExtent.Y);
+					BoxExtent.Z = FMath::Max(20.0f, BoxExtent.Z);
+
+					const FVector BoxCenter = (HitBox.Min + HitBox.Max) * 0.5;
+
+					// If we are within client tolerance
+					if (FMath::Abs(Impact.Location.Z - BoxCenter.Z) < BoxExtent.Z &&
+						FMath::Abs(Impact.Location.X - BoxCenter.X) < BoxExtent.X &&
+						FMath::Abs(Impact.Location.Y - BoxCenter.Y) < BoxExtent.Y)
+					{
+						ProcessInstantHitConfirmed(Impact, Origin, ShootDir);
+					}
+					else
+					{
+						UE_LOG(LogTemp, Warning, TEXT("ServerNotifyHit rejected: Client-side hit tolerance check failed. Location: %s, Center: %s, Extent: %s"), 
+							*Impact.Location.ToString(), *BoxCenter.ToString(), *BoxExtent.ToString());
+					}
+				}
 			}
 			else
 			{
-				const FBox HitBox = Impact.GetActor()->GetComponentsBoundingBox();
-
-				FVector BoxExtent = 0.5 * (HitBox.Max - HitBox.Min);
-				BoxExtent *= ClientSideHitLeeway;
-
-				BoxExtent.X = FMath::Max(20.0f, BoxExtent.X);
-				BoxExtent.Y = FMath::Max(20.0f, BoxExtent.Y);
-				BoxExtent.Z = FMath::Max(20.0f, BoxExtent.Z);
-
-				const FVector BoxCenter = (HitBox.Min + HitBox.Max) * 0.5;
-
-				// If we are within client tolerance
-				if (FMath::Abs(Impact.Location.Z - BoxCenter.Z) < BoxExtent.Z &&
-					FMath::Abs(Impact.Location.X - BoxCenter.X) < BoxExtent.X &&
-					FMath::Abs(Impact.Location.Y - BoxCenter.Y) < BoxExtent.Y)
-				{
-					ProcessInstantHitConfirmed(Impact, Origin, ShootDir);
-				}
+				UE_LOG(LogTemp, Warning, TEXT("ServerNotifyHit rejected: Weapon is not in Firing state. Current State: %d"), (int32)GetCurrentState());
 			}
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("ServerNotifyHit rejected: View-dot-hit direction check failed. Dot: %f, Allowed: %f"), ViewDotHitDir, AllowedViewDotHitDir);
+		}
 	}
-
-	// TODO: UE_LOG on failures & rejection
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ServerNotifyHit rejected: Instigator is null or no valid target/blocking hit. Instigator: %s"), 
+			GetInstigator() ? *GetInstigator()->GetName() : TEXT("None"));
+	}
 }
 
 
@@ -258,14 +279,29 @@ void ASWeaponInstant::SpawnImpactEffects(const FHitResult& Impact)
 {
 	if (ImpactTemplate && Impact.bBlockingHit)
 	{
-		// TODO: Possible re-trace to get hit component that is lost during replication.
+		// Re-trace on clients/server to retrieve the hit component which might not replicate.
+		FHitResult ReTracedImpact = Impact;
+		if (Impact.GetComponent() == nullptr)
+		{
+			FCollisionQueryParams TraceParams(TEXT("SpawnImpactEffects_ReTrace"), true, GetInstigator());
+			TraceParams.bReturnPhysicalMaterial = true;
+
+			FVector TraceStart = Impact.ImpactPoint + Impact.ImpactNormal * 10.f;
+			FVector TraceEnd = Impact.ImpactPoint - Impact.ImpactNormal * 10.f;
+
+			FHitResult Hit(ForceInit);
+			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, COLLISION_WEAPON, TraceParams))
+			{
+				ReTracedImpact = Hit;
+			}
+		}
 
 		/* This function prepares an actor to spawn, but requires another call to finish the actual spawn progress. This allows manipulation of properties before entering into the level */
-		ASImpactEffect* EffectActor = GetWorld()->SpawnActorDeferred<ASImpactEffect>(ImpactTemplate, FTransform(Impact.ImpactPoint.Rotation(), Impact.ImpactPoint));
+		ASImpactEffect* EffectActor = GetWorld()->SpawnActorDeferred<ASImpactEffect>(ImpactTemplate, FTransform(ReTracedImpact.ImpactPoint.Rotation(), ReTracedImpact.ImpactPoint));
 		if (EffectActor)
 		{
-			EffectActor->SurfaceHit = Impact;
-			UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(Impact.ImpactNormal.Rotation(), Impact.ImpactPoint));
+			EffectActor->SurfaceHit = ReTracedImpact;
+			UGameplayStatics::FinishSpawningActor(EffectActor, FTransform(ReTracedImpact.ImpactNormal.Rotation(), ReTracedImpact.ImpactPoint));
 		}
 	}
 }
