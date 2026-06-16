@@ -1,4 +1,6 @@
 engine/
+.claude/
+blueprint-rs/target/
 
 Saved/Backup/
 Intermediate/Build/
