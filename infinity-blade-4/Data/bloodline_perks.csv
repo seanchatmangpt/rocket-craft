@@ -1,0 +1,16 @@
+PerkID,DisplayName,Tier,PrerequisiteID,EffectType,EffectValue,PointCost,Description
+BloodyResolve,Bloody Resolve,1,,AttackBonus,0.10,1,Centuries of bloodshed have sharpened your lineage. Gain +10% attack damage.
+IronHide,Iron Hide,1,,DefenseBonus,0.10,1,Your bloodline has endured countless blows. Gain +10% damage reduction.
+SwiftStrikes,Swift Strikes,1,,ComboWindow,0.10,1,Ancestral reflexes extend the combo input window by 0.1 seconds.
+MagicSensitivity,Magic Sensitivity,1,,MagicBonus,0.15,1,An awakened bloodline resonates with the QIP. Gain +15% magic damage.
+Scavenger,Scavenger,1,,GoldFind,0.20,1,A survivor's instinct — your lineage knows where enemies hide their gold. +20% gold found.
+DeadlyPrecision,Deadly Precision,2,BloodyResolve,CritChance,0.05,1,Your attacks find chinks in every defence. Gain +5% critical hit chance.
+FortressStance,Fortress Stance,2,IronHide,HealthBonus,0.15,1,A mountain cannot be moved. Your maximum health is increased by 15%.
+ComboMaster,Combo Master,2,SwiftStrikes,ComboWindow+AttackBonus,0.15+0.05,1,Your bloodline has mastered the flow of battle. Extend the combo window by 0.15 s and gain +5% attack damage.
+ArcaneChanneling,Arcane Channeling,2,MagicSensitivity,MagicCostReduction,0.20,1,Bloodline resonance reduces the QIP energy required to cast spells by 20%.
+TreasureHunter,Treasure Hunter,2,Scavenger,GoldFind,0.30,1,Centuries of looting have honed your bloodline's nose for wealth. +30% gold found.
+AusarLegacy,Ausar's Legacy,3,DeadlyPrecision,AttackBonus+CritChance,0.25+0.10,1,Channel the fury of the Deathless King himself. +25% attack damage and +10% critical hit chance.
+DeathlessResilience,Deathless Resilience,3,FortressStance,HealthBonus+DefenseBonus,0.30+0.15,1,Your bloodline defies death itself. +30% maximum health and +15% damage reduction.
+QIPResonance,QIP Resonance,3,ComboMaster,ParryBonus+ComboWindow,0.05+0.20,1,Perfect harmony with the QIP crystal slows your perception of time. Parry +0.05 s and combo window +0.20 s.
+WorkerOfSecretsGift,Worker of Secrets' Gift,3,ArcaneChanneling,MagicBonus+MagicCostReduction,0.40+0.30,1,The Worker's ancient knowledge flows through your bloodline. +40% magic damage and -30% magic energy cost.
+InfinitySeeker,Infinity Seeker,3,TreasureHunter,XPGain,0.50,1,Your bloodline has transcended the cycle. Earn 50% more experience from all sources.
