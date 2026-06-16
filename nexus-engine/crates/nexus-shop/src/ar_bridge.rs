@@ -142,7 +142,7 @@ impl ArBridgeRegistry {
     fn generate_nonce(&self, barcode: &str, player_id: u64) -> String {
         let mut hasher = Sha256::new();
         hasher.update(barcode.as_bytes());
-        hasher.update(&player_id.to_le_bytes());
+        hasher.update(player_id.to_le_bytes());
         format!("{:x}", hasher.finalize())
     }
 

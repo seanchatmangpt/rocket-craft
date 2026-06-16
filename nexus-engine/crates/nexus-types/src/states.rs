@@ -1,9 +1,8 @@
-/// Typestate markers and runtime enums for all game-state domains.
-///
-/// The sealed marker traits enforce at compile time that only the canonical
-/// state structs defined here can be used as type parameters, preventing
-/// downstream crates from introducing undocumented states.
-
+//! Typestate markers and runtime enums for all game-state domains.
+//!
+//! The sealed marker traits enforce at compile time that only the canonical
+//! state structs defined here can be used as type parameters, preventing
+//! downstream crates from introducing undocumented states.
 // ---------------------------------------------------------------------------
 // Sealed trait (module-private, not re-exported)
 // ---------------------------------------------------------------------------

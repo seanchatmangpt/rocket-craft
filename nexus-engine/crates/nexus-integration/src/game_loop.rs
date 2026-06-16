@@ -283,7 +283,7 @@ impl GameSession {
                         let phase_changed = enemy.take_damage(dmg);
                         let new_hp = enemy.hp;
                         let new_phase = enemy.phase;
-                        drop(enemy);
+                        let _ = enemy;
                         out.push(self.ev(EventKind::CombatHit { damage: dmg, new_enemy_hp: new_hp }));
                         if phase_changed {
                             out.push(self.ev(EventKind::SpecialActivated { ability: format!("Phase {}", new_phase) }));
@@ -333,7 +333,7 @@ impl GameSession {
                         ParryOutcome::Normal  => enemy.attack * 0.1,
                         ParryOutcome::Miss    => enemy.attack,
                     };
-                    drop(enemy);
+                    let _ = enemy;
 
                     // QIP scar in GodKing Phase 2
                     if qip_eligible {
@@ -446,7 +446,7 @@ impl GameSession {
     }
 
     fn enemy_counter(&mut self) -> Option<GameEvent> {
-        let (atk, phase, new_dir) = {
+        let (atk, _phase, _new_dir) = {
             let e = self.current_enemy.as_mut()?;
             let dirs = [AttackDir::Overhead, AttackDir::Left, AttackDir::Right];
             let dir = dirs[self.rng.gen_range(0..3)];
