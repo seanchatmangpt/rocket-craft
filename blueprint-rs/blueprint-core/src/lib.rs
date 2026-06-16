@@ -20,6 +20,7 @@ pub mod diff;
 pub mod validator;
 pub(crate) mod t3d;
 pub mod parser;
+pub mod registry;
 
 pub use types::*;
 pub use ast::*;

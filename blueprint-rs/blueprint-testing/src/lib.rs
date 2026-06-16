@@ -3,10 +3,9 @@
 //! Provides macros for asserting graph properties and snapshot-based regression
 //! testing of T3D output.
 
-use blueprint_core::ast::{Blueprint, BpGraph, BpNode, Pin};
+use blueprint_core::ast::{Blueprint, BpNode, Pin};
 use blueprint_core::types::{PinType, PinDirection, PinCategory, ContainerType};
 use blueprint_core::serializer::T3dSerializer;
-use blueprint_core::validator;
 
 // ============================================================
 // ASSERTION MACROS
@@ -44,12 +43,6 @@ macro_rules! assert_has_node {
 /// Assert that two nodes are directly connected via specific pins.
 ///
 /// Checks that `$from_node.$from_pin` has a link pointing to `$to_node.$to_pin`.
-///
-/// # Example
-/// ```
-/// use blueprint_testing::assert_connected;
-/// // (after setting up blueprint with connected nodes)
-/// ```
 #[macro_export]
 macro_rules! assert_connected {
     ($blueprint:expr, $graph:expr, $from_node:expr, $from_pin:expr, $to_node:expr, $to_pin:expr) => {{
@@ -156,8 +149,8 @@ macro_rules! assert_t3d_contains {
 // ============================================================
 
 /// Save a Blueprint's T3D output as a snapshot file.
-/// File is written to `tests/snapshots/<name>.t3d` relative to the
-/// current directory (CARGO_MANIFEST_DIR when run under `cargo test`).
+/// File is written to `tests/snapshots/<name>.t3d` relative to
+/// the crate manifest directory (CARGO_MANIFEST_DIR).
 pub fn save_snapshot(blueprint: &Blueprint, name: &str) -> std::io::Result<()> {
     let snapshot_dir = snapshot_dir();
     std::fs::create_dir_all(&snapshot_dir)?;
@@ -167,9 +160,9 @@ pub fn save_snapshot(blueprint: &Blueprint, name: &str) -> std::io::Result<()> {
 }
 
 /// Assert a Blueprint's T3D output matches a previously saved snapshot.
-/// If no snapshot exists yet, saves it and passes (first-run mode).
+/// If no snapshot exists yet, saves it and passes (first-run / golden-file mode).
 ///
-/// Panics if an existing snapshot doesn't match.
+/// Panics if an existing snapshot does not match.
 pub fn assert_snapshot(blueprint: &Blueprint, name: &str) {
     let snapshot_dir = snapshot_dir();
     let path = snapshot_dir.join(format!("{}.t3d", name));
@@ -181,12 +174,12 @@ pub fn assert_snapshot(blueprint: &Blueprint, name: &str) {
         assert_eq!(
             current_t3d, saved,
             "Snapshot mismatch for '{}'. \
-             If this is intentional, delete {} and re-run tests to update the snapshot.",
+             Delete {} and re-run tests to update the snapshot.",
             name,
             path.display()
         );
     } else {
-        // First run: create the snapshot
+        // First run: persist as the golden file
         std::fs::create_dir_all(&snapshot_dir)
             .unwrap_or_else(|e| panic!("Failed to create snapshot dir: {}", e));
         std::fs::write(&path, &current_t3d)
@@ -194,8 +187,7 @@ pub fn assert_snapshot(blueprint: &Blueprint, name: &str) {
     }
 }
 
-/// Returns the path to the snapshots directory, resolving relative to
-/// CARGO_MANIFEST_DIR when set (during `cargo test`), else the current dir.
+/// Returns the path to the snapshot directory, anchored at CARGO_MANIFEST_DIR.
 fn snapshot_dir() -> std::path::PathBuf {
     let base = std::env::var("CARGO_MANIFEST_DIR")
         .map(std::path::PathBuf::from)
@@ -220,6 +212,7 @@ pub fn minimal_blueprint(name: &str) -> Blueprint {
 /// Build a Blueprint with two nodes connected via exec pins.
 ///
 /// Creates a BeginPlay event and a PrintString function node connected by exec flow.
+/// Falls back to the builder API (no T3D parser is required).
 pub fn blueprint_from_t3d_or_builder(name: &str) -> Blueprint {
     let mut bp = Blueprint::new(name, "Actor");
 
@@ -234,7 +227,7 @@ pub fn blueprint_from_t3d_or_builder(name: &str) -> Blueprint {
     bp
 }
 
-// ------ internal helpers -------------------------------------------------------
+// ------ private helpers --------------------------------------------------------
 
 fn make_begin_play_node(name: &str) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_Event", name)
@@ -273,6 +266,7 @@ fn make_print_node(name: &str) -> BpNode {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use blueprint_core::validator;
 
     // 1. assert_has_node passes for a node that exists
     #[test]
@@ -303,27 +297,32 @@ mod tests {
         assert_no_validation_errors!(bp);
     }
 
-    // 5. assert_t3d_contains passes when the T3D contains "Begin Object"
+    // 5. assert_t3d_contains passes when the T3D output contains "Begin Object"
     #[test]
     fn test_assert_t3d_contains_passes() {
         let bp = minimal_blueprint("T3dBP");
         assert_t3d_contains!(bp, "Begin Object");
     }
 
-    // 6. save_snapshot creates a file
+    // 6. save_snapshot creates a file on disk
     #[test]
     fn test_snapshot_creates_file() {
         let bp = minimal_blueprint("SnapshotBP");
         let snap_name = "test_snapshot_creates_file";
 
-        // Clean up before test in case a previous run left a file
+        // Resolve snapshot path the same way the function does
         let snap_dir = std::env::var("CARGO_MANIFEST_DIR")
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|_| std::path::PathBuf::from("."));
-        let snap_path = snap_dir.join("tests").join("snapshots").join(format!("{}.t3d", snap_name));
+        let snap_path = snap_dir
+            .join("tests")
+            .join("snapshots")
+            .join(format!("{}.t3d", snap_name));
+
+        // Clean up any leftover from a previous run
         let _ = std::fs::remove_file(&snap_path);
 
-        save_snapshot(&bp, snap_name).expect("save_snapshot should not fail");
+        save_snapshot(&bp, snap_name).expect("save_snapshot should succeed");
         assert!(snap_path.exists(), "Snapshot file should have been created at {:?}", snap_path);
 
         // Cleanup
@@ -336,14 +335,18 @@ mod tests {
         let bp = minimal_blueprint("MatchBP");
         let snap_name = "test_snapshot_matches";
 
-        // Clean up before test
         let snap_dir = std::env::var("CARGO_MANIFEST_DIR")
             .map(std::path::PathBuf::from)
             .unwrap_or_else(|_| std::path::PathBuf::from("."));
-        let snap_path = snap_dir.join("tests").join("snapshots").join(format!("{}.t3d", snap_name));
+        let snap_path = snap_dir
+            .join("tests")
+            .join("snapshots")
+            .join(format!("{}.t3d", snap_name));
+
+        // Clean up any leftover from a previous run
         let _ = std::fs::remove_file(&snap_path);
 
-        // First call: creates the snapshot
+        // First call: creates the golden file
         assert_snapshot(&bp, snap_name);
         assert!(snap_path.exists(), "Snapshot should exist after first call");
 
@@ -354,20 +357,27 @@ mod tests {
         let _ = std::fs::remove_file(&snap_path);
     }
 
-    // 8. minimal_blueprint returns a valid blueprint with exactly one BeginPlay node
+    // 8. minimal_blueprint returns a valid blueprint with a BeginPlay node
     #[test]
     fn test_minimal_blueprint_helper() {
         let bp = minimal_blueprint("MinimalBP");
         assert_eq!(bp.name, "MinimalBP");
         assert_eq!(bp.parent_class, "Actor");
 
-        let event_graph = bp.graphs.iter().find(|g| g.name == "EventGraph")
+        let event_graph = bp
+            .graphs
+            .iter()
+            .find(|g| g.name == "EventGraph")
             .expect("EventGraph must exist");
         let has_begin_play = event_graph.nodes.iter().any(|n| n.name == "BeginPlay");
         assert!(has_begin_play, "minimal_blueprint should include a BeginPlay node");
 
-        // Verify no validation errors
+        // Must produce a valid blueprint
         let errors = validator::validate(&bp);
-        assert!(errors.is_empty(), "minimal_blueprint should produce a valid blueprint: {:?}", errors);
+        assert!(
+            errors.is_empty(),
+            "minimal_blueprint should produce a valid blueprint: {:?}",
+            errors
+        );
     }
 }

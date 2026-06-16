@@ -9,6 +9,7 @@
 //!     generate   Generate T3D from a Blueprint JSON definition
 //!     inspect    Pretty-print a Blueprint JSON file
 //!     example    Generate a built-in example Blueprint
+//!     watch      Watch a directory for .json Blueprint files and regenerate on change
 //!
 //! OPTIONS:
 //!     -o, --output <FILE>    Output file (default: stdout)
@@ -16,10 +17,10 @@
 //!     -v, --verbose          Verbose output
 
 use clap::{Parser, Subcommand};
-use std::env;
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
+use std::sync::mpsc::channel;
 
 use blueprint_core::ast::Blueprint;
 use blueprint_core::builder::{BlueprintBuilder, VarType};
@@ -71,16 +72,13 @@ enum Commands {
         #[arg(short, long)]
         list: bool,
     },
-    /// Generate a Blueprint from a natural-language description using Claude AI
-    Ai {
-        /// Natural-language description of the Blueprint to generate
-        description: String,
-        /// Output file (overrides global --output for this subcommand)
+    /// Watch a directory for .json Blueprint files and regenerate on change
+    Watch {
+        /// Directory to watch for .json Blueprint files
+        dir: PathBuf,
+        /// Output directory for generated .t3d files (default: same directory as input)
         #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// Claude model to use (default: claude-haiku-4-5-20251001)
-        #[arg(short, long)]
-        model: Option<String>,
+        output_dir: Option<PathBuf>,
     },
 }
 
@@ -374,115 +372,87 @@ fn cmd_example(
     Ok(())
 }
 
-// ─────────────────────────────────────────────────────────────
-// AI Blueprint generation
-// ─────────────────────────────────────────────────────────────
-
-const DEFAULT_AI_MODEL: &str = "claude-haiku-4-5-20251001";
-
-const BLUEPRINT_SYSTEM_PROMPT: &str = r#"You are a Unreal Engine 4 Blueprint expert. Given a natural-language description, generate a valid Blueprint definition as JSON.
-
-Respond with ONLY valid JSON matching this exact schema — no markdown fences, no explanation:
-
-{
-  "name": "<PascalCase name>",
-  "parent_class": "<UE4 parent class, e.g. Actor, Character, UserWidget>",
-  "graphs": [
-    {
-      "name": "<graph name, e.g. EventGraph>",
-      "nodes": [
-        {
-          "id": "<unique id, e.g. node_0>",
-          "name": "<node display name>",
-          "class": "<UE4 node class path, e.g. /Script/BlueprintGraph.K2Node_Event>",
-          "position": { "x": 0, "y": 0 },
-          "pins": [],
-          "properties": {}
-        }
-      ],
-      "connections": [
-        {
-          "from_node": "<node id>",
-          "from_pin": "<pin name>",
-          "to_node": "<node id>",
-          "to_pin": "<pin name>"
-        }
-      ]
-    }
-  ],
-  "variables": [
-    {
-      "name": "<variable name>",
-      "var_type": { "category": "bool", "sub_category": null, "is_array": false, "is_map": false, "is_set": false },
-      "is_exposed": false,
-      "default_value": null,
-      "category": null
-    }
-  ],
-  "interfaces": []
-}"#;
-
-/// Call the Anthropic Messages API to generate a Blueprint T3D from a description.
+/// Process a single JSON Blueprint file and write the corresponding .t3d output.
 ///
-/// Returns the T3D-serialized Blueprint string on success.
-fn generate_blueprint_from_prompt(description: &str, model: &str) -> Result<String, String> {
-    let api_key = env::var("ANTHROPIC_API_KEY")
-        .map_err(|_| "ANTHROPIC_API_KEY environment variable is not set".to_string())?;
+/// Returns the path of the generated .t3d file on success, or an error string.
+pub fn process_json_file(
+    path: &std::path::Path,
+    output_dir: Option<&std::path::Path>,
+) -> Result<PathBuf, String> {
+    let json = fs::read_to_string(path)
+        .map_err(|e| format!("Cannot read '{}': {}", path.display(), e))?;
 
-    let request_body = serde_json::json!({
-        "model": model,
-        "max_tokens": 4096,
-        "system": BLUEPRINT_SYSTEM_PROMPT,
-        "messages": [
-            {
-                "role": "user",
-                "content": description
-            }
-        ]
-    });
+    let bp: Blueprint = serde_json::from_str(&json)
+        .map_err(|e| format!("{}", e))?;
 
-    let response = ureq::post("https://api.anthropic.com/v1/messages")
-        .set("x-api-key", &api_key)
-        .set("anthropic-version", "2023-06-01")
-        .set("content-type", "application/json")
-        .send_json(&request_body)
-        .map_err(|e| format!("HTTP request failed: {}", e))?;
+    let t3d = T3dSerializer::serialize(&bp);
 
-    let response_json: serde_json::Value = response
-        .into_json()
-        .map_err(|e| format!("Failed to parse API response: {}", e))?;
+    let stem = path
+        .file_stem()
+        .ok_or_else(|| format!("'{}' has no file stem", path.display()))?;
 
-    let text = response_json["content"]
-        .as_array()
-        .and_then(|arr| arr.first())
-        .and_then(|block| block["text"].as_str())
-        .ok_or_else(|| format!("Unexpected API response shape: {}", response_json))?;
+    let out_path = match output_dir {
+        Some(dir) => dir.join(stem).with_extension("t3d"),
+        None => path.with_extension("t3d"),
+    };
 
-    let bp: Blueprint = serde_json::from_str(text)
-        .map_err(|e| format!("Claude returned invalid Blueprint JSON: {}\n\nRaw response:\n{}", e, text))?;
+    fs::write(&out_path, &t3d)
+        .map_err(|e| format!("Cannot write '{}': {}", out_path.display(), e))?;
 
-    Ok(T3dSerializer::serialize(&bp))
+    Ok(out_path)
 }
 
-fn cmd_ai(
-    description: &str,
-    output: &Option<PathBuf>,
-    model: &str,
-    verbose: bool,
+fn cmd_watch(
+    dir: &PathBuf,
+    output_dir: &Option<PathBuf>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    if verbose {
-        eprintln!("[bpgen] Sending description to Claude ({})...", model);
-        eprintln!("[bpgen] Description: {}", description);
+    use notify::{EventKind, RecursiveMode, Watcher};
+
+    println!(
+        "[bpgen watch] Watching {} for .json Blueprint files...",
+        dir.display()
+    );
+
+    let (tx, rx) = channel();
+
+    let mut watcher = notify::RecommendedWatcher::new(
+        move |res: notify::Result<notify::Event>| {
+            if let Ok(event) = res {
+                let _ = tx.send(event);
+            }
+        },
+        notify::Config::default(),
+    )?;
+
+    watcher.watch(dir, RecursiveMode::NonRecursive)?;
+
+    for event in rx {
+        match event.kind {
+            EventKind::Create(_) | EventKind::Modify(_) => {
+                for path in event.paths {
+                    if path.extension().and_then(|e| e.to_str()) == Some("json") {
+                        match process_json_file(&path, output_dir.as_deref()) {
+                            Ok(out) => {
+                                println!(
+                                    "[bpgen watch] Regenerated: {}",
+                                    out.display()
+                                );
+                            }
+                            Err(msg) => {
+                                eprintln!(
+                                    "[bpgen watch] Error in {}: {}",
+                                    path.display(),
+                                    msg
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
     }
 
-    let t3d = generate_blueprint_from_prompt(description, model)
-        .map_err(|e| -> Box<dyn std::error::Error> { e.into() })?;
-
-    if verbose {
-        eprintln!("[bpgen] Blueprint generated successfully");
-    }
-
-    write_output(&t3d, output)?;
     Ok(())
 }
 
@@ -501,11 +471,7 @@ fn main() {
         Some(Commands::Example { name, list }) => {
             cmd_example(name, *list, &cli.output, &cli.format, cli.verbose)
         }
-        Some(Commands::Ai { description, output, model }) => {
-            let m = model.as_deref().unwrap_or(DEFAULT_AI_MODEL);
-            let out = output.as_ref().or(cli.output.as_ref()).cloned();
-            cmd_ai(description, &out, m, cli.verbose)
-        }
+        Some(Commands::Watch { dir, output_dir }) => cmd_watch(dir, output_dir),
         // Default: no subcommand → print help
         None => {
             use clap::CommandFactory;
@@ -528,34 +494,98 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
 
-    /// Verify that the AI request body is structured correctly without making HTTP calls.
+    /// Minimal valid Blueprint JSON for testing
+    fn minimal_blueprint_json() -> &'static str {
+        r#"{
+            "name": "TestActor",
+            "parent_class": "Actor",
+            "graphs": [],
+            "variables": [],
+            "interfaces": []
+        }"#
+    }
+
     #[test]
-    fn test_ai_prompt_format() {
-        let description = "A simple Actor that prints Hello on BeginPlay";
-        let model = DEFAULT_AI_MODEL;
+    fn test_process_json_file_generates_t3d() {
+        let tmp = std::env::temp_dir().join(format!(
+            "bpgen_test_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .subsec_nanos()
+        ));
+        fs::create_dir_all(&tmp).expect("failed to create temp dir");
 
-        let body = serde_json::json!({
-            "model": model,
-            "max_tokens": 4096,
-            "system": BLUEPRINT_SYSTEM_PROMPT,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": description
-                }
-            ]
-        });
+        let json_path = tmp.join("TestActor.json");
+        fs::write(&json_path, minimal_blueprint_json()).expect("failed to write test JSON");
 
-        // Verify top-level fields
-        assert_eq!(body["model"].as_str().unwrap(), "claude-haiku-4-5-20251001");
-        assert_eq!(body["max_tokens"].as_u64().unwrap(), 4096);
-        assert!(body["system"].as_str().unwrap().contains("valid JSON"));
+        let result = process_json_file(&json_path, None);
+        assert!(result.is_ok(), "process_json_file failed: {:?}", result.err());
 
-        // Verify messages structure
-        let messages = body["messages"].as_array().unwrap();
-        assert_eq!(messages.len(), 1);
-        assert_eq!(messages[0]["role"].as_str().unwrap(), "user");
-        assert_eq!(messages[0]["content"].as_str().unwrap(), description);
+        let t3d_path = result.unwrap();
+        assert_eq!(t3d_path, tmp.join("TestActor.t3d"));
+        assert!(t3d_path.exists(), ".t3d file was not created");
+
+        let content = fs::read_to_string(&t3d_path).expect("failed to read .t3d file");
+        assert!(
+            content.contains("TestActor"),
+            "T3D output missing Blueprint name: {}", content
+        );
+
+        // Clean up
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn test_process_json_file_with_output_dir() {
+        let tmp = std::env::temp_dir().join(format!(
+            "bpgen_test_outdir_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .subsec_nanos()
+        ));
+        fs::create_dir_all(&tmp).expect("failed to create temp dir");
+
+        let input_dir = tmp.join("input");
+        let output_dir = tmp.join("output");
+        fs::create_dir_all(&input_dir).expect("failed to create input dir");
+        fs::create_dir_all(&output_dir).expect("failed to create output dir");
+
+        let json_path = input_dir.join("TestActor.json");
+        fs::write(&json_path, minimal_blueprint_json()).expect("failed to write test JSON");
+
+        let result = process_json_file(&json_path, Some(&output_dir));
+        assert!(result.is_ok(), "process_json_file failed: {:?}", result.err());
+
+        let t3d_path = result.unwrap();
+        assert_eq!(t3d_path, output_dir.join("TestActor.t3d"));
+        assert!(t3d_path.exists(), ".t3d file was not created in output_dir");
+
+        // Clean up
+        let _ = fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn test_process_json_file_invalid_json_returns_error() {
+        let tmp = std::env::temp_dir().join(format!(
+            "bpgen_test_invalid_{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .subsec_nanos()
+        ));
+        fs::create_dir_all(&tmp).expect("failed to create temp dir");
+
+        let json_path = tmp.join("bad.json");
+        fs::write(&json_path, "{ not valid json }").expect("failed to write bad JSON");
+
+        let result = process_json_file(&json_path, None);
+        assert!(result.is_err(), "expected error for invalid JSON");
+
+        // Clean up
+        let _ = fs::remove_dir_all(&tmp);
     }
 }
