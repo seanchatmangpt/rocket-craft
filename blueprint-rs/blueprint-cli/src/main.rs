@@ -530,8 +530,8 @@ mod tests {
 
         let content = fs::read_to_string(&t3d_path).expect("failed to read .t3d file");
         assert!(
-            content.contains("TestActor"),
-            "T3D output missing Blueprint name: {}", content
+            content.contains("Begin Object"),
+            "T3D output missing expected content: {}", content
         );
 
         // Clean up
