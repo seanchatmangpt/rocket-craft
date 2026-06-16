@@ -19,6 +19,7 @@ members = [
     "unify-mcp",
     "unify-bp",
     "unify-integration-tests",
+    "unify-rocket",
     "unify",
 ]
 resolver = "2"
