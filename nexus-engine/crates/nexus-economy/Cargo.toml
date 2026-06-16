@@ -2,12 +2,3 @@
 name = "nexus-economy"
 version = "0.1.0"
 edition = "2021"
-
-[dependencies]
-serde = { version = "1", features = ["derive"] }
-thiserror = "1"
-chrono = { version = "0.4", features = ["serde"] }
-rand = { version = "0.8", features = ["small_rng"] }
-
-[dev-dependencies]
-proptest = "1"
