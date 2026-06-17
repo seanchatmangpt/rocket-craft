@@ -96,7 +96,10 @@ pub fn scan_file(filepath: &str) -> Vec<Observation> {
     let is_self_excluded = filepath.ends_with("src/rules/lsp318.rs")
         || filepath.ends_with("src/engine.rs")
         || filepath.ends_with("rules/lsp318.rs")
-        || filepath.ends_with("engine.rs");
+        || filepath.ends_with("engine.rs")
+        || filepath.ends_with("parsers/c.rs")
+        || filepath.ends_with("parsers/rust_tree_sitter.rs")
+        || filepath.ends_with("parsers/common.rs");
 
     if !is_self_excluded {
         let line_index = build_line_index(content.as_bytes());

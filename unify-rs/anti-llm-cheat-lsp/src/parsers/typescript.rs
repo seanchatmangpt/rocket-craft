@@ -1,6 +1,7 @@
 use crate::observations::Observation;
 use regex::Regex;
 use std::sync::OnceLock;
+use super::common;
 
 // ── Compiled-once regex statics ───────────────────────────────────────────────
 
@@ -72,13 +73,10 @@ fn hardcoded_base64_re() -> &'static Regex {
 
 fn promise_no_catch_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"\.then\s*\([^)]+\)\s*;").unwrap())
+    // Handles one level of nested parens in the callback: .then(resolve(x));
+    RE.get_or_init(|| Regex::new(r"\.then\s*\((?:[^()]+|\([^()]*\))*\)\s*;").unwrap())
 }
 
-fn oracle_float_re() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"0\.284171835|0\.577350269|1\.618033988|2\.718281828|3\.141592653").unwrap())
-}
 
 fn stub_fn_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
@@ -335,23 +333,6 @@ pub fn parse_typescript(filepath: &str, content: &str) -> Vec<Observation> {
             }
         }
 
-        // Oracle float literals
-        if !is_comment {
-            if let Some(mat) = oracle_float_re().find(line) {
-                obs.push(Observation {
-                    file_path: filepath.to_string(),
-                    start_byte: mat.start(),
-                    end_byte: mat.end(),
-                    line: line_num,
-                    column: mat.start() + 1,
-                    kind: "oracle_float".to_string(),
-                    construct: mat.as_str().to_string(),
-                    context: trimmed.to_string(),
-                    message: format!("Oracle float literal '{}' — potential hardcoded answer injection", mat.as_str()),
-                });
-            }
-        }
-
         // Stub arrow/regular functions returning only a constant literal
         if !is_comment {
             if let Some(mat) = stub_fn_re().find(line) {
@@ -370,6 +351,9 @@ pub fn parse_typescript(filepath: &str, content: &str) -> Vec<Observation> {
         }
     }
 
+    // Oracle float literals — use shared constant so all parsers stay in sync
+    common::detect_oracle_floats(filepath, content, &mut obs);
+
     // Detect module-level hardcoded lookup objects (oracle memo tables)
     detect_hardcoded_objects(filepath, content, &mut obs);
 
@@ -377,8 +361,6 @@ pub fn parse_typescript(filepath: &str, content: &str) -> Vec<Observation> {
 }
 
 fn detect_hardcoded_objects(filepath: &str, content: &str, obs: &mut Vec<Observation>) {
-    // Scan for large object literals at module scope (const/let/var x = { ... })
-    // Proxy: count lines between opening `= {` and closing `}` at same indent
     let lines: Vec<&str> = content.lines().collect();
     let mut depth = 0usize;
     let mut obj_start = 0usize;
@@ -387,48 +369,52 @@ fn detect_hardcoded_objects(filepath: &str, content: &str, obs: &mut Vec<Observa
 
     for (i, line) in lines.iter().enumerate() {
         let trimmed = line.trim();
+
         if !in_obj {
-            // Module-scope assignment with object literal
-            if (trimmed.starts_with("const ") || trimmed.starts_with("let ") || trimmed.starts_with("export const "))
-                && trimmed.contains("= {")
-            {
+            let is_decl = trimmed.starts_with("const ")
+                || trimmed.starts_with("let ")
+                || trimmed.starts_with("export const ");
+            if is_decl && trimmed.contains("= {") {
                 in_obj = true;
-                depth = 1;
+                depth = 0; // let the char loop below count the opening {
                 obj_start = i + 1;
                 obj_keys = 0;
+                // fall through to process chars on this same triggering line
+            } else {
+                continue;
             }
-        } else {
-            for ch in trimmed.chars() {
-                match ch {
-                    '{' => depth += 1,
-                    '}' => { if depth > 0 { depth -= 1; } }
-                    _ => {}
-                }
+        }
+
+        // Process chars for both the triggering line and all subsequent lines
+        for ch in trimmed.chars() {
+            match ch {
+                '{' => depth += 1,
+                '}' => { if depth > 0 { depth -= 1; } }
+                _ => {}
             }
-            // Count key-value pairs: lines containing `: ` or `:`
-            if depth > 0 && trimmed.contains(':') && !trimmed.starts_with("//") {
-                obj_keys += 1;
+        }
+        if depth > 0 && trimmed.contains(':') && !trimmed.starts_with("//") {
+            obj_keys += 1;
+        }
+        if depth == 0 {
+            in_obj = false;
+            if obj_keys > 15 {
+                obs.push(Observation {
+                    file_path: filepath.to_string(),
+                    start_byte: 0,
+                    end_byte: 0,
+                    line: obj_start,
+                    column: 1,
+                    kind: "js_oracle".to_string(),
+                    construct: "hardcoded_lookup_object".to_string(),
+                    context: format!("module-scope object ~{} keys", obj_keys),
+                    message: format!(
+                        "Module-scope object literal with ~{} entries — potential oracle lookup table",
+                        obj_keys
+                    ),
+                });
             }
-            if depth == 0 {
-                in_obj = false;
-                if obj_keys > 15 {
-                    obs.push(Observation {
-                        file_path: filepath.to_string(),
-                        start_byte: 0,
-                        end_byte: 0,
-                        line: obj_start,
-                        column: 1,
-                        kind: "js_oracle".to_string(),
-                        construct: "hardcoded_lookup_object".to_string(),
-                        context: format!("module-scope object ~{} keys", obj_keys),
-                        message: format!(
-                            "Module-scope object literal with ~{} entries — potential oracle lookup table",
-                            obj_keys
-                        ),
-                    });
-                }
-                obj_keys = 0;
-            }
+            obj_keys = 0;
         }
     }
 }

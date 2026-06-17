@@ -1,5 +1,6 @@
 pub mod c;
 pub mod cargo_lock;
+pub mod common;
 pub mod cargo_toml;
 pub mod contract;
 pub mod fitness_report;

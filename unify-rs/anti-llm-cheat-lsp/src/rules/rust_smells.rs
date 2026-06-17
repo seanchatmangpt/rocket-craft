@@ -79,11 +79,71 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
                 required_next_proof: "Verify utilizing tree-sitter or JSON-TOML deserializers.".to_string(),
             });
         }
-    }
 
-    // Check for warnings emitted for non-error states
-    // In our diagnostic rules, warning states should not be emitted for non-error states
-    // but this is mostly handled by custom checks on the diagnostic severity.
+        // Stub macros and stub functions detected by rust_tree_sitter
+        if o.kind == "rust_stub" {
+            diags.push(AntiLlmDiagnostic {
+                code: "ANTI-LLM-RUST-001".to_string(),
+                category: "rust-stub".to_string(),
+                file_path: o.file_path.clone(),
+                line: o.line,
+                column: o.column,
+                message: o.message.clone(),
+                forbidden_implication: "Stub macro/fn => Shipped implementation".to_string(),
+                blocking: true,
+                required_correction: "Replace stub with a real implementation.".to_string(),
+                required_next_proof: "Confirm the function body performs real work.".to_string(),
+            });
+        }
+
+        // Debug artifacts (println!, eprintln!, dbg!) in production code
+        if o.kind == "rust_debug_artifact" {
+            diags.push(AntiLlmDiagnostic {
+                code: "ANTI-LLM-RUST-002".to_string(),
+                category: "rust-debug".to_string(),
+                file_path: o.file_path.clone(),
+                line: o.line,
+                column: o.column,
+                message: o.message.clone(),
+                forbidden_implication: "Debug macro => Production artifact".to_string(),
+                blocking: false,
+                required_correction: "Remove debug print macros from production code paths.".to_string(),
+                required_next_proof: "Confirm no debug output in production build.".to_string(),
+            });
+        }
+
+        // #[allow(...)] suppression attributes
+        if o.kind == "rust_suppression" {
+            diags.push(AntiLlmDiagnostic {
+                code: "ANTI-LLM-RUST-003".to_string(),
+                category: "rust-suppression".to_string(),
+                file_path: o.file_path.clone(),
+                line: o.line,
+                column: o.column,
+                message: o.message.clone(),
+                forbidden_implication: "allow(…) suppression => Compiler warning silenced".to_string(),
+                blocking: false,
+                required_correction: "Fix the underlying warning instead of suppressing it.".to_string(),
+                required_next_proof: "Remove the suppression attribute and confirm clean build.".to_string(),
+            });
+        }
+
+        // TODO/FIXME/HACK/STUB comments
+        if o.kind == "rust_todo_comment" {
+            diags.push(AntiLlmDiagnostic {
+                code: "ANTI-LLM-RUST-004".to_string(),
+                category: "rust-todo".to_string(),
+                file_path: o.file_path.clone(),
+                line: o.line,
+                column: o.column,
+                message: o.message.clone(),
+                forbidden_implication: "TODO comment => Finished work".to_string(),
+                blocking: false,
+                required_correction: "Resolve the outstanding TODO before shipping.".to_string(),
+                required_next_proof: "Confirm no TODO/FIXME markers remain in this path.".to_string(),
+            });
+        }
+    }
 
     diags
 }

@@ -1,12 +1,5 @@
 use crate::observations::Observation;
-
-const ORACLE_FLOATS: &[(&str, &str)] = &[
-    ("0.284171835", "Pearl 1988"),
-    ("0.577350269", "sqrt(1/3) oracle"),
-    ("1.618033988", "phi oracle"),
-    ("2.718281828", "e oracle"),
-    ("3.141592653", "pi oracle"),
-];
+use super::common;
 
 const STUB_MACROS: &[&str] = &["todo!(", "unimplemented!(", "unreachable!("];
 const DEBUG_MACROS: &[&str] = &["println!(", "eprintln!(", "dbg!(", "print!("];
@@ -26,35 +19,13 @@ fn is_test_path(path: &str) -> bool {
 #[derive(Default)]
 struct FnMetrics {
     name: String,
+    start_line: usize,
     line_count: usize,
     branch_count: usize,
     nesting_depth: usize,
     literal_count: usize,
     total_tokens: usize,
     callees: Vec<String>,
-}
-
-fn detect_oracle_floats(filepath: &str, content: &str, obs: &mut Vec<Observation>) {
-    for (line_idx, line) in content.lines().enumerate() {
-        for (float_str, source) in ORACLE_FLOATS {
-            if line.contains(float_str) {
-                obs.push(Observation {
-                    file_path: filepath.to_string(),
-                    start_byte: 0,
-                    end_byte: 0,
-                    line: line_idx + 1,
-                    column: 1,
-                    kind: "oracle_float".to_string(),
-                    construct: float_str.to_string(),
-                    context: line.to_string(),
-                    message: format!(
-                        "Oracle float literal '{}' detected (source: {}) — potential answer injection",
-                        float_str, source
-                    ),
-                });
-            }
-        }
-    }
 }
 
 fn detect_stub_patterns(filepath: &str, content: &str, obs: &mut Vec<Observation>) {
@@ -312,10 +283,10 @@ fn collect_fn_metrics(content: &str) -> Vec<FnMetrics> {
     let mut brace_depth = 0i32;
     let mut fn_start_depth = 0i32;
 
-    for line in content.lines() {
+    for (line_idx, line) in content.lines().enumerate() {
         let trimmed = line.trim();
+        let line_num = line_idx + 1;
 
-        // Detect function start
         if trimmed.starts_with("pub fn ")
             || trimmed.starts_with("fn ")
             || trimmed.starts_with("async fn ")
@@ -332,24 +303,18 @@ fn collect_fn_metrics(content: &str) -> Vec<FnMetrics> {
             fn_start_depth = brace_depth;
             current = Some(FnMetrics {
                 name,
+                start_line: line_num,
                 ..Default::default()
             });
         }
 
         if let Some(ref mut m) = current {
             m.line_count += 1;
-
-            // Count branch keywords
-            if trimmed.contains("if ") || trimmed.contains("match ") || trimmed.contains("while ")
-            {
+            if trimmed.contains("if ") || trimmed.contains("match ") || trimmed.contains("while ") {
                 m.branch_count += 1;
             }
-
-            // Rough literal count
             m.literal_count += trimmed.matches('"').count() / 2;
             m.total_tokens += trimmed.split_whitespace().count();
-
-            // Track callees (very rough)
             for word in trimmed.split_whitespace() {
                 if word.ends_with("()") || word.ends_with("(") {
                     let callee = word.trim_end_matches('(').trim_end_matches(')');
@@ -360,8 +325,8 @@ fn collect_fn_metrics(content: &str) -> Vec<FnMetrics> {
             }
         }
 
-        // Track brace depth for nesting
-        for ch in trimmed.chars() {
+        // String-aware brace depth tracking
+        common::for_effective_braces(trimmed, |ch| {
             match ch {
                 '{' => {
                     brace_depth += 1;
@@ -382,7 +347,7 @@ fn collect_fn_metrics(content: &str) -> Vec<FnMetrics> {
                 }
                 _ => {}
             }
-        }
+        });
     }
 
     if let Some(m) = current {
@@ -403,7 +368,7 @@ fn check_fn_thresholds(
                 file_path: filepath.to_string(),
                 start_byte: 0,
                 end_byte: 0,
-                line: 1,
+                line: m.start_line,
                 column: 1,
                 kind: "fn_metric".to_string(),
                 construct: m.name.clone(),
@@ -420,7 +385,7 @@ fn check_fn_thresholds(
                 file_path: filepath.to_string(),
                 start_byte: 0,
                 end_byte: 0,
-                line: 1,
+                line: m.start_line,
                 column: 1,
                 kind: "fn_metric".to_string(),
                 construct: m.name.clone(),
@@ -437,7 +402,7 @@ fn check_fn_thresholds(
                 file_path: filepath.to_string(),
                 start_byte: 0,
                 end_byte: 0,
-                line: 1,
+                line: m.start_line,
                 column: 1,
                 kind: "fn_metric".to_string(),
                 construct: m.name.clone(),
@@ -453,7 +418,7 @@ fn check_fn_thresholds(
 
 pub fn parse_rust_source(filepath: &str, content: &str) -> Vec<Observation> {
     let mut obs = Vec::new();
-    detect_oracle_floats(filepath, content, &mut obs);
+    common::detect_oracle_floats(filepath, content, &mut obs);
     detect_risky_patterns(filepath, content, &mut obs);
     detect_stub_patterns(filepath, content, &mut obs);
     let metrics = collect_fn_metrics(content);
