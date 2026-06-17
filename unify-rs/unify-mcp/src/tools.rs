@@ -104,11 +104,18 @@ pub fn register_builtin_tools(registry: &mut ToolRegistry) {
                     Ok(json!({ "key": key, "hash": hash }))
                 }
                 ("rdf", "query") => {
-                    // Simple passthrough query stub
-                    Ok(json!({ "triples": [], "message": "RDF query dispatched" }))
+                    // TODO(anti-cheat): not yet implemented — unify/cli/dispatch does not
+                    // currently forward "rdf"/"query" to the unify-rdf triple store.
+                    // This arm must be wired to unify_rdf::Store::query() when that crate
+                    // is added as a dependency.
+                    Err("rdf/query via cli/dispatch is not yet implemented; use unify/rdf/query directly".to_string())
                 }
                 ("pm", "count") => {
-                    Ok(json!({ "count": 0, "message": "PM event count dispatched" }))
+                    // TODO(anti-cheat): not yet implemented — unify/cli/dispatch does not
+                    // currently forward "pm"/"count" to the unify-pm process mining layer.
+                    // This arm must be wired to unify_pm::EventLog::count() when that
+                    // crate is added as a dependency.
+                    Err("pm/count via cli/dispatch is not yet implemented; use unify/pm/event-count directly".to_string())
                 }
                 _ => Ok(json!({
                     "noun": noun,
@@ -308,10 +315,35 @@ fn attach_builtin_tools(server: McpServer) -> McpServer {
             }),
         },
         |params| {
-            let noun = params["noun"].as_str().unwrap_or("unknown");
-            let verb = params["verb"].as_str().unwrap_or("unknown");
+            let noun = params["noun"]
+                .as_str()
+                .ok_or_else(|| "Missing 'noun' parameter".to_string())?;
+            let verb = params["verb"]
+                .as_str()
+                .ok_or_else(|| "Missing 'verb' parameter".to_string())?;
             let args = params.get("args").cloned().unwrap_or(json!({}));
-            Ok(json!({ "noun": noun, "verb": verb, "status": "dispatched", "args": args }))
+            match (noun, verb) {
+                ("receipt", "compute") => {
+                    let key = args["key"].as_str().unwrap_or("default");
+                    let data = args["data"].as_str().unwrap_or("");
+                    let hash = blake3_hex(data.as_bytes());
+                    Ok(json!({ "key": key, "hash": hash }))
+                }
+                ("rdf", "query") => {
+                    // TODO(anti-cheat): not yet implemented — wiring to unify-rdf required.
+                    Err("rdf/query via cli/dispatch is not yet implemented; use unify/rdf/query directly".to_string())
+                }
+                ("pm", "count") => {
+                    // TODO(anti-cheat): not yet implemented — wiring to unify-pm required.
+                    Err("pm/count via cli/dispatch is not yet implemented; use unify/pm/event-count directly".to_string())
+                }
+                _ => Ok(json!({
+                    "noun": noun,
+                    "verb": verb,
+                    "status": "dispatched",
+                    "args": args
+                })),
+            }
         },
     );
 
@@ -376,7 +408,7 @@ fn attach_builtin_tools(server: McpServer) -> McpServer {
     )
 }
 
-/// Compute BLAKE3 hex hash of bytes.
+/// Compute a real BLAKE3 hex hash of bytes.
 fn blake3_hex(data: &[u8]) -> String {
     blake3::hash(data).to_hex().to_string()
 }

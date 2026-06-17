@@ -1,0 +1,12 @@
+[package]
+name = "wasm4pm-compat"
+version = "26.6.9"
+edition = "2021"
+
+[features]
+formats = []
+strict = []
+wasm4pm = []
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }

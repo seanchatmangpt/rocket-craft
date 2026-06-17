@@ -141,12 +141,10 @@ impl Law for AndroidKeystoreLaw {
 mod tests {
     use super::*;
     use super::plugin::PluginHost;
-    use std::io::Write;
-    use tempfile::NamedTempFile;
 
     #[test]
     fn test_plugin_host_new() {
         let host = PluginHost::new();
-        assert_eq!(host.receipts().len(), 0);
+        assert!(host.receipts().is_empty());
     }
 }

@@ -7,7 +7,7 @@ use serde_json::json;
 // Helpers
 // ─────────────────────────────────────────────
 
-/// Compute a BLAKE3 hex hash of bytes.
+/// Compute a real BLAKE3 hex hash of bytes.
 fn blake3_hex(data: &[u8]) -> String {
     blake3::hash(data).to_hex().to_string()
 }

@@ -6,6 +6,58 @@ use crate::manifest::Project;
 use serde::Serialize;
 use color_eyre::eyre::Result;
 
+/// Law that runs `anti-llm-cheat-lsp` over the project's `src/` directory.
+/// Skips gracefully when the binary is not installed.
+pub struct AntiCheatLaw {
+    config_path: std::path::PathBuf,
+}
+
+impl AntiCheatLaw {
+    pub fn new(config_path: std::path::PathBuf) -> Self {
+        Self { config_path }
+    }
+}
+
+impl Law for AntiCheatLaw {
+    fn name(&self) -> &str {
+        "anti-llm-cheat"
+    }
+
+    fn description(&self) -> &str {
+        "Source must pass anti-llm-cheat-lsp scan (detects fabricated evidence patterns)."
+    }
+
+    fn validate(&self, project_path: &Path) -> Result<(), LawError> {
+        let available = std::process::Command::new("anti-llm-cheat-lsp")
+            .arg("--version")
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+        if !available {
+            return Ok(());
+        }
+        let src_dir = project_path.join("src");
+        if !src_dir.exists() {
+            return Ok(());
+        }
+        let mut cmd = std::process::Command::new("anti-llm-cheat-lsp");
+        if self.config_path.exists() {
+            cmd.arg("--config").arg(&self.config_path);
+        }
+        let status = cmd.arg(&src_dir).status().map_err(|e| LawError {
+            law_name: "anti-llm-cheat".to_string(),
+            message: format!("Failed to spawn anti-llm-cheat-lsp: {e}"),
+        })?;
+        if !status.success() {
+            return Err(LawError {
+                law_name: "anti-llm-cheat".to_string(),
+                message: "anti-llm-cheat-lsp scan detected fabricated evidence patterns".to_string(),
+            });
+        }
+        Ok(())
+    }
+}
+
 #[derive(Serialize)]
 pub struct ComplianceResult {
     pub project_name: String,

@@ -59,10 +59,12 @@ pub fn cmd_logs(
     file: Option<String>,
     lines: usize,
 ) -> anyhow::Result<()> {
-    println!("Tailing logs... (Not fully implemented)");
-    if let Some(f) = file {
-        println!("File: {}", f);
-    }
-    println!("Lines: {}", lines);
-    Ok(())
+    // TODO(anti-cheat): `file` and `lines` were silently discarded — the old body printed
+    // "Tailing logs... (Not fully implemented)" and returned Ok(()) with no real log tailing.
+    // Real implementation: open the UE4 log file (Saved/Logs/<project>.log), seek to EOF-N
+    // lines, then stream new content. Delegate to `rocket-cmd/src/main.rs::run_logs()`.
+    let _ = (file, lines);
+    Err(anyhow::anyhow!(
+        "cmd_logs not yet implemented; use `rocket logs` (rocket-cmd binary) directly"
+    ))
 }

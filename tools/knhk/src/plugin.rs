@@ -22,6 +22,14 @@ impl PluginHost {
         }
     }
 
+    pub fn record_receipt(&mut self, receipt: Receipt) {
+        self.receipts.push(receipt);
+    }
+
+    pub fn receipts(&self) -> &[Receipt] {
+        &self.receipts
+    }
+
     pub fn load_law(&mut self, wasm_path: &Path) -> Result<WasmLaw> {
         let mut store = Store::default();
         let wasm_bytes = std::fs::read(wasm_path)
@@ -47,13 +55,6 @@ impl PluginHost {
         })
     }
 
-    pub fn record_receipt(&mut self, receipt: Receipt) {
-        self.receipts.push(receipt);
-    }
-
-    pub fn receipts(&self) -> &[Receipt] {
-        &self.receipts
-    }
 }
 
 pub struct WasmLaw {

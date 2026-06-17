@@ -1,16 +1,16 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use chrono::{DateTime, Utc};
 use std::path::PathBuf;
 use std::process::Command;
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Clone, PartialEq)]
 pub enum CheckStatus {
     Pass,
     Warn,
     Fail,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct CheckResult {
     pub name: String,
     pub status: CheckStatus,
@@ -18,7 +18,11 @@ pub struct CheckResult {
     pub details: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+// TODO(anti-cheat): DiagnosticReport previously derived Deserialize but DateTime<Utc>
+// requires chrono's "serde" feature flag which was not enabled in Cargo.toml, causing
+// a compile error. The CLI only serializes (outputs) diagnostic reports — it never
+// deserializes them — so Deserialize has been removed.
+#[derive(Debug, Serialize, Clone)]
 pub struct DiagnosticReport {
     pub timestamp: DateTime<Utc>,
     pub checks: Vec<CheckResult>,
@@ -43,6 +47,7 @@ impl RocketDoctor {
             self.check_versions_dir(),
             self.check_ue4_root(),
             self.check_ggen(),
+            self.check_anti_llm_cheat_lsp(),
         ];
 
         DiagnosticReport {
@@ -214,6 +219,25 @@ impl RocketDoctor {
         }
     }
     
+    fn check_anti_llm_cheat_lsp(&self) -> CheckResult {
+        match Command::new("anti-llm-cheat-lsp").arg("--version").output() {
+            Ok(output) => CheckResult {
+                name: "anti-llm-cheat-lsp".to_string(),
+                status: CheckStatus::Pass,
+                message: String::from_utf8_lossy(&output.stdout).trim().to_string(),
+                details: None,
+            },
+            Err(_) => CheckResult {
+                name: "anti-llm-cheat-lsp".to_string(),
+                status: CheckStatus::Warn,
+                message: "anti-llm-cheat-lsp not found in PATH".to_string(),
+                details: Some(
+                    "Install: cargo install lsp-max --bin anti-llm-cheat-lsp".to_string(),
+                ),
+            },
+        }
+    }
+
     fn check_ue4_root(&self) -> CheckResult {
         let rocket_json = self.project_root.join(".rocket.json");
         if rocket_json.exists() {
