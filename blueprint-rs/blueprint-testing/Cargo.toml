@@ -9,3 +9,5 @@ serde_json = "1"
 
 [dev-dependencies]
 blueprint-core = { path = "../blueprint-core" }
+chicago-tdd-tools = { path = "../../chicago-tdd-tools" }
+anyhow = "1"
