@@ -1,0 +1,19 @@
+[package]
+name = "genie-core"
+version = "0.1.0"
+edition = "2021"
+description = "Core data model and specification for the Genie 26 World Manufacturing Platform"
+
+[dependencies]
+unify-core = { path = "../unify-core" }
+unify-rdf = { path = "../unify-rdf" }
+unify-receipts = { path = "../unify-receipts" }
+unify-wasm = { path = "../unify-wasm" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+blake3 = { workspace = true }
+tracing = { workspace = true }
+regex = "1"
+

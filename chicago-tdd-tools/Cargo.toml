@@ -7,3 +7,5 @@ edition = "2024"
 tempfile = "3.10"
 anyhow = "1.0"
 clap = { version = "4.5", features = ["derive"] }
+unify-wasm = { path = "../unify-rs/unify-wasm" }
+un-test-utils = { path = "../tools/un-test-utils" }
