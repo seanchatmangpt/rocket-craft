@@ -70,3 +70,30 @@ impl SimulationEngine {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_rocket_contract_hash() {
+        let contract = RocketContract::new("test_rocket".to_string(), 42);
+        let hash = contract.compute_hash();
+        assert!(!hash.is_empty());
+    }
+
+    #[test]
+    fn test_generate_artifact() {
+        let dir = tempdir().unwrap();
+        let contract = RocketContract::new("test_artifact".to_string(), 123);
+        let path = contract.generate_artifact(dir.path()).unwrap();
+        assert!(path.exists());
+        
+        let content = std::fs::read_to_string(path).unwrap();
+        let loaded: RocketContract = serde_json::from_str(&content).unwrap();
+        assert_eq!(loaded.name, contract.name);
+        assert_eq!(loaded.world_seed, contract.world_seed);
+    }
+}
+

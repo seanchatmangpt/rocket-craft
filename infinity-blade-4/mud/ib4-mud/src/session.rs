@@ -1014,7 +1014,7 @@ impl GameSession {
     }
 
     fn random_dir(&mut self) -> AttackDir {
-        match self.rng.gen_range(0..3u32) {
+        match self.rng.random_range(0..3u32) {
             0 => AttackDir::Overhead,
             1 => AttackDir::Left,
             _ => AttackDir::Right,

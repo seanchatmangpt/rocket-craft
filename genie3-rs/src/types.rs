@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 /// A 3D coordinate, vector, or displacement.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[repr(C)]
 pub struct Vector3 {
     pub x: f32,
     pub y: f32,
@@ -70,6 +71,7 @@ impl Default for Vector3 {
 
 /// 3D Euler angles representation for rotations (in degrees).
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[repr(C)]
 pub struct Rotation3D {
     /// Rotation around the Y-axis (in degrees).
     pub pitch: f32,
@@ -114,6 +116,7 @@ impl Default for Rotation3D {
 
 /// Axis-aligned bounding box (AABB) in 3D space.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[repr(C)]
 pub struct Bounds3D {
     /// The center coordinates of the bounds.
     pub center: Vector3,
@@ -158,6 +161,7 @@ impl Default for Bounds3D {
 
 /// Complete placement definition in the 3D world (position, rotation, scale).
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[repr(C)]
 pub struct Transform {
     pub position: Vector3,
     pub rotation: Rotation3D,
