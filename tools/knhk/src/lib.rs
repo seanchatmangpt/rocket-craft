@@ -139,12 +139,12 @@ impl Law for AndroidKeystoreLaw {
 mod tests {
     use super::*;
     use super::plugin::PluginHost;
-    use std::io::Write;
-    use tempfile::NamedTempFile;
 
     #[test]
     fn test_plugin_host_new() {
-        let host = PluginHost::new();
-        assert_eq!(host.receipts().len(), 0);
+        // Verify PluginHost can be constructed without panicking.
+        // Receipt tracking was removed (fabricated Receipt type dependency);
+        // see plugin.rs TODO(anti-cheat) for context.
+        let _host = PluginHost::new();
     }
 }

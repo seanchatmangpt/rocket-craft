@@ -1,16 +1,16 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use chrono::{DateTime, Utc};
 use std::path::PathBuf;
 use std::process::Command;
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Serialize, Clone, PartialEq)]
 pub enum CheckStatus {
     Pass,
     Warn,
     Fail,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Clone)]
 pub struct CheckResult {
     pub name: String,
     pub status: CheckStatus,
@@ -18,7 +18,11 @@ pub struct CheckResult {
     pub details: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+// TODO(anti-cheat): DiagnosticReport previously derived Deserialize but DateTime<Utc>
+// requires chrono's "serde" feature flag which was not enabled in Cargo.toml, causing
+// a compile error. The CLI only serializes (outputs) diagnostic reports — it never
+// deserializes them — so Deserialize has been removed.
+#[derive(Debug, Serialize, Clone)]
 pub struct DiagnosticReport {
     pub timestamp: DateTime<Utc>,
     pub checks: Vec<CheckResult>,

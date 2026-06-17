@@ -80,10 +80,16 @@ pub fn cmd_logs(
     #[arg(short, long, default_value = "50")]
     lines: usize,
 ) -> clap_noun_verb::Result<EmptyResponse> {
-    println!("Tailing logs... (Not fully implemented)");
-    if let Some(f) = file {
-        println!("File: {}", f);
-    }
-    println!("Lines: {}", lines);
-    Ok(EmptyResponse {})
+    // TODO(anti-cheat): Both `file` and `lines` arguments were accepted but silently
+    // discarded — only "Tailing logs... (Not fully implemented)" was printed, giving
+    // the false impression of a working log tailer.
+    // The real log-tailing implementation lives in `rocket-cmd/src/main.rs::run_logs()`.
+    // This clap_noun_verb wrapper must delegate to that function once the
+    // `clap-noun-verb` path dependency is properly vendored.
+    // Until then, invoke `rocket logs` (the rocket-cmd binary) directly.
+    let _ = (file, lines); // suppress unused-variable warnings
+    Err(clap_noun_verb::Error::from(
+        "cmd_logs is not yet implemented in the clap_noun_verb wrapper; \
+         use `rocket logs` (rocket-cmd binary) directly".to_string(),
+    ))
 }
