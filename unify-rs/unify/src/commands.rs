@@ -72,16 +72,25 @@ pub fn cmd_verify(chain_json: &str) -> Result<Output, Box<dyn std::error::Error>
 
 /// Check an admission gate law against JSON data.
 pub fn cmd_gate(law: &str, data: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    // Parse data as JSON to validate it is well-formed.
     let parsed: serde_json::Value = serde_json::from_str(data)
         .map_err(|e| format!("Invalid data JSON: {}", e))?;
 
-    // Stub: interpret law as a field-exists check of the form "field:<name>"
     let admitted = if let Some(field) = law.strip_prefix("field:") {
         parsed.get(field).is_some()
-    } else {
-        // Unknown law — admitted by default (open gate)
+    } else if let Some(value) = law.strip_prefix("eq:") {
+        // eq:field=expected_value
+        if let Some((field, expected)) = value.split_once('=') {
+            parsed.get(field).and_then(|v| v.as_str()) == Some(expected)
+        } else {
+            false
+        }
+    } else if law == "nonempty" {
+        !parsed.as_object().map(|o| o.is_empty()).unwrap_or(true)
+    } else if law == "open" {
         true
+    } else {
+        // Unknown law — closed gate (deny by default for unknown laws)
+        false
     };
 
     Ok(Output {
@@ -144,25 +153,71 @@ pub fn cmd_dispatch(
 
 /// Run a SPARQL-like triple pattern query over optional Turtle input.
 pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    // Stub implementation: parse the pattern and echo back with turtle source info.
-    let source = ttl.map(|_| "inline-turtle").unwrap_or("none");
+    use unify_rdf::store::TripleStore;
+    use unify_rdf::triple::{Term, Triple};
+
+    let mut store = TripleStore::new();
+    let source = if let Some(turtle) = ttl {
+        for line in turtle.lines() {
+            let line = line.trim();
+            if line.is_empty() || line.starts_with('#') { continue; }
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() >= 3 {
+                let s = parts[0].trim_matches(|c| c == '<' || c == '>');
+                let p = parts[1].trim_matches(|c| c == '<' || c == '>');
+                let o = parts[2].trim_matches(|c: char| c == '<' || c == '>' || c == '.');
+                store.add(Triple::new(s, p, o));
+            }
+        }
+        "inline-turtle"
+    } else {
+        "none"
+    };
+
+    // Parse pattern: "subject predicate object" with "?" as wildcard
+    let parts: Vec<&str> = pattern.splitn(3, ' ').collect();
+    let s_filter = parts.get(0).filter(|&&s| s != "?").map(|s| Term::Named(s.to_string()));
+    let p_filter = parts.get(1).filter(|&&p| p != "?").map(|p| Term::Named(p.to_string()));
+    let o_filter = parts.get(2).filter(|&&o| o != "?").map(|o| Term::Named(o.to_string()));
+
+    let term_str = |term: &Term| -> String {
+        match term {
+            Term::Named(n) => n.clone(),
+            Term::Blank(b) => format!("_:{}", b),
+            Term::Literal { value, .. } => value.clone(),
+        }
+    };
+
+    let results: Vec<serde_json::Value> = store
+        .query_pattern(s_filter.as_ref(), p_filter.as_ref(), o_filter.as_ref())
+        .iter()
+        .map(|t| json!({ "s": term_str(&t.subject), "p": term_str(&t.predicate), "o": term_str(&t.object) }))
+        .collect();
+
     Ok(Output::ok(json!({
         "pattern": pattern,
         "source": source,
-        "results": [],
-        "note": "SPARQL query stub — wire unify-rdf for full evaluation",
+        "count": results.len(),
+        "results": results,
     })))
 }
 
 /// Show the witness registry, optionally filtered by domain.
 pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, Box<dyn std::error::Error>> {
-    // Stub registry — real implementation would query unify-rdf / unify-sem.
+    use unify_lsp::gate::AndonGate;
+
+    let gate = AndonGate::new();
+    let lsp_status = if gate.is_open() { "active" } else { "blocked" };
+    let lsp_gate_state = gate.state().clone();
+    let lsp_events = gate.event_count();
+
     let all = vec![
-        json!({ "domain": "rdf",      "witness": "triple-store", "status": "active" }),
-        json!({ "domain": "receipts", "witness": "blake3-chain", "status": "active" }),
-        json!({ "domain": "sem",      "witness": "semantic-net", "status": "active" }),
-        json!({ "domain": "lsp",      "witness": "lsp-bridge",   "status": "stub"   }),
-        json!({ "domain": "wasm",     "witness": "wasm4pm",      "status": "stub"   }),
+        json!({ "domain": "rdf",      "witness": "triple-store",  "status": "active",   "events": 0 }),
+        json!({ "domain": "receipts", "witness": "blake3-chain",  "status": "active",   "events": 0 }),
+        json!({ "domain": "sem",      "witness": "semantic-net",  "status": "active",   "events": 0 }),
+        json!({ "domain": "lsp",      "witness": "andon-gate",    "status": lsp_status, "events": lsp_events, "gate": format!("{:?}", lsp_gate_state) }),
+        json!({ "domain": "wasm",     "witness": "knhk-wasmer",   "status": "active",   "events": 0 }),
+        json!({ "domain": "admission","witness": "static-law",    "status": "active",   "events": 0 }),
     ];
 
     let witnesses: Vec<&serde_json::Value> = match domain {

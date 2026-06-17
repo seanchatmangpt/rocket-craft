@@ -16,6 +16,7 @@ members = [
     "unify-pm",
     "unify-rocket",
     "unify",
+    "anti-llm-cheat-lsp",
 ]
 resolver = "2"
 

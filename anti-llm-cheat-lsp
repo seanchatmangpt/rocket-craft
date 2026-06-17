@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# anti-llm-cheat-lsp — wrapper for the anti-llm-cheat-lsp LSP binary
+# Builds (if needed) and delegates to the compiled binary.
+#
+# Usage:
+#   ./anti-llm-cheat-lsp serve --stdio        # LSP server over stdio (wire to editors)
+#   ./anti-llm-cheat-lsp scan                 # Scan current directory
+#   ./anti-llm-cheat-lsp scan --dir ./src     # Scan specific directory
+#   ./anti-llm-cheat-lsp scan --ignore-dirs target --ignore-dirs .git
+#
+# Editor wiring (example neovim/lspconfig):
+#   cmd = { "/path/to/rocket-craft/anti-llm-cheat-lsp", "serve", "--stdio" }
+#
+# VS Code settings.json example:
+#   "anti-llm-cheat-lsp.serverPath": "/path/to/rocket-craft/anti-llm-cheat-lsp"
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+BINARY="$REPO_ROOT/unify-rs/target/release/anti-llm-cheat-lsp"
+WORKSPACE="$REPO_ROOT/unify-rs"
+
+# Build if binary is missing or source is newer
+if [ ! -f "$BINARY" ] || [ "$WORKSPACE/anti-llm-cheat-lsp/src" -nt "$BINARY" ] 2>/dev/null; then
+    echo "[anti-llm-cheat-lsp] Building..." >&2
+    (cd "$WORKSPACE" && cargo build -p anti-llm-cheat-lsp --release 2>&1) >&2
+fi
+
+exec "$BINARY" "$@"

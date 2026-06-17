@@ -1,0 +1,32 @@
+# Anti-LLM Admissibility Scanner Configuration
+# Used by anti-llm-cheat-lsp to configure per-repo scanning behavior.
+# See: ./anti-llm-cheat-lsp scan --dir .
+
+[claim]
+# Domain terms that are canonical vocabulary in this repo and must NOT
+# trigger CLAIM-004 victory-language detection.
+# "fully admitted" is a typestate term in unify-rs Machine<Law, Admitted>.
+# "candidate" is a valid phase in the Machine<Law, Phase> pattern.
+domain_terms = [
+    "fully admitted",
+    "candidate",
+    "done",
+    "admitted",
+]
+
+[surface]
+# Path prefixes where SURFACE-001 (plain tower-lsp reference) fires as
+# informational rather than blocking. Useful for historical docs.
+non_blocking_path_prefixes = [
+    "docs/",
+    "CLAUDE.md",
+    "versions/",
+]
+
+[test]
+# Path prefixes where Vec::contains structural checks are expected.
+structural_check_paths = [
+    "nexus-engine/crates/nexus-tests/",
+    "chicago-tdd-tools/",
+    "unify-rs/unify-integration-tests/",
+]
