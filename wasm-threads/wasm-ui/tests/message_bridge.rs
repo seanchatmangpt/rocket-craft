@@ -78,7 +78,8 @@ fn bridge_serializes_move_input_command() {
     let json = bridge.serialize_to_game(&msg).unwrap();
 
     log.info("Then the JSON contains 'Move'");
-    assert!(json.contains("Move"));
+    let parsed: UiToGameMessage = serde_json::from_str(&json).unwrap();
+    assert!(matches!(parsed, UiToGameMessage::Input(InputCommand::Move { .. })));
 }
 
 #[test]
@@ -91,7 +92,8 @@ fn bridge_serializes_pause_message() {
     let json = bridge.serialize_to_game(&UiToGameMessage::Pause).unwrap();
 
     log.info("Then the JSON contains 'Pause'");
-    assert!(json.contains("Pause"));
+    let parsed: UiToGameMessage = serde_json::from_str(&json).unwrap();
+    assert!(matches!(parsed, UiToGameMessage::Pause));
 }
 
 #[test]

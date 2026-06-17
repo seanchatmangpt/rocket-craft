@@ -1,20 +1,15 @@
 # Progress Tracker
 
 ## Current Status
-Last visited: 2026-06-15T16:56:00-07:00
+Last visited: 2026-06-17T23:25:40Z
 
 ## Iteration Status
 Current iteration: 1 / 32
 
 ## Tasks Checklist
-- [x] Planning and setup [done]
-- [x] Milestone 1: DB Schema & Trigger [done]
-- [x] Milestone 2: Auth & Frontend Setup [done]
-- [x] Milestone 3: Admin Dashboard & Leaderboard [done]
-- [x] Milestone 4: Edge Function Submit Score [done]
-- [x] Milestone 5: E2E Testing & Verification [done]
-- [x] Follow-up Milestone 1: Update Playwright configuration to run chromium only [done]
-- [x] Follow-up Milestone 2: Fix test regex in example.spec.ts [done]
-- [x] Follow-up Milestone 3: Verify Vitest unit tests run and pass [done]
-- [x] Follow-up Milestone 4: Verify Playwright E2E tests run and pass [done]
-
+- [x] Milestone 1: Technical Exploration and Baseline Assessment [done]
+- [/] Milestone 2: Complete Stubs and Placeholders (R1) [in-progress]
+- [/] Milestone 3: Replace Single-Line and Catch-All Stubs (R2) [in-progress]
+- [/] Milestone 4: Harden Assertions & Eliminate Test Shortcuts (R3) [in-progress]
+- [/] Milestone 5: Remove Debug Macros and Overclaim Language (R4, R5) [in-progress]
+- [ ] Milestone 6: Final Verification & Integration [pending]

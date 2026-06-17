@@ -20,58 +20,71 @@
     }
   }
 
-  function fetchWithProgress(url, type) {
-    return fetch(url).then((response) => {
-      if (!response.ok) {
-        throw new Error(`Failed to load ${url}: ${response.statusText}`);
-      }
+  /**
+   * Robust fetch with progress and DecompressionStream support
+   */
+  async function fetchWithProgress(url, type) {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to load ${url}: ${response.statusText}`);
+    }
 
-      const contentLength = response.headers.get('content-length');
-      const total = contentLength ? parseInt(contentLength, 10) : 0;
+    const contentLength = response.headers.get('content-length');
+    const total = contentLength ? parseInt(contentLength, 10) : 0;
 
-      if (!response.body) {
-        throw new Error('ReadableStream not supported on response body');
-      }
+    if (!response.body) {
+      throw new Error('ReadableStream not supported on response body');
+    }
 
-      const reader = response.body.getReader();
-      let loaded = 0;
-      const chunks = [];
-
-      return new Promise((resolve, reject) => {
-        function read() {
-          reader
-            .read()
-            .then(({ done, value }) => {
-              if (done) {
-                const resultBuffer = new Uint8Array(loaded);
-                let offset = 0;
-                for (const chunk of chunks) {
-                  resultBuffer.set(chunk, offset);
-                  offset += chunk.length;
-                }
-                resolve(resultBuffer);
-                return;
-              }
-
-              chunks.push(value);
-              loaded += value.length;
-
-              if (total > 0) {
-                loadProgress[type] = (loaded / total) * 100;
-                const combinedProgress = (loadProgress.wasm + loadProgress.data) / 2;
-                updateStatus(
-                  `Downloading game package...`,
-                  `Received ${Math.round(loaded / 1024)} KB / ${Math.round(total / 1024)} KB for ${url}`,
-                  combinedProgress
-                );
-              }
-              read();
-            })
-            .catch(reject);
+    // Check for GZIP compression
+    const isGzip = url.endsWith('.gz') || response.headers.get('Content-Encoding') === 'gzip' || response.headers.get('Content-Type') === 'application/x-gzip';
+    
+    let loaded = 0;
+    const progressStream = new TransformStream({
+      transform(chunk, controller) {
+        loaded += chunk.length;
+        if (total > 0) {
+          loadProgress[type] = (loaded / total) * 100;
+          const combinedProgress = (loadProgress.wasm + loadProgress.data) / 2;
+          updateStatus(
+            `Downloading game package...`,
+            `Received ${Math.round(loaded / 1024)} KB / ${Math.round(total / 1024)} KB for ${url}`,
+            combinedProgress
+          );
         }
-        read();
-      });
+        controller.enqueue(chunk);
+      }
     });
+
+    let stream = response.body.pipeThrough(progressStream);
+    
+    if (isGzip) {
+      if (typeof DecompressionStream !== 'undefined') {
+        console.log(`Decompressing ${url} via browser DecompressionStream...`);
+        stream = stream.pipeThrough(new DecompressionStream('gzip'));
+      } else {
+        console.warn(`DecompressionStream not supported, but ${url} appears to be gzipped. Falling back to raw stream (may fail).`);
+      }
+    }
+
+    const reader = stream.getReader();
+    const chunks = [];
+    let totalLength = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      totalLength += value.length;
+    }
+
+    const resultBuffer = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      resultBuffer.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return resultBuffer;
   }
 
   updateStatus('Initializing game engine...', 'Establishing connection...', 0);
@@ -94,163 +107,294 @@
       updateStatus('Failed to launch game', error.message, 0);
     });
 
+  /**
+   * Real WebGL 2.0 Rendering Implementation
+   */
   function runGame() {
-    window.UE4_EngineReady = true;
-    console.log('Game Assets Decoded:', gameDataText);
+    console.log('Finalizing WebGL 2.0 readiness...');
+    
     if (loadingOverlay) loadingOverlay.style.display = 'none';
     if (canvas) canvas.style.display = 'block';
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let carX = 100;
-    let carY = 300;
-    let speed = 4;
-    let obstacles = [
-      { x: 400, y: 300, width: 30, height: 40, passed: false },
-      { x: 700, y: 300, width: 30, height: 40, passed: false },
-    ];
-    let score = 0;
-    let isGameOver = false;
-
-    // Game loop
-    function loop() {
-      if (isGameOver) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = '#f39c12';
-        ctx.font = 'bold 36px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('CRASHED!', canvas.width / 2, canvas.height / 2 - 20);
-
-        ctx.fillStyle = '#eee';
-        ctx.font = '20px Arial';
-        ctx.fillText(
-          `Final Score: ${score} - Press SPACE to restart`,
-          canvas.width / 2,
-          canvas.height / 2 + 20
-        );
-        return;
-      }
-
-      // Physics / Updates
-      carX += speed;
-      if (carX > canvas.width - 150) {
-        carX = 50;
-        obstacles.forEach((o) => {
-          o.x = canvas.width + Math.random() * 300;
-          o.passed = false;
-        });
-      }
-
-      // Move obstacles
-      obstacles.forEach((o) => {
-        if (carX > o.x && !o.passed) {
-          o.passed = true;
-          score += 100;
-        }
-      });
-
-      // Collision Check
-      obstacles.forEach((o) => {
-        if (carX + 60 > o.x && carX < o.x + o.width && carY + 30 > o.y && carY < o.y + o.height) {
-          isGameOver = true;
-        }
-      });
-
-      // Render
-      ctx.fillStyle = '#222';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw Horizon/Sky
-      ctx.fillStyle = '#111';
-      ctx.fillRect(0, 0, canvas.width, 220);
-
-      // Draw Stars/Grid
-      ctx.strokeStyle = '#333';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < canvas.width; i += 40) {
-        ctx.beginPath();
-        ctx.moveTo(i, 220);
-        ctx.lineTo(i - 100, canvas.height);
-        ctx.stroke();
-      }
-
-      // Draw Road
-      ctx.fillStyle = '#333';
-      ctx.fillRect(0, 220, canvas.width, canvas.height - 220);
-      ctx.fillStyle = '#f39c12';
-      ctx.fillRect(0, 218, canvas.width, 4);
-
-      // Draw Car (Barbarian Road Mashine)
-      ctx.fillStyle = '#e74c3c';
-      ctx.fillRect(carX, carY, 60, 20);
-      ctx.fillStyle = '#f39c12';
-      ctx.fillRect(carX + 45, carY - 10, 15, 10);
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.arc(carX + 15, carY + 20, 8, 0, Math.PI * 2);
-      ctx.arc(carX + 45, carY + 20, 8, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Draw Obstacles
-      ctx.fillStyle = '#95a5a6';
-      obstacles.forEach((o) => {
-        ctx.fillRect(o.x, o.y, o.width, o.height);
-        ctx.fillStyle = '#7f8c8d';
-        ctx.fillRect(o.x + 5, o.y + 5, o.width - 10, o.height - 10);
-      });
-
-      // Draw UI HUD
-      ctx.fillStyle = '#fff';
-      ctx.font = '16px monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(`SYSTEM: BRM ENGINE (WASM CLIENT)`, 20, 30);
-      ctx.fillText(`ASSETS: ${gameDataText.substring(0, 24)}...`, 20, 50);
-      ctx.fillText(`SCORE: ${score}`, 20, 70);
-
-      requestAnimationFrame(loop);
-    }
-
-    // Keyboard handlers
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        if (isGameOver) {
-          isGameOver = false;
-          score = 0;
-          carX = 100;
-          obstacles = [
-            { x: 400, y: 300, width: 30, height: 40, passed: false },
-            { x: 700, y: 300, width: 30, height: 40, passed: false },
-          ];
-          loop();
-        } else {
-          // Jump simulation
-          if (carY === 300) {
-            let jumpHeight = 0;
-            let jumpingUp = true;
-            function jump() {
-              if (jumpingUp) {
-                carY -= 5;
-                jumpHeight += 5;
-                if (jumpHeight >= 80) jumpingUp = false;
-              } else {
-                carY += 5;
-                jumpHeight -= 5;
-                if (jumpHeight <= 0) {
-                  carY = 300;
-                  return;
-                }
-              }
-              setTimeout(jump, 16);
-            }
-            jump();
-          }
-        }
-      }
+    const gl = canvas.getContext('webgl2', { 
+      antialias: true, 
+      alpha: false, 
+      depth: true, 
+      stencil: false, 
+      desynchronized: true,
+      preserveDrawingBuffer: false
     });
 
-    loop();
+    if (!gl) {
+      const msg = 'WebGL 2.0 not supported by your browser. This application requires WebGL 2.0.';
+      console.error(msg);
+      updateStatus('Launch Error', msg, 0);
+      return;
+    }
+
+    console.log('WebGL 2.0 Context established. Renderer: ' + gl.getParameter(gl.RENDERER));
+
+    // --- Shaders ---
+    const vsSource = `#version 300 es
+      layout(location = 0) in vec3 aPosition;
+      layout(location = 1) in vec3 aNormal;
+
+      uniform mat4 uModelViewMatrix;
+      uniform mat4 uProjectionMatrix;
+      uniform vec3 uColor;
+
+      out vec3 vNormal;
+      out vec3 vColor;
+
+      void main() {
+        gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
+        vNormal = aNormal;
+        vColor = uColor;
+      }
+    `;
+
+    const fsSource = `#version 300 es
+      precision highp float;
+      in vec3 vNormal;
+      in vec3 vColor;
+      out vec4 outColor;
+
+      void main() {
+        vec3 lightDir = normalize(vec3(0.5, 1.0, 0.7));
+        float diff = max(dot(normalize(vNormal), lightDir), 0.2);
+        outColor = vec4(vColor * diff, 1.0);
+      }
+    `;
+
+    function createShader(gl, type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+      }
+      return shader;
+    }
+
+    const vertexShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
+    const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error('Program link error:', gl.getProgramInfoLog(program));
+      return;
+    }
+
+    const programInfo = {
+      program: program,
+      attribLocations: {
+        position: gl.getAttribLocation(program, 'aPosition'),
+        normal: gl.getAttribLocation(program, 'aNormal'),
+      },
+      uniformLocations: {
+        projectionMatrix: gl.getUniformLocation(program, 'uProjectionMatrix'),
+        modelViewMatrix: gl.getUniformLocation(program, 'uModelViewMatrix'),
+        color: gl.getUniformLocation(program, 'uColor'),
+      },
+    };
+
+    // --- Geometry ---
+    function createCube() {
+      const positions = [
+        -1,-1, 1,  1,-1, 1,  1, 1, 1, -1, 1, 1, // Front
+        -1,-1,-1, -1, 1,-1,  1, 1,-1,  1,-1,-1, // Back
+        -1, 1,-1, -1, 1, 1,  1, 1, 1,  1, 1,-1, // Top
+        -1,-1,-1,  1,-1,-1,  1,-1, 1, -1,-1, 1, // Bottom
+         1,-1,-1,  1, 1,-1,  1, 1, 1,  1,-1, 1, // Right
+        -1,-1,-1, -1,-1, 1, -1, 1, 1, -1, 1,-1, // Left
+      ];
+      const normals = [
+         0, 0, 1,  0, 0, 1,  0, 0, 1,  0, 0, 1,
+         0, 0,-1,  0, 0,-1,  0, 0,-1,  0, 0,-1,
+         0, 1, 0,  0, 1, 0,  0, 1, 0,  0, 1, 0,
+         0,-1, 0,  0,-1, 0,  0,-1, 0,  0,-1, 0,
+         1, 0, 0,  1, 0, 0,  1, 0, 0,  1, 0, 0,
+        -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+      ];
+      const indices = [
+        0, 1, 2,  0, 2, 3,    4, 5, 6,  4, 6, 7,
+        8, 9,10,  8,10,11,   12,13,14, 12,14,15,
+        16,17,18, 16,18,19,  20,21,22, 20,22,23,
+      ];
+      return { positions, normals, indices };
+    }
+
+    const cubeData = createCube();
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    const posBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubeData.positions), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(programInfo.attribLocations.position);
+    gl.vertexAttribPointer(programInfo.attribLocations.position, 3, gl.FLOAT, false, 0, 0);
+
+    const normBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubeData.normals), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(programInfo.attribLocations.normal);
+    gl.vertexAttribPointer(programInfo.attribLocations.normal, 3, gl.FLOAT, false, 0, 0);
+
+    const indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeData.indices), gl.STATIC_DRAW);
+
+    // --- Math Utils ---
+    const mat4 = {
+      perspective: (out, fov, aspect, near, far) => {
+        const f = 1.0 / Math.tan(fov / 2);
+        const nf = 1 / (near - far);
+        out.fill(0);
+        out[0] = f / aspect;
+        out[5] = f;
+        out[10] = (far + near) * nf;
+        out[11] = -1;
+        out[14] = (2 * far * near) * nf;
+      },
+      identity: (out) => {
+        out.fill(0);
+        out[0] = out[5] = out[10] = out[15] = 1;
+      },
+      translate: (out, a, v) => {
+        for(let i=0; i<16; i++) out[i] = a[i];
+        out[12] = a[0] * v[0] + a[4] * v[1] + a[8] * v[2] + a[12];
+        out[13] = a[1] * v[0] + a[5] * v[1] + a[9] * v[2] + a[13];
+        out[14] = a[2] * v[0] + a[6] * v[1] + a[10] * v[2] + a[14];
+        out[15] = a[3] * v[0] + a[7] * v[1] + a[11] * v[2] + a[15];
+      },
+      rotateY: (out, a, rad) => {
+        const s = Math.sin(rad), c = Math.cos(rad);
+        const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+        const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+        for(let i=0; i<16; i++) out[i] = a[i];
+        out[0] = a00 * c - a20 * s; out[1] = a01 * c - a21 * s;
+        out[2] = a02 * c - a22 * s; out[3] = a03 * c - a23 * s;
+        out[8] = a00 * s + a20 * c; out[9] = a01 * s + a21 * c;
+        out[10] = a02 * s + a22 * c; out[11] = a03 * s + a23 * c;
+      },
+      rotateX: (out, a, rad) => {
+        const s = Math.sin(rad), c = Math.cos(rad);
+        const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+        const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+        for(let i=0; i<16; i++) out[i] = a[i];
+        out[4] = a10 * c + a20 * s; out[5] = a11 * c + a21 * s;
+        out[6] = a12 * c + a22 * s; out[7] = a13 * c + a23 * s;
+        out[8] = a20 * c - a10 * s; out[9] = a21 * c - a11 * s;
+        out[10] = a22 * c - a12 * s; out[11] = a23 * c - a13 * s;
+      },
+      scale: (out, a, v) => {
+        out[0] = a[0] * v[0]; out[1] = a[1] * v[0]; out[2] = a[2] * v[0]; out[3] = a[3] * v[0];
+        out[4] = a[4] * v[1]; out[5] = a[5] * v[1]; out[6] = a[6] * v[1]; out[7] = a[7] * v[1];
+        out[8] = a[8] * v[2]; out[9] = a[9] * v[2]; out[10] = a[10] * v[2]; out[11] = a[11] * v[2];
+        out[12] = a[12]; out[13] = a[13]; out[14] = a[14]; out[15] = a[15];
+      }
+    };
+
+    // --- State & Interaction ---
+    let player = { x: 0, y: 0, z: 200, yaw: 0.0, pitch: 0.0 };
+    let actors = [];
+    let keys = {};
+    const coordsDiv = document.getElementById('coords');
+
+    function resize() {
+      const displayWidth = canvas.clientWidth;
+      const displayHeight = canvas.clientHeight;
+      if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+    window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+    // Parse data
+    try {
+      actors = JSON.parse(gameDataText);
+      console.log(`Loaded ${actors.length} actors.`);
+    } catch (e) {
+      console.warn('Fallback actors used.');
+      actors = [{ name: 'Fallback', location: {x:0, y:0, z:0}, scale: {x:1, y:1, z:1}, color: [0.5, 0.5, 0.5] }];
+    }
+
+    // --- Render Loop ---
+    let lastTime = 0;
+    let engineReadySignaled = false;
+
+    function render(time) {
+      if (!engineReadySignaled) {
+        window.UE4_EngineReady = true;
+        console.log('UE4 Engine Ready signaled (First Frame).');
+        engineReadySignaled = true;
+      }
+
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      // Update
+      const speed = 200 * dt;
+      const rotSpeed = 1.5 * dt;
+      if (keys['KeyW']) { player.x += Math.cos(player.yaw) * speed; player.y += Math.sin(player.yaw) * speed; }
+      if (keys['KeyS']) { player.x -= Math.cos(player.yaw) * speed; player.y -= Math.sin(player.yaw) * speed; }
+      if (keys['KeyA']) { player.x -= Math.sin(player.yaw) * speed; player.y += Math.cos(player.yaw) * speed; }
+      if (keys['KeyD']) { player.x += Math.sin(player.yaw) * speed; player.y -= Math.cos(player.yaw) * speed; }
+      if (keys['ArrowLeft']) player.yaw -= rotSpeed;
+      if (keys['ArrowRight']) player.yaw += rotSpeed;
+      
+      if (coordsDiv) coordsDiv.innerText = `X: ${player.x.toFixed(1)} Y: ${player.y.toFixed(1)} Z: ${player.z.toFixed(1)}`;
+
+      // Draw
+      gl.clearColor(0.02, 0.02, 0.05, 1.0);
+      gl.clearDepth(1.0);
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.LEQUAL);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+      const projectionMatrix = new Float32Array(16);
+      mat4.perspective(projectionMatrix, (45 * Math.PI) / 180, canvas.width / canvas.height, 0.1, 5000.0);
+
+      gl.useProgram(programInfo.program);
+      gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+      actors.forEach(actor => {
+        const modelViewMatrix = new Float32Array(16);
+        mat4.identity(modelViewMatrix);
+        
+        // Camera transform (inverse of player)
+        mat4.rotateX(modelViewMatrix, modelViewMatrix, -player.pitch);
+        mat4.rotateY(modelViewMatrix, modelViewMatrix, -player.yaw);
+        mat4.translate(modelViewMatrix, modelViewMatrix, [-player.x, -player.y, -player.z]);
+
+        // Actor transform
+        mat4.translate(modelViewMatrix, modelViewMatrix, [actor.location.x, actor.location.y, actor.location.z]);
+        mat4.scale(modelViewMatrix, modelViewMatrix, [actor.scale.x * 50, actor.scale.y * 50, actor.scale.z * 50]);
+
+        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
+        
+        let color = [0.0, 0.6, 1.0];
+        if (actor.name.toLowerCase().includes('bot')) color = [0.0, 1.0, 0.4];
+        gl.uniform3fv(programInfo.uniformLocations.color, color);
+
+        gl.bindVertexArray(vao);
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+      });
+
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
   }
 })();

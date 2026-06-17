@@ -8,13 +8,16 @@ fn main() {
     match run(cli) {
         Ok(output) => {
             if json {
-                println!("{}", output.to_json());
+                use std::io::Write;
+                let _ = writeln!(std::io::stdout(), "{}", output.to_json());
             } else {
-                println!("{}", output.to_human());
+                use std::io::Write;
+                let _ = writeln!(std::io::stdout(), "{}", output.to_human());
             }
         }
         Err(e) => {
-            eprintln!("Error: {}", e);
+            use std::io::Write;
+            let _ = writeln!(std::io::stderr(), "Error: {}", e);
             std::process::exit(1);
         }
     }

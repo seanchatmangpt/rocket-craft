@@ -1,4 +1,4 @@
-//! BlueprintPwaExporter — generate TypeScript HUD stubs, HTML overlays, and
+//! BlueprintPwaExporter — generate TypeScript HUD templates, HTML overlays, and
 //! JavaScript event bindings from Blueprint event graphs for the pwa-staff frontend.
 
 use serde::{Deserialize, Serialize};
@@ -26,7 +26,7 @@ pub struct BlueprintPwaMetadata {
 // BlueprintPwaExporter
 // ---------------------------------------------------------------------------
 
-/// Generates TypeScript event handler stubs, HTML overlays, and JavaScript
+/// Generates TypeScript event handler templates, HTML overlays, and JavaScript
 /// event bindings for a PWA HUD based on a Blueprint's event nodes and variables.
 pub struct BlueprintPwaExporter {
     pub blueprint_name: String,
@@ -44,7 +44,7 @@ impl BlueprintPwaExporter {
         }
     }
 
-    /// Generate a TypeScript class stub that mirrors the Blueprint's events as
+    /// Generate a TypeScript class template that mirrors the Blueprint's events as
     /// HUD update methods, matching the `pwa-staff/src/hud.ts` patterns.
     pub fn generate_typescript(&self) -> String {
         let class_name = format!("{}Hud", self.blueprint_name);

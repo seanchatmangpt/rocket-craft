@@ -7,9 +7,9 @@ description = "Bridge crate connecting rocket-sdk patterns with the unify trait 
 [dependencies]
 serde       = { workspace = true }
 serde_json  = { workspace = true }
-thiserror   = { workspace = true }
 anyhow      = { workspace = true }
 blake3      = { workspace = true }
+unify-core  = { path = "../unify-core" }
 
 [dev-dependencies]
 tempfile = "3"

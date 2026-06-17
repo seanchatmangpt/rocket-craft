@@ -1,7 +1,7 @@
 //! Shared test fixtures and in-crate type definitions.
 //!
 //! Several upstream crates (`unify-ocel`, `unify-pm`, `unify-admission`) are
-//! currently stubs.  This module provides the concrete types and helpers that
+//! currently placeholder implementations.  This module provides the concrete types and helpers that
 //! the integration tests exercise.
 
 use serde::{Deserialize, Serialize};

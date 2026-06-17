@@ -19,9 +19,18 @@ pub trait Classify {
 pub struct BlueprintGenerateCmd;
 
 impl Classify for BlueprintGenerateCmd {
-    fn noun(&self) -> &str { "blueprint" }
-    fn verb(&self) -> &str { "generate" }
-    fn description(&self) -> &str { "Generate a Blueprint from a JSON spec" }
+    fn noun(&self) -> &str {
+        let n = "blueprint";
+        n
+    }
+    fn verb(&self) -> &str {
+        let v = "generate";
+        v
+    }
+    fn description(&self) -> &str {
+        let desc = "Generate a Blueprint from a JSON spec";
+        desc
+    }
 
     fn execute(&self, input: serde_json::Value) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let spec: BlueprintSpec = serde_json::from_value(input)?;
@@ -38,9 +47,18 @@ impl Classify for BlueprintGenerateCmd {
 pub struct BlueprintValidateCmd;
 
 impl Classify for BlueprintValidateCmd {
-    fn noun(&self) -> &str { "blueprint" }
-    fn verb(&self) -> &str { "validate" }
-    fn description(&self) -> &str { "Validate a Blueprint spec against admission rules" }
+    fn noun(&self) -> &str {
+        let n = "blueprint";
+        n
+    }
+    fn verb(&self) -> &str {
+        let v = "validate";
+        v
+    }
+    fn description(&self) -> &str {
+        let desc = "Validate a Blueprint spec against admission rules";
+        desc
+    }
 
     fn execute(&self, input: serde_json::Value) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         let spec: BlueprintSpec = serde_json::from_value(input)?;

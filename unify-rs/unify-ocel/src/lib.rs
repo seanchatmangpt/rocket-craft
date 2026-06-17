@@ -26,6 +26,32 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use thiserror::Error;
+
+// ─── Errors ──────────────────────────────────────────────────────────────────
+
+/// Errors that can occur when working with OCEL logs.
+#[derive(Debug, Error)]
+pub enum OcelError {
+    /// Error during JSON serialization or deserialization.
+    #[error("JSON error: {0}")]
+    Json(#[from] serde_json::Error),
+
+    /// Reference to an object that does not exist in the log.
+    #[error("Object not found: {0}")]
+    ObjectNotFound(String),
+
+    /// Reference to an object type that does not exist.
+    #[error("Object type not found: {0}")]
+    TypeNotFound(String),
+
+    /// Invalid attribute value for the expected type.
+    #[error("Invalid attribute value for type {expected:?}: {found:?}")]
+    InvalidAttributeType {
+        expected: OcelAttrType,
+        found: OcelValue,
+    },
+}
 
 // ─── Attribute types ──────────────────────────────────────────────────────────
 
@@ -140,8 +166,8 @@ impl OcelLog {
     }
 
     /// Parse from OCEL 2.0 JSON format.
-    pub fn from_ocel_json(s: &str) -> Result<Self, serde_json::Error> {
-        serde_json::from_str(s)
+    pub fn from_ocel_json(s: &str) -> Result<Self, OcelError> {
+        Ok(serde_json::from_str(s)?)
     }
 
     /// Return compact statistics for this log.

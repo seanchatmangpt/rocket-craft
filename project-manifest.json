@@ -2,7 +2,7 @@
   "projects": [
     {
       "name": "SurvivalGame",
-      "uproject_path": "versions/4.24-Survival/EpicSurvivalGameSeries-4.24/SurvivalGame/SurvivalGame.uproject",
+      "uproject_path": "versions/4.27-Survival/EpicSurvivalGameSeries-4.27/SurvivalGame/SurvivalGame.uproject",
       "targets": [
         "SurvivalGameEditor",
         "SurvivalGameServer",
@@ -21,7 +21,7 @@
     },
     {
       "name": "Brm",
-      "uproject_path": "versions/4.24.0/Brm.uproject",
+      "uproject_path": "versions/4.27.0/Brm.uproject",
       "targets": [
         "BrmServer",
         "BrmEditor",
@@ -30,7 +30,7 @@
     },
     {
       "name": "ShooterGame",
-      "uproject_path": "versions/4.24-Shooter/ShooterGame/ShooterGame.uproject",
+      "uproject_path": "versions/4.27-Shooter/ShooterGame/ShooterGame.uproject",
       "targets": [
         "ShooterGameEditor",
         "ShooterClient",

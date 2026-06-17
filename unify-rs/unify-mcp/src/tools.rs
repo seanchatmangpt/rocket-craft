@@ -144,7 +144,6 @@ pub fn register_builtin_tools(registry: &mut ToolRegistry) {
                 }
                 ("pm", "count") => {
                     use unify_pm::EventLog;
-                    use unify_pm::Event;
                     let mut log = EventLog::new();
                     if let Some(events_arr) = args["events"].as_array() {
                         for ev in events_arr {
@@ -408,7 +407,6 @@ fn attach_builtin_tools(server: McpServer) -> McpServer {
                 }
                 ("pm", "count") => {
                     use unify_pm::EventLog;
-                    use unify_pm::Event;
                     let mut log = EventLog::new();
                     if let Some(events_arr) = args["events"].as_array() {
                         for ev in events_arr {

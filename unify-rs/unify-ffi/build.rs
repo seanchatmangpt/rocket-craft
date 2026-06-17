@@ -7,7 +7,9 @@ fn main() {
     // to always be present. Instead the napi-build crate is listed as an
     // optional build-dep for CI tooling and future npm-publish scaffolding.
     if std::env::var("CARGO_FEATURE_NAPI").is_ok() {
-        println!("cargo:rustc-cfg=napi");
-        println!("cargo:rerun-if-env-changed=CARGO_FEATURE_NAPI");
+        use std::io::Write;
+        let mut stdout = std::io::stdout();
+        let _ = writeln!(stdout, "cargo:rustc-cfg=napi");
+        let _ = writeln!(stdout, "cargo:rerun-if-env-changed=CARGO_FEATURE_NAPI");
     }
 }

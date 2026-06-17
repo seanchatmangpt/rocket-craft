@@ -2,16 +2,18 @@ import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
 test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
   test('verify WASM world drives and generates cryptographic receipt', async ({ page }) => {
-    // 1. Load the Factory Output
-    const targetUrl = '/manufactured/Brm-HTML5-Shipping.html';
+    // 1. Load the Factory Output (Dynamically loaded from ENV)
+    const targetUrl = process.env.TARGET_GAME_URL || '/manufactured/Brm-HTML5-Shipping.html';
 
     const logs: string[] = [];
-    page.on('console', (msg) => logs.push(`[${msg.type()}] ${msg.text()}`));
+    page.on('console', msg => {
+      console.log(`BROWSER LOG: ${msg.text()}`);
+      logs.push(msg.text());
+    });
 
     await page.goto(targetUrl);
 
@@ -49,6 +51,9 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
     const img2 = PNG.sync.read(afterBuffer);
     const { width, height } = img1;
     const diff = new PNG({ width, height });
+
+    const pixelmatchModule = await import('pixelmatch');
+    const pixelmatch = pixelmatchModule.default;
 
     const numDiffPixels = pixelmatch(img1.data, img2.data, diff.data, width, height, {
       threshold: 0.1,

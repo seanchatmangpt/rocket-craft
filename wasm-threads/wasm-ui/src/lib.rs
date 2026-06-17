@@ -7,7 +7,7 @@ pub use hud::{render_frame, HudData};
 pub use message_bridge::{GameToUiMessage, InputCommand, MessageBridge, UiToGameMessage};
 pub use renderer::{DrawCall, Renderer, TestRenderer};
 #[cfg(target_arch = "wasm32")]
-pub use renderer::CanvasRenderer;
+pub use renderer::{CanvasRenderer, WebGL2Renderer};
 pub use ui_state::{Error, Loading, Ready, Unloaded, UiState};
 
 #[cfg(target_arch = "wasm32")]

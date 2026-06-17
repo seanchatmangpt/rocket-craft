@@ -27,8 +27,8 @@ cargo_metadata = "0.19.1"
 rocket-sdk = { path = "../rocket-sdk" }
 knhk = { path = "../knhk" }
 unrdf = { path = "../unrdf" }
+simulator-core = { path = "../../rocket-simulator/simulator-core" }
 wasmer = { version = "4.4.0", default-features = false, features = ["sys", "singlepass", "wat"] }
 
 [dev-dependencies]
 un-test-utils = { path = "../un-test-utils" }
-mockall = "0.12"

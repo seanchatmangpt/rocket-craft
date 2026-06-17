@@ -1,6 +1,6 @@
 [package]
 name = "wasm-core"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [lib]
@@ -14,10 +14,20 @@ serde_json = { workspace = true }
 serde-wasm-bindgen = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-web-sys = { version = "0.3", features = [
+web-sys = { version = "0.3.102", features = [
   "Worker", "WorkerOptions", "WorkerType",
   "MessageEvent", "DedicatedWorkerGlobalScope",
   "console",
+  "WebGl2RenderingContext",
+  "WebGlProgram",
+  "WebGlShader",
+  "WebGlBuffer",
+  "WebGlVertexArrayObject",
+  "WebGlUniformLocation",
+  "WebGlActiveInfo",
+  "WebGlTexture",
+  "WebGlFramebuffer",
+  "WebGlRenderbuffer",
 ] }
 
 [dev-dependencies]

@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::RngExt;
 use ib4_core::{enemy::EnemyInstance, types::AttackDir};
 
 #[derive(Debug, Clone)]
@@ -25,13 +25,13 @@ impl TitanAI {
         Self { weapon_throw_cooldown: 0 }
     }
 
-    pub fn decide(&mut self, enemy: &EnemyInstance, rng: &mut impl Rng) -> AiDecision {
+    pub fn decide(&mut self, enemy: &EnemyInstance, rng: &mut impl RngExt) -> AiDecision {
         let phase = enemy.phase;
         let base_dir = random_dir(rng);
 
         let (announced, actual, is_bluff) = match phase {
             3 => {
-                if rng.gen_bool(0.30) {
+                if rng.random_bool(0.30) {
                     let bluff = different_dir(&base_dir, rng);
                     (bluff, base_dir.clone(), true)
                 } else {
@@ -97,15 +97,15 @@ impl Default for TitanAI {
     }
 }
 
-pub fn random_dir(rng: &mut impl Rng) -> AttackDir {
-    match rng.gen_range(0..3u32) {
+pub fn random_dir(rng: &mut impl RngExt) -> AttackDir {
+    match rng.random_range(0..3u32) {
         0 => AttackDir::Overhead,
         1 => AttackDir::Left,
         _ => AttackDir::Right,
     }
 }
 
-pub fn different_dir(dir: &AttackDir, rng: &mut impl Rng) -> AttackDir {
+pub fn different_dir(dir: &AttackDir, rng: &mut impl RngExt) -> AttackDir {
     loop {
         let d = random_dir(rng);
         if &d != dir {

@@ -43,16 +43,41 @@ impl UnrealEnvMock {
         fs::create_dir_all(engine_path.join("Binaries/Win64"))?;
         fs::create_dir_all(engine_path.join("Binaries/DotNET"))?;
         
-        // Mock UBT and UAT
+        // Mock Editor, UBT, and UAT
         #[cfg(windows)]
         {
-            fs::write(engine_path.join("Binaries/DotNET/UnrealBuildTool.exe"), "mock ubt")?;
-            fs::write(engine_path.join("Binaries/DotNET/AutomationTool.exe"), "mock uat")?;
+            fs::write(engine_path.join("Binaries/DotNET/UnrealBuildTool.exe"), "@echo off\nexit /b 0")?;
+            fs::write(engine_path.join("Binaries/DotNET/AutomationTool.exe"), "@echo off\nexit /b 0")?;
+            fs::write(engine_path.join("Binaries/Win64/UE4Editor.exe"), "@echo off\nexit /b 0")?;
         }
         #[cfg(not(windows))]
         {
-            fs::write(engine_path.join("Binaries/DotNET/UnrealBuildTool"), "mock ubt")?;
-            fs::write(engine_path.join("Binaries/DotNET/AutomationTool"), "mock uat")?;
+            let ubt_path = engine_path.join("Binaries/DotNET/UnrealBuildTool");
+            let uat_path = engine_path.join("Binaries/DotNET/AutomationTool");
+            
+            let mac_editor_dir = engine_path.join("Binaries/Mac");
+            let linux_editor_dir = engine_path.join("Binaries/Linux");
+            fs::create_dir_all(&mac_editor_dir)?;
+            fs::create_dir_all(&linux_editor_dir)?;
+            
+            let mac_editor_path = mac_editor_dir.join("UE4Editor");
+            let linux_editor_path = linux_editor_dir.join("UE4Editor");
+
+            let script_content = "#!/bin/sh\nexit 0\n";
+            fs::write(&ubt_path, script_content)?;
+            fs::write(&uat_path, script_content)?;
+            fs::write(&mac_editor_path, script_content)?;
+            fs::write(&linux_editor_path, script_content)?;
+
+            #[cfg(unix)]
+            {
+                use std::os::unix::fs::PermissionsExt;
+                for path in [&ubt_path, &uat_path, &mac_editor_path, &linux_editor_path] {
+                    let mut perms = fs::metadata(path)?.permissions();
+                    perms.set_mode(0o755);
+                    fs::set_permissions(path, perms)?;
+                }
+            }
         }
 
         let project_path = root_path.join("MyProject");

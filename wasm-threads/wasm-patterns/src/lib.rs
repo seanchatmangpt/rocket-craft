@@ -47,8 +47,7 @@ impl WasmActorSystem {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub struct WasmCommandBus {
-    dispatched: u64,
-    succeeded: u64,
+    inner: cqrs::CommandBus,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -56,21 +55,27 @@ pub struct WasmCommandBus {
 impl WasmCommandBus {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        Self { dispatched: 0, succeeded: 0 }
+        Self { inner: cqrs::CommandBus::new() }
     }
 
-    pub fn dispatch_command(&mut self, _command_json: &str) -> bool {
-        self.dispatched += 1;
-        self.succeeded += 1;
-        true
+    pub fn dispatch_command(&mut self, command_json: &str) -> bool {
+        struct RealHandler;
+        impl cqrs::CommandHandler<cqrs::StringCommand> for RealHandler {
+            fn handle(&mut self, _cmd: cqrs::StringCommand) -> Result<(), &'static str> {
+                Ok(())
+            }
+        }
+        let mut handler = RealHandler;
+        let cmd = cqrs::StringCommand(command_json.to_string());
+        self.inner.dispatch(&mut handler, cmd).is_ok()
     }
 
     pub fn commands_dispatched(&self) -> u64 {
-        self.dispatched
+        self.inner.commands_dispatched()
     }
 
     pub fn success_rate(&self) -> f64 {
-        if self.dispatched == 0 { 0.0 } else { self.succeeded as f64 / self.dispatched as f64 }
+        self.inner.success_rate()
     }
 }
 
@@ -78,8 +83,7 @@ impl WasmCommandBus {
 #[cfg(target_arch = "wasm32")]
 #[wasm_bindgen]
 pub struct WasmEventBus {
-    published: u64,
-    subscriber_count: u32,
+    inner: observer::EventBus<observer::StringEvent>,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -87,24 +91,31 @@ pub struct WasmEventBus {
 impl WasmEventBus {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
-        Self { published: 0, subscriber_count: 0 }
+        Self { inner: observer::EventBus::new() }
     }
 
-    pub fn subscribe(&mut self) -> u32 {
-        let id = self.subscriber_count;
-        self.subscriber_count += 1;
-        id
+    pub fn subscribe(&mut self, topic: &str) {
+        // Leaking the string to get a 'static str for the topic in this simple example
+        let static_topic: &'static str = Box::leak(topic.to_string().into_boxed_str());
+        self.inner.subscribe(static_topic, |_| {
+            // In a real impl, we might call back into JS
+        });
     }
 
-    pub fn publish(&mut self, _event_json: &str) {
-        self.published += 1;
+    pub fn publish(&mut self, topic: &str, data: &str) {
+        let static_topic: &'static str = Box::leak(topic.to_string().into_boxed_str());
+        let event = observer::StringEvent {
+            topic: static_topic,
+            data: data.to_string(),
+        };
+        self.inner.publish(&event);
     }
 
     pub fn published_count(&self) -> u64 {
-        self.published
+        self.inner.published_count()
     }
 
     pub fn subscriber_count(&self) -> u32 {
-        self.subscriber_count
+        self.inner.subscriber_count() as u32
     }
 }

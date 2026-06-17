@@ -1,43 +1,43 @@
-# Project: Rocket Craft PWA Integration
+# Project: Rocket-Craft Remediation
 
 ## Architecture
-- **Frontend**: Vanilla TypeScript/HTML progressive web app (PWA) served on port 3000.
-- **Backend/DB**: Local Supabase instance (PostgreSQL database, GoTrue Auth, Deno Edge Functions).
-- **Communication**: Supabase JS Client (`@supabase/supabase-js`) on the frontend, Deno edge functions on the backend.
+This project focuses on the remediation of code quality, correctness, and compliance issues across two main workspaces:
+- **`unify-rs`**: The core framework containing multiple crates (`unify-bp`, `unify-integration-tests`, `unify-rdf`, `unify-core`, `unify-rocket`, `unify-ffi`, `unify-mcp`, `unify`, etc.).
+- **`wasm-threads`**: The WASM runtime/logic layer containing crates like `wasm-patterns`, `wasm-tests`, `wasm-ui`, etc.
+
+The target is to replace all stubs/placeholders with robust implementations, remove debug macros/logs, harden tests to use schema-compliant structural validations instead of substring/text-based checks, and eliminate overclaiming terms.
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status | Conv ID |
 |---|------|-------|-------------|--------|---------|
-| 1 | DB Schema & Trigger | Add columns to `players`, create postgres trigger to sync `auth.users` to `public.players` | None | DONE | 3a6147ec-4c41-42b0-8013-c0f248348234 |
-| 2 | Auth & Frontend Setup | Config supabaseClient, actual auth flow, fix HTML asset paths | M1 | DONE | 7acf1108-b1f0-483b-a28a-06538b60f5c6 |
-| 3 | Admin Dashboard & Leaderboard | Query `players` for admin, join query for leaderboard | M1, M2 | DONE | 75a28482-a733-41c6-a29e-137b1c05a6b3 |
-| 4 | Edge Function Submit Score | Implement `submit-score` edge function to write to DB and leaderboard | M1 | DONE | ed8d8902-d2f5-42cf-b523-51bb5e89696b |
-| 5 | E2E Testing & Verification | Configure port 3000, run Playwright E2E tests, verify all flows | M1, M2, M3, M4 | DONE | 24a37630-5370-426a-95af-f89bda39a1ef |
-| 6 | Production Release Gaps | Playwright configuration chromium only, fix example.spec.ts regex, verify vitest and playwright E2E | M5 | DONE | 62170365-3e1f-4235-87b7-1cad9be5968a |
-
-
-
+| 1 | Technical Exploration | Identify all stubs, placeholders, print statements, and overclaim terms | None | DONE | df135978-48b4-4519-9ebf-9d88830e5ec0 |
+| 2 | Complete Stubs (R1) | Implement complete logic for `pwa_export.rs`, `fixtures.rs`, `pipeline.rs`, etc. | M1 | IN_PROGRESS | 6469f9db-14b9-489b-92a0-cae939dc947e |
+| 3 | Replace Single-Line (R2) | Implement single-line stubs, catch-alls, lifecycle `on_start/on_stop`, and helpers | M2 | IN_PROGRESS | 6469f9db-14b9-489b-92a0-cae939dc947e |
+| 4 | Harden Assertions (R3) | Refactor substring searches in tests to schema-compliant structural validations | M3 | IN_PROGRESS | 6469f9db-14b9-489b-92a0-cae939dc947e |
+| 5 | Clean Logs & Overclaims (R4/R5) | Replace `println!` with tracing/logging and remove overclaims | M4 | IN_PROGRESS | 6469f9db-14b9-489b-92a0-cae939dc947e |
+| 6 | E2E & Compliance Verify | Verify 100% tests pass, `anti-llm-cheat-lsp` has 0 violations, E2E Playwright passes | M5 | PLANNED | |
 
 ## Interface Contracts
-### Frontend ↔ Supabase Auth
-- Sign-up: `supabase.auth.signUp({ email, password })` -> triggers `public.handle_new_user()`
-- Login: `supabase.auth.signInWithPassword({ email, password })`
-- Logout: `supabase.auth.signOut()`
-- Session: `supabase.auth.getSession()` and `supabase.auth.onAuthStateChange()`
-
-### Frontend ↔ Supabase Database
-- Admin dashboard queries `players` table: `select('id, name, email')`
-- Leaderboard queries `leaderboard` table joined with `players` username: `select('score, rank, players(username)')`
-
-### Edge Function ↔ Database
-- Request: `POST /submit-score` with header `Authorization: Bearer <user_token>` and body `{ score: number }`
-- Logic: Verify `score` is between 0 and 1000. Insert into `game_sessions` and upsert into `leaderboard`.
+- **PWA Export**: Fully functional PWA packaging and exporting.
+- **RDF Pipeline**: Robust RDF processing pipeline.
+- **WASM Actor Lifecycle**: Proper state management in `on_start` and `on_stop`.
+- **Structured Assertions**: Testing methods validating precise types/structures rather than raw print/match logs.
 
 ## Code Layout
-- `supabase/migrations/` - PostgreSQL migration scripts
-- `supabase/functions/submit-score/index.ts` - Score submission Deno edge function
-- `pwa-staff/src/` - Frontend TypeScript sources
-- `pwa-staff/*.html` - Frontend HTML templates
-- `pwa-staff/package.json` - Frontend configuration and scripts
-- `pwa-staff/playwright.config.ts` - Playwright E2E tests configuration
-- `pwa-staff/tests-e2e/` - Playwright E2E test suites
+- `unify-rs/`
+  - `unify-bp/src/pwa_export.rs`
+  - `unify-integration-tests/src/fixtures.rs`
+  - `unify-rdf/src/pipeline.rs`
+  - `unify-core/src/lib.rs`
+  - `unify-rocket/src/lib.rs`
+  - `unify-ffi/build.rs`
+  - `unify-mcp/src/main.rs`
+  - `unify/src/commands.rs`
+  - `unify/src/main.rs`
+  - `manifest.rs` (find exact path in exploration)
+  - `classify.rs` (find exact path in exploration)
+- `wasm-threads/`
+  - `wasm-patterns/src/actor.rs`
+  - `wasm-tests/tests/pattern_integration.rs`
+  - `wasm-ui/tests/hud.rs`
+  - `wasm-ui/tests/message_bridge.rs`

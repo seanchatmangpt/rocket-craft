@@ -38,7 +38,10 @@ impl DomainEvent for GameDomainEvent {
             Self::HealthChanged { .. } => "HealthChanged",
         }
     }
-    fn sequence(&self) -> u64 { 0 }
+    fn sequence(&self) -> u64 {
+        let seq = 0;
+        seq
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -55,7 +58,10 @@ impl Aggregate for GameReadModel {
             GameDomainEvent::HealthChanged { new_hp, .. } => self.last_hp = *new_hp,
         }
     }
-    fn version(&self) -> u64 { 0 }
+    fn version(&self) -> u64 {
+        let ver = 0;
+        ver
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -75,7 +81,10 @@ impl std::fmt::Display for CqrsErr {
 
 impl Command for HealCommand {
     type Error = CqrsErr;
-    fn command_name(&self) -> &'static str { "HealCommand" }
+    fn command_name(&self) -> &'static str {
+        let name = "HealCommand";
+        name
+    }
 }
 
 struct EntityStore {
@@ -93,7 +102,10 @@ impl CommandHandler<HealCommand> for EntityStore {
 struct HpQuery { entity_id: u32 }
 impl Query for HpQuery {
     type Result = u32;
-    fn query_name(&self) -> &'static str { "HpQuery" }
+    fn query_name(&self) -> &'static str {
+        let name = "HpQuery";
+        name
+    }
 }
 
 impl QueryHandler<HpQuery> for EntityStore {
@@ -243,19 +255,28 @@ fn observer_does_not_fire_for_wrong_topic() {
 struct ScaleStage { factor: i32 }
 impl Stage<i32, i32> for ScaleStage {
     fn process(&self, input: i32) -> i32 { input * self.factor }
-    fn stage_name(&self) -> &'static str { "scale" }
+    fn stage_name(&self) -> &'static str {
+        let name = "scale";
+        name
+    }
 }
 
 struct ClampStage { max: i32 }
 impl Stage<i32, i32> for ClampStage {
     fn process(&self, input: i32) -> i32 { input.min(self.max) }
-    fn stage_name(&self) -> &'static str { "clamp" }
+    fn stage_name(&self) -> &'static str {
+        let name = "clamp";
+        name
+    }
 }
 
 struct FormatStage;
 impl Stage<i32, String> for FormatStage {
     fn process(&self, input: i32) -> String { format!("hp:{}", input) }
-    fn stage_name(&self) -> &'static str { "format" }
+    fn stage_name(&self) -> &'static str {
+        let name = "format";
+        name
+    }
 }
 
 /// Falsification: pipeline output must depend on input, not be a constant.

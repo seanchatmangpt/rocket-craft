@@ -10,7 +10,7 @@ impl GameWorld {
 
     /// Spawn a player entity with all required components
     pub fn spawn_player(&mut self, player_id: u64, name: &str, hp: f32, gold: u32) -> Entity {
-        // hecs 0.10 supports tuples up to 15 components — split spawn + insert
+        // hecs supports tuples up to 15 components — split spawn + insert
         let entity = self.inner.spawn((
             PlayerId(player_id),
             Name(name.to_string()),
@@ -109,10 +109,10 @@ impl GameWorld {
     pub fn despawn_dead(&mut self) -> Vec<Entity> {
         let dead: Vec<Entity> = self
             .inner
-            .query::<&Health>()
+            .query::<(Entity, &Health)>()
             .iter()
-            .filter(|(_, h)| !h.is_alive())
-            .map(|(e, _)| e)
+            .filter(|(_entity, health)| !health.is_alive())
+            .map(|(entity, _health)| entity)
             .collect();
         for e in &dead {
             self.inner.despawn(*e).ok();

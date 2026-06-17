@@ -1,0 +1,12 @@
+[package]
+name = "genie3-rs"
+version = "0.1.0"
+edition = "2021"
+description = "Genie 3 World Model state representation and latent actions"
+workspace = "../unify-rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }

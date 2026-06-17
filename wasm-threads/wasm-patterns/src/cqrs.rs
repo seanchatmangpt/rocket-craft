@@ -3,6 +3,14 @@ pub trait Command: 'static {
     fn command_name(&self) -> &'static str;
 }
 
+#[derive(Debug)]
+pub struct StringCommand(pub String);
+
+impl Command for StringCommand {
+    type Error = &'static str;
+    fn command_name(&self) -> &'static str { "string_command" }
+}
+
 pub trait Query: 'static {
     type Result;
     fn query_name(&self) -> &'static str;

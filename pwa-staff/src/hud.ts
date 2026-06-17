@@ -498,7 +498,10 @@ export function initHUD() {
         logToConsole(`Auto-submitted game score: ${realScore} (tick ${event.detail.tick})`, 'info');
       }
     } catch (err) {
-      logToConsole(`Failed to auto-submit game score: ${err instanceof Error ? err.message : String(err)}`, 'error');
+      logToConsole(
+        `Failed to auto-submit game score: ${err instanceof Error ? err.message : String(err)}`,
+        'error'
+      );
     }
   });
 }

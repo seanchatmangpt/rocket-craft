@@ -8,9 +8,9 @@ description = "RDF/SPARQL abstraction bridging ggen and unrdf patterns"
 unify-core = { path = "../unify-core" }
 unify-sem = { path = "../unify-sem" }
 blake3 = { workspace = true }
-thiserror = "1"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 [dev-dependencies]
 tempfile = "3"

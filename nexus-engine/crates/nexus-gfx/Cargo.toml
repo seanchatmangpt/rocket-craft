@@ -7,12 +7,12 @@ edition = "2021"
 gpu = ["wgpu"]
 
 [dependencies]
-serde = { version = "1", features = ["derive"] }
-thiserror = "1"
-nalgebra = { version = "0.33", features = ["serde-serialize"] }
+serde = { workspace = true }
+thiserror = { workspace = true }
+nalgebra = { workspace = true }
 bytemuck = { version = "1", features = ["derive"] }
 wgpu = { version = "22", optional = true }
 
 [dev-dependencies]
-proptest = "1"
+proptest = { workspace = true }
 chicago-tdd-tools = { path = "../../../chicago-tdd-tools" }

@@ -1,6 +1,6 @@
 use nexus_types::{Gold, Hp, Xp};
 use serde::{Serialize, Deserialize};
-use rand::{SeedableRng, Rng};
+use rand::{SeedableRng, RngExt};
 use rand::rngs::SmallRng;
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -299,7 +299,7 @@ impl GameSession {
                 // Check enemy defeated
                 if self.current_enemy.as_ref().map(|e| !e.is_alive()).unwrap_or(false) {
                     let xp = self.current_enemy.as_ref().map(|e| 50 + e.max_hp as u64 / 10).unwrap_or(50);
-                    let gold = 25 + self.rng.gen_range(0..50u32);
+                    let gold = 25 + self.rng.random_range(0..50u32);
                     let leveled = self.player.gain_xp(xp);
                     self.player.gold = self.player.gold + Gold::new(gold);
                     self.player.combo_depth = 0;
@@ -443,10 +443,10 @@ impl GameSession {
             ("GoldTitan",     300.0, 35.0),
             ("QuantumTitan",  400.0, 45.0),
         ];
-        let (name, hp, atk) = ROSTER[self.rng.gen_range(0..ROSTER.len())];
+        let (name, hp, atk) = ROSTER[self.rng.random_range(0..ROSTER.len())];
         let mut e = EnemyState::new(name, name, hp, atk);
         let dirs = [AttackDir::Overhead, AttackDir::Left, AttackDir::Right];
-        e.announced_dir = Some(dirs[self.rng.gen_range(0..3)]);
+        e.announced_dir = Some(dirs[self.rng.random_range(0..3)]);
         e
     }
 
@@ -454,7 +454,7 @@ impl GameSession {
         let (atk, _phase, _new_dir) = {
             let e = self.current_enemy.as_mut()?;
             let dirs = [AttackDir::Overhead, AttackDir::Left, AttackDir::Right];
-            let dir = dirs[self.rng.gen_range(0..3)];
+            let dir = dirs[self.rng.random_range(0..3)];
             e.announced_dir = Some(dir);
             let phase_mult = 1.0 + (e.phase as f32 - 1.0) * 0.25;
             (e.attack * phase_mult, e.phase, dir)

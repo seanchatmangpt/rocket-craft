@@ -3,7 +3,6 @@ use crate::errors::GenieError;
 use std::path::{Path, PathBuf};
 use std::fs::OpenOptions;
 use std::io::Write;
-use std::process::Command;
 
 /// Manages deployment logging and operations for manufactured worlds.
 pub struct DeploymentManager;
@@ -32,11 +31,11 @@ impl DeploymentManager {
         }
         writeln!(file, "Initiating Headless Unreal Engine 4 Build...").map_err(|e| GenieError::Deployment(e.to_string()))?;
 
-        let mut project_root = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-        let ue4_root = std::env::var("UE4_ROOT").unwrap_or_else(|_| "/Applications/UnrealEngine-4.24".to_string());
+        let project_root = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+        let ue4_root = std::env::var("UE4_ROOT").unwrap_or_else(|_| "/Applications/UnrealEngine-4.27".to_string());
         
         let t3d_path = project_root.join("map.t3d");
-        let project_uproject = project_root.join("versions").join("4.24.0").join("Brm.uproject");
+        let project_uproject = project_root.join("versions").join("4.27.0").join("Brm.uproject");
         let destination_dir = project_root.join("pwa-staff").join("manufactured");
 
         // Use unify-wasm packager instead of bash script
@@ -51,34 +50,42 @@ impl DeploymentManager {
             map_name: "ManufacturedWorld".to_string(),
         };
 
-        // Note: In real life, packager.package_html5 also needs to do the ImportAssets commandlet before BuildCookRun.
-        // For simplicity in this replacement, we assume it's done or we just invoke the pipeline script.
-        // Wait! WasmPackager does NOT do the ImportAssets step yet!
-        // The script `cook_html5.sh` does two things:
-        // 1. UE4Editor -run=ImportAssets
-        // 2. RunUAT.sh BuildCookRun
-        // Let's just invoke the script for now to preserve all logic, or add ImportAssets to WasmPackager.
-        
-        // Actually, if we use WasmPackager we need to add the import step to it.
-        // Let's add the import step.
         let status = packager.package_html5(&options);
-
         if status.is_err() {
             writeln!(file, "Pipeline Status: FAILED").map_err(|e| GenieError::Deployment(e.to_string()))?;
-            return Err(GenieError::Deployment("Headless UE4 Pipeline failed. Please check UE4_ROOT and logs.".to_string()));
+            return Err(GenieError::Deployment("Headless UE4 HTML5 Pipeline failed. Please check UE4_ROOT and logs.".to_string()));
+        }
+
+        let status_win = packager.package_windows(&options);
+        if status_win.is_err() {
+            writeln!(file, "Pipeline Status: FAILED").map_err(|e| GenieError::Deployment(e.to_string()))?;
+            return Err(GenieError::Deployment("Headless UE4 Win64 Pipeline failed. Please check UE4_ROOT and logs.".to_string()));
+        }
+
+        let status_linux = packager.package_linux(&options);
+        if status_linux.is_err() {
+            writeln!(file, "Pipeline Status: FAILED").map_err(|e| GenieError::Deployment(e.to_string()))?;
+            return Err(GenieError::Deployment("Headless UE4 Linux Pipeline failed. Please check UE4_ROOT and logs.".to_string()));
         }
 
         // Record a receipt
         let receipt_file = destination_dir.join("receipt.json");
         let receipt_json = format!(r#"{{
   "status": "success",
-  "engine": "UE4.24",
+  "engine": "UE4.27-ES3",
   "timestamp": "{}",
   "artifact": "{}",
   "url": "/manufactured/Brm-HTML5-Shipping.html"
 }}"#, timestamp_ms / 1000, t3d_path.display());
 
         std::fs::write(&receipt_file, receipt_json).map_err(|e| GenieError::Deployment(e.to_string()))?;
+
+        // Write spec.json
+        let spec_json_path = destination_dir.join("spec.json");
+        let spec_json = serde_json::to_string_pretty(spec)
+            .map_err(|e| GenieError::Deployment(format!("Failed to serialize spec: {}", e)))?;
+        std::fs::write(&spec_json_path, spec_json)
+            .map_err(|e| GenieError::Deployment(format!("Failed to write spec.json: {}", e)))?;
 
         writeln!(file, "Pipeline Status: SUCCESS").map_err(|e| GenieError::Deployment(e.to_string()))?;
         

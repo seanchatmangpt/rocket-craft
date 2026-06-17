@@ -4,6 +4,18 @@ pub trait EventType: Clone + std::fmt::Debug + 'static {
     fn topic(&self) -> &'static str;
 }
 
+#[derive(Debug, Clone)]
+pub struct StringEvent {
+    pub topic: &'static str,
+    pub data: String,
+}
+
+impl EventType for StringEvent {
+    fn topic(&self) -> &'static str {
+        self.topic
+    }
+}
+
 type BoxedCallback<E> = Box<dyn Fn(&E) + 'static>;
 
 pub struct EventBus<E: EventType> {

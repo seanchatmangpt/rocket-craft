@@ -1,0 +1,159 @@
+--------------------------------------------------------
+Starting HTML5 Pipeline Verification...
+Working directory: /Users/sac/rocket-craft
+--------------------------------------------------------
+[1/8] Cleaning previous build outputs...
+[2/8] Setting UE4_ROOT...
+UE4_ROOT is set to: /Users/sac/ue4-sim
+[3/8] Compiling backend (unify-rs)...
+warning: associated functions `type_mismatch` and `dangling_exec` are never used
+  --> /Users/sac/rocket-craft/blueprint-rs/blueprint-core/src/validator.rs:35:8
+   |
+34 | impl ValidationError {
+   | -------------------- associated functions in this implementation
+35 |     fn type_mismatch(node: &str, pin: &str, from: &str, to: &str) -> Self {
+   |        ^^^^^^^^^^^^^
+...
+50 |     fn dangling_exec(node: &str, pin: &str) -> Self {
+   |        ^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `T3dSerializer` is never constructed
+ --> /Users/sac/rocket-craft/blueprint-rs/blueprint-core/src/t3d.rs:6:12
+  |
+6 | pub struct T3dSerializer;
+  |            ^^^^^^^^^^^^^
+
+warning: constant `ZERO_GUID` is never used
+ --> /Users/sac/rocket-craft/blueprint-rs/blueprint-core/src/t3d.rs:9:7
+  |
+9 | const ZERO_GUID: &str = "00000000000000000000000000000000";
+  |       ^^^^^^^^^
+
+warning: function `container_ue_str` is never used
+  --> /Users/sac/rocket-craft/blueprint-rs/blueprint-core/src/t3d.rs:12:4
+   |
+12 | fn container_ue_str(c: &ContainerType) -> &'static str {
+   |    ^^^^^^^^^^^^^^^^
+
+warning: associated functions `serialize`, `serialize_graph`, `serialize_with_header`, `serialize_node`, and `serialize_pin` are never used
+  --> /Users/sac/rocket-craft/blueprint-rs/blueprint-core/src/t3d.rs:24:12
+   |
+21 | impl T3dSerializer {
+   | ------------------ associated functions in this implementation
+...
+24 |     pub fn serialize(blueprint: &Blueprint) -> String {
+   |            ^^^^^^^^^
+...
+39 |     pub fn serialize_graph(graph: &BpGraph) -> String {
+   |            ^^^^^^^^^^^^^^^
+...
+48 |     pub fn serialize_with_header(blueprint: &Blueprint) -> String {
+   |            ^^^^^^^^^^^^^^^^^^^^^
+...
+58 |     pub fn serialize_node(node: &BpNode) -> String {
+   |            ^^^^^^^^^^^^^^
+...
+94 |     fn serialize_pin(pin: &Pin) -> String {
+   |        ^^^^^^^^^^^^^
+
+warning: `blueprint-core` (lib) generated 5 warnings
+warning: function `extract_fn_references` is never used
+  --> anti-llm-cheat-lsp/src/parsers/refgraph.rs:39:4
+   |
+39 | fn extract_fn_references(content: &str) -> Vec<(String, String)> {
+   |    ^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `anti-llm-cheat-lsp` (lib) generated 1 warning
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.52s
+[4/8] Triggering world manufacture and evolution...
+[OK]
+{
+  "actors_count": 1,
+  "objects_count": 1,
+  "places_count": 1,
+  "spec_path": "/Users/sac/rocket-craft/spec.json",
+  "status": "manufactured",
+  "t3d_path": "/Users/sac/rocket-craft/map.t3d"
+}
+[OK]
+{
+  "actors_count": 1,
+  "objects_count": 1,
+  "places_count": 2,
+  "spec_path": "/Users/sac/rocket-craft/spec.json",
+  "status": "evolved",
+  "t3d_path": "/Users/sac/rocket-craft/map.t3d"
+}
+Deploying world layout and running simulated UE4 pipeline...
+Simulated UE4Editor starting...
+Arguments: ['/Users/sac/ue4-sim/Engine/Binaries/UE4Editor.py', '/Users/sac/rocket-craft/versions/4.27.0/Brm.uproject', '-run=ImportAssets', '-source=/Users/sac/rocket-craft/map.t3d', '-dest=Game/Content/Maps/ManufacturedWorld', '-NoUI', '-stdout', '-AllowCommandletRendering']
+Importing assets from /Users/sac/rocket-craft/map.t3d to Game/Content/Maps/ManufacturedWorld...
+Successfully parsed 4 actors from T3D.
+Saved parsed level asset to /Users/sac/ue4-sim/Saved/ManufacturedWorld.json
+Simulated RunUAT starting...
+Arguments: ['/Users/sac/ue4-sim/Engine/Build/BatchFiles/run_uat.py', 'BuildCookRun', '-project=/Users/sac/rocket-craft/versions/4.27.0/Brm.uproject', '-noP4', '-platform=HTML5', '-clientconfig=Shipping', '-cook', '-stage', '-package', '-map=ManufacturedWorld', '-pak', '-prereqs', '-nodebuginfo', '-targetplatform=HTML5', '-utf8output', '-es3', '-webgl2']
+Simulated BuildCookRun: Cooking, Staging, and Packaging HTML5...
+Target Staging Directory: /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/HTML5
+Staged /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/HTML5/Brm-HTML5-Shipping.html
+Staged /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/HTML5/Brm-HTML5-Shipping.js
+Staged /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/HTML5/Brm-HTML5-Shipping.wasm
+Staged compiled layout data to /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/HTML5/Brm-HTML5-Shipping.data
+Cooking and packaging completed successfully!
+Simulated UE4Editor starting...
+Arguments: ['/Users/sac/ue4-sim/Engine/Binaries/UE4Editor.py', '/Users/sac/rocket-craft/versions/4.27.0/Brm.uproject', '-run=ImportAssets', '-source=/Users/sac/rocket-craft/map.t3d', '-dest=Game/Content/Maps/ManufacturedWorld', '-NoUI', '-stdout', '-AllowCommandletRendering']
+Importing assets from /Users/sac/rocket-craft/map.t3d to Game/Content/Maps/ManufacturedWorld...
+Successfully parsed 4 actors from T3D.
+Saved parsed level asset to /Users/sac/ue4-sim/Saved/ManufacturedWorld.json
+Simulated RunUAT starting...
+Arguments: ['/Users/sac/ue4-sim/Engine/Build/BatchFiles/run_uat.py', 'BuildCookRun', '-project=/Users/sac/rocket-craft/versions/4.27.0/Brm.uproject', '-noP4', '-platform=Win64', '-clientconfig=Shipping', '-cook', '-stage', '-package', '-map=ManufacturedWorld', '-pak', '-prereqs', '-nodebuginfo', '-targetplatform=Win64', '-utf8output']
+Simulated BuildCookRun: Cooking, Staging, and Packaging Win64...
+Target Staging Directory: /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/Win64
+Staged mock Windows executable to /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/Win64/Brm-Windows-Shipping.exe
+Cooking and packaging completed successfully!
+Simulated UE4Editor starting...
+Arguments: ['/Users/sac/ue4-sim/Engine/Binaries/UE4Editor.py', '/Users/sac/rocket-craft/versions/4.27.0/Brm.uproject', '-run=ImportAssets', '-source=/Users/sac/rocket-craft/map.t3d', '-dest=Game/Content/Maps/ManufacturedWorld', '-NoUI', '-stdout', '-AllowCommandletRendering']
+Importing assets from /Users/sac/rocket-craft/map.t3d to Game/Content/Maps/ManufacturedWorld...
+Successfully parsed 4 actors from T3D.
+Saved parsed level asset to /Users/sac/ue4-sim/Saved/ManufacturedWorld.json
+Simulated RunUAT starting...
+Arguments: ['/Users/sac/ue4-sim/Engine/Build/BatchFiles/run_uat.py', 'BuildCookRun', '-project=/Users/sac/rocket-craft/versions/4.27.0/Brm.uproject', '-noP4', '-platform=Linux', '-clientconfig=Shipping', '-cook', '-stage', '-package', '-map=ManufacturedWorld', '-pak', '-prereqs', '-nodebuginfo', '-targetplatform=Linux', '-utf8output']
+Simulated BuildCookRun: Cooking, Staging, and Packaging Linux...
+Target Staging Directory: /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/Linux
+Staged mock Linux binary to /Users/sac/rocket-craft/versions/4.27.0/Saved/StagedBuilds/Linux/Brm-Linux-Shipping.sh
+Cooking and packaging completed successfully!
+World Factory completed. A Playable packaged browser world is now available in pwa-staff/manufactured.
+Launch a local server in pwa-staff/manufactured to enter the world.
+[OK]
+{
+  "log_path": "/Users/sac/rocket-craft/deploy.log",
+  "status": "deployed"
+}
+[5/8] Starting local web server on port 3000...
+=======================================================
+  Genie 26 World Operating Center online!
+  URL: http://localhost:3000
+=======================================================
+[6/8] Running Playwright E2E test...
+
+Running 1 test using 1 worker
+
+[1/1] [chromium] › tests-e2e/tps-dflss.spec.ts:8:7 › TPS/DfLSS Playwright Manufacturing Strategy › verify WASM world drives and generates cryptographic receipt
+[chromium] › tests-e2e/tps-dflss.spec.ts:8:7 › TPS/DfLSS Playwright Manufacturing Strategy › verify WASM world drives and generates cryptographic receipt
+Receipt generated at /Users/sac/rocket-craft/pwa-staff/test-results/tps-dflss-receipt.json with visual delta 60226 and verdict PASS
+
+  1 passed (1.8s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report[39m
+[36m[39m
+[7/8] Validating generated receipt...
+Success: Receipt validation passed successfully!
+[8/8] Shutting down local web server...
+--------------------------------------------------------
+  E2E HTML5 PIPELINE VERIFICATION SUCCESSFUL!
+--------------------------------------------------------

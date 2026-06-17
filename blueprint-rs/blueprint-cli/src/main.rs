@@ -430,7 +430,7 @@ fn cmd_decompile(
     if verbose {
         eprintln!("[bpgen] Parsed '{}' ({} nodes)", input.display(), nodes.len());
     }
-    let code = blueprint_core::parser::generate_rust_code(&nodes, name, parent);
+    let code = blueprint_core::parser::generate_rust_code(&nodes, name, parent)?;
     write_output(&code, output)
 }
 

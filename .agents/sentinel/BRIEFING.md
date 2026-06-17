@@ -1,22 +1,24 @@
-# BRIEFING — 2026-06-15T17:31:19-07:00
+# BRIEFING — 2026-06-17T23:24:31Z
 
 ## Mission
-Upgrade the Rocket Craft PWA launcher with a premium cyberpunk gamer-centric UI/UX, collapsible in-app developer debug HUD, database indexes, and telemetry logging to Supabase schema.
+Resolve all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project.
 
 ## 🔒 My Identity
 - Archetype: sentinel
 - Working directory: /Users/sac/rocket-craft/.agents/sentinel
-- Orchestrator: 7d8cb673-e0b8-4a3b-b105-284118fe4e06
+- Orchestrator: 0c5b7c84-281f-4a8a-86cc-4b95080943b3
 - Victory Auditor: TBD
 
 ## 🔒 Key Constraints
 - No technical decisions — relay only
 - Victory Audit is MANDATORY before reporting completion
+- Integrity mode: benchmark
+- Fully compliant with Anti-LLM guidelines and zero violations on anti-llm-cheat-lsp.
 
 ## User Context
-- **Last user request**: Upgrade Rocket Craft PWA launcher with premium cyberpunk UI/UX, collapsible in-app developer debug HUD, database indexes, and telemetry logging to Supabase schema, with associated tests.
+- **Last user request**: Resolve implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms.
 - **Pending clarifications**: none
-- **Delivered results**: none
+- **Delivered results**: [none]
 
 ## Project Status
 - **Phase**: in progress
@@ -27,4 +29,7 @@ Upgrade the Rocket Craft PWA launcher with a premium cyberpunk gamer-centric UI/
 - **Retry count**: 0
 
 ## Artifact Index
-- /Users/sac/rocket-craft/.agents/ORIGINAL_REQUEST.md — Verbatim user request record
+- /Users/sac/rocket-craft/ORIGINAL_REQUEST.md — Verbatim user request record
+- /Users/sac/rocket-craft/.agents/sentinel/BRIEFING.md — Sentinel tracking status
+- Task task-27 — Progress Reporting Cron (*/8 * * * *)
+- Task task-29 — Liveness Check Cron (*/10 * * * *)

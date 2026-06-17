@@ -61,4 +61,84 @@ pub enum Commands {
         #[arg(short, long)]
         domain: Option<String>,
     },
+    /// Genie 26 World Manufacturing Platform subcommands
+    Genie {
+        #[command(subcommand)]
+        subcommand: GenieSubcommands,
+    },
+    /// Parse natural language intent into a WorldSpec JSON
+    WorldParse {
+        #[arg(short, long)]
+        intent: String,
+        #[arg(short, long)]
+        output: String,
+    },
+    /// Validate a WorldSpec JSON against coherence rules
+    WorldValidate {
+        #[arg(short, long)]
+        spec: String,
+    },
+    /// Generate a UE4 T3D level map from a WorldSpec JSON
+    WorldGenerate {
+        #[arg(short, long)]
+        spec: String,
+        #[arg(short, long)]
+        output: String,
+    },
+    /// Deploy a manufactured world spec and start visualizer dashboard
+    WorldDeploy {
+        #[arg(short, long)]
+        spec: String,
+        #[arg(short, long)]
+        log: String,
+    },
+    /// Evolve an existing world spec with modification intent
+    WorldEvolve {
+        #[arg(short, long)]
+        spec: String,
+        #[arg(short, long)]
+        intent: String,
+        #[arg(short, long)]
+        output: String,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum GenieSubcommands {
+    /// Manufacture a new world from natural language intent
+    Manufacture {
+        /// Path to the natural language intent file or raw text
+        #[arg(short, long)]
+        intent: String,
+        /// Path to save the generated WorldSpec JSON file
+        #[arg(long)]
+        out_spec: String,
+        /// Path to save the compiled UE4 T3D level map file
+        #[arg(long)]
+        out_t3d: String,
+    },
+    /// Evolve an existing world spec using new modification intent
+    Evolve {
+        /// Path to the existing WorldSpec JSON file
+        #[arg(short, long)]
+        spec: String,
+        /// Path to the modification intent file or raw text
+        #[arg(short, long)]
+        intent: String,
+        /// Path to save the evolved WorldSpec JSON file
+        #[arg(long)]
+        out_spec: String,
+        /// Path to save the evolved UE4 T3D level map file
+        #[arg(long)]
+        out_t3d: String,
+    },
+    /// Deploy the manufactured world, registering telemetry log entry
+    Deploy {
+        /// Path to the WorldSpec JSON file
+        #[arg(short, long)]
+        spec: String,
+        /// Path to write the deployment log file
+        #[arg(short, long)]
+        log: String,
+    },
 }

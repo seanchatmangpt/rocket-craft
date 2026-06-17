@@ -5,6 +5,7 @@ import path from 'path';
 
 // Mock Supabase client
 const mockGetUser = vi.fn();
+const mockGetSession = vi.fn();
 const mockSignOut = vi.fn();
 const mockSignUp = vi.fn();
 const mockSignInWithPassword = vi.fn();
@@ -24,6 +25,7 @@ vi.mock('./src/lib/supabaseClient', () => {
     supabase: {
       auth: {
         getUser: () => mockGetUser(),
+        getSession: () => mockGetSession(),
         signOut: () => mockSignOut(),
         signUp: (args) => mockSignUp(args),
         signInWithPassword: (args) => mockSignInWithPassword(args),
@@ -63,6 +65,7 @@ describe('Supabase Auth Integration & Redirection Verification', () => {
     beforeEach(() => {
       vi.resetModules();
       mockGetUser.mockReset();
+      mockGetSession.mockReset();
       mockSignOut.mockReset();
 
       buttonListeners = {};
@@ -101,6 +104,10 @@ describe('Supabase Auth Integration & Redirection Verification', () => {
         data: { user: null },
         error: new Error('No active session'),
       });
+      mockGetSession.mockResolvedValue({
+        data: { session: null },
+        error: null,
+      });
 
       // Import the profile module to trigger initProfile
       await import('./src/profile');
@@ -115,6 +122,10 @@ describe('Supabase Auth Integration & Redirection Verification', () => {
       // Mock authenticated state
       mockGetUser.mockResolvedValue({
         data: { user: { email: 'staff@rocketcraft.com' } },
+        error: null,
+      });
+      mockGetSession.mockResolvedValue({
+        data: { session: { user: { email: 'staff@rocketcraft.com' } } },
         error: null,
       });
 
@@ -132,6 +143,10 @@ describe('Supabase Auth Integration & Redirection Verification', () => {
       // Mock authenticated state initially
       mockGetUser.mockResolvedValue({
         data: { user: { email: 'staff@rocketcraft.com' } },
+        error: null,
+      });
+      mockGetSession.mockResolvedValue({
+        data: { session: { user: { email: 'staff@rocketcraft.com' } } },
         error: null,
       });
 
@@ -162,6 +177,10 @@ describe('Supabase Auth Integration & Redirection Verification', () => {
       // Mock authenticated state
       mockGetUser.mockResolvedValue({
         data: { user: { id: 'test-user-id', email: 'staff@rocketcraft.com' } },
+        error: null,
+      });
+      mockGetSession.mockResolvedValue({
+        data: { session: { user: { id: 'test-user-id', email: 'staff@rocketcraft.com' } } },
         error: null,
       });
 

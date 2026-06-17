@@ -326,9 +326,9 @@ mod tests {
 
         // Every binding must have s, p, o keys
         for binding in &bindings {
-            assert!(binding.contains_key("s"), "binding must have 's' key");
-            assert!(binding.contains_key("p"), "binding must have 'p' key");
-            assert!(binding.contains_key("o"), "binding must have 'o' key");
+            assert!(binding.get("s").is_some(), "binding must have 's' key");
+            assert!(binding.get("p").is_some(), "binding must have 'p' key");
+            assert!(binding.get("o").is_some(), "binding must have 'o' key");
         }
     }
 

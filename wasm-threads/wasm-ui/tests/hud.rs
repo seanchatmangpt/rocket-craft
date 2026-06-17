@@ -138,7 +138,7 @@ fn hud_format_score_large_value() {
     let formatted = hud.format_score();
 
     log.info("Then the result contains the score digits");
-    assert!(formatted.contains("9999999999"));
+    assert!(formatted.find("9999999999").is_some());
 }
 
 proptest! {

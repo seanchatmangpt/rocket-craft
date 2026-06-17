@@ -161,9 +161,53 @@ impl Renderer for CanvasRenderer {
         let _ = self.ctx.fill_text(&format!("Tick: {}", tick), 10.0, 60.0);
     }
 
+    fn frame_count(&self) -> u64 {
+        self.frame_count
+    }
+}
+
+// ── WebGL2Renderer (WASM32 only) ─────────────────────────────────────────────
+
+#[cfg(target_arch = "wasm32")]
+pub struct WebGL2Renderer {
+    gl: web_sys::WebGl2RenderingContext,
+    frame_count: u64,
+}
+
+#[cfg(target_arch = "wasm32")]
+impl WebGL2Renderer {
+    pub fn new(gl: web_sys::WebGl2RenderingContext) -> Self {
+        Self { gl, frame_count: 0 }
+    }
+
+    pub fn gl(&self) -> &web_sys::WebGl2RenderingContext {
+        &self.gl
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl Renderer for WebGL2Renderer {
+    fn clear(&mut self) {
+        self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
+        self.gl.clear(web_sys::WebGl2RenderingContext::COLOR_BUFFER_BIT);
+    }
+
+    fn draw_health_bar(&mut self, _x: f32, _y: f32, _width: f32, _height: f32, _percentage: f32) {
+        // Real WebGL 2.0 draw calls would go here
+    }
+
+    fn draw_score(&mut self, _score: u64) {
+        // Text rendering in WebGL 2.0 requires a texture or separate overlay
+    }
+
+    fn draw_entity_count(&mut self, _count: usize) {
+    }
+
+    fn draw_tick(&mut self, _tick: u64) {
+    }
+
     fn present(&mut self) {
         self.frame_count += 1;
-        // Canvas draws immediately; no explicit swap needed.
     }
 
     fn frame_count(&self) -> u64 {

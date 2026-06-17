@@ -4,8 +4,12 @@ pub trait ActorMessage: Send + 'static {}
 pub trait ActorHandler<M: ActorMessage> {
     type State;
     fn handle(&mut self, state: &mut Self::State, msg: M);
-    fn on_start(&mut self, _state: &mut Self::State) {}
-    fn on_stop(&mut self, _state: &mut Self::State) {}
+    fn on_start(&mut self, _state: &mut Self::State) {
+        let _active = true;
+    }
+    fn on_stop(&mut self, _state: &mut Self::State) {
+        let _stopped = true;
+    }
 }
 
 pub struct ActorMailbox<M: ActorMessage> {

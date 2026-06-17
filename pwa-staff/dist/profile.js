@@ -3,9 +3,8 @@
   // node_modules/tslib/tslib.es6.mjs
   function __rest(s, e) {
     var t = {};
-    for (var p in s)
-      if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+      t[p] = s[p];
     if (s != null && typeof Object.getOwnPropertySymbols === "function")
       for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
         if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
@@ -423,12 +422,9 @@
     });
   }
   function shouldRetry(method, status, attemptCount, retryEnabled) {
-    if (!retryEnabled || attemptCount >= DEFAULT_MAX_RETRIES)
-      return false;
-    if (!RETRYABLE_METHODS.includes(method))
-      return false;
-    if (!RETRYABLE_STATUS_CODES.includes(status))
-      return false;
+    if (!retryEnabled || attemptCount >= DEFAULT_MAX_RETRIES) return false;
+    if (!RETRYABLE_METHODS.includes(method)) return false;
+    if (!RETRYABLE_STATUS_CODES.includes(status)) return false;
     return true;
   }
   var PostgrestBuilder = class {
@@ -470,10 +466,8 @@
       this.shouldStripNulls = (_builder$shouldStripN = builder.shouldStripNulls) !== null && _builder$shouldStripN !== void 0 ? _builder$shouldStripN : false;
       this.urlLengthLimit = (_builder$urlLengthLim = builder.urlLengthLimit) !== null && _builder$urlLengthLim !== void 0 ? _builder$urlLengthLim : 8e3;
       this.retryEnabled = (_builder$retry = builder.retry) !== null && _builder$retry !== void 0 ? _builder$retry : true;
-      if (builder.fetch)
-        this.fetch = builder.fetch;
-      else
-        this.fetch = fetch;
+      if (builder.fetch) this.fetch = builder.fetch;
+      else this.fetch = fetch;
     }
     /**
     * If there's an error with the query, throwOnError will reject the promise by
@@ -539,8 +533,7 @@
     * ```
     */
     stripNulls() {
-      if (this.headers.get("Accept") === "text/csv")
-        throw new Error("stripNulls() cannot be used with csv()");
+      if (this.headers.get("Accept") === "text/csv") throw new Error("stripNulls() cannot be used with csv()");
       this.shouldStripNulls = true;
       return this;
     }
@@ -593,18 +586,13 @@
     then(onfulfilled, onrejected) {
       var _this = this;
       if (this.schema === void 0) {
-      } else if (["GET", "HEAD"].includes(this.method))
-        this.headers.set("Accept-Profile", this.schema);
-      else
-        this.headers.set("Content-Profile", this.schema);
-      if (this.method !== "GET" && this.method !== "HEAD")
-        this.headers.set("Content-Type", "application/json");
+      } else if (["GET", "HEAD"].includes(this.method)) this.headers.set("Accept-Profile", this.schema);
+      else this.headers.set("Content-Profile", this.schema);
+      if (this.method !== "GET" && this.method !== "HEAD") this.headers.set("Content-Type", "application/json");
       if (this.shouldStripNulls) {
         const currentAccept = this.headers.get("Accept");
-        if (currentAccept === "application/vnd.pgrst.object+json")
-          this.headers.set("Accept", "application/vnd.pgrst.object+json;nulls=stripped");
-        else if (!currentAccept || currentAccept === "application/json")
-          this.headers.set("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
+        if (currentAccept === "application/vnd.pgrst.object+json") this.headers.set("Accept", "application/vnd.pgrst.object+json;nulls=stripped");
+        else if (!currentAccept || currentAccept === "application/json") this.headers.set("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
       }
       const _fetch = this.fetch;
       const executeWithRetry = async () => {
@@ -614,8 +602,7 @@
           _this.headers.forEach((value, key) => {
             headers[key] = value;
           });
-          if (attemptCount > 0)
-            headers["X-Retry-Count"] = String(attemptCount);
+          if (attemptCount > 0) headers["X-Retry-Count"] = String(attemptCount);
           let res$1;
           try {
             res$1 = await _fetch(_this.url.toString(), {
@@ -625,10 +612,8 @@
               signal: _this.signal
             });
           } catch (fetchError) {
-            if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR")
-              throw fetchError;
-            if (!RETRYABLE_METHODS.includes(_this.method))
-              throw fetchError;
+            if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") throw fetchError;
+            if (!RETRYABLE_METHODS.includes(_this.method)) throw fetchError;
             if (_this.retryEnabled && attemptCount < DEFAULT_MAX_RETRIES) {
               const delay = getRetryDelay(attemptCount);
               attemptCount++;
@@ -650,56 +635,51 @@
         }
       };
       let res = executeWithRetry();
-      if (!this.shouldThrowOnError)
-        res = res.catch((fetchError) => {
-          var _fetchError$name2;
-          let errorDetails = "";
-          let hint = "";
-          let code = "";
-          const cause = fetchError === null || fetchError === void 0 ? void 0 : fetchError.cause;
-          if (cause) {
-            var _cause$message, _cause$code, _fetchError$name, _cause$name;
-            const causeMessage = (_cause$message = cause === null || cause === void 0 ? void 0 : cause.message) !== null && _cause$message !== void 0 ? _cause$message : "";
-            const causeCode = (_cause$code = cause === null || cause === void 0 ? void 0 : cause.code) !== null && _cause$code !== void 0 ? _cause$code : "";
-            errorDetails = `${(_fetchError$name = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name !== void 0 ? _fetchError$name : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`;
-            errorDetails += `
+      if (!this.shouldThrowOnError) res = res.catch((fetchError) => {
+        var _fetchError$name2;
+        let errorDetails = "";
+        let hint = "";
+        let code = "";
+        const cause = fetchError === null || fetchError === void 0 ? void 0 : fetchError.cause;
+        if (cause) {
+          var _cause$message, _cause$code, _fetchError$name, _cause$name;
+          const causeMessage = (_cause$message = cause === null || cause === void 0 ? void 0 : cause.message) !== null && _cause$message !== void 0 ? _cause$message : "";
+          const causeCode = (_cause$code = cause === null || cause === void 0 ? void 0 : cause.code) !== null && _cause$code !== void 0 ? _cause$code : "";
+          errorDetails = `${(_fetchError$name = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name !== void 0 ? _fetchError$name : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`;
+          errorDetails += `
 
 Caused by: ${(_cause$name = cause === null || cause === void 0 ? void 0 : cause.name) !== null && _cause$name !== void 0 ? _cause$name : "Error"}: ${causeMessage}`;
-            if (causeCode)
-              errorDetails += ` (${causeCode})`;
-            if (cause === null || cause === void 0 ? void 0 : cause.stack)
-              errorDetails += `
+          if (causeCode) errorDetails += ` (${causeCode})`;
+          if (cause === null || cause === void 0 ? void 0 : cause.stack) errorDetails += `
 ${cause.stack}`;
-          } else {
-            var _fetchError$stack;
-            errorDetails = (_fetchError$stack = fetchError === null || fetchError === void 0 ? void 0 : fetchError.stack) !== null && _fetchError$stack !== void 0 ? _fetchError$stack : "";
-          }
-          const urlLength = this.url.toString().length;
-          if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") {
-            code = "";
-            hint = "Request was aborted (timeout or manual cancellation)";
-            if (urlLength > this.urlLengthLimit)
-              hint += `. Note: Your request URL is ${urlLength} characters, which may exceed server limits. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.`;
-          } else if ((cause === null || cause === void 0 ? void 0 : cause.name) === "HeadersOverflowError" || (cause === null || cause === void 0 ? void 0 : cause.code) === "UND_ERR_HEADERS_OVERFLOW") {
-            code = "";
-            hint = "HTTP headers exceeded server limits (typically 16KB)";
-            if (urlLength > this.urlLengthLimit)
-              hint += `. Your request URL is ${urlLength} characters. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [200+ IDs])), consider using an RPC function instead.`;
-          }
-          return {
-            success: false,
-            error: {
-              message: `${(_fetchError$name2 = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name2 !== void 0 ? _fetchError$name2 : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`,
-              details: errorDetails,
-              hint,
-              code
-            },
-            data: null,
-            count: null,
-            status: 0,
-            statusText: ""
-          };
-        });
+        } else {
+          var _fetchError$stack;
+          errorDetails = (_fetchError$stack = fetchError === null || fetchError === void 0 ? void 0 : fetchError.stack) !== null && _fetchError$stack !== void 0 ? _fetchError$stack : "";
+        }
+        const urlLength = this.url.toString().length;
+        if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") {
+          code = "";
+          hint = "Request was aborted (timeout or manual cancellation)";
+          if (urlLength > this.urlLengthLimit) hint += `. Note: Your request URL is ${urlLength} characters, which may exceed server limits. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.`;
+        } else if ((cause === null || cause === void 0 ? void 0 : cause.name) === "HeadersOverflowError" || (cause === null || cause === void 0 ? void 0 : cause.code) === "UND_ERR_HEADERS_OVERFLOW") {
+          code = "";
+          hint = "HTTP headers exceeded server limits (typically 16KB)";
+          if (urlLength > this.urlLengthLimit) hint += `. Your request URL is ${urlLength} characters. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [200+ IDs])), consider using an RPC function instead.`;
+        }
+        return {
+          success: false,
+          error: {
+            message: `${(_fetchError$name2 = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name2 !== void 0 ? _fetchError$name2 : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`,
+            details: errorDetails,
+            hint,
+            code
+          },
+          data: null,
+          count: null,
+          status: 0,
+          statusText: ""
+        };
+      });
       return res.then(onfulfilled, onrejected);
     }
     /**
@@ -718,45 +698,37 @@ ${cause.stack}`;
           var _this$headers$get;
           const body = await res.text();
           if (body === "") {
-          } else if (_this2.headers.get("Accept") === "text/csv")
-            data = body;
-          else if (_this2.headers.get("Accept") && ((_this$headers$get = _this2.headers.get("Accept")) === null || _this$headers$get === void 0 ? void 0 : _this$headers$get.includes("application/vnd.pgrst.plan+text")))
-            data = body;
-          else
-            try {
-              data = JSON.parse(body);
-            } catch (_unused) {
-              error = { message: body };
-              data = null;
-              if (_this2.shouldThrowOnError)
-                throw new PostgrestError({
-                  message: body,
-                  details: "",
-                  hint: "",
-                  code: ""
-                });
-            }
+          } else if (_this2.headers.get("Accept") === "text/csv") data = body;
+          else if (_this2.headers.get("Accept") && ((_this$headers$get = _this2.headers.get("Accept")) === null || _this$headers$get === void 0 ? void 0 : _this$headers$get.includes("application/vnd.pgrst.plan+text"))) data = body;
+          else try {
+            data = JSON.parse(body);
+          } catch (_unused) {
+            error = { message: body };
+            data = null;
+            if (_this2.shouldThrowOnError) throw new PostgrestError({
+              message: body,
+              details: "",
+              hint: "",
+              code: ""
+            });
+          }
         }
         const countHeader = (_this$headers$get2 = _this2.headers.get("Prefer")) === null || _this$headers$get2 === void 0 ? void 0 : _this$headers$get2.match(/count=(exact|planned|estimated)/);
         const contentRange = (_res$headers$get2 = res.headers.get("content-range")) === null || _res$headers$get2 === void 0 ? void 0 : _res$headers$get2.split("/");
-        if (countHeader && contentRange && contentRange.length > 1)
-          count = parseInt(contentRange[1]);
-        if (_this2.isMaybeSingle && Array.isArray(data))
-          if (data.length > 1) {
-            error = {
-              code: "PGRST116",
-              details: `Results contain ${data.length} rows, application/vnd.pgrst.object+json requires 1 row`,
-              hint: null,
-              message: "JSON object requested, multiple (or no) rows returned"
-            };
-            data = null;
-            count = null;
-            status = 406;
-            statusText = "Not Acceptable";
-          } else if (data.length === 1)
-            data = data[0];
-          else
-            data = null;
+        if (countHeader && contentRange && contentRange.length > 1) count = parseInt(contentRange[1]);
+        if (_this2.isMaybeSingle && Array.isArray(data)) if (data.length > 1) {
+          error = {
+            code: "PGRST116",
+            details: `Results contain ${data.length} rows, application/vnd.pgrst.object+json requires 1 row`,
+            hint: null,
+            message: "JSON object requested, multiple (or no) rows returned"
+          };
+          data = null;
+          count = null;
+          status = 406;
+          statusText = "Not Acceptable";
+        } else if (data.length === 1) data = data[0];
+        else data = null;
       } else {
         const body = await res.text();
         try {
@@ -771,11 +743,9 @@ ${cause.stack}`;
           if (res.status === 404 && body === "") {
             status = 204;
             statusText = "No Content";
-          } else
-            error = { message: body };
+          } else error = { message: body };
         }
-        if (error && _this2.shouldThrowOnError)
-          throw new PostgrestError(error);
+        if (error && _this2.shouldThrowOnError) throw new PostgrestError(error);
       }
       return {
         success: error === null,
@@ -948,10 +918,8 @@ ${cause.stack}`;
     select(columns) {
       let quoted = false;
       const cleanedColumns = (columns !== null && columns !== void 0 ? columns : "*").split("").map((c) => {
-        if (/\s/.test(c) && !quoted)
-          return "";
-        if (c === '"')
-          quoted = !quoted;
+        if (/\s/.test(c) && !quoted) return "";
+        if (c === '"') quoted = !quoted;
         return c;
       }).join("");
       this.url.searchParams.set("select", cleanedColumns);
@@ -1639,10 +1607,8 @@ ${cause.stack}`;
       ].filter(Boolean).join("|");
       const forMediatype = (_this$headers$get = this.headers.get("Accept")) !== null && _this$headers$get !== void 0 ? _this$headers$get : "application/json";
       this.headers.set("Accept", `application/vnd.pgrst.plan+${format}; for="${forMediatype}"; options=${options};`);
-      if (format === "json")
-        return this;
-      else
-        return this;
+      if (format === "json") return this;
+      else return this;
     }
     /**
     * Dry-run this request: execute the query but discard the changes.
@@ -2340,10 +2306,8 @@ ${cause.stack}`;
     */
     in(column, values) {
       const cleanedValues = Array.from(new Set(values)).map((s) => {
-        if (typeof s === "string" && PostgrestReservedCharsRegexp.test(s))
-          return `"${s}"`;
-        else
-          return `${s}`;
+        if (typeof s === "string" && PostgrestReservedCharsRegexp.test(s)) return `"${s}"`;
+        else return `${s}`;
       }).join(",");
       this.url.searchParams.append(column, `in.(${cleanedValues})`);
       return this;
@@ -2356,10 +2320,8 @@ ${cause.stack}`;
     */
     notIn(column, values) {
       const cleanedValues = Array.from(new Set(values)).map((s) => {
-        if (typeof s === "string" && PostgrestReservedCharsRegexp.test(s))
-          return `"${s}"`;
-        else
-          return `${s}`;
+        if (typeof s === "string" && PostgrestReservedCharsRegexp.test(s)) return `"${s}"`;
+        else return `${s}`;
       }).join(",");
       this.url.searchParams.append(column, `not.in.(${cleanedValues})`);
       return this;
@@ -2494,12 +2456,9 @@ ${cause.stack}`;
     * ```
     */
     contains(column, value) {
-      if (typeof value === "string")
-        this.url.searchParams.append(column, `cs.${value}`);
-      else if (Array.isArray(value))
-        this.url.searchParams.append(column, `cs.{${value.join(",")}}`);
-      else
-        this.url.searchParams.append(column, `cs.${JSON.stringify(value)}`);
+      if (typeof value === "string") this.url.searchParams.append(column, `cs.${value}`);
+      else if (Array.isArray(value)) this.url.searchParams.append(column, `cs.{${value.join(",")}}`);
+      else this.url.searchParams.append(column, `cs.${JSON.stringify(value)}`);
       return this;
     }
     /**
@@ -2633,12 +2592,9 @@ ${cause.stack}`;
     * ```
     */
     containedBy(column, value) {
-      if (typeof value === "string")
-        this.url.searchParams.append(column, `cd.${value}`);
-      else if (Array.isArray(value))
-        this.url.searchParams.append(column, `cd.{${value.join(",")}}`);
-      else
-        this.url.searchParams.append(column, `cd.${JSON.stringify(value)}`);
+      if (typeof value === "string") this.url.searchParams.append(column, `cd.${value}`);
+      else if (Array.isArray(value)) this.url.searchParams.append(column, `cd.{${value.join(",")}}`);
+      else this.url.searchParams.append(column, `cd.${JSON.stringify(value)}`);
       return this;
     }
     /**
@@ -3035,10 +2991,8 @@ ${cause.stack}`;
     * ```
     */
     overlaps(column, value) {
-      if (typeof value === "string")
-        this.url.searchParams.append(column, `ov.${value}`);
-      else
-        this.url.searchParams.append(column, `ov.{${value.join(",")}}`);
+      if (typeof value === "string") this.url.searchParams.append(column, `ov.${value}`);
+      else this.url.searchParams.append(column, `ov.{${value.join(",")}}`);
       return this;
     }
     /**
@@ -3147,12 +3101,9 @@ ${cause.stack}`;
     */
     textSearch(column, query, { config, type } = {}) {
       let typePart = "";
-      if (type === "plain")
-        typePart = "pl";
-      else if (type === "phrase")
-        typePart = "ph";
-      else if (type === "websearch")
-        typePart = "w";
+      if (type === "plain") typePart = "pl";
+      else if (type === "phrase") typePart = "ph";
+      else if (type === "websearch") typePart = "w";
       const configPart = config === void 0 ? "" : `(${config})`;
       this.url.searchParams.append(column, `${typePart}fts${configPart}.${query}`);
       return this;
@@ -4404,16 +4355,13 @@ ${cause.stack}`;
       const method = head2 ? "HEAD" : "GET";
       let quoted = false;
       const cleanedColumns = (columns !== null && columns !== void 0 ? columns : "*").split("").map((c) => {
-        if (/\s/.test(c) && !quoted)
-          return "";
-        if (c === '"')
-          quoted = !quoted;
+        if (/\s/.test(c) && !quoted) return "";
+        if (c === '"') quoted = !quoted;
         return c;
       }).join("");
       const { url, headers } = this.cloneRequestState();
       url.searchParams.set("select", cleanedColumns);
-      if (count)
-        headers.append("Prefer", `count=${count}`);
+      if (count) headers.append("Prefer", `count=${count}`);
       return new PostgrestFilterBuilder({
         method,
         url,
@@ -4548,10 +4496,8 @@ ${cause.stack}`;
       var _this$fetch;
       const method = "POST";
       const { url, headers } = this.cloneRequestState();
-      if (count)
-        headers.append("Prefer", `count=${count}`);
-      if (!defaultToNull)
-        headers.append("Prefer", `missing=default`);
+      if (count) headers.append("Prefer", `count=${count}`);
+      if (!defaultToNull) headers.append("Prefer", `missing=default`);
       if (Array.isArray(values)) {
         const columns = values.reduce((acc, x) => acc.concat(Object.keys(x)), []);
         if (columns.length > 0) {
@@ -4792,12 +4738,9 @@ ${cause.stack}`;
       const method = "POST";
       const { url, headers } = this.cloneRequestState();
       headers.append("Prefer", `resolution=${ignoreDuplicates ? "ignore" : "merge"}-duplicates`);
-      if (onConflict !== void 0)
-        url.searchParams.set("on_conflict", onConflict);
-      if (count)
-        headers.append("Prefer", `count=${count}`);
-      if (!defaultToNull)
-        headers.append("Prefer", "missing=default");
+      if (onConflict !== void 0) url.searchParams.set("on_conflict", onConflict);
+      if (count) headers.append("Prefer", `count=${count}`);
+      if (!defaultToNull) headers.append("Prefer", "missing=default");
       if (Array.isArray(values)) {
         const columns = values.reduce((acc, x) => acc.concat(Object.keys(x)), []);
         if (columns.length > 0) {
@@ -4968,8 +4911,7 @@ ${cause.stack}`;
       var _this$fetch3;
       const method = "PATCH";
       const { url, headers } = this.cloneRequestState();
-      if (count)
-        headers.append("Prefer", `count=${count}`);
+      if (count) headers.append("Prefer", `count=${count}`);
       return new PostgrestFilterBuilder({
         method,
         url,
@@ -5112,8 +5054,7 @@ ${cause.stack}`;
       var _this$fetch4;
       const method = "DELETE";
       const { url, headers } = this.cloneRequestState();
-      if (count)
-        headers.append("Prefer", `count=${count}`);
+      if (count) headers.append("Prefer", `count=${count}`);
       return new PostgrestFilterBuilder({
         method,
         url,
@@ -5134,13 +5075,11 @@ ${cause.stack}`;
     }, _typeof(o);
   }
   function toPrimitive(t, r) {
-    if ("object" != _typeof(t) || !t)
-      return t;
+    if ("object" != _typeof(t) || !t) return t;
     var e = t[Symbol.toPrimitive];
     if (void 0 !== e) {
       var i = e.call(t, r || "default");
-      if ("object" != _typeof(i))
-        return i;
+      if ("object" != _typeof(i)) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
     return ("string" === r ? String : Number)(t);
@@ -5224,30 +5163,28 @@ ${cause.stack}`;
       this.schemaName = schema;
       this.urlLengthLimit = urlLengthLimit;
       const originalFetch = fetch$1 !== null && fetch$1 !== void 0 ? fetch$1 : globalThis.fetch;
-      if (timeout !== void 0 && timeout > 0)
-        this.fetch = (input, init) => {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), timeout);
-          const existingSignal = init === null || init === void 0 ? void 0 : init.signal;
-          if (existingSignal) {
-            if (existingSignal.aborted) {
-              clearTimeout(timeoutId);
-              return originalFetch(input, init);
-            }
-            const abortHandler = () => {
-              clearTimeout(timeoutId);
-              controller.abort();
-            };
-            existingSignal.addEventListener("abort", abortHandler, { once: true });
-            return originalFetch(input, _objectSpread2(_objectSpread2({}, init), {}, { signal: controller.signal })).finally(() => {
-              clearTimeout(timeoutId);
-              existingSignal.removeEventListener("abort", abortHandler);
-            });
+      if (timeout !== void 0 && timeout > 0) this.fetch = (input, init) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        const existingSignal = init === null || init === void 0 ? void 0 : init.signal;
+        if (existingSignal) {
+          if (existingSignal.aborted) {
+            clearTimeout(timeoutId);
+            return originalFetch(input, init);
           }
-          return originalFetch(input, _objectSpread2(_objectSpread2({}, init), {}, { signal: controller.signal })).finally(() => clearTimeout(timeoutId));
-        };
-      else
-        this.fetch = originalFetch;
+          const abortHandler = () => {
+            clearTimeout(timeoutId);
+            controller.abort();
+          };
+          existingSignal.addEventListener("abort", abortHandler, { once: true });
+          return originalFetch(input, _objectSpread2(_objectSpread2({}, init), {}, { signal: controller.signal })).finally(() => {
+            clearTimeout(timeoutId);
+            existingSignal.removeEventListener("abort", abortHandler);
+          });
+        }
+        return originalFetch(input, _objectSpread2(_objectSpread2({}, init), {}, { signal: controller.signal })).finally(() => clearTimeout(timeoutId));
+      };
+      else this.fetch = originalFetch;
       this.retry = retry;
     }
     /**
@@ -5258,8 +5195,7 @@ ${cause.stack}`;
     * @category Database
     */
     from(relation) {
-      if (!relation || typeof relation !== "string" || relation.trim() === "")
-        throw new Error("Invalid relation name: relation must be a non-empty string.");
+      if (!relation || typeof relation !== "string" || relation.trim() === "") throw new Error("Invalid relation name: relation must be a non-empty string.");
       return new PostgrestQueryBuilder(new URL(`${this.url}/${relation}`), {
         headers: new Headers(this.headers),
         schema: this.schemaName,
@@ -5471,10 +5407,8 @@ ${cause.stack}`;
         body = args;
       }
       const headers = new Headers(this.headers);
-      if (_hasObjectArg)
-        headers.set("Prefer", count ? `count=${count},return=minimal` : "return=minimal");
-      else if (count)
-        headers.set("Prefer", `count=${count}`);
+      if (_hasObjectArg) headers.set("Prefer", count ? `count=${count},return=minimal` : "return=minimal");
+      else if (count) headers.set("Prefer", `count=${count}`);
       return new PostgrestFilterBuilder({
         method,
         url,
@@ -5844,17 +5778,24 @@ Suggested solution: ${env.workaround}`;
         return toJson(value);
       case PostgresTypes.timestamp:
         return toTimestampString(value);
+      // Format to be consistent with PostgREST
       case PostgresTypes.abstime:
+      // To allow users to cast it based on Timezone
       case PostgresTypes.date:
+      // To allow users to cast it based on Timezone
       case PostgresTypes.daterange:
       case PostgresTypes.int4range:
       case PostgresTypes.int8range:
       case PostgresTypes.money:
       case PostgresTypes.reltime:
+      // To allow users to cast it based on Timezone
       case PostgresTypes.text:
       case PostgresTypes.time:
+      // To allow users to cast it based on Timezone
       case PostgresTypes.timestamptz:
+      // To allow users to cast it based on Timezone
       case PostgresTypes.timetz:
+      // To allow users to cast it based on Timezone
       case PostgresTypes.tsrange:
       case PostgresTypes.tstzrange:
         return noop(value);
@@ -6170,22 +6111,19 @@ Suggested solution: ${env.workaround}`;
       });
       this.joinPush.receive("error", (reason) => {
         this.state = CHANNEL_STATES2.errored;
-        if (this.socket.hasLogger())
-          this.socket.log("channel", `error ${this.topic}`, reason);
+        if (this.socket.hasLogger()) this.socket.log("channel", `error ${this.topic}`, reason);
         if (this.socket.isConnected()) {
           this.rejoinTimer.scheduleTimeout();
         }
       });
       this.onClose(() => {
         this.rejoinTimer.reset();
-        if (this.socket.hasLogger())
-          this.socket.log("channel", `close ${this.topic}`);
+        if (this.socket.hasLogger()) this.socket.log("channel", `close ${this.topic}`);
         this.state = CHANNEL_STATES2.closed;
         this.socket.remove(this);
       });
       this.onError((reason) => {
-        if (this.socket.hasLogger())
-          this.socket.log("channel", `error ${this.topic}`, reason);
+        if (this.socket.hasLogger()) this.socket.log("channel", `error ${this.topic}`, reason);
         if (this.isJoining()) {
           this.joinPush.reset();
         }
@@ -6195,8 +6133,7 @@ Suggested solution: ${env.workaround}`;
         }
       });
       this.joinPush.receive("timeout", () => {
-        if (this.socket.hasLogger())
-          this.socket.log("channel", `timeout ${this.topic}`, this.joinPush.timeout);
+        if (this.socket.hasLogger()) this.socket.log("channel", `timeout ${this.topic}`, this.joinPush.timeout);
         let leavePush = new Push(this, CHANNEL_EVENTS2.leave, closure({}), this.timeout);
         leavePush.send();
         this.state = CHANNEL_STATES2.errored;
@@ -6356,8 +6293,7 @@ Suggested solution: ${env.workaround}`;
       this.joinPush.cancelTimeout();
       this.state = CHANNEL_STATES2.leaving;
       let onClose = () => {
-        if (this.socket.hasLogger())
-          this.socket.log("channel", `leave ${this.topic}`);
+        if (this.socket.hasLogger()) this.socket.log("channel", `leave ${this.topic}`);
         this.trigger(CHANNEL_EVENTS2.close, "leave");
       };
       let leavePush = new Push(this, CHANNEL_EVENTS2.leave, closure({}), timeout);
@@ -6395,8 +6331,7 @@ Suggested solution: ${env.workaround}`;
         return false;
       }
       if (joinRef && joinRef !== this.joinRef()) {
-        if (this.socket.hasLogger())
-          this.socket.log("channel", "dropping outdated message", { topic, event, payload, joinRef });
+        if (this.socket.hasLogger()) this.socket.log("channel", "dropping outdated message", { topic, event, payload, joinRef });
         return false;
       } else {
         return true;
@@ -7148,8 +7083,7 @@ Suggested solution: ${env.workaround}`;
           return;
         }
         this.teardown(async () => {
-          if (opts.beforeReconnect)
-            await opts.beforeReconnect();
+          if (opts.beforeReconnect) await opts.beforeReconnect();
           this.connect();
         });
       }, this.reconnectAfterMs);
@@ -7421,8 +7355,7 @@ Suggested solution: ${env.workaround}`;
       clearTimeout(this.heartbeatTimeoutTimer);
     }
     onConnOpen() {
-      if (this.hasLogger())
-        this.log("transport", `connected to ${this.endPointURL()}`);
+      if (this.hasLogger()) this.log("transport", `connected to ${this.endPointURL()}`);
       this.closeWasClean = false;
       this.disconnecting = false;
       this.establishedConnections++;
@@ -7510,11 +7443,9 @@ Suggested solution: ${env.workaround}`;
     * @param {CloseEvent} event
     */
     onConnClose(event) {
-      if (this.conn)
-        this.conn.onclose = () => {
-        };
-      if (this.hasLogger())
-        this.log("transport", "close", event);
+      if (this.conn) this.conn.onclose = () => {
+      };
+      if (this.hasLogger()) this.log("transport", "close", event);
       this.triggerChanError(event);
       this.clearHeartbeats();
       if (!this.closeWasClean) {
@@ -7527,8 +7458,7 @@ Suggested solution: ${env.workaround}`;
      * @param {Event} error
      */
     onConnError(error) {
-      if (this.hasLogger())
-        this.log("transport", "error", error);
+      if (this.hasLogger()) this.log("transport", "error", error);
       let transportBefore = this.transport;
       let establishedBefore = this.establishedConnections;
       this.triggerStateCallbacks("error", error, transportBefore, establishedBefore);
@@ -7677,8 +7607,7 @@ Suggested solution: ${env.workaround}`;
             this.heartbeatTimer = setTimeout(() => this.sendHeartbeat(), this.heartbeatIntervalMs);
           }
         }
-        if (this.hasLogger())
-          this.log("receive", `${payload.status || ""} ${topic} ${event} ${ref && "(" + ref + ")" || ""}`.trim(), payload);
+        if (this.hasLogger()) this.log("receive", `${payload.status || ""} ${topic} ${event} ${ref && "(" + ref + ")" || ""}`.trim(), payload);
         for (let i = 0; i < this.channels.length; i++) {
           const channel = this.channels[i];
           if (!channel.isMember(topic, event, payload, join_ref)) {
@@ -7712,8 +7641,7 @@ Suggested solution: ${env.workaround}`;
     leaveOpenTopic(topic) {
       let dupChannel = this.channels.find((c) => c.topic === topic && (c.isJoined() || c.isJoining()));
       if (dupChannel) {
-        if (this.hasLogger())
-          this.log("transport", `leaving duplicate topic "${topic}"`);
+        if (this.hasLogger()) this.log("transport", `leaving duplicate topic "${topic}"`);
         dupChannel.leave();
       }
     }
@@ -9375,9 +9303,9 @@ Option 2: Install and provide the "ws" package:
       result.logger = options === null || options === void 0 ? void 0 : options.logger;
       result.heartbeatCallback = this._wrapHeartbeatCallback(options === null || options === void 0 ? void 0 : options.heartbeatCallback);
       result.sessionStorage = (_h = options === null || options === void 0 ? void 0 : options.sessionStorage) !== null && _h !== void 0 ? _h : resolveSessionStorage();
-      result.reconnectAfterMs = (_j = options === null || options === void 0 ? void 0 : options.reconnectAfterMs) !== null && _j !== void 0 ? _j : (tries) => {
+      result.reconnectAfterMs = (_j = options === null || options === void 0 ? void 0 : options.reconnectAfterMs) !== null && _j !== void 0 ? _j : ((tries) => {
         return RECONNECT_INTERVALS[tries - 1] || DEFAULT_RECONNECT_FALLBACK;
-      };
+      });
       let defaultEncode;
       let defaultDecode;
       const vsn = (_k = options === null || options === void 0 ? void 0 : options.vsn) !== null && _k !== void 0 ? _k : DEFAULT_VSN;
@@ -9966,13 +9894,11 @@ Option 2: Install and provide the "ws" package:
     }, _typeof2(o);
   }
   function toPrimitive2(t, r) {
-    if ("object" != _typeof2(t) || !t)
-      return t;
+    if ("object" != _typeof2(t) || !t) return t;
     var e = t[Symbol.toPrimitive];
     if (void 0 !== e) {
       var i = e.call(t, r || "default");
-      if ("object" != _typeof2(i))
-        return i;
+      if ("object" != _typeof2(i)) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
     return ("string" === r ? String : Number)(t);
@@ -10052,34 +9978,27 @@ Option 2: Install and provide the "ws" package:
   function setHeader(headers, name, value) {
     const result = _objectSpread22({}, headers);
     const nameLower = name.toLowerCase();
-    for (const key of Object.keys(result))
-      if (key.toLowerCase() === nameLower)
-        delete result[key];
+    for (const key of Object.keys(result)) if (key.toLowerCase() === nameLower) delete result[key];
     result[nameLower] = value;
     return result;
   }
   function normalizeHeaders(headers) {
     const result = {};
-    for (const [key, value] of Object.entries(headers))
-      result[key.toLowerCase()] = value;
+    for (const [key, value] of Object.entries(headers)) result[key.toLowerCase()] = value;
     return result;
   }
   var resolveFetch2 = (customFetch) => {
-    if (customFetch)
-      return (...args) => customFetch(...args);
+    if (customFetch) return (...args) => customFetch(...args);
     return (...args) => fetch(...args);
   };
   var isPlainObject = (value) => {
-    if (typeof value !== "object" || value === null)
-      return false;
+    if (typeof value !== "object" || value === null) return false;
     const prototype = Object.getPrototypeOf(value);
     return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
   };
   var recursiveToCamel = (item) => {
-    if (Array.isArray(item))
-      return item.map((el) => recursiveToCamel(el));
-    else if (typeof item === "function" || item !== Object(item))
-      return item;
+    if (Array.isArray(item)) return item.map((el) => recursiveToCamel(el));
+    else if (typeof item === "function" || item !== Object(item)) return item;
     const result = {};
     Object.entries(item).forEach(([key, value]) => {
       const newKey = key.replace(/([-_][a-z])/gi, (c) => c.toUpperCase().replace(/[-_]/g, ""));
@@ -10088,31 +10007,22 @@ Option 2: Install and provide the "ws" package:
     return result;
   };
   var isValidBucketName = (bucketName) => {
-    if (!bucketName || typeof bucketName !== "string")
-      return false;
-    if (bucketName.length === 0 || bucketName.length > 100)
-      return false;
-    if (bucketName.trim() !== bucketName)
-      return false;
-    if (bucketName.includes("/") || bucketName.includes("\\"))
-      return false;
+    if (!bucketName || typeof bucketName !== "string") return false;
+    if (bucketName.length === 0 || bucketName.length > 100) return false;
+    if (bucketName.trim() !== bucketName) return false;
+    if (bucketName.includes("/") || bucketName.includes("\\")) return false;
     return /^[\w!.\*'() &$@=;:+,?-]+$/.test(bucketName);
   };
   var _getErrorMessage = (err) => {
     if (typeof err === "object" && err !== null) {
       const e = err;
-      if (typeof e.msg === "string")
-        return e.msg;
-      if (typeof e.message === "string")
-        return e.message;
-      if (typeof e.error_description === "string")
-        return e.error_description;
-      if (typeof e.error === "string")
-        return e.error;
+      if (typeof e.msg === "string") return e.msg;
+      if (typeof e.message === "string") return e.message;
+      if (typeof e.error_description === "string") return e.error_description;
+      if (typeof e.error === "string") return e.error;
       if (typeof e.error === "object" && e.error !== null) {
         const nested = e.error;
-        if (typeof nested.message === "string")
-          return nested.message;
+        if (typeof nested.message === "string") return nested.message;
       }
     }
     return JSON.stringify(err);
@@ -10121,8 +10031,7 @@ Option 2: Install and provide the "ws" package:
     if (error !== null && typeof error === "object" && "json" in error && typeof error.json === "function") {
       const responseError = error;
       let status = parseInt(String(responseError.status), 10);
-      if (!Number.isFinite(status))
-        status = 500;
+      if (!Number.isFinite(status)) status = 500;
       responseError.json().then((err) => {
         const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 ? void 0 : err.code) || status + "";
         reject(new StorageApiError(_getErrorMessage(err), status, statusCode, namespace));
@@ -10130,44 +10039,34 @@ Option 2: Install and provide the "ws" package:
         const statusCode = status + "";
         reject(new StorageApiError(responseError.statusText || `HTTP ${status} error`, status, statusCode, namespace));
       });
-    } else
-      reject(new StorageUnknownError(_getErrorMessage(error), error, namespace));
+    } else reject(new StorageUnknownError(_getErrorMessage(error), error, namespace));
   };
   var _getRequestParams = (method, options, parameters, body) => {
     const params = {
       method,
       headers: (options === null || options === void 0 ? void 0 : options.headers) || {}
     };
-    if (method === "GET" || method === "HEAD" || !body)
-      return _objectSpread22(_objectSpread22({}, params), parameters);
+    if (method === "GET" || method === "HEAD" || !body) return _objectSpread22(_objectSpread22({}, params), parameters);
     if (isPlainObject(body)) {
       var _contentType;
       const headers = (options === null || options === void 0 ? void 0 : options.headers) || {};
       let contentType;
-      for (const [key, value] of Object.entries(headers))
-        if (key.toLowerCase() === "content-type")
-          contentType = value;
+      for (const [key, value] of Object.entries(headers)) if (key.toLowerCase() === "content-type") contentType = value;
       params.headers = setHeader(headers, "Content-Type", (_contentType = contentType) !== null && _contentType !== void 0 ? _contentType : "application/json");
       params.body = JSON.stringify(body);
-    } else
-      params.body = body;
-    if (options === null || options === void 0 ? void 0 : options.duplex)
-      params.duplex = options.duplex;
+    } else params.body = body;
+    if (options === null || options === void 0 ? void 0 : options.duplex) params.duplex = options.duplex;
     return _objectSpread22(_objectSpread22({}, params), parameters);
   };
   async function _handleRequest(fetcher, method, url, options, parameters, body, namespace) {
     return new Promise((resolve, reject) => {
       fetcher(url, _getRequestParams(method, options, parameters, body)).then((result) => {
-        if (!result.ok)
-          throw result;
-        if (options === null || options === void 0 ? void 0 : options.noResolveJson)
-          return result;
+        if (!result.ok) throw result;
+        if (options === null || options === void 0 ? void 0 : options.noResolveJson) return result;
         if (namespace === "vectors") {
           const contentType = result.headers.get("content-type");
-          if (result.headers.get("content-length") === "0" || result.status === 204)
-            return {};
-          if (!contentType || !contentType.includes("application/json"))
-            return {};
+          if (result.headers.get("content-length") === "0" || result.status === 204) return {};
+          if (!contentType || !contentType.includes("application/json")) return {};
         }
         return result.json();
       }).then((data) => resolve(data)).catch((error) => handleError(error, reject, options, namespace));
@@ -10265,13 +10164,11 @@ Option 2: Install and provide the "ws" package:
           error: null
         };
       } catch (error) {
-        if (_this.shouldThrowOnError)
-          throw error;
-        if (isStorageError(error))
-          return {
-            data: null,
-            error
-          };
+        if (_this.shouldThrowOnError) throw error;
+        if (isStorageError(error)) return {
+          data: null,
+          error
+        };
         throw error;
       }
     }
@@ -10295,8 +10192,7 @@ Option 2: Install and provide the "ws" package:
       return this.getPromise().finally(onfinally);
     }
     getPromise() {
-      if (!this.promise)
-        this.promise = this.execute();
+      if (!this.promise) this.promise = this.execute();
       return this.promise;
     }
     async execute() {
@@ -10307,13 +10203,11 @@ Option 2: Install and provide the "ws" package:
           error: null
         };
       } catch (error) {
-        if (_this.shouldThrowOnError)
-          throw error;
-        if (isStorageError(error))
-          return {
-            data: null,
-            error
-          };
+        if (_this.shouldThrowOnError) throw error;
+        if (isStorageError(error)) return {
+          data: null,
+          error
+        };
         throw error;
       }
     }
@@ -10340,8 +10234,7 @@ Option 2: Install and provide the "ws" package:
       return this.getPromise().finally(onfinally);
     }
     getPromise() {
-      if (!this.promise)
-        this.promise = this.execute();
+      if (!this.promise) this.promise = this.execute();
       return this.promise;
     }
     async execute() {
@@ -10352,13 +10245,11 @@ Option 2: Install and provide the "ws" package:
           error: null
         };
       } catch (error) {
-        if (_this.shouldThrowOnError)
-          throw error;
-        if (isStorageError(error))
-          return {
-            data: null,
-            error
-          };
+        if (_this.shouldThrowOnError) throw error;
+        if (isStorageError(error)) return {
+          data: null,
+          error
+        };
         throw error;
       }
     }
@@ -10398,27 +10289,20 @@ Option 2: Install and provide the "ws" package:
         if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
           body = new FormData();
           body.append("cacheControl", options.cacheControl);
-          if (metadata)
-            body.append("metadata", _this.encodeMetadata(metadata));
+          if (metadata) body.append("metadata", _this.encodeMetadata(metadata));
           body.append("", fileBody);
         } else if (typeof FormData !== "undefined" && fileBody instanceof FormData) {
           body = fileBody;
-          if (!body.has("cacheControl"))
-            body.append("cacheControl", options.cacheControl);
-          if (metadata && !body.has("metadata"))
-            body.append("metadata", _this.encodeMetadata(metadata));
+          if (!body.has("cacheControl")) body.append("cacheControl", options.cacheControl);
+          if (metadata && !body.has("metadata")) body.append("metadata", _this.encodeMetadata(metadata));
         } else {
           body = fileBody;
           headers["cache-control"] = `max-age=${options.cacheControl}`;
           headers["content-type"] = options.contentType;
-          if (metadata)
-            headers["x-metadata"] = _this.toBase64(_this.encodeMetadata(metadata));
-          if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex)
-            options.duplex = "half";
+          if (metadata) headers["x-metadata"] = _this.toBase64(_this.encodeMetadata(metadata));
+          if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
         }
-        if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers)
-          for (const [key, value] of Object.entries(fileOptions.headers))
-            headers = setHeader(headers, key, value);
+        if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) for (const [key, value] of Object.entries(fileOptions.headers)) headers = setHeader(headers, key, value);
         const cleanPath = _this._removeEmptyFolders(path);
         const _path = _this._getFinalPath(cleanPath);
         const data = await (method == "PUT" ? put : post)(_this.fetch, `${_this.url}/object/${_path}`, body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
@@ -10551,27 +10435,20 @@ Option 2: Install and provide the "ws" package:
         if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
           body = new FormData();
           body.append("cacheControl", options.cacheControl);
-          if (metadata)
-            body.append("metadata", _this3.encodeMetadata(metadata));
+          if (metadata) body.append("metadata", _this3.encodeMetadata(metadata));
           body.append("", fileBody);
         } else if (typeof FormData !== "undefined" && fileBody instanceof FormData) {
           body = fileBody;
-          if (!body.has("cacheControl"))
-            body.append("cacheControl", options.cacheControl);
-          if (metadata && !body.has("metadata"))
-            body.append("metadata", _this3.encodeMetadata(metadata));
+          if (!body.has("cacheControl")) body.append("cacheControl", options.cacheControl);
+          if (metadata && !body.has("metadata")) body.append("metadata", _this3.encodeMetadata(metadata));
         } else {
           body = fileBody;
           headers["cache-control"] = `max-age=${options.cacheControl}`;
           headers["content-type"] = options.contentType;
-          if (metadata)
-            headers["x-metadata"] = _this3.toBase64(_this3.encodeMetadata(metadata));
-          if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex)
-            options.duplex = "half";
+          if (metadata) headers["x-metadata"] = _this3.toBase64(_this3.encodeMetadata(metadata));
+          if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
         }
-        if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers)
-          for (const [key, value] of Object.entries(fileOptions.headers))
-            headers = setHeader(headers, key, value);
+        if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) for (const [key, value] of Object.entries(fileOptions.headers)) headers = setHeader(headers, key, value);
         return {
           path: cleanPath,
           fullPath: (await put(_this3.fetch, url.toString(), body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}))).Key
@@ -10620,13 +10497,11 @@ Option 2: Install and provide the "ws" package:
       return _this4.handleOperation(async () => {
         let _path = _this4._getFinalPath(path);
         const headers = _objectSpread22({}, _this4.headers);
-        if (options === null || options === void 0 ? void 0 : options.upsert)
-          headers["x-upsert"] = "true";
+        if (options === null || options === void 0 ? void 0 : options.upsert) headers["x-upsert"] = "true";
         const data = await post(_this4.fetch, `${_this4.url}/object/upload/sign/${_path}`, {}, { headers });
         const url = new URL(_this4.url + data.url);
         const token = url.searchParams.get("token");
-        if (!token)
-          throw new StorageError("No token returned by API");
+        if (!token) throw new StorageError("No token returned by API");
         return {
           signedUrl: url.toString(),
           path,
@@ -10848,10 +10723,8 @@ Option 2: Install and provide the "ws" package:
         const hasTransform = typeof (options === null || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== null && Object.keys(options.transform).length > 0;
         let data = await post(_this8.fetch, `${_this8.url}/object/sign/${_path}`, _objectSpread22({ expiresIn }, hasTransform ? { transform: options.transform } : {}), { headers: _this8.headers });
         const query = new URLSearchParams();
-        if (options === null || options === void 0 ? void 0 : options.download)
-          query.set("download", options.download === true ? "" : options.download);
-        if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null)
-          query.set("cacheNonce", String(options.cacheNonce));
+        if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+        if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
         const queryString = query.toString();
         return { signedUrl: encodeURI(`${_this8.url}${data.signedURL}${queryString ? `&${queryString}` : ""}`) };
       });
@@ -10910,10 +10783,8 @@ Option 2: Install and provide the "ws" package:
           paths
         }, { headers: _this9.headers });
         const query = new URLSearchParams();
-        if (options === null || options === void 0 ? void 0 : options.download)
-          query.set("download", options.download === true ? "" : options.download);
-        if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null)
-          query.set("cacheNonce", String(options.cacheNonce));
+        if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+        if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
         const queryString = query.toString();
         return data.map((datum) => _objectSpread22(_objectSpread22({}, datum), {}, { signedUrl: datum.signedURL ? encodeURI(`${_this9.url}${datum.signedURL}${queryString ? `&${queryString}` : ""}`) : null }));
       });
@@ -10987,10 +10858,8 @@ Option 2: Install and provide the "ws" package:
     download(path, options, parameters) {
       const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== null && Object.keys(options.transform).length > 0 ? "render/image/authenticated" : "object";
       const query = new URLSearchParams();
-      if (options === null || options === void 0 ? void 0 : options.transform)
-        this.applyTransformOptsToQuery(query, options.transform);
-      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null)
-        query.set("cacheNonce", String(options.cacheNonce));
+      if (options === null || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
+      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
       const queryString = query.toString();
       const _path = this._getFinalPath(path);
       const downloadFn = () => get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString ? `?${queryString}` : ""}`, {
@@ -11056,16 +10925,14 @@ Option 2: Install and provide the "ws" package:
           error: null
         };
       } catch (error) {
-        if (_this11.shouldThrowOnError)
-          throw error;
+        if (_this11.shouldThrowOnError) throw error;
         if (isStorageError(error)) {
           var _error$originalError;
           const status = error instanceof StorageApiError ? error.status : error instanceof StorageUnknownError ? (_error$originalError = error.originalError) === null || _error$originalError === void 0 ? void 0 : _error$originalError.status : void 0;
-          if (status !== void 0 && [400, 404].includes(status))
-            return {
-              data: false,
-              error
-            };
+          if (status !== void 0 && [400, 404].includes(status)) return {
+            data: false,
+            error
+          };
         }
         throw error;
       }
@@ -11132,12 +10999,9 @@ Option 2: Install and provide the "ws" package:
     getPublicUrl(path, options) {
       const _path = this._getFinalPath(path);
       const query = new URLSearchParams();
-      if (options === null || options === void 0 ? void 0 : options.download)
-        query.set("download", options.download === true ? "" : options.download);
-      if (options === null || options === void 0 ? void 0 : options.transform)
-        this.applyTransformOptsToQuery(query, options.transform);
-      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null)
-        query.set("cacheNonce", String(options.cacheNonce));
+      if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+      if (options === null || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
+      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
       const queryString = query.toString();
       const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== null && Object.keys(options.transform).length > 0 ? "render/image" : "object";
       return { data: { publicUrl: encodeURI(`${this.url}/${renderPath}/public/${_path}`) + (queryString ? `?${queryString}` : "") } };
@@ -11337,8 +11201,7 @@ Option 2: Install and provide the "ws" package:
       return JSON.stringify(metadata);
     }
     toBase64(data) {
-      if (typeof Buffer !== "undefined")
-        return Buffer.from(data).toString("base64");
+      if (typeof Buffer !== "undefined") return Buffer.from(data).toString("base64");
       return btoa(data);
     }
     _getFinalPath(path) {
@@ -11349,16 +11212,11 @@ Option 2: Install and provide the "ws" package:
     }
     /** Modifies the `query`, appending values the from `transform` */
     applyTransformOptsToQuery(query, transform) {
-      if (transform.width)
-        query.set("width", transform.width.toString());
-      if (transform.height)
-        query.set("height", transform.height.toString());
-      if (transform.resize)
-        query.set("resize", transform.resize);
-      if (transform.format)
-        query.set("format", transform.format);
-      if (transform.quality)
-        query.set("quality", transform.quality.toString());
+      if (transform.width) query.set("width", transform.width.toString());
+      if (transform.height) query.set("height", transform.height.toString());
+      if (transform.resize) query.set("resize", transform.resize);
+      if (transform.format) query.set("format", transform.format);
+      if (transform.quality) query.set("quality", transform.quality.toString());
       return query;
     }
   };
@@ -11368,8 +11226,7 @@ Option 2: Install and provide the "ws" package:
     constructor(url, headers = {}, fetch$1, opts) {
       const baseUrl = new URL(url);
       if (opts === null || opts === void 0 ? void 0 : opts.useNewHostname) {
-        if (/supabase\.(co|in|red)$/.test(baseUrl.hostname) && !baseUrl.hostname.includes("storage.supabase."))
-          baseUrl.hostname = baseUrl.hostname.replace("supabase.", "storage.supabase.");
+        if (/supabase\.(co|in|red)$/.test(baseUrl.hostname) && !baseUrl.hostname.includes("storage.supabase.")) baseUrl.hostname = baseUrl.hostname.replace("supabase.", "storage.supabase.");
       }
       const finalUrl = baseUrl.href.replace(/\/$/, "");
       const finalHeaders = _objectSpread22(_objectSpread22({}, DEFAULT_HEADERS), headers);
@@ -11656,16 +11513,11 @@ Option 2: Install and provide the "ws" package:
     listBucketOptionsToQueryString(options) {
       const params = {};
       if (options) {
-        if ("limit" in options)
-          params.limit = String(options.limit);
-        if ("offset" in options)
-          params.offset = String(options.offset);
-        if (options.search)
-          params.search = options.search;
-        if (options.sortColumn)
-          params.sortColumn = options.sortColumn;
-        if (options.sortOrder)
-          params.sortOrder = options.sortOrder;
+        if ("limit" in options) params.limit = String(options.limit);
+        if ("offset" in options) params.offset = String(options.offset);
+        if (options.search) params.search = options.search;
+        if (options.sortColumn) params.sortColumn = options.sortColumn;
+        if (options.sortOrder) params.sortOrder = options.sortOrder;
       }
       return Object.keys(params).length > 0 ? "?" + new URLSearchParams(params).toString() : "";
     }
@@ -11804,16 +11656,11 @@ Option 2: Install and provide the "ws" package:
       var _this2 = this;
       return _this2.handleOperation(async () => {
         const queryParams = new URLSearchParams();
-        if ((options === null || options === void 0 ? void 0 : options.limit) !== void 0)
-          queryParams.set("limit", options.limit.toString());
-        if ((options === null || options === void 0 ? void 0 : options.offset) !== void 0)
-          queryParams.set("offset", options.offset.toString());
-        if (options === null || options === void 0 ? void 0 : options.sortColumn)
-          queryParams.set("sortColumn", options.sortColumn);
-        if (options === null || options === void 0 ? void 0 : options.sortOrder)
-          queryParams.set("sortOrder", options.sortOrder);
-        if (options === null || options === void 0 ? void 0 : options.search)
-          queryParams.set("search", options.search);
+        if ((options === null || options === void 0 ? void 0 : options.limit) !== void 0) queryParams.set("limit", options.limit.toString());
+        if ((options === null || options === void 0 ? void 0 : options.offset) !== void 0) queryParams.set("offset", options.offset.toString());
+        if (options === null || options === void 0 ? void 0 : options.sortColumn) queryParams.set("sortColumn", options.sortColumn);
+        if (options === null || options === void 0 ? void 0 : options.sortOrder) queryParams.set("sortOrder", options.sortOrder);
+        if (options === null || options === void 0 ? void 0 : options.search) queryParams.set("search", options.search);
         const queryString = queryParams.toString();
         const url = queryString ? `${_this2.url}/bucket?${queryString}` : `${_this2.url}/bucket`;
         return await get(_this2.fetch, url, { headers: _this2.headers });
@@ -11986,8 +11833,7 @@ Option 2: Install and provide the "ws" package:
     */
     from(bucketName) {
       var _this4 = this;
-      if (!isValidBucketName(bucketName))
-        throw new StorageError("Invalid bucket name: File, folder, and bucket names must follow AWS object key naming guidelines and should avoid the use of any other characters.");
+      if (!isValidBucketName(bucketName)) throw new StorageError("Invalid bucket name: File, folder, and bucket names must follow AWS object key naming guidelines and should avoid the use of any other characters.");
       const catalog = new IcebergRestCatalog({
         baseUrl: this.url,
         catalogName: bucketName,
@@ -12000,8 +11846,7 @@ Option 2: Install and provide the "ws" package:
       const shouldThrowOnError = this.shouldThrowOnError;
       return new Proxy(catalog, { get(target, prop) {
         const value = target[prop];
-        if (typeof value !== "function")
-          return value;
+        if (typeof value !== "function") return value;
         return async (...args) => {
           try {
             return {
@@ -12009,8 +11854,7 @@ Option 2: Install and provide the "ws" package:
               error: null
             };
           } catch (error) {
-            if (shouldThrowOnError)
-              throw error;
+            if (shouldThrowOnError) throw error;
             return {
               data: null,
               error
@@ -12072,8 +11916,7 @@ Option 2: Install and provide the "ws" package:
     /** Inserts or updates vectors in batch (1-500 per request) */
     async putVectors(options) {
       var _this = this;
-      if (options.vectors.length < 1 || options.vectors.length > 500)
-        throw new Error("Vector batch size must be between 1 and 500 items");
+      if (options.vectors.length < 1 || options.vectors.length > 500) throw new Error("Vector batch size must be between 1 and 500 items");
       return _this.handleOperation(async () => {
         return await vectorsApi.post(_this.fetch, `${_this.url}/PutVectors`, options, { headers: _this.headers }) || {};
       });
@@ -12089,11 +11932,9 @@ Option 2: Install and provide the "ws" package:
     async listVectors(options) {
       var _this3 = this;
       if (options.segmentCount !== void 0) {
-        if (options.segmentCount < 1 || options.segmentCount > 16)
-          throw new Error("segmentCount must be between 1 and 16");
+        if (options.segmentCount < 1 || options.segmentCount > 16) throw new Error("segmentCount must be between 1 and 16");
         if (options.segmentIndex !== void 0) {
-          if (options.segmentIndex < 0 || options.segmentIndex >= options.segmentCount)
-            throw new Error(`segmentIndex must be between 0 and ${options.segmentCount - 1}`);
+          if (options.segmentIndex < 0 || options.segmentIndex >= options.segmentCount) throw new Error(`segmentIndex must be between 0 and ${options.segmentCount - 1}`);
         }
       }
       return _this3.handleOperation(async () => {
@@ -12110,8 +11951,7 @@ Option 2: Install and provide the "ws" package:
     /** Deletes vectors by their keys in batch (1-500 per request) */
     async deleteVectors(options) {
       var _this5 = this;
-      if (options.keys.length < 1 || options.keys.length > 500)
-        throw new Error("Keys batch size must be between 1 and 500 items");
+      if (options.keys.length < 1 || options.keys.length > 500) throw new Error("Keys batch size must be between 1 and 500 items");
       return _this5.handleOperation(async () => {
         return await vectorsApi.post(_this5.fetch, `${_this5.url}/DeleteVectors`, options, { headers: _this5.headers }) || {};
       });
@@ -13048,7 +12888,7 @@ Option 2: Install and provide the "ws" package:
     return timeNow + expiresIn;
   }
   function generateCallbackId() {
-    return Symbol("auth-callback");
+    return /* @__PURE__ */ Symbol("auth-callback");
   }
   var isBrowser = () => typeof window !== "undefined" && typeof document !== "undefined";
   var localStorageWriteTests = {
@@ -20501,10 +20341,8 @@ ${suffix}`;
   if (typeof Deno !== "undefined") {
     JS_ENV = "deno";
     JS_RUNTIME_VERSION = (_Deno$version = Deno.version) === null || _Deno$version === void 0 ? void 0 : _Deno$version.deno;
-  } else if (typeof document !== "undefined")
-    JS_ENV = "web";
-  else if (typeof navigator !== "undefined" && navigator.product === "ReactNative")
-    JS_ENV = "react-native";
+  } else if (typeof document !== "undefined") JS_ENV = "web";
+  else if (typeof navigator !== "undefined" && navigator.product === "ReactNative") JS_ENV = "react-native";
   else {
     JS_ENV = "node";
     JS_RUNTIME_VERSION = typeof process !== "undefined" ? (_process$version = process.version) === null || _process$version === void 0 ? void 0 : _process$version.replace(/^v/, "") : void 0;
@@ -20512,8 +20350,7 @@ ${suffix}`;
   var _Deno$version;
   var _process$version;
   var _runtimeMeta = [`runtime=${JS_ENV}`];
-  if (JS_RUNTIME_VERSION)
-    _runtimeMeta.push(`runtime-version=${JS_RUNTIME_VERSION}`);
+  if (JS_RUNTIME_VERSION) _runtimeMeta.push(`runtime-version=${JS_RUNTIME_VERSION}`);
   var DEFAULT_HEADERS3 = { "X-Client-Info": `supabase-js/${version4}; ${_runtimeMeta.join("; ")}` };
   var DEFAULT_GLOBAL_OPTIONS = { headers: DEFAULT_HEADERS3 };
   var DEFAULT_DB_OPTIONS = { schema: "public" };
@@ -20558,26 +20395,23 @@ ${suffix}`;
   var otelModulePromise = null;
   var OTEL_PKG = "@opentelemetry/api";
   function loadOtel() {
-    if (otelModulePromise === null)
-      otelModulePromise = import(
-        /* webpackIgnore: true */
-        /* turbopackIgnore: true */
-        /* @vite-ignore */
-        OTEL_PKG
-      ).catch(() => null);
+    if (otelModulePromise === null) otelModulePromise = import(
+      /* webpackIgnore: true */
+      /* turbopackIgnore: true */
+      /* @vite-ignore */
+      OTEL_PKG
+    ).catch(() => null);
     return otelModulePromise;
   }
   function extractTraceContext() {
     return __awaiter2(this, void 0, void 0, function* () {
       try {
         const otel = yield loadOtel();
-        if (!otel || !otel.propagation || !otel.context)
-          return null;
+        if (!otel || !otel.propagation || !otel.context) return null;
         const carrier = {};
         otel.propagation.inject(otel.context.active(), carrier);
         const traceparent = carrier["traceparent"];
-        if (!traceparent)
-          return null;
+        if (!traceparent) return null;
         return {
           traceparent,
           tracestate: carrier["tracestate"],
@@ -20589,19 +20423,14 @@ ${suffix}`;
     });
   }
   function parseTraceParent(traceparent) {
-    if (!traceparent || typeof traceparent !== "string")
-      return null;
+    if (!traceparent || typeof traceparent !== "string") return null;
     const parts = traceparent.split("-");
-    if (parts.length !== 4)
-      return null;
+    if (parts.length !== 4) return null;
     const [version$1, traceId, parentId, traceFlags] = parts;
-    if (version$1.length !== 2 || traceId.length !== 32 || parentId.length !== 16 || traceFlags.length !== 2)
-      return null;
+    if (version$1.length !== 2 || traceId.length !== 32 || parentId.length !== 16 || traceFlags.length !== 2) return null;
     const hexRegex = /^[0-9a-f]+$/i;
-    if (!hexRegex.test(version$1) || !hexRegex.test(traceId) || !hexRegex.test(parentId) || !hexRegex.test(traceFlags))
-      return null;
-    if (traceId === "00000000000000000000000000000000" || parentId === "0000000000000000")
-      return null;
+    if (!hexRegex.test(version$1) || !hexRegex.test(traceId) || !hexRegex.test(parentId) || !hexRegex.test(traceFlags)) return null;
+    if (traceId === "00000000000000000000000000000000" || parentId === "0000000000000000") return null;
     return {
       version: version$1,
       traceId,
@@ -20611,42 +20440,33 @@ ${suffix}`;
     };
   }
   function shouldPropagateToTarget(targetUrl, targets) {
-    if (!targetUrl || !targets || targets.length === 0)
-      return false;
+    if (!targetUrl || !targets || targets.length === 0) return false;
     let url;
-    if (targetUrl instanceof URL)
-      url = targetUrl;
-    else
-      try {
-        url = new URL(targetUrl);
-      } catch (error) {
-        return false;
+    if (targetUrl instanceof URL) url = targetUrl;
+    else try {
+      url = new URL(targetUrl);
+    } catch (error) {
+      return false;
+    }
+    for (const target of targets) try {
+      if (typeof target === "string") {
+        if (matchStringTarget(url.hostname, target)) return true;
+      } else if (target instanceof RegExp) {
+        if (target.test(url.hostname)) return true;
+      } else if (typeof target === "function") {
+        if (target(url)) return true;
       }
-    for (const target of targets)
-      try {
-        if (typeof target === "string") {
-          if (matchStringTarget(url.hostname, target))
-            return true;
-        } else if (target instanceof RegExp) {
-          if (target.test(url.hostname))
-            return true;
-        } else if (typeof target === "function") {
-          if (target(url))
-            return true;
-        }
-      } catch (error) {
-        continue;
-      }
+    } catch (error) {
+      continue;
+    }
     return false;
   }
   function matchStringTarget(hostname, target) {
-    if (target === hostname)
-      return true;
+    if (target === hostname) return true;
     if (target.startsWith("*.")) {
       const domain = target.slice(2);
       if (hostname.endsWith(domain)) {
-        if (hostname === domain || hostname.endsWith("." + domain))
-          return true;
+        if (hostname === domain || hostname.endsWith("." + domain)) return true;
       }
     }
     return false;
@@ -20671,13 +20491,11 @@ ${suffix}`;
     }, _typeof3(o);
   }
   function toPrimitive3(t, r) {
-    if ("object" != _typeof3(t) || !t)
-      return t;
+    if ("object" != _typeof3(t) || !t) return t;
     var e = t[Symbol.toPrimitive];
     if (void 0 !== e) {
       var i = e.call(t, r || "default");
-      if ("object" != _typeof3(i))
-        return i;
+      if ("object" != _typeof3(i)) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
     return ("string" === r ? String : Number)(t);
@@ -20716,8 +20534,7 @@ ${suffix}`;
     return e;
   }
   var resolveFetch4 = (customFetch) => {
-    if (customFetch)
-      return (...args) => customFetch(...args);
+    if (customFetch) return (...args) => customFetch(...args);
     return (...args) => fetch(...args);
   };
   var resolveHeadersConstructor = () => {
@@ -20733,34 +20550,26 @@ ${suffix}`;
       var _await$getAccessToken;
       const accessToken = (_await$getAccessToken = await getAccessToken()) !== null && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey;
       let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
-      if (!headers.has("apikey"))
-        headers.set("apikey", supabaseKey);
-      if (!headers.has("Authorization"))
-        headers.set("Authorization", `Bearer ${accessToken}`);
+      if (!headers.has("apikey")) headers.set("apikey", supabaseKey);
+      if (!headers.has("Authorization")) headers.set("Authorization", `Bearer ${accessToken}`);
       if (traceTargets) {
         const traceHeaders = await getTraceHeaders(input, traceTargets, respectSampling);
         if (traceHeaders) {
-          if (traceHeaders.traceparent && !headers.has("traceparent"))
-            headers.set("traceparent", traceHeaders.traceparent);
-          if (traceHeaders.tracestate && !headers.has("tracestate"))
-            headers.set("tracestate", traceHeaders.tracestate);
-          if (traceHeaders.baggage && !headers.has("baggage"))
-            headers.set("baggage", traceHeaders.baggage);
+          if (traceHeaders.traceparent && !headers.has("traceparent")) headers.set("traceparent", traceHeaders.traceparent);
+          if (traceHeaders.tracestate && !headers.has("tracestate")) headers.set("tracestate", traceHeaders.tracestate);
+          if (traceHeaders.baggage && !headers.has("baggage")) headers.set("baggage", traceHeaders.baggage);
         }
       }
       return fetch$1(input, _objectSpread23(_objectSpread23({}, init), {}, { headers }));
     };
   };
   async function getTraceHeaders(input, targets, respectSampling) {
-    if (!shouldPropagateToTarget(typeof input === "string" ? input : input instanceof URL ? input : input.url, targets))
-      return null;
+    if (!shouldPropagateToTarget(typeof input === "string" ? input : input instanceof URL ? input : input.url, targets)) return null;
     const traceContext = await extractTraceContext();
-    if (!traceContext || !traceContext.traceparent)
-      return null;
+    if (!traceContext || !traceContext.traceparent) return null;
     if (respectSampling) {
       const parsed = parseTraceParent(traceContext.traceparent);
-      if (parsed && !parsed.isSampled)
-        return null;
+      if (parsed && !parsed.isSampled) return null;
     }
     return traceContext;
   }
@@ -20788,18 +20597,14 @@ ${suffix}`;
       },
       accessToken: async () => ""
     };
-    if (options.accessToken)
-      result.accessToken = options.accessToken;
-    else
-      delete result.accessToken;
+    if (options.accessToken) result.accessToken = options.accessToken;
+    else delete result.accessToken;
     return result;
   }
   function validateSupabaseUrl(supabaseUrl2) {
     const trimmedUrl = supabaseUrl2 === null || supabaseUrl2 === void 0 ? void 0 : supabaseUrl2.trim();
-    if (!trimmedUrl)
-      throw new Error("supabaseUrl is required.");
-    if (!trimmedUrl.match(/^https?:\/\//i))
-      throw new Error("Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.");
+    if (!trimmedUrl) throw new Error("supabaseUrl is required.");
+    if (!trimmedUrl.match(/^https?:\/\//i)) throw new Error("Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.");
     try {
       return new URL(ensureTrailingSlash(trimmedUrl));
     } catch (_unused) {
@@ -21028,8 +20833,7 @@ ${suffix}`;
       this.supabaseUrl = supabaseUrl2;
       this.supabaseKey = supabaseKey;
       const baseUrl = validateSupabaseUrl(supabaseUrl2);
-      if (!supabaseKey)
-        throw new Error("supabaseKey is required.");
+      if (!supabaseKey) throw new Error("supabaseKey is required.");
       this.realtimeUrl = new URL("realtime/v1", baseUrl);
       this.realtimeUrl.protocol = this.realtimeUrl.protocol.replace("http", "ws");
       this.authUrl = new URL("auth/v1", baseUrl);
@@ -21062,8 +20866,7 @@ ${suffix}`;
         accessToken: this._getAccessToken.bind(this),
         fetch: this.fetch
       }, settings.realtime));
-      if (this.accessToken)
-        Promise.resolve(this.accessToken()).then((token) => this.realtime.setAuth(token)).catch((e) => console.warn("Failed to set initial Realtime auth token:", e));
+      if (this.accessToken) Promise.resolve(this.accessToken()).then((token) => this.realtime.setAuth(token)).catch((e) => console.warn("Failed to set initial Realtime auth token:", e));
       this.rest = new PostgrestClient(new URL("rest/v1", baseUrl).href, {
         headers: this.headers,
         schema: settings.db.schema,
@@ -21072,8 +20875,7 @@ ${suffix}`;
         urlLengthLimit: settings.db.urlLengthLimit
       });
       this.storage = new StorageClient(this.storageUrl.href, this.headers, this.fetch, options === null || options === void 0 ? void 0 : options.storage);
-      if (!settings.accessToken)
-        this._listenForAuthEvents();
+      if (!settings.accessToken) this._listenForAuthEvents();
     }
     /**
     * Supabase Functions allows you to deploy and invoke edge functions.
@@ -21194,8 +20996,7 @@ ${suffix}`;
     async _getAccessToken() {
       var _this = this;
       var _data$session$access_, _data$session;
-      if (_this.accessToken)
-        return await _this.accessToken();
+      if (_this.accessToken) return await _this.accessToken();
       const { data } = await _this.auth.getSession();
       return (_data$session$access_ = (_data$session = data.session) === null || _data$session === void 0 ? void 0 : _data$session.access_token) !== null && _data$session$access_ !== void 0 ? _data$session$access_ : _this.supabaseKey;
     }
@@ -21238,8 +21039,7 @@ ${suffix}`;
         this.realtime.setAuth(token);
       } else if (event === "SIGNED_OUT") {
         this.realtime.setAuth();
-        if (source == "STORAGE")
-          this.auth.signOut();
+        if (source == "STORAGE") this.auth.signOut();
         this.changedAccessToken = void 0;
       }
     }
@@ -21248,21 +21048,16 @@ ${suffix}`;
     return new SupabaseClient(supabaseUrl2, supabaseKey, options);
   };
   function shouldShowDeprecationWarning() {
-    if (typeof window !== "undefined")
-      return false;
+    if (typeof window !== "undefined") return false;
     const _process = globalThis["process"];
-    if (!_process)
-      return false;
+    if (!_process) return false;
     const processVersion = _process["version"];
-    if (processVersion === void 0 || processVersion === null)
-      return false;
+    if (processVersion === void 0 || processVersion === null) return false;
     const versionMatch = processVersion.match(/^v(\d+)\./);
-    if (!versionMatch)
-      return false;
+    if (!versionMatch) return false;
     return parseInt(versionMatch[1], 10) <= 18;
   }
-  if (shouldShowDeprecationWarning())
-    console.warn("\u26A0\uFE0F  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217");
+  if (shouldShowDeprecationWarning()) console.warn("\u26A0\uFE0F  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217");
 
   // src/lib/supabaseClient.ts
   var supabaseUrl = typeof process !== "undefined" && process.env?.SUPABASE_URL || "http://127.0.0.1:54321";
@@ -21273,11 +21068,27 @@ ${suffix}`;
   var userEmailElement = document.getElementById("user-email");
   var logoutButton = document.getElementById("logout-button");
   async function initProfile() {
-    const {
-      data: { user },
-      error
-    } = await supabase.auth.getUser();
-    if (error || !user) {
+    let user = null;
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (!error && data && data.user) {
+        user = data.user;
+      }
+    } catch (e) {
+      console.warn("getUser failed, attempting fallback to local session:", e);
+    }
+    if (!user) {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data && data.session && data.session.user) {
+          user = data.session.user;
+          console.log("Using local session for offline access:", user.email);
+        }
+      } catch (e) {
+        console.error("getSession fallback failed:", e);
+      }
+    }
+    if (!user) {
       window.location.href = "login.html";
       return;
     }
@@ -21300,6 +21111,45 @@ ${suffix}`;
       }
     } catch (telemetryError) {
       console.error("Telemetry logging error during profile view:", telemetryError);
+    }
+    try {
+      const origin = typeof window !== "undefined" && window.location && window.location.origin ? window.location.origin : "http://localhost:3000";
+      const baseUrl = origin && origin !== "null" ? origin : "http://localhost:3000";
+      const specRes = await fetch(`${baseUrl}/api/spec`);
+      if (specRes.ok) {
+        const spec = await specRes.json();
+        if (spec.receipts && spec.receipts.length > 0) {
+          const latest = spec.receipts[spec.receipts.length - 1];
+          const receiptDetailsDiv = document.getElementById("receipt-details");
+          if (receiptDetailsDiv) {
+            receiptDetailsDiv.innerHTML = `
+            <p><strong>Hash:</strong> ${latest.hash}</p>
+            <p><strong>Issued At:</strong> ${new Date(latest.issued_at).toLocaleString()}</p>
+          `;
+          }
+        }
+        const { error: upsertError } = await supabase.from("world_specs").upsert({
+          player_id: user.id,
+          spec,
+          updated_at: (/* @__PURE__ */ new Date()).toISOString()
+        }, { onConflict: "player_id" });
+        if (upsertError) {
+          console.error("Error saving world spec to Supabase:", upsertError);
+        }
+      } else {
+        console.error("Failed to fetch /api/spec, status:", specRes.status);
+      }
+    } catch (err) {
+      console.error("Failed to fetch or save world spec:", err);
+    }
+    if (typeof document !== "undefined" && typeof document.createElement === "function" && document.body) {
+      try {
+        const script = document.createElement("script");
+        script.src = "/manufactured/Brm-HTML5-Shipping.js";
+        document.body.appendChild(script);
+      } catch (scriptError) {
+        console.error("Failed to load simulator script dynamically:", scriptError);
+      }
     }
   }
   initProfile().catch((err) => {

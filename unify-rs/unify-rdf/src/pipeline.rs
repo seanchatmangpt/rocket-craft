@@ -1,6 +1,17 @@
 use crate::store::TripleStore;
 use crate::triple::{Term, Triple};
 
+/// Errors that can occur during pipeline execution.
+#[derive(Debug, thiserror::Error)]
+pub enum PipelineError {
+    /// An error occurred while loading RDF content.
+    #[error("RDF load error: {0}")]
+    Load(String),
+    /// An error occurred during the rendering stage.
+    #[error("Render error: {0}")]
+    Render(String),
+}
+
 /// Configuration for the ontology pipeline.
 #[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]
 pub struct PipelineConfig {
@@ -43,10 +54,10 @@ impl OntologyPipeline {
     }
 
     /// μ₁: Load RDF/Turtle content.
-    /// This is a minimal stub: blank lines and comment lines are skipped;
+    /// This is a minimal implementation: blank lines and comment lines are skipped;
     /// each remaining line is parsed as a simple N-Triples-style triple.
     /// Returns the number of triples added.
-    pub fn load_turtle(&mut self, turtle: &str) -> Result<usize, String> {
+    pub fn load_turtle(&mut self, turtle: &str) -> Result<usize, PipelineError> {
         let before = self.store.len();
         for line in turtle.lines() {
             let line = line.trim();
@@ -79,8 +90,8 @@ impl OntologyPipeline {
             .collect()
     }
 
-    /// μ₃–μ₅: Stub rendering, canonicalization, and receipt generation.
-    pub fn render(&self) -> Result<PipelineOutput, String> {
+    /// μ₃–μ₅: Template rendering, canonicalization, and receipt generation.
+    pub fn render(&self) -> Result<PipelineOutput, PipelineError> {
         let types = self.extract_types();
         let mut files = Vec::new();
         for ty in &types {

@@ -18,7 +18,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run start',
+    command: 'node ../genie_server.js',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     stdout: 'ignore',
