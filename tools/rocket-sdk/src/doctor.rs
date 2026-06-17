@@ -43,6 +43,7 @@ impl RocketDoctor {
             self.check_versions_dir(),
             self.check_ue4_root(),
             self.check_ggen(),
+            self.check_anti_llm_cheat_lsp(),
         ];
 
         DiagnosticReport {
@@ -214,6 +215,25 @@ impl RocketDoctor {
         }
     }
     
+    fn check_anti_llm_cheat_lsp(&self) -> CheckResult {
+        match Command::new("anti-llm-cheat-lsp").arg("--version").output() {
+            Ok(output) => CheckResult {
+                name: "anti-llm-cheat-lsp".to_string(),
+                status: CheckStatus::Pass,
+                message: String::from_utf8_lossy(&output.stdout).trim().to_string(),
+                details: None,
+            },
+            Err(_) => CheckResult {
+                name: "anti-llm-cheat-lsp".to_string(),
+                status: CheckStatus::Warn,
+                message: "anti-llm-cheat-lsp not found in PATH".to_string(),
+                details: Some(
+                    "Install: cargo install lsp-max --bin anti-llm-cheat-lsp".to_string(),
+                ),
+            },
+        }
+    }
+
     fn check_ue4_root(&self) -> CheckResult {
         let rocket_json = self.project_root.join(".rocket.json");
         if rocket_json.exists() {

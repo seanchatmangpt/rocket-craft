@@ -11,3 +11,5 @@ unify-admission = { path = "../unify-admission" }
 thiserror = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+lsp-max          = { workspace = true }
+lsp-max-protocol = { workspace = true }

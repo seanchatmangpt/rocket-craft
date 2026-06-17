@@ -1,0 +1,42 @@
+# anti-llm.toml — per-repo scanner suppressions for rocket-craft
+# Format: https://wasm4pm.dev/anti-llm-spec
+# Each suppression needs a rationale. Do NOT add entries to silence real cheats.
+
+[claim]
+# UE4 typestate and domain vocabulary that legitimately appears in identifiers,
+# doc comments, and display strings throughout the codebase.
+# The scanner must not flag these as fabricated output claims.
+allowed_terms = [
+    "fully admitted",      # TypeState: Pending → Admitted transition in rocket-sdk
+    "BeginPlay",           # UE4 canonical event name
+    "EventTick",           # UE4 canonical event name
+    "InfinityBlade4",      # Project name — not a claim of capability
+    "ShooterGame",         # Project name
+    "SurvivalGame",        # Project name
+    "RealisticRendering",  # Project name
+]
+
+[paths]
+# Directories excluded from scanning
+exclude = [
+    "versions/",                    # Binary UE4 asset files
+    "pwa-staff/*-HTML5-Shipping.*", # Pre-built Emscripten game bundles
+    ".claude/",                     # Session artifacts
+    "target/",                      # Rust build artifacts
+    "node_modules/",                # JS deps
+]
+
+[scan]
+# Directories included in the scan (relative to repo root)
+include = [
+    "unify-rs/unify-lsp/src",
+    "unify-rs/unify-mcp/src",
+    "unify-rs/unify-bp/src",
+    "tools/rocket-sdk/src",
+    "tools/rocket-cmd/src",
+    "tools/knhk/src",
+    "blueprint-rs/blueprint-core/src",
+    "wasm-threads/wasm-game-logic/src",
+    "wasm-threads/wasm-ui/src",
+    "pwa-staff/src",
+]
