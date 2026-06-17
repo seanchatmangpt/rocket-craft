@@ -143,11 +143,17 @@ pub fn register_builtin_tools(registry: &mut ToolRegistry) {
                     Ok(json!({ "triples": matching, "count": count }))
                 }
                 ("pm", "count") => {
-                    // TODO(anti-cheat): not yet implemented — unify/cli/dispatch does not
-                    // currently forward "pm"/"count" to the unify-pm process mining layer.
-                    // This arm must be wired to unify_pm::EventLog::count() when that
-                    // crate is added as a dependency.
-                    Err("pm/count via cli/dispatch is not yet implemented; use unify/pm/event-count directly".to_string())
+                    use unify_pm::EventLog;
+                    use unify_pm::Event;
+                    let mut log = EventLog::new();
+                    if let Some(events_arr) = args["events"].as_array() {
+                        for ev in events_arr {
+                            if let (Some(id), Some(act)) = (ev["id"].as_str(), ev["activity"].as_str()) {
+                                log.push(id, act, "0");
+                            }
+                        }
+                    }
+                    Ok(json!({ "count": log.events.len() }))
                 }
                 _ => Ok(json!({
                     "noun": noun,
@@ -362,12 +368,56 @@ fn attach_builtin_tools(server: McpServer) -> McpServer {
                     Ok(json!({ "key": key, "hash": hash }))
                 }
                 ("rdf", "query") => {
-                    // TODO(anti-cheat): not yet implemented — wiring to unify-rdf required.
-                    Err("rdf/query via cli/dispatch is not yet implemented; use unify/rdf/query directly".to_string())
+                    use unify_rdf::store::TripleStore;
+                    use unify_rdf::triple::{Term, Triple};
+                    let turtle = args["turtle"].as_str().unwrap_or("");
+                    let subject_f = args["subject"].as_str();
+                    let predicate_f = args["predicate"].as_str();
+                    let object_f = args["object"].as_str();
+                    let mut store = TripleStore::new();
+                    for line in turtle.lines() {
+                        let line = line.trim();
+                        if line.is_empty() || line.starts_with('#') { continue; }
+                        let parts: Vec<&str> = line.split_whitespace().collect();
+                        if parts.len() >= 3 {
+                            let s = parts[0].trim_matches(|c| c == '<' || c == '>');
+                            let p = parts[1].trim_matches(|c| c == '<' || c == '>');
+                            let o = parts[2].trim_matches(|c: char| c == '<' || c == '>' || c == '.');
+                            store.add(Triple::new(s, p, o));
+                        }
+                    }
+                    let s_term = subject_f.map(|s| Term::Named(s.to_string()));
+                    let p_term = predicate_f.map(|p| Term::Named(p.to_string()));
+                    let o_term = object_f.map(|o| Term::Named(o.to_string()));
+                    let matching: Vec<serde_json::Value> = store
+                        .query_pattern(s_term.as_ref(), p_term.as_ref(), o_term.as_ref())
+                        .iter()
+                        .map(|t| {
+                            let term_str = |term: &Term| -> String {
+                                match term {
+                                    Term::Named(n) => n.clone(),
+                                    Term::Blank(b) => format!("_:{}", b),
+                                    Term::Literal { value, .. } => value.clone(),
+                                }
+                            };
+                            json!({ "subject": term_str(&t.subject), "predicate": term_str(&t.predicate), "object": term_str(&t.object) })
+                        })
+                        .collect();
+                    let count = matching.len();
+                    Ok(json!({ "triples": matching, "count": count }))
                 }
                 ("pm", "count") => {
-                    // TODO(anti-cheat): not yet implemented — wiring to unify-pm required.
-                    Err("pm/count via cli/dispatch is not yet implemented; use unify/pm/event-count directly".to_string())
+                    use unify_pm::EventLog;
+                    use unify_pm::Event;
+                    let mut log = EventLog::new();
+                    if let Some(events_arr) = args["events"].as_array() {
+                        for ev in events_arr {
+                            if let (Some(id), Some(act)) = (ev["id"].as_str(), ev["activity"].as_str()) {
+                                log.push(id, act, "0");
+                            }
+                        }
+                    }
+                    Ok(json!({ "count": log.events.len() }))
                 }
                 _ => Ok(json!({
                     "noun": noun,

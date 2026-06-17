@@ -79,9 +79,10 @@ impl BlueprintPwaExporter {
             if event == "BeginPlay" || event == "begin_play" {
                 lines.push(format!("  {}(): void {{", method_name));
                 lines.push(format!(
-                    "    // TODO: initialize HUD for {}",
+                    "    const overlay = document.getElementById('bp-hud-{}');",
                     self.blueprint_name
                 ));
+                lines.push("    if (overlay) overlay.style.display = 'block';".to_string());
                 lines.push(format!(
                     "    console.log('[{}] {}');",
                     self.blueprint_name, event
@@ -90,9 +91,13 @@ impl BlueprintPwaExporter {
             } else {
                 lines.push(format!("  {}(amount?: number): void {{", method_name));
                 lines.push(format!(
-                    "    // TODO: handle {} event",
+                    "    const eventIndicator = document.getElementById('bp-event-{}');",
                     event
                 ));
+                lines.push("    if (eventIndicator) {".to_string());
+                lines.push("      eventIndicator.classList.add('active');".to_string());
+                lines.push("      setTimeout(() => eventIndicator.classList.remove('active'), 500);".to_string());
+                lines.push("    }".to_string());
                 lines.push(format!(
                     "    console.log('[{}] {}', amount);",
                     self.blueprint_name, event
