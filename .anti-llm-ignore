@@ -1,0 +1,7 @@
+# Directories excluded from anti-llm-cheat-lsp scanning
+target/
+.claude/
+versions/
+.git/
+node_modules/
+dist/

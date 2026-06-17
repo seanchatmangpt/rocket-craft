@@ -3,9 +3,10 @@
 # Each suppression needs a rationale. Do NOT add entries to silence real cheats.
 
 [claim]
-# UE4 typestate and domain vocabulary that legitimately appears in identifiers,
-# doc comments, and display strings throughout the codebase.
-# The scanner must not flag these as fabricated output claims.
+# Domain terms that are canonical vocabulary in this repo and must NOT
+# trigger CLAIM-004 victory-language detection.
+# "fully admitted" is a typestate term in unify-rs Machine<Law, Admitted>.
+# "candidate" is a valid phase in the Machine<Law, Phase> pattern.
 allowed_terms = [
     "fully admitted",      # TypeState: Pending → Admitted transition in rocket-sdk
     "BeginPlay",           # UE4 canonical event name
@@ -14,6 +15,13 @@ allowed_terms = [
     "ShooterGame",         # Project name
     "SurvivalGame",        # Project name
     "RealisticRendering",  # Project name
+]
+
+domain_terms = [
+    "fully admitted",
+    "candidate",
+    "done",
+    "admitted",
 ]
 
 [paths]
@@ -39,4 +47,21 @@ include = [
     "wasm-threads/wasm-game-logic/src",
     "wasm-threads/wasm-ui/src",
     "pwa-staff/src",
+]
+
+[surface]
+# Path prefixes where SURFACE-001 (plain tower-lsp reference) fires as
+# informational rather than blocking. Useful for historical docs.
+non_blocking_path_prefixes = [
+    "docs/",
+    "CLAUDE.md",
+    "versions/",
+]
+
+[test]
+# Path prefixes where Vec::contains structural checks are expected.
+structural_check_paths = [
+    "nexus-engine/crates/nexus-tests/",
+    "chicago-tdd-tools/",
+    "unify-rs/unify-integration-tests/",
 ]

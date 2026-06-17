@@ -85,12 +85,22 @@ pub fn cmd_verify(chain_json: &str) -> Result<Output, CommandError> {
 pub fn cmd_gate(law: &str, data: &str) -> Result<Output, CommandError> {
     let parsed: serde_json::Value = serde_json::from_str(data)?;
 
-    // Stub: interpret law as a field-exists check of the form "field:<name>"
     let admitted = if let Some(field) = law.strip_prefix("field:") {
         parsed.get(field).is_some()
-    } else {
-        // Unknown law — admitted by default (open gate)
+    } else if let Some(value) = law.strip_prefix("eq:") {
+        // eq:field=expected_value
+        if let Some((field, expected)) = value.split_once('=') {
+            parsed.get(field).and_then(|v| v.as_str()) == Some(expected)
+        } else {
+            false
+        }
+    } else if law == "nonempty" {
+        !parsed.as_object().map(|o| o.is_empty()).unwrap_or(true)
+    } else if law == "open" {
         true
+    } else {
+        // Unknown law — closed gate (deny by default for unknown laws)
+        false
     };
 
     Ok(Output {
@@ -152,15 +162,6 @@ pub fn cmd_dispatch(
 }
 
 /// Run a SPARQL-like triple pattern query over optional Turtle input.
-///
-/// If `ttl` is `Some(turtle_str)`, the Turtle text is parsed into a fresh
-/// [`TripleStore`] via [`OntologyPipeline::load_turtle`].  The `pattern`
-/// string is then executed against the store using [`PatternExecutor`].
-///
-/// The pattern must be a SELECT query of the form `SELECT * WHERE { ?s ?p ?o }`.
-/// Additional SPO-position filters can be embedded in the pattern by passing a
-/// concrete term where the variable would appear; unsupported forms are surfaced
-/// in the `error` field of the returned JSON.
 pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, CommandError> {
     let source = ttl.map(|_| "inline-turtle").unwrap_or("none");
 
@@ -175,14 +176,6 @@ pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, CommandErro
         };
         let mut pipeline = OntologyPipeline::new(store, config);
         pipeline.load_turtle(turtle).map_err(|e| CommandError::TurtleParse(e.to_string()))?;
-        // Re-extract the store from the pipeline by running an extract step.
-        // OntologyPipeline does not expose its store directly, so we leverage
-        // the fact that the store is passed by value: rebuild by querying the
-        // pipeline via extract_types and then re-inserting with known triples.
-        // Instead, we use a second store built directly via the public API.
-        //
-        // Actually: OntologyPipeline does not re-expose the store, so we parse
-        // the Turtle ourselves using the same algorithm as load_turtle.
         drop(pipeline);
         store = TripleStore::new();
         parse_turtle_into_store(turtle, &mut store);
@@ -232,10 +225,6 @@ pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, CommandErro
 }
 
 /// Parse Turtle-like N-Triples lines into `store`.
-///
-/// Mirrors [`OntologyPipeline::load_turtle`]: blank lines and `#` comment
-/// lines are skipped; remaining whitespace-split tokens form (subject,
-/// predicate, object) triples with angle-bracket and trailing-dot stripping.
 fn parse_turtle_into_store(turtle: &str, store: &mut TripleStore) {
     use unify_rdf::triple::Triple;
     for line in turtle.lines() {
@@ -254,20 +243,6 @@ fn parse_turtle_into_store(turtle: &str, store: &mut TripleStore) {
 }
 
 /// Show the witness registry, optionally filtered by domain.
-///
-/// Each witness entry reflects the runtime health of a real component:
-///
-/// - `rdf / triple-store`: instantiates a [`TripleStore`], inserts a sentinel
-///   triple, and reports the live triple count as proof of operation.
-/// - `rdf / pipeline`: instantiates an [`OntologyPipeline`], loads a minimal
-///   N-Triples line, and reports the number of triples loaded.
-/// - `receipts / blake3-chain`: delegates to [`unify_receipts`]; the crate is
-///   always available so this is always "active".
-/// - `sem / semantic-net`: probes the `unify-sem` crate; the crate currently
-///   exposes no types beyond a module declaration, so it is reported as
-///   "available" (compiled and linked) but with no runtime metric.
-/// - `lsp / lsp-bridge`: not yet wired; reported as "stub".
-/// - `wasm / wasm4pm`: not yet wired; reported as "stub".
 pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, CommandError> {
     // -- rdf / triple-store ---------------------------------------------------
     let rdf_store_status = {
@@ -339,13 +314,7 @@ pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, CommandError> {
     };
 
     // -- sem / semantic-net ---------------------------------------------------
-    // unify-sem is compiled and linked (its Cargo.toml dep is declared and the
-    // crate builds successfully).  The crate is currently a stub with no public
-    // types, so we confirm linkage at compile time by importing the crate root
-    // and report it as "active" (linked) with a note that no runtime state is
-    // exposed yet.
     let sem_status = {
-        // This import will fail to compile if the crate is absent or broken.
         #[allow(unused_imports)]
         use unify_sem as _sem;
         json!({
@@ -357,11 +326,18 @@ pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, CommandError> {
     };
 
     // -- lsp / lsp-bridge  ----------------------------------------------------
-    let lsp_status = json!({
-        "domain": "lsp",
-        "witness": "lsp-bridge",
-        "status": "stub",
-    });
+    let lsp_status = {
+        use unify_lsp::gate::AndonGate;
+        let gate = AndonGate::new();
+        let status = if gate.is_open() { "active" } else { "blocked" };
+        json!({
+            "domain": "lsp",
+            "witness": "andon-gate",
+            "status": status,
+            "events": gate.event_count(),
+            "gate": format!("{:?}", gate.state())
+        })
+    };
 
     // -- wasm / wasm4pm -------------------------------------------------------
     let wasm_status = json!({

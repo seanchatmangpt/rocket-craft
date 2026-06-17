@@ -10,7 +10,9 @@ path = "src/main.rs"
 
 [dependencies]
 unify-core = { path = "../unify-core" }
-blake3 = { workspace = true }
+unify-rdf = { path = "../unify-rdf" }
+anti-llm-cheat-lsp = { path = "../anti-llm-cheat-lsp" }
 thiserror = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+blake3 = { workspace = true }
