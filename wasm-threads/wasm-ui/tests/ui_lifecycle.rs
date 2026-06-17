@@ -113,3 +113,24 @@ proptest! {
         prop_assert_eq!(s.frame, n as u64);
     }
 }
+
+#[test]
+fn frame_count_increments_on_each_message() {
+    // UiController is wasm32-only for the #[wasm_bindgen] struct, but
+    // we can test frame increment via the bridge directly.
+    // If UiController is not available on native, test MessageBridge instead.
+    use wasm_ui::message_bridge::{GameToUiMessage, MessageBridge};
+    let mut bridge = MessageBridge::new();
+    let msg = GameToUiMessage::StateUpdate {
+        tick: 1, entity_count: 0, player_health: Some(100),
+        player_health_max: Some(100), player_score: 0,
+    };
+    let json = serde_json::to_string(&msg).unwrap();
+    // messages_processed tracks calls
+    bridge.process(&json);
+    bridge.process(&json);
+    assert_eq!(bridge.messages_processed, 2);
+    // Falsification: 2 calls produce count of 2
+    assert_ne!(bridge.messages_processed, 0);
+    assert_ne!(bridge.messages_processed, 1);
+}

@@ -180,3 +180,47 @@ proptest! {
         prop_assert_eq!(bridge.messages_processed, n as u64);
     }
 }
+
+#[test]
+fn entity_moved_updates_entity_count() {
+    use wasm_ui::message_bridge::{GameToUiMessage, MessageBridge};
+    let mut bridge = MessageBridge::new();
+    let moved = GameToUiMessage::EntityMoved { entity_id: 1, x: 5.0, y: 3.0 };
+    let json = serde_json::to_string(&moved).unwrap();
+    let result = bridge.process(&json);
+    assert!(result.is_some(), "EntityMoved must produce Some(HudData)");
+    let hud = result.unwrap();
+    // Falsification: entity_count increased to 1
+    assert_eq!(hud.entity_count, 1);
+    assert_ne!(hud.entity_count, 0);
+}
+
+#[test]
+fn entity_died_decrements_entity_count() {
+    use wasm_ui::message_bridge::{GameToUiMessage, MessageBridge};
+    let mut bridge = MessageBridge::new();
+
+    // First add an entity
+    let moved = GameToUiMessage::EntityMoved { entity_id: 7, x: 1.0, y: 1.0 };
+    bridge.process(&serde_json::to_string(&moved).unwrap());
+
+    // Now kill it
+    let died = GameToUiMessage::EntityDied { entity_id: 7 };
+    let json = serde_json::to_string(&died).unwrap();
+    let result = bridge.process(&json);
+    assert!(result.is_some());
+    let hud = result.unwrap();
+    // Falsification: entity was removed, count is 0
+    assert_eq!(hud.entity_count, 0);
+}
+
+#[test]
+fn two_entity_moved_produces_count_of_two() {
+    use wasm_ui::message_bridge::{GameToUiMessage, MessageBridge};
+    let mut bridge = MessageBridge::new();
+    let m1 = GameToUiMessage::EntityMoved { entity_id: 1, x: 0.0, y: 0.0 };
+    let m2 = GameToUiMessage::EntityMoved { entity_id: 2, x: 5.0, y: 5.0 };
+    bridge.process(&serde_json::to_string(&m1).unwrap());
+    let result = bridge.process(&serde_json::to_string(&m2).unwrap());
+    assert_eq!(result.unwrap().entity_count, 2);
+}

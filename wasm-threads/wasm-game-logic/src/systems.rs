@@ -57,26 +57,26 @@ impl CombatSystem {
 pub struct InputSystem;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub enum PlayerInput {
+pub enum InputCommand {
     Move { entity: u32, dx: f32, dy: f32 },
     Attack { attacker: u32, target: u32 },
     UseItem { entity: u32, item_id: u32 },
 }
 
 impl InputSystem {
-    pub fn process(world: &mut World, input: PlayerInput) {
+    pub fn process(world: &mut World, input: InputCommand) {
         match input {
-            PlayerInput::Move { entity, dx, dy } => {
+            InputCommand::Move { entity, dx, dy } => {
                 let e = Entity(entity);
                 if let Some(vel) = world.get_velocity_mut(e) {
                     vel.dx = dx;
                     vel.dy = dy;
                 }
             }
-            PlayerInput::Attack { attacker, target } => {
+            InputCommand::Attack { attacker, target } => {
                 CombatSystem::apply_damage(world, Entity(attacker), Entity(target));
             }
-            PlayerInput::UseItem { entity, item_id } => {
+            InputCommand::UseItem { entity, item_id } => {
                 // item_id == 1 → heal 10 HP
                 if item_id == 1 {
                     if let Some(hp) = world.get_health_mut(Entity(entity)) {

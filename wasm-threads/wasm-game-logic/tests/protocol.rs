@@ -1,5 +1,5 @@
 use chicago_tdd_tools::{Logger, TuiBufferSink};
-use wasm_game_logic::{GameToUiMessage, PlayerInput, UiToGameMessage};
+use wasm_game_logic::{GameToUiMessage, InputCommand, UiToGameMessage};
 
 fn log() -> Logger {
     let mut l = Logger::new();
@@ -127,7 +127,7 @@ fn ui_to_game_ping_roundtrips_json() {
 fn ui_to_game_input_move_roundtrips_json() {
     let mut log = log();
     log.info("Given a UiToGameMessage::Input(Move) for entity 3 with dx=1.5, dy=-0.5");
-    let msg = UiToGameMessage::Input(PlayerInput::Move {
+    let msg = UiToGameMessage::Input(InputCommand::Move {
         entity: 3,
         dx: 1.5,
         dy: -0.5,
@@ -139,7 +139,7 @@ fn ui_to_game_input_move_roundtrips_json() {
 
     log.info("Then entity, dx, and dy are preserved");
     match decoded {
-        UiToGameMessage::Input(PlayerInput::Move { entity, dx, dy }) => {
+        UiToGameMessage::Input(InputCommand::Move { entity, dx, dy }) => {
             assert_eq!(entity, 3);
             assert!((dx - 1.5).abs() < 0.001);
             assert!((dy - (-0.5)).abs() < 0.001);

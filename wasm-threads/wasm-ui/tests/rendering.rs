@@ -148,3 +148,28 @@ proptest! {
         prop_assert!(r.has_call(&DrawCall::Present), "must always present after drawing");
     }
 }
+
+#[test]
+fn canvas_renderer_trait_is_implemented_by_test_renderer() {
+    use wasm_ui::renderer::{Renderer, TestRenderer};
+    let mut r = TestRenderer::new();
+    r.clear();
+    r.draw_health_bar(0.0, 0.0, 100.0, 10.0, 0.75);
+    r.draw_score(1234);
+    r.draw_entity_count(5);
+    r.draw_tick(99);
+    r.present();
+    assert_eq!(r.frame_count(), 1);
+    // Falsification: frame_count is 1 after one present(), not 0
+    assert_ne!(r.frame_count(), 0);
+}
+
+#[test]
+fn test_renderer_records_health_bar_percentage() {
+    use wasm_ui::renderer::{DrawCall, Renderer, TestRenderer};
+    let mut r = TestRenderer::new();
+    r.draw_health_bar(0.0, 0.0, 100.0, 10.0, 0.5);
+    let calls = r.draw_calls();
+    let found = calls.iter().any(|c| matches!(c, DrawCall::HealthBar { percentage, .. } if (*percentage - 0.5).abs() < 0.001));
+    assert!(found, "health bar with percentage 0.5 should be recorded");
+}

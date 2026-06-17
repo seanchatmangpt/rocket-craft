@@ -40,10 +40,11 @@ pub enum InputCommand {
     UseItem { entity: u32, item_id: u32 },
 }
 
-/// Stateless message dispatcher — converts incoming JSON to HudData
+/// Stateful message dispatcher — converts incoming JSON to HudData and tracks entity positions
 pub struct MessageBridge {
     pub messages_processed: u64,
     pub last_tick: u64,
+    pub entity_positions: std::collections::HashMap<u32, (f32, f32)>,
 }
 
 impl MessageBridge {
@@ -51,6 +52,7 @@ impl MessageBridge {
         Self {
             messages_processed: 0,
             last_tick: 0,
+            entity_positions: std::collections::HashMap::new(),
         }
     }
 
@@ -88,12 +90,40 @@ impl MessageBridge {
                 fps: 0.0,
                 messages_per_second: 0.0,
             }),
-            _ => None,
+            GameToUiMessage::EntityMoved { entity_id, x, y } => {
+                self.entity_positions.insert(entity_id, (x, y));
+                Some(HudData {
+                    player_health: 0,
+                    player_health_max: 100,
+                    score: 0,
+                    entity_count: self.entity_positions.len(),
+                    game_tick: self.last_tick,
+                    fps: 0.0,
+                    messages_per_second: 0.0,
+                })
+            }
+            GameToUiMessage::EntityDied { entity_id } => {
+                self.entity_positions.remove(&entity_id);
+                Some(HudData {
+                    player_health: 0,
+                    player_health_max: 100,
+                    score: 0,
+                    entity_count: self.entity_positions.len(),
+                    game_tick: self.last_tick,
+                    fps: 0.0,
+                    messages_per_second: 0.0,
+                })
+            }
         }
     }
 
     pub fn serialize_to_game(&self, msg: &UiToGameMessage) -> Option<String> {
         serde_json::to_string(msg).ok()
+    }
+
+    pub fn send_ping(&self, seq: u32) -> String {
+        let msg = UiToGameMessage::Ping { seq };
+        serde_json::to_string(&msg).unwrap_or_default()
     }
 }
 

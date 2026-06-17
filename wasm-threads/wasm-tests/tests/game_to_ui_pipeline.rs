@@ -197,3 +197,23 @@ fn bridge_rejects_garbage_json() {
         "failed parses must not increment message counter"
     );
 }
+
+#[test]
+fn ping_serializes_to_game_message() {
+    use wasm_ui::message_bridge::{MessageBridge, UiToGameMessage};
+    let bridge = MessageBridge::new();
+    let json = bridge.send_ping(42);
+    let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+    assert_eq!(parsed["Ping"]["seq"], 42);
+    // Falsification: seq is 42 not 0
+    assert_ne!(parsed["Ping"]["seq"], 0);
+}
+
+#[test]
+fn different_ping_seqs_produce_different_json() {
+    use wasm_ui::message_bridge::MessageBridge;
+    let bridge = MessageBridge::new();
+    let j1 = bridge.send_ping(1);
+    let j2 = bridge.send_ping(2);
+    assert_ne!(j1, j2);
+}

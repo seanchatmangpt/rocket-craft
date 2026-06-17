@@ -1,4 +1,4 @@
-use crate::systems::PlayerInput;
+use crate::systems::InputCommand;
 
 /// Messages sent from the game-logic worker to the UI worker.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -27,7 +27,7 @@ pub enum GameToUiMessage {
 /// Messages sent from the UI worker to the game-logic worker.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum UiToGameMessage {
-    Input(PlayerInput),
+    Input(InputCommand),
     Pause,
     Resume,
     Restart,

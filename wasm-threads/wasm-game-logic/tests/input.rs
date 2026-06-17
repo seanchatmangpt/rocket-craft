@@ -1,5 +1,5 @@
 use chicago_tdd_tools::{Logger, TuiBufferSink};
-use wasm_game_logic::{Attack, Health, InputSystem, PlayerInput, Velocity, World};
+use wasm_game_logic::{Attack, Health, InputCommand, InputSystem, Velocity, World};
 
 fn log() -> Logger {
     let mut l = Logger::new();
@@ -16,10 +16,10 @@ fn input_move_updates_velocity() {
     let e = world.spawn();
     world.add_velocity(e, Velocity { dx: 0.0, dy: 0.0 });
 
-    log.info("When PlayerInput::Move is processed with dx=3.5, dy=-1.2");
+    log.info("When InputCommand::Move is processed with dx=3.5, dy=-1.2");
     InputSystem::process(
         &mut world,
-        PlayerInput::Move {
+        InputCommand::Move {
             entity: e.0,
             dx: 3.5,
             dy: -1.2,
@@ -39,10 +39,10 @@ fn input_move_is_no_op_when_entity_has_no_velocity_component() {
     let mut world = World::new();
     let e = world.spawn();
 
-    log.info("When PlayerInput::Move is processed");
+    log.info("When InputCommand::Move is processed");
     InputSystem::process(
         &mut world,
-        PlayerInput::Move {
+        InputCommand::Move {
             entity: e.0,
             dx: 10.0,
             dy: 10.0,
@@ -70,10 +70,10 @@ fn input_attack_reduces_target_health() {
     );
     world.add_health(target, Health::new(100));
 
-    log.info("When PlayerInput::Attack is processed");
+    log.info("When InputCommand::Attack is processed");
     InputSystem::process(
         &mut world,
-        PlayerInput::Attack {
+        InputCommand::Attack {
             attacker: attacker.0,
             target: target.0,
         },
@@ -93,10 +93,10 @@ fn input_use_item_1_heals_entity_by_ten() {
     hp.apply_damage(50);
     world.add_health(e, hp);
 
-    log.info("When PlayerInput::UseItem with item_id=1 is processed");
+    log.info("When InputCommand::UseItem with item_id=1 is processed");
     InputSystem::process(
         &mut world,
-        PlayerInput::UseItem {
+        InputCommand::UseItem {
             entity: e.0,
             item_id: 1,
         },
@@ -116,10 +116,10 @@ fn input_use_item_unknown_id_does_nothing() {
     hp.apply_damage(50);
     world.add_health(e, hp);
 
-    log.info("When PlayerInput::UseItem with an unknown item_id=99 is processed");
+    log.info("When InputCommand::UseItem with an unknown item_id=99 is processed");
     InputSystem::process(
         &mut world,
-        PlayerInput::UseItem {
+        InputCommand::UseItem {
             entity: e.0,
             item_id: 99,
         },
@@ -137,10 +137,10 @@ fn input_use_item_1_does_not_exceed_max_health() {
     let e = world.spawn();
     world.add_health(e, Health::new(100));
 
-    log.info("When PlayerInput::UseItem with item_id=1 is processed");
+    log.info("When InputCommand::UseItem with item_id=1 is processed");
     InputSystem::process(
         &mut world,
-        PlayerInput::UseItem {
+        InputCommand::UseItem {
             entity: e.0,
             item_id: 1,
         },
@@ -159,10 +159,10 @@ fn input_attack_with_no_attacker_component_does_not_crash() {
     let target = world.spawn();
     world.add_health(target, Health::new(100));
 
-    log.info("When PlayerInput::Attack is processed");
+    log.info("When InputCommand::Attack is processed");
     InputSystem::process(
         &mut world,
-        PlayerInput::Attack {
+        InputCommand::Attack {
             attacker: attacker.0,
             target: target.0,
         },
