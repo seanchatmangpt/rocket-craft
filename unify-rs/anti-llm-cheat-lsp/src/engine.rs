@@ -2,8 +2,8 @@ use crate::config::AntiLlmConfig;
 use crate::diagnostics::AntiLlmDiagnostic;
 use crate::observations::Observation;
 use crate::parsers::{
-    cargo_lock, cargo_toml, contract, fitness_report, ggen_toml, json_rpc, markdown_claims,
-    receipt_json, refgraph, rust_tree_sitter, tera_template, typescript,
+    c as c_parser, cargo_lock, cargo_toml, contract, fitness_report, ggen_toml, json_rpc,
+    markdown_claims, receipt_json, refgraph, rust_tree_sitter, tera_template, typescript,
 };
 use crate::rules::{
     authority, claims, complexity, contract as contract_rules, determinism, ggen, lsp318, mutation,
@@ -175,7 +175,9 @@ pub fn scan_file(filepath: &str) -> Vec<Observation> {
         obs.extend(json_rpc::parse_json_rpc_transcript(filepath, &content));
     } else if filename.ends_with(".json") && filepath.contains("receipts") {
         obs.extend(receipt_json::parse_receipt_json(filepath, &content));
-    } else if filename.ends_with(".ts") || filename.ends_with(".tsx") || filename.ends_with(".js") || filename.ends_with(".jsx") {
+    } else if filename.ends_with(".c") || filename.ends_with(".h") || filename.ends_with(".cpp") || filename.ends_with(".cc") {
+        obs.extend(c_parser::parse_c_source(filepath, &content));
+    } else if filename.ends_with(".ts") || filename.ends_with(".tsx") || filename.ends_with(".js") || filename.ends_with(".jsx") || filename.ends_with(".mjs") || filename.ends_with(".cjs") {
         obs.extend(typescript::parse_typescript(filepath, &content));
     } else if filename == "ggen.toml" {
         obs.extend(ggen_toml::parse_ggen_toml(filepath, &content));
