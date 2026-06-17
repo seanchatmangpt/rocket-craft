@@ -151,7 +151,9 @@ pub fn scan_for_victory(
     for (line_idx, line) in content.lines().enumerate() {
         // Term-level matches
         for mat in victory_ac().find_iter(line) {
-            let term = VICTORY_TERMS[mat.pattern().as_usize()];
+            let Some(term) = VICTORY_TERMS.get(mat.pattern().as_usize()) else {
+                continue;
+            };
             if is_domain_exempt(term, domain_terms) {
                 continue;
             }
@@ -169,7 +171,9 @@ pub fn scan_for_victory(
         }
         // Context-level matches (surrounding line patterns)
         for mat in context_ac().find_iter(line) {
-            let pattern = VICTORY_CONTEXT_PATTERNS[mat.pattern().as_usize()];
+            let Some(pattern) = VICTORY_CONTEXT_PATTERNS.get(mat.pattern().as_usize()) else {
+                continue;
+            };
             if is_domain_exempt(pattern, domain_terms) {
                 continue;
             }

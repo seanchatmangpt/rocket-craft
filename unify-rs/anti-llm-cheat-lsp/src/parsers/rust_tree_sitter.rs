@@ -163,7 +163,7 @@ fn detect_stub_functions(filepath: &str, content: &str, obs: &mut Vec<Observatio
                 let name_start = trimmed.find("fn ").map(|p| p + 3).unwrap_or(0);
                 let name_end = trimmed[name_start..]
                     .find(|c: char| !c.is_alphanumeric() && c != '_')
-                    .unwrap_or(0);
+                    .unwrap_or(trimmed[name_start..].len());
                 let name = &trimmed[name_start..name_start + name_end];
                 obs.push(Observation {
                     file_path: filepath.to_string(),

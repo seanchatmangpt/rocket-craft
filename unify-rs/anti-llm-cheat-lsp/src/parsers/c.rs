@@ -272,6 +272,7 @@ fn detect_hardcoded_lookup_tables(filepath: &str, content: &str, obs: &mut Vec<O
                     }
                     entry_count = 0;
                     array_name = String::new();
+                    array_depth = 0;
                 }
             }
         } else {
@@ -290,6 +291,7 @@ fn detect_hardcoded_lookup_tables(filepath: &str, content: &str, obs: &mut Vec<O
                 }
                 entry_count = 0;
                 array_name = String::new();
+                array_depth = 0;
             }
         }
     }

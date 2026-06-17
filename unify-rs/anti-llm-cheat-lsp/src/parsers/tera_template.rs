@@ -9,14 +9,27 @@ const BUILTIN_TERA_VARS: &[&str] = &["loop", "self", "config", "now"];
 /// Returns root names only (before `.`, space, or `|`).
 fn extract_tera_variables(content: &str) -> HashSet<String> {
     let mut vars = HashSet::new();
-    let mut i = 0;
-    let bytes = content.as_bytes();
 
-    while i + 1 < bytes.len() {
-        if bytes[i] == b'{' && bytes[i + 1] == b'{' {
+    // Use character-based iteration to avoid UTF-8 boundary issues
+    let chars: Vec<char> = content.chars().collect();
+    let mut i = 0;
+
+    while i + 1 < chars.len() {
+        if chars[i] == '{' && chars[i + 1] == '{' {
             // Find closing }}
-            if let Some(end) = content[i + 2..].find("}}") {
-                let inner = content[i + 2..i + 2 + end].trim();
+            let search_start = i + 2;
+            let mut close_idx = None;
+            for j in search_start..chars.len().saturating_sub(1) {
+                if chars[j] == '}' && chars[j + 1] == '}' {
+                    close_idx = Some(j);
+                    break;
+                }
+            }
+
+            if let Some(end_idx) = close_idx {
+                let inner_chars = &chars[search_start..end_idx];
+                let inner: String = inner_chars.iter().collect::<String>().trim().to_string();
+
                 // Extract root name (before . / | / space)
                 let root: String = inner
                     .chars()
@@ -28,7 +41,7 @@ fn extract_tera_variables(content: &str) -> HashSet<String> {
                 {
                     vars.insert(root.to_lowercase());
                 }
-                i += 2 + end + 2;
+                i = end_idx + 2;
                 continue;
             }
         }
