@@ -150,3 +150,45 @@ fn game_state_total_ticks_reflects_run_time() {
     log.info("Then total_ticks() is 5");
     assert_eq!(over.total_ticks(), 5);
 }
+
+// Falsification: tick_js output depends on tick number
+#[test]
+fn tick_output_changes_with_each_tick() {
+    use wasm_game_logic::{GameState, state::Initializing};
+    let mut gs = GameState::<Initializing>::new();
+    // Use the public API to test the underlying logic, not the wasm32-gated wrapper
+    let mut gs = gs.start();
+    gs.tick(16);
+    let tick1 = gs.tick;
+    gs.tick(16);
+    let tick2 = gs.tick;
+    assert_ne!(tick1, tick2, "tick must increase on each call");
+    assert_eq!(tick2, tick1 + 1, "tick must increment by exactly 1");
+}
+
+#[test]
+fn physics_system_actually_moves_entities() {
+    use wasm_game_logic::{World, Position, Velocity, PhysicsSystem};
+    let mut world = World::new();
+    let e = world.spawn();
+    world.add_position(e, Position { x: 0.0, y: 0.0 });
+    world.add_velocity(e, Velocity { dx: 10.0, dy: 0.0 });
+    PhysicsSystem::run(&mut world, 1000); // 1 second
+    let pos = world.get_position(e).unwrap();
+    // Falsification: x must have moved, not remain at 0
+    assert!(pos.x > 0.0, "entity must have moved: x={}", pos.x);
+    assert_ne!(pos.x, 0.0);
+}
+
+#[test]
+fn score_system_increments_on_award() {
+    use wasm_game_logic::{World, Player, ScoreSystem, Entity};
+    let mut world = World::new();
+    let e = world.spawn();
+    world.add_player(e, Player { name: "p".to_string(), score: 0 });
+    ScoreSystem::award(&mut world, e, 100);
+    let score = world.get_player(e).unwrap().score;
+    // Falsification: score is 100, not 0
+    assert_eq!(score, 100);
+    assert_ne!(score, 0);
+}

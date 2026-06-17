@@ -65,3 +65,33 @@ fn terminated_worker_reports_terminated() {
     log.info("Then it returns true");
     assert!(t.is_terminated());
 }
+
+#[test]
+fn worker_start_transitions_to_running() {
+    use wasm_core::worker::{WasmWorker};
+    let w = WasmWorker::new("test.js", 1);
+    let running = w.start().expect("start should succeed on native");
+    assert_eq!(running.worker_id(), 1);
+    // Falsification: worker_id is 1 not 0
+    assert_ne!(running.worker_id(), 0);
+}
+
+#[test]
+fn worker_terminate_from_running() {
+    use wasm_core::worker::{WasmWorker};
+    let w = WasmWorker::new("test.js", 5);
+    let running = w.start().unwrap();
+    let terminated = running.terminate();
+    assert!(terminated.is_terminated());
+}
+
+#[test]
+fn different_worker_ids_are_different() {
+    use wasm_core::worker::{WasmWorker};
+    let w1 = WasmWorker::new("a.js", 1);
+    let w2 = WasmWorker::new("b.js", 2);
+    let r1 = w1.start().unwrap();
+    let r2 = w2.start().unwrap();
+    // Falsification: worker IDs differ
+    assert_ne!(r1.worker_id(), r2.worker_id());
+}

@@ -13,6 +13,8 @@ pub struct WasmWorker<S> {
     script_url: String,
     worker_id: u32,
     _state: PhantomData<S>,
+    #[cfg(target_arch = "wasm32")]
+    js_worker: Option<web_sys::Worker>,
 }
 
 impl WasmWorker<Uninitialized> {
@@ -21,15 +23,26 @@ impl WasmWorker<Uninitialized> {
             script_url: script_url.into(),
             worker_id,
             _state: PhantomData,
+            #[cfg(target_arch = "wasm32")]
+            js_worker: None,
         }
     }
 
     /// Transition from Uninitialized → Running.
-    /// In a real WASM target this would spawn the Web Worker.
+    /// On wasm32 this spawns the actual Web Worker via web_sys::Worker::new().
     pub fn start(self) -> Result<WasmWorker<Running>, WorkerError> {
-        // Native build: no actual OS thread is spawned; the state machine
-        // records that the logical worker is "running".
-        // WASM build: web_sys::Worker::new(&self.script_url) would go here.
+        #[cfg(target_arch = "wasm32")]
+        {
+            let js_worker = web_sys::Worker::new(&self.script_url)
+                .map_err(|e| WorkerError::CreationFailed(format!("{:?}", e)))?;
+            return Ok(WasmWorker {
+                script_url: self.script_url,
+                worker_id: self.worker_id,
+                _state: PhantomData,
+                js_worker: Some(js_worker),
+            });
+        }
+        #[cfg(not(target_arch = "wasm32"))]
         Ok(WasmWorker {
             script_url: self.script_url,
             worker_id: self.worker_id,
@@ -45,15 +58,23 @@ impl WasmWorker<Running> {
             script_url: self.script_url,
             worker_id: self.worker_id,
             _state: PhantomData,
+            #[cfg(target_arch = "wasm32")]
+            js_worker: None,
         }
     }
 
     /// Transition Running → Terminated.
     pub fn terminate(self) -> WasmWorker<Terminated> {
+        #[cfg(target_arch = "wasm32")]
+        if let Some(ref w) = self.js_worker {
+            w.terminate();
+        }
         WasmWorker {
             script_url: self.script_url,
             worker_id: self.worker_id,
             _state: PhantomData,
+            #[cfg(target_arch = "wasm32")]
+            js_worker: None,
         }
     }
 
@@ -64,6 +85,12 @@ impl WasmWorker<Running> {
     pub fn script_url(&self) -> &str {
         &self.script_url
     }
+
+    /// Return a reference to the underlying JS Worker (wasm32 only).
+    #[cfg(target_arch = "wasm32")]
+    pub fn js_worker(&self) -> Option<&web_sys::Worker> {
+        self.js_worker.as_ref()
+    }
 }
 
 impl WasmWorker<Paused> {
@@ -73,6 +100,8 @@ impl WasmWorker<Paused> {
             script_url: self.script_url,
             worker_id: self.worker_id,
             _state: PhantomData,
+            #[cfg(target_arch = "wasm32")]
+            js_worker: None,
         }
     }
 
@@ -82,6 +111,8 @@ impl WasmWorker<Paused> {
             script_url: self.script_url,
             worker_id: self.worker_id,
             _state: PhantomData,
+            #[cfg(target_arch = "wasm32")]
+            js_worker: None,
         }
     }
 }
