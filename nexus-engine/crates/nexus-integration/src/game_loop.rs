@@ -69,6 +69,7 @@ pub struct PlayerState {
     pub max_hp: f32,
     pub attack: u32,
     pub defense: u32,
+    pub magic: u32,
     pub stat_points: u32,
     pub perk_points: u32,
     pub selected_perks: Vec<String>,
@@ -83,7 +84,7 @@ impl PlayerState {
         PlayerState {
             id, name: name.into(), level: 1, xp: 0, bloodline: 0,
             gold: 500, hp: 100.0, max_hp: 100.0,
-            attack: 20, defense: 10, stat_points: 0, perk_points: 0,
+            attack: 20, defense: 10, magic: 0, stat_points: 0, perk_points: 0,
             selected_perks: vec![], combo_depth: 0, qip_scar_stacks: 0,
             trans_am_gauge: 0.0, suit_id: "RX-78-2".to_string(),
         }
@@ -394,7 +395,7 @@ impl GameSession {
                     match stat {
                         StatType::Attack  => self.player.attack += 5,
                         StatType::Defense => self.player.defense += 5,
-                        StatType::Magic   => {}  // magic stat not tracked in simplified model
+                        StatType::Magic   => self.player.magic += 5,
                         StatType::Health  => {
                             self.player.max_hp += 10.0;
                             self.player.hp = (self.player.hp + 10.0).min(self.player.max_hp);

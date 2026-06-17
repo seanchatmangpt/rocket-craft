@@ -10,3 +10,8 @@ rand = { version = "0.8", features = ["small_rng"] }
 rand_chacha = "0.3"
 thiserror = "1"
 proptest = "1"
+
+[dev-dependencies]
+chicago-tdd-tools = { path = "../../../chicago-tdd-tools" }
+nexus-net = { path = "../nexus-net" }
+nexus-integration = { path = "../nexus-integration" }

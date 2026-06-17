@@ -192,6 +192,8 @@ fn make_player(id: u64, name: &str, suit: &str, hp: f32) -> RoomPlayer {
         suit_id: suit.to_string(),
         hp,
         max_hp: hp,
+        attack: 30.0,
+        magic: 50.0,
         combo_depth: 0,
     }
 }

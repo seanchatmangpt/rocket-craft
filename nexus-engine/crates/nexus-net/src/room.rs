@@ -8,6 +8,28 @@ use tokio::sync::broadcast;
 
 use crate::protocol::{CombatAction, CombatOutcome};
 
+// ── Magic type bonus ──────────────────────────────────────────────────────────
+
+/// Returns the flat damage bonus for each magic type.
+///
+/// Mapping by raw `u8` value (as carried in `CombatAction::CastMagic`):
+/// - 0 → Fire        (+20 – intense but common)
+/// - 1 → Lightning   (+30 – fast and piercing)
+/// - 2 → Ice         (+15 – reliable, no special bonus)
+/// - 3 → Dark        (+35 – high-risk, high-reward)
+/// - 4 → Light       (+25 – balanced holy element)
+/// - _  → 10 (unknown/future types get a small base bonus)
+fn magic_type_multiplier(magic_type: u8) -> f32 {
+    match magic_type {
+        0 => 20.0, // Fire
+        1 => 30.0, // Lightning
+        2 => 15.0, // Ice
+        3 => 35.0, // Dark
+        4 => 25.0, // Light
+        _ => 10.0, // Unknown future type
+    }
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 /// One player's record inside a game room.
@@ -18,6 +40,8 @@ pub struct RoomPlayer {
     pub suit_id: String,
     pub hp: f32,
     pub max_hp: f32,
+    pub attack: f32,
+    pub magic: f32,
     pub combo_depth: u32,
 }
 
@@ -169,8 +193,7 @@ impl GameRoom {
                 }
                 CombatOutcome::Dodged
             }
-            CombatAction::UseSpecial { .. } | CombatAction::CastMagic { .. } => {
-                // Simplified: special/magic actions always deal a flat 40 damage.
+            CombatAction::UseSpecial { ability_id } => {
                 let (attacker, defender) = if is_p1_acting {
                     (&mut self.player1 as *mut RoomPlayer, &mut self.player2 as *mut RoomPlayer)
                 } else {
@@ -178,9 +201,34 @@ impl GameRoom {
                 };
                 let (attacker, defender) = unsafe { (&mut *attacker, &mut *defender) };
 
-                let dmg = 40.0_f32;
+                // Special abilities scale with the attacker's base attack and the
+                // ability tier (ability_id 0 = basic, higher = stronger).
+                let dmg = attacker.attack * 2.0 + ability_id as f32 * 5.0;
                 defender.hp = (defender.hp - dmg).max(0.0);
                 attacker.combo_depth = 0; // special resets combo
+
+                let new_hp = defender.hp;
+                if new_hp <= 0.0 {
+                    CombatOutcome::PlayerDied { player_id: defender.player_id }
+                } else {
+                    CombatOutcome::Hit { damage: dmg, new_hp, combo_depth: 0 }
+                }
+            }
+            CombatAction::CastMagic { magic_type } => {
+                let (attacker, defender) = if is_p1_acting {
+                    (&mut self.player1 as *mut RoomPlayer, &mut self.player2 as *mut RoomPlayer)
+                } else {
+                    (&mut self.player2 as *mut RoomPlayer, &mut self.player1 as *mut RoomPlayer)
+                };
+                let (attacker, defender) = unsafe { (&mut *attacker, &mut *defender) };
+
+                // Magic damage scales with the attacker's magic stat plus a
+                // type-specific bonus that reflects elemental potency.
+                // magic_type mapping: 0=Fire, 1=Lightning, 2=Ice, 3=Dark, 4=Light
+                let type_bonus = magic_type_multiplier(magic_type);
+                let dmg = attacker.magic * 1.5 + type_bonus;
+                defender.hp = (defender.hp - dmg).max(0.0);
+                attacker.combo_depth = 0; // magic cast resets combo
 
                 let new_hp = defender.hp;
                 if new_hp <= 0.0 {
