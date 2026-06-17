@@ -1,4 +1,5 @@
 use nexus_tests::{invariants::*, model::*, strategies::*};
+use nexus_types::MagicType;
 use proptest::prelude::*;
 
 proptest! {
@@ -114,6 +115,32 @@ proptest! {
         prop_assert!(oracle >= 1.0, "oracle damage floor: {}", oracle);
         let combo_mult = match combo { 0 | 1 => 1.0, 2 => 1.5, 3 => 2.0, _ => 3.0 };
         prop_assert!(damage_floor_holds(base, combo_mult, 0.0, armor));
+    }
+}
+
+proptest! {
+    // Every valid MagicType byte (0-4) converts to a positive damage multiplier
+    #[test]
+    fn magic_type_multiplier_always_positive(byte in 0u8..5u8) {
+        let mt = MagicType::try_from(byte).expect("byte 0-4 must convert to MagicType");
+        let multiplier = f32::from(mt);
+        prop_assert!(multiplier > 0.0, "MagicType multiplier must be > 0, got {}", multiplier);
+    }
+
+    // TryFrom<u8> and From<MagicType> are value-stable round-trips
+    #[test]
+    fn magic_type_u8_round_trip(byte in 0u8..5u8) {
+        let mt = MagicType::try_from(byte).expect("byte 0-4 should convert");
+        let multiplier: f32 = f32::from(mt);
+        // Re-converting from the same byte gives the same multiplier
+        let mt2 = MagicType::try_from(byte).expect("second conversion should succeed");
+        prop_assert_eq!(f32::from(mt2), multiplier, "MagicType conversion must be deterministic");
+    }
+
+    // Out-of-range bytes are always rejected
+    #[test]
+    fn magic_type_rejects_out_of_range(byte in 5u8..=255u8) {
+        prop_assert!(MagicType::try_from(byte).is_err(), "byte {} should not convert to MagicType", byte);
     }
 }
 

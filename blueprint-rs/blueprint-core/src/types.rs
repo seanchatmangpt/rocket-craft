@@ -169,6 +169,17 @@ impl PinType {
         }
     }
 
+    pub fn class(class_path: impl Into<String>) -> Self {
+        Self {
+            category: PinCategory::Class,
+            sub_category: None,
+            sub_category_object: Some(class_path.into()),
+            container: ContainerType::None,
+            is_reference: false,
+            is_const: false,
+        }
+    }
+
     pub fn struct_type(struct_path: impl Into<String>) -> Self {
         Self {
             category: PinCategory::Struct,

@@ -28,7 +28,7 @@ fn should_rebirth_increment_bloodline_on_player_death() {
         assert!(s.player.weapon.is_none(), "Weapon resets on rebirth");
         assert_eq!(s.player.health, s.player.max_health, "HP fully restored on rebirth");
         assert_eq!(s.player.qip_scar_stacks, 0, "QIP scars cleared on rebirth");
-        assert_eq!(s.arena_queue.len(), 4, "Arena queue resets to 4 enemies");
+        assert_eq!(s.arena.len(), 4, "Arena queue resets to 4 enemies");
         if initial_bloodline < 20 {
             assert!(s.player.perk_points > initial_perk_points,
                 "Perk point granted on rebirth (BL <= 20)");

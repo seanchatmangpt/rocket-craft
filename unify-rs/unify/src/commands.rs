@@ -2,10 +2,23 @@ use crate::app::{Cli, Commands};
 use crate::output::Output;
 use crate::version::crate_versions;
 use unify_receipts::receipt::Receipt;
+use unify_rdf::pipeline::{OntologyPipeline, PipelineConfig};
+use unify_rdf::sparql::{PatternExecutor, SparqlExecutor};
+use unify_rdf::store::TripleStore;
+use unify_rdf::triple::Term;
 use serde_json::json;
 
+/// Typed error variants for all CLI command handlers.
+#[derive(thiserror::Error, Debug)]
+pub enum CommandError {
+    #[error("JSON parse failed: {0}")]
+    JsonParse(#[from] serde_json::Error),
+    #[error("turtle parse error: {0}")]
+    TurtleParse(String),
+}
+
 /// Entry point: dispatch the parsed CLI to the matching handler.
-pub fn run(cli: Cli) -> Result<Output, Box<dyn std::error::Error>> {
+pub fn run(cli: Cli) -> Result<Output, CommandError> {
     match cli.command {
         Commands::Receipt { label, data } => cmd_receipt(&label, &data),
         Commands::Verify { chain_json } => cmd_verify(&chain_json),
@@ -20,7 +33,7 @@ pub fn run(cli: Cli) -> Result<Output, Box<dyn std::error::Error>> {
 }
 
 /// Compute a BLAKE3 receipt for `data` under `label`.
-pub fn cmd_receipt(label: &str, data: &str) -> Result<Output, Box<dyn std::error::Error>> {
+pub fn cmd_receipt(label: &str, data: &str) -> Result<Output, CommandError> {
     let receipt = Receipt::new(label, data.as_bytes());
     let value = json!({
         "key": receipt.key,
@@ -34,15 +47,13 @@ pub fn cmd_receipt(label: &str, data: &str) -> Result<Output, Box<dyn std::error
 ///
 /// Accepts either a single Receipt JSON object or an array of Receipt objects.
 /// Each receipt's `key` is treated as the data to verify against the stored hash.
-pub fn cmd_verify(chain_json: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    let value: serde_json::Value = serde_json::from_str(chain_json)
-        .map_err(|e| format!("Invalid JSON: {}", e))?;
+pub fn cmd_verify(chain_json: &str) -> Result<Output, CommandError> {
+    let value: serde_json::Value = serde_json::from_str(chain_json)?;
 
     let receipts: Vec<Receipt> = if value.is_array() {
-        serde_json::from_value(value).map_err(|e| format!("Invalid receipt array: {}", e))?
+        serde_json::from_value(value)?
     } else {
-        let r: Receipt =
-            serde_json::from_str(chain_json).map_err(|e| format!("Invalid receipt: {}", e))?;
+        let r: Receipt = serde_json::from_str(chain_json)?;
         vec![r]
     };
 
@@ -71,10 +82,8 @@ pub fn cmd_verify(chain_json: &str) -> Result<Output, Box<dyn std::error::Error>
 }
 
 /// Check an admission gate law against JSON data.
-pub fn cmd_gate(law: &str, data: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    // Parse data as JSON to validate it is well-formed.
-    let parsed: serde_json::Value = serde_json::from_str(data)
-        .map_err(|e| format!("Invalid data JSON: {}", e))?;
+pub fn cmd_gate(law: &str, data: &str) -> Result<Output, CommandError> {
+    let parsed: serde_json::Value = serde_json::from_str(data)?;
 
     // Stub: interpret law as a field-exists check of the form "field:<name>"
     let admitted = if let Some(field) = law.strip_prefix("field:") {
@@ -96,7 +105,7 @@ pub fn cmd_gate(law: &str, data: &str) -> Result<Output, Box<dyn std::error::Err
 }
 
 /// Show version info for all unify-rs crates.
-pub fn cmd_info() -> Result<Output, Box<dyn std::error::Error>> {
+pub fn cmd_info() -> Result<Output, CommandError> {
     let versions: Vec<serde_json::Value> = crate_versions()
         .into_iter()
         .map(|v| json!({ "name": v.name, "version": v.version }))
@@ -110,7 +119,7 @@ pub fn cmd_dispatch(
     noun: &str,
     verb: &str,
     input: Option<&str>,
-) -> Result<Output, Box<dyn std::error::Error>> {
+) -> Result<Output, CommandError> {
     let parsed_input: serde_json::Value = match input {
         Some(s) => serde_json::from_str(s).unwrap_or(json!(s)),
         None => json!(null),
@@ -143,26 +152,231 @@ pub fn cmd_dispatch(
 }
 
 /// Run a SPARQL-like triple pattern query over optional Turtle input.
-pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    // Stub implementation: parse the pattern and echo back with turtle source info.
+///
+/// If `ttl` is `Some(turtle_str)`, the Turtle text is parsed into a fresh
+/// [`TripleStore`] via [`OntologyPipeline::load_turtle`].  The `pattern`
+/// string is then executed against the store using [`PatternExecutor`].
+///
+/// The pattern must be a SELECT query of the form `SELECT * WHERE { ?s ?p ?o }`.
+/// Additional SPO-position filters can be embedded in the pattern by passing a
+/// concrete term where the variable would appear; unsupported forms are surfaced
+/// in the `error` field of the returned JSON.
+pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, CommandError> {
     let source = ttl.map(|_| "inline-turtle").unwrap_or("none");
-    Ok(Output::ok(json!({
-        "pattern": pattern,
-        "source": source,
-        "results": [],
-        "note": "SPARQL query stub — wire unify-rdf for full evaluation",
-    })))
+
+    // Build a fresh triple store, optionally loading Turtle input.
+    let mut store = TripleStore::new();
+    if let Some(turtle) = ttl {
+        let config = PipelineConfig {
+            target_language: "rust".into(),
+            output_dir: ".".into(),
+            template_dir: None,
+            namespace: "unify".into(),
+        };
+        let mut pipeline = OntologyPipeline::new(store, config);
+        pipeline.load_turtle(turtle).map_err(|e| CommandError::TurtleParse(e.to_string()))?;
+        // Re-extract the store from the pipeline by running an extract step.
+        // OntologyPipeline does not expose its store directly, so we leverage
+        // the fact that the store is passed by value: rebuild by querying the
+        // pipeline via extract_types and then re-inserting with known triples.
+        // Instead, we use a second store built directly via the public API.
+        //
+        // Actually: OntologyPipeline does not re-expose the store, so we parse
+        // the Turtle ourselves using the same algorithm as load_turtle.
+        drop(pipeline);
+        store = TripleStore::new();
+        parse_turtle_into_store(turtle, &mut store);
+    }
+
+    let executor = PatternExecutor(&store);
+    let triple_count = store.len();
+
+    match executor.select(pattern) {
+        Ok(bindings) => {
+            let results: Vec<serde_json::Value> = bindings
+                .iter()
+                .map(|b| {
+                    let term_to_str = |t: &Term| -> String {
+                        match t {
+                            Term::Named(iri) => iri.clone(),
+                            Term::Blank(id) => format!("_:{}", id),
+                            Term::Literal { value, .. } => value.clone(),
+                        }
+                    };
+                    json!({
+                        "s": b.get("s").map(term_to_str).unwrap_or_default(),
+                        "p": b.get("p").map(term_to_str).unwrap_or_default(),
+                        "o": b.get("o").map(term_to_str).unwrap_or_default(),
+                    })
+                })
+                .collect();
+            Ok(Output::ok(json!({
+                "pattern": pattern,
+                "source": source,
+                "triple_count": triple_count,
+                "results": results,
+            })))
+        }
+        Err(e) => Ok(Output {
+            data: json!({
+                "pattern": pattern,
+                "source": source,
+                "triple_count": triple_count,
+                "results": [],
+                "error": e.to_string(),
+            }),
+            success: false,
+            message: Some(format!("Query failed: {}", e)),
+        }),
+    }
+}
+
+/// Parse Turtle-like N-Triples lines into `store`.
+///
+/// Mirrors [`OntologyPipeline::load_turtle`]: blank lines and `#` comment
+/// lines are skipped; remaining whitespace-split tokens form (subject,
+/// predicate, object) triples with angle-bracket and trailing-dot stripping.
+fn parse_turtle_into_store(turtle: &str, store: &mut TripleStore) {
+    use unify_rdf::triple::Triple;
+    for line in turtle.lines() {
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() >= 3 {
+            let s = parts[0].trim_matches(|c| c == '<' || c == '>');
+            let p = parts[1].trim_matches(|c| c == '<' || c == '>');
+            let o = parts[2].trim_matches(|c| c == '<' || c == '>' || c == '.');
+            store.add(Triple::new(s, p, o));
+        }
+    }
 }
 
 /// Show the witness registry, optionally filtered by domain.
-pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, Box<dyn std::error::Error>> {
-    // Stub registry — real implementation would query unify-rdf / unify-sem.
+///
+/// Each witness entry reflects the runtime health of a real component:
+///
+/// - `rdf / triple-store`: instantiates a [`TripleStore`], inserts a sentinel
+///   triple, and reports the live triple count as proof of operation.
+/// - `rdf / pipeline`: instantiates an [`OntologyPipeline`], loads a minimal
+///   N-Triples line, and reports the number of triples loaded.
+/// - `receipts / blake3-chain`: delegates to [`unify_receipts`]; the crate is
+///   always available so this is always "active".
+/// - `sem / semantic-net`: probes the `unify-sem` crate; the crate currently
+///   exposes no types beyond a module declaration, so it is reported as
+///   "available" (compiled and linked) but with no runtime metric.
+/// - `lsp / lsp-bridge`: not yet wired; reported as "stub".
+/// - `wasm / wasm4pm`: not yet wired; reported as "stub".
+pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, CommandError> {
+    // -- rdf / triple-store ---------------------------------------------------
+    let rdf_store_status = {
+        let mut store = TripleStore::new();
+        store.add(unify_rdf::triple::Triple::new(
+            "unify:witness",
+            "unify:probe",
+            "unify:triple-store",
+        ));
+        if store.len() == 1 {
+            json!({
+                "domain": "rdf",
+                "witness": "triple-store",
+                "status": "active",
+                "triple_count": store.len(),
+            })
+        } else {
+            json!({
+                "domain": "rdf",
+                "witness": "triple-store",
+                "status": "unavailable",
+                "triple_count": store.len(),
+            })
+        }
+    };
+
+    // -- rdf / pipeline -------------------------------------------------------
+    let rdf_pipeline_status = {
+        let config = PipelineConfig {
+            target_language: "rust".into(),
+            output_dir: ".".into(),
+            template_dir: None,
+            namespace: "unify".into(),
+        };
+        let mut pipeline = OntologyPipeline::new(TripleStore::new(), config);
+        let n = pipeline
+            .load_turtle("<unify:witness> rdf:type <unify:Pipeline> .")
+            .unwrap_or(0);
+        let stage_count = pipeline.stage_count();
+        if n > 0 {
+            json!({
+                "domain": "rdf",
+                "witness": "pipeline",
+                "status": "active",
+                "triples_loaded": n,
+                "stage_count": stage_count,
+            })
+        } else {
+            json!({
+                "domain": "rdf",
+                "witness": "pipeline",
+                "status": "unavailable",
+                "triples_loaded": n,
+                "stage_count": stage_count,
+            })
+        }
+    };
+
+    // -- receipts / blake3-chain ----------------------------------------------
+    let receipts_status = {
+        let r = Receipt::new("unify:witness-probe", b"witness");
+        let valid = r.verify(b"witness");
+        json!({
+            "domain": "receipts",
+            "witness": "blake3-chain",
+            "status": if valid { "active" } else { "unavailable" },
+            "probe_valid": valid,
+        })
+    };
+
+    // -- sem / semantic-net ---------------------------------------------------
+    // unify-sem is compiled and linked (its Cargo.toml dep is declared and the
+    // crate builds successfully).  The crate is currently a stub with no public
+    // types, so we confirm linkage at compile time by importing the crate root
+    // and report it as "active" (linked) with a note that no runtime state is
+    // exposed yet.
+    let sem_status = {
+        // This import will fail to compile if the crate is absent or broken.
+        #[allow(unused_imports)]
+        use unify_sem as _sem;
+        json!({
+            "domain": "sem",
+            "witness": "semantic-net",
+            "status": "active",
+            "note": "crate linked; no runtime state exposed yet",
+        })
+    };
+
+    // -- lsp / lsp-bridge  ----------------------------------------------------
+    let lsp_status = json!({
+        "domain": "lsp",
+        "witness": "lsp-bridge",
+        "status": "stub",
+    });
+
+    // -- wasm / wasm4pm -------------------------------------------------------
+    let wasm_status = json!({
+        "domain": "wasm",
+        "witness": "wasm4pm",
+        "status": "stub",
+    });
+
     let all = vec![
-        json!({ "domain": "rdf",      "witness": "triple-store", "status": "active" }),
-        json!({ "domain": "receipts", "witness": "blake3-chain", "status": "active" }),
-        json!({ "domain": "sem",      "witness": "semantic-net", "status": "active" }),
-        json!({ "domain": "lsp",      "witness": "lsp-bridge",   "status": "stub"   }),
-        json!({ "domain": "wasm",     "witness": "wasm4pm",      "status": "stub"   }),
+        rdf_store_status,
+        rdf_pipeline_status,
+        receipts_status,
+        sem_status,
+        lsp_status,
+        wasm_status,
     ];
 
     let witnesses: Vec<&serde_json::Value> = match domain {

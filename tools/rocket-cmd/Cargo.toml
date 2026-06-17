@@ -27,8 +27,7 @@ cargo_metadata = "0.19.1"
 rocket-sdk = { path = "../rocket-sdk" }
 knhk = { path = "../knhk" }
 unrdf = { path = "../unrdf" }
-wasm4pm-compat = { path = "../wasm4pm-compat-stub" }
-wasmer = "4.4.0"
+wasmer = { version = "4.4.0", default-features = false, features = ["sys", "singlepass", "wat"] }
 
 [dev-dependencies]
 un-test-utils = { path = "../un-test-utils" }

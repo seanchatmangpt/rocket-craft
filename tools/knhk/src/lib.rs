@@ -1,6 +1,8 @@
 use std::path::Path;
 
 pub mod plugin;
+pub mod receipt;
+pub use receipt::Receipt;
 
 /// A trait representing a semantic law or constraint that a project must satisfy.
 ///
@@ -142,9 +144,7 @@ mod tests {
 
     #[test]
     fn test_plugin_host_new() {
-        // Verify PluginHost can be constructed without panicking.
-        // Receipt tracking was removed (fabricated Receipt type dependency);
-        // see plugin.rs TODO(anti-cheat) for context.
-        let _host = PluginHost::new();
+        let host = PluginHost::new();
+        assert!(host.receipts().is_empty());
     }
 }

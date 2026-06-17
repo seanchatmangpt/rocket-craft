@@ -122,7 +122,7 @@ impl OntologyPipeline {
         files.sort_by(|a, b| a.path.cmp(&b.path));
         // μ₅ receipt: hash of all content
         let combined: String = files.iter().map(|f| f.content.as_str()).collect();
-        let receipt = format!("{:x}", md5_stub(&combined));
+        let receipt = blake3::hash(combined.as_bytes()).to_hex().to_string();
         Ok(PipelineOutput { files, receipt })
     }
 
@@ -132,13 +132,6 @@ impl OntologyPipeline {
     }
 }
 
-/// Minimal hash stub (XOR-based, not cryptographic) for the receipt field.
-/// In production this would be blake3.
-fn md5_stub(s: &str) -> u64 {
-    s.bytes().fold(0u64, |acc, b| {
-        acc.wrapping_mul(6364136223846793005).wrapping_add(b as u64)
-    })
-}
 
 #[cfg(test)]
 mod tests {

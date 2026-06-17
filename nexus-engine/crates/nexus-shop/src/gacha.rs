@@ -132,8 +132,8 @@ impl GachaEngine {
     pub fn from_server_entropy(player_id: u64, nonce: u64) -> Self {
         use sha2::{Sha256, Digest};
         let mut hasher = Sha256::new();
-        hasher.update(&player_id.to_le_bytes());
-        hasher.update(&nonce.to_le_bytes());
+        hasher.update(player_id.to_le_bytes());
+        hasher.update(nonce.to_le_bytes());
         let result = hasher.finalize();
         let seed = u64::from_le_bytes(result[..8].try_into().unwrap());
         GachaEngine { rng: ChaCha8Rng::seed_from_u64(seed) }

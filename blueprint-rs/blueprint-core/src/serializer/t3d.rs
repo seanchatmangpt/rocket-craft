@@ -3,12 +3,25 @@
 //! The output can be pasted directly into the UE4 Blueprint editor Event Graph
 //! (Ctrl+V) and the nodes will appear with their connections intact.
 
-use crate::ast::{Blueprint, BpNode, Pin};
+use crate::ast::{Blueprint, BpGraph, BpNode, Pin};
 use crate::types::{PinDirection, PinCategory};
 
 pub struct T3dSerializer;
 
 impl T3dSerializer {
+    /// Serialize a single [`BpGraph`] to a flat sequence of `Begin Object … End Object` blocks.
+    ///
+    /// Unlike [`Self::serialize`], this does **not** wrap the output in a `K2Node_Tunnel`
+    /// container, so it matches the format expected by [`crate::parser::parse_t3d`].
+    pub fn serialize_graph(graph: &BpGraph) -> String {
+        let mut out = String::new();
+        for node in &graph.nodes {
+            out.push_str(&serialize_node(node));
+            out.push('\n');
+        }
+        out
+    }
+
     /// Serialize a `Blueprint` to UE4 T3D format string.
     pub fn serialize(bp: &Blueprint) -> String {
         let mut out = String::new();

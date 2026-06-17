@@ -236,12 +236,12 @@ pub enum RuntimeCombatState {
 
 /// Tick a stunned unit.
 ///
-/// Returns `Ok(turns_remaining_after_tick)` when still stunned, or `Err(())`
+/// Returns `Some(turns_remaining_after_tick)` when still stunned, or `None`
 /// when the stun expires and the caller should convert back to Idle.
-pub fn tick_stunned(turns_remaining: u32) -> Result<u32, ()> {
+pub fn tick_stunned(turns_remaining: u32) -> Option<u32> {
     if turns_remaining <= 1 {
-        Err(())
+        None
     } else {
-        Ok(turns_remaining - 1)
+        Some(turns_remaining - 1)
     }
 }

@@ -3,14 +3,10 @@ use wasmer::{Instance, Module, Store, imports, Value};
 use crate::{Law, LawError};
 use anyhow::{Result, Context};
 use std::sync::Mutex;
+use crate::receipt::Receipt;
 
 pub struct PluginHost {
-    // TODO(anti-cheat): wasm4pm_compat::receipt::Receipt was imported here but the type does
-    // not exist in the stub crate (only ReceiptEnvelope is defined in wasm4pm_compat::receipt).
-    // The `receipts: Vec<Receipt>` field and its `record_receipt` / `receipts` accessors have
-    // been removed because they referenced a non-existent type — a fabricated dependency.
-    // Re-add receipt tracking once the real wasm4pm-compat crate is vendored and provides
-    // the Receipt type.
+    receipts: Vec<Receipt>,
 }
 
 impl Default for PluginHost {
@@ -21,7 +17,17 @@ impl Default for PluginHost {
 
 impl PluginHost {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            receipts: Vec::new(),
+        }
+    }
+
+    pub fn record_receipt(&mut self, receipt: Receipt) {
+        self.receipts.push(receipt);
+    }
+
+    pub fn receipts(&self) -> &[Receipt] {
+        &self.receipts
     }
 
     pub fn load_law(&mut self, wasm_path: &Path) -> Result<WasmLaw> {

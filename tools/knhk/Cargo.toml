@@ -5,8 +5,7 @@ edition = "2024"
 
 [dependencies]
 ignore = "0.4"
-wasmer = "4.4.0"
-wasm4pm-compat = { path = "../wasm4pm-compat-stub" }
+wasmer = { version = "4.4.0", default-features = false, features = ["sys", "singlepass", "wat"] }
 anyhow = "1.0"
 
 [dev-dependencies]
