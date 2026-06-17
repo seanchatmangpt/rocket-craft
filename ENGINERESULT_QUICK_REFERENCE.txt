@@ -1,0 +1,223 @@
+================================================================================
+EngineResult Typestate Pattern — QUICK REFERENCE
+================================================================================
+
+FOUR STATES (Zero-Sized Markers):
+  1. ScanComplete   — raw observations collected
+  2. Enriched       — observations classified by file type/category
+  3. Evaluated      — diagnostics generated with blocking flags
+  4. Deduped        — duplicates removed, final state (no transitions)
+
+STATE TRANSITIONS (Only these are legal):
+  ScanComplete —(enrich)—> Enriched —(evaluate)—> Evaluated —(dedupe)—> Deduped
+                                                         └—(emit)—> Vec[Diagnostic]
+
+================================================================================
+STRUCT DEFINITION (Copy-Paste Ready)
+================================================================================
+
+pub struct EngineResult<S> {
+    file_path: String,
+    observations: Vec<Observation>,
+    enrichment_map: HashMap<usize, (String, String)>,
+    diagnostics: Vec<AntiLlmDiagnostic>,
+    dedup_set: HashSet<(String, usize, String)>,
+    _phantom: PhantomData<S>,
+}
+
+================================================================================
+IMPL BLOCKS (Method Signatures Only — Implementation Details Omitted)
+================================================================================
+
+IMPL 1: EngineResult<ScanComplete>
+  pub fn from_file_scan(file_path: &str) -> Self
+  pub fn from_directory_scan(dir_path: &str) -> Self
+  pub fn enrich(mut self) -> EngineResult<Enriched>
+  pub fn observations(&self) -> &[Observation]
+  pub fn file_path(&self) -> &str
+  pub fn observation_count(&self) -> usize
+
+IMPL 2: EngineResult<Enriched>
+  pub fn evaluate(self, config: &AntiLlmConfig) -> EngineResult<Evaluated>
+  pub fn enrichment_map(&self) -> &HashMap<usize, (String, String)>
+  pub fn observation_count(&self) -> usize
+  pub fn get_enrichment(&self, obs_idx: usize) -> Option<(&str, &str)>
+
+IMPL 3: EngineResult<Evaluated>
+  pub fn dedupe(mut self) -> EngineResult<Deduped>
+  pub fn diagnostics(&self) -> &[AntiLlmDiagnostic]
+  pub fn emit(&self) -> Vec<AntiLlmDiagnostic>
+  pub fn diagnostic_count(&self) -> usize
+  pub fn diagnostic_counts(&self) -> (usize, usize)
+  pub fn filter_by_blocking(&self, blocking: bool) -> Vec<&AntiLlmDiagnostic>
+  pub fn filter_by_category(&self, category: &str) -> Vec<&AntiLlmDiagnostic>
+  pub fn file_path(&self) -> &str
+
+IMPL 4: EngineResult<Deduped>  [TERMINAL STATE]
+  pub fn emit(&self) -> Vec<AntiLlmDiagnostic>
+  pub fn emit_blocking(&self) -> Vec<AntiLlmDiagnostic>
+  pub fn emit_warnings(&self) -> Vec<AntiLlmDiagnostic>
+  pub fn diagnostic_count(&self) -> usize
+  pub fn diagnostic_counts(&self) -> (usize, usize)
+  #[cfg(test)] pub fn verify_dedup(&self) -> Result<(), String>
+  pub fn file_path(&self) -> &str
+
+================================================================================
+USAGE: BEFORE vs AFTER
+================================================================================
+
+BEFORE (Unsafe — Manual Dedup):
+  let obs = scan_file("x.rs");
+  let diags = evaluate_diagnostics(&obs);
+
+  // Manual dedup (easy to forget!)
+  let mut seen = HashSet::new();
+  let unique = diags.into_iter()
+    .filter(|d| seen.insert((d.file_path.clone(), d.line, d.code.clone())))
+    .collect();
+
+AFTER (Safe — Type-Enforced):
+  let result = EngineResult::from_file_scan("x.rs")
+    .enrich()
+    .evaluate(&config)
+    .dedupe();
+
+  let unique = result.emit();  // Guaranteed unique!
+
+================================================================================
+IMPOSSIBLE OPERATIONS (Compile-Time Errors)
+================================================================================
+
+❌ .emit_blocking() before .dedupe()
+   EngineResult<Evaluated> has no emit_blocking() method
+
+❌ .enrich() twice
+   EngineResult<Enriched> has no enrich() method
+
+❌ .evaluate() before .enrich()
+   EngineResult<ScanComplete> has no evaluate() method
+
+❌ .dedupe() before .evaluate()
+   EngineResult<Enriched> has no dedupe() method
+
+================================================================================
+VALID PATTERNS
+================================================================================
+
+✅ Full pipeline with dedup:
+   EngineResult::from_file_scan(path)
+     .enrich()
+     .evaluate(&config)
+     .dedupe()
+     .emit()
+
+✅ Partial pipeline (pre-dedup):
+   EngineResult::from_file_scan(path)
+     .enrich()
+     .evaluate(&config)
+     .emit()  // OK: EngineResult<Evaluated> allows emit()
+
+✅ Filtered queries on pre-dedup state:
+   let result = EngineResult::from_file_scan(path)
+     .enrich()
+     .evaluate(&config);
+   result.filter_by_blocking(true)
+
+✅ Multiple queries on deduped state:
+   let result = EngineResult::from_file_scan(path)
+     .enrich()
+     .evaluate(&config)
+     .dedupe();
+   let all = result.emit();
+   let blocking = result.emit_blocking();
+
+================================================================================
+COST-BENEFIT ANALYSIS
+================================================================================
+
+Effort:          ~510 LOC, 14 hours over 2–3 weeks
+Compile overhead: ~5–10% incremental (negligible in practice)
+Learning curve:   1–2 hours for new Rust developers
+Bugs prevented:   2–3 per year (based on nexus-engine precedent)
+
+Comparison Table:
+
+              | Builder     | Docs-Only   | **Typestate**
+─────────────────────────────────────────────────────
+Compile-time  | ❌ Runtime  | ❌ None     | ✅ Type system
+safety        |             |             |
+─────────────────────────────────────────────────────
+Prevents      | ❌          | ❌          | ✅ Compile error
+emit before   |             |             |
+dedupe        |             |             |
+─────────────────────────────────────────────────────
+Prevents      | ❌          | ❌          | ✅ Compile error
+double-eval   |             |             |
+─────────────────────────────────────────────────────
+Ergonomics    | Good        | Good        | **Excellent**
+─────────────────────────────────────────────────────
+
+RECOMMENDATION: **Typestate is the correct choice.**
+
+✅ Aligns with nexus-engine (CombatMachine<S>)
+✅ Aligns with unify-rdf (ProjectManifest<Pending/Ingested/Validated>)
+✅ Prevents real bugs at compile time
+✅ Self-documenting code (type = protocol)
+✅ Modest effort for long-term subsystem
+
+================================================================================
+IMPLEMENTATION PHASES
+================================================================================
+
+Phase 1: Core Types (40 LOC, 1 hour)
+  - anti-llm-cheat-lsp/src/states.rs — Define ScanComplete, Enriched, etc.
+  - anti-llm-cheat-lsp/src/engine_result.rs — Define EngineResult<S>
+  - anti-llm-cheat-lsp/src/lib.rs — Export modules
+
+Phase 2: Impl Blocks (150 LOC, 4 hours)
+  - Four impl blocks in engine_result.rs (one per state)
+
+Phase 3: Integration (240 LOC, 6 hours)
+  - unify/src/commands.rs — cmd_audit()
+  - unify-lsp/src/anti_llm_gate.rs — scan_file_to_lsp()
+  - unify-mcp/src/anti_llm_tools.rs — handle_scan_directory()
+  - unify-admission/src/lib.rs — AntiLlmAdmissionGate::admit()
+
+Phase 4: Tests (80 LOC, 3 hours)
+  - State transition tests
+  - Dedup invariant tests
+  - Filtering tests
+
+TOTAL: 14 hours, 2–3 weeks
+TIMELINE: Q3 2026 (after Phase 1 integration stable)
+
+================================================================================
+DECISION GATE
+================================================================================
+
+Proceed if:
+  ✅ Team comfortable with Rust generics and PhantomData
+  ✅ Anti-llm-cheat-lsp is long-term subsystem (multi-year)
+  ✅ Compliance/correctness is a priority
+
+Do NOT proceed if:
+  ❌ Team unfamiliar with typestate pattern
+  ❌ Anti-llm-cheat-lsp is temporary/experimental
+  ❌ Compile-time performance is critical (unlikely)
+
+RECOMMENDATION: **Proceed. Strong architectural fit with existing codebase.**
+
+================================================================================
+FILES GENERATED
+================================================================================
+
+1. DESIGN_ENGINERESULT_TYPESTATE.md (original design doc, 1271 lines)
+   — Complete rationale, alternatives, cost-benefit, implementation roadmap
+
+2. ENGINERESULT_TYPESTATE_SPEC.rs (this spec, 910 lines)
+   — Copy-paste-ready Rust pseudo-code with exact signatures
+
+3. ENGINERESULT_QUICK_REFERENCE.txt (this file)
+   — Quick reference for developers
+
+All files committed to main repo.
