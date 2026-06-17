@@ -3838,7 +3838,10 @@ dependencies = [
 
 [[package]]
 name = "wasm4pm-compat"
-version = "0.1.0"
+version = "26.6.9"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "wasmer"
