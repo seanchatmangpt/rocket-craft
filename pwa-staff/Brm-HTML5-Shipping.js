@@ -95,6 +95,7 @@
     });
 
   function runGame() {
+    window.UE4_EngineReady = true;
     console.log('Game Assets Decoded:', gameDataText);
     if (loadingOverlay) loadingOverlay.style.display = 'none';
     if (canvas) canvas.style.display = 'block';
