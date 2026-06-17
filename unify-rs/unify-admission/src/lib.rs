@@ -325,6 +325,59 @@ fn walk_files<F: Fn(&Path) -> bool>(root: &Path, predicate: &F) -> bool {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// AntiLlmLaw — RuntimeLaw that blocks paths with blocking anti-llm diagnostics
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Law: a file or directory must not contain any blocking anti-llm diagnostics.
+///
+/// Registers as a `RuntimeLaw` so it can be added to any `LawRegistry` and
+/// run alongside other runtime laws via `validate_all`.
+pub struct AntiLlmLaw;
+
+impl RuntimeLaw for AntiLlmLaw {
+    fn name(&self) -> &str {
+        "AntiLlm"
+    }
+
+    fn description(&self) -> &str {
+        "No blocking anti-llm-cheat-lsp diagnostics (stubs, victory language, oracles)"
+    }
+
+    fn validate_path(&self, path: &Path) -> Result<(), LawViolation> {
+        use anti_llm_cheat_lsp::engine;
+
+        let path_str = path.to_string_lossy();
+        let observations = if path.is_dir() {
+            engine::scan_directory(&path_str)
+        } else {
+            engine::scan_file(&path_str)
+        };
+
+        let diags = engine::evaluate_diagnostics(&observations);
+        let blocking: Vec<_> = diags.iter().filter(|d| d.blocking).collect();
+
+        if blocking.is_empty() {
+            Ok(())
+        } else {
+            let summary = blocking
+                .iter()
+                .take(5)
+                .map(|d| format!("{}:{} [{}] {}", d.file_path, d.line, d.code, d.message))
+                .collect::<Vec<_>>()
+                .join("; ");
+            Err(LawViolation {
+                law_name: self.name().to_string(),
+                message: format!(
+                    "{} blocking diagnostic(s) found. First: {}",
+                    blocking.len(),
+                    summary
+                ),
+            })
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // GateChain — compose two gates sequentially over the same artifact type
 // ─────────────────────────────────────────────────────────────────────────────
 

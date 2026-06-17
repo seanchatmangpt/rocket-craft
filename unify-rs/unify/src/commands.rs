@@ -16,6 +16,9 @@ pub fn run(cli: Cli) -> Result<Output, Box<dyn std::error::Error>> {
         }
         Commands::Query { ttl, pattern } => cmd_query(ttl.as_deref(), &pattern),
         Commands::Witnesses { domain } => cmd_witnesses(domain.as_deref()),
+        Commands::Audit { path, blocking_only, strict } => {
+            cmd_audit(&path, blocking_only, strict)
+        }
     }
 }
 
@@ -226,4 +229,69 @@ pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, Box<dyn std::error:
     };
 
     Ok(Output::ok(json!({ "witnesses": witnesses })))
+}
+
+/// Scan a file or directory for LLM cheat patterns and emit diagnostics.
+pub fn cmd_audit(
+    path: &str,
+    blocking_only: bool,
+    strict: bool,
+) -> Result<Output, Box<dyn std::error::Error>> {
+    use anti_llm_cheat_lsp::engine;
+    use std::path::Path;
+
+    let p = Path::new(path);
+    let observations = if p.is_dir() {
+        engine::scan_directory(path)
+    } else {
+        engine::scan_file(path)
+    };
+
+    let all_diags = engine::evaluate_diagnostics(&observations);
+    let diags: Vec<_> = if blocking_only {
+        all_diags.into_iter().filter(|d| d.blocking).collect()
+    } else {
+        all_diags
+    };
+
+    let blocking_count = diags.iter().filter(|d| d.blocking).count();
+    let warning_count = diags.iter().filter(|d| !d.blocking).count();
+
+    let diag_values: Vec<serde_json::Value> = diags
+        .iter()
+        .map(|d| {
+            json!({
+                "code": d.code,
+                "category": d.category,
+                "file": d.file_path,
+                "line": d.line,
+                "column": d.column,
+                "blocking": d.blocking,
+                "message": d.message,
+                "correction": d.required_correction,
+            })
+        })
+        .collect();
+
+    let success = !strict || blocking_count == 0;
+    let message = if blocking_count > 0 {
+        format!(
+            "{} blocking, {} warning diagnostic(s) found in '{}'",
+            blocking_count, warning_count, path
+        )
+    } else {
+        format!("No blocking diagnostics found in '{}'", path)
+    };
+
+    Ok(Output {
+        data: json!({
+            "path": path,
+            "observation_count": observations.len(),
+            "blocking_count": blocking_count,
+            "warning_count": warning_count,
+            "diagnostics": diag_values,
+        }),
+        success,
+        message: Some(message),
+    })
 }

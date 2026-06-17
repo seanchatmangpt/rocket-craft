@@ -61,4 +61,15 @@ pub enum Commands {
         #[arg(short, long)]
         domain: Option<String>,
     },
+    /// Scan a path for LLM cheat patterns and emit diagnostics
+    Audit {
+        /// Directory or file to scan
+        path: String,
+        /// Only report blocking (error-level) diagnostics
+        #[arg(long)]
+        blocking_only: bool,
+        /// Fail with non-zero exit code if any blocking diagnostic is found
+        #[arg(long)]
+        strict: bool,
+    },
 }
