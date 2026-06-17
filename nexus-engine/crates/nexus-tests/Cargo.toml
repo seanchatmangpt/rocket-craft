@@ -15,3 +15,4 @@ proptest = "1"
 chicago-tdd-tools = { path = "../../../chicago-tdd-tools" }
 nexus-net = { path = "../nexus-net" }
 nexus-integration = { path = "../nexus-integration" }
+nexus-types = { path = "../nexus-types" }

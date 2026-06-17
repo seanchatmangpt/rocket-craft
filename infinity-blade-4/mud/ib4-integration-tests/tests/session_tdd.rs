@@ -6,7 +6,8 @@
 /// (e.g., save files written by `Command::Save`).
 use chicago_tdd_tools::TestEnvironment;
 use ib4_integration_tests::{new_session, Command, AttackDir};
-use ib4_core::types::MagicType;
+use ib4_core::types::{MagicType, Stat};
+use proptest::prelude::*;
 use ib4_ai::roster::spawn_enemy;
 use ib4_combat::{
     damage::calc_player_damage,
@@ -55,7 +56,7 @@ fn session_spawn_next_enemy_uses_roster() {
     // Attack when not in combat triggers spawn_next_enemy which calls roster::spawn_enemy
     let out = s.dispatch(Command::Attack(AttackDir::Overhead));
     assert!(s.current_enemy.is_some(), "Enemy should be spawned after first attack");
-    assert!(s.is_in_combat, "Should be in combat after spawning");
+    assert!(s.is_in_combat(), "Should be in combat after spawning");
 
     let enemy = s.current_enemy.as_ref().unwrap();
     // LightTitan is first in the default queue
@@ -465,4 +466,54 @@ fn session_enemy_defeat_awards_xp_and_triggers_level_up() {
     // 51 + 50 (LightTitan XP) = 101 ≥ 100 → level up
     assert!(s.player.level >= 2, "Player should have levelled up after defeat: level={}", s.player.level);
     assert!(s.player.xp >= 100, "Player should have XP >= threshold");
+}
+
+// ---------------------------------------------------------------------------
+// Property-based tests: stat parse invariants
+// ---------------------------------------------------------------------------
+
+proptest! {
+    // Every canonical stat name parses successfully
+    #[test]
+    fn stat_canonical_names_parse(idx in 0usize..4usize) {
+        let names = ["health", "attack", "defense", "magic"];
+        let result: Result<Stat, _> = names[idx].parse();
+        prop_assert!(result.is_ok(), "canonical stat name '{}' should parse", names[idx]);
+    }
+
+    // Every short alias also parses successfully
+    #[test]
+    fn stat_aliases_parse(idx in 0usize..4usize) {
+        let aliases = ["hp", "atk", "def", "mag"];
+        let result: Result<Stat, _> = aliases[idx].parse();
+        prop_assert!(result.is_ok(), "stat alias '{}' should parse", aliases[idx]);
+    }
+
+    // Case-insensitive: uppercase canonical names parse to the same variant
+    #[test]
+    fn stat_uppercase_parses(idx in 0usize..4usize) {
+        let names = ["HEALTH", "ATTACK", "DEFENSE", "MAGIC"];
+        let lc_names = ["health", "attack", "defense", "magic"];
+        let upper: Result<Stat, _> = names[idx].parse();
+        let lower: Result<Stat, _> = lc_names[idx].parse();
+        prop_assert!(upper.is_ok(), "uppercase stat '{}' should parse", names[idx]);
+        prop_assert_eq!(upper.unwrap(), lower.unwrap(), "case should not affect parsed variant");
+    }
+
+    // Damage from an attack never increases player HP (attack always deals damage)
+    #[test]
+    fn attack_never_heals_enemy(initial_hp in 500.0f32..2000.0f32) {
+        let mut s = new_session();
+        // Spawn enemy with known high HP by dispatching first attack
+        s.dispatch(Command::Attack(AttackDir::Overhead));
+        if let Some(enemy) = s.current_enemy.as_mut() {
+            enemy.current_hp = initial_hp;
+        }
+        let hp_before = s.current_enemy.as_ref().map(|e| e.current_hp).unwrap_or(0.0);
+        s.announced_attack = None;
+        s.dispatch(Command::Attack(AttackDir::Overhead));
+        // After an attack, enemy HP should be <= before (never increases)
+        let hp_after = s.current_enemy.as_ref().map(|e| e.current_hp).unwrap_or(0.0);
+        prop_assert!(hp_after <= hp_before, "attack must not increase enemy HP: before={}, after={}", hp_before, hp_after);
+    }
 }

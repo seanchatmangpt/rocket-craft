@@ -1,12 +1,12 @@
 use std::collections::VecDeque;
-use anyhow::Result;
+use std::marker::PhantomData;
 use rand::{SeedableRng, Rng};
 use rand::rngs::SmallRng;
 use serde::{Serialize, Deserialize};
 use ib4_core::{
     player::PlayerState,
     enemy::EnemyInstance,
-    types::{AttackDir, MagicType, Rarity},
+    types::{AttackDir, MagicType, Rarity, Stat},
     equipment::weapon_catalog,
 };
 use ib4_combat::{
@@ -27,6 +27,67 @@ use ib4_progression::{
 use crate::command::Command;
 use crate::narrative;
 
+// ── Arena manager ─────────────────────────────────────────────────────────────
+
+/// Wraps the arena enemy queue.  Centralises all queue mutations so the rest of
+/// `GameSession` never reaches into the VecDeque directly.
+pub struct ArenaManager {
+    queue: VecDeque<String>,
+}
+
+impl ArenaManager {
+    fn new(queue: VecDeque<String>) -> Self { ArenaManager { queue } }
+    fn next(&mut self) -> Option<String> { self.queue.pop_front() }
+    fn front(&self) -> Option<&str> { self.queue.front().map(|s| s.as_str()) }
+    fn is_empty(&self) -> bool { self.queue.is_empty() }
+    fn iter(&self) -> impl Iterator<Item = &String> { self.queue.iter() }
+    fn reset(&mut self, ids: &[&str]) {
+        self.queue = ids.iter().map(|s| s.to_string()).collect();
+    }
+    pub fn clear(&mut self) { self.queue.clear(); }
+    pub fn push_back(&mut self, item: String) { self.queue.push_back(item); }
+    pub fn len(&self) -> usize { self.queue.len() }
+}
+
+// ── Typestate phase markers ────────────────────────────────────────────────────
+
+/// Typestate marker: session is not actively in a combat encounter.
+pub struct NotInCombat;
+/// Typestate marker: session has a live combat encounter.
+pub struct InCombat;
+
+/// Compile-time-checked session wrapper.  `attack()` is only available when the
+/// session is `InCombat`; `enter_combat()` is only available when `NotInCombat`.
+pub struct TypedSession<Phase> {
+    inner: GameSession,
+    _phase: PhantomData<Phase>,
+}
+
+impl TypedSession<NotInCombat> {
+    pub fn new(name: &str) -> Self {
+        TypedSession { inner: GameSession::new(name), _phase: PhantomData }
+    }
+
+    pub fn enter_combat(mut self) -> TypedSession<InCombat> {
+        let _ = self.inner.spawn_next_enemy();
+        TypedSession { inner: self.inner, _phase: PhantomData }
+    }
+}
+
+impl TypedSession<InCombat> {
+    pub fn attack(&mut self, dir: AttackDir) -> Vec<String> {
+        self.inner.cmd_attack(dir)
+    }
+
+    pub fn flee(mut self) -> TypedSession<NotInCombat> {
+        self.inner.in_combat = false;
+        self.inner.current_enemy = None;
+        TypedSession { inner: self.inner, _phase: PhantomData }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SaveData {
     pub player: PlayerState,
@@ -37,7 +98,7 @@ pub struct SaveData {
 pub struct GameSession {
     pub player: PlayerState,
     pub current_enemy: Option<EnemyInstance>,
-    pub arena_queue: VecDeque<String>,
+    pub arena: ArenaManager,
     pub combo_depth: u32,
     pub combo_idle_turns: u32,
     pub combo_reset_threshold: u32,
@@ -45,7 +106,7 @@ pub struct GameSession {
     pub rng: SmallRng,
     pub turn: u32,
     pub loot_bag: Vec<ib4_core::equipment::Weapon>,
-    pub is_in_combat: bool,
+    in_combat: bool,
     pub god_king_ai_turn: u32,
     pub titan_ai: TitanAI,
 }
@@ -55,7 +116,6 @@ impl GameSession {
         let player = PlayerState::new(name);
         let rng = SmallRng::from_entropy();
 
-        // Build default arena queue for bloodline 0
         let queue: VecDeque<String> = vec![
             "LightTitan".to_string(),
             "HeavyTitan".to_string(),
@@ -67,7 +127,7 @@ impl GameSession {
         Self {
             player,
             current_enemy: None,
-            arena_queue: queue,
+            arena: ArenaManager::new(queue),
             combo_depth: 0,
             combo_idle_turns: 0,
             combo_reset_threshold: 2,
@@ -75,17 +135,20 @@ impl GameSession {
             rng,
             turn: 0,
             loot_bag: Vec::new(),
-            is_in_combat: false,
+            in_combat: false,
             god_king_ai_turn: 0,
             titan_ai: TitanAI::new(),
         }
     }
 
-    pub fn from_json(json: &str) -> Result<Self> {
+    /// Returns `true` when an active combat encounter is in progress.
+    pub fn is_in_combat(&self) -> bool { self.in_combat }
+
+    pub fn from_json(json: &str) -> Result<Self, serde_json::Error> {
         let save: SaveData = serde_json::from_str(json)?;
         let mut session = Self::new(&save.player.name);
         session.player = save.player;
-        session.arena_queue = save.arena_queue.into();
+        session.arena = ArenaManager::new(save.arena_queue.into());
         Ok(session)
     }
 
@@ -93,7 +156,7 @@ impl GameSession {
         let save = SaveData {
             player: self.player.clone(),
             bloodline: self.player.bloodline,
-            arena_queue: self.arena_queue.iter().cloned().collect(),
+            arena_queue: self.arena.iter().cloned().collect(),
         };
         serde_json::to_string_pretty(&save).unwrap_or_default()
     }
@@ -147,14 +210,10 @@ impl GameSession {
                     enemy.phase,
                 ));
             }
-        } else if self.arena_queue.is_empty() {
+        } else if self.arena.is_empty() {
             lines.push("The arena is empty. Victory!".to_string());
         } else {
-            let next = self
-                .arena_queue
-                .front()
-                .map(|s| s.as_str())
-                .unwrap_or("unknown");
+            let next = self.arena.front().unwrap_or("unknown");
             lines.push(format!("A {} approaches from the shadows...", next));
             lines.push("Type 'explore' to engage.".to_string());
         }
@@ -171,7 +230,7 @@ impl GameSession {
     }
 
     fn spawn_next_enemy(&mut self) -> Vec<String> {
-        let id = match self.arena_queue.pop_front() {
+        let id = match self.arena.next() {
             Some(id) => id,
             None => {
                 return vec!["No more enemies. You have conquered this bloodline!".to_string()]
@@ -187,7 +246,7 @@ impl GameSession {
         let name = enemy.name.clone();
         let is_god_king = id == "CorruptedGalath";
         self.current_enemy = Some(enemy);
-        self.is_in_combat = true;
+        self.in_combat = true;
         self.announced_attack = None;
         self.god_king_ai_turn = 0;
 
@@ -213,7 +272,7 @@ impl GameSession {
     }
 
     fn cmd_attack(&mut self, _dir: AttackDir) -> Vec<String> {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return self.spawn_next_enemy();
         }
         let enemy = match self.current_enemy.as_ref() {
@@ -328,7 +387,7 @@ impl GameSession {
     }
 
     fn cmd_parry(&mut self, dir: Option<AttackDir>) -> Vec<String> {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return vec!["No enemy to parry.".to_string()];
         }
 
@@ -402,7 +461,7 @@ impl GameSession {
     }
 
     fn cmd_dodge(&mut self) -> Vec<String> {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return vec!["Nothing to dodge.".to_string()];
         }
         self.announced_attack = None;
@@ -579,32 +638,25 @@ impl GameSession {
         if self.player.stat_points == 0 {
             return vec!["No stat points available.".to_string()];
         }
-        match stat.to_lowercase().as_str() {
-            "health" | "hp" => {
-                self.player.stat_health += 1;
-            }
-            "attack" | "atk" => {
-                self.player.stat_attack += 1;
-            }
-            "defense" | "def" => {
-                self.player.stat_defense += 1;
-            }
-            "magic" | "mag" => {
-                self.player.stat_magic += 1;
-            }
-            _ => {
-                return vec![format!(
-                    "Unknown stat '{}'. Use: health, attack, defense, magic",
-                    stat
-                )]
-            }
+        let parsed: Stat = match stat.parse() {
+            Ok(s) => s,
+            Err(_) => return vec![format!(
+                "Unknown stat '{}'. Use: health, attack, defense, magic",
+                stat
+            )],
+        };
+        match parsed {
+            Stat::Health  => self.player.stat_health += 1,
+            Stat::Attack  => self.player.stat_attack += 1,
+            Stat::Defense => self.player.stat_defense += 1,
+            Stat::Magic   => self.player.stat_magic += 1,
         }
         self.player.stat_points -= 1;
         self.player.recalculate_stats();
         self.player.health = self.player.max_health; // restore HP on stat alloc
         vec![format!(
-            "  {} increased! ({} points remaining)",
-            stat, self.player.stat_points
+            "  {:?} increased! ({} points remaining)",
+            parsed, self.player.stat_points
         )]
     }
 
@@ -836,7 +888,7 @@ impl GameSession {
             (0, 0, "Enemy".to_string())
         };
 
-        self.is_in_combat = false;
+        self.in_combat = false;
         self.announced_attack = None;
         self.combo_depth = 0;
 
@@ -876,14 +928,14 @@ impl GameSession {
             self.player.loot_bag.push(drop);
         }
 
-        if self.arena_queue.is_empty() {
+        if self.arena.is_empty() {
             lines.push(
                 "  You have conquered this arena. The bloodline endures.".to_string(),
             );
         } else {
             lines.push(format!(
                 "  Next: {}. Type 'explore' to continue.",
-                self.arena_queue.front().map(|s| s.as_str()).unwrap_or("?")
+                self.arena.front().unwrap_or("?")
             ));
         }
         lines
@@ -905,15 +957,12 @@ impl GameSession {
 
         // Reset session state that BloodlineSystem doesn't own
         self.current_enemy = None;
-        self.is_in_combat = false;
+        self.in_combat = false;
         self.combo_depth = 0;
         self.titan_ai = TitanAI::new();
 
         // Rebuild arena queue for new bloodline
-        self.arena_queue = vec!["LightTitan", "HeavyTitan", "DarkKnight", "CorruptedGalath"]
-            .into_iter()
-            .map(|s| s.to_string())
-            .collect();
+        self.arena.reset(&["LightTitan", "HeavyTitan", "DarkKnight", "CorruptedGalath"]);
 
         let hp_scale = BloodlineSystem::enemy_hp_scale(self.player.bloodline);
         let mut lines = vec![
@@ -944,7 +993,7 @@ impl GameSession {
     }
 
     fn announce_next_attack(&mut self, lines: &mut Vec<String>) {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return;
         }
         let enemy = match self.current_enemy.as_ref() {

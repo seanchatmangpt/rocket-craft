@@ -13,3 +13,4 @@ rand = { workspace = true }
 chicago-tdd-tools = { path = "../../../chicago-tdd-tools" }
 ib4-combat = { path = "../ib4-combat" }
 ib4-progression = { path = "../ib4-progression" }
+proptest = "1"

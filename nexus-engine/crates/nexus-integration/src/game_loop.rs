@@ -1,3 +1,4 @@
+use nexus_types::{Gold, Hp, Xp};
 use serde::{Serialize, Deserialize};
 use rand::{SeedableRng, Rng};
 use rand::rngs::SmallRng;
@@ -62,11 +63,11 @@ pub struct PlayerState {
     pub id: u64,
     pub name: String,
     pub level: u32,
-    pub xp: u64,
+    pub xp: Xp,
     pub bloodline: u32,
-    pub gold: u32,
-    pub hp: f32,
-    pub max_hp: f32,
+    pub gold: Gold,
+    pub hp: Hp,
+    pub max_hp: Hp,
     pub attack: u32,
     pub defense: u32,
     pub magic: u32,
@@ -82,22 +83,22 @@ pub struct PlayerState {
 impl PlayerState {
     pub fn new(id: u64, name: impl Into<String>) -> Self {
         PlayerState {
-            id, name: name.into(), level: 1, xp: 0, bloodline: 0,
-            gold: 500, hp: 100.0, max_hp: 100.0,
+            id, name: name.into(), level: 1, xp: Xp::new(0), bloodline: 0,
+            gold: Gold::new(500), hp: Hp::new(100.0), max_hp: Hp::new(100.0),
             attack: 20, defense: 10, magic: 0, stat_points: 0, perk_points: 0,
             selected_perks: vec![], combo_depth: 0, qip_scar_stacks: 0,
             trans_am_gauge: 0.0, suit_id: "RX-78-2".to_string(),
         }
     }
 
-    pub fn is_alive(&self) -> bool { self.hp > 0.0 }
+    pub fn is_alive(&self) -> bool { !self.hp.is_dead() }
 
     pub fn take_damage(&mut self, dmg: f32) {
-        self.hp = (self.hp - dmg.max(0.0)).max(0.0);
+        self.hp = Hp::new((self.hp.value() - dmg.max(0.0)).max(0.0));
     }
 
     pub fn heal(&mut self, amount: f32) {
-        self.hp = (self.hp + amount).min(self.max_hp);
+        self.hp = Hp::new((self.hp.value() + amount).min(self.max_hp.value()));
     }
 
     pub fn combo_multiplier(&self) -> f32 {
@@ -105,9 +106,9 @@ impl PlayerState {
     }
 
     pub fn gain_xp(&mut self, xp: u64) -> bool {
-        self.xp = self.xp.saturating_add(xp);
+        self.xp = self.xp + Xp::new(xp);
         let threshold = 100 * (self.level as u64).pow(2);
-        if self.xp >= threshold && self.level < 50 {
+        if self.xp.value() >= threshold && self.level < 50 {
             self.level += 1;
             self.stat_points += 3;
             true
@@ -115,7 +116,10 @@ impl PlayerState {
     }
 
     pub fn spend_gold(&mut self, amount: u32) -> bool {
-        if self.gold >= amount { self.gold -= amount; true } else { false }
+        if self.gold.value() >= amount {
+            self.gold = self.gold - Gold::new(amount);
+            true
+        } else { false }
     }
 
     pub fn rebirth(&mut self) {
@@ -297,7 +301,7 @@ impl GameSession {
                     let xp = self.current_enemy.as_ref().map(|e| 50 + e.max_hp as u64 / 10).unwrap_or(50);
                     let gold = 25 + self.rng.gen_range(0..50u32);
                     let leveled = self.player.gain_xp(xp);
-                    self.player.gold = self.player.gold.saturating_add(gold);
+                    self.player.gold = self.player.gold + Gold::new(gold);
                     self.player.combo_depth = 0;
                     self.current_enemy = None;
                     self.is_in_combat = false;
@@ -375,7 +379,7 @@ impl GameSession {
             }
 
             GameCommand::OpenShop => {
-                out.push(self.ev(EventKind::Info(format!("Shop open. Gold: {}", self.player.gold))));
+                out.push(self.ev(EventKind::Info(format!("Shop open. Gold: {}", self.player.gold.value()))));
             }
 
             GameCommand::BuyItem { item_index } => {
@@ -397,8 +401,8 @@ impl GameSession {
                         StatType::Defense => self.player.defense += 5,
                         StatType::Magic   => self.player.magic += 5,
                         StatType::Health  => {
-                            self.player.max_hp += 10.0;
-                            self.player.hp = (self.player.hp + 10.0).min(self.player.max_hp);
+                            self.player.max_hp = self.player.max_hp + Hp::new(10.0);
+                            self.player.hp = Hp::new((self.player.hp.value() + 10.0).min(self.player.max_hp.value()));
                         }
                     }
                     out.push(self.ev(EventKind::StatAllocated(stat)));
@@ -456,7 +460,7 @@ impl GameSession {
             (e.attack * phase_mult, e.phase, dir)
         };
         self.player.take_damage(atk);
-        let new_hp = self.player.hp;
+        let new_hp = self.player.hp.value();
 
         if !self.player.is_alive() {
             self.player.rebirth();

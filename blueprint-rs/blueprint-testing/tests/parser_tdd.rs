@@ -9,6 +9,7 @@ use blueprint_core::parser::{generate_rust_code, parse_t3d};
 use blueprint_core::serializer::T3dSerializer;
 use blueprint_core::types::PinType;
 use chicago_tdd_tools::TestEnvironment;
+use proptest::prelude::*;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -24,7 +25,7 @@ fn t3d_for_single_node(node: BpNode) -> String {
 /// Parse a T3D blob and run `generate_rust_code`. Panics on parse failure.
 fn codegen(t3d: &str) -> anyhow::Result<String> {
     let nodes = parse_t3d(t3d).expect("T3D parse must succeed");
-    generate_rust_code(&nodes, "TestBP", "Actor")
+    Ok(generate_rust_code(&nodes, "TestBP", "Actor")?)
 }
 
 // ---------------------------------------------------------------------------
@@ -236,4 +237,47 @@ fn variable_get_node_with_correct_name() {
         code.contains("PlayerHealth"),
         "The variable name 'PlayerHealth' should appear in the generated code, got:\n{code}"
     );
+}
+
+// ---------------------------------------------------------------------------
+// Property-based tests: node-handler registry is deterministic
+// ---------------------------------------------------------------------------
+
+proptest! {
+    // Simple node types (no extra properties required) generate identical output
+    // on repeated calls — the OnceLock registry must be idempotent
+    #[test]
+    fn registry_codegen_is_deterministic(class_idx in 0usize..3usize) {
+        let entries: &[(&str, &str)] = &[
+            ("/Script/BlueprintGraph.K2Node_IfThenElse",  "K2Node_IfThenElse_0"),
+            ("/Script/BlueprintGraph.K2Node_Select",      "K2Node_Select_0"),
+            ("/Script/BlueprintGraph.K2Node_ForEachLoop", "K2Node_ForEachLoop_0"),
+        ];
+        let (class, name) = entries[class_idx];
+        let node = BpNode::new(class, name);
+        let mut graph = BpGraph::new("TestGraph");
+        graph.add_node(node);
+        let t3d = T3dSerializer::serialize_graph(&graph);
+        let nodes = parse_t3d(&t3d).expect("parse should succeed");
+        let code1 = generate_rust_code(&nodes, "TestBP", "Actor")
+            .expect("codegen should succeed for known class");
+        let code2 = generate_rust_code(&nodes, "TestBP", "Actor")
+            .expect("repeated codegen should succeed");
+        prop_assert_eq!(&code1, &code2, "codegen must be deterministic for {}", class);
+    }
+
+    // Registry rejects unknown classes and returns a ParseError
+    #[test]
+    fn registry_rejects_unknown_class(suffix in "[A-Z][a-z]{3,8}") {
+        let class = format!("/Script/BlueprintGraph.K2Node_Unknown_{suffix}");
+        let node = BpNode::new(&class, "TestNode_0");
+        let mut graph = BpGraph::new("TestGraph");
+        graph.add_node(node);
+        let t3d = T3dSerializer::serialize_graph(&graph);
+        let nodes = parse_t3d(&t3d).expect("parse should succeed");
+        let result = generate_rust_code(&nodes, "TestBP", "Actor");
+        prop_assert!(result.is_err(), "unknown class should produce ParseError");
+        let msg = result.unwrap_err().to_string();
+        prop_assert!(msg.contains("Unsupported"), "error should mention 'Unsupported', got: {msg}");
+    }
 }

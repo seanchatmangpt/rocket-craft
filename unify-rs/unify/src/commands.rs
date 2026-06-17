@@ -8,8 +8,17 @@ use unify_rdf::store::TripleStore;
 use unify_rdf::triple::Term;
 use serde_json::json;
 
+/// Typed error variants for all CLI command handlers.
+#[derive(thiserror::Error, Debug)]
+pub enum CommandError {
+    #[error("JSON parse failed: {0}")]
+    JsonParse(#[from] serde_json::Error),
+    #[error("turtle parse error: {0}")]
+    TurtleParse(String),
+}
+
 /// Entry point: dispatch the parsed CLI to the matching handler.
-pub fn run(cli: Cli) -> Result<Output, Box<dyn std::error::Error>> {
+pub fn run(cli: Cli) -> Result<Output, CommandError> {
     match cli.command {
         Commands::Receipt { label, data } => cmd_receipt(&label, &data),
         Commands::Verify { chain_json } => cmd_verify(&chain_json),
@@ -24,7 +33,7 @@ pub fn run(cli: Cli) -> Result<Output, Box<dyn std::error::Error>> {
 }
 
 /// Compute a BLAKE3 receipt for `data` under `label`.
-pub fn cmd_receipt(label: &str, data: &str) -> Result<Output, Box<dyn std::error::Error>> {
+pub fn cmd_receipt(label: &str, data: &str) -> Result<Output, CommandError> {
     let receipt = Receipt::new(label, data.as_bytes());
     let value = json!({
         "key": receipt.key,
@@ -38,15 +47,13 @@ pub fn cmd_receipt(label: &str, data: &str) -> Result<Output, Box<dyn std::error
 ///
 /// Accepts either a single Receipt JSON object or an array of Receipt objects.
 /// Each receipt's `key` is treated as the data to verify against the stored hash.
-pub fn cmd_verify(chain_json: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    let value: serde_json::Value = serde_json::from_str(chain_json)
-        .map_err(|e| format!("Invalid JSON: {}", e))?;
+pub fn cmd_verify(chain_json: &str) -> Result<Output, CommandError> {
+    let value: serde_json::Value = serde_json::from_str(chain_json)?;
 
     let receipts: Vec<Receipt> = if value.is_array() {
-        serde_json::from_value(value).map_err(|e| format!("Invalid receipt array: {}", e))?
+        serde_json::from_value(value)?
     } else {
-        let r: Receipt =
-            serde_json::from_str(chain_json).map_err(|e| format!("Invalid receipt: {}", e))?;
+        let r: Receipt = serde_json::from_str(chain_json)?;
         vec![r]
     };
 
@@ -75,10 +82,8 @@ pub fn cmd_verify(chain_json: &str) -> Result<Output, Box<dyn std::error::Error>
 }
 
 /// Check an admission gate law against JSON data.
-pub fn cmd_gate(law: &str, data: &str) -> Result<Output, Box<dyn std::error::Error>> {
-    // Parse data as JSON to validate it is well-formed.
-    let parsed: serde_json::Value = serde_json::from_str(data)
-        .map_err(|e| format!("Invalid data JSON: {}", e))?;
+pub fn cmd_gate(law: &str, data: &str) -> Result<Output, CommandError> {
+    let parsed: serde_json::Value = serde_json::from_str(data)?;
 
     // Stub: interpret law as a field-exists check of the form "field:<name>"
     let admitted = if let Some(field) = law.strip_prefix("field:") {
@@ -100,7 +105,7 @@ pub fn cmd_gate(law: &str, data: &str) -> Result<Output, Box<dyn std::error::Err
 }
 
 /// Show version info for all unify-rs crates.
-pub fn cmd_info() -> Result<Output, Box<dyn std::error::Error>> {
+pub fn cmd_info() -> Result<Output, CommandError> {
     let versions: Vec<serde_json::Value> = crate_versions()
         .into_iter()
         .map(|v| json!({ "name": v.name, "version": v.version }))
@@ -114,7 +119,7 @@ pub fn cmd_dispatch(
     noun: &str,
     verb: &str,
     input: Option<&str>,
-) -> Result<Output, Box<dyn std::error::Error>> {
+) -> Result<Output, CommandError> {
     let parsed_input: serde_json::Value = match input {
         Some(s) => serde_json::from_str(s).unwrap_or(json!(s)),
         None => json!(null),
@@ -156,7 +161,7 @@ pub fn cmd_dispatch(
 /// Additional SPO-position filters can be embedded in the pattern by passing a
 /// concrete term where the variable would appear; unsupported forms are surfaced
 /// in the `error` field of the returned JSON.
-pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, Box<dyn std::error::Error>> {
+pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, CommandError> {
     let source = ttl.map(|_| "inline-turtle").unwrap_or("none");
 
     // Build a fresh triple store, optionally loading Turtle input.
@@ -169,7 +174,7 @@ pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, Box<dyn std
             namespace: "unify".into(),
         };
         let mut pipeline = OntologyPipeline::new(store, config);
-        pipeline.load_turtle(turtle).map_err(|e| format!("Turtle parse error: {}", e))?;
+        pipeline.load_turtle(turtle).map_err(|e| CommandError::TurtleParse(e.to_string()))?;
         // Re-extract the store from the pipeline by running an extract step.
         // OntologyPipeline does not expose its store directly, so we leverage
         // the fact that the store is passed by value: rebuild by querying the
@@ -263,7 +268,7 @@ fn parse_turtle_into_store(turtle: &str, store: &mut TripleStore) {
 ///   "available" (compiled and linked) but with no runtime metric.
 /// - `lsp / lsp-bridge`: not yet wired; reported as "stub".
 /// - `wasm / wasm4pm`: not yet wired; reported as "stub".
-pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, Box<dyn std::error::Error>> {
+pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, CommandError> {
     // -- rdf / triple-store ---------------------------------------------------
     let rdf_store_status = {
         let mut store = TripleStore::new();

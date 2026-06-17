@@ -37,14 +37,26 @@ pub enum BlendMode { Opaque, AlphaBlend, Additive }
 pub enum DepthCompare { Less, LessEqual, Greater, Always }
 
 // ---------------------------------------------------------------------------
-// wgpu enum mappings (only compiled-in when the gpu feature is active)
+// Errors
+// ---------------------------------------------------------------------------
+
+/// Errors returned when compiling a GPU render pipeline.
+#[cfg(feature = "gpu")]
+#[derive(Debug, thiserror::Error)]
+pub enum PipelineError {
+    #[error("shader compilation failed for '{label}': {message}")]
+    ShaderCompilation { label: String, message: String },
+}
+
+// ---------------------------------------------------------------------------
+// wgpu enum conversions (only compiled-in when the gpu feature is active)
 // ---------------------------------------------------------------------------
 
 #[cfg(feature = "gpu")]
-impl CullMode {
-    fn to_wgpu(self) -> Option<wgpu::Face> {
-        match self {
-            CullMode::None  => Option::None,
+impl From<CullMode> for Option<wgpu::Face> {
+    fn from(m: CullMode) -> Self {
+        match m {
+            CullMode::None  => None,
             CullMode::Front => Some(wgpu::Face::Front),
             CullMode::Back  => Some(wgpu::Face::Back),
         }
@@ -52,10 +64,10 @@ impl CullMode {
 }
 
 #[cfg(feature = "gpu")]
-impl BlendMode {
-    fn to_wgpu(self) -> Option<wgpu::BlendState> {
-        match self {
-            BlendMode::Opaque     => Option::None,
+impl From<BlendMode> for Option<wgpu::BlendState> {
+    fn from(m: BlendMode) -> Self {
+        match m {
+            BlendMode::Opaque     => None,
             BlendMode::AlphaBlend => Some(wgpu::BlendState::ALPHA_BLENDING),
             BlendMode::Additive   => Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),
         }
@@ -63,9 +75,9 @@ impl BlendMode {
 }
 
 #[cfg(feature = "gpu")]
-impl DepthCompare {
-    fn to_wgpu(self) -> wgpu::CompareFunction {
-        match self {
+impl From<DepthCompare> for wgpu::CompareFunction {
+    fn from(d: DepthCompare) -> Self {
+        match d {
             DepthCompare::Less      => wgpu::CompareFunction::Less,
             DepthCompare::LessEqual => wgpu::CompareFunction::LessEqual,
             DepthCompare::Greater   => wgpu::CompareFunction::Greater,
@@ -123,7 +135,7 @@ impl RenderPipeline<Uninitialized> {
     pub fn compile_with_device(
         self,
         device: &wgpu::Device,
-    ) -> anyhow::Result<RenderPipeline<Compiled>> {
+    ) -> Result<RenderPipeline<Compiled>, PipelineError> {
         let vs_module = device.create_shader_module(wgpu::ShaderModuleDescriptor {
             label: Some(&format!("{}_vs", self.label)),
             source: wgpu::ShaderSource::Wgsl(self.vertex_shader.as_str().into()),
@@ -134,7 +146,7 @@ impl RenderPipeline<Uninitialized> {
             source: wgpu::ShaderSource::Wgsl(self.fragment_shader.as_str().into()),
         });
 
-        let blend = self.blend_mode.to_wgpu();
+        let blend = Option::<wgpu::BlendState>::from(self.blend_mode);
 
         let color_targets = [Some(wgpu::ColorTargetState {
             format: wgpu::TextureFormat::Bgra8UnormSrgb,
@@ -145,7 +157,7 @@ impl RenderPipeline<Uninitialized> {
         let depth_stencil = Some(wgpu::DepthStencilState {
             format: wgpu::TextureFormat::Depth32Float,
             depth_write_enabled: self.depth_write,
-            depth_compare: self.depth_compare.to_wgpu(),
+            depth_compare: self.depth_compare.into(),
             stencil: wgpu::StencilState::default(),
             bias: wgpu::DepthBiasState::default(),
         });
@@ -175,7 +187,7 @@ impl RenderPipeline<Uninitialized> {
                 topology: wgpu::PrimitiveTopology::TriangleList,
                 strip_index_format: Option::None,
                 front_face: wgpu::FrontFace::Ccw,
-                cull_mode: self.cull_mode.to_wgpu(),
+                cull_mode: self.cull_mode.into(),
                 unclipped_depth: false,
                 polygon_mode: wgpu::PolygonMode::Fill,
                 conservative: false,

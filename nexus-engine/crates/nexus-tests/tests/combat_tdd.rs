@@ -12,6 +12,7 @@ use nexus_net::{
     room::{GameRoom, RoomPlayer, RoomState},
 };
 use nexus_integration::game_loop::{GameSession, GameCommand, StatType};
+use nexus_types::{Damage, Hp, MagicType};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -20,10 +21,10 @@ fn make_room_player(id: u64, hp: f32, attack: f32, magic: f32) -> RoomPlayer {
         player_id: id,
         name: format!("Player{}", id),
         suit_id: "RX-78-2".to_string(),
-        hp,
-        max_hp: hp,
-        attack,
-        magic,
+        hp: Hp::new(hp),
+        max_hp: Hp::new(hp),
+        attack: Damage::new(attack),
+        magic: Damage::new(magic),
         combo_depth: 0,
     }
 }
@@ -98,7 +99,7 @@ fn cast_magic_different_types_deal_different_damage() {
         make_room_player(2, 1000.0, 30.0, magic_stat),
     );
     let outcome_fire = room_fire
-        .apply_action(1, CombatAction::CastMagic { magic_type: 0 })
+        .apply_action(1, CombatAction::CastMagic { magic_type: MagicType::Fire })
         .expect("fire cast should succeed");
 
     let mut room_dark = active_room(
@@ -106,7 +107,7 @@ fn cast_magic_different_types_deal_different_damage() {
         make_room_player(2, 1000.0, 30.0, magic_stat),
     );
     let outcome_dark = room_dark
-        .apply_action(1, CombatAction::CastMagic { magic_type: 3 })
+        .apply_action(1, CombatAction::CastMagic { magic_type: MagicType::Dark })
         .expect("dark cast should succeed");
 
     let dmg_fire = extract_damage(&outcome_fire);
@@ -125,11 +126,11 @@ fn cast_magic_different_types_deal_different_damage() {
     assert_eq!(dmg_fire, expected_fire, "CastMagic Fire formula mismatch");
     assert_eq!(dmg_dark, expected_dark, "CastMagic Dark formula mismatch");
 
-    // Also verify Lightning (1, +30) and Ice (2, +15) and Light (4, +25)
-    let magic_values: &[(u8, f32, &str)] = &[
-        (1, 30.0, "Lightning"),
-        (2, 15.0, "Ice"),
-        (4, 25.0, "Light"),
+    // Also verify Lightning (+30), Ice (+15), and Light (+25)
+    let magic_values: &[(MagicType, f32, &str)] = &[
+        (MagicType::Lightning, 30.0, "Lightning"),
+        (MagicType::Ice,       15.0, "Ice"),
+        (MagicType::Light,     25.0, "Light"),
     ];
     for &(mt, bonus, label) in magic_values {
         let mut room = active_room(
@@ -181,7 +182,7 @@ fn higher_magic_stat_deals_more_magic_damage() {
     // Two otherwise identical rooms; player1 differs only in magic stat.
     let low_magic = 20.0_f32;
     let high_magic = 80.0_f32;
-    let magic_type = 1u8; // Lightning (+30)
+    let magic_type = MagicType::Lightning; // Lightning (+30)
 
     let mut room_low = active_room(
         make_room_player(1, 1000.0, 30.0, low_magic),
