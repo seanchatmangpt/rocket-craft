@@ -526,6 +526,249 @@ impl BlueprintBuilder {
         self.push_node(node)
     }
 
+    // ------------------------------------------------------------------
+    // Mutable-style event nodes for actor lifecycle events
+    // ------------------------------------------------------------------
+
+    /// Add an OnHit event node (ReceiveHit) — mutable style.
+    pub fn on_hit_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("OnHit");
+        let pos = self.next_pos();
+        let node = nodes::hit(&name).at(pos.x, pos.y);
+        self.push_node(node)
+    }
+
+    /// Add an OnOverlapBegin event node (ReceiveActorBeginOverlap) — mutable style.
+    pub fn on_overlap_begin_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("OnOverlapBegin");
+        let pos = self.next_pos();
+        let node = nodes::begin_overlap(&name).at(pos.x, pos.y);
+        self.push_node(node)
+    }
+
+    /// Add an OnOverlapEnd event node (ReceiveActorEndOverlap) — mutable style.
+    pub fn on_overlap_end_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("OnOverlapEnd");
+        let pos = self.next_pos();
+        let node = nodes::end_overlap(&name).at(pos.x, pos.y);
+        self.push_node(node)
+    }
+
+    // ------------------------------------------------------------------
+    // Mutable-style function call nodes
+    // ------------------------------------------------------------------
+
+    /// Add a SetActorLocation node (no fixed vector — parser-facing variant).
+    ///
+    /// Callers that want a fixed default vector can use [`Self::set_actor_location`] instead.
+    pub fn set_actor_location_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("SetActorLocation");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+            .at(pos.x, pos.y)
+            .with_property(
+                "FunctionReference",
+                "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"K2_SetActorLocation\")",
+            )
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"))
+            .with_pin(Pin::data_input(
+                "NewLocation",
+                PinType::struct_type("/Script/CoreUObject.Vector"),
+            ))
+            .with_pin(Pin::data_output("ReturnValue", PinType::bool()));
+        self.push_node(node)
+    }
+
+    /// Add a GetActorLocation node — mutable style.
+    pub fn get_actor_location_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("GetActorLocation");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+            .at(pos.x, pos.y)
+            .with_property(
+                "FunctionReference",
+                "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"K2_GetActorLocation\")",
+            )
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"))
+            .with_pin(Pin::data_output(
+                "ReturnValue",
+                PinType::struct_type("/Script/CoreUObject.Vector"),
+            ));
+        self.push_node(node)
+    }
+
+    /// Add a SetActorRotation node — mutable style.
+    pub fn set_actor_rotation_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("SetActorRotation");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+            .at(pos.x, pos.y)
+            .with_property(
+                "FunctionReference",
+                "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"K2_SetActorRotation\")",
+            )
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"))
+            .with_pin(Pin::data_input(
+                "NewRotation",
+                PinType::struct_type("/Script/CoreUObject.Rotator"),
+            ))
+            .with_pin(Pin::data_output("ReturnValue", PinType::bool()));
+        self.push_node(node)
+    }
+
+    /// Add a SpawnActor node (GameplayStatics::BeginSpawningActorFromClass) — mutable style.
+    pub fn spawn_actor_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("SpawnActor");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+            .at(pos.x, pos.y)
+            .with_property(
+                "FunctionReference",
+                "(MemberParent=Class'/Script/Engine.GameplayStatics',MemberName=\"BeginSpawningActorFromClass\")",
+            )
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"))
+            .with_pin(Pin::data_input(
+                "ActorClass",
+                PinType::class("/Script/Engine.Actor"),
+            ))
+            .with_pin(Pin::data_input(
+                "SpawnTransform",
+                PinType::struct_type("/Script/CoreUObject.Transform"),
+            ))
+            .with_pin(Pin::data_output(
+                "ReturnValue",
+                PinType::object("/Script/Engine.Actor"),
+            ));
+        self.push_node(node)
+    }
+
+    /// Add a DestroyActor node — mutable style.
+    pub fn destroy_actor_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("DestroyActor");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+            .at(pos.x, pos.y)
+            .with_property(
+                "FunctionReference",
+                "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"K2_DestroyActor\")",
+            )
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"));
+        self.push_node(node)
+    }
+
+    /// Add a PlaySound (PlaySoundAtLocation) node — mutable style.
+    pub fn play_sound_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("PlaySound");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+            .at(pos.x, pos.y)
+            .with_property(
+                "FunctionReference",
+                "(MemberParent=Class'/Script/Engine.GameplayStatics',MemberName=\"PlaySoundAtLocation\")",
+            )
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"))
+            .with_pin(Pin::data_input("Sound", PinType::object("/Script/Engine.SoundBase")))
+            .with_pin(Pin::data_input(
+                "Location",
+                PinType::struct_type("/Script/CoreUObject.Vector"),
+            ));
+        self.push_node(node)
+    }
+
+    /// Add an ApplyDamage node (UGameplayStatics::ApplyDamage) — mutable style.
+    pub fn apply_damage_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("ApplyDamage");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+            .at(pos.x, pos.y)
+            .with_property(
+                "FunctionReference",
+                "(MemberParent=Class'/Script/Engine.GameplayStatics',MemberName=\"ApplyDamage\")",
+            )
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"))
+            .with_pin(Pin::data_input("DamagedActor", PinType::object("/Script/Engine.Actor")))
+            .with_pin(Pin::data_input("BaseDamage", PinType::float()))
+            .with_pin(Pin::data_input(
+                "EventInstigator",
+                PinType::object("/Script/Engine.Controller"),
+            ))
+            .with_pin(Pin::data_input("DamageCauser", PinType::object("/Script/Engine.Actor")))
+            .with_pin(Pin::data_input("DamageTypeClass", PinType::class("/Script/Engine.DamageType")))
+            .with_pin(Pin::data_output("ReturnValue", PinType::float()));
+        self.push_node(node)
+    }
+
+    // ------------------------------------------------------------------
+    // Mutable-style variable and flow nodes
+    // ------------------------------------------------------------------
+
+    /// Add a VariableGet node — mutable style.
+    pub fn variable_get_node(&mut self, var_name: impl Into<std::string::String>) -> NodeHandle {
+        let var_name = var_name.into();
+        let name = self.unique_name(&format!("VariableGet_{var_name}"));
+        let pos = self.next_pos();
+        let node = nodes::get_variable(&name, &var_name, PinType::wildcard()).at(pos.x, pos.y);
+        self.push_node(node)
+    }
+
+    /// Add a VariableSet node — mutable style.
+    pub fn variable_set_node(&mut self, var_name: impl Into<std::string::String>) -> NodeHandle {
+        let var_name = var_name.into();
+        let name = self.unique_name(&format!("VariableSet_{var_name}"));
+        let pos = self.next_pos();
+        let node = nodes::set_variable(&name, &var_name, PinType::wildcard()).at(pos.x, pos.y);
+        self.push_node(node)
+    }
+
+    /// Add a MacroInstance (generic macro call) node — mutable style.
+    pub fn macro_instance_node(&mut self, macro_name: impl Into<std::string::String>) -> NodeHandle {
+        let macro_name = macro_name.into();
+        let name = self.unique_name(&format!("MacroInstance_{macro_name}"));
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_MacroInstance", &name)
+            .at(pos.x, pos.y)
+            .with_property("MacroGraphReference", &format!("(MacroName=\"{macro_name}\")"))
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::exec_output("then"));
+        self.push_node(node)
+    }
+
+    /// Add a Select node (pick between multiple values) — mutable style.
+    pub fn select_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("Select");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_Select", &name)
+            .at(pos.x, pos.y)
+            .with_pin(Pin::data_input("Index", PinType::int()))
+            .with_pin(Pin::data_input("Option 0", PinType::wildcard()))
+            .with_pin(Pin::data_input("Option 1", PinType::wildcard()))
+            .with_pin(Pin::data_output("ReturnValue", PinType::wildcard()));
+        self.push_node(node)
+    }
+
+    /// Add a ForEachLoop macro node — mutable style.
+    pub fn for_each_loop_node(&mut self) -> NodeHandle {
+        let name = self.unique_name("ForEachLoop");
+        let pos = self.next_pos();
+        let node = BpNode::new("/Script/BlueprintGraph.K2Node_MacroInstance", &name)
+            .at(pos.x, pos.y)
+            .with_property("MacroGraphReference", "(MacroName=\"ForEachLoop\")")
+            .with_pin(Pin::exec_input("execute"))
+            .with_pin(Pin::data_input("Array", PinType::wildcard().as_array()))
+            .with_pin(Pin::exec_output("LoopBody"))
+            .with_pin(Pin::data_output("ArrayElement", PinType::wildcard()))
+            .with_pin(Pin::data_output("ArrayIndex", PinType::int()))
+            .with_pin(Pin::exec_output("Completed"));
+        self.push_node(node)
+    }
+
     /// Add a SetTimer by event node (mutable style).
     pub fn set_timer_by_event(&mut self, rate: f32, looping: bool) -> NodeHandle {
         let name = self.unique_name("SetTimerByEvent");

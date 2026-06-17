@@ -1,6 +1,8 @@
 use std::path::Path;
 
 pub mod plugin;
+pub mod receipt;
+pub use receipt::Receipt;
 
 /// A trait representing a semantic law or constraint that a project must satisfy.
 ///

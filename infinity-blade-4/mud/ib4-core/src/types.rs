@@ -75,3 +75,36 @@ pub enum StatusEffect {
     Dark,
     Healed,
 }
+
+/// A player stat that can be allocated via a point-buy command.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Stat {
+    Health,
+    Attack,
+    Defense,
+    Magic,
+}
+
+#[derive(Debug)]
+pub struct StatParseError(pub String);
+
+impl std::fmt::Display for StatParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "unknown stat '{}': expected health, attack, defense, or magic", self.0)
+    }
+}
+
+impl std::error::Error for StatParseError {}
+
+impl std::str::FromStr for Stat {
+    type Err = StatParseError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "health" | "hp" => Ok(Stat::Health),
+            "attack" | "atk" => Ok(Stat::Attack),
+            "defense" | "def" => Ok(Stat::Defense),
+            "magic" | "mag" => Ok(Stat::Magic),
+            other => Err(StatParseError(other.to_string())),
+        }
+    }
+}

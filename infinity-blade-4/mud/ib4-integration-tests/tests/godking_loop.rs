@@ -4,8 +4,8 @@ use ib4_integration_tests::{new_session, Command, AttackDir, GameSession};
 /// Note: Command::Explore calls cmd_look(), not spawn. The spawn happens on Attack
 /// when not already in combat. So we clear the queue, push GodKing, then Attack.
 fn spawn_godking(s: &mut GameSession) {
-    s.arena_queue.clear();
-    s.arena_queue.push_back("CorruptedGalath".to_string());
+    s.arena.clear();
+    s.arena.push_back("CorruptedGalath".to_string());
     // Attack when not in combat triggers spawn_next_enemy
     s.dispatch(Command::Attack(AttackDir::Overhead));
 }
@@ -14,8 +14,8 @@ fn spawn_godking(s: &mut GameSession) {
 fn should_spawn_godking_with_shield_active() {
     let mut s = new_session();
     // Clear queue so only GodKing spawns
-    s.arena_queue.clear();
-    s.arena_queue.push_back("CorruptedGalath".to_string());
+    s.arena.clear();
+    s.arena.push_back("CorruptedGalath".to_string());
     s.dispatch(Command::Attack(AttackDir::Overhead));
 
     assert!(s.current_enemy.is_some(), "GodKing should be spawned");

@@ -24,7 +24,7 @@ pub struct Ndc { x: f32, y: f32 }
 
 impl Ndc {
     pub fn new(x: f32, y: f32) -> Result<Self, GfxError> {
-        if x < -1.0 || x > 1.0 || y < -1.0 || y > 1.0 {
+        if !(-1.0..=1.0).contains(&x) || !(-1.0..=1.0).contains(&y) {
             Err(GfxError::OutOfNdcRange { x, y })
         } else {
             Ok(Ndc { x, y })

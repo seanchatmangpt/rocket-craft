@@ -3,11 +3,16 @@ name = "nexus-gfx"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+gpu = ["wgpu"]
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 thiserror = "1"
 nalgebra = { version = "0.33", features = ["serde-serialize"] }
 bytemuck = { version = "1", features = ["derive"] }
+wgpu = { version = "22", optional = true }
 
 [dev-dependencies]
 proptest = "1"
+chicago-tdd-tools = { path = "../../../chicago-tdd-tools" }

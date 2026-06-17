@@ -6,7 +6,7 @@ fn should_spawn_enemy_on_first_attack() {
     // Attack when not in combat triggers spawn_next_enemy
     let out = s.dispatch(Command::Attack(AttackDir::Overhead));
     assert!(s.current_enemy.is_some(), "First Attack should spawn an enemy");
-    assert!(s.is_in_combat, "Should be in combat after spawning enemy");
+    assert!(s.is_in_combat(), "Should be in combat after spawning enemy");
     let text = out.join(" ");
     assert!(!text.is_empty(), "Should produce narrative output");
 }
@@ -17,7 +17,7 @@ fn should_produce_look_output_on_explore() {
     let out = s.dispatch(Command::Explore);
     // Explore calls cmd_look — no combat yet, shows queue info
     assert!(!out.is_empty(), "Explore should produce output");
-    assert!(!s.is_in_combat, "Explore alone does not start combat");
+    assert!(!s.is_in_combat(), "Explore alone does not start combat");
     assert!(s.current_enemy.is_none(), "Explore alone does not spawn enemy");
 }
 
@@ -38,7 +38,7 @@ fn should_complete_full_combat_loop_killing_light_titan() {
     }
 
     assert!(s.current_enemy.is_none(), "Enemy cleared after defeat");
-    assert!(!s.is_in_combat, "Not in combat after enemy defeated");
+    assert!(!s.is_in_combat(), "Not in combat after enemy defeated");
     assert!(s.player.xp > 0, "XP awarded on enemy defeat");
     // player starts with 100 gold, gains more on victory
     assert!(s.player.gold >= 100, "Gold awarded on enemy defeat (starts with 100)");

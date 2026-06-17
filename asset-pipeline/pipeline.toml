@@ -1,0 +1,6 @@
+[pipeline]
+watch_dir  = "/path/to/incoming/models"
+output_dir = "/path/to/UE4/Content/Assets"
+blender_bin = "blender"
+max_file_mb = 500
+log_level   = "info"

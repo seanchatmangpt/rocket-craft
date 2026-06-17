@@ -7,21 +7,9 @@ use serde_json::json;
 // Helpers
 // ─────────────────────────────────────────────
 
-/// Compute a BLAKE3 hex hash of bytes using a simple std-based fallback.
-/// (The unify-mcp crate does not yet depend on the blake3 crate, so we
-///  use DefaultHasher extended to 32 hex chars for determinism.)
+/// Compute a BLAKE3 hex hash of bytes.
 fn blake3_hex(data: &[u8]) -> String {
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-    // Two independent hashers to widen the output to 128 bits.
-    let mut h1 = DefaultHasher::new();
-    data.hash(&mut h1);
-    let mut h2 = DefaultHasher::new();
-    data.len().hash(&mut h2);
-    for chunk in data.chunks(8) {
-        chunk.hash(&mut h2);
-    }
-    format!("{:016x}{:016x}", h1.finish(), h2.finish())
+    blake3::hash(data).to_hex().to_string()
 }
 
 /// Hash a previous chain head with new content to produce the next link.

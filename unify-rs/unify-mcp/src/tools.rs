@@ -378,16 +378,7 @@ fn attach_builtin_tools(server: McpServer) -> McpServer {
 
 /// Compute BLAKE3 hex hash of bytes.
 fn blake3_hex(data: &[u8]) -> String {
-    // Simple BLAKE3 using only std (manual implementation not feasible without the crate).
-    // Instead, use a straightforward approach: we rely on the fact that blake3 is in workspace.
-    // We can't use it here since unify-mcp doesn't depend on it, so use a deterministic
-    // substitute: SHA-256 via std doesn't exist either, so we implement a simple hash.
-    // Actually let's just compute a reproducible hash using std primitives.
-    use std::collections::hash_map::DefaultHasher;
-    use std::hash::{Hash, Hasher};
-    let mut hasher = DefaultHasher::new();
-    data.hash(&mut hasher);
-    format!("{:016x}", hasher.finish())
+    blake3::hash(data).to_hex().to_string()
 }
 
 #[cfg(test)]
