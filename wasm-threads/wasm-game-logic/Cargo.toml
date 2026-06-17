@@ -14,3 +14,4 @@ serde_json = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }
+chicago-tdd-tools = { path = "../../chicago-tdd-tools" }
