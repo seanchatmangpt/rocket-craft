@@ -25,10 +25,9 @@ fn chain_hash(prev: &str, content: &str) -> String {
 /// `rocket/manifest/list` – parse `project-manifest.json` from cwd.
 pub fn handle_manifest_list(_params: serde_json::Value) -> Result<serde_json::Value, String> {
     let path = std::path::Path::new("project-manifest.json");
-    let contents = std::fs::read_to_string(path)
-        .map_err(|_| "manifest not found".to_string())?;
-    let manifest: serde_json::Value = serde_json::from_str(&contents)
-        .map_err(|e| format!("manifest parse error: {}", e))?;
+    let contents = std::fs::read_to_string(path).map_err(|_| "manifest not found".to_string())?;
+    let manifest: serde_json::Value =
+        serde_json::from_str(&contents).map_err(|e| format!("manifest parse error: {}", e))?;
 
     let projects = manifest["projects"]
         .as_array()
@@ -56,14 +55,16 @@ pub fn handle_project_audit(params: serde_json::Value) -> Result<serde_json::Val
 
     // Load manifest to find the project
     let path = std::path::Path::new("project-manifest.json");
-    let contents = std::fs::read_to_string(path)
-        .map_err(|_| "manifest not found".to_string())?;
-    let manifest: serde_json::Value = serde_json::from_str(&contents)
-        .map_err(|e| format!("manifest parse error: {}", e))?;
+    let contents = std::fs::read_to_string(path).map_err(|_| "manifest not found".to_string())?;
+    let manifest: serde_json::Value =
+        serde_json::from_str(&contents).map_err(|e| format!("manifest parse error: {}", e))?;
 
     let project = manifest["projects"]
         .as_array()
-        .and_then(|arr| arr.iter().find(|p| p["name"].as_str() == Some(project_name)))
+        .and_then(|arr| {
+            arr.iter()
+                .find(|p| p["name"].as_str() == Some(project_name))
+        })
         .ok_or_else(|| format!("project '{}' not found in manifest", project_name))?;
 
     let targets = project["targets"].as_array().cloned().unwrap_or_default();
@@ -173,7 +174,9 @@ pub fn handle_leaderboard_top(params: serde_json::Value) -> Result<serde_json::V
         acc.wrapping_add((b as u64).wrapping_mul(i as u64 + 31))
     });
 
-    let first_names = ["Alice", "Bob", "Carol", "Dave", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy"];
+    let first_names = [
+        "Alice", "Bob", "Carol", "Dave", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy",
+    ];
     let entries: Vec<serde_json::Value> = (0..n)
         .map(|i| {
             let name_idx = ((seed.wrapping_add(i as u64 * 7919)) % first_names.len() as u64) as usize;
@@ -200,16 +203,15 @@ pub fn handle_leaderboard_top(params: serde_json::Value) -> Result<serde_json::V
 /// `rocket://manifest` – return raw project-manifest.json contents.
 pub fn handle_resource_manifest(_uri: &str) -> Result<serde_json::Value, String> {
     let path = std::path::Path::new("project-manifest.json");
-    let contents = std::fs::read_to_string(path)
-        .map_err(|_| "manifest not found".to_string())?;
+    let contents = std::fs::read_to_string(path).map_err(|_| "manifest not found".to_string())?;
     Ok(json!({ "text": contents }))
 }
 
 /// `rocket://capabilities` – return raw CapabilityManifest.md contents.
 pub fn handle_resource_capabilities(_uri: &str) -> Result<serde_json::Value, String> {
     let path = std::path::Path::new("capabilities/CapabilityManifest.md");
-    let contents = std::fs::read_to_string(path)
-        .map_err(|_| "capabilities manifest not found".to_string())?;
+    let contents =
+        std::fs::read_to_string(path).map_err(|_| "capabilities manifest not found".to_string())?;
     Ok(json!({ "text": contents }))
 }
 
@@ -223,7 +225,8 @@ pub fn register_rocket_tools(registry: &mut ToolRegistry) {
     registry.register(
         ToolDescriptor {
             name: "rocket/manifest/list".into(),
-            description: "List all UE4 projects from project-manifest.json in the current directory.".into(),
+            description:
+                "List all UE4 projects from project-manifest.json in the current directory.".into(),
             input_schema: json!({
                 "type": "object",
                 "properties": {},
@@ -348,7 +351,9 @@ pub fn attach_rocket_tools(server: McpServer) -> McpServer {
         .with_tool(
             ToolDescriptor {
                 name: "rocket/manifest/list".into(),
-                description: "List all UE4 projects from project-manifest.json in the current directory.".into(),
+                description:
+                    "List all UE4 projects from project-manifest.json in the current directory."
+                        .into(),
                 input_schema: json!({
                     "type": "object",
                     "properties": {},
@@ -386,7 +391,8 @@ pub fn attach_rocket_tools(server: McpServer) -> McpServer {
         .with_tool(
             ToolDescriptor {
                 name: "rocket/receipt/chain".into(),
-                description: "Compute a BLAKE3 receipt chain for a list of build/audit operations.".into(),
+                description: "Compute a BLAKE3 receipt chain for a list of build/audit operations."
+                    .into(),
                 input_schema: json!({
                     "type": "object",
                     "properties": {
@@ -542,7 +548,9 @@ mod tests {
         assert_eq!(result["passed"], json!(false));
         let violations = result["violations"].as_array().unwrap();
         assert!(!violations.is_empty());
-        assert!(violations.iter().any(|v| v["law"] == json!("NonEmptyTargets")));
+        assert!(violations
+            .iter()
+            .any(|v| v["law"] == json!("NonEmptyTargets")));
     }
 
     // ── rocket/env/doctor ─────────────────────
@@ -556,7 +564,10 @@ mod tests {
         for check in checks {
             assert!(check["name"].is_string(), "each check must have a name");
             let status = check["status"].as_str().unwrap_or("");
-            assert!(status == "ok" || status == "error", "status must be ok or error");
+            assert!(
+                status == "ok" || status == "error",
+                "status must be ok or error"
+            );
         }
         assert!(result["healthy"].is_boolean());
     }
@@ -581,7 +592,10 @@ mod tests {
         // The second receipt's prev_hash must equal the first receipt's hash.
         let first_hash = receipts[0]["hash"].as_str().unwrap();
         let second_prev = receipts[1]["prev_hash"].as_str().unwrap();
-        assert_eq!(first_hash, second_prev, "chain must link consecutive hashes");
+        assert_eq!(
+            first_hash, second_prev,
+            "chain must link consecutive hashes"
+        );
 
         // head_hash must equal the last receipt's hash.
         let last_hash = receipts[1]["hash"].as_str().unwrap();
@@ -601,7 +615,8 @@ mod tests {
     #[test]
     fn test_mcp_dispatch_rocket_manifest_list() {
         let _lock = fs_lock();
-        let content = r#"{"projects":[{"name":"X","uproject_path":"X.uproject","targets":["XEditor"]}]}"#;
+        let content =
+            r#"{"projects":[{"name":"X","uproject_path":"X.uproject","targets":["XEditor"]}]}"#;
         let _guard = TempFile::write("project-manifest.json", content);
 
         let server = McpServer::new(ServerInfo {
@@ -625,8 +640,8 @@ mod tests {
         let content = r#"{"projects":[]}"#;
         let _guard = TempFile::write("project-manifest.json", content);
 
-        let result = handle_resource_manifest("rocket://manifest")
-            .expect("resource handler should succeed");
+        let result =
+            handle_resource_manifest("rocket://manifest").expect("resource handler should succeed");
         assert!(result["text"].is_string());
         let text = result["text"].as_str().unwrap();
         assert!(text.contains("projects"));

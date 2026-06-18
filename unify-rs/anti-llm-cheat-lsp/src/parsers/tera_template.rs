@@ -36,7 +36,11 @@ fn extract_tera_variables(content: &str) -> HashSet<String> {
                     .take_while(|&c| c.is_alphanumeric() || c == '_')
                     .collect();
                 if !root.is_empty()
-                    && root.chars().next().map(|c| !c.is_ascii_digit()).unwrap_or(false)
+                    && root
+                        .chars()
+                        .next()
+                        .map(|c| !c.is_ascii_digit())
+                        .unwrap_or(false)
                     && !BUILTIN_TERA_VARS.contains(&root.as_str())
                 {
                     vars.insert(root.to_lowercase());

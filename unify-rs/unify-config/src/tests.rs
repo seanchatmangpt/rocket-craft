@@ -1,9 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::{
-        ConfigLoader, ConfigFormat, ConfigMerge,
-        ManifestValidator, UnifyManifest,
-        sections::{TestConfig, LspConfig, WorkspaceConfig},
+        sections::{LspConfig, TestConfig, WorkspaceConfig},
+        ConfigFormat, ConfigLoader, ConfigMerge, ManifestValidator, UnifyManifest,
     };
 
     // 1. default_for creates valid manifest with name set
@@ -105,7 +104,9 @@ mod tests {
             ..Default::default()
         };
         let violations = ManifestValidator::validate(&m);
-        assert!(violations.iter().any(|v| v.field == "test.coverage_threshold"));
+        assert!(violations
+            .iter()
+            .any(|v| v.field == "test.coverage_threshold"));
     }
 
     // 9. ConfigLoader::from_str parses toml correctly
@@ -122,7 +123,7 @@ default_target = "debug"
 "#;
         let m = ConfigLoader::from_str(toml, ConfigFormat::Toml).expect("parse toml");
         assert_eq!(m.name, "toml-loader");
-        assert_eq!(m.version, "1.0.0");
+        assert_eq!(m.version, "1.0.1");
     }
 
     // 10. ConfigLoader::from_str parses json correctly
@@ -201,6 +202,8 @@ default_target = "debug"
             ..Default::default()
         };
         let violations = ManifestValidator::validate(&m);
-        assert!(violations.iter().any(|v| v.field == "lsp.conformance_threshold"));
+        assert!(violations
+            .iter()
+            .any(|v| v.field == "lsp.conformance_threshold"));
     }
 }

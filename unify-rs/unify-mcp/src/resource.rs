@@ -8,8 +8,7 @@ pub struct ResourceDescriptor {
 }
 
 /// Type alias for a boxed resource handler function.
-pub type ResourceHandler =
-    Box<dyn Fn(&str) -> Result<serde_json::Value, String> + Send + Sync>;
+pub type ResourceHandler = Box<dyn Fn(&str) -> Result<serde_json::Value, String> + Send + Sync>;
 
 /// Registry of MCP resources.
 pub struct ResourceRegistry {

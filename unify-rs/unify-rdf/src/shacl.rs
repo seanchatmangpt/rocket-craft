@@ -1,5 +1,5 @@
-use crate::triple::Term;
 use crate::store::TripleStore;
+use crate::triple::Term;
 
 /// A SHACL shape targeting a particular RDF class.
 pub struct ShaclShape {
@@ -75,8 +75,7 @@ pub fn validate(store: &TripleStore, shapes: &[ShaclShape]) -> ShaclResult {
                         for obj in store.objects_for(node, path) {
                             let conforms = match obj {
                                 Term::Literal {
-                                    datatype: Some(dt),
-                                    ..
+                                    datatype: Some(dt), ..
                                 } => dt == datatype,
                                 _ => false,
                             };
@@ -84,10 +83,7 @@ pub fn validate(store: &TripleStore, shapes: &[ShaclShape]) -> ShaclResult {
                                 violations.push(ShaclViolation {
                                     node: node.clone(),
                                     path: Some(path.clone()),
-                                    message: format!(
-                                        "Datatype violation: expected {}",
-                                        datatype
-                                    ),
+                                    message: format!("Datatype violation: expected {}", datatype),
                                 });
                             }
                         }

@@ -33,7 +33,9 @@ impl AntiLlmDiagnostic {
         Diagnostic {
             range: Range::new(start_pos, end_pos),
             severity: Some(severity),
-            code: Some(tower_lsp::lsp_types::NumberOrString::String(self.code.clone())),
+            code: Some(tower_lsp::lsp_types::NumberOrString::String(
+                self.code.clone(),
+            )),
             source: Some("anti-llm-cheat-lsp".to_string()),
             message: format!(
                 "{}\nForbidden Implication: {}\nRequired Correction: {}\nRequired Next Proof: {}",

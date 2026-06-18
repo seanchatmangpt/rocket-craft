@@ -27,7 +27,12 @@ pub struct OCELEvent {
 
 impl OCELEvent {
     pub fn new(id: String, activity: &str) -> Self {
-        Self { id, activity: activity.to_string(), attributes: vec![], relationships: vec![] }
+        Self {
+            id,
+            activity: activity.to_string(),
+            attributes: vec![],
+            relationships: vec![],
+        }
     }
 }
 
@@ -40,7 +45,11 @@ pub struct OCELObject {
 
 impl OCELObject {
     pub fn new(id: String, object_type: &str) -> Self {
-        Self { id, object_type: object_type.to_string(), attributes: vec![] }
+        Self {
+            id,
+            object_type: object_type.to_string(),
+            attributes: vec![],
+        }
     }
     pub fn with_attribute(mut self, attr: OCELEventAttribute) -> Self {
         self.attributes.push(attr);
@@ -57,10 +66,16 @@ pub enum OCELEventAttribute {
 
 impl OCELEventAttribute {
     pub fn string(name: &str, value: String) -> Self {
-        OCELEventAttribute::String { name: name.to_string(), value }
+        OCELEventAttribute::String {
+            name: name.to_string(),
+            value,
+        }
     }
     pub fn integer(name: &str, value: i64) -> Self {
-        OCELEventAttribute::Integer { name: name.to_string(), value }
+        OCELEventAttribute::Integer {
+            name: name.to_string(),
+            value,
+        }
     }
 }
 
@@ -73,7 +88,11 @@ pub struct OCELRelationship {
 
 impl OCELRelationship {
     pub fn new(event_id: String, object_id: String) -> Self {
-        Self { event_id, object_id, qualifier: String::new() }
+        Self {
+            event_id,
+            object_id,
+            qualifier: String::new(),
+        }
     }
     pub fn qualified(mut self, qualifier: &str) -> Self {
         self.qualifier = qualifier.to_string();

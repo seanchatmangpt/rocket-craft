@@ -1,17 +1,17 @@
+pub mod assert;
 pub mod chains;
 pub mod fixtures;
-pub mod assert;
 
 #[cfg(test)]
 mod tests {
+    use super::assert::*;
     use super::chains::*;
     use super::fixtures::*;
-    use super::assert::*;
-    use unify_receipts::receipt::Receipt;
-    use unify_rdf::triple::{Term, Triple};
-    use unify_rdf::store::TripleStore;
-    use unify_rdf::sparql::{PatternExecutor, SparqlExecutor};
     use unify_rdf::pipeline::OntologyPipeline;
+    use unify_rdf::sparql::{PatternExecutor, SparqlExecutor};
+    use unify_rdf::store::TripleStore;
+    use unify_rdf::triple::{Term, Triple};
+    use unify_receipts::receipt::Receipt;
 
     // -------------------------------------------------------------------------
     // 1. test_receipt_chain_end_to_end
@@ -46,8 +46,14 @@ mod tests {
     fn test_ocel_log_round_trip() {
         let log = OcelLog {
             objects: vec![
-                OcelObject { id: "obj1".into(), object_type: "Item".into() },
-                OcelObject { id: "obj2".into(), object_type: "Order".into() },
+                OcelObject {
+                    id: "obj1".into(),
+                    object_type: "Item".into(),
+                },
+                OcelObject {
+                    id: "obj2".into(),
+                    object_type: "Order".into(),
+                },
             ],
             events: vec![
                 OcelEvent {
@@ -86,15 +92,27 @@ mod tests {
                 Trace {
                     case_id: "case-001".into(),
                     events: vec![
-                        Event { name: "start".into(), timestamp: 100 },
-                        Event { name: "complete".into(), timestamp: 200 },
+                        Event {
+                            name: "start".into(),
+                            timestamp: 100,
+                        },
+                        Event {
+                            name: "complete".into(),
+                            timestamp: 200,
+                        },
                     ],
                 },
                 Trace {
                     case_id: "case-002".into(),
                     events: vec![
-                        Event { name: "start".into(), timestamp: 300 },
-                        Event { name: "complete".into(), timestamp: 400 },
+                        Event {
+                            name: "start".into(),
+                            timestamp: 300,
+                        },
+                        Event {
+                            name: "complete".into(),
+                            timestamp: 400,
+                        },
                     ],
                 },
             ],
@@ -120,8 +138,16 @@ mod tests {
     #[test]
     fn test_rdf_query_extracts_types() {
         let mut store = TripleStore::new();
-        store.add(Triple::new("http://ex/Character", "rdf:type", "http://ex/Class"));
-        store.add(Triple::new("http://ex/Location", "rdf:type", "http://ex/Class"));
+        store.add(Triple::new(
+            "http://ex/Character",
+            "rdf:type",
+            "http://ex/Class",
+        ));
+        store.add(Triple::new(
+            "http://ex/Location",
+            "rdf:type",
+            "http://ex/Class",
+        ));
         store.add(Triple::new("http://ex/Item", "rdf:type", "http://ex/Class"));
         // Non-type triple that should not appear
         store.add(Triple::new("http://ex/Character", "http://ex/name", "Hero"));
@@ -189,13 +215,19 @@ mod tests {
         let mut tracker = LifecycleTracker::new();
         assert_eq!(tracker.state(), LifecycleState::Raw);
 
-        tracker.transition(LifecycleState::Parsed).expect("Raw→Parsed must succeed");
+        tracker
+            .transition(LifecycleState::Parsed)
+            .expect("Raw→Parsed must succeed");
         assert_eq!(tracker.state(), LifecycleState::Parsed);
 
-        tracker.transition(LifecycleState::Admitted).expect("Parsed→Admitted must succeed");
+        tracker
+            .transition(LifecycleState::Admitted)
+            .expect("Parsed→Admitted must succeed");
         assert_eq!(tracker.state(), LifecycleState::Admitted);
 
-        tracker.transition(LifecycleState::Exported).expect("Admitted→Exported must succeed");
+        tracker
+            .transition(LifecycleState::Exported)
+            .expect("Admitted→Exported must succeed");
         assert_eq!(tracker.state(), LifecycleState::Exported);
 
         assert_eq!(tracker.history().len(), 4); // Raw + 3 transitions
@@ -238,7 +270,10 @@ mod tests {
         net.mark_source(p0);
         net.mark_sink(p2);
 
-        assert!(net.is_workflow_net(), "linear P→T→P net must be a workflow net");
+        assert!(
+            net.is_workflow_net(),
+            "linear P→T→P net must be a workflow net"
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -253,7 +288,11 @@ mod tests {
         );
 
         let zero = ConformanceScore::zero();
-        assert_eq!(zero.f_measure(), 0.0, "zero conformance must have f-measure == 0.0");
+        assert_eq!(
+            zero.f_measure(),
+            0.0,
+            "zero conformance must have f-measure == 0.0"
+        );
 
         let partial = ConformanceScore::new(0.8, 0.6);
         let expected_f = 2.0 * 0.8 * 0.6 / (0.8 + 0.6);
@@ -269,9 +308,10 @@ mod tests {
     #[test]
     fn test_ocel_validator_catches_dangling_ref() {
         let log = OcelLog {
-            objects: vec![
-                OcelObject { id: "obj1".into(), object_type: "Item".into() },
-            ],
+            objects: vec![OcelObject {
+                id: "obj1".into(),
+                object_type: "Item".into(),
+            }],
             events: vec![
                 OcelEvent {
                     id: "e1".into(),
@@ -290,7 +330,10 @@ mod tests {
         };
 
         let violations = validate_ocel(&log);
-        assert!(!violations.is_empty(), "validator must catch dangling object reference");
+        assert!(
+            !violations.is_empty(),
+            "validator must catch dangling object reference"
+        );
         assert!(
             violations.iter().any(|v| v.contains("obj99")),
             "violation message must mention the dangling ID"
@@ -370,15 +413,22 @@ mod tests {
     #[test]
     fn test_receipt_builder() {
         let data = b"rocket-craft-v1";
-        let receipt = ReceiptBuilder::new("cap:launch")
-            .with_data(data)
-            .build();
+        let receipt = ReceiptBuilder::new("cap:launch").with_data(data).build();
 
         assert_eq!(receipt.key, "cap:launch");
-        assert!(receipt.issued_at > 0, "issued_at must be a positive timestamp");
-        assert!(receipt.verify(data), "receipt must verify against its original data");
+        assert!(
+            receipt.issued_at > 0,
+            "issued_at must be a positive timestamp"
+        );
+        assert!(
+            receipt.verify(data),
+            "receipt must verify against its original data"
+        );
         // Verify rejects different data
-        assert!(!receipt.verify(b"other-data"), "receipt must not verify against different data");
+        assert!(
+            !receipt.verify(b"other-data"),
+            "receipt must not verify against different data"
+        );
     }
 
     // -------------------------------------------------------------------------
@@ -403,7 +453,8 @@ mod tests {
     // Extra: run_admission_lifecycle_chain pipeline
     #[test]
     fn test_pipeline_admission_lifecycle_chain() {
-        let result = run_admission_lifecycle_chain().expect("admission lifecycle chain must succeed");
+        let result =
+            run_admission_lifecycle_chain().expect("admission lifecycle chain must succeed");
         result.assert_success();
     }
 

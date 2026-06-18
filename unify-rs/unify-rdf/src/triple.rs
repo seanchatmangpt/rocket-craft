@@ -34,11 +34,7 @@ pub struct Triple {
 }
 
 impl Triple {
-    pub fn new(
-        s: impl Into<Term>,
-        p: impl Into<Term>,
-        o: impl Into<Term>,
-    ) -> Self {
+    pub fn new(s: impl Into<Term>, p: impl Into<Term>, o: impl Into<Term>) -> Self {
         Triple {
             subject: s.into(),
             predicate: p.into(),
@@ -53,7 +49,11 @@ mod tests {
 
     #[test]
     fn test_triple_new_creates_correctly() {
-        let t = Triple::new("http://example.org/s", "http://example.org/p", "http://example.org/o");
+        let t = Triple::new(
+            "http://example.org/s",
+            "http://example.org/p",
+            "http://example.org/o",
+        );
         assert_eq!(t.subject, Term::Named("http://example.org/s".into()));
         assert_eq!(t.predicate, Term::Named("http://example.org/p".into()));
         assert_eq!(t.object, Term::Named("http://example.org/o".into()));
@@ -72,7 +72,12 @@ mod tests {
             datatype: Some("xsd:string".into()),
             lang: None,
         };
-        if let Term::Literal { value, datatype, lang } = &t {
+        if let Term::Literal {
+            value,
+            datatype,
+            lang,
+        } = &t
+        {
             assert_eq!(value, "hello");
             assert_eq!(datatype.as_deref(), Some("xsd:string"));
             assert!(lang.is_none());

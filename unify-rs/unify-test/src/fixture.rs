@@ -10,13 +10,19 @@ pub struct Fixture<T> {
 impl<T> Fixture<T> {
     /// Create a `Fixture` wrapping `value` with no teardown.
     pub fn new(value: T) -> Self {
-        Self { value, teardown: None }
+        Self {
+            value,
+            teardown: None,
+        }
     }
 
     /// Create a `Fixture` wrapping `value`; `teardown` is called with a
     /// mutable reference to the value when the fixture is dropped.
     pub fn with_teardown(value: T, teardown: impl FnOnce(&mut T) + 'static) -> Self {
-        Self { value, teardown: Some(Box::new(teardown)) }
+        Self {
+            value,
+            teardown: Some(Box::new(teardown)),
+        }
     }
 
     /// Immutable access to the wrapped value.

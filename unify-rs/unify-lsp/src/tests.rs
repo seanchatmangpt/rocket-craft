@@ -60,13 +60,19 @@ mod capability_tests {
 
 #[cfg(test)]
 mod diagnostic_tests {
-    use crate::diagnostic::{Diagnostic, DiagnosticSeverity, DiagnosticSet, Position, Range};
+    use crate::diagnostic::{Diagnostic, DiagnosticSet, DiagnosticSeverity, Position, Range};
 
     fn make_diag(severity: DiagnosticSeverity, msg: &str) -> Diagnostic {
         Diagnostic {
             range: Range {
-                start: Position { line: 0, character: 0 },
-                end: Position { line: 0, character: 5 },
+                start: Position {
+                    line: 0,
+                    character: 0,
+                },
+                end: Position {
+                    line: 0,
+                    character: 5,
+                },
             },
             severity,
             message: msg.to_owned(),
@@ -78,7 +84,10 @@ mod diagnostic_tests {
     #[test]
     fn add_and_get_diagnostics() {
         let mut ds = DiagnosticSet::new();
-        ds.add("file:///a.rs".to_owned(), make_diag(DiagnosticSeverity::Error, "oops"));
+        ds.add(
+            "file:///a.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Error, "oops"),
+        );
         let diags = ds.get("file:///a.rs");
         assert_eq!(diags.len(), 1);
         assert_eq!(diags[0].message, "oops");
@@ -87,16 +96,28 @@ mod diagnostic_tests {
     #[test]
     fn error_count_counts_errors_only() {
         let mut ds = DiagnosticSet::new();
-        ds.add("file:///a.rs".to_owned(), make_diag(DiagnosticSeverity::Error, "e1"));
-        ds.add("file:///a.rs".to_owned(), make_diag(DiagnosticSeverity::Warning, "w1"));
-        ds.add("file:///b.rs".to_owned(), make_diag(DiagnosticSeverity::Error, "e2"));
+        ds.add(
+            "file:///a.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Error, "e1"),
+        );
+        ds.add(
+            "file:///a.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Warning, "w1"),
+        );
+        ds.add(
+            "file:///b.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Error, "e2"),
+        );
         assert_eq!(ds.error_count(), 2);
     }
 
     #[test]
     fn clear_removes_diagnostics_for_uri() {
         let mut ds = DiagnosticSet::new();
-        ds.add("file:///a.rs".to_owned(), make_diag(DiagnosticSeverity::Error, "e1"));
+        ds.add(
+            "file:///a.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Error, "e1"),
+        );
         ds.clear("file:///a.rs");
         assert_eq!(ds.get("file:///a.rs").len(), 0);
         assert_eq!(ds.uri_count(), 0);
@@ -105,11 +126,20 @@ mod diagnostic_tests {
     #[test]
     fn merge_combines_sets() {
         let mut ds1 = DiagnosticSet::new();
-        ds1.add("file:///a.rs".to_owned(), make_diag(DiagnosticSeverity::Error, "e1"));
+        ds1.add(
+            "file:///a.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Error, "e1"),
+        );
 
         let mut ds2 = DiagnosticSet::new();
-        ds2.add("file:///a.rs".to_owned(), make_diag(DiagnosticSeverity::Warning, "w1"));
-        ds2.add("file:///b.rs".to_owned(), make_diag(DiagnosticSeverity::Error, "e2"));
+        ds2.add(
+            "file:///a.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Warning, "w1"),
+        );
+        ds2.add(
+            "file:///b.rs".to_owned(),
+            make_diag(DiagnosticSeverity::Error, "e2"),
+        );
 
         ds1.merge(ds2);
         assert_eq!(ds1.get("file:///a.rs").len(), 2);
@@ -134,7 +164,10 @@ mod gate_tests {
         let mut gate = AndonGate::new();
         gate.raise("conformance check failed");
         assert!(!gate.is_open());
-        assert_eq!(gate.state(), &AndonState::Raised("conformance check failed".to_owned()));
+        assert_eq!(
+            gate.state(),
+            &AndonState::Raised("conformance check failed".to_owned())
+        );
     }
 
     #[test]
@@ -176,24 +209,37 @@ mod gate_tests {
 #[cfg(test)]
 mod compositor_tests {
     use crate::compositor::{CompositorState, ServerEntry};
-    use crate::diagnostic::{Diagnostic, DiagnosticSeverity, DiagnosticSet, Position, Range};
+    use crate::diagnostic::{Diagnostic, DiagnosticSet, DiagnosticSeverity, Position, Range};
 
     fn server(name: &str, lang: &str) -> ServerEntry {
-        ServerEntry { name: name.to_owned(), language: lang.to_owned(), weight: 1.0 }
+        ServerEntry {
+            name: name.to_owned(),
+            language: lang.to_owned(),
+            weight: 1.0,
+        }
     }
 
     fn error_set(uri: &str, msg: &str) -> DiagnosticSet {
         let mut ds = DiagnosticSet::new();
-        ds.add(uri.to_owned(), Diagnostic {
-            range: Range {
-                start: Position { line: 0, character: 0 },
-                end: Position { line: 0, character: 1 },
+        ds.add(
+            uri.to_owned(),
+            Diagnostic {
+                range: Range {
+                    start: Position {
+                        line: 0,
+                        character: 0,
+                    },
+                    end: Position {
+                        line: 0,
+                        character: 1,
+                    },
+                },
+                severity: DiagnosticSeverity::Error,
+                message: msg.to_owned(),
+                code: None,
+                source: None,
             },
-            severity: DiagnosticSeverity::Error,
-            message: msg.to_owned(),
-            code: None,
-            source: None,
-        });
+        );
         ds
     }
 
@@ -246,7 +292,12 @@ mod conformance_tests {
         // harmonic mean: 2 * 0.8 * 0.6 / (0.8 + 0.6) = 0.96 / 1.4
         let expected = 2.0 * 0.8 * 0.6 / (0.8 + 0.6);
         let diff = (s.f_measure() - expected).abs();
-        assert!(diff < 1e-10, "f_measure={} expected={}", s.f_measure(), expected);
+        assert!(
+            diff < 1e-10,
+            "f_measure={} expected={}",
+            s.f_measure(),
+            expected
+        );
     }
 
     #[test]

@@ -96,7 +96,10 @@ impl BlueprintPwaExporter {
                 ));
                 lines.push("    if (eventIndicator) {".to_string());
                 lines.push("      eventIndicator.classList.add('active');".to_string());
-                lines.push("      setTimeout(() => eventIndicator.classList.remove('active'), 500);".to_string());
+                lines.push(
+                    "      setTimeout(() => eventIndicator.classList.remove('active'), 500);"
+                        .to_string(),
+                );
                 lines.push("    }".to_string());
                 lines.push(format!(
                     "    console.log('[{}] {}', amount);",
@@ -112,10 +115,7 @@ impl BlueprintPwaExporter {
             let method_name = format!("update{}", var);
             let (ts_type, _) = infer_ts_type(var);
             lines.push(String::new());
-            lines.push(format!(
-                "  {}(value: {}): void {{",
-                method_name, ts_type
-            ));
+            lines.push(format!("  {}(value: {}): void {{", method_name, ts_type));
             lines.push(format!("    this.{} = value;", field_name));
             // For the first variable that looks like a display value, add DOM update
             if ts_type == "number" {
@@ -182,10 +182,7 @@ impl BlueprintPwaExporter {
             "// Wires game events to HUD instance — vanilla JS, no framework deps"
         ));
         lines.push(String::new());
-        lines.push(format!(
-            "const {} = new {}();",
-            instance_name, class_name
-        ));
+        lines.push(format!("const {} = new {}();", instance_name, class_name));
         lines.push(String::new());
 
         for event in &self.event_names {
@@ -235,7 +232,14 @@ impl BlueprintPwaExporter {
         node_names: &[&str],
         variable_names: &[&str],
     ) -> BlueprintPwaMetadata {
-        let lifecycle_keywords = ["BeginPlay", "EndPlay", "Tick", "begin_play", "end_play", "tick"];
+        let lifecycle_keywords = [
+            "BeginPlay",
+            "EndPlay",
+            "Tick",
+            "begin_play",
+            "end_play",
+            "tick",
+        ];
         let exec_entry_keywords = ["BeginPlay", "begin_play"];
 
         let mut event_names: Vec<String> = Vec::new();
@@ -462,7 +466,10 @@ mod tests {
     #[test]
     fn from_metadata_copies_event_names() {
         let exporter = player_health_exporter();
-        assert_eq!(exporter.event_names, vec!["BeginPlay", "TakeDamage", "Death"]);
+        assert_eq!(
+            exporter.event_names,
+            vec!["BeginPlay", "TakeDamage", "Death"]
+        );
     }
 
     #[test]
@@ -524,7 +531,10 @@ mod tests {
     fn generate_html_overlay_contains_div_for_each_variable() {
         let html = player_health_exporter().generate_html_overlay();
         assert!(html.contains(r#"id="bp-Health""#), "missing Health div");
-        assert!(html.contains(r#"id="bp-MaxHealth""#), "missing MaxHealth div");
+        assert!(
+            html.contains(r#"id="bp-MaxHealth""#),
+            "missing MaxHealth div"
+        );
         assert!(html.contains(r#"id="bp-IsAlive""#), "missing IsAlive div");
     }
 
@@ -546,7 +556,10 @@ mod tests {
     fn generate_js_bindings_contains_event_binding_for_each_event() {
         let js = player_health_exporter().generate_js_bindings();
         assert!(js.contains("bp:BeginPlay"), "missing bp:BeginPlay binding");
-        assert!(js.contains("bp:TakeDamage"), "missing bp:TakeDamage binding");
+        assert!(
+            js.contains("bp:TakeDamage"),
+            "missing bp:TakeDamage binding"
+        );
         assert!(js.contains("bp:Death"), "missing bp:Death binding");
     }
 
@@ -554,7 +567,10 @@ mod tests {
     fn generate_js_bindings_contains_variable_update_bindings() {
         let js = player_health_exporter().generate_js_bindings();
         assert!(js.contains("bp:update:Health"), "missing bp:update:Health");
-        assert!(js.contains("bp:update:IsAlive"), "missing bp:update:IsAlive");
+        assert!(
+            js.contains("bp:update:IsAlive"),
+            "missing bp:update:IsAlive"
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -564,7 +580,10 @@ mod tests {
     #[test]
     fn pwa_bundle_generate_produces_non_empty_fields() {
         let bundle = PwaBundle::generate(&player_health_exporter());
-        assert!(!bundle.typescript_class.is_empty(), "typescript_class is empty");
+        assert!(
+            !bundle.typescript_class.is_empty(),
+            "typescript_class is empty"
+        );
         assert!(!bundle.html_overlay.is_empty(), "html_overlay is empty");
         assert!(!bundle.js_bindings.is_empty(), "js_bindings is empty");
         assert!(!bundle.receipt_hash.is_empty(), "receipt_hash is empty");
@@ -573,7 +592,10 @@ mod tests {
     #[test]
     fn pwa_bundle_verify_receipt_returns_true_for_fresh_bundle() {
         let bundle = PwaBundle::generate(&player_health_exporter());
-        assert!(bundle.verify_receipt(), "verify_receipt returned false for fresh bundle");
+        assert!(
+            bundle.verify_receipt(),
+            "verify_receipt returned false for fresh bundle"
+        );
     }
 
     #[test]

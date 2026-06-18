@@ -194,8 +194,8 @@ fn test_query_without_turtle_returns_empty_results_gracefully() {
 
     // With no turtle input the store is empty; SELECT * WHERE { ?s ?p ?o }
     // is supported by PatternExecutor but will match zero triples.
-    let output = cmd_query(None, "SELECT * WHERE { ?s ?p ?o }")
-        .expect("cmd_query must not return Err");
+    let output =
+        cmd_query(None, "SELECT * WHERE { ?s ?p ?o }").expect("cmd_query must not return Err");
 
     let results = output.data["results"]
         .as_array()
@@ -225,8 +225,11 @@ fn test_query_unsupported_pattern_returns_error_output() {
 
     // PatternExecutor only supports SELECT queries containing ?s ?p ?o.
     // An INSERT query must be reported as an error, not a panic.
-    let output = cmd_query(Some(turtle), "INSERT DATA { <http://s> <http://p> <http://o> }")
-        .expect("cmd_query must return Ok even for unsupported patterns");
+    let output = cmd_query(
+        Some(turtle),
+        "INSERT DATA { <http://s> <http://p> <http://o> }",
+    )
+    .expect("cmd_query must return Ok even for unsupported patterns");
 
     assert!(
         !output.success,

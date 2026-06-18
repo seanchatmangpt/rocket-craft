@@ -261,7 +261,11 @@ impl DirectFollowsGraph {
 
         // Collect all node names
         let mut nodes: Vec<String> = Vec::new();
-        for act in self.start_activities.keys().chain(self.end_activities.keys()) {
+        for act in self
+            .start_activities
+            .keys()
+            .chain(self.end_activities.keys())
+        {
             if !nodes.contains(act) {
                 nodes.push(act.clone());
             }
@@ -280,8 +284,12 @@ impl DirectFollowsGraph {
         }
 
         // Start / end markers
-        out.push_str("  \"__start__\" [shape=circle, label=\"\", style=filled, fillcolor=black];\n");
-        out.push_str("  \"__end__\" [shape=doublecircle, label=\"\", style=filled, fillcolor=black];\n");
+        out.push_str(
+            "  \"__start__\" [shape=circle, label=\"\", style=filled, fillcolor=black];\n",
+        );
+        out.push_str(
+            "  \"__end__\" [shape=doublecircle, label=\"\", style=filled, fillcolor=black];\n",
+        );
 
         for (act, count) in &self.start_activities {
             out.push_str(&format!(
@@ -502,11 +510,16 @@ pub fn rocket_pipeline_petri_net() -> PetriNet {
         .add_place("p4", "After build")
         .add_place("end", "End");
 
-    net.add_transition("t_load_manifest", Some("load_manifest"), &["start"], &["p1"])
-        .add_transition("t_doctor", Some("doctor_check"), &["p1"], &["p2"])
-        .add_transition("t_audit", Some("audit"), &["p2"], &["p3"])
-        .add_transition("t_build", Some("build"), &["p3"], &["p4"])
-        .add_transition("t_package", Some("package"), &["p4"], &["end"]);
+    net.add_transition(
+        "t_load_manifest",
+        Some("load_manifest"),
+        &["start"],
+        &["p1"],
+    )
+    .add_transition("t_doctor", Some("doctor_check"), &["p1"], &["p2"])
+    .add_transition("t_audit", Some("audit"), &["p2"], &["p3"])
+    .add_transition("t_build", Some("build"), &["p3"], &["p4"])
+    .add_transition("t_package", Some("package"), &["p4"], &["end"]);
 
     net.set_initial_marking("start", 1)
         .set_final_marking("end", 1);
@@ -1239,8 +1252,10 @@ mod tests {
     #[test]
     fn test_lifecycle_tracker_to_event_log() {
         let mut t = LifecycleTracker::new("Brm");
-        t.transition("load_manifest", "2024-01-01T09:00:00Z").unwrap();
-        t.transition("doctor_check", "2024-01-01T09:05:00Z").unwrap();
+        t.transition("load_manifest", "2024-01-01T09:00:00Z")
+            .unwrap();
+        t.transition("doctor_check", "2024-01-01T09:05:00Z")
+            .unwrap();
         t.transition("build", "2024-01-01T09:30:00Z").unwrap();
         t.transition("package", "2024-01-01T10:00:00Z").unwrap();
 

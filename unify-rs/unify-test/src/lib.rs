@@ -1,9 +1,11 @@
-pub mod scenario;
 pub mod assertions;
-pub mod tracker;
-pub mod coverage;
-pub mod golden;
-pub mod fixture;
 pub mod chicago;
+pub mod coverage;
+pub mod fixture;
+pub mod golden;
+pub mod scenario;
+pub mod tracker;
 
-pub use chicago::{NounVerbScenario, TestEnvironment, EnvironmentGate, BehaviorTest, LogCapture, LogRecord};
+pub use chicago::{
+    BehaviorTest, EnvironmentGate, LogCapture, LogRecord, NounVerbScenario, TestEnvironment,
+};

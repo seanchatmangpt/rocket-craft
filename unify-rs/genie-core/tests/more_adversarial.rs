@@ -1,7 +1,6 @@
 use genie_core::spec::{
-    WorldSpec, Place, Actor, Object, RelationshipType,
-    Rule, RuleSeverity, ProcessStep,
-    Vector3, Bounds3D
+    Actor, Bounds3D, Object, Place, ProcessStep, RelationshipType, Rule, RuleSeverity, Vector3,
+    WorldSpec,
 };
 use std::collections::HashMap;
 
@@ -37,7 +36,8 @@ fn test_missing_placement_in_serialization() {
         "tags": []
     }"#;
 
-    let res_obj: Result<Object, serde_json::Error> = serde_json::from_str(object_json_missing_placement);
+    let res_obj: Result<Object, serde_json::Error> =
+        serde_json::from_str(object_json_missing_placement);
     assert!(
         res_obj.is_ok(),
         "Expected deserialization of Object to succeed when placement is missing: {:?}",
@@ -53,7 +53,7 @@ fn test_custom_relationship_serialization() {
     // Custom relationship type serialization format:
     let rel_type = RelationshipType::Custom("custom_op".to_string());
     let serialized = serde_json::to_string(&rel_type).unwrap();
-    
+
     // Default serde representation for enums with payloads is externally tagged: {"custom":"custom_op"}
     assert_eq!(serialized, r#"{"custom":"custom_op"}"#);
 
@@ -117,20 +117,23 @@ fn test_step_number_zero_and_negative_duration() {
 #[test]
 fn test_complex_json_properties() {
     let mut actor = Actor::new("actor_1", "Welder", "Robot", "room_1");
-    
+
     // Properties allow any JSON values (objects, nested arrays, booleans, nulls)
     let mut props = HashMap::new();
-    props.insert("nested_obj".to_string(), serde_json::json!({
-        "status": "online",
-        "tasks": ["weld", "move"],
-        "telemetry": {
-            "voltage": 240,
-            "temp_c": [12.5, 13.0, 14.1]
-        }
-    }));
+    props.insert(
+        "nested_obj".to_string(),
+        serde_json::json!({
+            "status": "online",
+            "tasks": ["weld", "move"],
+            "telemetry": {
+                "voltage": 240,
+                "temp_c": [12.5, 13.0, 14.1]
+            }
+        }),
+    );
     props.insert("is_active".to_string(), serde_json::json!(true));
     props.insert("null_val".to_string(), serde_json::json!(null));
-    
+
     actor.properties = props;
 
     let serialized = serde_json::to_string(&actor).unwrap();
@@ -144,7 +147,7 @@ fn test_complex_json_properties() {
         deserialized.properties.get("null_val").unwrap(),
         &serde_json::json!(null)
     );
-    
+
     let nested = deserialized.properties.get("nested_obj").unwrap();
     assert_eq!(nested["status"], "online");
     assert_eq!(nested["telemetry"]["voltage"], 240);
@@ -154,9 +157,13 @@ fn test_complex_json_properties() {
 #[test]
 fn test_regex_parser_place_truncation_loophole() {
     // A place name that mimics the coords pattern will fail to parse under the new non-lazy regex
-    let intent = "create place room_1 name \"Main Room at (1.0, 2.0, 3.0) bounds (10.0, 20.0, 30.0)";
+    let intent =
+        "create place room_1 name \"Main Room at (1.0, 2.0, 3.0) bounds (10.0, 20.0, 30.0)";
     let spec_res = genie_core::parse_intent(intent);
-    assert!(spec_res.is_err(), "Expected intent to fail to parse because of name hijacking protection");
+    assert!(
+        spec_res.is_err(),
+        "Expected intent to fail to parse because of name hijacking protection"
+    );
 }
 
 #[test]
@@ -164,9 +171,11 @@ fn test_regex_parser_actor_truncation_loophole() {
     // An actor name containing the role/in keywords will fail to parse under the new non-lazy regex
     let intent = "create actor bot_1 name \"Welder Bot role RoboticWelder in room_1\"";
     let spec_res = genie_core::parse_intent(intent);
-    assert!(spec_res.is_err(), "Expected intent to fail to parse because of name hijacking protection");
+    assert!(
+        spec_res.is_err(),
+        "Expected intent to fail to parse because of name hijacking protection"
+    );
 }
-
 
 #[test]
 fn test_parser_fails_on_inline_comment() {
@@ -185,22 +194,44 @@ fn test_validation_gate_rule_expression_referential_integrity_gap() {
     // Case 1: First entity exists, but second entity (ghost_room) does not.
     let mut spec1 = WorldSpec::new();
     let bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
-    spec1.places.push(Place::new("room_1", "Control Room", bounds));
-    spec1.rules.push(Rule::new("rule_1", "TempCheck", "room_1.temp < 30 && ghost_room.temp < 40", RuleSeverity::Error));
+    spec1
+        .places
+        .push(Place::new("room_1", "Control Room", bounds));
+    spec1.rules.push(Rule::new(
+        "rule_1",
+        "TempCheck",
+        "room_1.temp < 30 && ghost_room.temp < 40",
+        RuleSeverity::Error,
+    ));
 
     let res1 = gate.validate(&spec1);
-    assert!(res1.is_err(), "Expected referential integrity failure for room_1 and ghost_room");
+    assert!(
+        res1.is_err(),
+        "Expected referential integrity failure for room_1 and ghost_room"
+    );
     let errs1 = res1.unwrap_err();
-    assert!(errs1.iter().any(|e| e.contains("references non-existent entity 'ghost_room'")));
+    assert!(errs1
+        .iter()
+        .any(|e| e.contains("references non-existent entity 'ghost_room'")));
 
     // Case 2: Expression starts with non-alphanumeric token, referring to non-existent entity later.
     let mut spec2 = WorldSpec::new();
-    spec2.rules.push(Rule::new("rule_2", "TempCheck", "30 > ghost_room.temp", RuleSeverity::Error));
+    spec2.rules.push(Rule::new(
+        "rule_2",
+        "TempCheck",
+        "30 > ghost_room.temp",
+        RuleSeverity::Error,
+    ));
 
     let res2 = gate.validate(&spec2);
-    assert!(res2.is_err(), "Expected referential integrity failure for ghost_room");
+    assert!(
+        res2.is_err(),
+        "Expected referential integrity failure for ghost_room"
+    );
     let errs2 = res2.unwrap_err();
-    assert!(errs2.iter().any(|e| e.contains("references non-existent entity 'ghost_room'")));
+    assert!(errs2
+        .iter()
+        .any(|e| e.contains("references non-existent entity 'ghost_room'")));
 }
 
 #[test]
@@ -208,7 +239,8 @@ fn test_receipt_metadata_tampering_vulnerability() {
     use genie_core::receipt_chain::ReceiptChainManager;
 
     let mut spec = WorldSpec::new();
-    spec.history.push(genie_core::spec::HistoryEvent::new("evt_1", 1000, "Boot"));
+    spec.history
+        .push(genie_core::spec::HistoryEvent::new("evt_1", 1000, "Boot"));
 
     let salt = b"genie_salt";
     assert!(ReceiptChainManager::generate_receipt_chain(&mut spec, salt).is_ok());
@@ -219,6 +251,8 @@ fn test_receipt_metadata_tampering_vulnerability() {
 
     // The receipt verification passes despite the tampered issued_at metadata because verify() does not validate it
     let verified = ReceiptChainManager::verify_receipt_chain(&spec, salt);
-    assert!(verified, "Receipt verification should pass despite tampered metadata");
+    assert!(
+        verified,
+        "Receipt verification should pass despite tampered metadata"
+    );
 }
-

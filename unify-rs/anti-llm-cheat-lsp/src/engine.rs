@@ -91,7 +91,10 @@ pub fn scan_file(filepath: &str) -> Vec<Observation> {
         Ok(c) => c,
         Err(_) => return obs,
     };
-    let filename = path.file_name().and_then(|f| f.to_str()).unwrap_or_default();
+    let filename = path
+        .file_name()
+        .and_then(|f| f.to_str())
+        .unwrap_or_default();
 
     let is_self_excluded = filepath.ends_with("src/rules/lsp318.rs")
         || filepath.ends_with("src/engine.rs")
@@ -109,7 +112,10 @@ pub fn scan_file(filepath: &str) -> Vec<Observation> {
             let idx = mat.start();
             if pattern_idx == 0 || pattern_idx == 1 {
                 let suffix = &content[idx + smell.len()..];
-                if suffix.starts_with("-max") || suffix.starts_with("_max") || suffix.starts_with("::max") {
+                if suffix.starts_with("-max")
+                    || suffix.starts_with("_max")
+                    || suffix.starts_with("::max")
+                {
                     continue;
                 }
             }
@@ -129,10 +135,17 @@ pub fn scan_file(filepath: &str) -> Vec<Observation> {
     }
 
     if !is_self_excluded {
-        obs.extend(claims::scan_for_victory(filepath, &content, "raw_text", &[]));
+        obs.extend(claims::scan_for_victory(
+            filepath,
+            &content,
+            "raw_text",
+            &[],
+        ));
     }
 
-    let is_test_file = filepath.contains("tests/") || filepath.ends_with("_test.rs") || filepath.contains("/test/");
+    let is_test_file = filepath.contains("tests/")
+        || filepath.ends_with("_test.rs")
+        || filepath.contains("/test/");
     if is_test_file {
         for (line_idx, line) in content.lines().enumerate() {
             let line_num = line_idx + 1;
@@ -174,19 +187,33 @@ pub fn scan_file(filepath: &str) -> Vec<Observation> {
         obs.extend(rust_tree_sitter::parse_rust_source(filepath, &content));
     } else if filename.ends_with(".md") {
         obs.extend(markdown_claims::parse_markdown_claims(filepath, &content));
-    } else if (filename.ends_with(".json") || filename.ends_with(".jsonl")) && filepath.contains("transcripts") {
+    } else if (filename.ends_with(".json") || filename.ends_with(".jsonl"))
+        && filepath.contains("transcripts")
+    {
         obs.extend(json_rpc::parse_json_rpc_transcript(filepath, &content));
     } else if filename.ends_with(".json") && filepath.contains("receipts") {
         obs.extend(receipt_json::parse_receipt_json(filepath, &content));
-    } else if filename.ends_with(".c") || filename.ends_with(".h") || filename.ends_with(".cpp") || filename.ends_with(".cc") {
+    } else if filename.ends_with(".c")
+        || filename.ends_with(".h")
+        || filename.ends_with(".cpp")
+        || filename.ends_with(".cc")
+    {
         obs.extend(c_parser::parse_c_source(filepath, &content));
-    } else if filename.ends_with(".ts") || filename.ends_with(".tsx") || filename.ends_with(".js") || filename.ends_with(".jsx") || filename.ends_with(".mjs") || filename.ends_with(".cjs") {
+    } else if filename.ends_with(".ts")
+        || filename.ends_with(".tsx")
+        || filename.ends_with(".js")
+        || filename.ends_with(".jsx")
+        || filename.ends_with(".mjs")
+        || filename.ends_with(".cjs")
+    {
         obs.extend(typescript::parse_typescript(filepath, &content));
     } else if filename == "ggen.toml" {
         obs.extend(ggen_toml::parse_ggen_toml(filepath, &content));
     } else if filename.ends_with(".tera") {
         obs.extend(tera_template::parse_tera_template(filepath, &content));
-    } else if filename.ends_with(".json") && (filepath.contains("ocel/reports") || filepath.contains("fitness_reports")) {
+    } else if filename.ends_with(".json")
+        && (filepath.contains("ocel/reports") || filepath.contains("fitness_reports"))
+    {
         obs.extend(fitness_report::parse_fitness_report(filepath, &content));
     } else if filename.ends_with(".json") && filepath.contains("refgraph") {
         obs.extend(refgraph::parse_refgraph_json(filepath, &content));
@@ -223,7 +250,10 @@ pub fn evaluate_diagnostics(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
     evaluate_diagnostics_with_config(obs, &AntiLlmConfig::default())
 }
 
-pub fn evaluate_diagnostics_with_config(obs: &[Observation], config: &AntiLlmConfig) -> Vec<AntiLlmDiagnostic> {
+pub fn evaluate_diagnostics_with_config(
+    obs: &[Observation],
+    config: &AntiLlmConfig,
+) -> Vec<AntiLlmDiagnostic> {
     let mut diags = Vec::new();
     diags.extend(surface::evaluate(obs, config));
     diags.extend(authority::evaluate(obs));
@@ -244,7 +274,11 @@ pub fn evaluate_diagnostics_with_config(obs: &[Observation], config: &AntiLlmCon
     diags.extend(contract_rules::evaluate(obs));
     diags.extend(refgraph_rules::evaluate(obs));
     let has_non_victory_errors = diags.iter().any(|d| d.code != "ANTI-LLM-CLAIM-004");
-    diags.extend(claims::evaluate(obs, &config.claim.domain_terms, has_non_victory_errors));
+    diags.extend(claims::evaluate(
+        obs,
+        &config.claim.domain_terms,
+        has_non_victory_errors,
+    ));
     let mut seen = std::collections::HashSet::new();
     diags.retain(|d| seen.insert((d.file_path.clone(), d.line, d.code.clone())));
     diags

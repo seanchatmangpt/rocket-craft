@@ -1,7 +1,7 @@
-use crate::spec::{WorldSpec, HistoryEvent, Vector3};
 use crate::errors::GenieError;
 use crate::parser::IntentParser;
 use crate::receipt_chain::ReceiptChainManager;
+use crate::spec::{HistoryEvent, Vector3, WorldSpec};
 use regex::Regex;
 
 /// Handles incremental evolution of a manufactured world specification.
@@ -91,7 +91,12 @@ impl WorldEvolver {
                     "object" => new_spec.objects.retain(|x| x.id != id),
                     "relationship" => new_spec.relationships.retain(|x| x.id != id),
                     "rule" => new_spec.rules.retain(|x| x.id != id),
-                    other => return Err(GenieError::Evolution(format!("Line {}: unknown entity type for delete: {}", line_num, other))),
+                    other => {
+                        return Err(GenieError::Evolution(format!(
+                            "Line {}: unknown entity type for delete: {}",
+                            line_num, other
+                        )))
+                    }
                 }
             } else if delete_generic_re.is_match(trimmed) {
                 let caps = delete_generic_re.captures(trimmed).unwrap();
@@ -105,46 +110,82 @@ impl WorldEvolver {
             } else if update_actor_pos_re.is_match(trimmed) {
                 let caps = update_actor_pos_re.captures(trimmed).unwrap();
                 let id = &caps[1];
-                let x = caps[2].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid x: {}", line_num, e)))?;
-                let y = caps[3].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid y: {}", line_num, e)))?;
-                let z = caps[4].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid z: {}", line_num, e)))?;
+                let x = caps[2].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid x: {}", line_num, e))
+                })?;
+                let y = caps[3].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid y: {}", line_num, e))
+                })?;
+                let z = caps[4].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid z: {}", line_num, e))
+                })?;
                 if let Some(actor) = new_spec.actors.iter_mut().find(|a| a.id == id) {
                     actor.placement.position = Vector3::new(x, y, z);
                 } else {
-                    return Err(GenieError::Evolution(format!("Line {}: Actor not found: {}", line_num, id)));
+                    return Err(GenieError::Evolution(format!(
+                        "Line {}: Actor not found: {}",
+                        line_num, id
+                    )));
                 }
             } else if update_actor_rot_re.is_match(trimmed) {
                 let caps = update_actor_rot_re.captures(trimmed).unwrap();
                 let id = &caps[1];
-                let x = caps[2].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid pitch: {}", line_num, e)))?;
-                let y = caps[3].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid yaw: {}", line_num, e)))?;
-                let z = caps[4].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid roll: {}", line_num, e)))?;
+                let x = caps[2].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid pitch: {}", line_num, e))
+                })?;
+                let y = caps[3].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid yaw: {}", line_num, e))
+                })?;
+                let z = caps[4].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid roll: {}", line_num, e))
+                })?;
                 if let Some(actor) = new_spec.actors.iter_mut().find(|a| a.id == id) {
                     actor.placement.rotation = Vector3::new(x, y, z);
                 } else {
-                    return Err(GenieError::Evolution(format!("Line {}: Actor not found: {}", line_num, id)));
+                    return Err(GenieError::Evolution(format!(
+                        "Line {}: Actor not found: {}",
+                        line_num, id
+                    )));
                 }
             } else if update_object_pos_re.is_match(trimmed) {
                 let caps = update_object_pos_re.captures(trimmed).unwrap();
                 let id = &caps[1];
-                let x = caps[2].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid x: {}", line_num, e)))?;
-                let y = caps[3].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid y: {}", line_num, e)))?;
-                let z = caps[4].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid z: {}", line_num, e)))?;
+                let x = caps[2].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid x: {}", line_num, e))
+                })?;
+                let y = caps[3].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid y: {}", line_num, e))
+                })?;
+                let z = caps[4].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid z: {}", line_num, e))
+                })?;
                 if let Some(obj) = new_spec.objects.iter_mut().find(|o| o.id == id) {
                     obj.placement.position = Vector3::new(x, y, z);
                 } else {
-                    return Err(GenieError::Evolution(format!("Line {}: Object not found: {}", line_num, id)));
+                    return Err(GenieError::Evolution(format!(
+                        "Line {}: Object not found: {}",
+                        line_num, id
+                    )));
                 }
             } else if update_object_rot_re.is_match(trimmed) {
                 let caps = update_object_rot_re.captures(trimmed).unwrap();
                 let id = &caps[1];
-                let x = caps[2].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid pitch: {}", line_num, e)))?;
-                let y = caps[3].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid yaw: {}", line_num, e)))?;
-                let z = caps[4].parse::<f32>().map_err(|e| GenieError::Evolution(format!("Line {}: invalid roll: {}", line_num, e)))?;
+                let x = caps[2].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid pitch: {}", line_num, e))
+                })?;
+                let y = caps[3].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid yaw: {}", line_num, e))
+                })?;
+                let z = caps[4].parse::<f32>().map_err(|e| {
+                    GenieError::Evolution(format!("Line {}: invalid roll: {}", line_num, e))
+                })?;
                 if let Some(obj) = new_spec.objects.iter_mut().find(|o| o.id == id) {
                     obj.placement.rotation = Vector3::new(x, y, z);
                 } else {
-                    return Err(GenieError::Evolution(format!("Line {}: Object not found: {}", line_num, id)));
+                    return Err(GenieError::Evolution(format!(
+                        "Line {}: Object not found: {}",
+                        line_num, id
+                    )));
                 }
             } else {
                 return Err(GenieError::Evolution(format!(
@@ -164,7 +205,7 @@ impl WorldEvolver {
         let mut new_event = HistoryEvent::new(event_id, timestamp_ms, "Evolve");
         new_event.details.insert(
             "modification_intent".to_string(),
-            serde_json::Value::String(modification_intent.to_string())
+            serde_json::Value::String(modification_intent.to_string()),
         );
         new_spec.history.push(new_event);
 

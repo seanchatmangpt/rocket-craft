@@ -28,10 +28,7 @@ impl ToolRegistry {
     pub fn register(
         &mut self,
         desc: ToolDescriptor,
-        handler: impl Fn(serde_json::Value) -> Result<serde_json::Value, String>
-            + Send
-            + Sync
-            + 'static,
+        handler: impl Fn(serde_json::Value) -> Result<serde_json::Value, String> + Send + Sync + 'static,
     ) {
         self.handlers.insert(desc.name.clone(), Box::new(handler));
         self.descriptors.push(desc);
@@ -88,9 +85,7 @@ mod tests {
     #[test]
     fn test_registry_call_registered_tool_returns_ok() {
         let mut registry = ToolRegistry::new();
-        registry.register(make_desc("echo"), |params| {
-            Ok(json!({"echo": params}))
-        });
+        registry.register(make_desc("echo"), |params| Ok(json!({"echo": params})));
         let result = registry.call("echo", json!({"input": "hello"}));
         assert!(result.is_ok());
         let v = result.unwrap();

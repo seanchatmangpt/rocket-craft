@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use crate::triple::Term;
 use crate::store::TripleStore;
+use crate::triple::Term;
+use std::collections::HashMap;
 
 /// A single result row from a SELECT query: variable name → Term.
 pub type Binding = HashMap<String, Term>;
@@ -49,9 +49,10 @@ impl<'a> SparqlExecutor for PatternExecutor<'a> {
                 .collect();
             return Ok(bindings);
         }
-        Err(SparqlError::Unsupported(
-            format!("Cannot parse query: {}", query),
-        ))
+        Err(SparqlError::Unsupported(format!(
+            "Cannot parse query: {}",
+            query
+        )))
     }
 
     fn ask(&self, query: &str) -> Result<bool, SparqlError> {
@@ -65,9 +66,10 @@ impl<'a> SparqlExecutor for PatternExecutor<'a> {
         if q.contains("?s") && q.contains("?p") && q.contains("?o") {
             return Ok(!self.0.is_empty());
         }
-        Err(SparqlError::Unsupported(
-            format!("Cannot parse ASK query: {}", query),
-        ))
+        Err(SparqlError::Unsupported(format!(
+            "Cannot parse ASK query: {}",
+            query
+        )))
     }
 }
 

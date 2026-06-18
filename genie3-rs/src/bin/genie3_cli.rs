@@ -1,7 +1,7 @@
 use genie3_rs::{
+    simulation::{SimulationCommand, SimulationEngine},
     types::{Bounds3D, Rotation3D, Transform, Vector3},
     world::{Actor, Environment, Object, Place, Weather, WorldState},
-    simulation::{SimulationCommand, SimulationEngine},
 };
 use std::collections::HashMap;
 use std::io::{self, Write};
@@ -26,19 +26,41 @@ fn print_help() {
 
 fn print_state(state: &WorldState) {
     tracing::info!("\n--- World State (Step {}) ---", state.step_index);
-    tracing::info!("Time: {:.1}h | Weather: {:?}", state.environment.time_of_day, state.environment.weather);
+    tracing::info!(
+        "Time: {:.1}h | Weather: {:?}",
+        state.environment.time_of_day,
+        state.environment.weather
+    );
     tracing::info!("Places:");
     for p in &state.places {
         let bounds = &p.bounds;
-        tracing::info!("  - Place '{}' ({}) bounds center: {:?}, half_extents: {:?}", p.id, p.name, bounds.center, bounds.half_extents);
+        tracing::info!(
+            "  - Place '{}' ({}) bounds center: {:?}, half_extents: {:?}",
+            p.id,
+            p.name,
+            bounds.center,
+            bounds.half_extents
+        );
     }
     tracing::info!("Actors:");
     for a in &state.actors {
-        tracing::info!("  - Actor '{}' ({}) position: {:?} in Place: {:?}", a.id, a.name, a.position, a.place_id);
+        tracing::info!(
+            "  - Actor '{}' ({}) position: {:?} in Place: {:?}",
+            a.id,
+            a.name,
+            a.position,
+            a.place_id
+        );
     }
     tracing::info!("Objects:");
     for o in &state.objects {
-        tracing::info!("  - Object '{}' ({}) position: {:?} in Place: {:?}", o.id, o.name, o.transform.position, o.place_id);
+        tracing::info!(
+            "  - Object '{}' ({}) position: {:?} in Place: {:?}",
+            o.id,
+            o.name,
+            o.transform.position,
+            o.place_id
+        );
     }
     tracing::info!("-----------------------------\n");
 }
@@ -55,24 +77,37 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Default place
     let room_bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(50.0, 50.0, 50.0));
     let mut room = Place::new("room_1", "Control Room", room_bounds);
-    room.properties.insert("hard_containment".to_string(), serde_json::Value::Bool(true));
+    room.properties.insert(
+        "hard_containment".to_string(),
+        serde_json::Value::Bool(true),
+    );
     state.places.push(room);
 
     // Default actor
     let mut bot = Actor::new("bot_1", "Welder Bot", "Robot", Vector3::new(0.0, 0.0, 0.0));
     bot.place_id = Some("room_1".to_string());
     let mut bot_props = HashMap::new();
-    bot_props.insert("half_extents".to_string(), serde_json::json!({"x": 1.0, "y": 1.0, "z": 2.0}));
+    bot_props.insert(
+        "half_extents".to_string(),
+        serde_json::json!({"x": 1.0, "y": 1.0, "z": 2.0}),
+    );
     bot_props.insert("max_speed".to_string(), serde_json::json!(15.0));
     bot.properties = bot_props;
     state.actors.push(bot);
 
     // Default object
-    let cnc_transform = Transform::new(Vector3::new(10.0, 10.0, 0.0), Rotation3D::default(), Vector3::new(1.0, 1.0, 1.0));
+    let cnc_transform = Transform::new(
+        Vector3::new(10.0, 10.0, 0.0),
+        Rotation3D::default(),
+        Vector3::new(1.0, 1.0, 1.0),
+    );
     let mut cnc = Object::new("cnc_1", "CNC Alpha", "Machine", cnc_transform);
     cnc.place_id = Some("room_1".to_string());
     let mut cnc_props = HashMap::new();
-    cnc_props.insert("half_extents".to_string(), serde_json::json!({"x": 2.0, "y": 2.0, "z": 2.0}));
+    cnc_props.insert(
+        "half_extents".to_string(),
+        serde_json::json!({"x": 2.0, "y": 2.0, "z": 2.0}),
+    );
     cnc.properties = cnc_props;
     state.objects.push(cnc);
 
@@ -185,7 +220,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 if spawn_type == "actor" {
                     let mut props = HashMap::new();
-                    props.insert("half_extents".to_string(), serde_json::json!({"x": 0.5, "y": 0.5, "z": 1.0}));
+                    props.insert(
+                        "half_extents".to_string(),
+                        serde_json::json!({"x": 0.5, "y": 0.5, "z": 1.0}),
+                    );
                     let sim_cmd = SimulationCommand::SpawnActor {
                         id: id.clone(),
                         name: format!("Actor {}", id),
@@ -204,12 +242,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 } else if spawn_type == "object" {
                     let mut props = HashMap::new();
-                    props.insert("half_extents".to_string(), serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}));
+                    props.insert(
+                        "half_extents".to_string(),
+                        serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}),
+                    );
                     let sim_cmd = SimulationCommand::SpawnObject {
                         id: id.clone(),
                         name: format!("Object {}", id),
                         class: "Generic".to_string(),
-                        transform: Transform::new(position, Rotation3D::default(), Vector3::new(1.0, 1.0, 1.0)),
+                        transform: Transform::new(
+                            position,
+                            Rotation3D::default(),
+                            Vector3::new(1.0, 1.0, 1.0),
+                        ),
                         properties: props,
                     };
                     match engine.execute_command(&state, &sim_cmd, 0.1) {
@@ -256,7 +301,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     continue;
                 }
                 let time_val: f32 = parts[1].parse().unwrap_or(12.0);
-                let sim_cmd = SimulationCommand::ChangeTime { time_of_day: time_val };
+                let sim_cmd = SimulationCommand::ChangeTime {
+                    time_of_day: time_val,
+                };
                 match engine.execute_command(&state, &sim_cmd, 0.0) {
                     Ok(next) => {
                         state = next;

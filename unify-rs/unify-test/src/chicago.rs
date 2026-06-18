@@ -127,7 +127,10 @@ impl EnvironmentGate {
         let current = std::env::var("TEST_ENV")
             .map(|v| TestEnvironment::from_str(&v))
             .unwrap_or(TestEnvironment::Unit);
-        Self { required: current, current }
+        Self {
+            required: current,
+            current,
+        }
     }
 
     /// Returns `true` when the current environment satisfies the requirement.
@@ -197,7 +200,10 @@ pub fn account_overdraft_scenario() -> NounVerbScenario<i64> {
             }
         })
         .then_state(|balance| {
-            assert!(*balance >= 0, "balance must never be negative after overdraft");
+            assert!(
+                *balance >= 0,
+                "balance must never be negative after overdraft"
+            );
             assert_eq!(*balance, 0, "overdraft should clamp balance to zero");
         })
 }

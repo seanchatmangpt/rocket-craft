@@ -479,7 +479,10 @@ fn attach_builtin_tools(server: McpServer) -> McpServer {
             let events = params["events"].as_array().unwrap_or(&empty_arr);
             let filter_type = params["filter_type"].as_str();
             let count = if let Some(ft) = filter_type {
-                events.iter().filter(|e| e["type"].as_str() == Some(ft)).count()
+                events
+                    .iter()
+                    .filter(|e| e["type"].as_str() == Some(ft))
+                    .count()
             } else {
                 events.len()
             };
@@ -514,7 +517,9 @@ mod tests {
     fn test_version_tool_returns_version() {
         let mut registry = ToolRegistry::new();
         register_builtin_tools(&mut registry);
-        let result = registry.call("unify/version", serde_json::json!({})).unwrap();
+        let result = registry
+            .call("unify/version", serde_json::json!({}))
+            .unwrap();
         assert!(result["version"].is_string());
     }
 

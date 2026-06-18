@@ -369,12 +369,8 @@ where
 
     /// Run both gates in order.  The first failure short-circuits the chain.
     pub fn admit(&self, artifact: &T) -> Result<(), String> {
-        self.first
-            .admit(artifact)
-            .map_err(|r| r.to_string())?;
-        self.second
-            .admit(artifact)
-            .map_err(|r| r.to_string())?;
+        self.first.admit(artifact).map_err(|r| r.to_string())?;
+        self.second.admit(artifact).map_err(|r| r.to_string())?;
         Ok(())
     }
 }
@@ -396,7 +392,10 @@ mod tests {
         let r: Refusal<NonEmptyNameLaw> = Refusal::new("Name must not be empty or whitespace-only");
         let text = r.to_string();
         assert!(text.contains("NonEmptyName"), "missing law name in: {text}");
-        assert!(text.contains("Name must not be empty"), "missing message in: {text}");
+        assert!(
+            text.contains("Name must not be empty"),
+            "missing message in: {text}"
+        );
     }
 
     #[test]
@@ -573,7 +572,10 @@ mod tests {
         let result = chain.admit(&String::new());
         assert!(result.is_err());
         let msg = result.unwrap_err();
-        assert!(msg.contains("NonEmptyName"), "error should name first law: {msg}");
+        assert!(
+            msg.contains("NonEmptyName"),
+            "error should name first law: {msg}"
+        );
     }
 
     #[test]
@@ -595,7 +597,10 @@ mod tests {
         let result = chain.admit(&"valid".to_string());
         assert!(result.is_err());
         let msg = result.unwrap_err();
-        assert!(msg.contains("AlwaysRefuse"), "error should name second law: {msg}");
+        assert!(
+            msg.contains("AlwaysRefuse"),
+            "error should name second law: {msg}"
+        );
     }
 
     #[test]
@@ -622,12 +627,18 @@ mod tests {
         let calls = Arc::new(AtomicUsize::new(0));
         let chain = GateChain::new(
             NonEmptyNameGate,
-            CountingGate { calls: calls.clone() },
+            CountingGate {
+                calls: calls.clone(),
+            },
         );
 
         // Empty string triggers the first gate; second gate must NOT be called.
         let _ = chain.admit(&String::new());
-        assert_eq!(calls.load(Ordering::SeqCst), 0, "second gate was called despite first failure");
+        assert_eq!(
+            calls.load(Ordering::SeqCst),
+            0,
+            "second gate was called despite first failure"
+        );
     }
 
     // ── LawRegistry ───────────────────────────────────────────────────────────
@@ -635,9 +646,15 @@ mod tests {
     /// A `RuntimeLaw` that always passes.
     struct PassingRuntimeLaw;
     impl RuntimeLaw for PassingRuntimeLaw {
-        fn name(&self) -> &str { "PassingLaw" }
-        fn description(&self) -> &str { "Always passes" }
-        fn validate_path(&self, _: &Path) -> Result<(), LawViolation> { Ok(()) }
+        fn name(&self) -> &str {
+            "PassingLaw"
+        }
+        fn description(&self) -> &str {
+            "Always passes"
+        }
+        fn validate_path(&self, _: &Path) -> Result<(), LawViolation> {
+            Ok(())
+        }
     }
 
     /// A `RuntimeLaw` that always fails.
@@ -645,8 +662,12 @@ mod tests {
         message: &'static str,
     }
     impl RuntimeLaw for FailingRuntimeLaw {
-        fn name(&self) -> &str { "FailingLaw" }
-        fn description(&self) -> &str { "Always fails" }
+        fn name(&self) -> &str {
+            "FailingLaw"
+        }
+        fn description(&self) -> &str {
+            "Always fails"
+        }
         fn validate_path(&self, _: &Path) -> Result<(), LawViolation> {
             Err(LawViolation {
                 law_name: self.name().to_string(),
@@ -707,7 +728,10 @@ mod tests {
         };
         let text = v.to_string();
         assert!(text.contains("SomeLaw"), "missing law name in: {text}");
-        assert!(text.contains("something went wrong"), "missing message in: {text}");
+        assert!(
+            text.contains("something went wrong"),
+            "missing message in: {text}"
+        );
     }
 
     // ── StaticLaw NAME constants ───────────────────────────────────────────────

@@ -1,7 +1,7 @@
+use std::sync::{Arc, Mutex};
 use tower_lsp::jsonrpc::Result;
 use tower_lsp::lsp_types::*;
 use tower_lsp::{Client, LanguageServer};
-use std::sync::{Arc, Mutex};
 
 use crate::engine;
 

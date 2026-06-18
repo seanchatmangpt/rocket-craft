@@ -39,17 +39,26 @@ impl TripleStore {
 
     /// Return all triples whose subject matches.
     pub fn query_subject(&self, subject: &Term) -> Vec<&Triple> {
-        self.triples.iter().filter(|t| &t.subject == subject).collect()
+        self.triples
+            .iter()
+            .filter(|t| &t.subject == subject)
+            .collect()
     }
 
     /// Return all triples whose predicate matches.
     pub fn query_predicate(&self, predicate: &Term) -> Vec<&Triple> {
-        self.triples.iter().filter(|t| &t.predicate == predicate).collect()
+        self.triples
+            .iter()
+            .filter(|t| &t.predicate == predicate)
+            .collect()
     }
 
     /// Return all triples whose object matches.
     pub fn query_object(&self, object: &Term) -> Vec<&Triple> {
-        self.triples.iter().filter(|t| &t.object == object).collect()
+        self.triples
+            .iter()
+            .filter(|t| &t.object == object)
+            .collect()
     }
 
     /// Pattern-based lookup. `None` acts as a wildcard.
@@ -169,8 +178,16 @@ mod tests {
         let pred = Term::Named("http://p".into());
         let obj1 = Term::Named("http://o1".into());
         let obj2 = Term::Named("http://o2".into());
-        store.add(Triple { subject: subj.clone(), predicate: pred.clone(), object: obj1.clone() });
-        store.add(Triple { subject: subj.clone(), predicate: pred.clone(), object: obj2.clone() });
+        store.add(Triple {
+            subject: subj.clone(),
+            predicate: pred.clone(),
+            object: obj1.clone(),
+        });
+        store.add(Triple {
+            subject: subj.clone(),
+            predicate: pred.clone(),
+            object: obj2.clone(),
+        });
         // different subject triple
         store.add(make_triple("http://other", "http://p", "http://o3"));
         let objs = store.objects_for(&subj, &pred);

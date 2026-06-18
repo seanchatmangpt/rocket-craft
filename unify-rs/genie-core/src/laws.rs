@@ -1,11 +1,11 @@
-use crate::spec::{WorldSpec, RelationshipType, RuleSeverity, Vector3};
-use unify_core::{StaticLaw, Admit, Refusal};
-use unify_rdf::{
-    triple::{Term, Triple},
-    store::TripleStore,
-    shacl::{validate as shacl_validate, ShaclShape, ShaclConstraint},
-};
+use crate::spec::{RelationshipType, RuleSeverity, Vector3, WorldSpec};
 use std::collections::{HashMap, HashSet};
+use unify_core::{Admit, Refusal, StaticLaw};
+use unify_rdf::{
+    shacl::{validate as shacl_validate, ShaclConstraint, ShaclShape},
+    store::TripleStore,
+    triple::{Term, Triple},
+};
 
 /// Law constraint representing semantic and structural coherence of a manufactured world.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq)]
@@ -40,12 +40,18 @@ impl WorldCoherenceGate {
         let mut global_entity_ids = HashSet::new();
         for place in &spec.places {
             if !global_entity_ids.insert(place.id.clone()) {
-                errors.push(format!("Duplicate Entity ID '{}' found in places", place.id));
+                errors.push(format!(
+                    "Duplicate Entity ID '{}' found in places",
+                    place.id
+                ));
             }
         }
         for actor in &spec.actors {
             if !global_entity_ids.insert(actor.id.clone()) {
-                errors.push(format!("Duplicate Entity ID '{}' found in actors", actor.id));
+                errors.push(format!(
+                    "Duplicate Entity ID '{}' found in actors",
+                    actor.id
+                ));
             }
         }
         for obj in &spec.objects {
@@ -86,7 +92,9 @@ impl WorldCoherenceGate {
         let place_ids: HashSet<&str> = spec.places.iter().map(|p| p.id.as_str()).collect();
         let actor_ids: HashSet<&str> = spec.actors.iter().map(|a| a.id.as_str()).collect();
         let object_ids: HashSet<&str> = spec.objects.iter().map(|o| o.id.as_str()).collect();
-        let valid_entity_ids: HashSet<&str> = place_ids.iter().copied()
+        let valid_entity_ids: HashSet<&str> = place_ids
+            .iter()
+            .copied()
             .chain(actor_ids.iter().copied())
             .chain(object_ids.iter().copied())
             .collect();
@@ -200,7 +208,10 @@ impl WorldCoherenceGate {
             {
                 errors.push(format!(
                     "Bounds Violation: Place '{}' half_extents ({}, {}, {}) must be positive",
-                    place.id, place.bounds.half_extents.x, place.bounds.half_extents.y, place.bounds.half_extents.z
+                    place.id,
+                    place.bounds.half_extents.x,
+                    place.bounds.half_extents.y,
+                    place.bounds.half_extents.z
                 ));
             }
         }
@@ -230,9 +241,8 @@ impl WorldCoherenceGate {
         }
 
         // 4. Floating-point coordinates validation (prevent NaN/Infinity)
-        let check_finite = |v: Vector3| -> bool {
-            v.x.is_finite() && v.y.is_finite() && v.z.is_finite()
-        };
+        let check_finite =
+            |v: Vector3| -> bool { v.x.is_finite() && v.y.is_finite() && v.z.is_finite() };
 
         for place in &spec.places {
             if !check_finite(place.bounds.center) {
@@ -282,12 +292,16 @@ impl WorldCoherenceGate {
         let mut adj: HashMap<String, Vec<String>> = HashMap::new();
         for place in &spec.places {
             if let Some(parent_id) = &place.parent_place_id {
-                adj.entry(parent_id.clone()).or_default().push(place.id.clone());
+                adj.entry(parent_id.clone())
+                    .or_default()
+                    .push(place.id.clone());
             }
         }
         for rel in &spec.relationships {
             if rel.rel_type == RelationshipType::Contains {
-                adj.entry(rel.source.clone()).or_default().push(rel.target.clone());
+                adj.entry(rel.source.clone())
+                    .or_default()
+                    .push(rel.target.clone());
             }
         }
 
@@ -300,7 +314,7 @@ impl WorldCoherenceGate {
             visited: &mut HashSet<String>,
             rec_stack: &mut HashSet<String>,
             path: &mut Vec<String>,
-            errors: &mut Vec<String>
+            errors: &mut Vec<String>,
         ) {
             visited.insert(node.to_string());
             rec_stack.insert(node.to_string());
@@ -330,7 +344,14 @@ impl WorldCoherenceGate {
         for node in all_nodes {
             if !visited.contains(&node) {
                 let mut path = Vec::new();
-                dfs(&node, &adj, &mut visited, &mut rec_stack, &mut path, &mut errors);
+                dfs(
+                    &node,
+                    &adj,
+                    &mut visited,
+                    &mut rec_stack,
+                    &mut path,
+                    &mut errors,
+                );
             }
         }
 
@@ -360,7 +381,8 @@ impl Admit<WorldCoherenceLaw> for WorldCoherenceGate {
     type Refusal = Refusal<WorldCoherenceLaw>;
 
     fn admit(&self, spec: &WorldSpec) -> Result<(), Self::Refusal> {
-        self.validate(spec).map_err(|errs| Refusal::new(errs.join("\n")))
+        self.validate(spec)
+            .map_err(|errs| Refusal::new(errs.join("\n")))
     }
 }
 
@@ -368,7 +390,7 @@ impl Admit<WorldCoherenceLaw> for WorldCoherenceGate {
 pub fn spec_to_triples(spec: &WorldSpec) -> TripleStore {
     let mut store = TripleStore::new();
     let genie_ns = "genie:";
-    
+
     let literal = |val: &str, dt: &str| -> Term {
         Term::Literal {
             value: val.to_string(),
@@ -380,73 +402,145 @@ pub fn spec_to_triples(spec: &WorldSpec) -> TripleStore {
     // 1. Translate Places
     for place in &spec.places {
         let subj = Term::Named(format!("{}place:{}", genie_ns, place.id));
-        store.add(Triple::new(subj.clone(), "rdf:type", format!("{}Place", genie_ns)));
-        store.add(Triple::new(subj.clone(), format!("{}name", genie_ns), literal(&place.name, "xsd:string")));
+        store.add(Triple::new(
+            subj.clone(),
+            "rdf:type",
+            format!("{}Place", genie_ns),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}name", genie_ns),
+            literal(&place.name, "xsd:string"),
+        ));
         if let Some(desc) = &place.description {
-            store.add(Triple::new(subj.clone(), format!("{}description", genie_ns), literal(desc, "xsd:string")));
+            store.add(Triple::new(
+                subj.clone(),
+                format!("{}description", genie_ns),
+                literal(desc, "xsd:string"),
+            ));
         }
         if let Some(parent) = &place.parent_place_id {
             store.add(Triple::new(
                 subj.clone(),
                 format!("{}parentPlace", genie_ns),
-                Term::Named(format!("{}place:{}", genie_ns, parent))
+                Term::Named(format!("{}place:{}", genie_ns, parent)),
             ));
         }
-        
+
         // Bounds mapping (using Blank Nodes)
         let bounds_bnode = Term::Blank(format!("bounds_{}", place.id));
-        store.add(Triple::new(subj.clone(), format!("{}hasBounds", genie_ns), bounds_bnode.clone()));
-        store.add(Triple::new(bounds_bnode.clone(), "rdf:type", format!("{}Bounds3D", genie_ns)));
-        store.add(Triple::new(bounds_bnode.clone(), format!("{}centerX", genie_ns), literal(&place.bounds.center.x.to_string(), "xsd:float")));
-        store.add(Triple::new(bounds_bnode.clone(), format!("{}centerY", genie_ns), literal(&place.bounds.center.y.to_string(), "xsd:float")));
-        store.add(Triple::new(bounds_bnode.clone(), format!("{}centerZ", genie_ns), literal(&place.bounds.center.z.to_string(), "xsd:float")));
-        store.add(Triple::new(bounds_bnode.clone(), format!("{}halfExtentX", genie_ns), literal(&place.bounds.half_extents.x.to_string(), "xsd:float")));
-        store.add(Triple::new(bounds_bnode.clone(), format!("{}halfExtentY", genie_ns), literal(&place.bounds.half_extents.y.to_string(), "xsd:float")));
-        store.add(Triple::new(bounds_bnode.clone(), format!("{}halfExtentZ", genie_ns), literal(&place.bounds.half_extents.z.to_string(), "xsd:float")));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}hasBounds", genie_ns),
+            bounds_bnode.clone(),
+        ));
+        store.add(Triple::new(
+            bounds_bnode.clone(),
+            "rdf:type",
+            format!("{}Bounds3D", genie_ns),
+        ));
+        store.add(Triple::new(
+            bounds_bnode.clone(),
+            format!("{}centerX", genie_ns),
+            literal(&place.bounds.center.x.to_string(), "xsd:float"),
+        ));
+        store.add(Triple::new(
+            bounds_bnode.clone(),
+            format!("{}centerY", genie_ns),
+            literal(&place.bounds.center.y.to_string(), "xsd:float"),
+        ));
+        store.add(Triple::new(
+            bounds_bnode.clone(),
+            format!("{}centerZ", genie_ns),
+            literal(&place.bounds.center.z.to_string(), "xsd:float"),
+        ));
+        store.add(Triple::new(
+            bounds_bnode.clone(),
+            format!("{}halfExtentX", genie_ns),
+            literal(&place.bounds.half_extents.x.to_string(), "xsd:float"),
+        ));
+        store.add(Triple::new(
+            bounds_bnode.clone(),
+            format!("{}halfExtentY", genie_ns),
+            literal(&place.bounds.half_extents.y.to_string(), "xsd:float"),
+        ));
+        store.add(Triple::new(
+            bounds_bnode.clone(),
+            format!("{}halfExtentZ", genie_ns),
+            literal(&place.bounds.half_extents.z.to_string(), "xsd:float"),
+        ));
     }
-    
+
     // 2. Translate Actors
     for actor in &spec.actors {
         let subj = Term::Named(format!("{}actor:{}", genie_ns, actor.id));
-        store.add(Triple::new(subj.clone(), "rdf:type", format!("{}Actor", genie_ns)));
-        store.add(Triple::new(subj.clone(), format!("{}name", genie_ns), literal(&actor.name, "xsd:string")));
-        store.add(Triple::new(subj.clone(), format!("{}role", genie_ns), literal(&actor.role, "xsd:string")));
+        store.add(Triple::new(
+            subj.clone(),
+            "rdf:type",
+            format!("{}Actor", genie_ns),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}name", genie_ns),
+            literal(&actor.name, "xsd:string"),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}role", genie_ns),
+            literal(&actor.role, "xsd:string"),
+        ));
         store.add(Triple::new(
             subj.clone(),
             format!("{}place", genie_ns),
-            Term::Named(format!("{}place:{}", genie_ns, actor.place_id))
+            Term::Named(format!("{}place:{}", genie_ns, actor.place_id)),
         ));
         // Backward compatibility shape matching (inPlace vs place)
         store.add(Triple::new(
             subj.clone(),
             format!("{}inPlace", genie_ns),
-            Term::Named(format!("{}place:{}", genie_ns, actor.place_id))
+            Term::Named(format!("{}place:{}", genie_ns, actor.place_id)),
         ));
     }
-    
+
     // 3. Translate Objects
     for object in &spec.objects {
         let subj = Term::Named(format!("{}object:{}", genie_ns, object.id));
-        store.add(Triple::new(subj.clone(), "rdf:type", format!("{}Object", genie_ns)));
-        store.add(Triple::new(subj.clone(), format!("{}name", genie_ns), literal(&object.name, "xsd:string")));
-        store.add(Triple::new(subj.clone(), format!("{}class", genie_ns), literal(&object.class, "xsd:string")));
+        store.add(Triple::new(
+            subj.clone(),
+            "rdf:type",
+            format!("{}Object", genie_ns),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}name", genie_ns),
+            literal(&object.name, "xsd:string"),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}class", genie_ns),
+            literal(&object.class, "xsd:string"),
+        ));
         store.add(Triple::new(
             subj.clone(),
             format!("{}place", genie_ns),
-            Term::Named(format!("{}place:{}", genie_ns, object.place_id))
+            Term::Named(format!("{}place:{}", genie_ns, object.place_id)),
         ));
         store.add(Triple::new(
             subj.clone(),
             format!("{}inPlace", genie_ns),
-            Term::Named(format!("{}place:{}", genie_ns, object.place_id))
+            Term::Named(format!("{}place:{}", genie_ns, object.place_id)),
         ));
     }
-    
+
     // 4. Translate Relationships
     for rel in &spec.relationships {
         let subj = Term::Named(format!("{}relationship:{}", genie_ns, rel.id));
-        store.add(Triple::new(subj.clone(), "rdf:type", format!("{}Relationship", genie_ns)));
-        
+        store.add(Triple::new(
+            subj.clone(),
+            "rdf:type",
+            format!("{}Relationship", genie_ns),
+        ));
+
         let type_str = match &rel.rel_type {
             RelationshipType::Connects => "connects",
             RelationshipType::Contains => "contains",
@@ -455,9 +549,17 @@ pub fn spec_to_triples(spec: &WorldSpec) -> TripleStore {
             RelationshipType::Controls => "controls",
             RelationshipType::Custom(s) => s.as_str(),
         };
-        store.add(Triple::new(subj.clone(), format!("{}relType", genie_ns), Term::Named(format!("{}relationshipType:{}", genie_ns, type_str))));
-        store.add(Triple::new(subj.clone(), format!("{}relationshipType", genie_ns), literal(type_str, "xsd:string")));
-        
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}relType", genie_ns),
+            Term::Named(format!("{}relationshipType:{}", genie_ns, type_str)),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}relationshipType", genie_ns),
+            literal(type_str, "xsd:string"),
+        ));
+
         // Find correct prefix for source and target
         let resolve_iri = |id: &str| -> Term {
             if spec.places.iter().any(|p| p.id == id) {
@@ -473,26 +575,50 @@ pub fn spec_to_triples(spec: &WorldSpec) -> TripleStore {
 
         let source_iri = resolve_iri(&rel.source);
         let target_iri = resolve_iri(&rel.target);
-        store.add(Triple::new(subj.clone(), format!("{}source", genie_ns), source_iri.clone()));
-        store.add(Triple::new(subj.clone(), format!("{}target", genie_ns), target_iri.clone()));
-        
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}source", genie_ns),
+            source_iri.clone(),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}target", genie_ns),
+            target_iri.clone(),
+        ));
+
         // Direct statement triple
         let predicate_iri = Term::Named(format!("{}{}", genie_ns, type_str));
         store.add(Triple::new(source_iri, predicate_iri, target_iri));
     }
-    
+
     // 5. Translate Rules
     for rule in &spec.rules {
         let subj = Term::Named(format!("{}rule:{}", genie_ns, rule.id));
-        store.add(Triple::new(subj.clone(), "rdf:type", format!("{}Rule", genie_ns)));
-        store.add(Triple::new(subj.clone(), format!("{}name", genie_ns), literal(&rule.name, "xsd:string")));
-        store.add(Triple::new(subj.clone(), format!("{}expression", genie_ns), literal(&rule.expression, "xsd:string")));
+        store.add(Triple::new(
+            subj.clone(),
+            "rdf:type",
+            format!("{}Rule", genie_ns),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}name", genie_ns),
+            literal(&rule.name, "xsd:string"),
+        ));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}expression", genie_ns),
+            literal(&rule.expression, "xsd:string"),
+        ));
         let sev_str = match &rule.severity {
             RuleSeverity::Info => "info",
             RuleSeverity::Warning => "warning",
             RuleSeverity::Error => "error",
         };
-        store.add(Triple::new(subj.clone(), format!("{}severity", genie_ns), Term::Named(format!("{}ruleSeverity:{}", genie_ns, sev_str))));
+        store.add(Triple::new(
+            subj.clone(),
+            format!("{}severity", genie_ns),
+            Term::Named(format!("{}ruleSeverity:{}", genie_ns, sev_str)),
+        ));
     }
 
     store

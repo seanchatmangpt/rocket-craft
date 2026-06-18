@@ -22,14 +22,13 @@ impl GoldenFile {
     ///   panics with a clear diff message.
     pub fn assert_matches(&self, content: &str) {
         if !self.path.exists() {
-            self.update(content).unwrap_or_else(|e| {
-                panic!("GoldenFile: could not write {:?}: {e}", self.path)
-            });
+            self.update(content)
+                .unwrap_or_else(|e| panic!("GoldenFile: could not write {:?}: {e}", self.path));
             return;
         }
-        let stored = self.read().unwrap_or_else(|e| {
-            panic!("GoldenFile: could not read {:?}: {e}", self.path)
-        });
+        let stored = self
+            .read()
+            .unwrap_or_else(|e| panic!("GoldenFile: could not read {:?}: {e}", self.path));
         assert_eq!(
             stored, content,
             "GoldenFile mismatch for {:?}\n--- expected (stored) ---\n{}\n--- actual ---\n{}",

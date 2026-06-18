@@ -1,12 +1,15 @@
-use crate::observations::Observation;
 use super::common;
+use crate::observations::Observation;
 
 const UNSAFE_STRING_FNS: &[&str] = &["strcpy(", "strcat(", "gets(", "sprintf(", "scanf("];
 const DEBUG_CALLS: &[&str] = &["printf(", "fprintf(stderr", "fprintf(stdout"];
 
 fn is_test_path(path: &str) -> bool {
-    path.contains("test/") || path.contains("tests/") || path.ends_with("_test.c")
-        || path.ends_with("_spec.c") || path.contains("check/")
+    path.contains("test/")
+        || path.contains("tests/")
+        || path.ends_with("_test.c")
+        || path.ends_with("_spec.c")
+        || path.contains("check/")
 }
 
 struct FnState {
@@ -46,10 +49,15 @@ fn extract_c_fn_name(trimmed: &str) -> &str {
     raw.trim_start_matches(|c: char| !c.is_alphanumeric() && c != '_')
 }
 
-fn verified(filepath: &str, content: &str, obs: &mut Vec<Observation>) {
+fn detect_victory_comments(filepath: &str, content: &str, obs: &mut Vec<Observation>) {
     const VICTORY_TERMS: &[&str] = &[
-        "fully implemented", "complete", "works perfectly", "all done",
-        "production ready", "verified correct", "tested and working",
+        "fully implemented",
+        "complete",
+        "works perfectly",
+        "all done",
+        "production ready",
+        "verified correct",
+        "tested and working",
     ];
     for (line_idx, line) in content.lines().enumerate() {
         let trimmed = line.trim();
@@ -95,7 +103,10 @@ fn detect_todo_comments(filepath: &str, content: &str, obs: &mut Vec<Observation
                     kind: "c_todo".to_string(),
                     construct: marker.to_string(),
                     context: trimmed.to_string(),
-                    message: format!("Unresolved '{}' comment — placeholder or stub left in code", marker),
+                    message: format!(
+                        "Unresolved '{}' comment — placeholder or stub left in code",
+                        marker
+                    ),
                 });
                 break;
             }
@@ -179,7 +190,8 @@ fn detect_getenv(filepath: &str, content: &str, obs: &mut Vec<Observation>) {
                 kind: "c_oracle".to_string(),
                 construct: "getenv".to_string(),
                 context: trimmed.to_string(),
-                message: "getenv() in production code — environment oracle injection channel".to_string(),
+                message: "getenv() in production code — environment oracle injection channel"
+                    .to_string(),
             });
         }
     }
@@ -192,17 +204,26 @@ fn detect_malloc_without_check(filepath: &str, content: &str, obs: &mut Vec<Obse
         if trimmed.starts_with("//") || trimmed.starts_with('*') {
             continue;
         }
-        if !trimmed.contains("malloc(") && !trimmed.contains("calloc(") && !trimmed.contains("realloc(") {
+        if !trimmed.contains("malloc(")
+            && !trimmed.contains("calloc(")
+            && !trimmed.contains("realloc(")
+        {
             continue;
         }
         // The current line may already be a conditional allocation: if ((p = malloc(n)) != NULL)
-        let current_ok = trimmed.contains("!= NULL") || trimmed.contains("== NULL")
-            || trimmed.contains("if (") || trimmed.contains("if(");
-        let next_check = current_ok || lines.iter().skip(i + 1).take(3).any(|l| {
-            let t = l.trim();
-            t.starts_with("if") || t.contains("== NULL") || t.contains("!= NULL")
-                || t.starts_with("assert(") || t.contains("NULL)")
-        });
+        let current_ok = trimmed.contains("!= NULL")
+            || trimmed.contains("== NULL")
+            || trimmed.contains("if (")
+            || trimmed.contains("if(");
+        let next_check = current_ok
+            || lines.iter().skip(i + 1).take(3).any(|l| {
+                let t = l.trim();
+                t.starts_with("if")
+                    || t.contains("== NULL")
+                    || t.contains("!= NULL")
+                    || t.starts_with("assert(")
+                    || t.contains("NULL)")
+            });
         if !next_check {
             obs.push(Observation {
                 file_path: filepath.to_string(),
@@ -261,14 +282,23 @@ fn detect_hardcoded_lookup_tables(filepath: &str, content: &str, obs: &mut Vec<O
                 common::for_effective_braces(trimmed, |ch| {
                     match ch {
                         '{' => array_depth += 1,
-                        '}' => { if array_depth > 0 { array_depth -= 1; } }
+                        '}' => {
+                            if array_depth > 0 {
+                                array_depth -= 1;
+                            }
+                        }
                         _ => { /* handled */ }
                     }
                 });
                 if array_depth == 0 {
                     in_array = false;
                     if entry_count > 20 {
-                        obs.push(make_lookup_obs(filepath, array_start, &array_name, entry_count));
+                        obs.push(make_lookup_obs(
+                            filepath,
+                            array_start,
+                            &array_name,
+                            entry_count,
+                        ));
                     }
                     entry_count = 0;
                     array_name = String::new();
@@ -280,14 +310,23 @@ fn detect_hardcoded_lookup_tables(filepath: &str, content: &str, obs: &mut Vec<O
             common::for_effective_braces(trimmed, |ch| {
                 match ch {
                     '{' => array_depth += 1,
-                    '}' => { if array_depth > 0 { array_depth -= 1; } }
+                    '}' => {
+                        if array_depth > 0 {
+                            array_depth -= 1;
+                        }
+                    }
                     _ => { /* handled */ }
                 }
             });
             if array_depth == 0 {
                 in_array = false;
                 if entry_count > 20 {
-                    obs.push(make_lookup_obs(filepath, array_start, &array_name, entry_count));
+                    obs.push(make_lookup_obs(
+                        filepath,
+                        array_start,
+                        &array_name,
+                        entry_count,
+                    ));
                 }
                 entry_count = 0;
                 array_name = String::new();
@@ -329,7 +368,11 @@ fn detect_stub_functions(filepath: &str, content: &str, obs: &mut Vec<Observatio
                 common::for_effective_braces(bl, |ch| {
                     match ch {
                         '{' => depth += 1,
-                        '}' => { if depth > 0 { depth -= 1; } }
+                        '}' => {
+                            if depth > 0 {
+                                depth -= 1;
+                            }
+                        }
                         _ => { /* handled */ }
                     }
                 });
@@ -339,18 +382,18 @@ fn detect_stub_functions(filepath: &str, content: &str, obs: &mut Vec<Observatio
                 j += 1;
             }
 
-            let non_empty: Vec<&&str> = body_lines.iter()
+            let non_empty: Vec<&&str> = body_lines
+                .iter()
                 .filter(|l| !l.is_empty() && !l.starts_with("//"))
                 .collect();
             let is_stub = non_empty.is_empty()
-                || (non_empty.len() == 1 && (
-                    non_empty[0].starts_with("return 0")
-                    || non_empty[0].starts_with("return NULL")
-                    || non_empty[0].starts_with("return -1")
-                    || non_empty[0].starts_with("return false")
-                    || non_empty[0].starts_with("return true")
-                    || *non_empty[0] == "return;"
-                ));
+                || (non_empty.len() == 1
+                    && (non_empty[0].starts_with("return 0")
+                        || non_empty[0].starts_with("return NULL")
+                        || non_empty[0].starts_with("return -1")
+                        || non_empty[0].starts_with("return false")
+                        || non_empty[0].starts_with("return true")
+                        || *non_empty[0] == "return;"));
 
             if is_stub {
                 let name = extract_c_fn_name(trimmed);
@@ -450,7 +493,10 @@ fn emit_metric_obs(filepath: &str, st: &FnState, obs: &mut Vec<Observation>) {
             kind: "c_fn_metric".to_string(),
             construct: st.name.clone(),
             context: format!("lines={}", st.line_count),
-            message: format!("Function '{}' exceeds 80-line threshold ({} lines)", st.name, st.line_count),
+            message: format!(
+                "Function '{}' exceeds 80-line threshold ({} lines)",
+                st.name, st.line_count
+            ),
         });
     }
     if st.branch_count > 10 {
@@ -463,7 +509,10 @@ fn emit_metric_obs(filepath: &str, st: &FnState, obs: &mut Vec<Observation>) {
             kind: "c_fn_metric".to_string(),
             construct: st.name.clone(),
             context: format!("cyclomatic={}", st.branch_count),
-            message: format!("Function '{}' has high cyclomatic complexity ({} branches)", st.name, st.branch_count),
+            message: format!(
+                "Function '{}' has high cyclomatic complexity ({} branches)",
+                st.name, st.branch_count
+            ),
         });
     }
     if st.nesting_depth > 4 {
@@ -476,7 +525,10 @@ fn emit_metric_obs(filepath: &str, st: &FnState, obs: &mut Vec<Observation>) {
             kind: "c_fn_metric".to_string(),
             construct: st.name.clone(),
             context: format!("nesting={}", st.nesting_depth),
-            message: format!("Function '{}' exceeds nesting depth threshold ({} levels)", st.name, st.nesting_depth),
+            message: format!(
+                "Function '{}' exceeds nesting depth threshold ({} levels)",
+                st.name, st.nesting_depth
+            ),
         });
     }
 }
@@ -550,7 +602,9 @@ mod tests {
         let src = "void f(int x) {\n    if (x > 0) {\n        x = 1;\n    } else if (x < 0) {\n        x = -1;\n    }\n}";
         let obs = parse_c_source("foo.c", src);
         // f() returns nothing constant — not a stub. else-if must not be treated as a fn.
-        assert!(!obs.iter().any(|o| o.kind == "c_stub" && o.message.contains("else")));
+        assert!(!obs
+            .iter()
+            .any(|o| o.kind == "c_stub" && o.message.contains("else")));
     }
 
     #[test]
@@ -562,23 +616,30 @@ mod tests {
         }
         src.push_str("};\n");
         let obs = parse_c_source("lookup.c", &src);
-        assert!(obs.iter().any(|o| o.construct == "large_static_array"),
-            "should detect large nested struct array");
+        assert!(
+            obs.iter().any(|o| o.construct == "large_static_array"),
+            "should detect large nested struct array"
+        );
     }
 
     #[test]
     fn victory_in_block_comment_body_detected() {
-        let src = "/*\n * This is fully implemented and works perfectly.\n */\nint foo() { return 1; }";
+        let src =
+            "/*\n * This is fully implemented and works perfectly.\n */\nint foo() { return 1; }";
         let obs = parse_c_source("foo.c", src);
-        assert!(obs.iter().any(|o| o.kind == "c_claim"),
-            "should detect victory language in block comment body");
+        assert!(
+            obs.iter().any(|o| o.kind == "c_claim"),
+            "should detect victory language in block comment body"
+        );
     }
 
     #[test]
     fn string_with_brace_does_not_confuse_stub_detection() {
         let src = "int f(int x) {\n    printf(\"hello {\");\n    return x + 1;\n}";
         let obs = parse_c_source("foo.c", src);
-        assert!(!obs.iter().any(|o| o.kind == "c_stub"),
-            "brace inside string should not confuse stub detection");
+        assert!(
+            !obs.iter().any(|o| o.kind == "c_stub"),
+            "brace inside string should not confuse stub detection"
+        );
     }
 }

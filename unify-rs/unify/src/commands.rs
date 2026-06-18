@@ -1,13 +1,13 @@
-use crate::app::{Cli, Commands, GenieSubcommands};
+use crate::app::{AutomlSubcommands, Cli, Commands, DevSubcommands, GenieSubcommands};
 use crate::output::Output;
 use crate::version::crate_versions;
-use unify_receipts::receipt::Receipt;
+use genie_core::spec::WorldSpec;
+use serde_json::json;
 use unify_rdf::pipeline::{OntologyPipeline, PipelineConfig};
 use unify_rdf::sparql::{PatternExecutor, SparqlExecutor};
 use unify_rdf::store::TripleStore;
 use unify_rdf::triple::Term;
-use serde_json::json;
-use genie_core::spec::WorldSpec;
+use unify_receipts::receipt::Receipt;
 
 /// Typed error variants for all CLI command handlers.
 #[derive(thiserror::Error, Debug)]
@@ -18,6 +18,8 @@ pub enum CommandError {
     TurtleParse(String),
     #[error("Genie error: {0}")]
     Genie(String),
+    #[error("AutoML error: {0}")]
+    Automl(String),
 }
 
 /// Entry point: dispatch the parsed CLI to the matching handler.
@@ -27,9 +29,12 @@ pub fn run(cli: Cli) -> Result<Output, CommandError> {
         Commands::Verify { chain_json } => cmd_verify(&chain_json),
         Commands::Gate { law, data } => cmd_gate(&law, &data),
         Commands::Info => cmd_info(),
-        Commands::Dispatch { namespace, noun, verb, input } => {
-            cmd_dispatch(namespace.as_deref(), &noun, &verb, input.as_deref())
-        }
+        Commands::Dispatch {
+            namespace,
+            noun,
+            verb,
+            input,
+        } => cmd_dispatch(namespace.as_deref(), &noun, &verb, input.as_deref()),
         Commands::Query { ttl, pattern } => cmd_query(ttl.as_deref(), &pattern),
         Commands::Witnesses { domain } => cmd_witnesses(domain.as_deref()),
         Commands::Genie { subcommand } => cmd_genie(subcommand),
@@ -37,7 +42,13 @@ pub fn run(cli: Cli) -> Result<Output, CommandError> {
         Commands::WorldValidate { spec } => cmd_world_validate(&spec),
         Commands::WorldGenerate { spec, output } => cmd_world_generate(&spec, &output),
         Commands::WorldDeploy { spec, log } => cmd_world_deploy(&spec, &log),
-        Commands::WorldEvolve { spec, intent, output } => cmd_world_evolve(&spec, &intent, &output),
+        Commands::WorldEvolve {
+            spec,
+            intent,
+            output,
+        } => cmd_world_evolve(&spec, &intent, &output),
+        Commands::Automl { subcommand } => cmd_automl(subcommand),
+        Commands::Dev { subcommand } => cmd_dev(subcommand),
     }
 }
 
@@ -184,7 +195,9 @@ pub fn cmd_query(ttl: Option<&str>, pattern: &str) -> Result<Output, CommandErro
             namespace: "unify".into(),
         };
         let mut pipeline = OntologyPipeline::new(store, config);
-        pipeline.load_turtle(turtle).map_err(|e| CommandError::TurtleParse(e.to_string()))?;
+        pipeline
+            .load_turtle(turtle)
+            .map_err(|e| CommandError::TurtleParse(e.to_string()))?;
         drop(pipeline);
         store = TripleStore::new();
         parse_turtle_into_store(turtle, &mut store);
@@ -374,11 +387,16 @@ pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, CommandError> {
 /// Genie 26 World Manufacturing Platform CLI command handler.
 pub fn cmd_genie(subcmd: GenieSubcommands) -> Result<Output, CommandError> {
     match subcmd {
-        GenieSubcommands::Manufacture { intent, out_spec, out_t3d } => {
+        GenieSubcommands::Manufacture {
+            intent,
+            out_spec,
+            out_t3d,
+        } => {
             // Load intent (either file path or raw string)
             let intent_str = if std::path::Path::new(&intent).exists() {
-                std::fs::read_to_string(&intent)
-                    .map_err(|e| CommandError::Genie(format!("Failed to read intent file {}: {}", intent, e)))?
+                std::fs::read_to_string(&intent).map_err(|e| {
+                    CommandError::Genie(format!("Failed to read intent file {}: {}", intent, e))
+                })?
             } else {
                 intent
             };
@@ -390,22 +408,30 @@ pub fn cmd_genie(subcmd: GenieSubcommands) -> Result<Output, CommandError> {
             // Validate
             let gate = genie_core::laws::WorldCoherenceGate::new();
             if let Err(errors) = gate.validate(&spec) {
-                return Err(CommandError::Genie(format!("World coherence validation failed:\n{}", errors.join("\n"))));
+                return Err(CommandError::Genie(format!(
+                    "World coherence validation failed:\n{}",
+                    errors.join("\n")
+                )));
             }
 
             // Receipts
-            genie_core::receipt_chain::ReceiptChainManager::generate_receipt_chain(&mut spec, b"genie_salt")
-                .map_err(|e| CommandError::Genie(format!("Receipt chaining failed: {}", e)))?;
+            genie_core::receipt_chain::ReceiptChainManager::generate_receipt_chain(
+                &mut spec,
+                b"genie_salt",
+            )
+            .map_err(|e| CommandError::Genie(format!("Receipt chaining failed: {}", e)))?;
 
             // Save JSON Spec
             let spec_json = serde_json::to_string_pretty(&spec)?;
-            std::fs::write(&out_spec, spec_json)
-                .map_err(|e| CommandError::Genie(format!("Failed to write spec JSON to {}: {}", out_spec, e)))?;
+            std::fs::write(&out_spec, spec_json).map_err(|e| {
+                CommandError::Genie(format!("Failed to write spec JSON to {}: {}", out_spec, e))
+            })?;
 
             // Save T3D Layout
             let t3d_str = genie_core::layout::LayoutCompiler::compile(&spec);
-            std::fs::write(&out_t3d, t3d_str)
-                .map_err(|e| CommandError::Genie(format!("Failed to write T3D layout to {}: {}", out_t3d, e)))?;
+            std::fs::write(&out_t3d, t3d_str).map_err(|e| {
+                CommandError::Genie(format!("Failed to write T3D layout to {}: {}", out_t3d, e))
+            })?;
 
             Ok(Output::ok(json!({
                 "status": "manufactured",
@@ -416,39 +442,58 @@ pub fn cmd_genie(subcmd: GenieSubcommands) -> Result<Output, CommandError> {
                 "objects_count": spec.objects.len(),
             })))
         }
-        GenieSubcommands::Evolve { spec, intent, out_spec, out_t3d } => {
+        GenieSubcommands::Evolve {
+            spec,
+            intent,
+            out_spec,
+            out_t3d,
+        } => {
             // Load initial spec
-            let spec_content = std::fs::read_to_string(&spec)
-                .map_err(|e| CommandError::Genie(format!("Failed to read spec file {}: {}", spec, e)))?;
+            let spec_content = std::fs::read_to_string(&spec).map_err(|e| {
+                CommandError::Genie(format!("Failed to read spec file {}: {}", spec, e))
+            })?;
             let world_spec: WorldSpec = serde_json::from_str(&spec_content)?;
 
             // Load modification intent
             let intent_str = if std::path::Path::new(&intent).exists() {
-                std::fs::read_to_string(&intent)
-                    .map_err(|e| CommandError::Genie(format!("Failed to read intent file {}: {}", intent, e)))?
+                std::fs::read_to_string(&intent).map_err(|e| {
+                    CommandError::Genie(format!("Failed to read intent file {}: {}", intent, e))
+                })?
             } else {
                 intent
             };
 
             // Evolve
-            let evolved_spec = genie_core::evolution::WorldEvolver::evolve(&world_spec, &intent_str)
-                .map_err(|e| CommandError::Genie(format!("Evolution failed: {}", e)))?;
+            let evolved_spec =
+                genie_core::evolution::WorldEvolver::evolve(&world_spec, &intent_str)
+                    .map_err(|e| CommandError::Genie(format!("Evolution failed: {}", e)))?;
 
             // Validate
             let gate = genie_core::laws::WorldCoherenceGate::new();
             if let Err(errors) = gate.validate(&evolved_spec) {
-                return Err(CommandError::Genie(format!("Evolved world coherence validation failed:\n{}", errors.join("\n"))));
+                return Err(CommandError::Genie(format!(
+                    "Evolved world coherence validation failed:\n{}",
+                    errors.join("\n")
+                )));
             }
 
             // Save JSON Spec
             let spec_json = serde_json::to_string_pretty(&evolved_spec)?;
-            std::fs::write(&out_spec, spec_json)
-                .map_err(|e| CommandError::Genie(format!("Failed to write evolved spec JSON to {}: {}", out_spec, e)))?;
+            std::fs::write(&out_spec, spec_json).map_err(|e| {
+                CommandError::Genie(format!(
+                    "Failed to write evolved spec JSON to {}: {}",
+                    out_spec, e
+                ))
+            })?;
 
             // Save T3D Layout
             let t3d_str = genie_core::layout::LayoutCompiler::compile(&evolved_spec);
-            std::fs::write(&out_t3d, t3d_str)
-                .map_err(|e| CommandError::Genie(format!("Failed to write evolved T3D layout to {}: {}", out_t3d, e)))?;
+            std::fs::write(&out_t3d, t3d_str).map_err(|e| {
+                CommandError::Genie(format!(
+                    "Failed to write evolved T3D layout to {}: {}",
+                    out_t3d, e
+                ))
+            })?;
 
             Ok(Output::ok(json!({
                 "status": "evolved",
@@ -461,13 +506,17 @@ pub fn cmd_genie(subcmd: GenieSubcommands) -> Result<Output, CommandError> {
         }
         GenieSubcommands::Deploy { spec, log } => {
             // Load spec
-            let spec_content = std::fs::read_to_string(&spec)
-                .map_err(|e| CommandError::Genie(format!("Failed to read spec file {}: {}", spec, e)))?;
+            let spec_content = std::fs::read_to_string(&spec).map_err(|e| {
+                CommandError::Genie(format!("Failed to read spec file {}: {}", spec, e))
+            })?;
             let world_spec: WorldSpec = serde_json::from_str(&spec_content)?;
 
             // Deploy
-            genie_core::deployment::DeploymentManager::deploy(&world_spec, std::path::Path::new(&log))
-                .map_err(|e| CommandError::Genie(format!("Deployment failed: {}", e)))?;
+            genie_core::deployment::DeploymentManager::deploy(
+                &world_spec,
+                std::path::Path::new(&log),
+            )
+            .map_err(|e| CommandError::Genie(format!("Deployment failed: {}", e)))?;
 
             Ok(Output::ok(json!({
                 "status": "deployed",
@@ -479,16 +528,18 @@ pub fn cmd_genie(subcmd: GenieSubcommands) -> Result<Output, CommandError> {
 
 fn load_intent(intent: &str) -> Result<String, CommandError> {
     if std::path::Path::new(intent).exists() {
-        std::fs::read_to_string(intent)
-            .map_err(|e| CommandError::Genie(format!("Failed to read intent file {}: {}", intent, e)))
+        std::fs::read_to_string(intent).map_err(|e| {
+            CommandError::Genie(format!("Failed to read intent file {}: {}", intent, e))
+        })
     } else {
         Ok(intent.to_string())
     }
 }
 
 fn load_world_spec(spec_path: &str) -> Result<WorldSpec, CommandError> {
-    let spec_content = std::fs::read_to_string(spec_path)
-        .map_err(|e| CommandError::Genie(format!("Failed to read spec file {}: {}", spec_path, e)))?;
+    let spec_content = std::fs::read_to_string(spec_path).map_err(|e| {
+        CommandError::Genie(format!("Failed to read spec file {}: {}", spec_path, e))
+    })?;
     let spec: WorldSpec = serde_json::from_str(&spec_content)
         .map_err(|e| CommandError::Genie(format!("Failed to parse spec JSON: {}", e)))?;
     Ok(spec)
@@ -522,7 +573,10 @@ pub fn cmd_world_validate(spec: &str) -> Result<Output, CommandError> {
         Err(errors) => Ok(Output {
             data: json!({ "valid": false, "errors": errors }),
             success: false,
-            message: Some(format!("Coherence validation failed:\n{}", errors.join("\n"))),
+            message: Some(format!(
+                "Coherence validation failed:\n{}",
+                errors.join("\n")
+            )),
         }),
     }
 }
@@ -531,8 +585,11 @@ pub fn cmd_world_generate(spec: &str, output: &str) -> Result<Output, CommandErr
     let mut world_spec = load_world_spec(spec)?;
 
     // Regenerate and verify the BLAKE3 receipt chain using ReceiptChainManager and secret salt b"genie_salt"
-    genie_core::receipt_chain::ReceiptChainManager::generate_receipt_chain(&mut world_spec, b"genie_salt")
-        .map_err(|e| CommandError::Genie(format!("Receipt chaining failed: {}", e)))?;
+    genie_core::receipt_chain::ReceiptChainManager::generate_receipt_chain(
+        &mut world_spec,
+        b"genie_salt",
+    )
+    .map_err(|e| CommandError::Genie(format!("Receipt chaining failed: {}", e)))?;
 
     // Save the updated spec back to its original path to store the new receipts
     let spec_json = serde_json::to_string_pretty(&world_spec)?;
@@ -540,15 +597,21 @@ pub fn cmd_world_generate(spec: &str, output: &str) -> Result<Output, CommandErr
         .map_err(|e| CommandError::Genie(format!("Failed to write updated spec: {}", e)))?;
 
     // Verify receipt chain
-    let is_valid = genie_core::receipt_chain::ReceiptChainManager::verify_receipt_chain(&world_spec, b"genie_salt");
+    let is_valid = genie_core::receipt_chain::ReceiptChainManager::verify_receipt_chain(
+        &world_spec,
+        b"genie_salt",
+    );
     if !is_valid {
-        return Err(CommandError::Genie("Failed to verify newly generated receipt chain".to_string()));
+        return Err(CommandError::Genie(
+            "Failed to verify newly generated receipt chain".to_string(),
+        ));
     }
 
     // Compile layout to T3D
     let t3d_str = genie_core::layout::LayoutCompiler::compile(&world_spec);
-    std::fs::write(output, t3d_str)
-        .map_err(|e| CommandError::Genie(format!("Failed to write T3D layout to {}: {}", output, e)))?;
+    std::fs::write(output, t3d_str).map_err(|e| {
+        CommandError::Genie(format!("Failed to write T3D layout to {}: {}", output, e))
+    })?;
 
     Ok(Output::ok(json!({
         "status": "generated",
@@ -563,7 +626,10 @@ pub fn cmd_world_deploy(spec: &str, log: &str) -> Result<Output, CommandError> {
         .map_err(|e| CommandError::Genie(format!("Deployment failed: {}", e)))?;
 
     use std::io::Write;
-    let _ = writeln!(std::io::stdout(), "Deployment active! Server running on http://127.0.0.1:8080");
+    let _ = writeln!(
+        std::io::stdout(),
+        "Deployment active! Server running on http://127.0.0.1:8080"
+    );
     let _ = writeln!(std::io::stdout(), "Press Ctrl+C to terminate.");
     if std::env::var("GENIE_TEST_NO_BLOCK").is_ok() {
         return Ok(Output::ok(json!({
@@ -587,19 +653,31 @@ pub fn cmd_world_evolve(spec: &str, intent: &str, output: &str) -> Result<Output
         .map_err(|e| CommandError::Genie(format!("Evolution failed: {}", e)))?;
 
     // Regenerate and verify the BLAKE3 receipt chain using ReceiptChainManager and secret salt b"genie_salt"
-    genie_core::receipt_chain::ReceiptChainManager::generate_receipt_chain(&mut evolved_spec, b"genie_salt")
-        .map_err(|e| CommandError::Genie(format!("Receipt chaining failed: {}", e)))?;
+    genie_core::receipt_chain::ReceiptChainManager::generate_receipt_chain(
+        &mut evolved_spec,
+        b"genie_salt",
+    )
+    .map_err(|e| CommandError::Genie(format!("Receipt chaining failed: {}", e)))?;
 
     // Verify receipt chain
-    let is_valid = genie_core::receipt_chain::ReceiptChainManager::verify_receipt_chain(&evolved_spec, b"genie_salt");
+    let is_valid = genie_core::receipt_chain::ReceiptChainManager::verify_receipt_chain(
+        &evolved_spec,
+        b"genie_salt",
+    );
     if !is_valid {
-        return Err(CommandError::Genie("Failed to verify evolved receipt chain".to_string()));
+        return Err(CommandError::Genie(
+            "Failed to verify evolved receipt chain".to_string(),
+        ));
     }
 
     // Save evolved spec
     let spec_json = serde_json::to_string_pretty(&evolved_spec)?;
-    std::fs::write(output, spec_json)
-        .map_err(|e| CommandError::Genie(format!("Failed to write evolved spec JSON to {}: {}", output, e)))?;
+    std::fs::write(output, spec_json).map_err(|e| {
+        CommandError::Genie(format!(
+            "Failed to write evolved spec JSON to {}: {}",
+            output, e
+        ))
+    })?;
 
     Ok(Output::ok(json!({
         "status": "evolved",
@@ -609,4 +687,41 @@ pub fn cmd_world_evolve(spec: &str, intent: &str, output: &str) -> Result<Output
         "actors": evolved_spec.actors.len(),
         "objects": evolved_spec.objects.len(),
     })))
+}
+
+pub fn cmd_automl(subcmd: AutomlSubcommands) -> Result<Output, CommandError> {
+    let args = match subcmd {
+        AutomlSubcommands::Discover { path } => vec!["discover".to_string(), path],
+        AutomlSubcommands::Optimize {
+            points,
+            target,
+            sims,
+        } => vec![
+            "optimize".to_string(),
+            points.to_string(),
+            target.to_string(),
+            sims.to_string(),
+        ],
+    };
+    let out = unify_automl::cli::dispatch_command(&args)
+        .map_err(|e| CommandError::Automl(e.to_string()))?;
+    Ok(Output {
+        data: out.data,
+        success: out.success,
+        message: Some(out.message),
+    })
+}
+
+pub fn cmd_dev(subcmd: DevSubcommands) -> Result<Output, CommandError> {
+    let args = match subcmd {
+        DevSubcommands::Init { path } => vec!["init".to_string(), path],
+        DevSubcommands::Start { path } => vec!["start".to_string(), path],
+    };
+    let out = unify_automl::cli::dispatch_dev_command(&args)
+        .map_err(|e| CommandError::Automl(e.to_string()))?;
+    Ok(Output {
+        data: out.data,
+        success: out.success,
+        message: Some(out.message),
+    })
 }

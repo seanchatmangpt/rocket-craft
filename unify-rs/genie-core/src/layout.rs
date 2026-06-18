@@ -1,4 +1,4 @@
-use crate::spec::{WorldSpec, Place, Actor, Object, Vector3};
+use crate::spec::{Actor, Object, Place, Vector3, WorldSpec};
 
 /// Compiles a validated `WorldSpec` into a copy-pasteable Unreal Engine 4 compatible `.t3d` level map string.
 pub struct LayoutCompiler;
@@ -18,12 +18,18 @@ impl LayoutCompiler {
         }
 
         for actor in &spec.actors {
-            let parent_center = place_centers.get(&actor.place_id).copied().unwrap_or_default();
+            let parent_center = place_centers
+                .get(&actor.place_id)
+                .copied()
+                .unwrap_or_default();
             out.push_str(&Self::compile_actor(actor, parent_center));
         }
 
         for object in &spec.objects {
-            let parent_center = place_centers.get(&object.place_id).copied().unwrap_or_default();
+            let parent_center = place_centers
+                .get(&object.place_id)
+                .copied()
+                .unwrap_or_default();
             out.push_str(&Self::compile_object(object, parent_center));
         }
 
@@ -94,9 +100,13 @@ impl LayoutCompiler {
 
         let (class_path, class_name) = Self::get_class_info(&actor.role);
         let actor_name = format!("Actor_{}", actor.id);
-        
+
         let archetype_path = if let Some(dot_idx) = class_path.rfind('.') {
-            format!("{}.Default__{}", &class_path[..dot_idx], &class_path[dot_idx + 1..])
+            format!(
+                "{}.Default__{}",
+                &class_path[..dot_idx],
+                &class_path[dot_idx + 1..]
+            )
         } else {
             class_path.clone()
         };
@@ -139,7 +149,11 @@ impl LayoutCompiler {
         let actor_name = format!("Object_{}", object.id);
 
         let archetype_path = if let Some(dot_idx) = class_path.rfind('.') {
-            format!("{}.Default__{}", &class_path[..dot_idx], &class_path[dot_idx + 1..])
+            format!(
+                "{}.Default__{}",
+                &class_path[..dot_idx],
+                &class_path[dot_idx + 1..]
+            )
         } else {
             class_path.clone()
         };

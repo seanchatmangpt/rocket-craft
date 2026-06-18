@@ -490,12 +490,12 @@ impl DynamicLaw for NonEmptyNameDynamicLaw {
     }
 
     fn validate_path(&self, path: &Path) -> Result<(), LawViolation> {
-        let stem = path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or("");
+        let stem = path.file_stem().and_then(|s| s.to_str()).unwrap_or("");
         if stem.is_empty() {
-            Err(LawViolation::new(NonEmptyNameLaw::NAME, "file stem is empty"))
+            Err(LawViolation::new(
+                NonEmptyNameLaw::NAME,
+                "file stem is empty",
+            ))
         } else {
             Ok(())
         }
@@ -758,9 +758,7 @@ mod tests {
             .expect("admission should succeed");
         assert_eq!(admitted.inner().items.len(), 2);
 
-        let (output, exported) = admitted.export(|a| {
-            format!("{}: {}", a.name, a.items.join(", "))
-        });
+        let (output, exported) = admitted.export(|a| format!("{}: {}", a.name, a.items.join(", ")));
         assert_eq!(output, "LIFECYCLE: one, two");
         assert_eq!(exported.inner().name, "LIFECYCLE");
     }
@@ -772,9 +770,9 @@ mod tests {
     }
 
     fn always_fail(msg: &'static str) -> Box<dyn DynamicLaw> {
-        Box::new(StaticLawAdapter::<NonEmptyCollectionLaw>::new(move |_path| {
-            Err(LawViolation::new(NonEmptyCollectionLaw::NAME, msg))
-        }))
+        Box::new(StaticLawAdapter::<NonEmptyCollectionLaw>::new(
+            move |_path| Err(LawViolation::new(NonEmptyCollectionLaw::NAME, msg)),
+        ))
     }
 
     #[test]
@@ -883,14 +881,21 @@ mod tests {
 
     #[test]
     fn codegen_generates_output() {
-        struct Template { greeting: String }
+        struct Template {
+            greeting: String,
+        }
         impl Codegen for Template {
             fn generate(&self) -> String {
-                format!("// Generated\nconst GREETING: &str = \"{}\";", self.greeting)
+                format!(
+                    "// Generated\nconst GREETING: &str = \"{}\";",
+                    self.greeting
+                )
             }
         }
 
-        let t = Template { greeting: "hello".into() };
+        let t = Template {
+            greeting: "hello".into(),
+        };
         let code = t.generate();
         assert!(code.contains("Generated"));
         assert!(code.contains("hello"));

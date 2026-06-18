@@ -28,9 +28,7 @@ pub enum Commands {
         data: String,
     },
     /// Verify a receipt chain stored as JSON
-    Verify {
-        chain_json: String,
-    },
+    Verify { chain_json: String },
     /// Check an admission gate law
     Gate {
         #[arg(short, long)]
@@ -100,6 +98,48 @@ pub enum Commands {
         intent: String,
         #[arg(short, long)]
         output: String,
+    },
+    /// AutoML subcommands
+    Automl {
+        #[command(subcommand)]
+        subcommand: AutomlSubcommands,
+    },
+    /// Dev subcommands
+    Dev {
+        #[command(subcommand)]
+        subcommand: DevSubcommands,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum AutomlSubcommands {
+    /// Scan directory for components
+    Discover {
+        #[arg(default_value = ".")]
+        path: String,
+    },
+    /// Run game balance optimizer
+    Optimize {
+        #[arg(short, long, default_value_t = 8)]
+        points: u32,
+        #[arg(short, long, default_value_t = 0.6)]
+        target: f64,
+        #[arg(short, long, default_value_t = 20)]
+        sims: usize,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum DevSubcommands {
+    /// Initialize developer environment folder and configs
+    Init {
+        #[arg(default_value = "./dev_env")]
+        path: String,
+    },
+    /// Start local developer server
+    Start {
+        #[arg(default_value = "./dev_env")]
+        path: String,
     },
 }
 

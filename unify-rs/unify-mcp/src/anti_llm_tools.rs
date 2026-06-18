@@ -6,7 +6,10 @@ use serde_json::json;
 pub fn attach_anti_llm_tools(server: crate::server::McpServer) -> crate::server::McpServer {
     server
         .with_tool(scan_directory_descriptor(), handle_scan_directory)
-        .with_tool(evaluate_diagnostics_descriptor(), handle_evaluate_diagnostics)
+        .with_tool(
+            evaluate_diagnostics_descriptor(),
+            handle_evaluate_diagnostics,
+        )
 }
 
 /// MCP tool: `audit/scan_directory` - scan a directory for LLM cheat patterns
@@ -41,11 +44,9 @@ pub fn handle_scan_directory(params: serde_json::Value) -> Result<serde_json::Va
 }
 
 /// MCP tool: `audit/evaluate_diagnostics` - convert observations to diagnostics
-pub fn handle_evaluate_diagnostics(
-    params: serde_json::Value,
-) -> Result<serde_json::Value, String> {
-    use anti_llm_cheat_lsp::observations::Observation;
+pub fn handle_evaluate_diagnostics(params: serde_json::Value) -> Result<serde_json::Value, String> {
     use anti_llm_cheat_lsp::config::AntiLlmConfig;
+    use anti_llm_cheat_lsp::observations::Observation;
 
     let observations_json = params["observations"]
         .as_array()

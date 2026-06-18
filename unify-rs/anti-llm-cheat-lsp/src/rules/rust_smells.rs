@@ -107,7 +107,8 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
                 message: o.message.clone(),
                 forbidden_implication: "Debug macro => Production artifact".to_string(),
                 blocking: false,
-                required_correction: "Remove debug print macros from production code paths.".to_string(),
+                required_correction: "Remove debug print macros from production code paths."
+                    .to_string(),
                 required_next_proof: "Confirm no debug output in production build.".to_string(),
             });
         }
@@ -121,10 +122,13 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
                 line: o.line,
                 column: o.column,
                 message: o.message.clone(),
-                forbidden_implication: "allow(…) suppression => Compiler warning silenced".to_string(),
+                forbidden_implication: "allow(…) suppression => Compiler warning silenced"
+                    .to_string(),
                 blocking: false,
-                required_correction: "Fix the underlying warning instead of suppressing it.".to_string(),
-                required_next_proof: "Remove the suppression attribute and confirm clean build.".to_string(),
+                required_correction: "Fix the underlying warning instead of suppressing it."
+                    .to_string(),
+                required_next_proof: "Remove the suppression attribute and confirm clean build."
+                    .to_string(),
             });
         }
 
@@ -140,7 +144,8 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
                 forbidden_implication: "TODO comment => Finished work".to_string(),
                 blocking: false,
                 required_correction: "Resolve the outstanding TODO before shipping.".to_string(),
-                required_next_proof: "Confirm no TODO/FIXME markers remain in this path.".to_string(),
+                required_next_proof: "Confirm no TODO/FIXME markers remain in this path."
+                    .to_string(),
             });
         }
     }

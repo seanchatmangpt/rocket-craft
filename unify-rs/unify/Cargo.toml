@@ -18,6 +18,7 @@ unify-admission = { path = "../unify-admission" }
 unify-rdf = { path = "../unify-rdf" }
 unify-sem = { path = "../unify-sem" }
 unify-lsp = { path = "../unify-lsp" }
+unify-automl = { path = "../unify-automl" }
 genie-core = { path = "../genie-core" }
 clap = { workspace = true }
 serde = { workspace = true }

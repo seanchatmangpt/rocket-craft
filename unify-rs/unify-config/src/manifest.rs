@@ -1,4 +1,6 @@
-use crate::sections::{WorkspaceConfig, CodegenConfig, LspConfig, CliConfig, TestConfig, OtelConfig, RdfConfig};
+use crate::sections::{
+    CliConfig, CodegenConfig, LspConfig, OtelConfig, RdfConfig, TestConfig, WorkspaceConfig,
+};
 use crate::ConfigError;
 
 #[derive(Debug, Default, Clone, serde::Serialize, serde::Deserialize)]

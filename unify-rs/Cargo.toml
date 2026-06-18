@@ -18,6 +18,7 @@ members = [
     "unify",
     "anti-llm-cheat-lsp",
     "genie-core",
+    "unify-automl",
     "../genie3-rs",
 ]
 resolver = "2"

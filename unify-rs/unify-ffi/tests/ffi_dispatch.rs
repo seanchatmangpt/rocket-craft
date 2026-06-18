@@ -54,7 +54,8 @@ fn two_different_unknown_commands_return_errors() {
     match (&r1, &r2) {
         (Err(e1), Err(e2)) => {
             assert!(
-                e1.contains("nonexistent_cmd_alpha") || e2.contains("nonexistent_cmd_beta")
+                e1.contains("nonexistent_cmd_alpha")
+                    || e2.contains("nonexistent_cmd_beta")
                     || !e1.is_empty(),
                 "at least one error should reference the command name: {e1} / {e2}"
             );

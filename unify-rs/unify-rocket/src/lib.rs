@@ -16,14 +16,16 @@
 // Re-exports (modules are defined inline below)
 // ---------------------------------------------------------------------------
 
-pub use context::{UeProject, WorkspaceContext, WorkspaceManifest};
-pub use compliance::{LawViolation, NonEmptyTargetsLaw, ProjectLaw, ProjectValidator, ValidUprojectPathLaw};
-pub use receipt::{RocketReceipt, RocketReceiptChain};
 pub use classify::{
-    RocketAuditCommand, RocketBuildCommand, RocketClassify, RocketDoctorCommand,
-    RocketInfoCommand, RocketSetupCommand,
+    RocketAuditCommand, RocketBuildCommand, RocketClassify, RocketDoctorCommand, RocketInfoCommand,
+    RocketSetupCommand,
 };
 pub use codegen::{RocketDockerfileCodegen, RocketMakefileCodegen};
+pub use compliance::{
+    LawViolation, NonEmptyTargetsLaw, ProjectLaw, ProjectValidator, ValidUprojectPathLaw,
+};
+pub use context::{UeProject, WorkspaceContext, WorkspaceManifest};
+pub use receipt::{RocketReceipt, RocketReceiptChain};
 pub use supabase::{LeaderboardEntry, LeaderboardStore};
 
 // ============================================================================
@@ -52,7 +54,11 @@ pub mod context {
 
     impl UeProject {
         /// Create a new `UeProject` with the given name, path, and targets.
-        pub fn new(name: impl Into<String>, uproject_path: impl Into<PathBuf>, targets: Vec<String>) -> Self {
+        pub fn new(
+            name: impl Into<String>,
+            uproject_path: impl Into<PathBuf>,
+            targets: Vec<String>,
+        ) -> Self {
             Self {
                 name: name.into(),
                 uproject_path: uproject_path.into(),
@@ -84,8 +90,7 @@ pub mod context {
     impl WorkspaceManifest {
         /// Parse a `project-manifest.json` from a file path.
         pub fn load(path: &Path) -> Result<Self, serde_json::Error> {
-            let content = std::fs::read_to_string(path)
-                .map_err(|e| serde_json::Error::io(e))?;
+            let content = std::fs::read_to_string(path).map_err(|e| serde_json::Error::io(e))?;
             serde_json::from_str(&content)
         }
 
@@ -128,8 +133,9 @@ pub mod context {
         pub fn load(root: impl Into<PathBuf>) -> anyhow::Result<Self> {
             let root = root.into();
             let manifest_path = root.join("project-manifest.json");
-            let manifest = WorkspaceManifest::load(&manifest_path)
-                .map_err(|e| anyhow::anyhow!("Failed to load manifest at {:?}: {}", manifest_path, e))?;
+            let manifest = WorkspaceManifest::load(&manifest_path).map_err(|e| {
+                anyhow::anyhow!("Failed to load manifest at {:?}: {}", manifest_path, e)
+            })?;
             Ok(Self { root, manifest })
         }
 
@@ -454,7 +460,9 @@ pub mod receipt {
     impl RocketReceiptChain {
         /// Create an empty chain.
         pub fn new() -> Self {
-            Self { receipts: Vec::new() }
+            Self {
+                receipts: Vec::new(),
+            }
         }
 
         /// Append a new receipt to the chain.
@@ -557,7 +565,11 @@ pub mod classify {
 
     impl RocketBuildCommand {
         /// Create a new build command.
-        pub fn new(project: impl Into<String>, target: impl Into<String>, platform: impl Into<String>) -> Self {
+        pub fn new(
+            project: impl Into<String>,
+            target: impl Into<String>,
+            platform: impl Into<String>,
+        ) -> Self {
             Self {
                 project: project.into(),
                 target: target.into(),
@@ -604,7 +616,9 @@ pub mod classify {
 
         /// Audit a single named project.
         pub fn for_project(name: impl Into<String>) -> Self {
-            Self { project: Some(name.into()) }
+            Self {
+                project: Some(name.into()),
+            }
         }
     }
 
@@ -729,7 +743,9 @@ pub mod classify {
     impl RocketCommandRegistry {
         /// Create an empty registry.
         pub fn new() -> Self {
-            Self { commands: Vec::new() }
+            Self {
+                commands: Vec::new(),
+            }
         }
 
         /// Register a command.
@@ -834,7 +850,9 @@ pub mod codegen {
         pub fn generate_audit_script(&self) -> String {
             let mut out = String::new();
             out.push_str("#!/usr/bin/env bash\n");
-            out.push_str("# Auto-generated audit script — runs compliance checks for all projects\n");
+            out.push_str(
+                "# Auto-generated audit script — runs compliance checks for all projects\n",
+            );
             out.push_str("set -euo pipefail\n\n");
 
             for project in &self.manifest.projects {
@@ -842,10 +860,7 @@ pub mod codegen {
                     "echo \"==> Auditing project: {}\"\n",
                     project.name
                 ));
-                out.push_str(&format!(
-                    "rocket audit --project {}\n\n",
-                    project.name
-                ));
+                out.push_str(&format!("rocket audit --project {}\n\n", project.name));
             }
 
             out.push_str("echo \"All audits complete.\"\n");
@@ -899,7 +914,11 @@ pub mod codegen {
                 out.push_str(&format!("FROM base AS {}\n", stage));
                 out.push_str(&format!(
                     "ARG TARGET={}\n",
-                    project.targets.first().map(String::as_str).unwrap_or("Editor")
+                    project
+                        .targets
+                        .first()
+                        .map(String::as_str)
+                        .unwrap_or("Editor")
                 ));
                 out.push_str("RUN ${UE4_ROOT}/Engine/Build/BatchFiles/RunUAT.sh BuildCookRun \\\n");
                 out.push_str(&format!(
@@ -984,7 +1003,9 @@ pub mod supabase {
     impl LeaderboardStore {
         /// Create an empty store.
         pub fn new() -> Self {
-            Self { entries: Vec::new() }
+            Self {
+                entries: Vec::new(),
+            }
         }
 
         /// Add an entry.
@@ -1043,17 +1064,16 @@ pub mod supabase {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use context::{UeProject, WorkspaceManifest, WorkspaceContext};
-    use compliance::{
-        LawViolation, NonEmptyTargetsLaw, ProjectLaw, ProjectValidator,
-        ValidUprojectPathLaw,
-    };
-    use receipt::{RocketReceipt, RocketReceiptChain};
     use classify::{
         RocketAuditCommand, RocketBuildCommand, RocketClassify, RocketDoctorCommand,
         RocketInfoCommand, RocketSetupCommand,
     };
     use codegen::{RocketDockerfileCodegen, RocketMakefileCodegen};
+    use compliance::{
+        LawViolation, NonEmptyTargetsLaw, ProjectLaw, ProjectValidator, ValidUprojectPathLaw,
+    };
+    use context::{UeProject, WorkspaceContext, WorkspaceManifest};
+    use receipt::{RocketReceipt, RocketReceiptChain};
     use supabase::{LeaderboardEntry, LeaderboardStore};
 
     // -----------------------------------------------------------------------
@@ -1097,7 +1117,11 @@ mod tests {
         UeProject::new(
             "SurvivalGame",
             "versions/4.24-Survival/EpicSurvivalGameSeries-4.24/SurvivalGame/SurvivalGame.uproject",
-            vec!["SurvivalGameEditor".into(), "SurvivalGameServer".into(), "SurvivalGame".into()],
+            vec![
+                "SurvivalGameEditor".into(),
+                "SurvivalGameServer".into(),
+                "SurvivalGame".into(),
+            ],
         )
     }
 
@@ -1178,7 +1202,11 @@ mod tests {
     fn workspace_context_absolute_uproject_path() {
         let m = make_manifest();
         let ctx = WorkspaceContext::from_manifest("/workspace", m);
-        let p = ctx.projects().iter().find(|p| p.name == "SurvivalGame").unwrap();
+        let p = ctx
+            .projects()
+            .iter()
+            .find(|p| p.name == "SurvivalGame")
+            .unwrap();
         let abs = ctx.absolute_uproject_path(p);
         assert!(abs.starts_with("/workspace"));
         assert!(abs.to_string_lossy().ends_with(".uproject"));
@@ -1260,8 +1288,7 @@ mod tests {
 
     #[test]
     fn project_validator_validate_all_skips_compliant_projects() {
-        let validator = ProjectValidator::new()
-            .add(Box::new(NonEmptyTargetsLaw));
+        let validator = ProjectValidator::new().add(Box::new(NonEmptyTargetsLaw));
 
         let manifest = make_manifest();
         let results = validator.validate_all(&manifest.projects);
@@ -1274,16 +1301,14 @@ mod tests {
 
     #[test]
     fn project_validator_all_pass_returns_false_on_any_violation() {
-        let validator = ProjectValidator::new()
-            .add(Box::new(NonEmptyTargetsLaw));
+        let validator = ProjectValidator::new().add(Box::new(NonEmptyTargetsLaw));
         let manifest = make_manifest();
         assert!(!validator.all_pass(&manifest.projects));
     }
 
     #[test]
     fn project_validator_all_pass_returns_true_when_no_violations() {
-        let validator = ProjectValidator::new()
-            .add(Box::new(ValidUprojectPathLaw));
+        let validator = ProjectValidator::new().add(Box::new(ValidUprojectPathLaw));
         // All projects in our fixture have .uproject paths
         let manifest = make_manifest();
         assert!(validator.all_pass(&manifest.projects));
@@ -1303,7 +1328,13 @@ mod tests {
 
     #[test]
     fn rocket_receipt_new_has_non_empty_hashes() {
-        let r = RocketReceipt::new("build", "SurvivalGame", Some("SurvivalGameEditor"), Some("Win64"), true);
+        let r = RocketReceipt::new(
+            "build",
+            "SurvivalGame",
+            Some("SurvivalGameEditor"),
+            Some("Win64"),
+            true,
+        );
         assert!(!r.data_hash.is_empty());
         assert!(!r.receipt_hash.is_empty());
         assert_ne!(r.data_hash, r.receipt_hash);
@@ -1317,7 +1348,13 @@ mod tests {
 
     #[test]
     fn rocket_receipt_verify_returns_false_after_tampering() {
-        let mut r = RocketReceipt::new("build", "ShooterGame", Some("ShooterGameEditor"), Some("Linux"), true);
+        let mut r = RocketReceipt::new(
+            "build",
+            "ShooterGame",
+            Some("ShooterGameEditor"),
+            Some("Linux"),
+            true,
+        );
         r.receipt_hash = "0000000000000000000000000000000000000000000000000000000000000000".into();
         assert!(!r.verify());
     }
@@ -1325,7 +1362,13 @@ mod tests {
     #[test]
     fn rocket_receipt_chain_push_and_verify_all() {
         let mut chain = RocketReceiptChain::new();
-        chain.push("build", "SurvivalGame", Some("SurvivalGameEditor"), Some("Win64"), true);
+        chain.push(
+            "build",
+            "SurvivalGame",
+            Some("SurvivalGameEditor"),
+            Some("Win64"),
+            true,
+        );
         chain.push("audit", "SurvivalGame", None, None, true);
         assert_eq!(chain.len(), 2);
         assert!(chain.verify_all());
@@ -1485,9 +1528,9 @@ mod tests {
     fn make_entries() -> Vec<LeaderboardEntry> {
         vec![
             LeaderboardEntry::new("p1", "Alice", 500, "SurvivalGame", "2024-01-01T00:00:00Z"),
-            LeaderboardEntry::new("p2", "Bob",   300, "SurvivalGame", "2024-01-02T00:00:00Z"),
+            LeaderboardEntry::new("p2", "Bob", 300, "SurvivalGame", "2024-01-02T00:00:00Z"),
             LeaderboardEntry::new("p3", "Carol", 700, "SurvivalGame", "2024-01-03T00:00:00Z"),
-            LeaderboardEntry::new("p4", "Dave",  900, "ShooterGame",  "2024-01-04T00:00:00Z"),
+            LeaderboardEntry::new("p4", "Dave", 900, "ShooterGame", "2024-01-04T00:00:00Z"),
         ]
     }
 

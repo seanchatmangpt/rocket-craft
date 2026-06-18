@@ -72,7 +72,9 @@ pub fn parse_cargo_toml(filepath: &str, content: &str) -> Vec<Observation> {
                     kind: "cargo_toml".to_string(),
                     construct: "default_template_version".to_string(),
                     context: trimmed.to_string(),
-                    message: "Default template version '1.0.0' found — replace with CalVer (YY.M.D)".to_string(),
+                    message:
+                        "Default template version '1.0.0' found — replace with CalVer (YY.M.D)"
+                            .to_string(),
                 });
             }
         }
