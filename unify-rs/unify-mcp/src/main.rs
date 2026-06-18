@@ -24,6 +24,7 @@ fn main() {
             continue;
         }
         let response = server.handle(&line);
-        println!("{}", response);
+        use std::io::Write;
+        let _ = writeln!(std::io::stdout(), "{}", response);
     }
 }

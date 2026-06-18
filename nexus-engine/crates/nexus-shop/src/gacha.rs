@@ -1,4 +1,4 @@
-use rand::{SeedableRng, Rng};
+use rand::{SeedableRng, RngExt};
 use rand_chacha::ChaCha8Rng;
 use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
@@ -132,8 +132,8 @@ impl GachaEngine {
     pub fn from_server_entropy(player_id: u64, nonce: u64) -> Self {
         use sha2::{Sha256, Digest};
         let mut hasher = Sha256::new();
-        hasher.update(&player_id.to_le_bytes());
-        hasher.update(&nonce.to_le_bytes());
+        hasher.update(player_id.to_le_bytes());
+        hasher.update(nonce.to_le_bytes());
         let result = hasher.finalize();
         let seed = u64::from_le_bytes(result[..8].try_into().unwrap());
         GachaEngine { rng: ChaCha8Rng::seed_from_u64(seed) }
@@ -150,7 +150,7 @@ impl GachaEngine {
         session.pulls_since_last_ssr += 1;
         session.total_pulls += 1;
 
-        let roll: f64 = self.rng.gen();
+        let roll: f64 = self.rng.random();
         let ssr_rate = session.current_ssr_rate();
         let pity_pull = session.pulls_since_last_ssr >= 90;
 
@@ -191,7 +191,7 @@ impl GachaEngine {
             if let Some(last) = results.last_mut() {
                 let sr_items: Vec<_> = banner.items.iter().filter(|i| i.rarity == GachaRarity::SR).collect();
                 if !sr_items.is_empty() {
-                    let idx = self.rng.gen_range(0..sr_items.len());
+                    let idx = self.rng.random_range(0..sr_items.len());
                     last.item = sr_items[idx].clone();
                 }
             }
@@ -211,22 +211,22 @@ impl GachaEngine {
                     rarity: format!("{:?}", rarity),
                 });
             }
-            let idx = self.rng.gen_range(0..lower_pool.len());
+            let idx = self.rng.random_range(0..lower_pool.len());
             return Ok(lower_pool[idx].clone());
         }
 
         if rarity == GachaRarity::SSR {
             let rate_up_items: Vec<_> = pool.iter().filter(|i| i.is_rate_up).collect();
             if !rate_up_items.is_empty() {
-                let roll: f64 = self.rng.gen();
+                let roll: f64 = self.rng.random();
                 if roll < banner.rate_up_share || session.rate_up_pity_active {
-                    let idx = self.rng.gen_range(0..rate_up_items.len());
+                    let idx = self.rng.random_range(0..rate_up_items.len());
                     return Ok((*rate_up_items[idx]).clone());
                 }
             }
         }
 
-        let idx = self.rng.gen_range(0..pool.len());
+        let idx = self.rng.random_range(0..pool.len());
         Ok(pool[idx].clone())
     }
 }

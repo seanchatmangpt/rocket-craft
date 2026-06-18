@@ -1,0 +1,17 @@
+[package]
+name = "wasm-game-logic"
+version = "0.2.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-core = { path = "../wasm-core", version = "0.2.0" }
+wasm-bindgen = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+chicago-tdd-tools = { path = "../../chicago-tdd-tools" }

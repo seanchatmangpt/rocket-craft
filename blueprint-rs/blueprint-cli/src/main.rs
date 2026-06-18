@@ -80,6 +80,17 @@ enum Commands {
         #[arg(short, long)]
         output_dir: Option<PathBuf>,
     },
+    /// Decompile a .t3d file back to Blueprint Rust builder code
+    Decompile {
+        /// Input .t3d file
+        input: PathBuf,
+        /// Blueprint name to use in generated code
+        #[arg(short = 'n', long, default_value = "MyBlueprint")]
+        name: String,
+        /// Parent class to use in generated code
+        #[arg(short = 'p', long, default_value = "Actor")]
+        parent: String,
+    },
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -402,6 +413,27 @@ pub fn process_json_file(
     Ok(out_path)
 }
 
+fn cmd_decompile(
+    input: &PathBuf,
+    output: &Option<PathBuf>,
+    name: &str,
+    parent: &str,
+    verbose: bool,
+) -> Result<(), Box<dyn std::error::Error>> {
+    if verbose {
+        eprintln!("[bpgen] Decompiling: {}", input.display());
+    }
+    let t3d = fs::read_to_string(input)
+        .map_err(|e| format!("Cannot read '{}': {}", input.display(), e))?;
+    let nodes = blueprint_core::parser::parse_t3d(&t3d)
+        .map_err(|e| format!("Failed to parse T3D: {}", e))?;
+    if verbose {
+        eprintln!("[bpgen] Parsed '{}' ({} nodes)", input.display(), nodes.len());
+    }
+    let code = blueprint_core::parser::generate_rust_code(&nodes, name, parent)?;
+    write_output(&code, output)
+}
+
 fn cmd_watch(
     dir: &PathBuf,
     output_dir: &Option<PathBuf>,
@@ -472,6 +504,9 @@ fn main() {
             cmd_example(name, *list, &cli.output, &cli.format, cli.verbose)
         }
         Some(Commands::Watch { dir, output_dir }) => cmd_watch(dir, output_dir),
+        Some(Commands::Decompile { input, name, parent }) => {
+            cmd_decompile(input, &cli.output, name, parent, cli.verbose)
+        }
         // Default: no subcommand → print help
         None => {
             use clap::CommandFactory;

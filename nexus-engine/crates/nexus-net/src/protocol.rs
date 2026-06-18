@@ -3,6 +3,7 @@
 //! Every message sent over the wire is represented here.  No raw JSON strings
 //! should appear in game logic; everything routes through `MessageCodec`.
 
+use nexus_types::MagicType;
 use serde::{Deserialize, Serialize};
 
 // ── Client → Server ──────────────────────────────────────────────────────────
@@ -87,7 +88,7 @@ pub enum CombatAction {
     Parry { dir: Option<AttackDir> },
     Dodge,
     UseSpecial { ability_id: u8 },
-    CastMagic { magic_type: u8 },
+    CastMagic { magic_type: MagicType },
 }
 
 /// The resolution result returned after a combat action is evaluated.

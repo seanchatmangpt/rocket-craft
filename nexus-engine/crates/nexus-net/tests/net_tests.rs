@@ -6,6 +6,7 @@ use nexus_net::{
     protocol::{AttackDir, ClientMessage, CombatAction, CombatOutcome, ServerMessage},
     room::{GameRoom, RoomPlayer, RoomState, ServerRoomEvent},
 };
+use nexus_types::{Damage, Hp, MagicType};
 use proptest::prelude::*;
 
 // ── Codec roundtrip ───────────────────────────────────────────────────────────
@@ -78,7 +79,7 @@ fn all_combat_actions_roundtrip() {
         CombatAction::Parry { dir: None },
         CombatAction::Dodge,
         CombatAction::UseSpecial { ability_id: 1 },
-        CombatAction::CastMagic { magic_type: 2 },
+        CombatAction::CastMagic { magic_type: MagicType::Ice },
     ];
 
     for action in actions {
@@ -190,8 +191,10 @@ fn make_player(id: u64, name: &str, suit: &str, hp: f32) -> RoomPlayer {
         player_id: id,
         name: name.to_string(),
         suit_id: suit.to_string(),
-        hp,
-        max_hp: hp,
+        hp: Hp::new(hp),
+        max_hp: Hp::new(hp),
+        attack: Damage::new(30.0),
+        magic: Damage::new(50.0),
         combo_depth: 0,
     }
 }
@@ -207,7 +210,7 @@ fn room_tracks_hp_and_win_condition() {
     let outcome =
         room.apply_action(1, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap();
     assert!(matches!(outcome, CombatOutcome::Hit { .. }), "expected Hit, got {:?}", outcome);
-    assert!(room.player2.hp < 100.0, "player2 HP should be reduced");
+    assert!(room.player2.hp.value() < 100.0, "player2 HP should be reduced");
     assert!(!room.is_player1_turn, "turn should have switched to player 2");
     assert_eq!(room.turn_number, 1);
 }

@@ -1,9 +1,8 @@
-/// Typestate markers and runtime enums for all game-state domains.
-///
-/// The sealed marker traits enforce at compile time that only the canonical
-/// state structs defined here can be used as type parameters, preventing
-/// downstream crates from introducing undocumented states.
-
+//! Typestate markers and runtime enums for all game-state domains.
+//!
+//! The sealed marker traits enforce at compile time that only the canonical
+//! state structs defined here can be used as type parameters, preventing
+//! downstream crates from introducing undocumented states.
 // ---------------------------------------------------------------------------
 // Sealed trait (module-private, not re-exported)
 // ---------------------------------------------------------------------------
@@ -193,4 +192,48 @@ pub enum GachaRarity {
     SR,
     /// Super Super Rare — top banner tier.
     SSR,
+}
+
+// ---------------------------------------------------------------------------
+// MagicType conversions
+// ---------------------------------------------------------------------------
+
+/// Error returned when a raw `u8` byte does not map to any `MagicType` variant.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct MagicTypeParseError(pub u8);
+
+impl std::fmt::Display for MagicTypeParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "unknown magic type byte: {}", self.0)
+    }
+}
+
+impl std::error::Error for MagicTypeParseError {}
+
+/// Flat damage bonus for each magic school (used by combat resolvers).
+impl From<MagicType> for f32 {
+    fn from(m: MagicType) -> f32 {
+        match m {
+            MagicType::Fire      => 20.0,
+            MagicType::Lightning => 30.0,
+            MagicType::Ice       => 15.0,
+            MagicType::Dark      => 35.0,
+            MagicType::Light     => 25.0,
+        }
+    }
+}
+
+/// Wire-format decoding: converts a raw protocol byte into a `MagicType`.
+impl TryFrom<u8> for MagicType {
+    type Error = MagicTypeParseError;
+    fn try_from(v: u8) -> Result<Self, Self::Error> {
+        match v {
+            0 => Ok(MagicType::Fire),
+            1 => Ok(MagicType::Lightning),
+            2 => Ok(MagicType::Ice),
+            3 => Ok(MagicType::Dark),
+            4 => Ok(MagicType::Light),
+            other => Err(MagicTypeParseError(other)),
+        }
+    }
 }

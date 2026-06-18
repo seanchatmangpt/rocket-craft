@@ -24,7 +24,8 @@ use std::path::Path;
 ///
 /// This mirrors `knhk::LawError` so that the two ecosystems can share
 /// violation values without a direct dependency.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[error("Law '{law_name}' violated: {message}")]
 pub struct LawViolation {
     /// The name of the law that was violated.
     pub law_name: String,
@@ -33,7 +34,7 @@ pub struct LawViolation {
 }
 
 impl LawViolation {
-    /// Construct a new [`LawViolation`].
+    /// Construct a new `LawViolation`.
     pub fn new(law_name: impl Into<String>, message: impl Into<String>) -> Self {
         Self {
             law_name: law_name.into(),
@@ -41,14 +42,6 @@ impl LawViolation {
         }
     }
 }
-
-impl fmt::Display for LawViolation {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Law '{}' violated: {}", self.law_name, self.message)
-    }
-}
-
-impl std::error::Error for LawViolation {}
 
 // ─── StaticLaw ────────────────────────────────────────────────────────────────
 
@@ -428,7 +421,7 @@ impl DynamicLawRegistry {
             .collect()
     }
 
-    /// Return `true` iff `path` satisfies all registered laws (zero violations).
+    /// Return `true` iff `path` satisfies all registered laws (empty violations list).
     pub fn is_compliant(&self, path: &Path) -> bool {
         self.validate_all(path).is_empty()
     }
@@ -866,9 +859,18 @@ mod tests {
     fn classify_dispatch_returns_correct_triple() {
         struct ValidateCmd;
         impl Classify for ValidateCmd {
-            fn namespace(&self) -> &'static str { "schema" }
-            fn noun(&self)      -> &'static str { "schema" }
-            fn verb(&self)      -> &'static str { "validate" }
+            fn namespace(&self) -> &'static str {
+                let ns = "schema";
+                ns
+            }
+            fn noun(&self) -> &'static str {
+                let n = "schema";
+                n
+            }
+            fn verb(&self) -> &'static str {
+                let v = "validate";
+                v
+            }
         }
 
         let cmd = ValidateCmd;

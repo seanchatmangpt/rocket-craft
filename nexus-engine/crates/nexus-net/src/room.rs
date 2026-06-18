@@ -6,6 +6,8 @@
 
 use tokio::sync::broadcast;
 
+use nexus_types::{Damage, Hp};
+
 use crate::protocol::{CombatAction, CombatOutcome};
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -16,8 +18,10 @@ pub struct RoomPlayer {
     pub player_id: u64,
     pub name: String,
     pub suit_id: String,
-    pub hp: f32,
-    pub max_hp: f32,
+    pub hp: Hp,
+    pub max_hp: Hp,
+    pub attack: Damage,
+    pub magic: Damage,
     pub combo_depth: u32,
 }
 
@@ -127,33 +131,37 @@ impl GameRoom {
         // ── Resolve the action ───────────────────────────────────────────────
         let outcome = match action {
             CombatAction::Attack { .. } => {
-                let (attacker, defender) = if is_p1_acting {
-                    (&mut self.player1 as *mut RoomPlayer, &mut self.player2 as *mut RoomPlayer)
+                let combo_before = if is_p1_acting {
+                    self.player1.combo_depth
                 } else {
-                    (&mut self.player2 as *mut RoomPlayer, &mut self.player1 as *mut RoomPlayer)
+                    self.player2.combo_depth
                 };
-                // SAFETY: attacker and defender are distinct fields of self.
-                let (attacker, defender) = unsafe { (&mut *attacker, &mut *defender) };
 
-                let base_dmg = 25.0_f32;
-                let combo_bonus = attacker.combo_depth as f32 * 2.5;
-                let dmg = base_dmg + combo_bonus;
+                let dmg = Damage::new(25.0 + combo_before as f32 * 2.5);
 
-                defender.hp = (defender.hp - dmg).max(0.0);
-                attacker.combo_depth += 1;
-
-                let new_hp = defender.hp;
-                let combo_depth = attacker.combo_depth;
-
-                if new_hp <= 0.0 {
-                    let player_id = defender.player_id;
-                    CombatOutcome::PlayerDied { player_id }
+                let (new_hp, defender_id) = if is_p1_acting {
+                    self.player2.hp = Hp::new((self.player2.hp.value() - dmg.value()).max(0.0));
+                    self.player1.combo_depth = combo_before + 1;
+                    (self.player2.hp, self.player2.player_id)
                 } else {
-                    CombatOutcome::Hit { damage: dmg, new_hp, combo_depth }
+                    self.player1.hp = Hp::new((self.player1.hp.value() - dmg.value()).max(0.0));
+                    self.player2.combo_depth = combo_before + 1;
+                    (self.player1.hp, self.player1.player_id)
+                };
+
+                let combo_depth = if is_p1_acting {
+                    self.player1.combo_depth
+                } else {
+                    self.player2.combo_depth
+                };
+
+                if new_hp.is_dead() {
+                    CombatOutcome::PlayerDied { player_id: defender_id }
+                } else {
+                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth }
                 }
             }
             CombatAction::Parry { .. } => {
-                // Reset the acting player's combo — a parry is a defensive reset.
                 if is_p1_acting {
                     self.player1.combo_depth = 0;
                 } else {
@@ -169,24 +177,56 @@ impl GameRoom {
                 }
                 CombatOutcome::Dodged
             }
-            CombatAction::UseSpecial { .. } | CombatAction::CastMagic { .. } => {
-                // Simplified: special/magic actions always deal a flat 40 damage.
-                let (attacker, defender) = if is_p1_acting {
-                    (&mut self.player1 as *mut RoomPlayer, &mut self.player2 as *mut RoomPlayer)
+            CombatAction::UseSpecial { ability_id } => {
+                let attacker_attack = if is_p1_acting {
+                    self.player1.attack
                 } else {
-                    (&mut self.player2 as *mut RoomPlayer, &mut self.player1 as *mut RoomPlayer)
+                    self.player2.attack
                 };
-                let (attacker, defender) = unsafe { (&mut *attacker, &mut *defender) };
 
-                let dmg = 40.0_f32;
-                defender.hp = (defender.hp - dmg).max(0.0);
-                attacker.combo_depth = 0; // special resets combo
+                let dmg =
+                    Damage::new(attacker_attack.value() * 2.0 + ability_id as f32 * 5.0);
 
-                let new_hp = defender.hp;
-                if new_hp <= 0.0 {
-                    CombatOutcome::PlayerDied { player_id: defender.player_id }
+                let (new_hp, defender_id) = if is_p1_acting {
+                    self.player2.hp = Hp::new((self.player2.hp.value() - dmg.value()).max(0.0));
+                    self.player1.combo_depth = 0;
+                    (self.player2.hp, self.player2.player_id)
                 } else {
-                    CombatOutcome::Hit { damage: dmg, new_hp, combo_depth: 0 }
+                    self.player1.hp = Hp::new((self.player1.hp.value() - dmg.value()).max(0.0));
+                    self.player2.combo_depth = 0;
+                    (self.player1.hp, self.player1.player_id)
+                };
+
+                if new_hp.is_dead() {
+                    CombatOutcome::PlayerDied { player_id: defender_id }
+                } else {
+                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth: 0 }
+                }
+            }
+            CombatAction::CastMagic { magic_type } => {
+                let attacker_magic = if is_p1_acting {
+                    self.player1.magic
+                } else {
+                    self.player2.magic
+                };
+
+                let type_bonus = f32::from(magic_type);
+                let dmg = Damage::new(attacker_magic.value() * 1.5 + type_bonus);
+
+                let (new_hp, defender_id) = if is_p1_acting {
+                    self.player2.hp = Hp::new((self.player2.hp.value() - dmg.value()).max(0.0));
+                    self.player1.combo_depth = 0;
+                    (self.player2.hp, self.player2.player_id)
+                } else {
+                    self.player1.hp = Hp::new((self.player1.hp.value() - dmg.value()).max(0.0));
+                    self.player2.combo_depth = 0;
+                    (self.player1.hp, self.player1.player_id)
+                };
+
+                if new_hp.is_dead() {
+                    CombatOutcome::PlayerDied { player_id: defender_id }
+                } else {
+                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth: 0 }
                 }
             }
         };
@@ -196,14 +236,13 @@ impl GameRoom {
         self.is_player1_turn = !self.is_player1_turn;
 
         // ── Win condition ────────────────────────────────────────────────────
-        if self.player1.hp <= 0.0 || self.player2.hp <= 0.0 {
+        if self.player1.hp.is_dead() || self.player2.hp.is_dead() {
             self.state = RoomState::Ended;
-            let winner_id = if self.player1.hp > 0.0 {
+            let winner_id = if !self.player1.hp.is_dead() {
                 self.player1.player_id
             } else {
                 self.player2.player_id
             };
-            // Ignore send errors — there may be no subscribers yet in tests.
             let _ = self.tx.send(ServerRoomEvent::MatchEnded { winner_id });
         }
 
@@ -219,8 +258,8 @@ impl GameRoom {
     pub fn snapshot(&self) -> crate::protocol::MatchStateSnapshot {
         crate::protocol::MatchStateSnapshot {
             match_id: self.match_id,
-            player1_hp: self.player1.hp,
-            player2_hp: self.player2.hp,
+            player1_hp: self.player1.hp.value(),
+            player2_hp: self.player2.hp.value(),
             player1_combo: self.player1.combo_depth,
             player2_combo: self.player2.combo_depth,
             turn_number: self.turn_number,

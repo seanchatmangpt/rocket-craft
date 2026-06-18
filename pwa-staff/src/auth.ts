@@ -64,6 +64,24 @@ export function login(user: User, token: string) {
   dispatchAuthChange();
 }
 
+/** Sign in via Supabase with email and password, updating local session state. */
+export async function loginWithCredentials(email: string, password: string): Promise<void> {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    throw error;
+  }
+  if (data.session && data.user) {
+    currentSession = {
+      user: {
+        name: data.user.email?.split('@')[0] || 'User',
+        email: data.user.email || '',
+      },
+      token: data.session.access_token,
+    };
+    dispatchAuthChange();
+  }
+}
+
 export function logout() {
   supabase.auth
     .signOut()

@@ -1,4 +1,4 @@
-//! BlueprintPwaExporter — generate TypeScript HUD stubs, HTML overlays, and
+//! BlueprintPwaExporter — generate TypeScript HUD templates, HTML overlays, and
 //! JavaScript event bindings from Blueprint event graphs for the pwa-staff frontend.
 
 use serde::{Deserialize, Serialize};
@@ -26,7 +26,7 @@ pub struct BlueprintPwaMetadata {
 // BlueprintPwaExporter
 // ---------------------------------------------------------------------------
 
-/// Generates TypeScript event handler stubs, HTML overlays, and JavaScript
+/// Generates TypeScript event handler templates, HTML overlays, and JavaScript
 /// event bindings for a PWA HUD based on a Blueprint's event nodes and variables.
 pub struct BlueprintPwaExporter {
     pub blueprint_name: String,
@@ -44,7 +44,7 @@ impl BlueprintPwaExporter {
         }
     }
 
-    /// Generate a TypeScript class stub that mirrors the Blueprint's events as
+    /// Generate a TypeScript class template that mirrors the Blueprint's events as
     /// HUD update methods, matching the `pwa-staff/src/hud.ts` patterns.
     pub fn generate_typescript(&self) -> String {
         let class_name = format!("{}Hud", self.blueprint_name);
@@ -79,9 +79,10 @@ impl BlueprintPwaExporter {
             if event == "BeginPlay" || event == "begin_play" {
                 lines.push(format!("  {}(): void {{", method_name));
                 lines.push(format!(
-                    "    // TODO: initialize HUD for {}",
+                    "    const overlay = document.getElementById('bp-hud-{}');",
                     self.blueprint_name
                 ));
+                lines.push("    if (overlay) overlay.style.display = 'block';".to_string());
                 lines.push(format!(
                     "    console.log('[{}] {}');",
                     self.blueprint_name, event
@@ -90,9 +91,13 @@ impl BlueprintPwaExporter {
             } else {
                 lines.push(format!("  {}(amount?: number): void {{", method_name));
                 lines.push(format!(
-                    "    // TODO: handle {} event",
+                    "    const eventIndicator = document.getElementById('bp-event-{}');",
                     event
                 ));
+                lines.push("    if (eventIndicator) {".to_string());
+                lines.push("      eventIndicator.classList.add('active');".to_string());
+                lines.push("      setTimeout(() => eventIndicator.classList.remove('active'), 500);".to_string());
+                lines.push("    }".to_string());
                 lines.push(format!(
                     "    console.log('[{}] {}', amount);",
                     self.blueprint_name, event
@@ -218,26 +223,34 @@ impl BlueprintPwaExporter {
     }
 
     /// Extract metadata from lists of node names and variable names.
-    /// Classifies node names as events or exec entry points based on naming conventions.
+    ///
+    /// Event nodes: known lifecycle names (BeginPlay, EndPlay, Tick, and their
+    /// snake_case variants) or names prefixed with "On"/"on". Other node names are
+    /// not classified as events.
+    ///
+    /// Exec entry points: canonical lifecycle events that start a top-level execution
+    /// chain (BeginPlay / begin_play only).
     pub fn extract_metadata(
         blueprint_name: &str,
         node_names: &[&str],
         variable_names: &[&str],
     ) -> BlueprintPwaMetadata {
-        let event_keywords = ["BeginPlay", "EndPlay", "Tick", "begin_play", "end_play", "tick"];
+        let lifecycle_keywords = ["BeginPlay", "EndPlay", "Tick", "begin_play", "end_play", "tick"];
+        let exec_entry_keywords = ["BeginPlay", "begin_play"];
+
         let mut event_names: Vec<String> = Vec::new();
         let mut exec_entry_points: Vec<String> = Vec::new();
 
         for &name in node_names {
-            let is_known_event = event_keywords.iter().any(|&kw| kw == name);
-            if is_known_event || name.starts_with("On") || name.starts_with("on") {
-                event_names.push(name.to_string());
-            } else {
-                // Custom nodes that are not known events can still be events
-                // if they appear to be lifecycle-style names
+            let is_known_lifecycle = lifecycle_keywords.iter().any(|&kw| kw == name);
+            let is_event_prefix = name.starts_with("On") || name.starts_with("on");
+            if is_known_lifecycle || is_event_prefix {
                 event_names.push(name.to_string());
             }
-            exec_entry_points.push(name.to_string());
+            // Only canonical exec-chain entry points (BeginPlay) go into exec_entry_points.
+            if exec_entry_keywords.iter().any(|&kw| kw == name) {
+                exec_entry_points.push(name.to_string());
+            }
         }
 
         let generated_at = iso8601_now();
@@ -577,15 +590,48 @@ mod tests {
     // -----------------------------------------------------------------------
 
     #[test]
-    fn extract_metadata_returns_correct_event_names() {
+    fn extract_metadata_classifies_lifecycle_and_on_prefix_as_events() {
+        // BeginPlay is a known lifecycle keyword → event.
+        // OnTakeDamage starts with "On" → event.
+        // Respawn is neither a lifecycle keyword nor On/on-prefixed → not an event.
         let meta = BlueprintPwaExporter::extract_metadata(
             "GameActor",
-            &["BeginPlay", "TakeDamage", "Respawn"],
+            &["BeginPlay", "OnTakeDamage", "Respawn"],
             &["Score", "Lives"],
         );
-        assert!(meta.event_names.contains(&"BeginPlay".to_string()));
-        assert!(meta.event_names.contains(&"TakeDamage".to_string()));
-        assert!(meta.event_names.contains(&"Respawn".to_string()));
+        assert!(
+            meta.event_names.contains(&"BeginPlay".to_string()),
+            "BeginPlay should be classified as an event"
+        );
+        assert!(
+            meta.event_names.contains(&"OnTakeDamage".to_string()),
+            "OnTakeDamage should be classified as an event (On-prefix)"
+        );
+        assert!(
+            !meta.event_names.contains(&"Respawn".to_string()),
+            "Respawn should NOT be classified as an event"
+        );
+    }
+
+    #[test]
+    fn extract_metadata_exec_entry_points_contains_only_begin_play() {
+        let meta = BlueprintPwaExporter::extract_metadata(
+            "GameActor",
+            &["BeginPlay", "OnTakeDamage", "Respawn"],
+            &["Score"],
+        );
+        assert!(
+            meta.exec_entry_points.contains(&"BeginPlay".to_string()),
+            "BeginPlay should be an exec entry point"
+        );
+        assert!(
+            !meta.exec_entry_points.contains(&"OnTakeDamage".to_string()),
+            "OnTakeDamage should NOT be an exec entry point"
+        );
+        assert!(
+            !meta.exec_entry_points.contains(&"Respawn".to_string()),
+            "Respawn should NOT be an exec entry point"
+        );
     }
 
     #[test]

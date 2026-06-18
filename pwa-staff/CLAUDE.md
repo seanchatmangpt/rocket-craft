@@ -122,10 +122,10 @@ independently. `--bundle` flag means all imports are inlined.
 
 ## Environment Variables
 
-| Variable            | Required | Where Used           | Description                    |
-|---------------------|----------|----------------------|--------------------------------|
-| `SUPABASE_URL`      | Yes      | `src/lib/supabaseClient.ts` | Supabase project URL      |
-| `SUPABASE_ANON_KEY` | Yes      | `src/lib/supabaseClient.ts` | Supabase anonymous key    |
+| Variable            | Required | Where Used                  | Description            |
+| ------------------- | -------- | --------------------------- | ---------------------- |
+| `SUPABASE_URL`      | Yes      | `src/lib/supabaseClient.ts` | Supabase project URL   |
+| `SUPABASE_ANON_KEY` | Yes      | `src/lib/supabaseClient.ts` | Supabase anonymous key |
 
 For local dev, set these in `.env` and reference them in `supabaseClient.ts`. They
 are not bundled by esbuild's `define` — pass them at runtime or via a build step.
@@ -133,7 +133,7 @@ are not bundled by esbuild's `define` — pass them at runtime or via a build st
 ## Pages and Their Entry Points
 
 | HTML Page          | TypeScript Entry     | Supabase Tables Used     |
-|--------------------|----------------------|--------------------------|
+| ------------------ | -------------------- | ------------------------ |
 | `index.html`       | (none / inline)      | —                        |
 | `login.html`       | `src/login.ts`       | `auth.users`             |
 | `signup.html`      | `src/signup.ts`      | `auth.users`, `profiles` |
@@ -144,6 +144,7 @@ are not bundled by esbuild's `define` — pass them at runtime or via a build st
 ## Service Worker (`worker.ts`)
 
 Handles:
+
 - Cache-first strategy for static assets (CSS, JS, HTML)
 - Network-first strategy for Supabase API calls
 - Offline fallback to `offline.html` when network unavailable
@@ -173,6 +174,7 @@ npx playwright test
 ```
 
 Tests in `tests-e2e/`:
+
 - `auth.spec.ts` — login, logout, signup flows
 - `hud.spec.ts` — HUD rendering with mock game state
 - `example.spec.ts` — smoke test
@@ -184,7 +186,7 @@ Playwright config in `playwright.config.ts` targets `localhost:3000`.
 The `*-HTML5-Shipping.*` files are compiled UE4 games. Each game is a set of 4 files:
 
 | Extension | Purpose                                      |
-|-----------|----------------------------------------------|
+| --------- | -------------------------------------------- |
 | `.html`   | Loader page (links JS/WASM/data)             |
 | `.js`     | Emscripten JavaScript runtime                |
 | `.wasm`   | Compiled game binary                         |

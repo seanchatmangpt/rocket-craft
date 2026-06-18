@@ -2,14 +2,31 @@ use std::path::PathBuf;
 use tracing::{info, debug};
 use crate::{ConvertedAsset, StagedAsset, PipelineError};
 
+/// Default staging path for UE 4.27 projects in this workspace.
+///
+/// This path follows the established pattern in the Rocket-Craft environment
+/// where UE 4.27 projects are located in `versions/4.27.0/`.
+pub const DEFAULT_4_27_STAGING_DIR: &str = "versions/4.27.0/Content/Assets/";
+
 /// Copies converted FBX files into the UE4 Content directory tree.
+///
+/// Supports both legacy UE 4.24 paths and the modern 4.27.0 environment.
 pub struct Stager {
-    /// Root UE4 Content directory (e.g. versions/4.24-Shooter/ShooterGame/Content/Assets/)
+    /// Root UE4 Content directory where assets should be staged.
+    ///
+    /// # Examples
+    /// - **UE 4.27 (Modern):** `versions/4.27.0/Content/Assets/`
+    /// - **UE 4.24 (Legacy):** `versions/4.24-Shooter/ShooterGame/Content/Assets/`
     pub content_dir: PathBuf,
 }
 
 impl Stager {
     pub fn new(content_dir: PathBuf) -> Self { Self { content_dir } }
+
+    /// Create a stager targeting the default UE 4.27.0 content path.
+    pub fn for_ue4_27() -> Self {
+        Self::new(PathBuf::from(DEFAULT_4_27_STAGING_DIR))
+    }
 
     /// Copy the FBX to `content_dir/<asset_name>.fbx`.
     /// Creates content_dir (and parents) if they do not exist.
@@ -74,6 +91,12 @@ mod tests {
             source_format: Format::Obj,
             fbx_path,
         }
+    }
+
+    #[test]
+    fn for_ue4_27_uses_correct_default_path() {
+        let stager = Stager::for_ue4_27();
+        assert_eq!(stager.content_dir, PathBuf::from(DEFAULT_4_27_STAGING_DIR));
     }
 
     #[test]

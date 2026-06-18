@@ -1,16 +1,92 @@
 use std::collections::VecDeque;
-use anyhow::Result;
+use std::marker::PhantomData;
 use rand::{SeedableRng, Rng};
 use rand::rngs::SmallRng;
 use serde::{Serialize, Deserialize};
 use ib4_core::{
     player::PlayerState,
     enemy::EnemyInstance,
-    types::{AttackDir, MagicType, Rarity},
+    types::{AttackDir, MagicType, Rarity, Stat},
     equipment::weapon_catalog,
+};
+use ib4_combat::{
+    damage::calc_player_damage,
+    parry::{ParryResolver, ParryIntent, ParryOutcome},
+    magic::resolve_magic,
+};
+use ib4_ai::{
+    roster::spawn_enemy,
+    titan::TitanAI,
+    godking::GodKingAI,
+};
+use ib4_progression::{
+    xp::XPSystem,
+    bloodline::BloodlineSystem,
+    perks::PerkTree,
 };
 use crate::command::Command;
 use crate::narrative;
+
+// ── Arena manager ─────────────────────────────────────────────────────────────
+
+/// Wraps the arena enemy queue.  Centralises all queue mutations so the rest of
+/// `GameSession` never reaches into the VecDeque directly.
+pub struct ArenaManager {
+    queue: VecDeque<String>,
+}
+
+impl ArenaManager {
+    fn new(queue: VecDeque<String>) -> Self { ArenaManager { queue } }
+    fn next(&mut self) -> Option<String> { self.queue.pop_front() }
+    fn front(&self) -> Option<&str> { self.queue.front().map(|s| s.as_str()) }
+    fn is_empty(&self) -> bool { self.queue.is_empty() }
+    fn iter(&self) -> impl Iterator<Item = &String> { self.queue.iter() }
+    fn reset(&mut self, ids: &[&str]) {
+        self.queue = ids.iter().map(|s| s.to_string()).collect();
+    }
+    pub fn clear(&mut self) { self.queue.clear(); }
+    pub fn push_back(&mut self, item: String) { self.queue.push_back(item); }
+    pub fn len(&self) -> usize { self.queue.len() }
+}
+
+// ── Typestate phase markers ────────────────────────────────────────────────────
+
+/// Typestate marker: session is not actively in a combat encounter.
+pub struct NotInCombat;
+/// Typestate marker: session has a live combat encounter.
+pub struct InCombat;
+
+/// Compile-time-checked session wrapper.  `attack()` is only available when the
+/// session is `InCombat`; `enter_combat()` is only available when `NotInCombat`.
+pub struct TypedSession<Phase> {
+    inner: GameSession,
+    _phase: PhantomData<Phase>,
+}
+
+impl TypedSession<NotInCombat> {
+    pub fn new(name: &str) -> Self {
+        TypedSession { inner: GameSession::new(name), _phase: PhantomData }
+    }
+
+    pub fn enter_combat(mut self) -> TypedSession<InCombat> {
+        let _ = self.inner.spawn_next_enemy();
+        TypedSession { inner: self.inner, _phase: PhantomData }
+    }
+}
+
+impl TypedSession<InCombat> {
+    pub fn attack(&mut self, dir: AttackDir) -> Vec<String> {
+        self.inner.cmd_attack(dir)
+    }
+
+    pub fn flee(mut self) -> TypedSession<NotInCombat> {
+        self.inner.in_combat = false;
+        self.inner.current_enemy = None;
+        TypedSession { inner: self.inner, _phase: PhantomData }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SaveData {
@@ -22,7 +98,7 @@ pub struct SaveData {
 pub struct GameSession {
     pub player: PlayerState,
     pub current_enemy: Option<EnemyInstance>,
-    pub arena_queue: VecDeque<String>,
+    pub arena: ArenaManager,
     pub combo_depth: u32,
     pub combo_idle_turns: u32,
     pub combo_reset_threshold: u32,
@@ -30,8 +106,9 @@ pub struct GameSession {
     pub rng: SmallRng,
     pub turn: u32,
     pub loot_bag: Vec<ib4_core::equipment::Weapon>,
-    pub is_in_combat: bool,
+    in_combat: bool,
     pub god_king_ai_turn: u32,
+    pub titan_ai: TitanAI,
 }
 
 impl GameSession {
@@ -39,7 +116,6 @@ impl GameSession {
         let player = PlayerState::new(name);
         let rng = SmallRng::from_entropy();
 
-        // Build default arena queue for bloodline 0
         let queue: VecDeque<String> = vec![
             "LightTitan".to_string(),
             "HeavyTitan".to_string(),
@@ -51,7 +127,7 @@ impl GameSession {
         Self {
             player,
             current_enemy: None,
-            arena_queue: queue,
+            arena: ArenaManager::new(queue),
             combo_depth: 0,
             combo_idle_turns: 0,
             combo_reset_threshold: 2,
@@ -59,16 +135,20 @@ impl GameSession {
             rng,
             turn: 0,
             loot_bag: Vec::new(),
-            is_in_combat: false,
+            in_combat: false,
             god_king_ai_turn: 0,
+            titan_ai: TitanAI::new(),
         }
     }
 
-    pub fn from_json(json: &str) -> Result<Self> {
+    /// Returns `true` when an active combat encounter is in progress.
+    pub fn is_in_combat(&self) -> bool { self.in_combat }
+
+    pub fn from_json(json: &str) -> Result<Self, serde_json::Error> {
         let save: SaveData = serde_json::from_str(json)?;
         let mut session = Self::new(&save.player.name);
         session.player = save.player;
-        session.arena_queue = save.arena_queue.into();
+        session.arena = ArenaManager::new(save.arena_queue.into());
         Ok(session)
     }
 
@@ -76,7 +156,7 @@ impl GameSession {
         let save = SaveData {
             player: self.player.clone(),
             bloodline: self.player.bloodline,
-            arena_queue: self.arena_queue.iter().cloned().collect(),
+            arena_queue: self.arena.iter().cloned().collect(),
         };
         serde_json::to_string_pretty(&save).unwrap_or_default()
     }
@@ -130,14 +210,10 @@ impl GameSession {
                     enemy.phase,
                 ));
             }
-        } else if self.arena_queue.is_empty() {
+        } else if self.arena.is_empty() {
             lines.push("The arena is empty. Victory!".to_string());
         } else {
-            let next = self
-                .arena_queue
-                .front()
-                .map(|s| s.as_str())
-                .unwrap_or("unknown");
+            let next = self.arena.front().unwrap_or("unknown");
             lines.push(format!("A {} approaches from the shadows...", next));
             lines.push("Type 'explore' to engage.".to_string());
         }
@@ -154,20 +230,23 @@ impl GameSession {
     }
 
     fn spawn_next_enemy(&mut self) -> Vec<String> {
-        let id = match self.arena_queue.pop_front() {
+        let id = match self.arena.next() {
             Some(id) => id,
             None => {
                 return vec!["No more enemies. You have conquered this bloodline!".to_string()]
             }
         };
 
-        // TODO: call ib4-ai::roster::spawn_enemy — using inline spawning for now
-        let hp_scale = 1.0 + self.player.bloodline.max(0) as f32 * 0.15;
-        let enemy = self.make_enemy_inline(&id, hp_scale);
+        let enemy = match spawn_enemy(&id, self.player.bloodline) {
+            Some(e) => e,
+            None => {
+                return vec![format!("Unknown enemy '{}' — skipping.", id)];
+            }
+        };
         let name = enemy.name.clone();
         let is_god_king = id == "CorruptedGalath";
         self.current_enemy = Some(enemy);
-        self.is_in_combat = true;
+        self.in_combat = true;
         self.announced_attack = None;
         self.god_king_ai_turn = 0;
 
@@ -193,7 +272,7 @@ impl GameSession {
     }
 
     fn cmd_attack(&mut self, _dir: AttackDir) -> Vec<String> {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return self.spawn_next_enemy();
         }
         let enemy = match self.current_enemy.as_ref() {
@@ -226,25 +305,19 @@ impl GameSession {
             return self.handle_player_death(lines);
         }
 
-        // Deal damage
-        // TODO: call ib4-combat::damage::calc_player_damage
-        let weapon_atk = self
-            .player
-            .weapon
-            .as_ref()
-            .map(|w| w.attack_bonus)
-            .unwrap_or(0) as f32;
-        let base_dmg = weapon_atk + self.player.stat_attack as f32;
+        // Deal damage via ib4-combat::damage::calc_player_damage
+        let perk_tree = PerkTree::new();
+        let agg = perk_tree.compute_aggregate(&self.player.selected_perks);
         let multiplier = combo_multiplier(self.combo_depth + 1);
-        let crit_chance = self
-            .player
-            .weapon
-            .as_ref()
-            .map(|w| w.crit_chance)
-            .unwrap_or(0.05);
         let rng_val: f32 = self.rng.gen();
-        let is_crit = rng_val < crit_chance;
-        let dmg = base_dmg * multiplier * if is_crit { 1.5 } else { 1.0 };
+        let (dmg, is_crit) = calc_player_damage(
+            &self.player,
+            &enemy,
+            multiplier * agg.attack_mult,
+            1.0,
+            agg.crit_bonus,
+            rng_val,
+        );
 
         // GodKing shield check
         let shield_blocked = self
@@ -293,29 +366,18 @@ impl GameSession {
             return self.handle_enemy_defeat(lines);
         }
 
-        // Check phase transition
-        // TODO: call ib4-combat::titan::TitanAI::check_phase_transition
+        // Check phase transition via ib4-combat::titan::TitanAI::check_phase_transition
         if let Some(enemy_mut) = self.current_enemy.as_mut() {
-            let hp_pct = enemy_mut.hp_percent();
-            let new_phase = if hp_pct <= 30.0 {
-                3
-            } else if hp_pct <= 60.0 {
-                2
-            } else {
-                1
-            };
-            if new_phase > enemy_mut.phase {
-                enemy_mut.phase = new_phase;
-                enemy_mut.attack_damage = match new_phase {
-                    2 => enemy_mut.base_attack_damage * 1.25,
-                    3 => enemy_mut.base_attack_damage * 1.875,
-                    _ => enemy_mut.base_attack_damage,
-                };
+            if let Some(new_phase) = TitanAI::check_phase_transition(enemy_mut) {
                 lines.push(format!(
                     "  \u{26a1} {} enters {}!",
                     enemy_mut.name,
                     enemy_mut.phase_label()
                 ));
+                // Reset TitanAI throw cooldown on new phase
+                if new_phase == 3 {
+                    self.titan_ai = TitanAI::new();
+                }
             }
         }
 
@@ -325,7 +387,7 @@ impl GameSession {
     }
 
     fn cmd_parry(&mut self, dir: Option<AttackDir>) -> Vec<String> {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return vec!["No enemy to parry.".to_string()];
         }
 
@@ -339,27 +401,25 @@ impl GameSession {
             None => return vec!["No enemy present.".to_string()],
         };
 
-        // TODO: call ib4-combat::parry::ParryResolver::resolve
-        let perfect = match &dir {
-            Some(d) => d == &announced,
-            None => false,
+        // Resolve parry via ib4-combat::parry::ParryResolver::resolve
+        let intent = match dir {
+            Some(ref d) => ParryIntent::DirectionalParry(d.clone()),
+            None => ParryIntent::AnyParry,
         };
+        let parry_outcome = ParryResolver::resolve(announced.clone(), intent);
+        let perfect = parry_outcome == ParryOutcome::PerfectParry;
 
         let mut lines = vec![narrative::fmt_parry_result(perfect, &announced)];
 
-        // GodKing shield: perfect parries break it
+        // GodKing shield: perfect parries break it via ib4-ai::godking::GodKingAI::register_perfect_parry
         if enemy.shield_active && perfect {
             if let Some(e) = self.current_enemy.as_mut() {
-                // TODO: call ib4-ai::godking::GodKingAI::register_perfect_parry
-                e.perfect_parries_received += 1;
+                let event = GodKingAI::register_perfect_parry(e);
                 lines.push(format!(
                     "  \u{2728} Perfect Parry on Galath's shield! ({}/3)",
                     e.perfect_parries_received
                 ));
-                if e.perfect_parries_received >= 3 {
-                    e.shield_active = false;
-                    e.phase = 2;
-                    e.attack_damage = e.base_attack_damage * 1.25;
+                if event.is_some() {
                     lines.push(
                         "  \u{1f4a5} GALATH'S SHIELD SHATTERS! He draws dual blades \u{2014} Phase II!"
                             .to_string(),
@@ -368,15 +428,14 @@ impl GameSession {
             }
         }
 
-        // QIP Scar (GodKing Phase 2 on normal parry)
+        // QIP Scar (GodKing Phase 2 on normal parry) via ib4-ai::godking::GodKingAI::apply_qip_scar
         if !enemy.shield_active && enemy.id == "CorruptedGalath" && !perfect {
-            // TODO: call ib4-ai::godking::GodKingAI::apply_qip_scar
-            self.player.qip_scar_stacks += 1;
+            let event = GodKingAI::apply_qip_scar(&mut self.player);
             lines.push(format!(
                 "  \u{2620}  QIP Scar: {}/3 stacks on your soul.",
                 self.player.qip_scar_stacks
             ));
-            if self.player.qip_scar_stacks >= 3 {
+            if event.is_some() {
                 lines.push("  \u{1f480} THREE QIP SCARS \u{2014} Forced Rebirth!".to_string());
                 lines.extend(self.handle_forced_rebirth());
                 return lines;
@@ -402,7 +461,7 @@ impl GameSession {
     }
 
     fn cmd_dodge(&mut self) -> Vec<String> {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return vec!["Nothing to dodge.".to_string()];
         }
         self.announced_attack = None;
@@ -418,14 +477,15 @@ impl GameSession {
             return vec![format!("  {} magic not yet unlocked.", magic)];
         }
 
-        // TODO: call ib4-combat::magic::resolve_magic for mana cost and damage
-        let mana_cost = match magic {
-            MagicType::Fire => 20.0,
-            MagicType::Lightning => 30.0,
-            MagicType::Ice => 25.0,
-            MagicType::Dark => 35.0,
-            MagicType::Light => 25.0,
-        };
+        // Resolve magic via ib4-combat::magic::resolve_magic
+        let perk_tree = PerkTree::new();
+        let agg = perk_tree.compute_aggregate(&self.player.selected_perks);
+        let (magic_result, mana_cost) = resolve_magic(
+            magic.clone(),
+            self.player.stat_magic,
+            agg.magic_mult,
+            agg.magic_cost_mult,
+        );
 
         if !self.player.spend_mana(mana_cost) {
             return vec![format!(
@@ -434,13 +494,14 @@ impl GameSession {
             )];
         }
 
-        let magic_bonus = self.player.stat_magic as f32 * 10.0;
-        let (damage, heal, effect_text) = match magic {
-            MagicType::Fire => (30.0 + magic_bonus, 0.0, "BURNING (3 turns)"),
-            MagicType::Lightning => (50.0 + magic_bonus, 0.0, "STUNNED (1 turn)"),
-            MagicType::Ice => (35.0 + magic_bonus, 0.0, "FROZEN (2 turns)"),
-            MagicType::Dark => (60.0 + magic_bonus * 0.5, 0.0, "DARK CURSED"),
-            MagicType::Light => (0.0, 40.0 + magic_bonus, ""),
+        let damage = magic_result.damage;
+        let heal = magic_result.heal_amount;
+        let effect_text = match magic {
+            MagicType::Fire => "BURNING (3 turns)",
+            MagicType::Lightning => "STUNNED (1 turn)",
+            MagicType::Ice => "FROZEN (2 turns)",
+            MagicType::Dark => "DARK CURSED",
+            MagicType::Light => "",
         };
 
         let mut lines = vec![narrative::fmt_magic_use(&magic, damage, heal)];
@@ -577,32 +638,25 @@ impl GameSession {
         if self.player.stat_points == 0 {
             return vec!["No stat points available.".to_string()];
         }
-        match stat.to_lowercase().as_str() {
-            "health" | "hp" => {
-                self.player.stat_health += 1;
-            }
-            "attack" | "atk" => {
-                self.player.stat_attack += 1;
-            }
-            "defense" | "def" => {
-                self.player.stat_defense += 1;
-            }
-            "magic" | "mag" => {
-                self.player.stat_magic += 1;
-            }
-            _ => {
-                return vec![format!(
-                    "Unknown stat '{}'. Use: health, attack, defense, magic",
-                    stat
-                )]
-            }
+        let parsed: Stat = match stat.parse() {
+            Ok(s) => s,
+            Err(_) => return vec![format!(
+                "Unknown stat '{}'. Use: health, attack, defense, magic",
+                stat
+            )],
+        };
+        match parsed {
+            Stat::Health  => self.player.stat_health += 1,
+            Stat::Attack  => self.player.stat_attack += 1,
+            Stat::Defense => self.player.stat_defense += 1,
+            Stat::Magic   => self.player.stat_magic += 1,
         }
         self.player.stat_points -= 1;
         self.player.recalculate_stats();
         self.player.health = self.player.max_health; // restore HP on stat alloc
         vec![format!(
-            "  {} increased! ({} points remaining)",
-            stat, self.player.stat_points
+            "  {:?} increased! ({} points remaining)",
+            parsed, self.player.stat_points
         )]
     }
 
@@ -834,31 +888,26 @@ impl GameSession {
             (0, 0, "Enemy".to_string())
         };
 
-        self.is_in_combat = false;
+        self.in_combat = false;
         self.announced_attack = None;
         self.combo_depth = 0;
 
-        // Gold with Scavenger bonus
-        // TODO: call ib4-progression to apply perk bonuses
-        let gold_mult = if self.player.has_perk("TreasureHunter") {
-            1.5
-        } else if self.player.has_perk("Scavenger") {
-            1.2
-        } else {
-            1.0
-        };
-        let gold_gained = (gold as f32 * gold_mult) as u32;
+        // Apply perk bonuses via ib4-progression::perks::PerkTree::compute_aggregate
+        let perk_tree = PerkTree::new();
+        let agg = perk_tree.compute_aggregate(&self.player.selected_perks);
+
+        let gold_gained = (gold as f32 * agg.gold_mult) as u32;
         self.player.gold += gold_gained;
 
-        // XP with InfinitySeeker bonus
-        let xp_mult = if self.player.has_perk("InfinitySeeker") {
-            1.5
-        } else {
-            1.0
-        };
-        let xp_gained = (xp as f32 * xp_mult) as u64;
-        self.player.xp += xp_gained;
-        let levelled = check_level_up(&mut self.player);
+        // XP with perk mult via ib4-progression::xp::XPSystem::add_xp
+        let level_events = XPSystem::add_xp(&mut self.player, xp, agg.xp_mult);
+        let xp_gained = (xp as f32 * agg.xp_mult).round() as u64;
+        let levelled: Vec<String> = level_events.iter().map(|e| {
+            format!(
+                "  \u{2b06}  LEVEL UP! Now Level {}. +{} stat points.",
+                e.new_level, e.stat_points_gained
+            )
+        }).collect();
 
         lines.push(format!("  \u{2694}  {} defeated!", name));
         lines.push(format!("  +{} XP | +{} gp", xp_gained, gold_gained));
@@ -879,14 +928,14 @@ impl GameSession {
             self.player.loot_bag.push(drop);
         }
 
-        if self.arena_queue.is_empty() {
+        if self.arena.is_empty() {
             lines.push(
                 "  You have conquered this arena. The bloodline endures.".to_string(),
             );
         } else {
             lines.push(format!(
                 "  Next: {}. Type 'explore' to continue.",
-                self.arena_queue.front().map(|s| s.as_str()).unwrap_or("?")
+                self.arena.front().unwrap_or("?")
             ));
         }
         lines
@@ -903,47 +952,19 @@ impl GameSession {
     }
 
     fn do_rebirth(&mut self, died: bool) -> Vec<String> {
-        self.player.bloodline += 1;
-        let perk_gained = self.player.bloodline <= 20;
-        if perk_gained {
-            self.player.perk_points += 1;
-        }
+        // Trigger rebirth via ib4-progression::bloodline::BloodlineSystem::trigger_rebirth
+        let rebirth = BloodlineSystem::trigger_rebirth(&mut self.player);
 
-        // Reset economy
-        self.player.gold = 0;
-        self.player.weapon = None;
-        self.player.shield = None;
-        self.player.loot_bag.clear();
-        self.player.qip_scar_stacks = 0;
+        // Reset session state that BloodlineSystem doesn't own
         self.current_enemy = None;
-        self.is_in_combat = false;
+        self.in_combat = false;
         self.combo_depth = 0;
-
-        // Restore HP/mana
-        self.player.health = self.player.max_health;
-        self.player.mana = self.player.max_mana;
-
-        // Check magic unlocks
-        // TODO: call ib4-progression::bloodline for magic unlock table
-        let mut new_magic = Vec::new();
-        for (bl, magic) in &[
-            (3, MagicType::Lightning),
-            (6, MagicType::Ice),
-            (10, MagicType::Dark),
-            (15, MagicType::Light),
-        ] {
-            if self.player.bloodline >= *bl && !self.player.magic_unlocks.contains(magic) {
-                self.player.magic_unlocks.push(magic.clone());
-                new_magic.push(format!("{}", magic));
-            }
-        }
+        self.titan_ai = TitanAI::new();
 
         // Rebuild arena queue for new bloodline
-        self.arena_queue = vec!["LightTitan", "HeavyTitan", "DarkKnight", "CorruptedGalath"]
-            .into_iter()
-            .map(|s| s.to_string())
-            .collect();
+        self.arena.reset(&["LightTitan", "HeavyTitan", "DarkKnight", "CorruptedGalath"]);
 
+        let hp_scale = BloodlineSystem::enemy_hp_scale(self.player.bloodline);
         let mut lines = vec![
             format!(
                 "  \u{2550}\u{2550}\u{2550} BLOODLINE {} \u{2550}\u{2550}\u{2550}",
@@ -956,23 +977,23 @@ impl GameSession {
             },
             format!(
                 "  Enemies grow stronger ({:.2}\u{d7} HP).",
-                1.0 + self.player.bloodline as f32 * 0.15
+                hp_scale
             ),
         ];
-        if perk_gained {
+        if rebirth.perk_point_gained {
             lines.push(format!(
                 "  +1 Perk Point! ({})",
                 self.player.perk_points
             ));
         }
-        for m in &new_magic {
-            lines.push(format!("  \u{2728} New magic unlocked: {}", m));
+        for magic in &rebirth.newly_unlocked_magic {
+            lines.push(format!("  \u{2728} New magic unlocked: {}", magic));
         }
         lines
     }
 
     fn announce_next_attack(&mut self, lines: &mut Vec<String>) {
-        if !self.is_in_combat {
+        if !self.in_combat {
             return;
         }
         let enemy = match self.current_enemy.as_ref() {
@@ -986,20 +1007,21 @@ impl GameSession {
             lines.push("  The enemy is stunned and cannot act!".to_string());
             return;
         }
-        // TODO: call ib4-ai::titan::TitanAI::decide for smarter AI decisions
-        let dir = self.random_dir();
-        lines.push(narrative::fmt_attack_announce(&enemy.name, &dir, enemy.phase));
-        self.announced_attack = Some(dir);
+        // Use ib4-ai::titan::TitanAI::decide for smarter AI decisions
+        let decision = self.titan_ai.decide(&enemy, &mut self.rng);
+        lines.push(narrative::fmt_attack_announce(&enemy.name, &decision.announced_dir, enemy.phase));
+        self.announced_attack = Some(decision.announced_dir);
     }
 
     fn random_dir(&mut self) -> AttackDir {
-        match self.rng.gen_range(0..3u32) {
+        match self.rng.random_range(0..3u32) {
             0 => AttackDir::Overhead,
             1 => AttackDir::Left,
             _ => AttackDir::Right,
         }
     }
 
+    #[allow(dead_code)]
     fn make_enemy_inline(&self, id: &str, hp_scale: f32) -> EnemyInstance {
         let (name, hp, atk, bl_req, xp, gold, drop, titan_type) = match id {
             "LightTitan" => (
@@ -1206,24 +1228,17 @@ fn xp_to_next(player: &PlayerState) -> u64 {
     threshold.saturating_sub(player.xp)
 }
 
+/// Delegate level-up checking to ib4-progression::xp::XPSystem.
+/// Adds 0 raw XP so no extra XP is granted; only flushes any pending level-ups.
+#[allow(dead_code)]
 fn check_level_up(player: &mut PlayerState) -> Vec<String> {
-    // TODO: call ib4-progression::xp::check_level_up
-    let mut lines = Vec::new();
-    while player.level < 45 {
-        let threshold = (100.0 * ((player.level + 1) as f64).powf(1.5)).round() as u64;
-        if player.xp >= threshold {
-            player.level += 1;
-            player.stat_points += 2;
-            player.recalculate_stats();
-            lines.push(format!(
-                "  \u{2b06}  LEVEL UP! Now Level {}. +2 stat points.",
-                player.level
-            ));
-        } else {
-            break;
-        }
-    }
-    lines
+    XPSystem::add_xp(player, 0, 1.0)
+        .into_iter()
+        .map(|e| format!(
+            "  \u{2b06}  LEVEL UP! Now Level {}. +{} stat points.",
+            e.new_level, e.stat_points_gained
+        ))
+        .collect()
 }
 
 fn tier_locked(tier: u8, bloodline: i32) -> bool {

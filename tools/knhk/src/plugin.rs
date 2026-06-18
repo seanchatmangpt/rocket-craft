@@ -3,7 +3,7 @@ use wasmer::{Instance, Module, Store, imports, Value};
 use crate::{Law, LawError};
 use anyhow::{Result, Context};
 use std::sync::Mutex;
-use wasm4pm_compat::receipt::Receipt;
+use crate::receipt::Receipt;
 
 pub struct PluginHost {
     receipts: Vec<Receipt>,
@@ -20,6 +20,14 @@ impl PluginHost {
         Self {
             receipts: Vec::new(),
         }
+    }
+
+    pub fn record_receipt(&mut self, receipt: Receipt) {
+        self.receipts.push(receipt);
+    }
+
+    pub fn receipts(&self) -> &[Receipt] {
+        &self.receipts
     }
 
     pub fn load_law(&mut self, wasm_path: &Path) -> Result<WasmLaw> {
@@ -47,13 +55,6 @@ impl PluginHost {
         })
     }
 
-    pub fn record_receipt(&mut self, receipt: Receipt) {
-        self.receipts.push(receipt);
-    }
-
-    pub fn receipts(&self) -> &[Receipt] {
-        &self.receipts
-    }
 }
 
 pub struct WasmLaw {

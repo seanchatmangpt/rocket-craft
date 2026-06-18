@@ -1,6 +1,8 @@
 use std::path::Path;
 
 pub mod plugin;
+pub mod receipt;
+pub use receipt::Receipt;
 
 /// A trait representing a semantic law or constraint that a project must satisfy.
 ///
@@ -139,12 +141,10 @@ impl Law for AndroidKeystoreLaw {
 mod tests {
     use super::*;
     use super::plugin::PluginHost;
-    use std::io::Write;
-    use tempfile::NamedTempFile;
 
     #[test]
     fn test_plugin_host_new() {
         let host = PluginHost::new();
-        assert_eq!(host.receipts().len(), 0);
+        assert!(host.receipts().is_empty());
     }
 }

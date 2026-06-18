@@ -117,3 +117,355 @@ Integrity mode: benchmark
 ### Test Suite Execution
 - [ ] Vitest unit tests in `pwa-staff/` execute and pass successfully.
 - [ ] Playwright E2E tests execute and pass successfully on Chromium.
+
+## Follow-up — 2026-06-17T07:06:50Z
+
+Research Google DeepMind's Genie (Generative Interactive Environments / World Model) on arXiv (e.g. arXiv:2402.15391). Implement a core interactive world-model simulator in Rust, and build a Python-based pipeline that integrates TPOT2 for model optimization and DSPy for optimizing interactive player/designer LLM agents.
+
+Working directory: ~/rocket-craft
+Integrity mode: development
+
+## Requirements
+
+### R1. DeepMind Genie World Model Core in Rust
+Implement a high-performance simulation or reference model of the Genie architecture. The core must include:
+1. A spatiotemporal tokenizer representation to discretize state inputs (e.g., grid maps, 2D/3D states, or simple image frames).
+2. A Latent Action Model (LAM) that infers actions from transitions between consecutive states.
+3. A Dynamics Model that predicts the next discretized state given the current state and a (latent) action.
+
+### R2. Python Integration & TPOT2 AutoML Optimization
+Build a Python wrapper or interface to interact with the Rust world model. Use TPOT2 to automate hyperparameter tuning or pipeline optimization for the dynamics predictor or latent action classifier (e.g., optimizing predictive accuracy or convergence rates on a dataset of state trajectories).
+
+### R3. DSPy LLM Player & Designer Agent
+Create a DSPy-based interactive agent. Use DSPy to define and compile an optimized LLM prompt/program that:
+1. Acts as a player navigating the simulated world, selecting actions based on natural language commands or visual/textual feedback.
+2. Acts as a world designer, generating prompt inputs for the world model to spawn new environments.
+
+### R4. Unreal Engine 4 Export & Benchmark
+Provide a utility to export simulated world maps or state sequences into a standard JSON-based scene/actor layout format compatible with Unreal Engine 4. Include a benchmark script comparing frame-by-frame generation latency and memory footprint between the Genie world model implementation and traditional engine-like asset loads.
+
+### R5. End-to-End Validation
+Provide an automated script (`verify_world_model.sh` or `.py`) that runs the Rust simulator, executes the TPOT2 optimization, tests the DSPy agent, exports a map to UE4 format, and verifies that the entire flow completes without errors.
+
+## Acceptance Criteria
+
+### Core Implementation
+- [ ] The Rust core compiles and can load, tokenize, and predict state transitions.
+- [ ] The Python bindings/subprocess wrapper can interact with the Rust simulator to get state predictions.
+
+### Pipelines & Optimization
+- [ ] The TPOT2 AutoML search runs and successfully finds optimized parameters for the dynamics model.
+- [ ] The DSPy interactive agent successfully compiles and executes navigation instructions on the simulated environment using an LLM.
+
+### Unreal Engine 4 Export
+- [ ] The system outputs a valid JSON map file representing the generated world layout, compatible with Unreal Engine 4 import.
+
+### Verification
+- [ ] Running the verification script completes successfully, demonstrating the entire pipeline runs from end to end.
+
+## Follow-up — 2026-06-17T07:14:14Z
+
+Incorporate the "Genie 26 Vision 2030" philosophy and specification into the World Manufacturing Platform design for the Genie simulator and pipeline in `~/rocket-craft`.
+
+### Genie 26 Vision 2030 Core Principles to Incorporate:
+1. **World Manufacturing Philosophy:** Treat every generated system as a "world" that contains:
+   * **Objects** (State variables/world elements)
+   * **Actors** (Entities interacting within the world)
+   * **Relationships** (Structural bounds/hierarchies)
+   * **Events** (Transitions/Inputs)
+   * **Rules** (Physics/Constraints/Semantic Laws)
+   * **Processes** (Workflows/Execution loops)
+   * **Receipts** (Lineage, provenance, BLAKE3 receipts/cryptographic lineage, replay records)
+
+2. **Receipted Worlds:** Every world state transition and generation run must support verifiable receipts (cryptographic origin, specification alignment, operational/replay history).
+
+Ensure that the Rust simulation/dynamics model and the Python pipeline reflect these core components, allowing a user to specify a world's objects/rules and manufacture it with verifiable execution and cryptographic receipts.
+
+
+## Follow-up — 2026-06-17T07:16:57Z
+
+Implement the Genie 26 World Manufacturing Platform based on the Version Vision 2030 PRD and ARD. The platform must manufacture, deploy, operate, and evolve playable Unreal 4 worlds directly from user intent.
+
+Working directory: ~/rocket-craft
+Integrity mode: development
+
+## Requirements
+
+### R1. Intent & Specification Layer
+Implement a mechanism to ingest user intent (natural language prompts) and output a structured World Specification. The specification must explicitly model the world components:
+1. Places (locations and environments)
+2. Actors (entities within the world)
+3. Objects (items and assets)
+4. Relationships (structural hierarchy and bounds)
+5. Rules (physics, constraints, and interactions)
+6. History/Events (logs of modifications and state transitions)
+
+### R2. World Manufacturing (Unreal 4 Artifacts)
+Implement a manufacturing engine that takes the structured World Specification and constructs a playable, navigable Unreal 4 world artifact (e.g., scene layouts, maps, or project setups compatible with Unreal 4).
+
+### R3. World Evolution & State Continuity
+Implement an evolution mechanism. When new user intent is received to modify an existing world, the system must update the World Specification and manufacture the updated Unreal 4 artifacts while preserving the existing state, structures, relationships, and history (no starting over from scratch).
+
+### R4. World Deployment & Operation
+Provide support to launch/deploy the manufactured world, access/re-enter the world, and log the world's operational and modification history.
+
+### R5. Automated Verification
+Provide an automated integration script (`verify_genie.sh`) that takes a test intent prompt, generates a world, applies a modification intent to evolve it, and verifies the generated and evolved Unreal 4 artifacts for structural validity.
+
+## Acceptance Criteria
+
+### Input & Output Validation
+- [ ] Natural language intent can be parsed into a structured World Specification modeling Places, Actors, Objects, Relationships, Rules, and History.
+- [ ] The manufacturing output is a valid Unreal 4 compatible world map/scene layout file.
+
+### Evolution & Continuity
+- [ ] World modifications update the existing map/scene artifacts incrementally, preserving unmodified actors and relationships.
+
+### Verification
+- [ ] The `verify_genie.sh` script runs the generation and evolution process on a sample case and exits with code 0 on success.
+
+
+## Follow-up — 2026-06-17T07:25:43Z
+
+The user has set a /goal to validate the entire Genie system. The goal details are:
+"entire genie system is validated by using claude -p to create a world and then interacting with world in browser"
+
+To achieve this goal:
+1. **Web Runtime / Browser Deployment:** The manufactured Unreal 4 world artifact must have a browser runtime implementation (e.g., an HTML/JS/WebAssembly frontend, or a web dashboard representing the simulated Unreal 4 world layout) so that the user can open and interact with the manufactured world directly in a web browser.
+2. **Interactive CLI / Script:** Ensure there is a CLI/script (like `claude -p` or a direct prompt generation interface) that creates a world, launches a local web server to host it, and prints the URL to open it.
+3. **Validation:** The verification suite must demonstrate that the world can be built, hosted, and interacted with via a web interface.
+
+Update the project specification and direct the orchestrator to build a web/browser-based interactive runtime for the manufactured worlds.
+
+## Follow-up — 2026-06-17T18:00:30Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Launched
+> Goal: Execute the Teamwork Multi-Agent System on the problem constraints.
+
+Refactor Rocket-Craft into a browser-native Unreal 4 world manufacturing pipeline using the SpeculativeCoder UE4.27 HTML5 ES3 fork.
+
+Working directory: ~/rocket-craft
+Integrity mode: benchmark
+
+**Reference Material:**
+- UE4 HTML5 ES3 Fork: [SpeculativeCoder/UnrealEngine-HTML5-ES3](https://github.com/SpeculativeCoder/UnrealEngine-HTML5-ES3)
+
+## Requirements
+
+### R1. Target Output Architecture
+The pipeline must output a static HTML5/WebGL2/WASM Unreal 4 package. Pixel Streaming is forbidden. Success is defined exclusively as a packaged, playable browser world—not just a passing simulator or unit test suite.
+
+### R2. End-to-End Playwright Verification
+Use Playwright as the mandatory end-to-end verifier. The verification script must open the locally served HTML5 output, send movement input into the canvas, and capture screenshots before and after the input.
+
+### R3. Combinatorial Maximalism (Parallel Uncertain uncertainties)
+Launch parallel agents against every independent uncertainty. No agent may claim project victory; agents may only claim local receipts. The orchestrator admits only end-to-end receipts.
+The independent uncertainties to attack in parallel are:
+- UE4 fork setup
+- HTML5 packaging
+- minimal project creation
+- generated world artifact import
+- Rocket-Craft contract refactor
+- headless build automation
+- local web serving
+- Playwright browser validation
+- visual screenshot comparison
+- repair-loop automation
+
+## Acceptance Criteria
+
+### End-to-End Pipeline
+- [ ] A Prompt is converted to a Rocket-Craft world contract.
+- [ ] Unreal 4 world artifacts are successfully generated.
+- [ ] The world is packaged via the SpeculativeCoder UE4.27 HTML5 build/package.
+- [ ] The static package is served locally.
+
+### Verifiable Browser Receipt
+- [ ] Playwright opens the locally served world without errors.
+- [ ] Playwright successfully sends movement input to the running WebGL instance.
+- [ ] The screenshot delta (before and after movement) proves motion occurred.
+- [ ] A receipt records the build log, package path, browser URL, screenshots, input trace, and verdict.
+
+## Follow-up — 2026-06-17T18:02:12Z
+
+Implement the TPS/DfLSS Playwright Manufacturing Strategy as the governing acceptance system for Rocket-Craft.
+
+Do not treat this as documentation. Treat it as law.
+
+Refactor Rocket-Craft so the final authority is Playwright visual verification of a browser-native Unreal 4 HTML5/WASM world built with the SpeculativeCoder UE4.27 HTML5 ES3 fork.
+
+The pipeline must not accept:
+- Rust-only simulation
+- CLI emulation
+- mocked worlds
+- unit-test-only success
+- package-only success
+- compile-only success
+- screenshots without input actuation
+- input actuation without visual delta
+- visual delta without receipt
+
+The accepted crown path is:
+
+Prompt
+→ Rocket-Craft Contract
+→ Unreal 4 world artifact
+→ HTML5/WASM package
+→ local browser launch
+→ Playwright waits for engine readiness
+→ Playwright captures baseline screenshot
+→ Playwright sends movement input
+→ Playwright captures after screenshot
+→ visual delta is computed
+→ browser console logs are captured
+→ cryptographic receipt is produced
+
+If visual motion delta is below threshold, mark DEFECT and route repair by failure taxonomy.
+
+Victory requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.
+
+## Add this acceptance matrix
+
+GATE 0 — Source Admission
+PASS only if Rocket-Craft has a declared world contract for the prompt.
+
+GATE 1 — Unreal Artifact Admission
+PASS only if Rocket-Craft emits Unreal 4-consumable world artifacts.
+
+GATE 2 — HTML5/WASM Package Admission
+PASS only if the SpeculativeCoder UE4.27 HTML5 ES3 build produces browser-deployable output.
+
+GATE 3 — Browser Load Admission
+PASS only if Playwright opens the packaged world and detects engine readiness.
+
+GATE 4 — Visual World Admission
+PASS only if screenshot shows a non-error WebGL/Unreal scene.
+
+GATE 5 — Actuation Admission
+PASS only if keyboard input is injected.
+
+GATE 6 — Motion Admission
+PASS only if after-screenshot differs from before-screenshot above threshold.
+
+GATE 7 — Receipt Admission
+PASS only if prompt, contract hash, build log, package path, screenshots, console logs, input trace, visual delta, and final verdict are recorded.
+
+## The repair routing law
+
+No generic repair loop.
+
+Every failure must route to a cell:
+- UE4 fork/build cell
+- HTML5 packaging cell
+- Rocket-Craft contract cell
+- Unreal artifact generation cell
+- local serving cell
+- Playwright browser-load cell
+- WebGL/runtime cell
+- input-binding cell
+- visual-delta cell
+- receipt/audit cell
+
+## Stop proving that code exists.
+
+Prove that the world drives.
+
+## Follow-up — 2026-06-17T19:29:01Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Launched
+> Goal: Execute the Teamwork Multi-Agent System on the problem constraints.
+
+Complete the full Rocket-Craft ecosystem by closing all remaining feature gaps across the PWA Frontend, Supabase State Persistence, Multiplatform Builds (Windows/Linux), and offline Service Worker caching.
+
+Working directory: ~/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. PWA Frontend & Canvas Integration
+The web dashboard (`pwa-staff/`) must seamlessly embed the manufactured HTML5 UE4 output. It must replace any mock visualization with the actual compiled WASM game canvas and render the cryptographic receipt upon completion.
+
+### R2. State Persistence & Authentication
+Integrate Supabase to authenticate users and persist generated `WorldSpec` contracts to the database, ensuring world history is tied to specific user accounts.
+
+### R3. Multiplatform Packaging
+Extend the headless manufacturing pipeline (currently HTML5-only) to also target Windows (`.exe`) and Linux (`.elf` or `.sh`) standalone builds for dedicated servers or native desktop clients.
+
+### R4. Offline Asset Caching
+Implement a Service Worker in the PWA to aggressively cache the heavy Unreal Engine WASM payloads and asset bundles, enabling the world to load offline after the initial play.
+
+## Acceptance Criteria
+
+### PWA & Canvas Integration
+- [ ] Playwright E2E script confirms the UE4 `<canvas>` element mounts inside the React/PWA dashboard DOM.
+- [ ] The cryptographic receipt data is visually rendered in the UI adjacent to the canvas.
+
+### State Persistence
+- [ ] Programmatic script successfully registers a mock user via Supabase Auth.
+- [ ] A test script queries the Supabase database and verifies the generated `WorldSpec` JSON was saved under the correct user ID.
+
+### Multiplatform Builds
+- [ ] The pipeline successfully emits a Windows `.exe` standalone build for a generated world.
+- [ ] The pipeline successfully emits a Linux standalone build for a generated world.
+
+### Offline Caching
+- [ ] Playwright disables network connectivity (offline mode) after initial load and confirms the UE4 application still boots successfully from the Service Worker cache.
+
+
+## Follow-up — 2026-06-17T23:24:31Z
+
+Resolve all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project. Ensure the entire codebase is production-ready, fully compliant with Anti-LLM guidelines, and passes the complete test suite.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Complete Stubs and Placeholders
+Fully implement all code paths and files marked with `STUB` or acting as placeholders with complete, production-ready business logic:
+- `unify-rs/unify-bp/src/pwa_export.rs`
+- `unify-rs/unify-integration-tests/src/fixtures.rs`
+- `unify-rs/unify-rdf/src/pipeline.rs`
+- Any other files containing `STUB` comments or placeholder blocks across the workspace.
+
+### R2. Replace Single-Line and Catch-All Stubs
+Replace all hardcoded/empty single-line functions, placeholder method bodies, and empty catch-all match arms with robust, functional code:
+- Replace the single-line `description` method in `classify.rs` with descriptive logic.
+- Fully implement `namespace`, `noun`, and `verb` functions in `unify-core/src/lib.rs` and `unify-rocket/src/lib.rs`.
+- Replace empty catch-all `_ => {}` matches in `manifest.rs` with proper error handling/logging.
+- Fully implement the lifecycle stubs `on_start` and `on_stop` in `wasm-patterns/src/actor.rs`.
+- Replace dummy helper functions in `wasm-tests/tests/pattern_integration.rs`.
+
+### R3. Harden Assertions & Eliminate Test Shortcuts
+Refactor tests relying on substring matching or text-based shortcut assertions to use precise, schema-compliant structural validations:
+- Refactor string assertions in `unify-integration-tests/src/lib.rs`.
+- Refactor HUD display/substring searches in `wasm-ui/tests/hud.rs` and `wasm-ui/tests/message_bridge.rs`.
+
+### R4. Remove Debug Macro Leakage
+Clean up and replace all print statements (`println!`) in compiler scripts, FFI modules, and MCP/CLI binary entrypoints with structured logging or tracing:
+- `unify-ffi/build.rs`
+- `unify-mcp/src/main.rs`
+- `unify/src/commands.rs` and `unify/src/main.rs`
+
+### R5. Eliminate Overclaim/Victory Language
+Remove any unverified overclaiming status tags (like `zero violations`, `solved`, `done`) in code comments or logs.
+
+## Acceptance Criteria
+
+### Compilation & Workspace Testing
+- [ ] The entire `unify-rs` and `wasm-threads` workspaces compile without any errors or warnings.
+- [ ] Running `cargo test --workspace` passes 100% of all unit and integration tests.
+- [ ] No stubs, placeholders, or `TODO` comments remain anywhere in the code.
+
+### Compliance & Quality
+- [ ] The `anti-llm-cheat-lsp` compliance scanner returns 0 errors/violations across the entire codebase.
+- [ ] The E2E Playwright test suite passes successfully.
+
+
+
+
+

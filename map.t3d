@@ -1,0 +1,56 @@
+Begin Map
+   Begin Level
+      Begin Actor Class=StaticMeshActor Name=Place_room_1 Archetype=StaticMeshActor'/Script/Engine.Default__StaticMeshActor'
+         Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0 Archetype=StaticMeshComponent'/Script/Engine.Default__StaticMeshActor:StaticMeshComponent0'
+         End Object
+         Begin Object Name="StaticMeshComponent0"
+            StaticMesh=StaticMesh'/Engine/BasicShapes/Cube.Cube'
+            RelativeLocation=(X=0.000000,Y=0.000000,Z=-100.000000)
+            RelativeRotation=(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+            RelativeScale3D=(X=2.000000,Y=2.000000,Z=1.000000)
+         End Object
+         StaticMeshComponent=StaticMeshComponent0
+         RootComponent=StaticMeshComponent0
+         ActorLabel="Floor_Control Room"
+      End Actor
+      Begin Actor Class=StaticMeshActor Name=Place_room_2 Archetype=StaticMeshActor'/Script/Engine.Default__StaticMeshActor'
+         Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0 Archetype=StaticMeshComponent'/Script/Engine.Default__StaticMeshActor:StaticMeshComponent0'
+         End Object
+         Begin Object Name="StaticMeshComponent0"
+            StaticMesh=StaticMesh'/Engine/BasicShapes/Cube.Cube'
+            RelativeLocation=(X=200.000000,Y=0.000000,Z=-80.000000)
+            RelativeRotation=(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+            RelativeScale3D=(X=1.000000,Y=1.000000,Z=1.000000)
+         End Object
+         StaticMeshComponent=StaticMeshComponent0
+         RootComponent=StaticMeshComponent0
+         ActorLabel="Floor_Storage Room"
+      End Actor
+      Begin Actor Class=BP_RoboticWelder_C Name=Actor_bot_1 Archetype=BP_RoboticWelder_C'/Game/BP_RoboticWelder.Default__BP_RoboticWelder_C'
+         Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0
+         End Object
+         Begin Object Name="StaticMeshComponent0"
+            StaticMesh=StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'
+            RelativeLocation=(X=20.000000,Y=-10.000000,Z=0.000000)
+            RelativeRotation=(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+            RelativeScale3D=(X=1.000000,Y=1.000000,Z=2.000000)
+         End Object
+         StaticMeshComponent=StaticMeshComponent0
+         RootComponent=StaticMeshComponent0
+         ActorLabel="Welder Bot"
+      End Actor
+      Begin Actor Class=BP_CNC_Machine_C Name=Object_cnc_1 Archetype=BP_CNC_Machine_C'/Game/BP_CNC_Machine.Default__BP_CNC_Machine_C'
+         Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0
+         End Object
+         Begin Object Name="StaticMeshComponent0"
+            StaticMesh=StaticMesh'/Engine/BasicShapes/Sphere.Sphere'
+            RelativeLocation=(X=0.000000,Y=0.000000,Z=0.000000)
+            RelativeRotation=(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+            RelativeScale3D=(X=1.000000,Y=1.000000,Z=1.000000)
+         End Object
+         StaticMeshComponent=StaticMeshComponent0
+         RootComponent=StaticMeshComponent0
+         ActorLabel="CNC Alpha"
+      End Actor
+   End Level
+End Map

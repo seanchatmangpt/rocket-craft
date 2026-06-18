@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genie 26 World Operating Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js and OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="brand">
+                <i class="fa-solid fa-wand-magic-sparkles logo-icon"></i>
+                <div class="brand-text">
+                    <h1>GENIE 26</h1>
+                    <span class="sub-brand">World Manufacturing Platform</span>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator">
+                    <span class="pulse-dot green"></span>
+                    <span class="status-label">SYS_ONLINE</span>
+                </div>
+                <div class="status-indicator">
+                    <i class="fa-solid fa-shield-halved secure-icon"></i>
+                    <span class="status-label text-secure">BLAKE3_SECURE</span>
+                </div>
+                <div class="stats">
+                    <span class="stat-badge"><i class="fa-solid fa-cube"></i> Places: <span id="place-count">0</span></span>
+                    <span class="stat-badge"><i class="fa-solid fa-robot"></i> Actors: <span id="actor-count">0</span></span>
+                    <span class="stat-badge"><i class="fa-solid fa-box"></i> Objects: <span id="object-count">0</span></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left Panel: Prompt & Entities -->
+            <section class="panel left-panel">
+                <div class="panel-section">
+                    <h3><i class="fa-solid fa-terminal"></i> Natural Language Intent</h3>
+                    <div class="prompt-container">
+                        <textarea id="prompt-input" placeholder="Type command to evolve the world...
+e.g.,
+create place room_2 name 'Storage Room' at (100, 0, 0) bounds (20, 20, 10)
+create actor bot_2 name 'Drill Bot' role RoboticDrill in room_2
+update actor bot_1 position (10, 10, 0)
+delete actor bot_1"></textarea>
+                        <button id="evolve-btn" class="primary-btn">
+                            <i class="fa-solid fa-gears btn-icon"></i>
+                            <span>Evolve World</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel-section flex-grow">
+                    <h3><i class="fa-solid fa-list-check"></i> Active Entities</h3>
+                    <div class="tabs">
+                        <button class="tab-btn active" data-tab="places-tab">Places</button>
+                        <button class="tab-btn" data-tab="actors-tab">Actors</button>
+                        <button class="tab-btn" data-tab="objects-tab">Objects</button>
+                    </div>
+                    <div class="tab-content">
+                        <div id="places-tab" class="tab-pane active">
+                            <ul id="places-list" class="entity-list"></ul>
+                        </div>
+                        <div id="actors-tab" class="tab-pane">
+                            <ul id="actors-list" class="entity-list"></ul>
+                        </div>
+                        <div id="objects-tab" class="tab-pane">
+                            <ul id="objects-list" class="entity-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Panel: 3D Navigable Viewport -->
+            <section class="center-panel">
+                <div class="viewport-header">
+                    <div class="viewport-title">
+                        <i class="fa-solid fa-cube"></i> Interactive 3D Simulation
+                    </div>
+                    <div class="viewport-controls">
+                        <button id="walk-mode-btn" class="walk-btn" title="Enter World Walk Mode"><i class="fa-solid fa-person-walking"></i> Enter World</button>
+                        <button id="reset-cam-btn" title="Reset Camera"><i class="fa-solid fa-arrows-to-eye"></i></button>
+                        <button id="toggle-grid-btn" title="Toggle Grid"><i class="fa-solid fa-border-all"></i></button>
+                    </div>
+                </div>
+                <div id="canvas-container">
+                    <!-- WebGL Canvas will be injected here -->
+                </div>
+                <div id="walkthrough-overlay" class="walkthrough-overlay hidden">
+                    <div class="walkthrough-hud">
+                        <div class="current-room-hud">
+                            Location: <span id="current-room-name">Outside</span>
+                        </div>
+                        <div class="reticle"></div>
+                        <div id="hud-console-container" class="hud-console-container hidden">
+                            <span class="hud-console-prompt">> </span>
+                            <input id="hud-console-input" type="text" placeholder="Type intent (e.g. update actor bot_1 position (10, 20, 0))..." autocomplete="off" />
+                        </div>
+                        <div class="walkthrough-instructions">
+                            <span class="hud-key">W</span> <span class="hud-key">A</span> <span class="hud-key">S</span> <span class="hud-key">D</span> to Walk | <span>Mouse</span> to Look | <span class="hud-key">Enter</span>/<span>`</span> to Type | <span class="hud-key">Esc</span> to Exit
+                        </div>
+                    </div>
+                </div>
+                <div id="entity-details" class="details-card hidden">
+                    <div class="details-header">
+                        <h4 id="details-name">Entity Name</h4>
+                        <button id="close-details-btn"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="details-body">
+                        <p><strong>ID:</strong> <span id="details-id">N/A</span></p>
+                        <p><strong>Class/Role:</strong> <span id="details-class">N/A</span></p>
+                        <p><strong>Position:</strong> <span id="details-pos">N/A</span></p>
+                        <div id="details-properties-section">
+                            <h5>Properties</h5>
+                            <pre id="details-properties">{}</pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Telemetry & Receipts -->
+            <section class="panel right-panel">
+                <div class="panel-section">
+                    <h3><i class="fa-solid fa-shield-halved"></i> Cryptographic Receipts</h3>
+                    <div class="receipt-chain-container">
+                        <div id="receipt-list" class="receipt-list">
+                            <!-- Receipts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section flex-grow">
+                    <h3><i class="fa-solid fa-scroll"></i> World Logs</h3>
+                    <div class="log-console-container">
+                        <div id="log-console" class="log-console">
+                            <div class="log-entry system">[SYSTEM] Operating center initialized.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

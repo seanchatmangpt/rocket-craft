@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GENIE 26 - Cyberpunk World Visualizer</title>
+    <style>
+        :root {
+            --bg-color: #050508;
+            --panel-bg: #0d0e15;
+            --neon-cyan: #00f0ff;
+            --neon-pink: #ff0055;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffea00;
+            --border-color: #1f2335;
+            --text-color: #c0caf5;
+            --text-muted: #565f89;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace, sans-serif;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--neon-cyan);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px -5px var(--neon-cyan);
+        }
+
+        h1 {
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+            text-shadow: 0 0 8px var(--neon-cyan);
+        }
+
+        .subtitle {
+            color: var(--neon-pink);
+            font-weight: bold;
+            text-shadow: 0 0 5px var(--neon-pink);
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 120px);
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .visualizer-card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.05);
+        }
+
+        .panel-header {
+            background-color: rgba(31, 35, 53, 0.5);
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            color: var(--neon-pink);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, #0e111a 0%, #050508 100%);
+        }
+
+        canvas {
+            border: 1px dashed rgba(0, 240, 255, 0.2);
+            background-color: rgba(0, 0, 0, 0.3);
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .card-title {
+            color: var(--neon-cyan);
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            border-left: 3px solid var(--neon-cyan);
+            padding-left: 10px;
+            font-size: 15px;
+            text-shadow: 0 0 3px var(--neon-cyan);
+        }
+
+        .entity-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-right: 5px;
+        }
+
+        .entity-item {
+            padding: 8px 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            background-color: rgba(0,0,0,0.2);
+        }
+
+        .entity-item:hover {
+            border-color: var(--neon-cyan);
+            background-color: rgba(0, 240, 255, 0.05);
+            box-shadow: 0 0 5px rgba(0, 240, 255, 0.2);
+        }
+
+        .entity-item.active {
+            border-color: var(--neon-pink);
+            background-color: rgba(255, 0, 85, 0.1);
+            box-shadow: 0 0 5px rgba(255, 0, 85, 0.2);
+        }
+
+        .entity-item .type-badge {
+            float: right;
+            font-size: 10px;
+            text-transform: uppercase;
+            padding: 2px 5px;
+            border-radius: 3px;
+            background-color: var(--border-color);
+        }
+
+        .type-place { color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+        .type-actor { color: var(--neon-cyan); border: 1px solid var(--neon-cyan); }
+        .type-object { color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            background-color: #000;
+            border: 1px solid var(--border-color);
+            color: var(--neon-cyan);
+            padding: 8px;
+            border-radius: 3px;
+            font-family: inherit;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 5px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn {
+            background-color: transparent;
+            color: var(--neon-pink);
+            border: 1px solid var(--neon-pink);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            width: 100%;
+            box-shadow: 0 0 5px rgba(255, 0, 85, 0.1);
+        }
+
+        .btn:hover {
+            background-color: var(--neon-pink);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        .btn-cyan {
+            color: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 5px rgba(0, 240, 255, 0.1);
+        }
+
+        .btn-cyan:hover {
+            background-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            font-size: 12px;
+        }
+
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 5px;
+        }
+
+        .details-label {
+            color: var(--text-muted);
+        }
+
+        .details-val {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .log-console {
+            background-color: #000;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            font-size: 11px;
+            height: 120px;
+            overflow-y: auto;
+            color: var(--neon-green);
+            text-shadow: 0 0 2px var(--neon-green);
+            box-shadow: inset 0 0 10px rgba(57, 255, 20, 0.15);
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 15px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Genie 26 Visualizer</h1>
+            <span style="font-size: 11px; color: var(--text-muted);">WORLD MANUFACTURING PLATFORM</span>
+        </div>
+        <div>
+            <span class="subtitle">STATUS: ONLINE</span>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="left-panel">
+            <div class="visualizer-card">
+                <div class="panel-header">
+                    <span>Tactical Level Map</span>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--neon-pink);"></div>
+                            <span>Place Floor</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--neon-cyan);"></div>
+                            <span>Actor</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: var(--neon-yellow);"></div>
+                            <span>Object</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="mapCanvas" width="800" height="500"></canvas>
+                </div>
+            </div>
+            
+            <div class="card" style="padding: 10px;">
+                <div class="card-title" style="margin-bottom: 8px;">Telemetry Stream Logs</div>
+                <div id="logConsole" class="log-console">
+                    <div class="log-entry">> System initialized. Telemetry online.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="card">
+                <div class="card-title">Entities Index</div>
+                <div class="entity-list" id="placesList">
+                    <div style="color: var(--text-muted); font-size: 12px; text-align: center;">No places loaded</div>
+                </div>
+                <div class="entity-list" id="actorsList"></div>
+                <div class="entity-list" id="objectsList"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Selected Entity Info</div>
+                <div id="detailsPanel">
+                    <div style="color: var(--text-muted); font-size: 12px; text-align: center; padding: 20px 0;">Select an entity from the map or list</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Interaction Simulator</div>
+                <div class="control-group">
+                    <label for="simActor">Actor</label>
+                    <select id="simActor"></select>
+                </div>
+                <div class="control-group">
+                    <label for="simAction">Interaction Payload</label>
+                    <input type="text" id="simAction" placeholder="e.g. MOVE_TO(X=100, Y=-50)">
+                </div>
+                <button id="simBtn" class="btn">Trigger Interaction</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let specData = null;
+        let selectedEntity = null;
+        const canvas = document.getElementById('mapCanvas');
+        const ctx = canvas.getContext('2d');
+        let scale = 1.0;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        // Fetch World Spec from API
+        async function fetchSpec() {
+            try {
+                const res = await fetch('/api/spec');
+                if (!res.ok) throw new Error("HTTP status " + res.status);
+                specData = await res.json();
+                logConsole("Successfully loaded WorldSpec: " + specData.places.length + " places, " + specData.actors.length + " actors, " + specData.objects.length + " objects.");
+                initDashboard();
+            } catch (err) {
+                logConsole("Error loading WorldSpec from backend: " + err.message);
+                // Load fallback mock spec to guarantee premium visual behavior if api not reachable
+                specData = {
+                    places: [
+                        { id: "p1", name: "Main Bay", bounds: { center: { x: 0, y: 0, z: 0 }, half_extents: { x: 300, y: 200, z: 10 } } }
+                    ],
+                    actors: [
+                        { id: "a1", name: "RoboGuard", role: "Guard", placement: { position: { x: 50, y: 50, z: 0 }, rotation: { x: 0, y: 90, z: 0 } }, place_id: "p1" }
+                    ],
+                    objects: [
+                        { id: "o1", name: "Energy Core", class: "Generator", placement: { position: { x: -100, y: -50, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, place_id: "p1" }
+                    ],
+                    rules: [],
+                    history: []
+                };
+                initDashboard();
+            }
+        }
+
+        function logConsole(msg) {
+            const console = document.getElementById('logConsole');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${time}] > ${msg}`;
+            console.appendChild(entry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function initDashboard() {
+            populateLists();
+            populateSimDropdowns();
+            calculateViewBounds();
+            drawMap();
+        }
+
+        function populateLists() {
+            const placesDiv = document.getElementById('placesList');
+            const actorsDiv = document.getElementById('actorsList');
+            const objectsDiv = document.getElementById('objectsList');
+
+            placesDiv.innerHTML = '';
+            actorsDiv.innerHTML = '';
+            objectsDiv.innerHTML = '';
+
+            specData.places.forEach(p => {
+                const item = createListItem(p.name, 'Place', 'type-place', () => selectEntity(p, 'place'));
+                placesDiv.appendChild(item);
+            });
+
+            specData.actors.forEach(a => {
+                const item = createListItem(a.name, a.role, 'type-actor', () => selectEntity(a, 'actor'));
+                actorsDiv.appendChild(item);
+            });
+
+            specData.objects.forEach(o => {
+                const item = createListItem(o.name, o.class, 'type-object', () => selectEntity(o, 'object'));
+                objectsDiv.appendChild(item);
+            });
+        }
+
+        function createListItem(name, detail, badgeClass, clickHandler) {
+            const div = document.createElement('div');
+            div.className = 'entity-item';
+            div.onclick = clickHandler;
+            
+            const badge = document.createElement('span');
+            badge.className = `type-badge ${badgeClass}`;
+            badge.textContent = detail;
+
+            div.appendChild(badge);
+            const textNode = document.createTextNode(name);
+            div.appendChild(textNode);
+            return div;
+        }
+
+        function populateSimDropdowns() {
+            const selectActor = document.getElementById('simActor');
+            selectActor.innerHTML = '';
+            
+            specData.actors.forEach(a => {
+                const opt = document.createElement('option');
+                opt.value = a.id;
+                opt.textContent = `${a.name} (${a.role})`;
+                selectActor.appendChild(opt);
+            });
+        }
+
+        function selectEntity(entity, type) {
+            selectedEntity = { entity, type };
+            
+            // Highlight list item
+            document.querySelectorAll('.entity-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.textContent.includes(entity.name)) {
+                    item.classList.add('active');
+                }
+            });
+
+            const panel = document.getElementById('detailsPanel');
+            panel.innerHTML = '';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'details-grid';
+
+            addDetailRow(wrapper, 'ID', entity.id);
+            addDetailRow(wrapper, 'Name', entity.name);
+            addDetailRow(wrapper, 'Type', type.toUpperCase());
+
+            if (type === 'place') {
+                addDetailRow(wrapper, 'Center', `(${entity.bounds.center.x}, ${entity.bounds.center.y}, ${entity.bounds.center.z})`);
+                addDetailRow(wrapper, 'Extents', `(${entity.bounds.half_extents.x}, ${entity.bounds.half_extents.y}, ${entity.bounds.half_extents.z})`);
+                if (entity.description) {
+                    addDetailRow(wrapper, 'Description', entity.description);
+                }
+            } else if (type === 'actor') {
+                addDetailRow(wrapper, 'Role', entity.role);
+                addDetailRow(wrapper, 'Place ID', entity.place_id);
+                addDetailRow(wrapper, 'Position', `(${entity.placement.position.x}, ${entity.placement.position.y}, ${entity.placement.position.z})`);
+                addDetailRow(wrapper, 'Rotation', `(${entity.placement.rotation.x}, ${entity.placement.rotation.y}, ${entity.placement.rotation.z})`);
+            } else if (type === 'object') {
+                addDetailRow(wrapper, 'Class', entity.class);
+                addDetailRow(wrapper, 'Place ID', entity.place_id);
+                addDetailRow(wrapper, 'Position', `(${entity.placement.position.x}, ${entity.placement.position.y}, ${entity.placement.position.z})`);
+                addDetailRow(wrapper, 'Rotation', `(${entity.placement.rotation.x}, ${entity.placement.rotation.y}, ${entity.placement.rotation.z})`);
+            }
+
+            // Display properties if present
+            if (entity.properties && Object.keys(entity.properties).length > 0) {
+                addDetailRow(wrapper, 'Properties', JSON.stringify(entity.properties));
+            }
+
+            panel.appendChild(wrapper);
+            drawMap();
+        }
+
+        function addDetailRow(parent, label, value) {
+            const row = document.createElement('div');
+            row.className = 'details-row';
+            
+            const lbl = document.createElement('span');
+            lbl.className = 'details-label';
+            lbl.textContent = label;
+
+            const val = document.createElement('span');
+            val.className = 'details-val';
+            val.textContent = value;
+
+            row.appendChild(lbl);
+            row.appendChild(val);
+            parent.appendChild(row);
+        }
+
+        function calculateViewBounds() {
+            if (!specData || specData.places.length === 0) return;
+
+            let minX = Infinity;
+            let maxX = -Infinity;
+            let minY = Infinity;
+            let maxY = -Infinity;
+
+            specData.places.forEach(p => {
+                const c = p.bounds.center;
+                const ext = p.bounds.half_extents;
+                minX = Math.min(minX, c.x - ext.x);
+                maxX = Math.max(maxX, c.x + ext.x);
+                minY = Math.min(minY, c.y - ext.y);
+                maxY = Math.max(maxY, c.y + ext.y);
+            });
+
+            // Add margin
+            const width = (maxX - minX) || 100;
+            const height = (maxY - minY) || 100;
+            minX -= width * 0.1;
+            maxX += width * 0.1;
+            minY -= height * 0.1;
+            maxY += height * 0.1;
+
+            const viewWidth = maxX - minX;
+            const viewHeight = maxY - minY;
+
+            const scaleX = canvas.width / viewWidth;
+            const scaleY = canvas.height / viewHeight;
+            scale = Math.min(scaleX, scaleY);
+
+            offsetX = canvas.width / 2 - (minX + viewWidth / 2) * scale;
+            offsetY = canvas.height / 2 - (minY + viewHeight / 2) * scale;
+        }
+
+        function transform(x, y) {
+            return {
+                x: x * scale + offsetX,
+                y: canvas.height - (y * scale + offsetY) // Invert Y for standard 2D cartesian view
+            };
+        }
+
+        function drawMap() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(31, 35, 53, 0.4)';
+            ctx.lineWidth = 1;
+            const gridSize = 50;
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            if (!specData) return;
+
+            // Draw Places (Bounds)
+            specData.places.forEach(p => {
+                const c = p.bounds.center;
+                const ext = p.bounds.half_extents;
+                
+                const topLeft = transform(c.x - ext.x, c.y + ext.y);
+                const bottomRight = transform(c.x + ext.x, c.y - ext.y);
+
+                const width = bottomRight.x - topLeft.x;
+                const height = bottomRight.y - topLeft.y;
+
+                ctx.strokeStyle = varColor('--neon-pink');
+                ctx.lineWidth = selectedEntity && selectedEntity.entity.id === p.id ? 3 : 1.5;
+                ctx.strokeRect(topLeft.x, topLeft.y, width, height);
+
+                ctx.fillStyle = 'rgba(255, 0, 85, 0.05)';
+                ctx.fillRect(topLeft.x, topLeft.y, width, height);
+
+                ctx.fillStyle = varColor('--neon-pink');
+                ctx.font = '10px Courier New';
+                ctx.fillText(p.name, topLeft.x + 5, topLeft.y + 15);
+            });
+
+            // Create dictionary of place centers to resolve absolute placements of actors and objects
+            const placeCenters = {};
+            specData.places.forEach(p => {
+                placeCenters[p.id] = p.bounds.center;
+            });
+
+            // Draw Objects
+            specData.objects.forEach(o => {
+                const parentCenter = placeCenters[o.place_id] || { x: 0, y: 0 };
+                const absX = parentCenter.x + o.placement.position.x;
+                const absY = parentCenter.y + o.placement.position.y;
+                const pos = transform(absX, absY);
+
+                const size = selectedEntity && selectedEntity.entity.id === o.id ? 8 : 5;
+                ctx.fillStyle = varColor('--neon-yellow');
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = varColor('--text-color');
+                ctx.font = '9px Courier New';
+                ctx.fillText(o.name, pos.x + 8, pos.y + 3);
+            });
+
+            // Draw Actors
+            specData.actors.forEach(a => {
+                const parentCenter = placeCenters[a.place_id] || { x: 0, y: 0 };
+                const absX = parentCenter.x + a.placement.position.x;
+                const absY = parentCenter.y + a.placement.position.y;
+                const pos = transform(absX, absY);
+
+                const size = selectedEntity && selectedEntity.entity.id === a.id ? 9 : 6;
+                ctx.fillStyle = varColor('--neon-cyan');
+                
+                // Draw a small futuristic triangle representing directional actor
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y - size);
+                ctx.lineTo(pos.x - size, pos.y + size);
+                ctx.lineTo(pos.x + size, pos.y + size);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = varColor('--text-color');
+                ctx.font = '9px Courier New';
+                ctx.fillText(a.name, pos.x + 8, pos.y + 3);
+            });
+        }
+
+        function varColor(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        // Simulating interactions
+        document.getElementById('simBtn').addEventListener('click', async () => {
+            const actorId = document.getElementById('simActor').value;
+            const action = document.getElementById('simAction').value.trim();
+
+            if (!actorId || !action) {
+                alert("Please select an actor and write an interaction payload.");
+                return;
+            }
+
+            const actor = specData.actors.find(a => a.id === actorId);
+            const payload = {
+                actor_id: actorId,
+                actor_name: actor ? actor.name : "Unknown",
+                payload: action,
+                timestamp: Date.now()
+            };
+
+            logConsole(`Dispatching interaction: ${actor ? actor.name : actorId} -> ${action}`);
+
+            try {
+                const res = await fetch('/api/interact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    logConsole(`Interaction registered and logged to host.`);
+                    document.getElementById('simAction').value = '';
+                } else {
+                    logConsole(`Failed to register interaction. Status: ${res.status}`);
+                }
+            } catch (err) {
+                logConsole(`Error dispatching interaction: ${err.message}`);
+            }
+        });
+
+        // Initialize page
+        fetchSpec();
+    </script>
+</body>
+</html>

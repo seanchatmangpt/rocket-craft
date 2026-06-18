@@ -1,0 +1,130 @@
+{
+  "engine_version": "UE4.27-ES3",
+  "places": [
+    {
+      "id": "room_1",
+      "name": "Control Room",
+      "description": null,
+      "parent_place_id": null,
+      "bounds": {
+        "center": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "half_extents": {
+          "x": 100.0,
+          "y": 100.0,
+          "z": 50.0
+        }
+      },
+      "properties": {}
+    },
+    {
+      "id": "room_2",
+      "name": "Storage Room",
+      "description": null,
+      "parent_place_id": null,
+      "bounds": {
+        "center": {
+          "x": 200.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "half_extents": {
+          "x": 50.0,
+          "y": 50.0,
+          "z": 30.0
+        }
+      },
+      "properties": {}
+    }
+  ],
+  "actors": [
+    {
+      "id": "bot_1",
+      "name": "Welder Bot",
+      "role": "RoboticWelder",
+      "placement": {
+        "position": {
+          "x": 20.0,
+          "y": -10.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "place_id": "room_1",
+      "properties": {}
+    }
+  ],
+  "objects": [
+    {
+      "id": "cnc_1",
+      "name": "CNC Alpha",
+      "class": "CNC_Machine",
+      "placement": {
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        }
+      },
+      "place_id": "room_1",
+      "properties": {},
+      "tags": []
+    }
+  ],
+  "relationships": [
+    {
+      "id": "rel_1",
+      "rel_type": "contains",
+      "source": "room_1",
+      "target": "bot_1",
+      "properties": {}
+    },
+    {
+      "id": "rel_2",
+      "rel_type": "connects",
+      "source": "room_1",
+      "target": "room_2",
+      "properties": {}
+    }
+  ],
+  "rules": [
+    {
+      "id": "rule_1",
+      "name": "TempCheck",
+      "description": null,
+      "expression": "room_1.temp < 30",
+      "severity": "error"
+    }
+  ],
+  "history": [
+    {
+      "id": "evt_evolve_1781734845224",
+      "timestamp_ms": 1781734845224,
+      "activity": "Evolve",
+      "actor_id": null,
+      "details": {
+        "modification_intent": "create place room_2 name \"Storage Room\" at (200.0, 0.0, 0.0) bounds (50.0, 50.0, 30.0)\nupdate actor bot_1 position (20.0, -10.0, 0.0)\ncreate relationship rel_2 connects from room_1 to room_2\n"
+      }
+    }
+  ],
+  "processes": [],
+  "receipts": [
+    {
+      "key": "history_receipt_evt_evolve_1781734845224",
+      "hash": "971974660b5d034222747d61d47cb2ca920e84a1996be5d5565fbaf015d86463",
+      "issued_at": 1781734845224
+    }
+  ]
+}

@@ -1,21 +1,21 @@
-# BRIEFING — 2026-06-15T16:56:00-07:00
+# BRIEFING — 2026-06-17T23:25:40Z
 
 ## Mission
-Orchestrate resolving remaining gaps for production release of the PWA with local Supabase integration, focusing on browser config, spec fixes, and unit/E2E test runs.
+Resolve all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project.
 
 ## 🔒 My Identity
 - Archetype: teamwork_preview_orchestrator
 - Roles: orchestrator, user_liaison, human_reporter, successor
 - Working directory: /Users/sac/rocket-craft/.agents/orchestrator
-- Original parent: top-level
-- Original parent conversation ID: top-level
+- Original parent: parent (id: 6327e89d-e34c-4854-952f-a9c3d3f1ec07)
+- Original parent conversation ID: 6327e89d-e34c-4854-952f-a9c3d3f1ec07
 
 ## 🔒 My Workflow
 - **Pattern**: Project Pattern
 - **Scope document**: /Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md
-1. **Decompose**: Decompose the task into milestones (e.g. Supabase auth, DB trigger/schema, Edge functions, frontend display, E2E tests).
+1. **Decompose**: Decompose the task into milestones (Technical Exploration, Complete Stubs/Placeholders, Replace Single-line/Catch-alls, Harden Assertions, Remove Debug Macros/Overclaims, Final Verification).
 2. **Dispatch & Execute**:
-   - **Delegate**: Spawn subagents for each milestone (e.g., Explorer, Worker, Reviewer).
+   - **Delegate (sub-orchestrator)**: Spawn sub-orchestrators for milestones or run explorer-worker-reviewer cycles.
 3. **On failure** (in this order):
    - Retry: nudge stuck agent or re-send task
    - Replace: spawn fresh agent with partial progress
@@ -25,13 +25,14 @@ Orchestrate resolving remaining gaps for production release of the PWA with loca
    - Escalate: report to parent (sub-orchestrators only, last resort)
 4. **Succession**: At 16 spawns, write handoff.md, spawn successor.
 - **Work items**:
-  1. Follow-up planning and setup [done]
-  2. Implement Playwright configuration change [done]
-  3. Update example spec expectations [done]
-  4. Verify Vitest unit tests and Playwright E2E tests [done]
-- Current phase: 4
-- Current focus: Report results to user
-
+  - Milestone 1: Technical Exploration and Baseline Assessment [pending]
+  - Milestone 2: Complete Stubs and Placeholders (R1) [pending]
+  - Milestone 3: Replace Single-Line and Catch-All Stubs (R2) [pending]
+  - Milestone 4: Harden Assertions & Eliminate Test Shortcuts (R3) [pending]
+  - Milestone 5: Remove Debug Macros and Overclaim Language (R4, R5) [pending]
+  - Milestone 6: Final Verification & Integration [pending]
+- **Current phase**: 1
+- **Current focus**: Technical Exploration and Baseline Assessment
 
 ## 🔒 Key Constraints
 - NEVER write, modify, or create source code files directly.
@@ -40,38 +41,28 @@ Orchestrate resolving remaining gaps for production release of the PWA with loca
 - Succession threshold: 16 spawns.
 
 ## Current Parent
-- Conversation ID: top-level
-- Updated: not yet
+- Conversation ID: 6327e89d-e34c-4854-952f-a9c3d3f1ec07
+- Updated: 2026-06-17T23:25:40Z
 
 ## Key Decisions Made
-- Initialized project orchestration.
-- Created plan.md and updated progress.md for follow-up requirements.
+- Initialized the Rocket-Craft remediation project.
+- Decided to spawn an Explorer to map out stubs and verify baseline state.
 
 ## Team Roster
 | Agent | Type | Work Item | Status | Conv ID |
 |-------|------|-----------|--------|---------|
-| 3f586b3a-b256-4930-90c4-a8226f37c82d | teamwork_preview_explorer | Initial codebase exploration | completed | 3f586b3a-b256-4930-90c4-a8226f37c82d |
-| 3a6147ec-4c41-42b0-8013-c0f248348234 | self | Milestone 1 DB Schema Sub-orchestration | completed | 3a6147ec-4c41-42b0-8013-c0f248348234 |
-| 7acf1108-b1f0-483b-a28a-06538b60f5c6 | self | Milestone 2 Auth & Frontend Setup Sub-orchestration | completed | 7acf1108-b1f0-483b-a28a-06538b60f5c6 |
-| 75a28482-a733-41c6-a29e-137b1c05a6b3 | self | Milestone 3 Admin & Leaderboard Sub-orchestration | completed | 75a28482-a733-41c6-a29e-137b1c05a6b3 |
-| ed8d8902-d2f5-42cf-b523-51bb5e89696b | self | Milestone 4 Edge Function Sub-orchestration | completed | ed8d8902-d2f5-42cf-b523-51bb5e89696b |
-| 24a37630-5370-426a-95af-f89bda39a1ef | self | Milestone 5 E2E Testing Sub-orchestration | completed | 24a37630-5370-426a-95af-f89bda39a1ef |
-| 62170365-3e1f-4235-87b7-1cad9be5968a | teamwork_preview_worker | PWA Config and Testing Worker | completed | 62170365-3e1f-4235-87b7-1cad9be5968a |
-| a62408c2-9c77-40ce-93e2-5b672c090974 | teamwork_preview_auditor | Forensic Integrity Auditor | completed | a62408c2-9c77-40ce-93e2-5b672c090974 |
-
-
-
+| df135978-48b4-4519-9ebf-9d88830e5ec0 | teamwork_preview_explorer | Technical Exploration | completed | df135978-48b4-4519-9ebf-9d88830e5ec0 |
+| 6469f9db-14b9-489b-92a0-cae939dc947e | teamwork_preview_worker | Remediation Worker | in-progress | 6469f9db-14b9-489b-92a0-cae939dc947e |
 
 ## Succession Status
 - Succession required: no
-- Spawn count: 6 / 16
-- Pending subagents: none
+- Spawn count: 2 / 16
+- Pending subagents: 6469f9db-14b9-489b-92a0-cae939dc947e
 - Predecessor: none
 - Successor: not yet spawned
 
 ## Active Timers
-- Heartbeat cron: stopped
-
+- Heartbeat cron: 0c5b7c84-281f-4a8a-86cc-4b95080943b3/task-33
 - Safety timer: none
 - On succession: kill all timers before spawning successor
 - On context truncation: run `manage_task(Action="list")` — re-create if missing

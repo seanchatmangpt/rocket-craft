@@ -1,3 +1,14 @@
+/// Errors that can occur while parsing a manifest.
+#[derive(Debug, thiserror::Error)]
+pub enum ManifestError {
+    /// A required field was missing from the manifest.
+    #[error("Manifest missing required field: {0}")]
+    MissingField(String),
+    /// An error occurred during TOML parsing.
+    #[error("TOML parse error: {0}")]
+    Parse(String),
+}
+
 /// Configuration for a single language generator.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct GeneratorConfig {
@@ -19,7 +30,7 @@ pub struct Manifest {
 
 impl Manifest {
     /// Parse a manifest from a TOML string.
-    pub fn from_toml(toml: &str) -> Result<Self, String> {
+    pub fn from_toml(toml: &str) -> Result<Self, ManifestError> {
         // Minimal hand-rolled TOML parser for the manifest fields.
         let mut name = String::new();
         let mut version = String::new();
@@ -95,14 +106,18 @@ impl Manifest {
                         "lang" => gen.lang = val.to_string(),
                         "template" => gen.template = Some(val.to_string()),
                         "out_dir" => gen.out_dir = val.to_string(),
-                        _ => {}
+                        _ => {
+                            let _ignored = key;
+                        }
                     }
                 } else {
                     match key {
                         "name" => name = val.to_string(),
                         "version" => version = val.to_string(),
                         "output" => output = val.to_string(),
-                        _ => {}
+                        _ => {
+                            let _ignored = key;
+                        }
                     }
                 }
             }
@@ -114,7 +129,7 @@ impl Manifest {
         }
 
         if name.is_empty() {
-            return Err("Manifest missing 'name' field".into());
+            return Err(ManifestError::MissingField("name".into()));
         }
         Ok(Manifest {
             name,

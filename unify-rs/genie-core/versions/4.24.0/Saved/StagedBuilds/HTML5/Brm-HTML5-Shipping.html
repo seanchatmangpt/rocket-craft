@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Barbarian Road Mashines - HTML5 Shipping</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #111;
+      font-family: 'Courier New', Courier, monospace;
+      color: #eee;
+    }
+    #canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background-color: #050508;
+    }
+    #info {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(10, 10, 15, 0.85);
+      padding: 15px;
+      border: 1px solid #00ff66;
+      border-radius: 6px;
+      font-size: 14px;
+      pointer-events: none;
+      box-shadow: 0 0 15px rgba(0, 255, 100, 0.2);
+    }
+    h3 {
+      margin-top: 0;
+      color: #00ff66;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .key-btn {
+      display: inline-block;
+      border: 1px solid #555;
+      border-radius: 3px;
+      padding: 1px 6px;
+      background: #222;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div id="info">
+    <h3>Genie 26 World visualizer</h3>
+    <p>Move: <span class="key-btn">W</span> <span class="key-btn">A</span> <span class="key-btn">S</span> <span class="key-btn">D</span></p>
+    <p>Look: <span class="key-btn">←</span> <span class="key-btn">↑</span> <span class="key-btn">→</span> <span class="key-btn">↓</span></p>
+    <p>Fly: <span class="key-btn">Space</span> (Up) / <span class="key-btn">Shift</span> (Down)</p>
+    <div id="coords" style="color: #00ff66; font-weight: bold; margin-top: 10px;">Initializing engine...</div>
+  </div>
+  <script src="Brm-HTML5-Shipping.js"></script>
+</body>
+</html>

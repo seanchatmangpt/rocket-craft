@@ -113,6 +113,8 @@ globalThis.document = {
 const mockAlert = vi.fn();
 globalThis.window = {
   alert: mockAlert,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
 } as any;
 globalThis.alert = mockAlert;
 

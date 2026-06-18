@@ -16,6 +16,7 @@ dependencies = [
     "fmt-check",
     "clippy",
     "test",
+    "anti-cheat-gate",
     "audit"
 ]
 
@@ -75,6 +76,19 @@ description = "Watch and run tests"
 install_crate = "cargo-watch"
 command = "cargo"
 args = ["watch", "-x", "test"]
+
+[tasks.anti-cheat-gate]
+description = "Scan source for fabricated evidence patterns via anti-llm-cheat-lsp"
+script_runner = "@shell"
+script = [
+    "if ! command -v anti-llm-cheat-lsp > /dev/null 2>&1; then",
+    "  echo 'WARN: anti-llm-cheat-lsp not installed — skipping gate'",
+    "  echo 'Install: cargo install lsp-max --bin anti-llm-cheat-lsp'",
+    "  exit 0",
+    "fi",
+    "anti-llm-cheat-lsp --config ../anti-llm.toml ../unify-rs/unify-lsp/src ../tools/rocket-sdk/src ../tools/knhk/src",
+]
+ignore_errors = true
 
 [tasks.rocket-audit]
 description = "Run Rocket Audit command"

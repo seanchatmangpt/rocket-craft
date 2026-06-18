@@ -11,6 +11,7 @@ path = "src/main.rs"
 [dependencies]
 unify-core = { path = "../unify-core" }
 unify-rdf = { path = "../unify-rdf" }
+unify-pm = { path = "../unify-pm" }
 anti-llm-cheat-lsp = { path = "../anti-llm-cheat-lsp" }
 thiserror = "1"
 serde = { version = "1", features = ["derive"] }

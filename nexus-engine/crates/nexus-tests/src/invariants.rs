@@ -41,6 +41,7 @@ pub fn attack_dir_roundtrip_holds(dir: u8) -> bool {
 }
 
 /// Graphics invariant: transform composition is associative
+#[allow(clippy::too_many_arguments)]
 pub fn transform_composition_associative(
     a_tx: f32, a_ty: f32, a_tz: f32, a_scale: f32,
     b_tx: f32, b_ty: f32, b_tz: f32, b_scale: f32,

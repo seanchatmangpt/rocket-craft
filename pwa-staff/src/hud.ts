@@ -474,4 +474,34 @@ export function initHUD() {
 
   // Initial fetch of DB stats
   fetchDbStats();
+
+  // Listen for real game score updates from the WASM game worker.
+  // Dispatched by the game bridge as: window.dispatchEvent(new CustomEvent('game-score-update', { detail: { score, tick } }))
+  window.addEventListener('game-score-update', async (e: Event) => {
+    const event = e as CustomEvent<{ score: number; tick: number }>;
+    const realScore = event.detail.score;
+    if (realScore <= 0) return;
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) return;
+      const response = await fetch('http://127.0.0.1:54321/functions/v1/submit-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ score: realScore }),
+      });
+      if (response.ok) {
+        logToConsole(`Auto-submitted game score: ${realScore} (tick ${event.detail.tick})`, 'info');
+      }
+    } catch (err) {
+      logToConsole(
+        `Failed to auto-submit game score: ${err instanceof Error ? err.message : String(err)}`,
+        'error'
+      );
+    }
+  });
 }

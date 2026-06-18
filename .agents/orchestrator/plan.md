@@ -1,32 +1,55 @@
-# Plan - Production Release Gaps for Rocket Craft PWA E2E
+# Remediation Plan - Rocket-Craft Project
 
-This plan outlines the steps to resolve remaining gaps for the production release of the Progressive Web App (PWA) with local Supabase integration and ensure 100% successful E2E testing with Playwright.
+This plan coordinates the resolution of all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project, ensuring full compliance and passing verification.
 
 ## Milestones
 
-### Milestone 1: Playwright Configuration Modification
-- Target File: `pwa-staff/playwright.config.ts`
-- Objective: Modify the configuration to run E2E tests exclusively on the `chromium` browser project (removing `firefox` and `webkit` to avoid missing browser binary issues on the host system).
-- Verification: Inspection of config file.
+### Milestone 1: Technical Exploration and Baseline Assessment
+- **Objective**: Identify all stubs, placeholders, debug macros, overclaiming language, and check baseline compile and test status.
+- **Tasks**:
+  - Spawn an Explorer to locate target files (`pwa_export.rs`, `fixtures.rs`, `pipeline.rs`, `classify.rs`, `unify-core/src/lib.rs`, `unify-rocket/src/lib.rs`, `manifest.rs`, `wasm-patterns/src/actor.rs`, `pattern_integration.rs`, `unify-integration-tests/src/lib.rs`, `hud.rs`, `message_bridge.rs`, `build.rs`, `unify-mcp/src/main.rs`, `commands.rs`, `unify/src/main.rs`).
+  - Read files and collect details on what logic needs to be fully implemented.
+  - Run baseline cargo compilation and tests using a Worker.
+  - Run the `anti-llm-cheat-lsp` compliance scanner to identify starting violations.
+- **Verification**: Exploration report documenting target files, stubs, and initial test/scan status.
 
-### Milestone 2: Fix Test Title Regex Expectation
-- Target File: `pwa-staff/tests-e2e/example.spec.ts`
-- Objective: Update the expected title regex match from `/PWA Staff/` to `/Rocket Craft/` to match the actual application title in `index.html`.
-- Verification: Inspection of test file.
+### Milestone 2: Complete Stubs and Placeholders (R1)
+- **Objective**: Implement complete, production-ready logic for all files containing `STUB` or placeholders.
+- **Tasks**:
+  - Implement `unify-rs/unify-bp/src/pwa_export.rs`.
+  - Implement `unify-rs/unify-integration-tests/src/fixtures.rs`.
+  - Implement `unify-rs/unify-rdf/src/pipeline.rs`.
+  - Fix any other stubs/placeholders in the workspace.
+- **Verification**: Code review and local workspace compilation.
 
-### Milestone 3: Run and Verify Vitest Unit Tests
-- Workspace: `pwa-staff`
-- Command: `npm run test` (which maps to `vitest run`)
-- Verification: Verify unit tests execute and pass successfully.
+### Milestone 3: Replace Single-Line and Catch-All Stubs (R2)
+- **Objective**: Replace single-line stubs and catch-alls with robust implementation logic.
+- **Tasks**:
+  - Replace description method in `classify.rs` with descriptive logic.
+  - Implement `namespace`, `noun`, and `verb` functions in `unify-core/src/lib.rs` and `unify-rocket/src/lib.rs`.
+  - Fix `manifest.rs` empty catch-all match arms with proper error handling/logging.
+  - Implement `on_start` and `on_stop` in `wasm-patterns/src/actor.rs`.
+  - Replace dummy helper functions in `wasm-tests/tests/pattern_integration.rs`.
+- **Verification**: Compilation and unit test passes.
 
-### Milestone 4: Run and Verify Playwright E2E Tests
-- Workspace: `pwa-staff`
-- Command: `npx playwright test`
-- Verification: Verify Playwright E2E tests execute and pass successfully on the Chromium browser. Check that the webServer command correctly boots the PWA on port 3000 during test execution and no browser configuration or launch errors are present.
+### Milestone 4: Harden Assertions & Eliminate Test Shortcuts (R3)
+- **Objective**: Replace substring matches and shortcut assertions with schema-compliant structural validation.
+- **Tasks**:
+  - Refactor assertions in `unify-integration-tests/src/lib.rs`.
+  - Refactor HUD display/substring searches in `wasm-ui/tests/hud.rs` and `wasm-ui/tests/message_bridge.rs`.
+- **Verification**: Test suite runs and passes.
 
-## Subagent Dispatch Plan
-We will dispatch a `teamwork_preview_worker` agent to perform these actions and verification.
-1. The worker will modify the two target files in the `pwa-staff` folder.
-2. The worker will run `npm run test` (Vitest) in the `pwa-staff` directory and verify it passes.
-3. The worker will run `npx playwright test` (Playwright) in the `pwa-staff` directory and verify it passes.
-4. The worker will report back with logs showing clean test execution.
+### Milestone 5: Remove Debug Macros and Overclaim Language (R4, R5)
+- **Objective**: Clean up print statements and remove unverified overclaiming status tags.
+- **Tasks**:
+  - Replace `println!` with structured logging/tracing in `unify-ffi/build.rs`, `unify-mcp/src/main.rs`, `unify/src/commands.rs`, and `unify/src/main.rs`.
+  - Remove terms like "zero violations", "solved", "done" from comments/logs if unverified.
+- **Verification**: Compliance scanner (`anti-llm-cheat-lsp`) returns 0 errors/violations.
+
+### Milestone 6: Final Verification & Integration
+- **Objective**: Full verification of all acceptance criteria.
+- **Tasks**:
+  - Compile `unify-rs` and `wasm-threads` workspaces without warnings/errors.
+  - Run `cargo test --workspace` and ensure 100% pass rate.
+  - Run E2E Playwright tests.
+- **Verification**: Audit check pass with zero violations, 100% tests pass.

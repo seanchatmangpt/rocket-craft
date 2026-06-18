@@ -34,6 +34,7 @@
 use crate::ast::{BpNode, Pin, PinRef};
 use crate::types::{ContainerType, PinCategory, PinDirection, PinType, UeGuid};
 use std::collections::HashMap;
+use std::sync::OnceLock;
 
 // ---------------------------------------------------------------------------
 // ParseError
@@ -83,6 +84,141 @@ pub fn parse_t3d(text: &str) -> Result<Vec<BpNode>, ParseError> {
     Ok(nodes)
 }
 
+// ---------------------------------------------------------------------------
+// Node-handler registry — replaces large match on short_class
+// ---------------------------------------------------------------------------
+
+type NodeHandler = fn(&BpNode, &str) -> Result<String, ParseError>;
+
+static HANDLER_REGISTRY: OnceLock<HashMap<&'static str, NodeHandler>> = OnceLock::new();
+
+fn handler_registry() -> &'static HashMap<&'static str, NodeHandler> {
+    HANDLER_REGISTRY.get_or_init(|| {
+        let mut m: HashMap<&'static str, NodeHandler> = HashMap::new();
+        m.insert("K2Node_Event",         handle_event);
+        m.insert("K2Node_CustomEvent",   handle_custom_event);
+        m.insert("K2Node_CallFunction",  handle_call_function);
+        m.insert("K2Node_IfThenElse",    handle_if_then_else);
+        m.insert("K2Node_VariableGet",   handle_variable_get);
+        m.insert("K2Node_VariableSet",   handle_variable_set);
+        m.insert("K2Node_MacroInstance", handle_macro_instance);
+        m.insert("K2Node_Select",        handle_select);
+        m.insert("K2Node_ForEachLoop",   handle_for_each_loop);
+        m
+    })
+}
+
+fn handle_event(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    if let Some(ev_ref) = node.properties.get("EventReference") {
+        if ev_ref.contains("ReceiveBeginPlay") {
+            Ok(format!("let {var_name} = builder.begin_play_node();\n"))
+        } else if ev_ref.contains("ReceiveTick") {
+            Ok(format!("let {var_name} = builder.tick_node();\n"))
+        } else if ev_ref.contains("ReceiveEndPlay") {
+            Ok(format!("let {var_name} = builder.end_play_node();\n"))
+        } else if ev_ref.contains("ReceiveHit") {
+            Ok(format!("let {var_name} = builder.on_hit_node();\n"))
+        } else if ev_ref.contains("ReceiveActorBeginOverlap") {
+            Ok(format!("let {var_name} = builder.on_overlap_begin_node();\n"))
+        } else if ev_ref.contains("ReceiveActorEndOverlap") {
+            Ok(format!("let {var_name} = builder.on_overlap_end_node();\n"))
+        } else {
+            Err(ParseError { line: 0, message: format!("Unsupported K2Node_Event: {}", ev_ref) })
+        }
+    } else {
+        Ok(format!("let {var_name} = builder.begin_play_node();\n"))
+    }
+}
+
+fn handle_custom_event(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    let ev_name = node.properties.get("CustomFunctionName")
+        .map(|s| s.trim_matches('"').to_string())
+        .unwrap_or_else(|| "MyEvent".to_string());
+    Ok(format!("let {var_name} = builder.custom_event_node(\"{ev_name}\");\n"))
+}
+
+fn handle_call_function(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    let fn_ref = node.properties.get("FunctionReference")
+        .ok_or_else(|| ParseError {
+            line: 0,
+            message: format!("K2Node_CallFunction '{}' has no FunctionReference property", node.name),
+        })?;
+    if fn_ref.contains("PrintString") {
+        let default_str = node.pins.iter()
+            .find(|p| p.name == "InString")
+            .and_then(|p| p.default_value.as_deref())
+            .unwrap_or("Hello!");
+        Ok(format!("let {var_name} = builder.print_string(\"{default_str}\");\n"))
+    } else if fn_ref.contains("SetActorLocation") || fn_ref.contains("K2_SetActorLocation") {
+        Ok(format!("let {var_name} = builder.set_actor_location_node();\n"))
+    } else if fn_ref.contains("GetActorLocation") || fn_ref.contains("K2_GetActorLocation") {
+        Ok(format!("let {var_name} = builder.get_actor_location_node();\n"))
+    } else if fn_ref.contains("SetActorRotation") || fn_ref.contains("K2_SetActorRotation") {
+        Ok(format!("let {var_name} = builder.set_actor_rotation_node();\n"))
+    } else if fn_ref.contains("SpawnActor") || fn_ref.contains("BeginSpawningActorFromClass") {
+        Ok(format!("let {var_name} = builder.spawn_actor_node();\n"))
+    } else if fn_ref.contains("DestroyActor") || fn_ref.contains("K2_DestroyActor") {
+        Ok(format!("let {var_name} = builder.destroy_actor_node();\n"))
+    } else if fn_ref.contains("PlaySound") || fn_ref.contains("PlaySoundAtLocation") {
+        Ok(format!("let {var_name} = builder.play_sound_node();\n"))
+    } else if fn_ref.contains("ApplyDamage") {
+        Ok(format!("let {var_name} = builder.apply_damage_node();\n"))
+    } else {
+        Err(ParseError {
+            line: 0,
+            message: format!("Unsupported K2Node_CallFunction FunctionReference: {}", fn_ref),
+        })
+    }
+}
+
+fn handle_if_then_else(_node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    Ok(format!("let {var_name} = builder.branch_node();\n"))
+}
+
+fn extract_var_name_prop(node: &BpNode) -> String {
+    node.properties.get("VariableName")
+        .or_else(|| node.properties.get("VariableReference"))
+        .map(|s| {
+            let s = s.trim();
+            if let Some(pos) = s.find("MemberName=\"") {
+                let after = &s[pos + 12..];
+                after.split('"').next().unwrap_or(s).to_string()
+            } else {
+                s.trim_matches('"').to_string()
+            }
+        })
+        .unwrap_or_else(|| node.name.clone())
+}
+
+fn handle_variable_get(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    let prop = extract_var_name_prop(node);
+    Ok(format!("let {var_name} = builder.variable_get_node(\"{prop}\");\n"))
+}
+
+fn handle_variable_set(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    let prop = extract_var_name_prop(node);
+    Ok(format!("let {var_name} = builder.variable_set_node(\"{prop}\");\n"))
+}
+
+fn handle_macro_instance(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    let macro_name = node.properties.get("MacroGraphReference")
+        .and_then(|s| {
+            let pos = s.find("MacroName=\"")?;
+            let after = &s[pos + 11..];
+            Some(after.split('"').next().unwrap_or("Macro").to_string())
+        })
+        .unwrap_or_else(|| node.name.clone());
+    Ok(format!("let {var_name} = builder.macro_instance_node(\"{macro_name}\");\n"))
+}
+
+fn handle_select(_node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    Ok(format!("let {var_name} = builder.select_node();\n"))
+}
+
+fn handle_for_each_loop(_node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    Ok(format!("let {var_name} = builder.for_each_loop_node();\n"))
+}
+
 /// Generate Rust [`crate::builder::BlueprintBuilder`] code from a slice of parsed nodes.
 ///
 /// This is the "decompiler" — it turns T3D text → Rust source code that, when
@@ -91,75 +227,32 @@ pub fn parse_t3d(text: &str) -> Result<Vec<BpNode>, ParseError> {
 /// The generated string is valid Rust code that can be embedded in a function
 /// body.  All generated identifiers start with `builder.` as required by the
 /// integration tests.
-pub fn generate_rust_code(nodes: &[BpNode], bp_name: &str, parent: &str) -> String {
+///
+/// # Errors
+///
+/// Returns an error if a node class or event/function reference is not
+/// recognised and cannot be mapped to a [`crate::builder::BlueprintBuilder`] call.
+pub fn generate_rust_code(nodes: &[BpNode], bp_name: &str, parent: &str) -> Result<String, ParseError> {
     let mut out = String::new();
     out.push_str(&format!(
         "let mut builder = BlueprintBuilder::new(\"{}\", \"{}\");\n",
         bp_name, parent
     ));
 
-    // Map node name → local variable name so we can emit exec_connect calls later.
     let mut node_vars: HashMap<&str, String> = HashMap::new();
+    let registry = handler_registry();
 
     for (i, node) in nodes.iter().enumerate() {
         let var_name = format!("node_{i}");
         let short_class = node.class.split('.').last().unwrap_or(&node.class);
 
-        let code = match short_class {
-            "K2Node_Event" => {
-                if let Some(ev_ref) = node.properties.get("EventReference") {
-                    if ev_ref.contains("ReceiveBeginPlay") {
-                        format!("let {var_name} = builder.begin_play_node();\n")
-                    } else if ev_ref.contains("ReceiveTick") {
-                        format!("let {var_name} = builder.tick_node();\n")
-                    } else {
-                        format!(
-                            "// K2Node_Event: {}\nlet {var_name} = builder.begin_play_node(); \
-                             // TODO: map to correct event\n",
-                            node.name
-                        )
-                    }
-                } else {
-                    format!("let {var_name} = builder.begin_play_node();\n")
-                }
-            }
-            "K2Node_CustomEvent" => {
-                let ev_name = node
-                    .properties
-                    .get("CustomFunctionName")
-                    .map(|s| s.trim_matches('"').to_string())
-                    .unwrap_or_else(|| "MyEvent".to_string());
-                format!("let {var_name} = builder.custom_event_node(\"{ev_name}\");\n")
-            }
-            "K2Node_CallFunction" => {
-                if let Some(fn_ref) = node.properties.get("FunctionReference") {
-                    if fn_ref.contains("PrintString") {
-                        let default_str = node
-                            .pins
-                            .iter()
-                            .find(|p| p.name == "InString")
-                            .and_then(|p| p.default_value.as_deref())
-                            .unwrap_or("Hello!");
-                        format!("let {var_name} = builder.print_string(\"{default_str}\");\n")
-                    } else {
-                        format!(
-                            "// K2Node_CallFunction: {}\n\
-                             // FunctionReference: {fn_ref}\n\
-                             let {var_name} = builder.begin_play_node(); \
-                             // TODO: map function\n",
-                            node.name
-                        )
-                    }
-                } else {
-                    format!("// Node: {}\n", node.name)
-                }
-            }
-            "K2Node_IfThenElse" => format!("let {var_name} = builder.branch_node();\n"),
-            _ => format!(
-                "// TODO: map node '{}' (class: {})\n",
-                node.name, short_class
-            ),
-        };
+        let code = registry
+            .get(short_class)
+            .ok_or_else(|| ParseError {
+                line: 0,
+                message: format!("Unsupported node class: {}", short_class),
+            })
+            .and_then(|handler| handler(node, &var_name))?;
 
         out.push_str(&code);
         node_vars.insert(&node.name, var_name);
@@ -187,7 +280,7 @@ pub fn generate_rust_code(nodes: &[BpNode], bp_name: &str, parent: &str) -> Stri
     }
 
     out.push_str("\nlet t3d = builder.to_t3d();\n");
-    out
+    Ok(out)
 }
 
 // ---------------------------------------------------------------------------
@@ -827,7 +920,7 @@ End Object
     fn generate_rust_code_contains_builder_dot() {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
-        let code = generate_rust_code(&nodes, "MyBlueprint", "Actor");
+        let code = generate_rust_code(&nodes, "MyBlueprint", "Actor").unwrap();
         assert!(
             code.contains("builder."),
             "generated code should contain 'builder.'"
@@ -838,7 +931,7 @@ End Object
     fn generate_rust_code_has_begin_play_node() {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
-        let code = generate_rust_code(&nodes, "MyBlueprint", "Actor");
+        let code = generate_rust_code(&nodes, "MyBlueprint", "Actor").unwrap();
         assert!(
             code.contains("begin_play_node"),
             "should emit begin_play_node for K2Node_Event with ReceiveBeginPlay"
@@ -849,7 +942,7 @@ End Object
     fn generate_rust_code_has_print_string() {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
-        let code = generate_rust_code(&nodes, "MyBlueprint", "Actor");
+        let code = generate_rust_code(&nodes, "MyBlueprint", "Actor").unwrap();
         assert!(
             code.contains("print_string"),
             "should emit print_string for PrintString call-function node"
@@ -860,13 +953,13 @@ End Object
     fn generate_rust_code_has_to_t3d() {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
-        let code = generate_rust_code(&nodes, "TestBP", "Pawn");
+        let code = generate_rust_code(&nodes, "TestBP", "Pawn").unwrap();
         assert!(code.contains("to_t3d()"), "generated code should end with to_t3d()");
     }
 
     #[test]
     fn generate_rust_code_empty_nodes() {
-        let code = generate_rust_code(&[], "EmptyBP", "Actor");
+        let code = generate_rust_code(&[], "EmptyBP", "Actor").unwrap();
         assert!(code.contains("BlueprintBuilder::new"));
         assert!(code.contains("to_t3d()"));
     }

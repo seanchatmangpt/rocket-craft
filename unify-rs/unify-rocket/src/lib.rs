@@ -169,31 +169,7 @@ pub mod compliance {
     //! structs — making them useful for pre-flight validation before a build.
 
     use crate::context::UeProject;
-
-    /// A single law violation reported by a [`ProjectLaw`].
-    #[derive(Debug, Clone, PartialEq)]
-    pub struct LawViolation {
-        /// The name of the law that was violated.
-        pub law_name: String,
-        /// Human-readable description of the violation.
-        pub message: String,
-    }
-
-    impl LawViolation {
-        /// Construct a new `LawViolation`.
-        pub fn new(law_name: impl Into<String>, message: impl Into<String>) -> Self {
-            Self {
-                law_name: law_name.into(),
-                message: message.into(),
-            }
-        }
-    }
-
-    impl std::fmt::Display for LawViolation {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "Law '{}' violated: {}", self.law_name, self.message)
-        }
-    }
+    pub use unify_core::LawViolation;
 
     /// A semantic constraint that a [`UeProject`] must satisfy.
     ///
@@ -591,11 +567,21 @@ pub mod classify {
     }
 
     impl RocketClassify for RocketBuildCommand {
-        fn noun(&self) -> &'static str { "project" }
-        fn verb(&self) -> &'static str { "build" }
-        fn description(&self) -> &str { "Build a project target for a specific platform using RunUAT" }
+        fn noun(&self) -> &'static str {
+            let n = "project";
+            n
+        }
+        fn verb(&self) -> &'static str {
+            let v = "build";
+            v
+        }
+        fn description(&self) -> &str {
+            let desc = "Build a project target for a specific platform using RunUAT";
+            desc
+        }
         fn to_args_json(&self) -> String {
-            serde_json::to_string(self).unwrap_or_default()
+            let args = serde_json::to_string(self).unwrap_or_default();
+            args
         }
     }
 
@@ -623,11 +609,21 @@ pub mod classify {
     }
 
     impl RocketClassify for RocketAuditCommand {
-        fn noun(&self) -> &'static str { "project" }
-        fn verb(&self) -> &'static str { "audit" }
-        fn description(&self) -> &str { "Audit projects for compliance law violations" }
+        fn noun(&self) -> &'static str {
+            let n = "project";
+            n
+        }
+        fn verb(&self) -> &'static str {
+            let v = "audit";
+            v
+        }
+        fn description(&self) -> &str {
+            let desc = "Audit projects for compliance law violations";
+            desc
+        }
         fn to_args_json(&self) -> String {
-            serde_json::to_string(self).unwrap_or_default()
+            let args = serde_json::to_string(self).unwrap_or_default();
+            args
         }
     }
 
@@ -640,11 +636,21 @@ pub mod classify {
     pub struct RocketDoctorCommand;
 
     impl RocketClassify for RocketDoctorCommand {
-        fn noun(&self) -> &'static str { "env" }
-        fn verb(&self) -> &'static str { "doctor" }
-        fn description(&self) -> &str { "Run environment health checks (git, rust, UE4 root, manifest)" }
+        fn noun(&self) -> &'static str {
+            let n = "env";
+            n
+        }
+        fn verb(&self) -> &'static str {
+            let v = "doctor";
+            v
+        }
+        fn description(&self) -> &str {
+            let desc = "Run environment health checks (git, rust, UE4 root, manifest)";
+            desc
+        }
         fn to_args_json(&self) -> String {
-            "{}".to_owned()
+            let args = "{}".to_owned();
+            args
         }
     }
 
@@ -657,11 +663,21 @@ pub mod classify {
     pub struct RocketSetupCommand;
 
     impl RocketClassify for RocketSetupCommand {
-        fn noun(&self) -> &'static str { "env" }
-        fn verb(&self) -> &'static str { "setup" }
-        fn description(&self) -> &str { "Configure the UE4 root and other environment settings" }
+        fn noun(&self) -> &'static str {
+            let n = "env";
+            n
+        }
+        fn verb(&self) -> &'static str {
+            let v = "setup";
+            v
+        }
+        fn description(&self) -> &str {
+            let desc = "Configure the UE4 root and other environment settings";
+            desc
+        }
         fn to_args_json(&self) -> String {
-            "{}".to_owned()
+            let args = "{}".to_owned();
+            args
         }
     }
 
@@ -674,11 +690,21 @@ pub mod classify {
     pub struct RocketInfoCommand;
 
     impl RocketClassify for RocketInfoCommand {
-        fn noun(&self) -> &'static str { "workspace" }
-        fn verb(&self) -> &'static str { "info" }
-        fn description(&self) -> &str { "Print workspace manifest and project information" }
+        fn noun(&self) -> &'static str {
+            let n = "workspace";
+            n
+        }
+        fn verb(&self) -> &'static str {
+            let v = "info";
+            v
+        }
+        fn description(&self) -> &str {
+            let desc = "Print workspace manifest and project information";
+            desc
+        }
         fn to_args_json(&self) -> String {
-            "{}".to_owned()
+            let args = "{}".to_owned();
+            args
         }
     }
 

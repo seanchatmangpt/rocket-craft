@@ -30,10 +30,11 @@ const STATIC_ASSETS = [
   'dist/signup.js',
   'dist/profile.js',
   'dist/auth.js',
-  'Brm-HTML5-Shipping.html',
-  'Brm-HTML5-Shipping.js',
-  'Brm-HTML5-Shipping.wasm',
-  'Brm-HTML5-Shipping.data',
+  '/manufactured/Brm-HTML5-Shipping.html',
+  '/manufactured/Brm-HTML5-Shipping.js',
+  '/manufactured/Brm-HTML5-Shipping.wasm',
+  '/manufactured/Brm-HTML5-Shipping.data',
+  '/manufactured/receipt.json',
   'SurvivalGame-HTML5-Shipping.html',
   'SurvivalGame-HTML5-Shipping.js',
   'SurvivalGame-HTML5-Shipping.wasm',
@@ -115,7 +116,54 @@ sw.addEventListener('fetch', (event: FetchEvent) => {
     return;
   }
 
-  // Strategy for navigation requests: Network First, falling back to offline.html
+  // Strategy for /manufactured/* requests: Network First, falling back to cache
+  const requestUrl = new URL(event.request.url);
+
+  // Intercept root Brm files and rewrite URL to /manufactured/ path
+  const rootBrmFiles = [
+    '/Brm-HTML5-Shipping.wasm',
+    '/Brm-HTML5-Shipping.data',
+    '/Brm-HTML5-Shipping.js',
+    '/Brm-HTML5-Shipping.html'
+  ];
+  const isRootBrmFile = rootBrmFiles.includes(requestUrl.pathname);
+  const processedUrl = isRootBrmFile ? `${requestUrl.origin}/manufactured${requestUrl.pathname}` : event.request.url;
+
+  if (requestUrl.pathname.startsWith('/manufactured/') || isRootBrmFile) {
+    const fetchRequest = isRootBrmFile ? new Request(processedUrl, {
+      method: event.request.method,
+      headers: event.request.headers,
+      mode: 'cors',
+      credentials: event.request.credentials
+    }) : event.request;
+
+    event.respondWith(
+      fetch(fetchRequest)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches
+              .open(DYNAMIC_CACHE_NAME)
+              .then((cache) => {
+                cache.put(processedUrl, responseToCache);
+              })
+              .catch((err) => {
+                console.warn('[Service Worker] Failed to cache manufactured asset:', err);
+              });
+          }
+          return networkResponse;
+        })
+        .catch((error) => {
+          console.warn('[Service Worker] Fetch failed for manufactured asset, falling back to cache:', error);
+          return caches.match(processedUrl).then((cachedResponse) => {
+            return cachedResponse || Response.error();
+          });
+        })
+    );
+    return;
+  }
+
+  // Strategy for navigation requests: Network First, falling back to cached page or offline.html
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request)
@@ -132,9 +180,14 @@ sw.addEventListener('fetch', (event: FetchEvent) => {
           });
         })
         .catch((error) => {
-          console.error('[Service Worker] Navigation fetch failed; returning offline page:', error);
-          return caches.match(OFFLINE_URL).then((cachedResponse) => {
-            return cachedResponse || Response.error(); // Last resort
+          console.error('[Service Worker] Navigation fetch failed; checking cache or returning offline page:', error);
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            return caches.match(OFFLINE_URL).then((offlineResponse) => {
+              return offlineResponse || Response.error(); // Last resort
+            });
           });
         })
     );

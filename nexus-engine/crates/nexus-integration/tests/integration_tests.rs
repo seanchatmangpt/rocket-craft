@@ -1,4 +1,5 @@
 use nexus_integration::game_loop::*;
+use nexus_types::Gold;
 use proptest::prelude::*;
 
 // ── Combat loop ──────────────────────────────────────────────────────────────
@@ -18,8 +19,8 @@ fn full_combat_loop_kills_enemy_and_grants_rewards() {
     }
 
     assert!(!s.is_in_combat);
-    assert!(s.player.xp > 0);
-    assert!(s.player.gold > 500, "should earn gold from combat");
+    assert!(s.player.xp.value() > 0);
+    assert!(s.player.gold.value() > 500, "should earn gold from combat");
     assert_eq!(s.player.combo_depth, 0, "combo resets on enemy defeat");
 }
 
@@ -112,7 +113,7 @@ fn rebirth_increments_bloodline_and_restores_hp() {
     s.player.rebirth();
     assert_eq!(s.player.bloodline, initial_bl + 1);
     assert_eq!(s.player.hp, s.player.max_hp);
-    assert_eq!(s.player.gold, 500, "gold resets on rebirth");
+    assert_eq!(s.player.gold, Gold::new(500), "gold resets on rebirth");
 }
 
 #[test]
@@ -139,20 +140,20 @@ fn perk_point_granted_on_rebirth_below_bl20() {
 fn buying_weapon_increases_attack_and_costs_gold() {
     let mut s = GameSession::new(1, "Miorine", 42);
     let initial_atk = s.player.attack;
-    s.player.gold = 1000;
+    s.player.gold = Gold::new(1000);
     s.dispatch(GameCommand::BuyItem { item_index: 0 }); // Beam Saber (+15 ATK, 100 gold)
     assert!(s.player.attack > initial_atk);
-    assert_eq!(s.player.gold, 900);
+    assert_eq!(s.player.gold, Gold::new(900));
 }
 
 #[test]
 fn cannot_buy_item_without_enough_gold() {
     let mut s = GameSession::new(1, "Char", 1);
-    s.player.gold = 0;
+    s.player.gold = Gold::new(0);
     let initial_atk = s.player.attack;
     s.dispatch(GameCommand::BuyItem { item_index: 0 });
     assert_eq!(s.player.attack, initial_atk, "no gold = no purchase");
-    assert_eq!(s.player.gold, 0);
+    assert_eq!(s.player.gold, Gold::new(0));
 }
 
 // ── Stat allocation ──────────────────────────────────────────────────────────
@@ -228,7 +229,7 @@ proptest! {
         let mut s = GameSession::new(1, "inv-test", 42);
         for dmg in damage_seq {
             s.player.take_damage(dmg);
-            prop_assert!(s.player.hp >= 0.0, "HP must never be negative");
+            prop_assert!(s.player.hp.value() >= 0.0, "HP must never be negative");
         }
     }
 
