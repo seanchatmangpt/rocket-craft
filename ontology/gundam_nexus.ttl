@@ -1,0 +1,86 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix gn: <https://ggen.io/ontology/gundam-nexus/> .
+
+gn:GundamNexusOntology a owl:Ontology ;
+    rdfs:label "Gundam Nexus Ontology" ;
+    rdfs:comment "Constitutional semantic primitives for Combinatorial Maximalist universe manufacturing." .
+
+# --- UNIVERSE LAYERS ---
+
+gn:Cosmology a owl:Class ;
+    rdfs:label "Cosmology Layer" .
+
+gn:PlanetaryMind a owl:Class ;
+    rdfs:subClassOf gn:Cosmology ;
+    rdfs:label "Planetary Mind" ;
+    rdfs:comment "Planets are sentient entities that influence civilizations." .
+
+gn:Civilization a owl:Class ;
+    rdfs:label "Civilization" ;
+    rdfs:comment "Manufactured from Planet + History + Values + Environment + Resources." .
+
+gn:Culture a owl:Class ;
+    rdfs:label "Culture" .
+
+gn:Economy a owl:Class ;
+    rdfs:label "Economy" .
+
+gn:Faction a owl:Class ;
+    rdfs:label "Faction" .
+
+gn:History a owl:Class ;
+    rdfs:label "History" .
+
+gn:Mythology a owl:Class ;
+    rdfs:label "Mythology" ;
+    rdfs:comment "Emerges naturally from history. Contains heroes, saints, villains, etc." .
+
+gn:Experience a owl:Class ;
+    rdfs:label "Experience" .
+
+# --- SYSTEMS ---
+
+gn:EdenSystem a owl:Class ;
+    rdfs:label "Eden System" ;
+    rdfs:comment "Low conflict, high stability civilizational flourishing." .
+
+gn:FrontierSystem a owl:Class ;
+    rdfs:label "Frontier System" ;
+    rdfs:comment "High risk, high reward expansion system." .
+
+# --- MECH PRIMITIVES ---
+
+gn:MechAssembly a owl:Class ;
+    rdfs:label "Mech Assembly" ;
+    rdfs:comment "A mech is an assembly, not an asset." .
+
+gn:MechPrimitive a owl:Class ;
+    rdfs:label "Mech Primitive" .
+
+gn:Frame a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+gn:Mobility a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+gn:Power a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+gn:Armor a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+gn:Weapon a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+gn:Sensor a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+gn:UtilitySystem a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+
+gn:MechClass a owl:Class ;
+    rdfs:label "Mech Class" .
+gn:Worker a owl:Class ; rdfs:subClassOf gn:MechClass .
+gn:Explorer a owl:Class ; rdfs:subClassOf gn:MechClass .
+gn:Warrior a owl:Class ; rdfs:subClassOf gn:MechClass .
+gn:Guardian a owl:Class ; rdfs:subClassOf gn:MechClass .
+gn:Ark a owl:Class ; rdfs:subClassOf gn:MechClass .
+
+# --- PRESERVATION ---
+
+gn:PreservationArtifact a owl:Class ;
+    rdfs:label "Preservation Artifact" ;
+    rdfs:comment "Faithful recreations of historical game experiences." .
+
+gn:ArkSystem a owl:Class ;
+    rdfs:label "Ark System" ;
+    rdfs:comment "Knowledge, population, and cultural preservation." .
