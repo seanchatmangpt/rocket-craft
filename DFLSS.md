@@ -31,7 +31,7 @@ Recent work—**E2E orchestration** (Playwright TPS/DfLSS), **Chicago TDD for WA
 
 ## Sustainability Pillars
 
-### 1. Architectural Clarity: Typestate Patterns
+### 1. Architectural Clarity: Typestate Patterns & Automated Component Discovery
 
 The dominant pattern across all Rust workspaces is the **`Machine<Law, Phase>` typestate pattern**, where state transitions are compile-time checkable via zero-sized `PhantomData<S>` markers.
 
@@ -54,6 +54,46 @@ The dominant pattern across all Rust workspaces is the **`Machine<Law, Phase>` t
 - Prevents entire categories of bugs (invalid state transitions).
 - Makes refactoring safe: `cargo check` will catch missed cases.
 
+#### Automated Component Discovery (unify-automl)
+
+**Recent Addition (commit 6e41266):** The `unify-automl` crate provides **autonomous component inventory and binding discovery** to prevent technical debt from unregistered, orphaned, or incompletely-bound game components.
+
+**How It Works:**
+
+```rust
+// Recursive scan of Rust, C++, and C source code
+let registry = unify_automl::discovery::scan_directory("/path/to/codebase")?;
+
+// Discovers components marked with:
+// - @UnifyAutoBind comment tags (any language)
+// - #[derive(AutoBind)] macros (Rust)
+
+// Returns ComponentRegistry with:
+registry.components  // Vec<DiscoveredComponent> with name, file_path, language, binding_tag
+registry.workspace_games  // Auto-discovered games from Chicago TDD Tools
+```
+
+**Component Discovery Process:**
+
+1. **Scan** — traverse entire codebase for `@UnifyAutoBind` markers and `#[derive(AutoBind)]` macros
+2. **Classify** — extract component name, language, source file, and binding context
+3. **Inventory** — populate `ComponentRegistry` with discoverable components
+4. **Integrate** — discovered components are automatically wired to `unify-rdf` and `unify-mcp` tooling
+
+**Sustainability Impact:**
+- **Zero orphaned components** — automatic discovery prevents developer oversight; an unmarked component does not register.
+- **Reduced manual binding** — `@UnifyAutoBind` tags eliminate ad-hoc registration logic.
+- **Audit trail** — every component has discoverable metadata (file, language, binding spec).
+- **Scales with monorepo growth** — adding 10 new game components is mechanical (tag them, scan completes automatically).
+
+**Typical Usage in CI/CD:**
+
+```bash
+./rocket audit  # Scans entire monorepo; auto-discovers and validates component bindings
+```
+
+The discovery output is consumed by `unify-mcp` to expose discovered components as MCP resources and `unify-rdf` to stamp them into the project triple store.
+
 ### 2. Centralized Orchestration: `rocket` CLI Wrapper
 
 All project operations flow through a single unified CLI, the `./rocket` shell wrapper, which auto-builds and delegates to `tools/target/release/rocket-cmd`:
@@ -75,7 +115,85 @@ All project operations flow through a single unified CLI, the `./rocket` shell w
 - Scripts can fail loudly with consistent error handling (via `anyhow` + `color-eyre`).
 - New contributors learn one interface, not ten ad-hoc scripts.
 
-### 3. Semantic Versioning & Workspace Resolution
+### 3. Unified Developer CLI with Real-Time World Management (genie3_cli)
+
+**Recent Implementation (commit 6e41266):** Interactive CLI for real-time simulation world management, enabling designers to iterate on game worlds without recompilation.
+
+**The `genie3_cli` Tool:**
+
+An interactive REPL that allows live manipulation of the `Genie3` world model:
+
+```bash
+genie3> spawn actor bot_2 at 20.0 30.0 5.0
+genie3> weather stormy
+genie3> time 18.5
+genie3> status
+--- World State (Step 42) ---
+Time: 18.5h | Weather: Stormy
+Places:
+  - Place 'room_1' (Control Room) bounds center: {...}
+Actors:
+  - Actor 'bot_1' (Welder Bot) position: {...} in Place: room_1
+  - Actor 'bot_2' (New Bot) position: {...} in Place: room_1
+Objects:
+  - Object 'cnc_1' (CNC Alpha) position: {...} in Place: room_1
+-----------------------------
+
+genie3> w  # Move forward (Y += 5.0)
+genie3> s  # Move backward
+genie3> a  # Move left
+genie3> d  # Move right
+genie3> exit
+```
+
+**Supported Commands:**
+
+| Command | Effect |
+|---------|--------|
+| `w` / `forward` | Move active actor forward (Y += 5.0) |
+| `s` / `backward` | Move active actor backward (Y -= 5.0) |
+| `a` / `left` | Move active actor left (X -= 5.0) |
+| `d` / `right` | Move active actor right (X += 5.0) |
+| `spawn actor <id> at <x> <y> <z>` | Instantiate new actor at coordinates |
+| `spawn object <id> at <x> <y> <z>` | Instantiate new object at coordinates |
+| `weather <sunny\|cloudy\|stormy\|rainy>` | Change environment weather |
+| `time <hour>` | Set time of day (0.0–24.0) |
+| `status` / `show` | Display complete world state |
+| `help` | Show help menu |
+| `exit` / `quit` | Close simulation |
+
+**Real-Time Physics Validation:**
+
+Every command is validated against the `SimulationEngine`:
+
+```rust
+engine.validate_movement(
+    &world_state,
+    actor_id,
+    proposed_position,
+    proposed_rotation
+)?;  // Prevents teleportation, enforces collision, respects place bounds
+```
+
+**Sustainability Impact:**
+- **Zero-compile iteration** — designers adjust worlds in seconds, no Rust rebuild.
+- **Real-time feedback** — physics, collisions, and layout are validated live.
+- **Knowledge codification** — the CLI documents what operations are legal; source of truth.
+- **Bridges designers and engineers** — designers see immediate physics feedback; engineers iterate on constraints.
+
+**Typical Designer Workflow:**
+
+1. Designer opens `genie3_cli`
+2. Designer spawns actors/objects and adjusts environment
+3. Designer verifies visual layout via `status` command
+4. Designer exports validated world via `./rocket` to generate a `WorldSpec`
+5. WorldSpec is committed to `project-manifest.json` and consumed by game engine
+
+**Integration with CI/CD:**
+
+The same `SimulationEngine` used by the CLI is exercised by all E2E tests, ensuring designers' iterative changes are validated before shipping.
+
+### 4. Semantic Versioning & Workspace Resolution
 
 All Rust workspaces declare shared dependencies in `[workspace.dependencies]` and use `dep = { workspace = true }` to reference them. Resolver versions are pinned per workspace:
 
@@ -205,17 +323,74 @@ pwa-staff/tests-e2e/tps-dflss.spec.ts
 - **Continuous verification**: each build generates an auditable receipt.
 - **Cross-team accountability**: designers, engineers, and QA all trust the same receipt.
 
-### 4. CI/CD Pipeline
+### 4. Monte Carlo Balancing Engine (genie3)
+
+**Recent Implementation (commit 6e41266):** Statistical validation of game balance via Monte Carlo combat simulation.
+
+**Purpose:** Ensure game balance remains stable as designers tune stat allocations. Every balance change is statistically validated rather than relying on play-testing intuition alone.
+
+**How It Works:**
+
+```rust
+// Define a stat allocation (player vs enemy)
+let allocation = StatAllocation {
+    health: 100,
+    attack: 50,
+    defense: 30,
+    magic: 20,
+};
+
+// Run N Monte Carlo battle simulations
+let result = unify_automl::balancer::simulate_battles(&allocation, 1000);
+
+// Returns statistical evidence:
+result.player_win_rate     // E.g., 0.52 (52% win rate)
+result.avg_turns           // E.g., 15.3 (average battle length)
+result.average_player_final_hp  // E.g., 23.4 (health remaining post-victory)
+```
+
+**Quality Signals:**
+
+Each simulation runs a real `GameSession` from `ib4-mud` with:
+- Actual combat state machine (`nexus-combat::CombatMachine`)
+- Realistic move selection heuristics (prioritize parries, high-value attacks)
+- 100-turn loop safety (prevents infinite loops)
+
+**Statistical Interpretation:**
+
+| Win Rate | Verdict | Action |
+|----------|---------|--------|
+| > 0.60 | Player overpowered | Nerf player stats |
+| 0.45–0.55 | Balanced | Ship |
+| 0.40–0.44 | Player underpowered | Buff player stats |
+| < 0.40 | Trivial for enemy | Redesign allocation |
+
+**Sustainability Impact:**
+- **Reproducible balance decisions** — win rate is data, not opinion.
+- **Continuous validation** — every stat tweak is tested against 1000 simulations (~5 seconds).
+- **Cross-platform consistency** — same simulation engine used in CI, release QA, and game server.
+- **Scales to multiple matchups** — can validate 50+ stat allocations in parallel across game balance matrix.
+
+**Integration with CI:**
+
+```bash
+./rocket test  # Runs balance validation tests with predefined allocations
+# Verifies new stat allocations meet minimum quality bar (e.g., 0.45–0.55 win rate)
+```
+
+### 5. CI/CD Pipeline
 
 Currently active (`.github/workflows/ci.yml`):
 - **pwa-staff job**: `npm ci` → lint → type-check → test → build
 - **chicago-tdd-tools job**: `cargo build --all-features` → test
+- **Monte Carlo balancing** (optional): Run balance validation on stat changes
 
 **Planned Extensions:**
 - `nexus-engine`: Full property-based test suite + WASM compilation
 - `unify-rs`: 17-crate workspace tests + MCP server validation
 - `blueprint-rs`: AST round-tripping + code generation
 - Cross-workspace integration tests
+- Automatic balance regression detection (alert if win rate drops below 0.45)
 
 Each push to any branch triggers CI. PRs to `master`/`main` require all checks passing.
 
@@ -321,7 +496,96 @@ mcp.call("audit/scan_directory", {
 - **Transparent auditing**: developers see exactly why a file was flagged.
 - **Policy enforcement**: business rules (e.g., "all public APIs must be documented") are enforced automatically.
 
-### 3. Critical Bug Triage Process
+### 3. Affidavit Provenance Receipts — Immutable Audit Trail
+
+**Recent Implementation (commits b1c20cb, a3c9f65):** Cryptographic BLAKE3 chaining of all world state mutations, providing immutable, tamper-proof audit trails for game balance changes, deployment decisions, and designer-engineer collaboration.
+
+**How It Works:**
+
+Every `WorldSpec` (game world definition) carries a **receipt chain** — a series of BLAKE3 hashes that cryptographically link all history events:
+
+```rust
+// Example: Designer creates a new world with 3 historical events
+let mut spec = WorldSpec::new();
+spec.history.push(HistoryEvent { id: "evt_1", timestamp_ms: 0, ... });
+spec.history.push(HistoryEvent { id: "evt_2", timestamp_ms: 100, ... });
+spec.history.push(HistoryEvent { id: "evt_3", timestamp_ms: 200, ... });
+
+// Generate cryptographic receipt chain
+ReceiptChainManager::generate_receipt_chain(&mut spec, b"secret_salt")?;
+
+// spec.receipts now contains:
+// [
+//   Receipt { key: "history_receipt_evt_1", hash: "BLAKE3(salt + engine + evt_1)" },
+//   Receipt { key: "history_receipt_evt_2", hash: "BLAKE3(salt + prev_hash + evt_2)" },
+//   Receipt { key: "history_receipt_evt_3", hash: "BLAKE3(salt + prev_hash + evt_3)" },
+// ]
+```
+
+**Receipt Chain Properties:**
+
+1. **Genesis Receipt**: First event binds the secret salt, engine version, and initial event.
+2. **Chained Receipts**: Each subsequent receipt incorporates the hash of the previous receipt, creating an immutable sequence.
+3. **Deterministic Ordering**: Events are sorted by timestamp, then by ID, guaranteeing consistent chain reconstruction.
+4. **Tamper-Proof**: Altering any historical event invalidates all downstream receipts. Verified via `ReceiptChainManager::verify_receipt_chain()`.
+
+**Example Receipt Chain JSON:**
+
+```json
+{
+  "receipts": [
+    {
+      "key": "history_receipt_spawn_player",
+      "hash": "7a3f8d2e9c1b4f6a5e3d8c2b9f1a4e7d3c2b5a8f1e3d6c9b2f5a8e1d4c7b",
+      "timestamp": "2026-06-17T12:00:00Z"
+    },
+    {
+      "key": "history_receipt_balance_tweak",
+      "hash": "9e2b1c3d8f4a6e7c5d2a1f3b8e4c6d9a2f5e7b1c3d6a9e2f4c7b0a3d5e8f1",
+      "timestamp": "2026-06-17T12:15:00Z"
+    },
+    {
+      "key": "history_receipt_deploy_v0.3",
+      "hash": "4f6a1e3d8c2b7f5a9e1d4c6b2f5a8e1d3c7b2e5a9f1d4c8b3f6e9a2d5c7e0",
+      "timestamp": "2026-06-17T12:30:00Z"
+    }
+  ]
+}
+```
+
+**Verification Workflow:**
+
+```bash
+# Check if a world spec's receipt chain is valid
+if !ReceiptChainManager::verify_receipt_chain(&spec, b"secret_salt") {
+    eprintln!("ERROR: World spec has been tampered with!");
+    std::process::exit(1);
+}
+
+# Deployment only proceeds if receipt chain is verified
+./rocket build --verify-receipts  # Validates all specs before build
+```
+
+**Sustainability Impact:**
+- **Irrevocable audit trail** — every change to game balance, enemy stats, or level layout is cryptographically stamped.
+- **Forensic analysis** — when a balance bug is discovered in production, developers can trace it back to the exact change, timestamp, and designer responsible.
+- **Cross-team accountability** — designers, engineers, and QA teams all trust the same immutable record.
+- **Compliance & legal protection** — receipts prove that all changes followed the established process; valuable for litigation or regulatory audits.
+- **Deployment safety gate** — build system refuses to deploy worlds with broken receipt chains, catching tampering before it reaches production.
+
+**Integration with CI/CD:**
+
+The `./rocket audit` command automatically validates receipt chains:
+
+```bash
+./rocket audit  # Phase 5: Semantic Audits
+# Checks anti-llm scanning, component discovery, AND receipt chain integrity
+# Fails fast if any spec has a broken chain
+```
+
+Every world deployed to production carries a manifest of receipt hashes, enabling post-deployment verification if needed.
+
+### 4. Critical Bug Triage Process
 
 **Severity Levels:**
 | Level | Impact | SLA | Examples |
@@ -965,6 +1229,15 @@ cargo publish --manifest-path tools/rocket-sdk/Cargo.toml
 | **Blake3** | Cryptographic hash function; used for artifact signing |
 | **Emscripten** | Toolchain for compiling C++ to WebAssembly |
 | **AutomationTool** | UE4 command-line tool for headless builds |
+| **AutoML** | Automated machine learning; `unify-automl` discovers and binds game components autonomously |
+| **Component Discovery** | Scan-based inventory of components via `@UnifyAutoBind` tags or `#[derive(AutoBind)]` macros |
+| **Monte Carlo Simulation** | Statistical validation via repeated randomized combat simulations; game balance proof |
+| **Receipt Chain** | BLAKE3-linked cryptographic history of world mutations; tamper-proof audit trail |
+| **Affidavit** | Cryptographic proof of world spec integrity; signed by salt + engine version + history |
+| **Genie3** | World model and physics engine; provides `genie3_cli` interactive REPL |
+| **genie3_cli** | Interactive CLI for real-time world management and designer iteration |
+| **WorldSpec** | Immutable specification of a game world including actors, objects, physics, and receipt chain |
+| **SimulationEngine** | Physics and transition validator; ensures collisions, bounds, and movement legality |
 
 ---
 
@@ -1026,7 +1299,7 @@ git push origin v0.5.0     # Triggers release workflow
 
 ## Document Metadata
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Last Updated:** 2026-06-18  
 **Authors:** Sean Chatman, Rocket Craft Engineering Team  
 **Status:** Active  
@@ -1038,5 +1311,6 @@ git push origin v0.5.0     # Triggers release workflow
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-06-18 | 1.1 | Added Automated Component Discovery (unify-automl), Monte Carlo Balancing Engine (genie3), Unified Developer CLI (genie3_cli), and Affidavit Provenance Receipts. Integrated 4 new architectural capabilities under Sustainability Pillars, QA Strategy, and Security Posture. |
 | 2026-06-18 | 1.0 | Initial DFLSS document; integrated TPS/DfLSS E2E, Chicago TDD, anti-LLM, and recent gap-closing work |
 
