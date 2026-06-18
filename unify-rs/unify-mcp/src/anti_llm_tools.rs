@@ -11,15 +11,16 @@ pub fn attach_anti_llm_tools(server: crate::server::McpServer) -> crate::server:
 
 /// MCP tool: `audit/scan_directory` - scan a directory for LLM cheat patterns
 pub fn handle_scan_directory(params: serde_json::Value) -> Result<serde_json::Value, String> {
+    use anti_llm_cheat_lsp::config::AntiLlmConfig;
+
     let dir_path = params["dir_path"]
         .as_str()
         .ok_or_else(|| "Missing 'dir_path' parameter".to_string())?;
 
     let observations = engine::scan_directory(dir_path);
-    let blocking_count = observations
-        .iter()
-        .filter(|o| o.kind.contains("stub") || o.kind.contains("oracle"))
-        .count();
+    let config = AntiLlmConfig::default();
+    let diagnostics = engine::evaluate_diagnostics_with_config(&observations, &config);
+    let blocking_count = diagnostics.iter().filter(|d| d.blocking).count();
 
     Ok(json!({
         "directory": dir_path,
