@@ -7,18 +7,23 @@ use crate::parry::{AttackDir, ParryOutcome};
 // ---------------------------------------------------------------------------
 
 /// The unit is waiting; all actions are available.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Idle;
 
 /// An attack has been initiated but not yet rereaddressed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Attacking;
 
 /// A parry is in progress (any-direction).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Parrying;
 
 /// A perfect-parry window is open (direction must match announced).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PerfectParrying;
 
 /// A dodge is in progress.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Dodging;
 
 // ---------------------------------------------------------------------------
@@ -30,6 +35,7 @@ pub struct Dodging;
 /// Only valid state transitions are representable at compile time.
 /// Illegal sequences (e.g. attacking while dodging, resolving a parry
 /// that was never started) are simply not constructible.
+#[derive(Debug, Clone, PartialEq)]
 pub struct CombatMachine<S> {
     pub hp: f32,
     pub max_hp: f32,

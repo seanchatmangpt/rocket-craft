@@ -82,6 +82,8 @@ pub struct World {
     attacks: HashMap<Entity, Attack>,
     players: HashMap<Entity, Player>,
     alive: HashSet<Entity>,
+    pub current_time_ms: u64,
+    pub attack_cooldowns: HashMap<Entity, u64>,
 }
 
 impl World {
@@ -94,6 +96,8 @@ impl World {
             attacks: HashMap::new(),
             players: HashMap::new(),
             alive: HashSet::new(),
+            current_time_ms: 0,
+            attack_cooldowns: HashMap::new(),
         }
     }
 
@@ -113,6 +117,7 @@ impl World {
         self.healths.remove(&e);
         self.attacks.remove(&e);
         self.players.remove(&e);
+        self.attack_cooldowns.remove(&e);
     }
 
     pub fn entity_count(&self) -> usize {

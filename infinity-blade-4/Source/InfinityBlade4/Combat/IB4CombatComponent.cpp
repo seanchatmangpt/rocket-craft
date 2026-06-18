@@ -88,6 +88,11 @@ float UIB4CombatComponent::GetComboMultiplier() const
     return 3.0f; // 4+ hits
 }
 
+float UIB4CombatComponent::GetMagicCost() const
+{
+    return MagicCost;
+}
+
 //-----------------------------------------------------------------------------
 // Attack
 //-----------------------------------------------------------------------------

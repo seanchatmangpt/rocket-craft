@@ -1,7 +1,7 @@
 //! T3D reverse parser — converts UE4 Blueprint clipboard text (T3D format) back
 //! into [`BpNode`] instances and generates Rust [`BlueprintBuilder`] code.
 //!
-//! This closes the round-trip: Rust → T3D (via [`crate::t3d::T3dSerializer`]) → Rust.
+//! This closes the round-trip: Rust → T3D (via [`crate::serializer::T3dSerializer`]) → Rust.
 //!
 //! # CLI usage (bpgen decompile)
 //!
@@ -98,6 +98,7 @@ fn handler_registry() -> &'static HashMap<&'static str, NodeHandler> {
         m.insert("K2Node_Event",         handle_event);
         m.insert("K2Node_CustomEvent",   handle_custom_event);
         m.insert("K2Node_CallFunction",  handle_call_function);
+        m.insert("K2Node_CommutativeAssociativeBinaryOperator", handle_commutative_binary_operator);
         m.insert("K2Node_IfThenElse",    handle_if_then_else);
         m.insert("K2Node_VariableGet",   handle_variable_get);
         m.insert("K2Node_VariableSet",   handle_variable_set);
@@ -163,10 +164,30 @@ fn handle_call_function(node: &BpNode, var_name: &str) -> Result<String, ParseEr
         Ok(format!("let {var_name} = builder.play_sound_node();\n"))
     } else if fn_ref.contains("ApplyDamage") {
         Ok(format!("let {var_name} = builder.apply_damage_node();\n"))
+    } else if fn_ref.contains("Add_IntInt") {
+        Ok(format!("let {var_name} = builder.add_int();\n"))
+    } else if fn_ref.contains("Subtract_IntInt") {
+        Ok(format!("let {var_name} = builder.subtract_int();\n"))
     } else {
         Err(ParseError {
             line: 0,
             message: format!("Unsupported K2Node_CallFunction FunctionReference: {}", fn_ref),
+        })
+    }
+}
+
+fn handle_commutative_binary_operator(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
+    let fn_ref = node.properties.get("FunctionReference")
+        .ok_or_else(|| ParseError {
+            line: 0,
+            message: format!("K2Node_CommutativeAssociativeBinaryOperator '{}' has no FunctionReference property", node.name),
+        })?;
+    if fn_ref.contains("Add_IntInt") {
+        Ok(format!("let {var_name} = builder.add_int();\n"))
+    } else {
+        Err(ParseError {
+            line: 0,
+            message: format!("Unsupported K2Node_CommutativeAssociativeBinaryOperator FunctionReference: {}", fn_ref),
         })
     }
 }
@@ -497,7 +518,7 @@ fn parse_pin_category(s: &str) -> PinCategory {
     }
 }
 
-/// Parse `LinkedTo=(NodeName GUID,NodeName2 GUID2,)` into a `Vec<PinRef>`.
+/// Parse `LinkedTo=(NodeName GUID,NodeName2 GUID2,)` or `LinkedTo=(NodeName(GUID))` into a `Vec<PinRef>`.
 fn parse_linked_to(s: &str) -> Vec<PinRef> {
     let mut refs = Vec::new();
     // Strip outer parentheses if present.
@@ -513,7 +534,7 @@ fn parse_linked_to(s: &str) -> Vec<PinRef> {
         if part.is_empty() {
             continue;
         }
-        // Each part is "<NodeName> <PinGuid>"
+        // Each part is "<NodeName> <PinGuid>" or "<NodeName>(<PinGuid>)"
         let mut iter = part.splitn(2, ' ');
         if let (Some(node_name), Some(guid)) = (iter.next(), iter.next()) {
             let node_name = node_name.trim().to_string();
@@ -523,6 +544,19 @@ fn parse_linked_to(s: &str) -> Vec<PinRef> {
                     node_name,
                     pin_id: UeGuid(guid),
                 });
+            }
+        } else {
+            if let Some(open_paren) = part.find('(') {
+                if part.ends_with(')') {
+                    let node_name = part[..open_paren].trim().to_string();
+                    let guid = part[open_paren + 1..part.len() - 1].trim().to_string();
+                    if !node_name.is_empty() && !guid.is_empty() {
+                        refs.push(PinRef {
+                            node_name,
+                            pin_id: UeGuid(guid),
+                        });
+                    }
+                }
             }
         }
     }
@@ -634,9 +668,9 @@ mod tests {
     use crate::types::{PinDirection, PinType};
 
     // Helper: serialize a single graph to T3D using the canonical t3d serializer
-    // (src/t3d.rs) which produces the flat per-node format that parse_t3d expects.
+    // which produces the flat per-node format that parse_t3d expects.
     fn serialize_graph(graph: BpGraph) -> String {
-        crate::t3d::T3dSerializer::serialize_graph(&graph)
+        crate::serializer::T3dSerializer::serialize_graph(&graph)
     }
 
     // -----------------------------------------------------------------------
@@ -962,6 +996,23 @@ End Object
         let code = generate_rust_code(&[], "EmptyBP", "Actor").unwrap();
         assert!(code.contains("BlueprintBuilder::new"));
         assert!(code.contains("to_t3d()"));
+    }
+
+    #[test]
+    fn generate_rust_code_math_nodes() {
+        // Build a node vector containing Add_IntInt and Subtract_IntInt
+        let mut graph = BpGraph::new("EventGraph");
+        let add = crate::nodes::math::add_int("MyAdd");
+        let sub = crate::nodes::math::subtract_int("MySub");
+        graph.add_node(add);
+        graph.add_node(sub);
+
+        let t3d = serialize_graph(graph);
+        let nodes = parse_t3d(&t3d).unwrap();
+        let code = generate_rust_code(&nodes, "MathBP", "Actor").unwrap();
+
+        assert!(code.contains("add_int()"), "should emit add_int() for Add_IntInt: {}", code);
+        assert!(code.contains("subtract_int()"), "should emit subtract_int() for Subtract_IntInt: {}", code);
     }
 
     // -----------------------------------------------------------------------

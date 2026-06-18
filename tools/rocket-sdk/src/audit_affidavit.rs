@@ -61,6 +61,8 @@ pub struct AuditEvent {
     pub project_name: String,
     pub passed: bool,
     pub violations: Vec<(String, String)>,
+    pub visual_delta: Option<f64>,
+    pub combinatorial_matrix: Option<serde_json::Value>,
 }
 
 // ── Chain implementation (mirrors affidavit chain.rs exactly) ─────────────────
@@ -172,6 +174,8 @@ mod tests {
                 } else {
                     vec![("TestLaw".into(), "missing keystore".into())]
                 },
+                visual_delta: None,
+                combinatorial_matrix: None,
             })
             .collect()
     }

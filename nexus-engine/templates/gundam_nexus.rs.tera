@@ -1,0 +1,352 @@
+#![allow(unused_imports, dead_code)]
+
+use serde::{Serialize, Deserialize};
+
+pub trait OntologyName {
+    fn ontology_name() -> &'static str;
+}
+
+pub trait PlanetCategory {}
+pub trait PlanetDimensionCategory {}
+pub trait MobilityTypeCategory: Serialize {
+    fn physical(&self) -> &Mobility;
+    fn type_name(&self) -> &'static str;
+}
+pub trait MechClassCategory {}
+pub trait PreservationDomainCategory {}
+pub trait ExperiencePhaseCategory {}
+pub trait MythologyArchetypeCategory {}
+pub trait CosmologyPhaseCategory {}
+pub trait ArkFormCategory {}
+pub trait ArkPurposeCategory {}
+pub trait HistoryTypeCategory {}
+pub trait PreservationAspectCategory {}
+pub trait MechPrimitiveCategory {}
+
+pub trait CosmicCycleCategory {}
+pub trait ResourceCategory {}
+pub trait FrameTypeCategory {}
+pub trait PowerSourceCategory {}
+pub trait ArmorTypeCategory {}
+pub trait WeaponTypeCategory {}
+pub trait SensorTypeCategory {}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct AABB {
+    pub min: [f32; 3],
+    pub max: [f32; 3],
+}
+
+impl AABB {
+    pub fn new(min: [f32; 3], max: [f32; 3]) -> Self {
+        Self { min, max }
+    }
+
+    pub fn intersects(&self, other: &Self) -> bool {
+        self.min[0] <= other.max[0] && self.max[0] >= other.min[0] &&
+        self.min[1] <= other.max[1] && self.max[1] >= other.min[1] &&
+        self.min[2] <= other.max[2] && self.max[2] >= other.min[2]
+    }
+}
+
+impl Default for AABB {
+    fn default() -> Self {
+        Self::new([0.0, 0.0, 0.0], [0.0, 0.0, 0.0])
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct RotationLimits {
+    pub min_yaw: f32,
+    pub max_yaw: f32,
+    pub min_pitch: f32,
+    pub max_pitch: f32,
+    pub min_roll: f32,
+    pub max_roll: f32,
+}
+
+impl Default for RotationLimits {
+    fn default() -> Self {
+        Self {
+            min_yaw: -180.0,
+            max_yaw: 180.0,
+            min_pitch: -90.0,
+            max_pitch: 90.0,
+            min_roll: -180.0,
+            max_roll: 180.0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Frame {
+    pub id: String,
+    pub mass: f32,
+    pub occupancy: AABB,
+    pub clearance: AABB,
+    pub slot_count: usize,
+}
+
+impl Default for Frame {
+    fn default() -> Self {
+        Frame {
+            id: "Standard Frame".to_string(),
+            mass: 50.0,
+            occupancy: AABB::new([-1.0, -1.0, -1.0], [1.0, 1.0, 1.0]),
+            clearance: AABB::new([-1.1, -1.1, -1.1], [1.1, 1.1, 1.1]),
+            slot_count: 5,
+        }
+    }
+}
+
+impl MechPrimitiveCategory for Frame {}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Joint {
+    pub name: String,
+    pub parent_component_id: String,
+    pub child_component_id: String,
+    pub location: [f32; 3],
+    pub limits: Option<RotationLimits>,
+    pub mass: f32,
+}
+
+impl MechPrimitiveCategory for Joint {}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Power {
+    pub id: String,
+    pub mass: f32,
+    pub occupancy: AABB,
+    pub clearance: AABB,
+    pub energy_capacity: f32,
+    pub output: f32,
+}
+
+impl Default for Power {
+    fn default() -> Self {
+        Power {
+            id: "Fusion Reactor".to_string(),
+            mass: 20.0,
+            occupancy: AABB::new([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5]),
+            clearance: AABB::new([-0.6, -0.6, -0.6], [0.6, 0.6, 0.6]),
+            energy_capacity: 1000.0,
+            output: 100.0,
+        }
+    }
+}
+
+impl MechPrimitiveCategory for Power {}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Armor {
+    pub id: String,
+    pub mass: f32,
+    pub occupancy: AABB,
+    pub clearance: AABB,
+    pub defense_rating: f32,
+    pub material: String,
+}
+
+impl Default for Armor {
+    fn default() -> Self {
+        Armor {
+            id: "Nano-composite Armor".to_string(),
+            mass: 30.0,
+            occupancy: AABB::new([-1.05, -1.05, -1.05], [1.05, 1.05, 1.05]),
+            clearance: AABB::new([-1.1, -1.1, -1.1], [1.1, 1.1, 1.1]),
+            defense_rating: 100.0,
+            material: "Nano-composite".to_string(),
+        }
+    }
+}
+
+impl MechPrimitiveCategory for Armor {}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Weapon {
+    pub id: String,
+    pub mass: f32,
+    pub occupancy: AABB,
+    pub clearance: AABB,
+    pub damage: f32,
+    pub range: f32,
+}
+
+impl MechPrimitiveCategory for Weapon {}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Sensor {
+    pub id: String,
+    pub mass: f32,
+    pub occupancy: AABB,
+    pub clearance: AABB,
+    pub detection_range: f32,
+}
+
+impl MechPrimitiveCategory for Sensor {}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UtilitySystem {
+    pub id: String,
+    pub mass: f32,
+    pub occupancy: AABB,
+    pub clearance: AABB,
+    pub utility_type: String,
+}
+
+impl MechPrimitiveCategory for UtilitySystem {}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Mobility {
+    pub id: String,
+    pub mass: f32,
+    pub occupancy: AABB,
+    pub clearance: AABB,
+    pub load_capacity: f32,
+    pub max_speed: f32,
+}
+
+impl MechPrimitiveCategory for Mobility {}
+
+// --- Mobility Typestates ---
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Walking {
+    pub physical: Mobility,
+    pub leg_count: u32,
+}
+
+impl MobilityTypeCategory for Walking {
+    fn physical(&self) -> &Mobility {
+        &self.physical
+    }
+    fn type_name(&self) -> &'static str {
+        "Walking"
+    }
+}
+
+impl OntologyName for Walking {
+    fn ontology_name() -> &'static str {
+        "Walking"
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Flight {
+    pub physical: Mobility,
+    pub wing_span: f32,
+}
+
+impl MobilityTypeCategory for Flight {
+    fn physical(&self) -> &Mobility {
+        &self.physical
+    }
+    fn type_name(&self) -> &'static str {
+        "Flight"
+    }
+}
+
+impl OntologyName for Flight {
+    fn ontology_name() -> &'static str {
+        "Flight"
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Hover {
+    pub physical: Mobility,
+    pub ground_clearance: f32,
+}
+
+impl MobilityTypeCategory for Hover {
+    fn physical(&self) -> &Mobility {
+        &self.physical
+    }
+    fn type_name(&self) -> &'static str {
+        "Hover"
+    }
+}
+
+impl OntologyName for Hover {
+    fn ontology_name() -> &'static str {
+        "Hover"
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Space {
+    pub physical: Mobility,
+    pub thruster_count: u32,
+}
+
+impl MobilityTypeCategory for Space {
+    fn physical(&self) -> &Mobility {
+        &self.physical
+    }
+    fn type_name(&self) -> &'static str {
+        "Space"
+    }
+}
+
+impl OntologyName for Space {
+    fn ontology_name() -> &'static str {
+        "Space"
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Aquatic {
+    pub physical: Mobility,
+    pub depth_rating: f32,
+}
+
+impl MobilityTypeCategory for Aquatic {
+    fn physical(&self) -> &Mobility {
+        &self.physical
+    }
+    fn type_name(&self) -> &'static str {
+        "Aquatic"
+    }
+}
+
+impl OntologyName for Aquatic {
+    fn ontology_name() -> &'static str {
+        "Aquatic"
+    }
+}
+
+{% for row in results %}
+{% if row.name != "Walking" and row.name != "Flight" and row.name != "Hover" and row.name != "Space" and row.name != "Aquatic" %}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct {{ row.name }};
+
+impl OntologyName for {{ row.name }} {
+    fn ontology_name() -> &'static str {
+        "{{ row.name }}"
+    }
+}
+
+{% set types_list = "," ~ row.types ~ "," %}
+{% if ",CosmicCycle," in types_list %}impl CosmicCycleCategory for {{ row.name }} {}
+{% endif %}{% if ",Resource," in types_list %}impl ResourceCategory for {{ row.name }} {}
+{% endif %}{% if ",FrameType," in types_list %}impl FrameTypeCategory for {{ row.name }} {}
+{% endif %}{% if ",PowerSource," in types_list %}impl PowerSourceCategory for {{ row.name }} {}
+{% endif %}{% if ",ArmorType," in types_list %}impl ArmorTypeCategory for {{ row.name }} {}
+{% endif %}{% if ",WeaponType," in types_list %}impl WeaponTypeCategory for {{ row.name }} {}
+{% endif %}{% if ",SensorType," in types_list %}impl SensorTypeCategory for {{ row.name }} {}
+{% endif %}{% if ",ArkForm," in types_list %}impl ArkFormCategory for {{ row.name }} {}
+{% endif %}{% if ",ArkPurpose," in types_list %}impl ArkPurposeCategory for {{ row.name }} {}
+{% endif %}{% if ",CosmologyPhase," in types_list %}impl CosmologyPhaseCategory for {{ row.name }} {}
+{% endif %}{% if ",HistoryType," in types_list %}impl HistoryTypeCategory for {{ row.name }} {}
+{% endif %}{% if ",PreservationAspect," in types_list %}impl PreservationAspectCategory for {{ row.name }} {}
+{% endif %}{% if ",MechPrimitive," in types_list %}impl MechPrimitiveCategory for {{ row.name }} {}
+{% endif %}{% if ",MechClass," in types_list %}impl MechClassCategory for {{ row.name }} {}
+{% endif %}{% if ",PreservationDomain," in types_list %}impl PreservationDomainCategory for {{ row.name }} {}
+{% endif %}{% if ",ExperiencePhase," in types_list %}impl ExperiencePhaseCategory for {{ row.name }} {}
+{% endif %}{% if ",MythologyArchetype," in types_list %}impl MythologyArchetypeCategory for {{ row.name }} {}
+{% endif %}{% if ",Planet," in types_list %}impl PlanetCategory for {{ row.name }} {}
+{% endif %}{% if ",PlanetDimension," in types_list %}impl PlanetDimensionCategory for {{ row.name }} {}
+{% endif %}
+{% endif %}
+{% endfor %}

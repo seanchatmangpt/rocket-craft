@@ -67,10 +67,10 @@ fn should_perfect_parry_when_direction_matches() {
 }
 
 #[test]
-fn should_degrade_to_normal_parry_on_wrong_direction() {
+fn should_miss_parry_on_wrong_direction() {
     let outcome = ParryResolver::resolve(
         AttackDir::Overhead,
         ParryIntent::DirectionalParry(AttackDir::Right),
     );
-    assert_eq!(outcome, ParryOutcome::NormalParry);
+    assert_eq!(outcome, ParryOutcome::Miss);
 }

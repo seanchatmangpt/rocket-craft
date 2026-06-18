@@ -22,7 +22,7 @@ proptest! {
         max_health in 1u32..1000,
         tick in 0u64..10000,
     ) {
-        let mut log = log();
+        let log = log();
         log.info(&format!(
             "Given workers={worker_count} buf={buffer_size} hp={health}/{max_health} tick={tick}"
         ));

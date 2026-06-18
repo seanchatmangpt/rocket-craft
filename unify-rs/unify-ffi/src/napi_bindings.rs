@@ -82,19 +82,19 @@ fn ffi_value_to_string(v: FfiValue) -> String {
 /// Returns the JSON-encoded output, or an error string.
 ///
 /// Usable from Rust unit tests without any napi toolchain.
-pub fn dispatch_raw(name: &str, input: &str) -> Result<String, String> {
+pub fn dispatch_raw(name: &str, input: &str) -> std::result::Result<String, String> {
     unify_dispatch_ffi(name.to_string(), input.to_string()).map_err(|e| e.to_string())
 }
 
 /// Return the version string without going through napi.
-pub fn version_raw() -> Result<String, String> {
+pub fn version_raw() -> std::result::Result<String, String> {
     unify_version_ffi()
         .map(ffi_value_to_string)
         .map_err(|e| e.to_string())
 }
 
 /// Return all registered command names without going through napi.
-pub fn list_commands_raw() -> Result<Vec<String>, String> {
+pub fn list_commands_raw() -> std::result::Result<Vec<String>, String> {
     match unify_list_commands_ffi() {
         Ok(FfiValue::Array(arr)) => {
             let names: Vec<String> = arr

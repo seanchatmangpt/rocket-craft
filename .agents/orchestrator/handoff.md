@@ -1,33 +1,31 @@
-# Orchestrator Handoff — Project Completed with CLEAN Audit
+# Orchestrator Handoff: Deep Architecture Migration Complete
 
 ## Milestone State
-- **Milestone 1: DB Schema & Trigger** — DONE (Conv ID: `3a6147ec-4c41-42b0-8013-c0f248348234`)
-- **Milestone 2: Auth & Frontend Setup** — DONE (Conv ID: `7acf1108-b1f0-483b-a28a-06538b60f5c6`)
-- **Milestone 3: Admin Dashboard & Leaderboard** — DONE (Conv ID: `75a28482-a733-41c6-a29e-137b1c05a6b3`)
-- **Milestone 4: Edge Function Submit Score** — DONE (Conv ID: `ed8d8902-d2f5-42cf-b523-51bb5e89696b`)
-- **Milestone 5: E2E Testing & Verification** — DONE (Conv ID: `24a37630-5370-426a-95af-f89bda39a1ef`)
-- **Milestone 6: Production Release Gaps** — DONE (Conv ID: `62170365-3e1f-4235-87b7-1cad9be5968a`)
-- **Milestone 7: Database Optimization & Telemetry Schema** — DONE (Conv ID: `efecceba-175f-4398-96df-4118d18bb1ec`)
-- **Milestone 8: Cyberpunk UI/UX & Collapsible Developer Console HUD** — DONE (Conv ID: `02799c0c-b169-44fd-8f6c-50ca17cb14f2`)
-- **Milestone 9: Verification & Testing** — DONE (Conv ID: `da08d33e-305f-4e7a-b483-33be6319792c`)
-- **Milestone 10: Resolve Victory Auditor Feedback** — DONE (Conv ID: `9853f96c-b76e-4ecc-b52c-ae80154ac31f`)
+- **Phase 1: Baseline Verification** — **DONE** (All cargo workspaces compile and tests pass successfully)
+- **Phase 2: Migrate `unrdf` Git Dependencies** — **DONE** (All git URL dependencies redirected to local `/Users/sac/rocket-craft/tools/unrdf`)
+- **Phase 3: Migrate `chicago-tdd-tools` Git Dependencies** — **DONE** (All git URL dependencies redirected to local `/Users/sac/rocket-craft/chicago-tdd-tools`)
+- **Phase 4: Verify `lsp-max` Integration** — **DONE** (`anti-llm-cheat-lsp` fully migrated from `tower-lsp` to workspace `lsp-max` dependencies)
+- **Phase 5: Refactor `genie-core` / `unify-rdf` Stubs** — **DONE** (Grep scans verified 0 stubs or dummy placeholders exist in core engine logic)
+- **Phase 6: Refactor `nexus-engine` State Machines** — **DONE** (`CombatMachine` and `PlayerSession` migrated to type-safe generated `Machine<L, P>` kernels)
+- **Phase 7: Configure `ggen.toml` and `.tera` templates** — **DONE** (`ggen sync` successfully drives state machine code generation from `.specify/schema/state_machines.ttl`)
+- **Phase 8: Wire Playwright WebGL2 Test Scripts** — **DONE** (TDD runner executes Playwright visual delta tests and generates cryptographic receipts)
+- **Phase 9: Automated Combinatorial Testing Execution** — **DONE** (`combinatorial-engine` executed successfully with 2004 states explored and 9879 transitions generated)
+- **Phase 10: Forensic Auditing & Clean Verdict Release** — **DONE** (Independent Forensic Auditor completed full compliance review and issued a **CLEAN VERDICT**)
 
 ## Active Subagents
-- None. All subagents have finished executing and are retired.
+- **None**. All dispatched subagents (workers, explorers, and auditor) have successfully completed their tasks and are retired.
 
 ## Pending Decisions
-- None.
+- **None**. All requirements and implementation details have been fully resolved and verified.
 
 ## Remaining Work
-- None. The client-side telemetry inserts are fully functional and authenticated under anon and authenticated roles. Client-side files check and handle Supabase insertion error payloads without swallowing them. Deno Edge Function tests pass perfectly due to client query updates. The Forensic Auditor has attests to a CLEAN verdict.
+- **None**. The 10-phase codebase retrofit plan is 100% complete and fully verified.
 
 ## Key Artifacts
 - **Progress Tracker**: `/Users/sac/rocket-craft/.agents/orchestrator/progress.md`
-- **Briefing State**: `/Users/sac/rocket-craft/.agents/orchestrator/BRIEFING.md`
-- **Project Scope**: `/Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md`
 - **Execution Plan**: `/Users/sac/rocket-craft/.agents/orchestrator/plan.md`
-- **Worker Fix Report**: `/Users/sac/rocket-craft/.agents/worker_resolve_victory_auditor_feedback/handoff.md`
-- **Auditor Verdict Report**: `/Users/sac/rocket-craft/.agents/auditor_resolve_victory_auditor_feedback/handoff.md`
-- **Database Migrations**: 
-  - `/Users/sac/rocket-craft/supabase/migrations/20260616000000_telemetry_and_optimization.sql`
-  - `/Users/sac/rocket-craft/supabase/migrations/20260616000001_grant_telemetry_logs_insert.sql`
+- **Briefing Document**: `/Users/sac/rocket-craft/.agents/orchestrator/BRIEFING.md`
+- **Project Roadmap**: `/Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md`
+- **Auditor Handoff Report**: `/Users/sac/rocket-craft/.agents/victory_auditor_deep_migration/handoff.md`
+- **Combinatorial Report**: `/Users/sac/rocket-craft/chicago-tdd-tools/combinatorial_report.json`
+- **Cryptographic Receipt**: `/Users/sac/rocket-craft/pwa-staff/test-results/tps-dflss-receipt.json`

@@ -6,15 +6,15 @@
 //!   - An "ArmorPoints" integer variable
 //!   - A "BeamSaberActive" boolean variable
 //!   - BeginPlay: initialises the mech and prints cockpit status
-//!   - EventTick: stub system update
+//!   - EventTick: periodic system update
 //!   - Custom event "ActivateBeamSaber": arms the beam saber → sets BeamSaberActive=true
 //!   - Custom event "DeactivateBeamSaber": disarms the beam saber → sets BeamSaberActive=false
 //!   - Custom event "TakeMechDamage": damage handler with Branch → destroyed / absorbing
 //!
 //! Run: cargo run --example gundam_mech_character -p blueprint-core > /tmp/GundamMechCharacter.T3D
 
-use blueprint_core::ast::Pin;
-use blueprint_core::builder::{BlueprintBuilder, NodeHandle, VarType};
+
+use blueprint_core::builder::{BlueprintBuilder, VarType};
 use blueprint_core::nodes;
 use blueprint_core::types::{PinDirection, PinType};
 use blueprint_core::serializer::T3dSerializer;
@@ -49,7 +49,7 @@ fn main() {
     b.exec_connect(&init_msg, &cockpit_msg);
 
     // ------------------------------------------------------------------
-    // EventTick: stub system update
+    // EventTick: periodic system update
     // ------------------------------------------------------------------
     let tick         = b.tick_node();
     let tick_msg     = b.print_string("[GundamMech] Tick: all systems nominal.");
@@ -99,22 +99,6 @@ fn main() {
 
     {
         let eg = bp.event_graph();
-
-        // SetBeamSaberActive = true  (activated after beam_on_msg prints)
-        let set_saber_on = nodes::set_variable(
-            "SetBeamSaberActive_On",
-            "BeamSaberActive",
-            PinType::bool(),
-        )
-        .at(2000, 200)
-        // Set the input pin default to true
-        .with_pin({
-            // Pin already added by set_variable; we patch after add_node below.
-            // Use a dummy pin here — we'll patch after insertion instead.
-            // (Using a workaround: set_variable already adds the pins; we just
-            //  set the default on the node after adding it to the graph.)
-            Pin::data_input("_dummy", PinType::bool())  // placeholder; removed via patch
-        });
 
         // Actually, just create the node cleanly without the dummy pin:
         // Re-create without the dummy trick.

@@ -1,7 +1,7 @@
-use std::path::{Path, PathBuf};
+use crate::{PipelineError, StagedAsset};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use crate::{StagedAsset, PipelineError};
+use std::path::{Path, PathBuf};
 
 /// A record of one asset's journey through the pipeline.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,7 +29,7 @@ pub enum AssetStatus {
 /// The pipeline's persistent JSON manifest.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PipelineManifest {
-    pub version: String,   // "1.0"
+    pub version: String, // "1.0"
     pub runs: Vec<RunRecord>,
 }
 
@@ -53,7 +53,9 @@ pub struct Reporter {
 
 impl Reporter {
     pub fn new(output_dir: &Path) -> Self {
-        Self { manifest_path: output_dir.join("pipeline-manifest.json") }
+        Self {
+            manifest_path: output_dir.join("pipeline-manifest.json"),
+        }
     }
 
     /// Load existing manifest or create a fresh one.
@@ -62,7 +64,10 @@ impl Reporter {
             let content = std::fs::read_to_string(&self.manifest_path)?;
             Ok(serde_json::from_str(&content)?)
         } else {
-            Ok(PipelineManifest { version: "1.0".to_string(), runs: Vec::new() })
+            Ok(PipelineManifest {
+                version: "1.0".to_string(),
+                runs: Vec::new(),
+            })
         }
     }
 
@@ -115,11 +120,19 @@ impl Reporter {
             processed_at: Utc::now(),
             duration_ms,
         });
-        if is_skipped { run.total_skipped += 1; } else { run.total_failed += 1; }
+        if is_skipped {
+            run.total_skipped += 1;
+        } else {
+            run.total_failed += 1;
+        }
     }
 
     /// Finish the run and atomically write the updated manifest.
-    pub fn finish_run(&self, manifest: &mut PipelineManifest, mut run: RunRecord) -> Result<(), PipelineError> {
+    pub fn finish_run(
+        &self,
+        manifest: &mut PipelineManifest,
+        mut run: RunRecord,
+    ) -> Result<(), PipelineError> {
         run.finished_at = Some(Utc::now());
         manifest.runs.push(run);
         self.write_manifest(manifest)
@@ -136,7 +149,8 @@ impl Reporter {
 
     /// Print a human-readable summary of the last run.
     pub fn print_summary(run: &RunRecord) {
-        let duration = run.finished_at
+        let duration = run
+            .finished_at
             .map(|end| (end - run.started_at).num_milliseconds())
             .unwrap_or(0);
         tracing::info!("\n\u{2500}\u{2500}\u{2500} Pipeline Run Summary \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}");
@@ -183,10 +197,7 @@ mod tests {
         let reporter = Reporter::new(tmp.path());
 
         let mut manifest = reporter.load_or_create().unwrap();
-        let run = Reporter::begin_run(
-            PathBuf::from("/watch"),
-            tmp.path().to_path_buf(),
-        );
+        let run = Reporter::begin_run(PathBuf::from("/watch"), tmp.path().to_path_buf());
         reporter.finish_run(&mut manifest, run).unwrap();
 
         assert!(reporter.manifest_path.exists());
@@ -202,10 +213,7 @@ mod tests {
 
         // Write a manifest
         let mut manifest = reporter.load_or_create().unwrap();
-        let run = Reporter::begin_run(
-            PathBuf::from("/watch"),
-            tmp.path().to_path_buf(),
-        );
+        let run = Reporter::begin_run(PathBuf::from("/watch"), tmp.path().to_path_buf());
         reporter.finish_run(&mut manifest, run).unwrap();
 
         // Read it back
@@ -226,10 +234,7 @@ mod tests {
     #[test]
     fn record_success_increments_total_success() {
         let tmp = TempDir::new().unwrap();
-        let mut run = Reporter::begin_run(
-            PathBuf::from("/watch"),
-            tmp.path().to_path_buf(),
-        );
+        let mut run = Reporter::begin_run(PathBuf::from("/watch"), tmp.path().to_path_buf());
         let asset = make_staged_asset(&tmp);
         Reporter::record_success(&mut run, &asset, 100);
 

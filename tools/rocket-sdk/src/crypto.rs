@@ -42,21 +42,56 @@ fn run_generate_all() -> Result<()> {
     Ok(())
 }
 
-pub fn generate_keystore(_path: &str, _alias: &str, _password: &str) -> Result<()> {
-    // TRACKED_WORK(anti-cheat): All three parameters are accepted but silently discarded — this
-    // function is an unimplemented stub that returns Ok(()) without doing anything.
-    // Real implementation must:
-    //   1. Generate a 2048-bit RSA key pair (e.g. via `rcgen`).
-    //   2. Wrap it in a PKCS#12 envelope with the given alias and password
-    //      (e.g. via `p12-keystore` or an `openssl` subprocess).
-    //   3. Write the resulting .keystore file to `_path`.
-    // Until implemented, callers must use the `keytool` command printed by
-    // `generate_all_keystores()` / `rocket crypto generate`.
-    Err(anyhow::anyhow!(
-        "generate_keystore is not yet implemented; use `keytool -genkey ...` directly \
-         (run `rocket crypto generate` for the exact command)"
-    ))
+pub fn generate_keystore(path: &str, alias: &str, password: &str) -> Result<()> {
+    use rcgen::{KeyPair, CertificateParams, DnType};
+    use p12_keystore::{KeyStore, KeyStoreEntry, PrivateKeyChain, Certificate as P12Certificate};
+
+    // 1. Generate a 2048-bit RSA key pair using openssl and load it into rcgen KeyPair
+    let rsa = openssl::rsa::Rsa::generate(2048)
+        .map_err(|e| anyhow::anyhow!("Failed to generate RSA key pair: {}", e))?;
+    let pkey = openssl::pkey::PKey::from_rsa(rsa)
+        .map_err(|e| anyhow::anyhow!("Failed to wrap RSA key in PKey: {}", e))?;
+    let pem = pkey.private_key_to_pem_pkcs8()
+        .map_err(|e| anyhow::anyhow!("Failed to serialize private key to PKCS#8 PEM: {}", e))?;
+    let pem_str = std::str::from_utf8(&pem)
+        .map_err(|e| anyhow::anyhow!("Failed to parse PEM bytes as UTF-8 string: {}", e))?;
+
+    // 2. Import into rcgen KeyPair
+    let key_pair = KeyPair::from_pem(pem_str)
+        .map_err(|e| anyhow::anyhow!("Failed to import key pair into rcgen: {}", e))?;
+
+    // 3. Generate a self-signed certificate using rcgen
+    let mut params = CertificateParams::new(vec![alias.to_string()])
+        .map_err(|e| anyhow::anyhow!("Failed to construct certificate parameters: {}", e))?;
+    
+    params.distinguished_name.push(DnType::CommonName, alias);
+
+    let cert = params.self_signed(&key_pair)
+        .map_err(|e| anyhow::anyhow!("Failed to sign certificate: {}", e))?;
+
+    // 4. Wrap them in a PKCS#12 envelope with the given alias and password
+    let p12_cert = P12Certificate::from_der(cert.der().as_ref())
+        .map_err(|e| anyhow::anyhow!("Failed to parse certificate for PKCS#12: {}", e))?;
+
+    let private_key_der = key_pair.serialize_der();
+    let local_key_id = alias.as_bytes();
+    let private_key_chain = PrivateKeyChain::new(private_key_der, local_key_id, vec![p12_cert]);
+
+    let mut keystore = KeyStore::new();
+    keystore.add_entry(alias, KeyStoreEntry::PrivateKeyChain(private_key_chain));
+
+    let p12_bytes = keystore.writer(password).write()
+        .map_err(|e| anyhow::anyhow!("Failed to write PKCS#12 keystore: {}", e))?;
+
+    // 5. Write the resulting bytes to the target path
+    if let Some(parent) = Path::new(path).parent() {
+        fs::create_dir_all(parent)?;
+    }
+    fs::write(path, p12_bytes)?;
+
+    Ok(())
 }
+
 
 pub fn manage_placeholder(keystore_path: &str) -> Result<()> {
     let placeholder_path = format!("{}.placeholder", keystore_path);
@@ -96,3 +131,47 @@ fn run_check_status() -> Result<()> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+    use p12_keystore::KeyStore;
+
+    #[test]
+    fn test_generate_keystore_native() {
+        let dir = tempdir().unwrap();
+        let keystore_path = dir.path().join("test.keystore");
+        let path_str = keystore_path.to_str().unwrap();
+        let alias = "test-alias";
+        let password = "test-password";
+
+        // Generate the keystore
+        let gen_result = generate_keystore(path_str, alias, password);
+        assert!(gen_result.is_ok(), "Keystore generation failed: {:?}", gen_result.err());
+
+        // Verify the keystore exists
+        assert!(keystore_path.exists(), "Keystore file was not created");
+
+        // Read and parse the keystore using p12-keystore
+        let bytes = fs::read(&keystore_path).unwrap();
+        let keystore = KeyStore::from_pkcs12(&bytes, password);
+        assert!(keystore.is_ok(), "Failed to parse generated keystore: {:?}", keystore.err());
+        let keystore = keystore.unwrap();
+
+        // Check entry exists with the specified alias
+        let entry = keystore.entry(alias);
+        assert!(entry.is_some(), "Keystore does not contain the entry for alias '{}'", alias);
+
+        // Verify the key type is RSA and size is 2048-bit (256 bytes) using openssl
+        let p12 = openssl::pkcs12::Pkcs12::from_der(&bytes)
+            .expect("Failed to parse PKCS#12 from bytes");
+        let parsed = p12.parse2(password)
+            .expect("Failed to decrypt/parse PKCS#12");
+        let pkey = parsed.pkey.expect("No private key found in PKCS#12");
+        let rsa = pkey.rsa()
+            .expect("Private key is not an RSA key");
+        assert_eq!(rsa.size(), 256, "RSA key size is not 2048 bits");
+    }
+}
+

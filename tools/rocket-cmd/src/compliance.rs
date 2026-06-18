@@ -8,10 +8,12 @@ use color_eyre::eyre::Result;
 
 /// Law that runs `anti-llm-cheat-lsp` over the project's `src/` directory.
 /// Skips gracefully when the binary is not installed.
+#[allow(dead_code)]
 pub struct AntiCheatLaw {
     config_path: std::path::PathBuf,
 }
 
+#[allow(dead_code)]
 impl AntiCheatLaw {
     pub fn new(config_path: std::path::PathBuf) -> Self {
         Self { config_path }

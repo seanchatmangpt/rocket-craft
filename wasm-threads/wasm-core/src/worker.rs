@@ -59,7 +59,7 @@ impl WasmWorker<Running> {
             worker_id: self.worker_id,
             _state: PhantomData,
             #[cfg(target_arch = "wasm32")]
-            js_worker: None,
+            js_worker: self.js_worker,
         }
     }
 
@@ -101,12 +101,16 @@ impl WasmWorker<Paused> {
             worker_id: self.worker_id,
             _state: PhantomData,
             #[cfg(target_arch = "wasm32")]
-            js_worker: None,
+            js_worker: self.js_worker,
         }
     }
 
     /// Transition Paused → Terminated.
     pub fn terminate(self) -> WasmWorker<Terminated> {
+        #[cfg(target_arch = "wasm32")]
+        if let Some(ref w) = self.js_worker {
+            w.terminate();
+        }
         WasmWorker {
             script_url: self.script_url,
             worker_id: self.worker_id,
@@ -114,6 +118,12 @@ impl WasmWorker<Paused> {
             #[cfg(target_arch = "wasm32")]
             js_worker: None,
         }
+    }
+
+    /// Return a reference to the underlying JS Worker (wasm32 only).
+    #[cfg(target_arch = "wasm32")]
+    pub fn js_worker(&self) -> Option<&web_sys::Worker> {
+        self.js_worker.as_ref()
     }
 }
 

@@ -18,7 +18,7 @@ mod tests {
     use crate::gate::BlueprintAdmissionGate;
     use crate::ocel::BlueprintOcelBridge;
     use crate::receipt::BlueprintReceiptChain;
-    use blueprint_core::{Blueprint, BlueprintBuilder};
+    use blueprint_core::Blueprint;
 
     // -----------------------------------------------------------------------
     // Helpers

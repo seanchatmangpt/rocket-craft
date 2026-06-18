@@ -1,0 +1,205 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sm: <https://rocket-craft.io/ontology/state-machine/> .
+
+# State Machine Class
+sm:StateMachine a rdfs:Class ;
+    rdfs:label "StateMachine" .
+
+sm:State a rdfs:Class ;
+    rdfs:label "State" .
+
+sm:Transition a rdfs:Class ;
+    rdfs:label "Transition" .
+
+# Properties
+sm:belongsTo a rdf:Property ;
+    rdfs:domain sm:State ;
+    rdfs:range sm:StateMachine .
+
+sm:fromState a rdf:Property ;
+    rdfs:domain sm:Transition ;
+    rdfs:range sm:State .
+
+sm:toState a rdf:Property ;
+    rdfs:domain sm:Transition ;
+    rdfs:range sm:State .
+
+sm:belongsToMachine a rdf:Property ;
+    rdfs:domain sm:Transition ;
+    rdfs:range sm:StateMachine .
+
+# --- Combat Machine states ---
+sm:CombatMachine a sm:StateMachine ;
+    rdfs:label "CombatMachine" .
+
+sm:CombatIdle a sm:State ;
+    rdfs:label "Idle" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatAttacking a sm:State ;
+    rdfs:label "Attacking" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatParrying a sm:State ;
+    rdfs:label "Parrying" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatPerfectParrying a sm:State ;
+    rdfs:label "PerfectParrying" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatDodging a sm:State ;
+    rdfs:label "Dodging" ;
+    sm:belongsTo sm:CombatMachine .
+
+# --- Combat Machine Transitions ---
+sm:CombatBeginAttack a sm:Transition ;
+    rdfs:label "begin_attack" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatAttacking ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatBeginParry a sm:Transition ;
+    rdfs:label "begin_parry" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatParrying ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatBeginPerfectParry a sm:Transition ;
+    rdfs:label "begin_perfect_parry" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatPerfectParrying ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatBeginDodge a sm:Transition ;
+    rdfs:label "begin_dodge" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatDodging ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveHit a sm:Transition ;
+    rdfs:label "resolve_hit" ;
+    sm:fromState sm:CombatAttacking ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveBlocked a sm:Transition ;
+    rdfs:label "resolve_blocked" ;
+    sm:fromState sm:CombatAttacking ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveParry a sm:Transition ;
+    rdfs:label "resolve" ;
+    sm:fromState sm:CombatParrying ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolvePerfectParry a sm:Transition ;
+    rdfs:label "resolve" ;
+    sm:fromState sm:CombatPerfectParrying ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveDodge a sm:Transition ;
+    rdfs:label "resolve" ;
+    sm:fromState sm:CombatDodging ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+# --- Session Machine states ---
+sm:SessionMachine a sm:StateMachine ;
+    rdfs:label "SessionMachine" .
+
+sm:SessionConnecting a sm:State ;
+    rdfs:label "Connecting" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionAuthenticated a sm:State ;
+    rdfs:label "Authenticated" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionInLobby a sm:State ;
+    rdfs:label "InLobby" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionInMatch a sm:State ;
+    rdfs:label "InMatch" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionSpectating a sm:State ;
+    rdfs:label "Spectating" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionDisconnected a sm:State ;
+    rdfs:label "Disconnected" ;
+    sm:belongsTo sm:SessionMachine .
+
+# --- Session Machine Transitions ---
+sm:SessionAuthenticate a sm:Transition ;
+    rdfs:label "authenticate" ;
+    sm:fromState sm:SessionConnecting ;
+    sm:toState sm:SessionAuthenticated ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionReject a sm:Transition ;
+    rdfs:label "reject" ;
+    sm:fromState sm:SessionConnecting ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionEnterLobby a sm:Transition ;
+    rdfs:label "enter_lobby" ;
+    sm:fromState sm:SessionAuthenticated ;
+    sm:toState sm:SessionInLobby ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectAuth a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionAuthenticated ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionEnterMatch a sm:Transition ;
+    rdfs:label "enter_match" ;
+    sm:fromState sm:SessionInLobby ;
+    sm:toState sm:SessionInMatch ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionSpectate a sm:Transition ;
+    rdfs:label "spectate" ;
+    sm:fromState sm:SessionInLobby ;
+    sm:toState sm:SessionSpectating ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectLobby a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionInLobby ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionMatchComplete a sm:Transition ;
+    rdfs:label "match_complete" ;
+    sm:fromState sm:SessionInMatch ;
+    sm:toState sm:SessionInLobby ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectMatch a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionInMatch ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionLeaveSpectate a sm:Transition ;
+    rdfs:label "leave_spectate" ;
+    sm:fromState sm:SessionSpectating ;
+    sm:toState sm:SessionInLobby ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectSpectating a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionSpectating ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .

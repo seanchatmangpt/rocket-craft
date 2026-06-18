@@ -11,7 +11,7 @@ fn log() -> Logger {
 
 #[test]
 fn bridge_processes_state_update_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a MessageBridge and a valid StateUpdate JSON payload");
     let mut bridge = MessageBridge::new();
     let json = r#"{"StateUpdate":{"tick":5,"entity_count":3,"player_health":80,"player_health_max":100,"player_score":2000}}"#;
@@ -31,7 +31,7 @@ fn bridge_processes_state_update_json() {
 
 #[test]
 fn bridge_rejects_invalid_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a MessageBridge and a non-JSON string");
     let mut bridge = MessageBridge::new();
 
@@ -45,7 +45,7 @@ fn bridge_rejects_invalid_json() {
 
 #[test]
 fn bridge_last_tick_reflects_message_content() {
-    let mut log = log();
+    let log = log();
     log.info("Given a MessageBridge and two StateUpdate messages with different ticks");
     let mut bridge = MessageBridge::new();
     let json1 = r#"{"StateUpdate":{"tick":10,"entity_count":1,"player_health":null,"player_health_max":null,"player_score":0}}"#;
@@ -65,7 +65,7 @@ fn bridge_last_tick_reflects_message_content() {
 
 #[test]
 fn bridge_serializes_move_input_command() {
-    let mut log = log();
+    let log = log();
     log.info("Given a MessageBridge and a Move InputCommand");
     let bridge = MessageBridge::new();
     let msg = UiToGameMessage::Input(InputCommand::Move {
@@ -84,7 +84,7 @@ fn bridge_serializes_move_input_command() {
 
 #[test]
 fn bridge_serializes_pause_message() {
-    let mut log = log();
+    let log = log();
     log.info("Given a MessageBridge and a Pause message");
     let bridge = MessageBridge::new();
 
@@ -98,7 +98,7 @@ fn bridge_serializes_pause_message() {
 
 #[test]
 fn bridge_different_messages_produce_different_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Move command and a Pause message");
     let bridge = MessageBridge::new();
     let move_json = bridge
@@ -119,7 +119,7 @@ fn bridge_different_messages_produce_different_json() {
 
 #[test]
 fn bridge_entity_count_flows_through_to_hud() {
-    let mut log = log();
+    let log = log();
     log.info("Given a StateUpdate with entity_count=7");
     let mut bridge = MessageBridge::new();
     let json = r#"{"StateUpdate":{"tick":1,"entity_count":7,"player_health":100,"player_health_max":100,"player_score":0}}"#;
@@ -133,7 +133,7 @@ fn bridge_entity_count_flows_through_to_hud() {
 
 #[test]
 fn bridge_game_over_message_is_processed() {
-    let mut log = log();
+    let log = log();
     log.info("Given a GameOver JSON message");
     let mut bridge = MessageBridge::new();
     let json = r#"{"GameOver":{"winner_score":9999,"total_ticks":500}}"#;
@@ -149,7 +149,7 @@ fn bridge_game_over_message_is_processed() {
 
 #[test]
 fn bridge_health_defaults_to_zero_when_null() {
-    let mut log = log();
+    let log = log();
     log.info("Given a StateUpdate with null player_health and null player_health_max");
     let mut bridge = MessageBridge::new();
     let json = r#"{"StateUpdate":{"tick":1,"entity_count":0,"player_health":null,"player_health_max":null,"player_score":0}}"#;
@@ -165,7 +165,7 @@ fn bridge_health_defaults_to_zero_when_null() {
 proptest! {
     #[test]
     fn bridge_message_count_monotonically_increases(n in 1usize..20) {
-        let mut log = log();
+        let log = log();
         log.info("Given n valid StateUpdate messages");
         let mut bridge = MessageBridge::new();
 
@@ -225,4 +225,31 @@ fn two_entity_moved_produces_count_of_two() {
     bridge.process(&serde_json::to_string(&m1).unwrap());
     let result = bridge.process(&serde_json::to_string(&m2).unwrap());
     assert_eq!(result.unwrap().entity_count, 2);
+}
+
+#[test]
+fn test_entity_moved_and_died_preserves_hud_state() {
+    use wasm_ui::message_bridge::{GameToUiMessage, MessageBridge};
+    let mut bridge = MessageBridge::new();
+    
+    // Set baseline state
+    let state_update = r#"{"StateUpdate":{"tick":10,"entity_count":1,"player_health":85,"player_health_max":120,"player_score":450}}"#;
+    let hud1 = bridge.process(state_update).unwrap();
+    assert_eq!(hud1.player_health, 85);
+    assert_eq!(hud1.player_health_max, 120);
+    assert_eq!(hud1.score, 450);
+
+    // Process EntityMoved
+    let moved = GameToUiMessage::EntityMoved { entity_id: 1, x: 10.0, y: 20.0 };
+    let hud2 = bridge.process(&serde_json::to_string(&moved).unwrap()).unwrap();
+    assert_eq!(hud2.player_health, 85);
+    assert_eq!(hud2.player_health_max, 120);
+    assert_eq!(hud2.score, 450);
+
+    // Process EntityDied
+    let died = GameToUiMessage::EntityDied { entity_id: 1 };
+    let hud3 = bridge.process(&serde_json::to_string(&died).unwrap()).unwrap();
+    assert_eq!(hud3.player_health, 85);
+    assert_eq!(hud3.player_health_max, 120);
+    assert_eq!(hud3.score, 450);
 }

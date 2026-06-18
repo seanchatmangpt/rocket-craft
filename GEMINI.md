@@ -35,7 +35,7 @@ Prompt
 → browser console logs are captured
 → cryptographic receipt is produced
 
-*If visual motion delta is below threshold, mark DEFECT and route repair by failure taxonomy. verified requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.*
+*If visual motion delta is below threshold, mark DEFECT and route repair by failure taxonomy. Victory requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.*
 
 ## The Acceptance Matrix
 
@@ -68,3 +68,8 @@ Every failure must route to a cell:
 
 **Stop proving that code exists.**
 **Prove that the world drives.**
+
+## The Law of Combinatorial Maximalism
+- **Reject MVP:** Minimum Viable Product (MVP) thinking is structurally forbidden. An MVP accepts technical debt, hidden state, and unbounded edge cases under the guise of "iteration."
+- **Architect for Infinity Day One:** Because artifacts ($A$) are deterministically projected from the ontology ($O^*$) via `ggen` ($\mu$), projecting 1 game costs the exact same computational and structural effort as projecting 1,000,000 games.
+- **Exhaustive Closure:** Do not build "a feature." Build the ontological boundaries that allow the Combinatorial Engine to exhaustively generate, test, admit, refuse, and receipt *every materially possible combination* within that bounded state space.

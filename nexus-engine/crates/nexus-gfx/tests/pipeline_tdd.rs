@@ -1,8 +1,8 @@
-/// TDD tests for the `nexus-gfx` render pipeline using `chicago-tdd-tools`.
-///
-/// All tests operate on the descriptor / configuration layer only — no GPU
-/// device is required.  The `gpu` feature is intentionally NOT enabled here
-/// so that CI can run these tests without physical or virtual GPU hardware.
+//! TDD tests for the `nexus-gfx` render pipeline using `chicago-tdd-tools`.
+//!
+//! All tests operate on the descriptor / configuration layer only — no GPU
+//! device is required.  The `gpu` feature is intentionally NOT enabled here
+//! so that CI can run these tests without physical or virtual GPU hardware.
 
 use chicago_tdd_tools::TestEnvironment;
 use nexus_gfx::pipeline::{

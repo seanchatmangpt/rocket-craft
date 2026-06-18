@@ -1,0 +1,300 @@
+# Research Dossier: `unjucks`
+
+**Total Files:** 175 Ontologies (.ttl) | 0 Queries (.rq)
+**Total Volume:** 175 files
+
+## 1. Core Vocabularies (Prefixes)
+- `access: <http://unjucks.dev/access/>`
+- `api: <http://api.example.org/>`
+- `api: <http://example.org/api#>`
+- `api: <http://example.org/api/>`
+- `api: <http://unjucks.dev/api/>`
+- `attest: <https://kgen.io/attest#>`
+- `audit: <http://enterprise.example.com/audit#>`
+- `audit: <http://unjucks.dev/audit/>`
+- `basel: <http://www.bis.org/basel3/ontology/>`
+- `bibo: <http://purl.org/ontology/bibo/>`
+- `blockchain: <http://blockchain.org/voc/>`
+- `blog: <https://unjucks.dev/ontology/blog#>`
+- `cbv: <http://gs1.org/cbv/>`
+- `cicd: <https://unjucks.dev/ontology/cicd#>`
+- `cli: <https://kgen.io/cli#>`
+- `code: <https://unjucks.dev/ontology/code#>`
+- `compliance: <http://example.org/compliance#>`
+- `compliance: <http://standards.org/compliance/>`
+- `compliance: <http://unjucks.dev/compliance/>`
+- `consent: <http://unjucks.dev/consent/>`
+- `crypto: <http://kgen.ai/ontology/crypto/>`
+- `css: <http://www.w3.org/Style/CSS/>`
+- `dash: <http://datashapes.org/dash#>`
+- `data: <http://unjucks.dev/data/>`
+- `dc: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/terms/>`
+- `dcat: <http://www.w3.org/ns/dcat#>`
+- `dct: <http://purl.org/dc/terms/>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `declaration
+@prefix : <ht://invalid-scheme>`
+- `design: <http://design-system.example.org/>`
+- `doap: <http://usefulinc.com/ns/doap#>`
+- `documentation: <http://unjucks.dev/documentation/>`
+- `ecom: <https://unjucks.dev/ontology/ecommerce#>`
+- `enterprise: <http://example.org/enterprise#>`
+- `enterprise: <http://unjucks.dev/enterprise/>`
+- `enterprise: <https://enterprise.example.org/ontology#>`
+- `epcis: <http://gs1.org/epcis/>`
+- `error: <http://error.example.org/>`
+- `evil: <javascript:alert('XSS')>`
+- `ex: <http://example . org/>`
+- `ex: <http://example.org/>`
+- `ex: <http://example.org/ontology#>`
+- `ex: <http://example.org/ontology/>`
+- `ex: <http://example.org/people/>`
+- `ex: <http://example.org/schema/>`
+- `ex: <http://example.org/shapes#>`
+- `ex: <https://example.org/>`
+- `example: <http://example.org/>`
+- `fhir: <http://hl7.org/fhir/>`
+- *...and 80 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:AccessControlShape`
+- `:Address`
+- `:AgentShape`
+- `:ArchitectureShape`
+- `:ArtifactShape`
+- `:AttestationShape`
+- `:Author`
+- `:Book`
+- `:CTQMetricShape`
+- `:CardinalityTestShape`
+- `:ChangeManagementShape`
+- `:CharterShape`
+- `:ClassTestShape`
+- `:CodeQualityMetrics`
+- `:ComplianceAuditShape`
+- `:ComponentShape`
+- `:ContactInfo`
+- `:DataModelShape`
+- `:DataQualityShape`
+- `:DeleteEndpointRule`
+- `:DependencySecurityShape`
+- `:EndpointShape`
+- `:Entity000`
+- `:Entity001`
+- `:Entity002`
+- `:Entity003`
+- `:Entity004`
+- `:Entity005`
+- `:Entity006`
+- `:Entity007`
+- `:Entity008`
+- `:Entity009`
+- `:Entity010`
+- `:Entity011`
+- `:Entity012`
+- `:Entity013`
+- `:Entity014`
+- `:Entity015`
+- `:Entity016`
+- `:Entity017`
+- `:Entity018`
+- `:Entity019`
+- `:ExtendedPerson`
+- `:FieldShape`
+- `:FrontmatterConstraintsShape`
+- `:FrontmatterShape`
+- `:GeneratedArtifactShape`
+- `:GenerationActivityShape`
+- `:GraphStructureShape`
+- `:IntegrityMeasurementShape`
+- *...and 443 more.*
+
+## 3. Extraction Layer (SPARQL)
+- *No queries executed in this project.*
+
+### Projected Variables (SELECT ?var)
+- *No specific projection variables identified.*
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/unjucks/_templates/enterprise/data/schemas/api-standards.ttl` (1497 bytes)
+- `/Users/sac/unjucks/_templates/enterprise/data/schemas/compliance-requirements.ttl` (1779 bytes)
+- `/Users/sac/unjucks/_templates/nuxt-openapi/config/openapi-schema.ttl` (13366 bytes)
+- `/Users/sac/unjucks/advanced-demo/semantic-person-enriched.ttl` (3765 bytes)
+- `/Users/sac/unjucks/demo/sample-graph.ttl` (479 bytes)
+- `/Users/sac/unjucks/docs/book/examples/09-rdf-turtle-integration.ttl` (20032 bytes)
+- `/Users/sac/unjucks/examples/01-basic-generation/data/api-schema.ttl` (3616 bytes)
+- `/Users/sac/unjucks/examples/02-validation/data/invalid-data.ttl` (3587 bytes)
+- `/Users/sac/unjucks/examples/02-validation/data/valid-data.ttl` (3217 bytes)
+- `/Users/sac/unjucks/examples/02-validation/data/validation-rules.ttl` (6974 bytes)
+- `/Users/sac/unjucks/examples/03-enterprise/data/enterprise-ontology.ttl` (27347 bytes)
+- `/Users/sac/unjucks/examples/generated-hr-types/reverse.ttl` (1338 bytes)
+- `/Users/sac/unjucks/examples/generated/reverse-generated.ttl` (2468 bytes)
+- `/Users/sac/unjucks/examples/ontologies/library-schema.ttl` (3855 bytes)
+- `/Users/sac/unjucks/examples/output-semantic-web-demo.ttl` (7813 bytes)
+- `/Users/sac/unjucks/examples/sample-ontology.ttl` (4124 bytes)
+- `/Users/sac/unjucks/examples/workshop/knowledge/sample.ttl` (6399 bytes)
+- `/Users/sac/unjucks/examples/workshop/knowledge/shapes.ttl` (8412 bytes)
+- `/Users/sac/unjucks/features/fixtures/ontologies/component-library.shacl.ttl` (13565 bytes)
+- `/Users/sac/unjucks/features/fixtures/ontologies/user-validation.shacl.ttl` (10085 bytes)
+- `/Users/sac/unjucks/features/fixtures/rdf/academic-paper.ttl` (5007 bytes)
+- `/Users/sac/unjucks/features/fixtures/rdf/api-specification.ttl` (9399 bytes)
+- `/Users/sac/unjucks/features/fixtures/rdf/component-library.ttl` (14291 bytes)
+- `/Users/sac/unjucks/features/fixtures/rdf/error-cases.ttl` (8836 bytes)
+- `/Users/sac/unjucks/features/fixtures/sample-rdf-data.ttl` (7950 bytes)
+- `/Users/sac/unjucks/invalid-graph.ttl` (120 bytes)
+- `/Users/sac/unjucks/invalid-uri-graph.ttl` (168 bytes)
+- `/Users/sac/unjucks/job.ttl` (778 bytes)
+- `/Users/sac/unjucks/ontologies/attest.ttl` (16663 bytes)
+- `/Users/sac/unjucks/ontologies/cli.ttl` (14495 bytes)
+- `/Users/sac/unjucks/ontologies/core.ttl` (21015 bytes)
+- `/Users/sac/unjucks/ontologies/explore/architect-view.ttl` (6893 bytes)
+- `/Users/sac/unjucks/ontologies/explore/developer-view.ttl` (8399 bytes)
+- `/Users/sac/unjucks/ontologies/explore/executive-view.ttl` (5457 bytes)
+- `/Users/sac/unjucks/ontologies/marketplace.ttl` (13916 bytes)
+- `/Users/sac/unjucks/ontologies/marketplace/core.ttl` (30460 bytes)
+- `/Users/sac/unjucks/ontologies/shacl/artifact-shapes.ttl` (9717 bytes)
+- `/Users/sac/unjucks/ontologies/shacl/cli-shapes.ttl` (10929 bytes)
+- `/Users/sac/unjucks/packages/kgen-cli/test-graph.ttl` (197 bytes)
+- `/Users/sac/unjucks/packages/kgen-cli/test/sample-graph.ttl` (1193 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/src/validation/schemas/compliance-shapes.ttl` (14503 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/test-data/sample.ttl` (2124 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/test-data/simple.ttl` (395 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/test/artifact/test-data/sample.ttl` (891 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/tests/fixtures/graphs/complex-hierarchy.ttl` (1636 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/tests/fixtures/graphs/simple-person.ttl` (672 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/tests/fixtures/sample-graph.ttl` (1623 bytes)
+- `/Users/sac/unjucks/packages/kgen-core/tests/rdf/test-data.ttl` (975 bytes)
+- `/Users/sac/unjucks/person.ttl` (929 bytes)
+- `/Users/sac/unjucks/sample.ttl` (555 bytes)
+- `/Users/sac/unjucks/schema/user.ttl` (1029 bytes)
+- `/Users/sac/unjucks/src/kgen/validation/shapes/governance-compliance-shapes.ttl` (18164 bytes)
+- `/Users/sac/unjucks/src/kgen/validation/shapes/kgen-attest-shapes.ttl` (17498 bytes)
+- `/Users/sac/unjucks/src/kgen/validation/shapes/template-constraints.ttl` (15479 bytes)
+- `/Users/sac/unjucks/src/semantic/ontologies/enterprise-template-ontology.ttl` (16043 bytes)
+- `/Users/sac/unjucks/src/semantic/schemas/api-governance.ttl` (10092 bytes)
+- `/Users/sac/unjucks/src/semantic/schemas/gdpr-compliance.ttl` (7648 bytes)
+- `/Users/sac/unjucks/src/semantic/schemas/sox-compliance.ttl` (4471 bytes)
+- `/Users/sac/unjucks/templates/_templates/fortune5/registry.ttl` (6839 bytes)
+- `/Users/sac/unjucks/test-data/complex-rdf-dataset.ttl` (11585 bytes)
+- `/Users/sac/unjucks/test-data/invalid.ttl` (82 bytes)
+- `/Users/sac/unjucks/test-data/modified-rdf-dataset.ttl` (12455 bytes)
+- `/Users/sac/unjucks/test-data/no-name.ttl` (139 bytes)
+- `/Users/sac/unjucks/test-data/rdf/baseline.ttl` (653 bytes)
+- `/Users/sac/unjucks/test-data/rdf/modified.ttl` (1010 bytes)
+- `/Users/sac/unjucks/test-data/rdf/semantically-equivalent.ttl` (809 bytes)
+- `/Users/sac/unjucks/test-data/sample.ttl` (168 bytes)
+- `/Users/sac/unjucks/test-data/simple-graph.ttl` (655 bytes)
+- `/Users/sac/unjucks/test-generation/sample-api.ttl` (4026 bytes)
+- `/Users/sac/unjucks/test-generation/sample.ttl` (483 bytes)
+- `/Users/sac/unjucks/test-graph-2.ttl` (471 bytes)
+- `/Users/sac/unjucks/test-graph-copy.ttl` (1934 bytes)
+- `/Users/sac/unjucks/test-graph-formatted.ttl` (2221 bytes)
+- `/Users/sac/unjucks/test-graph-reordered.ttl` (2042 bytes)
+- `/Users/sac/unjucks/test-graph.ttl` (259 bytes)
+- `/Users/sac/unjucks/tests/agent6-test-dataset.ttl` (3582 bytes)
+- `/Users/sac/unjucks/tests/blank-nodes-graph.ttl` (1010 bytes)
+- `/Users/sac/unjucks/tests/blank-nodes-reordered.ttl` (994 bytes)
+- `/Users/sac/unjucks/tests/features/fixtures/rdf/foaf-data.ttl` (2153 bytes)
+- `/Users/sac/unjucks/tests/features/fixtures/rdf/invalid-syntax.ttl` (656 bytes)
+- `/Users/sac/unjucks/tests/features/fixtures/rdf/namespaces.ttl` (1343 bytes)
+- `/Users/sac/unjucks/tests/features/fixtures/rdf/sample-ontology.ttl` (3941 bytes)
+- `/Users/sac/unjucks/tests/fixtures/api-data.ttl` (4883 bytes)
+- `/Users/sac/unjucks/tests/fixtures/cli/services.ttl` (491 bytes)
+- `/Users/sac/unjucks/tests/fixtures/data/invalid-data.ttl` (230 bytes)
+- `/Users/sac/unjucks/tests/fixtures/data/valid-data.ttl` (218 bytes)
+- `/Users/sac/unjucks/tests/fixtures/fortune5/cvs-health/patient-records.ttl` (6551 bytes)
+- `/Users/sac/unjucks/tests/fixtures/fortune5/jpmorgan/financial-instruments.ttl` (7631 bytes)
+- `/Users/sac/unjucks/tests/fixtures/fortune5/walmart/product-catalog.ttl` (9023 bytes)
+- `/Users/sac/unjucks/tests/fixtures/fortune5/walmart/supply-chain-events.ttl` (11311 bytes)
+- `/Users/sac/unjucks/tests/fixtures/knowledge-graphs/schemas/kg-validation.shacl.ttl` (5560 bytes)
+- `/Users/sac/unjucks/tests/fixtures/ontologies/circular.ttl` (1645 bytes)
+- `/Users/sac/unjucks/tests/fixtures/ontologies/complex.ttl` (1969 bytes)
+- `/Users/sac/unjucks/tests/fixtures/ontologies/i18n.ttl` (1606 bytes)
+- `/Users/sac/unjucks/tests/fixtures/ontologies/incomplete.ttl` (744 bytes)
+- `/Users/sac/unjucks/tests/fixtures/ontologies/shapes.ttl` (2393 bytes)
+- `/Users/sac/unjucks/tests/fixtures/ontologies/simple.ttl` (4125 bytes)
+- `/Users/sac/unjucks/tests/fixtures/ontologies/with-imports.ttl` (2104 bytes)
+- `/Users/sac/unjucks/tests/fixtures/performance/large-api-ontology.ttl` (467907 bytes)
+- `/Users/sac/unjucks/tests/fixtures/performance/massive-enterprise-graph.ttl` (2700161 bytes)
+- `/Users/sac/unjucks/tests/fixtures/rdf/validation/complex-schema.ttl` (2809 bytes)
+- `/Users/sac/unjucks/tests/fixtures/sample-ontology.ttl` (1243 bytes)
+- `/Users/sac/unjucks/tests/fixtures/semantic/financial/fibo-instruments.ttl` (5439 bytes)
+- `/Users/sac/unjucks/tests/fixtures/semantic/healthcare/fhir-patient-data.ttl` (4293 bytes)
+- `/Users/sac/unjucks/tests/fixtures/semantic/supply-chain/gs1-product-catalog.ttl` (7436 bytes)
+- `/Users/sac/unjucks/tests/fixtures/shacl/critical-validation-shapes.ttl` (7336 bytes)
+- `/Users/sac/unjucks/tests/fixtures/shacl/invalid-test-data.ttl` (7403 bytes)
+- `/Users/sac/unjucks/tests/fixtures/shacl/rule-packs/data-quality-rules.ttl` (4038 bytes)
+- `/Users/sac/unjucks/tests/fixtures/shacl/rule-packs/security-rules.ttl` (3149 bytes)
+- `/Users/sac/unjucks/tests/fixtures/shacl/valid-test-data.ttl` (6282 bytes)
+- `/Users/sac/unjucks/tests/fixtures/shapes/sample-shapes.ttl` (736 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/api-ontology.ttl` (235 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/basic-person.ttl` (599 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/complex-project.ttl` (1728 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/complex-schema.ttl` (1961 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/compliance-ontology.ttl` (290 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/edge-cases.ttl` (1090 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/enterprise-schema.ttl` (18318 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/fortune5-compliance.ttl` (487 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/invalid-syntax.ttl` (193 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/large-dataset.ttl` (6437 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/malicious.ttl` (1921 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/ontology.ttl` (3954 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/performance/complex-schema.ttl` (19077 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/performance/large-10000.ttl` (378255 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/performance/medium-1000.ttl` (36255 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/performance/small-100.ttl` (3630 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/sample-ontology.ttl` (1538 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/sample.ttl` (2671 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/security-ontology.ttl` (346 bytes)
+- `/Users/sac/unjucks/tests/fixtures/turtle/shacl-validation.ttl` (2764 bytes)
+- `/Users/sac/unjucks/tests/invalid-test-data.ttl` (1943 bytes)
+- `/Users/sac/unjucks/tests/malformed-turtle-test.ttl` (458 bytes)
+- `/Users/sac/unjucks/tests/modified-test-graph.ttl` (2159 bytes)
+- `/Users/sac/unjucks/tests/performance/data/test-huge.ttl` (6100208 bytes)
+- `/Users/sac/unjucks/tests/performance/data/test-large.ttl` (596208 bytes)
+- `/Users/sac/unjucks/tests/performance/data/test-medium.ttl` (50051 bytes)
+- `/Users/sac/unjucks/tests/performance/data/test-small.ttl` (5011 bytes)
+- `/Users/sac/unjucks/tests/performance/data/test-tiny.ttl` (669 bytes)
+- `/Users/sac/unjucks/tests/performance/templates/test-graph.ttl` (404 bytes)
+- `/Users/sac/unjucks/tests/reproducibility/reports/perf-test/perf-test.ttl` (8314 bytes)
+- `/Users/sac/unjucks/tests/reproducibility/reports/test-graph.ttl` (71 bytes)
+- `/Users/sac/unjucks/tests/sample-data.ttl` (767 bytes)
+- `/Users/sac/unjucks/tests/sample-data/test.ttl` (623 bytes)
+- `/Users/sac/unjucks/tests/sample-ontology.ttl` (1463 bytes)
+- `/Users/sac/unjucks/tests/sample-shapes.ttl` (1416 bytes)
+- `/Users/sac/unjucks/tests/sample.ttl` (604 bytes)
+- `/Users/sac/unjucks/tests/security/fixtures/malicious-patterns.ttl` (1334 bytes)
+- `/Users/sac/unjucks/tests/semantic-web-clean-room/examples/complete-enterprise-ontology.ttl` (13098 bytes)
+- `/Users/sac/unjucks/tests/semantic-web-clean-room/examples/schema-org-structured-data.ttl` (15203 bytes)
+- `/Users/sac/unjucks/tests/shacl-validation/comprehensive-shapes.ttl` (14348 bytes)
+- `/Users/sac/unjucks/tests/shacl-validation/edge-case-data.ttl` (11733 bytes)
+- `/Users/sac/unjucks/tests/shacl-validation/invalid-test-data.ttl` (13124 bytes)
+- `/Users/sac/unjucks/tests/shacl-validation/valid-test-data.ttl` (8335 bytes)
+- `/Users/sac/unjucks/tests/test-data.ttl` (1391 bytes)
+- `/Users/sac/unjucks/tests/test-data/blank-node-test1.ttl` (178 bytes)
+- `/Users/sac/unjucks/tests/test-data/blank-node-test2.ttl` (199 bytes)
+- `/Users/sac/unjucks/tests/test-data/graph1.ttl` (675 bytes)
+- `/Users/sac/unjucks/tests/test-data/graph2.ttl` (808 bytes)
+- `/Users/sac/unjucks/tests/test-data/graph3.ttl` (770 bytes)
+- `/Users/sac/unjucks/tests/test-data/invalid.ttl` (397 bytes)
+- `/Users/sac/unjucks/tests/test-data/sample-api.ttl` (4026 bytes)
+- `/Users/sac/unjucks/tests/test-data/shacl/invalid-artifact.ttl` (797 bytes)
+- `/Users/sac/unjucks/tests/test-data/shacl/sample-artifact.ttl` (2212 bytes)
+- `/Users/sac/unjucks/tests/test-shacl-shapes.ttl` (7172 bytes)
+- `/Users/sac/unjucks/tests/valid-data.ttl` (470 bytes)
+- `/Users/sac/unjucks/tests/valid-test-data.ttl` (2448 bytes)
+- `/Users/sac/unjucks/tests/validation-test-data/invalid-graph.ttl` (436 bytes)
+- `/Users/sac/unjucks/tests/validation-test-data/valid-graph.ttl` (481 bytes)
+- `/Users/sac/unjucks/tests/validation/simple-person-shapes.ttl` (363 bytes)
+- `/Users/sac/unjucks/tests/validation/test-person-invalid.ttl` (202 bytes)
+- `/Users/sac/unjucks/tests/validation/test-person.ttl` (307 bytes)
+- `/Users/sac/unjucks/workshop/rdf/kgen-shapes.ttl` (10757 bytes)
+- `/Users/sac/unjucks/workshop/rdf/workshop.ttl` (9482 bytes)
+- `/Users/sac/unjucks/workshop/validation/validation-report.ttl` (212 bytes)
+
+</details>

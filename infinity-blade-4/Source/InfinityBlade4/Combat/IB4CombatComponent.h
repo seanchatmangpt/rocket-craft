@@ -44,6 +44,9 @@ class INFINITYBLADE4_API UIB4CombatComponent : public UActorComponent
 public:
     UIB4CombatComponent();
 
+    UFUNCTION(BlueprintCallable, Category = "Combat|Magic")
+    float GetMagicCost() const;
+
 protected:
     virtual void BeginPlay() override;
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -276,4 +279,7 @@ public:
     FORCEINLINE ECombatState GetCurrentState() const { return CurrentState; }
     FORCEINLINE int32 GetComboCount() const { return ComboCount; }
     FORCEINLINE bool IsInvincible() const { return bInvincible; }
+
+    /** Returns the magic cost of casting spells. */
+    float GetMagicCost() const { return MagicCost; }
 };

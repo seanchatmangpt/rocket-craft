@@ -1,6 +1,6 @@
+use crate::error::PipelineError;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
-use crate::error::PipelineError;
 
 /// Top-level configuration document.
 ///
@@ -54,23 +54,21 @@ fn default_log_level() -> String {
 impl PipelineConfig {
     /// Read and parse a TOML config file from `path`.
     pub fn from_file(path: &Path) -> Result<Self, PipelineError> {
-        let content = std::fs::read_to_string(path).map_err(|e| {
-            PipelineError::Config(format!("cannot read {}: {e}", path.display()))
-        })?;
+        let content = std::fs::read_to_string(path)
+            .map_err(|e| PipelineError::Config(format!("cannot read {}: {e}", path.display())))?;
         toml::from_str(&content).map_err(|e| PipelineError::Config(e.to_string()))
     }
 
     /// Serialize the current config back to a TOML string.
     pub fn to_toml_string(&self) -> Result<String, PipelineError> {
-        toml::to_string_pretty(self)
-            .map_err(|e| PipelineError::Config(e.to_string()))
+        toml::to_string_pretty(self).map_err(|e| PipelineError::Config(e.to_string()))
     }
 
     /// A ready-to-paste example configuration file with inline comments.
     pub fn example_toml() -> &'static str {
         r#"[pipeline]
-watch_dir  = "/path/to/incoming/models"
-output_dir = "/path/to/ue4/Content/Assets"
+watch_dir  = "incoming"
+output_dir = "Content/Assets"
 blender_bin = "blender"
 max_file_mb = 500
 log_level   = "info"
@@ -141,24 +139,21 @@ output_dir = "/tmp/out"
 
     #[test]
     fn validate_rejects_zero_max_mb() {
-        let mut cfg: PipelineConfig =
-            toml::from_str(PipelineConfig::example_toml()).unwrap();
+        let mut cfg: PipelineConfig = toml::from_str(PipelineConfig::example_toml()).unwrap();
         cfg.pipeline.max_file_mb = 0;
         assert!(cfg.validate().is_err());
     }
 
     #[test]
     fn validate_rejects_empty_blender_bin() {
-        let mut cfg: PipelineConfig =
-            toml::from_str(PipelineConfig::example_toml()).unwrap();
+        let mut cfg: PipelineConfig = toml::from_str(PipelineConfig::example_toml()).unwrap();
         cfg.pipeline.blender_bin = "   ".to_string();
         assert!(cfg.validate().is_err());
     }
 
     #[test]
     fn round_trip_toml() {
-        let cfg: PipelineConfig =
-            toml::from_str(PipelineConfig::example_toml()).unwrap();
+        let cfg: PipelineConfig = toml::from_str(PipelineConfig::example_toml()).unwrap();
         let serialised = cfg.to_toml_string().unwrap();
         let cfg2: PipelineConfig = toml::from_str(&serialised).unwrap();
         assert_eq!(cfg.pipeline.max_file_mb, cfg2.pipeline.max_file_mb);

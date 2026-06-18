@@ -1,0 +1,19 @@
+{
+  "operation_id": "705b2f90-7853-4314-8825-cf513cc3223b",
+  "timestamp": "2026-06-18T07:46:56.977396Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.9",
+    "ggen.toml:538500dd02efedb005ecdd6cdccb19aac8c26c6c59554e6ca29ea4fe660f60f9",
+    ".specify/schema/combined.ttl:9ca9990291462bbc0f1bda5dac318b50f4c7f475ef73b653ae1b748496c25730",
+    "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a",
+    "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a",
+    "templates/gundam_nexus.rs.tera:256245465e0f13f01abe607290e222bd8009ef220cec262bcf176e787566be78"
+  ],
+  "output_hashes": [
+    "./crates/nexus-combat/src/generated_machine.rs:4812468bd80704e41a6f92b9827965832ce60414710dc91b955dea8a4fdf6a36",
+    "./crates/nexus-session/src/generated_session.rs:a7da1b32b662f7ae7750a6c08b0f21c3bb0300b996fd388781ed69bb58d2618a",
+    "./crates/nexus-gundam/src/generated_gundam.rs:5782486bde8b16313b20e6a79dcefe9b93bb3a4ee41dfe8184c6c390c93c7d65"
+  ],
+  "signature": "f4b9183839e064b4c128fc5bf5776d43a009ccf85ab74a22b581bc2a9180896d43fae3eb8dcce97dc9cabbdc40feb37ace9f1b4dcb0d7a14a08b064c1a77c205",
+  "previous_receipt_hash": "7d73a23c325388469ac5a65ca7c99490b804c8c437c3497d5a223a5d225fefd4"
+}

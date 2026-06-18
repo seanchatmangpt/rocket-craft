@@ -50,6 +50,16 @@
 </head>
 <body>
   <canvas id="canvas"></canvas>
+  <div id="dflss-hud" style="position: absolute; top: 15px; right: 15px; background: rgba(10, 10, 15, 0.85); padding: 15px; border: 2px solid #f39c12; border-radius: 6px; font-family: 'Courier New', Courier, monospace; font-size: 13px; color: #eee; z-index: 100; pointer-events: none; min-width: 250px;">
+    <div style="font-weight: bold; color: #f39c12; border-bottom: 1px solid #f39c12; padding-bottom: 5px; margin-bottom: 8px; text-transform: uppercase;">TPS/DfLSS Factory HUD</div>
+    <div id="hud-status" style="font-weight: bold; color: #00ff66; margin-bottom: 10px;">Pipeline Status: ACTIVE_RUNNING</div>
+    <div id="hud-zone-1" style="margin: 4px 0; color: #aaa;">[ ] Zone 1: Primitive Foundry</div>
+    <div id="hud-zone-2" style="margin: 4px 0; color: #aaa;">[ ] Zone 2: Part Runner Wall</div>
+    <div id="hud-zone-3" style="margin: 4px 0; color: #aaa;">[ ] Zone 3: Assembly Gantry</div>
+    <div id="hud-zone-4" style="margin: 4px 0; color: #aaa;">[ ] Zone 4: Fit + Collision Bay</div>
+    <div id="hud-zone-5" style="margin: 4px 0; color: #aaa;">[ ] Zone 5: Physics Proving Ground</div>
+    <div id="hud-zone-6" style="margin: 4px 0; color: #aaa;">[ ] Zone 6: Final Reveal Platform</div>
+  </div>
   <div id="info">
     <h3>Genie 26 World visualizer</h3>
     <p>Move: <span class="key-btn">W</span> <span class="key-btn">A</span> <span class="key-btn">S</span> <span class="key-btn">D</span></p>

@@ -102,14 +102,7 @@ pub enum CombatOutcome {
     PlayerDied { player_id: u64 },
 }
 
-/// Directional component of an attack or parry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum AttackDir {
-    Overhead,
-    Left,
-    Right,
-}
+pub use nexus_types::AttackDir;
 
 /// Why a match concluded.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

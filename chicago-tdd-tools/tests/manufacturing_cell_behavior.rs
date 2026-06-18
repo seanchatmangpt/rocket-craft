@@ -1,7 +1,6 @@
 use genie_core::spec::{WorldSpec, HistoryEvent, Place, Bounds3D, Vector3};
 use genie_core::receipt_chain::ReceiptChainManager;
 use genie_core::layout::LayoutCompiler;
-use std::collections::HashMap;
 
 #[test]
 fn should_verify_427_es3_t3d_semantic_correctness() {
@@ -49,6 +48,8 @@ fn should_capture_427_es3_metadata_in_receipt_chain() {
     // 3. Assert
     assert_eq!(spec.receipts.len(), 1);
     let receipt = &spec.receipts[0];
+    assert_eq!(receipt.key, "history_receipt_evolve_1");
+    assert!(!receipt.hash.is_empty());
     
     // Verify the receipt actually binds the metadata
     // We do this by checking if the chain verifies only with the correct data

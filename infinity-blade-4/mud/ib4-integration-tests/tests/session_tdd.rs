@@ -192,14 +192,14 @@ fn parry_resolver_directional_correct_direction_is_perfect() {
 }
 
 #[test]
-fn parry_resolver_directional_wrong_direction_is_normal() {
+fn parry_resolver_directional_wrong_direction_is_miss() {
     let _env = TestEnvironment::new().expect("test env");
 
     let outcome = ParryResolver::resolve(
         AttackDir::Left,
         ParryIntent::DirectionalParry(AttackDir::Right),
     );
-    assert_eq!(outcome, ParryOutcome::NormalParry, "Non-matching direction should be NormalParry");
+    assert_eq!(outcome, ParryOutcome::Miss, "Non-matching direction should be Miss");
 }
 
 #[test]
@@ -222,6 +222,20 @@ fn session_parry_command_prevents_damage() {
     s.announced_attack = Some(AttackDir::Left);
     s.dispatch(Command::Parry); // AnyParry → NormalParry → no damage
     assert_eq!(s.player.health, hp_before, "Normal parry should prevent all damage");
+}
+
+#[test]
+fn session_wrong_directional_parry_takes_damage() {
+    let _env = TestEnvironment::new().expect("test env");
+
+    let mut s = new_session();
+    s.dispatch(Command::Attack(AttackDir::Overhead)); // spawn enemy
+    assert!(s.current_enemy.is_some());
+
+    let hp_before = s.player.health;
+    s.announced_attack = Some(AttackDir::Left);
+    s.dispatch(Command::PerfectParry(AttackDir::Right)); // wrong direction -> Miss -> takes damage
+    assert!(s.player.health < hp_before, "Wrong direction parry should cause player to take damage");
 }
 
 #[test]

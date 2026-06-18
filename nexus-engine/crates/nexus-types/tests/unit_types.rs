@@ -31,7 +31,7 @@ proptest! {
     #[test]
     fn gold_never_negative(v in 0u32..=u32::MAX) {
         let g = Gold::new(v);
-        prop_assert!(g.value() <= u32::MAX);
+        prop_assert_eq!(g.value(), v);
     }
 
     /// Gold saturating addition never wraps to a smaller value.

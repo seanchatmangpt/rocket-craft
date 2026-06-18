@@ -1,17 +1,7 @@
-use nexus_types::{Gold, Hp, Xp};
+pub use nexus_types::{Gold, Hp, Xp, AttackDir, ParryOutcome};
 use serde::{Serialize, Deserialize};
 use rand::{SeedableRng, RngExt};
 use rand::rngs::SmallRng;
-
-// ──────────────────────────────────────────────────────────────────────────────
-// Core types (self-contained — no cross-crate deps so compilation is ensured)
-// ──────────────────────────────────────────────────────────────────────────────
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum AttackDir { Overhead, Left, Right }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum ParryOutcome { Miss, Normal, Perfect }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum StatType { Attack, Defense, Magic, Health }

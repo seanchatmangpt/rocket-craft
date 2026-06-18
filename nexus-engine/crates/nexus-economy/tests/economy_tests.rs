@@ -158,7 +158,7 @@ fn auction_outbid_refunds_previous_bidder() {
     assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 9_900);
 
     // Player 2 outbids — player 1 should be refunded automatically.
-    let min_bid = 100 + (100 / 20).max(1); // 105
+    let min_bid = 100 + (100 / 20); // 105
     auction.place_bid(2, min_bid, &mut ledger).unwrap();
     assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 10_000); // refunded
 

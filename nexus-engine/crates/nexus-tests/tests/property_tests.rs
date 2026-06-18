@@ -10,8 +10,13 @@ proptest! {
         armor in armor_strategy(),
         combo in combo_depth_strategy(),
     ) {
+                let combo_mult = match combo { 0 | 1 => 1.0, 2 => 1.5, 3 => 2.0, _ => 3.0 };
+        let real_dmg = nexus_combat::calculate_damage(base, combo_mult, 0.0, 1.0, false, armor);
+        prop_assert!(real_dmg >= 1.0, "real damage must always be >= 1.0, got {}", real_dmg);
+
         let dmg = oracle_damage(base, combo, 0.0, armor, false);
         prop_assert!(dmg >= 1.0, "damage must always be >= 1.0, got {}", dmg);
+        prop_assert_eq!(real_dmg, dmg);
     }
 
     // Perfect parry counter always does more than normal attack
@@ -21,14 +26,38 @@ proptest! {
         armor in 0.0f32..50.0,
         combo in 0u32..5,
     ) {
+                let combo_mult = match combo { 0 | 1 => 1.0, 2 => 1.5, 3 => 2.0, _ => 3.0 };
+        let real_normal = nexus_combat::calculate_damage(base, combo_mult, 0.0, 1.0, false, armor);
+        let real_counter = nexus_combat::calculate_damage(base, combo_mult, 0.0, 1.0, true, armor);
+        prop_assert!(real_counter >= real_normal, "real perfect counter must beat real normal");
+
         let normal = oracle_damage(base, combo, 0.0, armor, false);
         let counter = oracle_damage(base, combo, 0.0, armor, true);
         prop_assert!(counter >= normal, "perfect counter ({}) must beat normal ({})", counter, normal);
+        prop_assert_eq!(real_normal, normal);
+        prop_assert_eq!(real_counter, counter);
     }
 
     // XP requirement is monotone: higher level always needs more XP
     #[test]
     fn xp_requirement_monotone(level in 1u32..100) {
+        use nexus_session::player::PlayerProfile;
+        let mut p = PlayerProfile::new(1, "test".to_string());
+        p.level = level;
+        p.xp = 0;
+        
+        let req_next = oracle_xp_for_level(level + 1);
+        
+        // If we gain 1 less than next level requirement, we should NOT level up
+        let gained_less = p.apply_xp_gain(req_next - 1);
+        prop_assert!(!gained_less);
+        prop_assert_eq!(p.level, level);
+        
+        // If we gain the remaining 1 XP, we should level up
+        let gained_enough = p.apply_xp_gain(1);
+        prop_assert!(gained_enough);
+        prop_assert_eq!(p.level, level + 1);
+
         let current = oracle_xp_for_level(level);
         let next = oracle_xp_for_level(level + 1);
         prop_assert!(next > current, "level {} needs {} xp, level {} needs {} xp", level, current, level+1, next);
@@ -37,33 +66,94 @@ proptest! {
     // Gacha probability never decreases (monotone in pity pulls)
     #[test]
     fn gacha_pity_monotone(pull in 1u32..89) {
-        let p_now = oracle_ssr_probability(pull);
-        let p_next = oracle_ssr_probability(pull + 1);
-        prop_assert!(p_next >= p_now, "SSR rate must not decrease with more pulls: pull {} was {}, pull {} was {}", pull, p_now, pull+1, p_next);
+        use nexus_shop::gacha::PullSession;
+        let mut session = PullSession::new(1, "banner".to_string());
+        session.pulls_since_last_ssr = pull;
+        let p_now = session.current_ssr_rate();
+        session.pulls_since_last_ssr = pull + 1;
+        let p_next = session.current_ssr_rate();
+        prop_assert!(p_next >= p_now, "Real SSR rate must not decrease with more pulls: pull {} was {}, pull {} was {}", pull, p_now, pull+1, p_next);
+
+        let p_now_oracle = oracle_ssr_probability(pull);
+        let p_next_oracle = oracle_ssr_probability(pull + 1);
+        prop_assert_eq!(p_now, p_now_oracle);
+        prop_assert_eq!(p_next, p_next_oracle);
     }
 
     // Hard pity at pull 90 guarantees SSR
     #[test]
     fn hard_pity_at_90_guarantees_ssr(pull in 90u32..200) {
+        use nexus_shop::gacha::PullSession;
+        let mut session = PullSession::new(1, "banner".to_string());
+        session.pulls_since_last_ssr = pull;
+        prop_assert_eq!(session.current_ssr_rate(), 1.0);
+
         prop_assert_eq!(oracle_ssr_probability(pull), 1.0);
     }
 
     // Auction minimum bid is always > current bid (prevents bid snaking)
     #[test]
     fn auction_min_bid_above_current(current in 1u32..1_000_000) {
+        use nexus_economy::auction::{Auction, OpenForBids};
+        use nexus_economy::ledger::Ledger;
+
+        let mut ledger = Ledger::new();
+        let seller_id = 1u64;
+        let bidder_1_id = 2u64;
+        let bidder_2_id = 3u64;
+
+        let _ = ledger.award_gold(bidder_1_id, current, "seed");
+        let _ = ledger.award_gold(bidder_2_id, current * 2 + 10, "seed");
+
+        let mut auction = Auction::<OpenForBids>::new(
+            1,
+            seller_id,
+            "Gundam Part".to_string(),
+            current,
+            None,
+            24,
+        );
+
+        let first_bid_res = auction.place_bid(bidder_1_id, current, &mut ledger);
+        prop_assert!(first_bid_res.is_ok());
+
+        let min_required = current + (current / 20).max(1);
+
+        if min_required > current + 1 {
+            let too_low_res = auction.place_bid(bidder_2_id, min_required - 1, &mut ledger);
+            prop_assert!(too_low_res.is_err(), "bid {} should be rejected, min required is {}", min_required - 1, min_required);
+        }
+
+        let ok_res = auction.place_bid(bidder_2_id, min_required, &mut ledger);
+        prop_assert!(ok_res.is_ok());
+
         let minimum = oracle_min_bid(current);
         prop_assert!(minimum > current, "min bid {} must be > current bid {}", minimum, current);
+        prop_assert_eq!(min_required, minimum);
     }
 
     // GodKing shield breaks exactly at 3rd perfect parry
     #[test]
     fn godking_shield_breaks_only_at_3(parries_before in 0u32..2) {
-        // Before 3rd parry: shield does not break
+        use nexus_combat::ParryResolver;
+        use nexus_combat::parry::{AttackDir, ParryOutcome};
+
+        let (outcome, broke) = ParryResolver::resolve_shield_parry(
+            AttackDir::Overhead,
+            Some(AttackDir::Overhead),
+            parries_before,
+        );
+        prop_assert_eq!(outcome, ParryOutcome::Perfect);
+        if parries_before < 2 {
+            prop_assert!(!broke, "shield should not break at {} parries", parries_before + 1);
+        } else {
+            prop_assert!(broke);
+        }
+
         let not_yet = oracle_shield_breaks(parries_before, true);
         if parries_before < 2 {
             prop_assert!(!not_yet, "shield should not break at {} parries", parries_before + 1);
         }
-        // At exactly 3rd parry: breaks
         let breaks = oracle_shield_breaks(2, true);
         prop_assert!(breaks, "shield should break at 3rd perfect parry");
     }
@@ -74,7 +164,19 @@ proptest! {
         combo in 0u32..7,
         gauge in 0.0f32..1.2,
     ) {
+        use nexus_combat::combo::TransAmCombo;
+
+        let mut chain = TransAmCombo::new(2);
+        for _ in 0..combo {
+            chain.on_hit();
+        }
+
+        let depth_ok = chain.is_trans_am_zone();
+        let gauge_ok = gauge >= 1.0;
+        let real_activates = depth_ok && gauge_ok;
+
         let activates = oracle_trans_am_activates(combo, gauge);
+        prop_assert_eq!(real_activates, activates);
         if activates {
             prop_assert!(combo >= 4, "trans-am needs combo >= 4, had {}", combo);
             prop_assert!(gauge >= 1.0, "trans-am needs full gauge, had {}", gauge);
@@ -119,18 +221,18 @@ proptest! {
 }
 
 proptest! {
-    // Every valid MagicType byte (0-4) converts to a positive damage multiplier
+    // Every valid MagicType byte (0-5) converts to a positive damage multiplier
     #[test]
-    fn magic_type_multiplier_always_positive(byte in 0u8..5u8) {
-        let mt = MagicType::try_from(byte).expect("byte 0-4 must convert to MagicType");
+    fn magic_type_multiplier_always_positive(byte in 0u8..6u8) {
+        let mt = MagicType::try_from(byte).expect("byte 0-5 must convert to MagicType");
         let multiplier = f32::from(mt);
         prop_assert!(multiplier > 0.0, "MagicType multiplier must be > 0, got {}", multiplier);
     }
 
     // TryFrom<u8> and From<MagicType> are value-stable round-trips
     #[test]
-    fn magic_type_u8_round_trip(byte in 0u8..5u8) {
-        let mt = MagicType::try_from(byte).expect("byte 0-4 should convert");
+    fn magic_type_u8_round_trip(byte in 0u8..6u8) {
+        let mt = MagicType::try_from(byte).expect("byte 0-5 should convert");
         let multiplier: f32 = f32::from(mt);
         // Re-converting from the same byte gives the same multiplier
         let mt2 = MagicType::try_from(byte).expect("second conversion should succeed");
@@ -139,7 +241,7 @@ proptest! {
 
     // Out-of-range bytes are always rejected
     #[test]
-    fn magic_type_rejects_out_of_range(byte in 5u8..=255u8) {
+    fn magic_type_rejects_out_of_range(byte in 6u8..=255u8) {
         prop_assert!(MagicType::try_from(byte).is_err(), "byte {} should not convert to MagicType", byte);
     }
 }

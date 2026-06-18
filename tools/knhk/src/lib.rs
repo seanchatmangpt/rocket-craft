@@ -139,7 +139,7 @@ impl Law for AndroidKeystoreLaw {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+
     use super::plugin::PluginHost;
 
     #[test]

@@ -35,36 +35,41 @@ fn run_orchestrator() -> Result<(), anyhow::Error> {
     let pwa_staff_dir = project_root.join("pwa-staff");
 
     tracing::info!("Project root detected at: {:?}", project_root);
-    tracing::info!("Spawning genie_server.js in background relative to pwa-staff...");
+    // Check if port 3000 is already in use first
+    let already_running = TcpStream::connect("127.0.0.1:3000").is_ok();
 
-    // Spawn server: node ../genie_server.js inside pwa-staff dir
-    let server_child = Command::new("node")
-        .arg("../genie_server.js")
-        .current_dir(&pwa_staff_dir)
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()?;
+    let _guard = if already_running {
+        tracing::info!("Server on port 3000 is already running. Reusing the existing server.");
+        None
+    } else {
+        tracing::info!("Spawning genie_server.js in background relative to pwa-staff...");
+        // Spawn server: node ../genie_server.js inside pwa-staff dir
+        let server_child = Command::new("node")
+            .arg("../genie_server.js")
+            .current_dir(&pwa_staff_dir)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()?;
 
-    // Wrap in Guard to guarantee cleanup on drop
-    let _guard = ChildGuard(server_child);
-
-    // Poll http://localhost:3000 until online
-    tracing::info!("Polling http://localhost:3000...");
-    let start_time = Instant::now();
-    let timeout = Duration::from_secs(15);
-    let mut online = false;
-    while start_time.elapsed() < timeout {
-        if TcpStream::connect("127.0.0.1:3000").is_ok() {
-            online = true;
-            break;
+        // Poll http://localhost:3000 until online
+        tracing::info!("Polling http://localhost:3000...");
+        let start_time = Instant::now();
+        let timeout = Duration::from_secs(15);
+        let mut online = false;
+        while start_time.elapsed() < timeout {
+            if TcpStream::connect("127.0.0.1:3000").is_ok() {
+                online = true;
+                break;
+            }
+            thread::sleep(Duration::from_millis(100));
         }
-        thread::sleep(Duration::from_millis(100));
-    }
 
-    if !online {
-        anyhow::bail!("genie_server.js did not bind to port 3000 within 15 seconds.");
-    }
-    tracing::info!("genie_server.js is online!");
+        if !online {
+            anyhow::bail!("genie_server.js did not bind to port 3000 within 15 seconds.");
+        }
+        tracing::info!("genie_server.js is online!");
+        Some(ChildGuard(server_child))
+    };
 
     // Run Playwright test
     tracing::info!("Running Playwright visual delta test...");

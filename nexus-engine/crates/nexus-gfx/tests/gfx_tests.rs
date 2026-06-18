@@ -7,11 +7,11 @@ fn transform_identity_is_neutral_for_composition() {
     let t = Transform {
         translation: Vec3::new(1.0, 2.0, 3.0),
         rotation: UnitQuat::identity(),
-        scale: 2.0,
+        scale: Vec3::new(2.0, 2.0, 2.0),
     };
     let composed = id.mul_transform(&t);
     assert!((composed.translation - t.translation).norm() < 1e-5, "identity * t should equal t");
-    assert!((composed.scale - t.scale).abs() < 1e-5);
+    assert!((composed.scale - t.scale).norm() < 1e-5);
 }
 
 #[test]
@@ -20,7 +20,7 @@ fn transform_lerp_endpoints() {
     let b = Transform {
         translation: Vec3::new(10.0, 0.0, 0.0),
         rotation: UnitQuat::identity(),
-        scale: 2.0,
+        scale: Vec3::new(2.0, 2.0, 2.0),
     };
     let at_zero = a.lerp(&b, 0.0);
     let at_one = a.lerp(&b, 1.0);
@@ -93,9 +93,9 @@ proptest! {
     // Transform * identity == identity * transform (near-commutativity for rotation=identity)
     #[test]
     fn transform_scale_multiplication(scale in 0.1f32..10.0) {
-        let t = Transform { translation: Vec3::zeros(), rotation: UnitQuat::identity(), scale };
+        let t = Transform { translation: Vec3::zeros(), rotation: UnitQuat::identity(), scale: Vec3::new(scale, scale, scale) };
         let id = Transform::identity();
         let result = id.mul_transform(&t);
-        prop_assert!((result.scale - t.scale).abs() < 1e-4);
+        prop_assert!((result.scale - t.scale).norm() < 1e-4);
     }
 }

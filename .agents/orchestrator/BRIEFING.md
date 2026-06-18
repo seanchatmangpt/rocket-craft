@@ -1,7 +1,7 @@
-# BRIEFING — 2026-06-17T23:25:40Z
+# BRIEFING — 2026-06-18T06:07:34Z
 
 ## Mission
-Resolve all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project.
+Execute the 10-phase codebase retrofit plan to fully leverage the newly integrated `ggen`, `chicago-tdd-tools`, `unrdf`, and `lsp-max` architectures, updating the system's core capabilities.
 
 ## 🔒 My Identity
 - Archetype: teamwork_preview_orchestrator
@@ -13,26 +13,23 @@ Resolve all implementation gaps, stubs, placeholders, single-line functions, ass
 ## 🔒 My Workflow
 - **Pattern**: Project Pattern
 - **Scope document**: /Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md
-1. **Decompose**: Decompose the task into milestones (Technical Exploration, Complete Stubs/Placeholders, Replace Single-line/Catch-alls, Harden Assertions, Remove Debug Macros/Overclaims, Final Verification).
-2. **Dispatch & Execute**:
-   - **Delegate (sub-orchestrator)**: Spawn sub-orchestrators for milestones or run explorer-worker-reviewer cycles.
-3. **On failure** (in this order):
-   - Retry: nudge stuck agent or re-send task
-   - Replace: spawn fresh agent with partial progress
-   - Skip: proceed without (only if non-critical)
-   - Redistribute: split stuck agent's remaining work
-   - Redesign: re-partition decomposition
-   - Escalate: report to parent (sub-orchestrators only, last resort)
+1. **Decompose**: Decompose the task into milestones/phases.
+2. **Dispatch & Execute**: Spawn workers and specialists.
+3. **On failure**: Retry, Replace, Skip, Redistribute, Redesign, Escalate.
 4. **Succession**: At 16 spawns, write handoff.md, spawn successor.
 - **Work items**:
-  - Milestone 1: Technical Exploration and Baseline Assessment [pending]
-  - Milestone 2: Complete Stubs and Placeholders (R1) [pending]
-  - Milestone 3: Replace Single-Line and Catch-All Stubs (R2) [pending]
-  - Milestone 4: Harden Assertions & Eliminate Test Shortcuts (R3) [pending]
-  - Milestone 5: Remove Debug Macros and Overclaim Language (R4, R5) [pending]
-  - Milestone 6: Final Verification & Integration [pending]
-- **Current phase**: 1
-- **Current focus**: Technical Exploration and Baseline Assessment
+  - Phase 1: Baseline Verification [done]
+  - Phase 2: Migrate `unrdf` Git Dependencies to Local Path Dependencies [done]
+  - Phase 3: Migrate `chicago-tdd-tools` Git Dependencies to Local Path Dependencies [done]
+  - Phase 4: Verify `lsp-max` Integration & Clean Tower-LSP References [done]
+  - Phase 5: Refactor `genie-core` / `unify-rdf` Stubs and Mock Libraries [done]
+  - Phase 6: Refactor `nexus-engine` State Machines to Type-Safe `Machine<L, P>` [done]
+  - Phase 7: Configure `ggen.toml` and `.tera` Code-Generation Templates [done]
+  - Phase 8: Wire `chicago-tdd-tools` with Playwright WebGL2 Test Scripts [done]
+  - Phase 9: Automated Combinatorial Testing Execution [done]
+  - Phase 10: Forensic Auditing & Clean Verdict Release [done]
+- **Current phase**: 10
+- **Current focus**: Complete forensic audit and claim victory.
 
 ## 🔒 Key Constraints
 - NEVER write, modify, or create source code files directly.
@@ -41,31 +38,37 @@ Resolve all implementation gaps, stubs, placeholders, single-line functions, ass
 - Succession threshold: 16 spawns.
 
 ## Current Parent
-- Conversation ID: 6327e89d-e34c-4854-952f-a9c3d3f1ec07
-- Updated: 2026-06-17T23:25:40Z
+- Conversation ID: 0817d278-2530-4201-80db-a2ef611d396b
+- Updated: 2026-06-18T06:07:34Z
 
 ## Key Decisions Made
-- Initialized the Rocket-Craft remediation project.
-- Decided to spawn an Explorer to map out stubs and verify baseline state.
+- Initialized the 10-phase codebase retrofit project.
+- Completed all 10 phases.
+- Spawned Forensic Integrity Auditor and received a CLEAN VERDICT.
 
 ## Team Roster
 | Agent | Type | Work Item | Status | Conv ID |
 |-------|------|-----------|--------|---------|
-| df135978-48b4-4519-9ebf-9d88830e5ec0 | teamwork_preview_explorer | Technical Exploration | completed | df135978-48b4-4519-9ebf-9d88830e5ec0 |
-| 6469f9db-14b9-489b-92a0-cae939dc947e | teamwork_preview_worker | Remediation Worker | in-progress | 6469f9db-14b9-489b-92a0-cae939dc947e |
+| a8cc2d67-576d-4a0e-8463-face7c03027e | teamwork_preview_worker | Baseline Verification | completed | a8cc2d67-576d-4a0e-8463-face7c03027e |
+| f439e6dc-d3b8-456b-a0d0-c938e572bfd0 | teamwork_preview_worker | Migrate unrdf | completed | f439e6dc-d3b8-456b-a0d0-c938e572bfd0 |
+| 05987603-df7b-42a5-950c-6a5ed5573b6e | teamwork_preview_worker | Migrate chicago | completed | 05987603-df7b-42a5-950c-6a5ed5573b6e |
+| 5bd0b6e0-5850-46c4-a0f4-e0c846ed4265 | teamwork_preview_worker | Migrate lsp-max | completed | 5bd0b6e0-5850-46c4-a0f4-e0c846ed4265 |
+| 76d42451-79e2-47ab-a543-7cdf82db2bc4 | teamwork_preview_worker | Align ggen/nexus | completed | 76d42451-79e2-47ab-a543-7cdf82db2bc4 |
+| dab33b40-b362-469f-b87b-6fd27d0f5d3a | teamwork_preview_worker | Impl ggen/nexus | completed | dab33b40-b362-469f-b87b-6fd27d0f5d3a |
+| d63e50fb-1b65-4b0d-918d-a148f0ef0ce3 | teamwork_preview_worker | Verify chicago tests | completed | d63e50fb-1b65-4b0d-918d-a148f0ef0ce3 |
+| 7ae29387-8de6-405f-b400-79575df50f59 | teamwork_preview_worker | Run combinatorial | completed | 7ae29387-8de6-405f-b400-79575df50f59 |
+| 550ed2b8-4b3e-4d50-8c88-d753c22d9d3f | teamwork_preview_auditor | Forensic Audit | completed | 550ed2b8-4b3e-4d50-8c88-d753c22d9d3f |
 
 ## Succession Status
 - Succession required: no
-- Spawn count: 2 / 16
-- Pending subagents: 6469f9db-14b9-489b-92a0-cae939dc947e
+- Spawn count: 9 / 16
+- Pending subagents: none
 - Predecessor: none
 - Successor: not yet spawned
 
 ## Active Timers
-- Heartbeat cron: 0c5b7c84-281f-4a8a-86cc-4b95080943b3/task-33
+- Heartbeat cron: 247ccb3c-d954-496a-b230-a51245bbbdc5/task-306
 - Safety timer: none
-- On succession: kill all timers before spawning successor
-- On context truncation: run `manage_task(Action="list")` — re-create if missing
 
 ## Artifact Index
 - /Users/sac/rocket-craft/.agents/orchestrator/progress.md — progress tracker

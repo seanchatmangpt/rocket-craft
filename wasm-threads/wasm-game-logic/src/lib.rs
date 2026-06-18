@@ -45,6 +45,7 @@ impl GameLogicWorker {
         self.world.add_health(pe, Health::new(100));
         self.world.add_position(pe, Position { x: 0.0, y: 0.0 });
         self.world.add_velocity(pe, Velocity { dx: 0.0, dy: 0.0 });
+        self.world.add_attack(pe, Attack { damage: 10, range: 50.0, cooldown_ms: 500 });
         self.world.add_player(pe, Player { name: "Player1".to_string(), score: 0 });
         self.player_entity = Some(pe);
     }
@@ -54,6 +55,7 @@ impl GameLogicWorker {
             return "{}".to_string();
         }
         self.elapsed_ms += delta_ms as u64;
+        self.world.current_time_ms = self.elapsed_ms;
         self.tick += 1;
 
         PhysicsSystem::run(&mut self.world, delta_ms as u64);

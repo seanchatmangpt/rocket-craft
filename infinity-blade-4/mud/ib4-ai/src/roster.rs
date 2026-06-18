@@ -71,7 +71,7 @@ pub fn arena_sequence(bloodline: i32) -> Vec<&'static str> {
         .iter()
         .filter(|e| e.bloodline_required <= bloodline && e.id != "CorruptedGalath")
         .collect();
-    available.sort_by(|a, b| b.bloodline_required.cmp(&a.bloodline_required));
+    available.sort_by_key(|b| std::cmp::Reverse(b.bloodline_required));
     let mut seq: Vec<&'static str> = available.iter().take(3).map(|e| e.id).collect();
     seq.push("CorruptedGalath");
     seq

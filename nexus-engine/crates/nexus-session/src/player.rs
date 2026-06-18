@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+pub use nexus_types::{GundamSeries, MagicType};
 
 use crate::session::SessionError;
 
@@ -15,27 +16,9 @@ pub enum NewtypeRank {
     Coordinator,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum GundamSeries {
-    WitchFromMercury,
-    Seed,
-    Unicorn,
-    UniversalCentury,
-    Wing,
-    DoubleO,
-    IronBloodedOrphans,
-    TurnA,
-    BuildFighters,
-}
+// GundamSeries imported from nexus_types
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum MagicType {
-    Fire,
-    Lightning,
-    Ice,
-    Dark,
-    Light,
-}
+// MagicType imported from nexus_types
 
 // ────────────────────────────────────────────────────────────────────────────
 // PlayerProfile

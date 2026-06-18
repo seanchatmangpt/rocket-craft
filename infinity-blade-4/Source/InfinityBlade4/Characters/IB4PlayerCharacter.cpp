@@ -158,8 +158,10 @@ void AIB4PlayerCharacter::OnAttackInput(EAttackDirection Direction)
         return;
     }
 
-    // Delegate to CombatComponent once it is fully implemented.
-    // CombatComponent->RequestAttack(Direction);
+    if (CombatComponent)
+    {
+        CombatComponent->BeginAttack(Direction);
+    }
 
     UE_LOG(LogTemp, Verbose, TEXT("AIB4PlayerCharacter::OnAttackInput — Direction=%d"), (int32)Direction);
 }
@@ -171,7 +173,10 @@ void AIB4PlayerCharacter::OnParryInput()
         return;
     }
 
-    // CombatComponent->RequestParry();
+    if (CombatComponent)
+    {
+        CombatComponent->AttemptParry();
+    }
 
     UE_LOG(LogTemp, Verbose, TEXT("AIB4PlayerCharacter::OnParryInput"));
 }
@@ -183,7 +188,16 @@ void AIB4PlayerCharacter::OnDodgeInput()
         return;
     }
 
-    // CombatComponent->RequestDodge();
+    FVector DodgeDir = GetLastMovementInputVector();
+    if (DodgeDir.IsNearlyZero())
+    {
+        DodgeDir = -GetActorForwardVector();
+    }
+
+    if (CombatComponent)
+    {
+        CombatComponent->ExecuteDodge(DodgeDir);
+    }
 
     UE_LOG(LogTemp, Verbose, TEXT("AIB4PlayerCharacter::OnDodgeInput"));
 }
@@ -204,7 +218,7 @@ void AIB4PlayerCharacter::OnMagicInput(EMagicType Type)
     }
 
     // Verify enough magic is available before consuming it
-    const float SpellCost = 10.f;  // TODO: retrieve from CombatComponent / spell data table
+    const float SpellCost = CombatComponent ? CombatComponent->GetMagicCost() : 10.f;
     if (Magic < SpellCost)
     {
         UE_LOG(LogTemp, Warning, TEXT("AIB4PlayerCharacter::OnMagicInput — insufficient magic (%.1f / %.1f)"),
@@ -212,9 +226,10 @@ void AIB4PlayerCharacter::OnMagicInput(EMagicType Type)
         return;
     }
 
-    Magic = FMath::Clamp(Magic - SpellCost, 0.f, MaxMagic);
-
-    // CombatComponent->CastMagic(Type);
+    if (CombatComponent)
+    {
+        CombatComponent->CastMagic(Type);
+    }
 
     UE_LOG(LogTemp, Verbose, TEXT("AIB4PlayerCharacter::OnMagicInput — Type=%d"), (int32)Type);
 }

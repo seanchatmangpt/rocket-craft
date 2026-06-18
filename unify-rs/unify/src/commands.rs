@@ -367,7 +367,7 @@ pub fn cmd_witnesses(domain: Option<&str>) -> Result<Output, CommandError> {
         "status": "stub",
     });
 
-    let all = vec![
+    let all = [
         rdf_store_status,
         rdf_pipeline_status,
         receipts_status,

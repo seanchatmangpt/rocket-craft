@@ -28,12 +28,38 @@ pub struct CombatSystem;
 impl CombatSystem {
     /// Apply damage from `attacker` to `target`. Returns actual damage dealt.
     pub fn apply_damage(world: &mut World, attacker: Entity, target: Entity) -> u32 {
-        let dmg = world.get_attack(attacker).map(|a| a.damage).unwrap_or(0);
+        let attack = match world.get_attack(attacker) {
+            Some(a) => a.clone(),
+            None => return 0,
+        };
+        let dmg = attack.damage;
         if dmg == 0 {
             return 0;
         }
+
+        // Enforce range check (defaulting to 0.0 distance if position components are missing)
+        if let (Some(ap), Some(tp)) = (world.get_position(attacker), world.get_position(target)) {
+            let dx = ap.x - tp.x;
+            let dy = ap.y - tp.y;
+            let dist = (dx * dx + dy * dy).sqrt();
+            if dist > attack.range {
+                return 0;
+            }
+        }
+
+        // Enforce cooldown check
+        let current_time = world.current_time_ms;
+        if let Some(&allowed_time) = world.attack_cooldowns.get(&attacker) {
+            if current_time < allowed_time {
+                return 0;
+            }
+        }
+
         if let Some(hp) = world.get_health_mut(target) {
             hp.apply_damage(dmg);
+            if attack.cooldown_ms > 0 {
+                world.attack_cooldowns.insert(attacker, current_time + attack.cooldown_ms);
+            }
             dmg
         } else {
             0

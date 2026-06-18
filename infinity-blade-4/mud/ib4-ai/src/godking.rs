@@ -71,7 +71,7 @@ impl GodKingAI {
 
         // Phase 3 effects: time dilation every 3 turns; reinforcements at turn 6.
         if enemy.phase == 3 {
-            if self.turn_counter % 3 == 0 {
+            if self.turn_counter.is_multiple_of(3) {
                 self.time_dilation = match rng.random_range(0..3u32) {
                     0 => TimeDilationState::Slowed,
                     1 => TimeDilationState::Accelerated,

@@ -15,7 +15,7 @@ struct Ping {
 
 #[test]
 fn channel_send_receive_typed_messages() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WorkerChannel<Ping> with worker_id 0");
     let mut ch = WorkerChannel::<Ping>::new(0);
 
@@ -31,7 +31,7 @@ fn channel_send_receive_typed_messages() {
 
 #[test]
 fn channel_receive_empty_returns_none() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WorkerChannel<u32> with no messages");
     let mut ch = WorkerChannel::<u32>::new(0);
 
@@ -42,7 +42,7 @@ fn channel_receive_empty_returns_none() {
 
 #[test]
 fn channel_drain_clears_queue() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WorkerChannel<u32> with three messages enqueued");
     let mut ch = WorkerChannel::<u32>::new(0);
     ch.send(1).unwrap();

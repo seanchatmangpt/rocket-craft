@@ -11,7 +11,7 @@ fn log() -> Logger {
 
 #[test]
 fn damage_scales_with_attack_stat_not_constant() {
-    let mut log = log();
+    let log = log();
     log.info("Given two identical targets with different attacker attack stats");
     let mut world = World::new();
     let attacker = world.spawn();
@@ -47,7 +47,7 @@ fn damage_scales_with_attack_stat_not_constant() {
 
 #[test]
 fn zero_attack_deals_zero_damage() {
-    let mut log = log();
+    let log = log();
     log.info("Given an attacker with 0 damage and a target with 100 HP");
     let mut world = World::new();
     let attacker = world.spawn();
@@ -72,7 +72,7 @@ fn zero_attack_deals_zero_damage() {
 
 #[test]
 fn no_attack_component_deals_zero_damage() {
-    let mut log = log();
+    let log = log();
     log.info("Given an attacker with no Attack component and a target with 100 HP");
     let mut world = World::new();
     let attacker = world.spawn();
@@ -88,7 +88,7 @@ fn no_attack_component_deals_zero_damage() {
 
 #[test]
 fn health_cannot_go_below_zero() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Health component with 10 HP");
     let mut hp = Health::new(10);
 
@@ -102,7 +102,7 @@ fn health_cannot_go_below_zero() {
 
 #[test]
 fn health_cannot_exceed_max_on_heal() {
-    let mut log = log();
+    let log = log();
     log.info("Given a full-health Health component with max 100");
     let mut hp = Health::new(100);
 
@@ -115,7 +115,7 @@ fn health_cannot_exceed_max_on_heal() {
 
 #[test]
 fn health_percentage_at_full() {
-    let mut log = log();
+    let log = log();
     log.info("Given a full-health Health component");
     let hp = Health::new(100);
 
@@ -126,7 +126,7 @@ fn health_percentage_at_full() {
 
 #[test]
 fn health_percentage_at_zero() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Health component with 100 max HP");
     let mut hp = Health::new(100);
 
@@ -139,7 +139,7 @@ fn health_percentage_at_zero() {
 
 #[test]
 fn dead_entities_are_removed_by_cleanup() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an attacker (10 damage) and a target (1 HP)");
     let mut world = World::new();
     let attacker = world.spawn();
@@ -209,4 +209,70 @@ proptest! {
         hp.heal(heal);
         prop_assert!(hp.current <= hp.max);
     }
+}
+
+#[test]
+fn combat_range_check_enforced() {
+    use wasm_game_logic::Position;
+    let mut world = World::new();
+    let attacker = world.spawn();
+    let target = world.spawn();
+    world.add_health(target, Health::new(100));
+    world.add_attack(
+        attacker,
+        Attack {
+            damage: 15,
+            range: 10.0,
+            cooldown_ms: 0,
+        },
+    );
+
+    // Attacker at (0, 0), Target at (15, 0) -> distance 15.0 > range 10.0
+    world.add_position(attacker, Position { x: 0.0, y: 0.0 });
+    world.add_position(target, Position { x: 15.0, y: 0.0 });
+
+    let dmg = CombatSystem::apply_damage(&mut world, attacker, target);
+    assert_eq!(dmg, 0, "No damage should be dealt when target is out of range");
+    assert_eq!(world.get_health(target).unwrap().current, 100);
+
+    // Target moves to (8, 0) -> distance 8.0 <= range 10.0
+    *world.get_position_mut(target).unwrap() = Position { x: 8.0, y: 0.0 };
+
+    let dmg2 = CombatSystem::apply_damage(&mut world, attacker, target);
+    assert_eq!(dmg2, 15, "Damage should be dealt when target is in range");
+    assert_eq!(world.get_health(target).unwrap().current, 85);
+}
+
+#[test]
+fn combat_cooldown_enforced() {
+    let mut world = World::new();
+    let attacker = world.spawn();
+    let target = world.spawn();
+    world.add_health(target, Health::new(100));
+    world.add_attack(
+        attacker,
+        Attack {
+            damage: 10,
+            range: 100.0,
+            cooldown_ms: 100,
+        },
+    );
+
+    // First attack at t=0
+    world.current_time_ms = 0;
+    let dmg1 = CombatSystem::apply_damage(&mut world, attacker, target);
+    assert_eq!(dmg1, 10, "First attack should succeed");
+    assert_eq!(world.get_health(target).unwrap().current, 90);
+
+    // Second attack at t=50 (cooldown is 100ms)
+    world.current_time_ms = 50;
+    let dmg2 = CombatSystem::apply_damage(&mut world, attacker, target);
+    assert_eq!(dmg2, 0, "Second attack should be blocked by cooldown");
+    assert_eq!(world.get_health(target).unwrap().current, 90);
+
+    // Third attack at t=100
+    world.current_time_ms = 100;
+    let dmg3 = CombatSystem::apply_damage(&mut world, attacker, target);
+    assert_eq!(dmg3, 10, "Third attack should succeed after cooldown expires");
+    assert_eq!(world.get_health(target).unwrap().current, 80);
 }

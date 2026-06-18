@@ -1,4 +1,5 @@
 use serde::{Serialize, Deserialize};
+pub use nexus_types::{GundamSeries, AttackDir, MagicType};
 
 // === Transform Components ===
 #[derive(Debug, Clone, Copy, Default, PartialEq, Serialize, Deserialize)]
@@ -74,17 +75,7 @@ pub struct MobileSuit {
     pub nt_d_active: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum GundamSeries {
-    WitchFromMercury,
-    Seed,
-    Unicorn,
-    UniversalCentury,
-    Wing,
-    DoubleO,
-    IronBloodedOrphans,
-    TurnA,
-}
+// GundamSeries imported from nexus_types
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum SpecialAbility {
@@ -110,15 +101,12 @@ pub struct PlayerControlled;  // marker component
 pub struct AiState {
     pub current_behavior: AiBehavior,
     pub turns_in_behavior: u32,
-    pub announced_attack: Option<AttackDirection>,
+    pub announced_attack: Option<AttackDir>,
     pub phase: u8,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AiBehavior { Idle, Attacking, Defending, SpecialAttack, Fleeing }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum AttackDirection { Overhead, Left, Right }
 
 // === Economy Components ===
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
@@ -158,5 +146,4 @@ pub struct Projectile {
     pub magic_type: MagicType,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum MagicType { Fire, Lightning, Ice, Dark, Light, BeamSaber }
+// MagicType imported from nexus_types

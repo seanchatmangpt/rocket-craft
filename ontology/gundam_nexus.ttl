@@ -84,3 +84,160 @@ gn:PreservationArtifact a owl:Class ;
 gn:ArkSystem a owl:Class ;
     rdfs:label "Ark System" ;
     rdfs:comment "Knowledge, population, and cultural preservation." .
+
+# --- New Ontological Classes ---
+
+gn:CosmicCycle a owl:Class ;
+    rdfs:label "Cosmic Cycle" .
+
+gn:Resource a owl:Class ;
+    rdfs:label "Resource" .
+
+gn:FrameType a owl:Class ;
+    rdfs:label "Frame Type" .
+
+gn:PowerSource a owl:Class ;
+    rdfs:label "Power Source" .
+
+gn:ArmorType a owl:Class ;
+    rdfs:label "Armor Type" .
+
+gn:WeaponType a owl:Class ;
+    rdfs:label "Weapon Type" .
+
+gn:SensorType a owl:Class ;
+    rdfs:label "Sensor Type" .
+
+gn:ArkForm a owl:Class ;
+    rdfs:label "Ark Form" .
+
+gn:ArkPurpose a owl:Class ;
+    rdfs:label "Ark Purpose" .
+
+# --- New Instances ---
+
+gn:Growth a gn:CosmicCycle ;
+    rdfs:label "Growth" .
+
+gn:ExpansionCycle a gn:CosmicCycle ;
+    rdfs:label "Expansion Cycle" .
+
+gn:Judgment a gn:CosmicCycle ;
+    rdfs:label "Judgment" .
+
+gn:PreservationCycle a gn:CosmicCycle ;
+    rdfs:label "Preservation Cycle" .
+
+gn:Renewal a gn:CosmicCycle ;
+    rdfs:label "Renewal" .
+
+gn:MinovskyParticles a gn:Resource ;
+    rdfs:label "Minovsky Particles" .
+
+gn:Gundanium a gn:Resource, gn:ArmorType ;
+    rdfs:label "Gundanium" .
+
+gn:LunaTitanium a gn:Resource, gn:ArmorType ;
+    rdfs:label "Luna Titanium" .
+
+gn:NanoComposite a gn:ArmorType ;
+    rdfs:label "Nano Composite" .
+
+gn:GundamFrame a gn:FrameType ;
+    rdfs:label "Gundam Frame" .
+
+gn:ZakuFrame a gn:FrameType ;
+    rdfs:label "Zaku Frame" .
+
+gn:GMFrame a gn:FrameType ;
+    rdfs:label "GM Frame" .
+
+gn:MinovskyUltracompact a gn:PowerSource ;
+    rdfs:label "Minovsky Ultracompact" .
+
+gn:FusionReactor a gn:PowerSource ;
+    rdfs:label "Fusion Reactor" .
+
+gn:BeamRifle a gn:WeaponType ;
+    rdfs:label "Beam Rifle" .
+
+gn:BeamSaber a gn:WeaponType ;
+    rdfs:label "Beam Saber" .
+
+gn:HeatHawk a gn:WeaponType ;
+    rdfs:label "Heat Hawk" .
+
+gn:Monoeye a gn:SensorType ;
+    rdfs:label "Monoeye" .
+
+gn:DualSensor a gn:SensorType ;
+    rdfs:label "Dual Sensor" .
+
+gn:CityArk a gn:ArkForm ;
+    rdfs:label "City Ark" .
+
+gn:ColonyArk a gn:ArkForm ;
+    rdfs:label "Colony Ark" .
+
+gn:KnowledgePreservation a gn:ArkPurpose ;
+    rdfs:label "Knowledge Preservation" .
+
+gn:Sentinel a gn:Planet ;
+    rdfs:label "Sentinel" .
+
+
+# --- NEW DOMAINS & PRIMITIVES ---
+
+gn:CosmologyPhase a owl:Class ;
+    rdfs:label "Cosmology Phase" .
+
+gn:Growth a gn:CosmologyPhase ; rdfs:label "Growth" .
+gn:SentientExpansion a gn:CosmologyPhase ; rdfs:label "SentientExpansion" .
+gn:Judgment a gn:CosmologyPhase ; rdfs:label "Judgment" .
+gn:SentientPreservation a gn:CosmologyPhase ; rdfs:label "SentientPreservation" .
+gn:Renewal a gn:CosmologyPhase ; rdfs:label "Renewal" .
+
+gn:ArkForm a owl:Class ;
+    rdfs:label "Ark Form" .
+
+gn:Cities a gn:ArkForm ; rdfs:label "Cities" .
+gn:Colonies a gn:ArkForm ; rdfs:label "Colonies" .
+gn:Ships a gn:ArkForm ; rdfs:label "Ships" .
+gn:Vaults a gn:ArkForm ; rdfs:label "Vaults" .
+gn:Sanctuaries a gn:ArkForm ; rdfs:label "Sanctuaries" .
+
+gn:ArkPurpose a owl:Class ;
+    rdfs:label "Ark Purpose" .
+
+gn:KnowledgePreservation a gn:ArkPurpose ; rdfs:label "KnowledgePreservation" .
+gn:PopulationPreservation a gn:ArkPurpose ; rdfs:label "PopulationPreservation" .
+gn:CulturalPreservation a gn:ArkPurpose ; rdfs:label "CulturalPreservation" .
+
+gn:HistoryType a owl:Class ;
+    rdfs:label "History Type" .
+
+gn:Wars a gn:HistoryType ; rdfs:label "Wars" .
+gn:TradeRoutes a gn:HistoryType ; rdfs:label "TradeRoutes" .
+gn:Discoveries a gn:HistoryType ; rdfs:label "Discoveries" .
+gn:HistoryReligions a gn:HistoryType ; rdfs:label "HistoryReligions" .
+gn:Organizations a gn:HistoryType ; rdfs:label "Organizations" .
+gn:Dynasties a gn:HistoryType ; rdfs:label "Dynasties" .
+gn:Legends a gn:HistoryType ; rdfs:label "Legends" .
+
+gn:PreservationAspect a owl:Class ;
+    rdfs:label "Preservation Aspect" .
+
+gn:Mechanics a gn:PreservationAspect ; rdfs:label "Mechanics" .
+gn:Communities a gn:PreservationAspect ; rdfs:label "Communities" .
+gn:Progression a gn:PreservationAspect ; rdfs:label "Progression" .
+gn:Identity a gn:PreservationAspect ; rdfs:label "Identity" .
+
+# MechPrimitive instances
+gn:Frame a gn:MechPrimitive ; rdfs:label "Frame" .
+gn:Mobility a gn:MechPrimitive ; rdfs:label "Mobility" .
+gn:Power a gn:MechPrimitive ; rdfs:label "Power" .
+gn:Armor a gn:MechPrimitive ; rdfs:label "Armor" .
+gn:Weapons a gn:MechPrimitive ; rdfs:label "Weapons" .
+gn:Sensors a gn:MechPrimitive ; rdfs:label "Sensors" .
+gn:UtilitySystems a gn:MechPrimitive ; rdfs:label "UtilitySystems" .
+

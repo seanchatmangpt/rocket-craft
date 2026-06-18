@@ -1,0 +1,229 @@
+# Research Dossier: `unibit`
+
+**Total Files:** 104 Ontologies (.ttl) | 1 Queries (.rq)
+**Total Volume:** 105 files
+
+## 1. Core Vocabularies (Prefixes)
+- `ao: <http://purl.org/ontology/ao/core#>`
+- `bio: <http://purl.org/vocab/bio/0.1/>`
+- `bldg: <http://example.org/ontology/ies-building#>`
+- `boroa: <http://example.org/ontology/boro-building-ai#>`
+- `borob: <http://example.org/ontology/boro-building-handcrafted#>`
+- `building: <http://ies.data.gov.uk/ontology/ies-building1#>`
+- `cc: <http://web.resource.org/cc/>`
+- `cgpt: <https://chatmangpt.com/ns/powl#>`
+- `data: <http://data.gov.uk/testdata#>`
+- `dc11: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/terms/>`
+- `dct: <http://purl.org/dc/terms/>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `event: <http://purl.org/NET/c4dm/event.owl#>`
+- `ex: <http://example.com/>`
+- `ex: <http://example.org/image/>`
+- `ex: <http://example.org/test#>`
+- `foaf: <http://xmlns.com/foaf/0.1/>`
+- `frbr: <http://purl.org/vocab/frbr/core#>`
+- `geo1: <http://www.w3.org/2003/01/geo/wgs84_pos#>`
+- `geo: <http://www.opengis.net/ont/geosparql#>`
+- `geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>`
+- `gr: <http://purl.org/goodrelations/v1#>`
+- `gufo: <http://purl.org/nemo/gufo#>`
+- `ies: <http://ies.data.gov.uk/ontology/ies4#>`
+- `ies_core: <http://ies.data.gov.uk/ontology/ies5/core#>`
+- `ies_core: <http://purl.org/ies/core/v0/ont/>`
+- `ies_core_sh: <http://purl.org/ies/core/v0/shapes/>`
+- `ies_top: <http://ies.data.gov.uk/ontology/ies5/top#>`
+- `ies_top: <http://purl.org/ies/top/v0/ont/>`
+- `ies_top_sh: <http://purl.org/ies/top/v0/shapes/>`
+- `iso8601: <http://iso.org/iso8601#>`
+- `keys: <http://purl.org/NET/c4dm/keys.owl#>`
+- `mo: <http://purl.org/ontology/mo/>`
+- `mr: <http://ontology.tno.nl/movie-rating-ontology/>`
+- `mush: <http://example.org/mushroom#>`
+- `ns0: <http://www.w3.org/2003/06/sw-vocab-status/ns#>`
+- `owl: <http://www.w3.org/2002/07/owl#>`
+- `pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>`
+- `prov: <http://www.w3.org/ns/prov#>`
+- `qudt: <http://qudt.org/schema/qudt/>`
+- `rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>`
+- `rdfs: <http://www.w3.org/2000/01/rdf-schema#>`
+- `s4syst: <https://saref.etsi.org/saref4syst/>`
+- `saref: <https://saref.etsi.org/core/>`
+- `schema: <http://schema.org/>`
+- `schema: <https://schema.org/>`
+- `sh: <http://www.w3.org/ns/shacl#>`
+- `skos: <http://www.w3.org/2004/02/skos/core#>`
+- *...and 7 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:American`
+- `:AmericanHot`
+- `:AnchoviesTopping`
+- `:ArtichokeTopping`
+- `:AsparagusTopping`
+- `:Cajun`
+- `:CajunSpiceTopping`
+- `:CaperTopping`
+- `:Capricciosa`
+- `:Caprina`
+- `:CheeseTopping`
+- `:CheeseyPizza`
+- `:CheeseyVegetableTopping`
+- `:ChickenTopping`
+- `:Country`
+- `:DeepPanBase`
+- `:DomainConcept`
+- `:Fiorentina`
+- `:FishTopping`
+- `:Food`
+- `:FourCheesesTopping`
+- `:FourSeasons`
+- `:FruitTopping`
+- `:FruttiDiMare`
+- `:GarlicTopping`
+- `:Giardiniera`
+- `:GoatsCheeseTopping`
+- `:GorgonzolaTopping`
+- `:GreenPepperTopping`
+- `:HamTopping`
+- `:HerbSpiceTopping`
+- `:Hot`
+- `:HotGreenPepperTopping`
+- `:HotSpicedBeefTopping`
+- `:IceCream`
+- `:InterestingPizza`
+- `:JalapenoPepperTopping`
+- `:LaReine`
+- `:LeekTopping`
+- `:Margherita`
+- `:MeatTopping`
+- `:MeatyPizza`
+- `:Medium`
+- `:Mild`
+- `:MixedSeafoodTopping`
+- `:MozzarellaTopping`
+- `:Mushroom`
+- `:MushroomTopping`
+- `:NamedPizza`
+- `:Napoletana`
+- *...and 1266 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'CONSTRUCT': 1}
+
+### Projected Variables (SELECT ?var)
+- *No specific projection variables identified.*
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/unibit/crates/unibit-graph/queries/manufacture_powl64.rq` (2067 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/assessment.ttl` (1686 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/characteristics-and-measures.ttl` (804 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/communication.ttl` (1330 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/event-linkages.ttl` (795 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/event-participation.ttl` (1879 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/events.ttl` (782 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/hospital.ttl` (3329 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/identifiers.ttl` (1045 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/invalid-PersonState.ttl` (272 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/movement.ttl` (1930 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/period-of-time.ttl` (703 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/pizza-shapes.ttl` (651 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/relationships.ttl` (597 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/sometimes.ttl` (791 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/types.ttl` (686 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/valid-PersonState.ttl` (431 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/data/when-and-where.ttl` (948 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/epc/iris-building.ttl` (106925 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/generated/boro-building-ai.ttl` (9973 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/generated/ies-building-extension.ttl` (229037 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/generated/pizza-ai.ttl` (35950 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/mushroom/mushroom-ontology.ttl` (10022 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/oaei/data/anatomy/human.ttl` (3139435 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/oaei/data/anatomy/mouse.ttl` (1321538 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/era.ttl` (558440 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/foaf.ttl` (22344 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/goodrelations.ttl` (122344 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/gufo.ttl` (102713 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/movie.ttl` (13033 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/music.ttl` (99044 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/nordstream.ttl` (29031 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/pizza.ttl` (51873 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/saref.ttl` (95814 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/time.ttl` (107037 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/reference/BirthStateShape.shacl.ttl` (405 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/reference/PersonState.shacl.ttl` (1596 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/reference/boro-building-handcrafted.ttl` (29957 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/reference/ies-core.ttl` (86907 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/reference/ies-top.ttl` (19648 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/reference/ies4.ttl` (249173 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_1.ttl` (17735 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_10.ttl` (9549 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_2.ttl` (9205 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_3.ttl` (14595 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_4.ttl` (11677 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_5.ttl` (12797 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_6.ttl` (6144 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_7.ttl` (13555 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_8.ttl` (11374 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_9.ttl` (6559 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/tests/data/sample.ttl` (854 bytes)
+- `/Users/sac/unibit/ostar_ref/unibit_ref/ostar_ref/vendors/open-ontologies/tests/test_ontology.ttl` (291 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/assessment.ttl` (1686 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/characteristics-and-measures.ttl` (804 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/communication.ttl` (1330 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/event-linkages.ttl` (795 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/event-participation.ttl` (1879 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/events.ttl` (782 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/hospital.ttl` (3329 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/identifiers.ttl` (1045 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/invalid-PersonState.ttl` (272 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/movement.ttl` (1930 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/period-of-time.ttl` (703 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/pizza-shapes.ttl` (651 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/relationships.ttl` (597 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/sometimes.ttl` (791 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/types.ttl` (686 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/valid-PersonState.ttl` (431 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/data/when-and-where.ttl` (948 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/epc/iris-building.ttl` (106925 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/generated/boro-building-ai.ttl` (9973 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/generated/ies-building-extension.ttl` (229037 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/generated/pizza-ai.ttl` (35950 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/mushroom/mushroom-ontology.ttl` (10022 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/oaei/data/anatomy/human.ttl` (3139435 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/oaei/data/anatomy/mouse.ttl` (1321538 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/era.ttl` (558440 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/foaf.ttl` (22344 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/goodrelations.ttl` (122344 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/gufo.ttl` (102713 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/movie.ttl` (13033 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/music.ttl` (99044 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/nordstream.ttl` (29031 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/pizza.ttl` (51873 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/saref.ttl` (95814 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/time.ttl` (107037 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/reference/BirthStateShape.shacl.ttl` (405 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/reference/PersonState.shacl.ttl` (1596 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/reference/boro-building-handcrafted.ttl` (29957 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/reference/ies-core.ttl` (86907 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/reference/ies-top.ttl` (19648 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/reference/ies4.ttl` (249173 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_1.ttl` (17735 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_10.ttl` (9549 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_2.ttl` (9205 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_3.ttl` (14595 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_4.ttl` (11677 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_5.ttl` (12797 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_6.ttl` (6144 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_7.ttl` (13555 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_8.ttl` (11374 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/benchmark/vision/dataset/img_9.ttl` (6559 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/tests/data/sample.ttl` (854 bytes)
+- `/Users/sac/unibit/ostar_ref/vendors/open-ontologies/tests/test_ontology.ttl` (291 bytes)
+
+</details>

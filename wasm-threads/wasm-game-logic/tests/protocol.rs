@@ -10,7 +10,7 @@ fn log() -> Logger {
 
 #[test]
 fn game_to_ui_state_update_roundtrips_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a GameToUiMessage::StateUpdate with tick=42 and player_health=Some(75)");
     let msg = GameToUiMessage::StateUpdate {
         tick: 42,
@@ -40,7 +40,7 @@ fn game_to_ui_state_update_roundtrips_json() {
 
 #[test]
 fn game_to_ui_game_over_roundtrips_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a GameToUiMessage::GameOver with winner_score=42000 and total_ticks=1800");
     let msg = GameToUiMessage::GameOver {
         winner_score: 42000,
@@ -66,7 +66,7 @@ fn game_to_ui_game_over_roundtrips_json() {
 
 #[test]
 fn game_to_ui_entity_moved_roundtrips_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a GameToUiMessage::EntityMoved for entity 7 at (1.5, -2.0)");
     let msg = GameToUiMessage::EntityMoved {
         entity_id: 7,
@@ -91,7 +91,7 @@ fn game_to_ui_entity_moved_roundtrips_json() {
 
 #[test]
 fn game_to_ui_entity_died_roundtrips_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a GameToUiMessage::EntityDied for entity 3");
     let msg = GameToUiMessage::EntityDied { entity_id: 3 };
 
@@ -108,7 +108,7 @@ fn game_to_ui_entity_died_roundtrips_json() {
 
 #[test]
 fn ui_to_game_ping_roundtrips_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a UiToGameMessage::Ping with seq=7");
     let msg = UiToGameMessage::Ping { seq: 7 };
 
@@ -125,7 +125,7 @@ fn ui_to_game_ping_roundtrips_json() {
 
 #[test]
 fn ui_to_game_input_move_roundtrips_json() {
-    let mut log = log();
+    let log = log();
     log.info("Given a UiToGameMessage::Input(Move) for entity 3 with dx=1.5, dy=-0.5");
     let msg = UiToGameMessage::Input(InputCommand::Move {
         entity: 3,
@@ -150,7 +150,7 @@ fn ui_to_game_input_move_roundtrips_json() {
 
 #[test]
 fn ui_to_game_pause_resume_restart_roundtrip() {
-    let mut log = log();
+    let log = log();
     for (label, msg) in [
         ("Pause", UiToGameMessage::Pause),
         ("Resume", UiToGameMessage::Resume),
@@ -167,7 +167,7 @@ fn ui_to_game_pause_resume_restart_roundtrip() {
 
 #[test]
 fn game_to_ui_from_json_returns_none_on_invalid_input() {
-    let mut log = log();
+    let log = log();
     log.info("Given invalid JSON");
     let bad = "not valid json at all {{{}}}";
 
@@ -180,7 +180,7 @@ fn game_to_ui_from_json_returns_none_on_invalid_input() {
 
 #[test]
 fn ui_to_game_from_json_returns_none_on_invalid_input() {
-    let mut log = log();
+    let log = log();
     log.info("Given invalid JSON");
     let bad = "not valid json at all {{{}}}";
 

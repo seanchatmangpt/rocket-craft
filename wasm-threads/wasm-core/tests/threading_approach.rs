@@ -11,7 +11,7 @@ fn make_logger() -> Logger {
 
 #[test]
 fn separate_modules_does_not_require_coop_coep() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given ThreadingApproach::SeparateModules with worker_count 2");
     let a = ThreadingApproach::SeparateModules { worker_count: 2 };
 
@@ -22,7 +22,7 @@ fn separate_modules_does_not_require_coop_coep() {
 
 #[test]
 fn shared_memory_requires_coop_coep() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given ThreadingApproach::SharedMemory with buffer_size_bytes 1024");
     let a = ThreadingApproach::SharedMemory {
         buffer_size_bytes: 1024,
@@ -35,7 +35,7 @@ fn shared_memory_requires_coop_coep() {
 
 #[test]
 fn hybrid_requires_coop_coep() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given ThreadingApproach::Hybrid with worker_count 4 and shared_buffer_size_bytes 4096");
     let a = ThreadingApproach::Hybrid {
         worker_count: 4,
@@ -49,7 +49,7 @@ fn hybrid_requires_coop_coep() {
 
 #[test]
 fn recommended_for_game_logic_is_separate_modules() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given the recommended_for_game_logic() factory");
 
     log.info("When we call it");
@@ -62,7 +62,7 @@ fn recommended_for_game_logic_is_separate_modules() {
 
 #[test]
 fn shared_memory_worker_count_is_one() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given ThreadingApproach::SharedMemory with buffer_size_bytes 512");
     let a = ThreadingApproach::SharedMemory {
         buffer_size_bytes: 512,
@@ -76,7 +76,7 @@ fn shared_memory_worker_count_is_one() {
 proptest! {
     #[test]
     fn approach_worker_count_consistent(n in 1usize..64) {
-        let mut log = make_logger();
+        let log = make_logger();
         log.info(&format!("Given SeparateModules with worker_count={n}"));
         let a = ThreadingApproach::SeparateModules { worker_count: n };
         log.info("Then worker_count() returns n");
@@ -85,7 +85,7 @@ proptest! {
 
     #[test]
     fn hybrid_worker_count_consistent(n in 1usize..64, buf in 1usize..65536) {
-        let mut log = make_logger();
+        let log = make_logger();
         log.info(&format!("Given Hybrid with worker_count={n} shared_buffer_size_bytes={buf}"));
         let a = ThreadingApproach::Hybrid {
             worker_count: n,

@@ -22,7 +22,7 @@ impl ParryResolver {
                 if d == announced {
                     ParryOutcome::PerfectParry
                 } else {
-                    ParryOutcome::NormalParry
+                    ParryOutcome::Miss
                 }
             }
         }

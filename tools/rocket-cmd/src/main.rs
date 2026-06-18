@@ -14,6 +14,7 @@ use rocket_sdk::setup;
 use rocket_sdk::error;
 use rocket_sdk::audit_affidavit::{AuditEvent, record_audit, persist_receipt};
 mod compliance;
+pub mod lock;
 
 use color_eyre::eyre::{eyre, ContextCompat, Result};
 use error::RocketError;
@@ -42,6 +43,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Recursively map dependencies of all 7 local workspaces and enforce deterministic A=μ(O*) lock
+    Lock,
     /// Setup the Unreal Engine environment
     Setup,
     /// Synchronize project manifest with filesystem
@@ -129,6 +132,10 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Lock => {
+            let root = std::env::current_dir()?;
+            lock::run_lock(&root)?;
+        }
         Commands::Setup => {
             setup::run_setup().map_err(|e| eyre!("{}", e))?;
         }
@@ -422,6 +429,8 @@ fn run_audit() -> Result<()> {
                 violations: result.errors.into_iter()
                     .map(|e| (e.law_name, e.message))
                     .collect(),
+                visual_delta: None,
+                combinatorial_matrix: None,
             });
         }
     }

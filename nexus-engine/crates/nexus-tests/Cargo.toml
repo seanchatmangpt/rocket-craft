@@ -10,9 +10,13 @@ rand = { workspace = true }
 rand_chacha = { workspace = true }
 thiserror = { workspace = true }
 proptest = { workspace = true }
+nexus-combat = { workspace = true }
+nexus-session = { workspace = true }
+nexus-economy = { workspace = true }
+nexus-shop = { workspace = true }
+nexus-types = { workspace = true }
 
 [dev-dependencies]
 chicago-tdd-tools = { path = "../../../chicago-tdd-tools" }
 nexus-net = { workspace = true }
 nexus-integration = { workspace = true }
-nexus-types = { workspace = true }

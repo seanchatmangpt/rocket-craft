@@ -1,0 +1,29 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sm: <https://rocket-craft.io/ontology/state-machine/>
+
+SELECT ?machine_name ?type ?name ?from ?to
+WHERE {
+  {
+    ?state a sm:State ;
+           sm:belongsTo ?m1 ;
+           rdfs:label ?name .
+    ?m1 rdfs:label ?machine_name .
+    BIND("State" AS ?type)
+    BIND("" AS ?from)
+    BIND("" AS ?to)
+  }
+  UNION
+  {
+    ?trans a sm:Transition ;
+           sm:belongsToMachine ?m2 ;
+           rdfs:label ?name ;
+           sm:fromState ?fs ;
+           sm:toState ?ts .
+    ?m2 rdfs:label ?machine_name .
+    ?fs rdfs:label ?from .
+    ?ts rdfs:label ?to .
+    BIND("Transition" AS ?type)
+  }
+}
+ORDER BY ?machine_name ?type ?name

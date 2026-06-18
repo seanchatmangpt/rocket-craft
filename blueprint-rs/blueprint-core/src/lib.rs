@@ -18,7 +18,6 @@ pub mod render;
 pub mod layout;
 pub mod diff;
 pub mod validator;
-pub(crate) mod t3d;
 pub mod parser;
 pub mod registry;
 

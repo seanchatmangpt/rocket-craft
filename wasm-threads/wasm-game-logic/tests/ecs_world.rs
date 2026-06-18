@@ -11,7 +11,7 @@ fn log() -> Logger {
 
 #[test]
 fn spawning_entity_increases_world_count() {
-    let mut log = log();
+    let log = log();
     log.info("Given an empty World");
     let mut world = World::new();
     assert_eq!(world.entity_count(), 0);
@@ -31,7 +31,7 @@ fn spawning_entity_increases_world_count() {
 
 #[test]
 fn despawning_entity_decreases_world_count() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with one spawned entity");
     let mut world = World::new();
     let e = world.spawn();
@@ -46,7 +46,7 @@ fn despawning_entity_decreases_world_count() {
 
 #[test]
 fn component_roundtrip_health() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with one entity");
     let mut world = World::new();
     let e = world.spawn();
@@ -62,7 +62,7 @@ fn component_roundtrip_health() {
 
 #[test]
 fn despawned_entity_components_are_removed() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity that has Health and Position");
     let mut world = World::new();
     let e = world.spawn();
@@ -79,7 +79,7 @@ fn despawned_entity_components_are_removed() {
 
 #[test]
 fn entities_with_position_query_returns_alive_only() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with two entities that have Position");
     let mut world = World::new();
     let e1 = world.spawn();
@@ -98,7 +98,7 @@ fn entities_with_position_query_returns_alive_only() {
 
 #[test]
 fn entities_with_health_query_returns_alive_only() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with two entities that have Health");
     let mut world = World::new();
     let e1 = world.spawn();
@@ -117,7 +117,7 @@ fn entities_with_health_query_returns_alive_only() {
 
 #[test]
 fn add_and_mutate_velocity_component() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity that has Velocity(0,0)");
     let mut world = World::new();
     let e = world.spawn();
@@ -137,7 +137,7 @@ fn add_and_mutate_velocity_component() {
 
 #[test]
 fn add_and_retrieve_player_component() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with one entity");
     let mut world = World::new();
     let e = world.spawn();
@@ -159,7 +159,7 @@ fn add_and_retrieve_player_component() {
 
 #[test]
 fn add_and_retrieve_attack_component() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with one entity");
     let mut world = World::new();
     let e = world.spawn();

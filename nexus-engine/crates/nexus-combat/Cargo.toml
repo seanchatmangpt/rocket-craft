@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 serde = { workspace = true }
 thiserror = { workspace = true }
+nexus-types = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }

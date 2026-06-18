@@ -40,7 +40,7 @@ impl ArenaManager {
     fn new(queue: VecDeque<String>) -> Self { ArenaManager { queue } }
     fn next(&mut self) -> Option<String> { self.queue.pop_front() }
     fn front(&self) -> Option<&str> { self.queue.front().map(|s| s.as_str()) }
-    fn is_empty(&self) -> bool { self.queue.is_empty() }
+    pub fn is_empty(&self) -> bool { self.queue.is_empty() }
     fn iter(&self) -> impl Iterator<Item = &String> { self.queue.iter() }
     fn reset(&mut self, ids: &[&str]) {
         self.queue = ids.iter().map(|s| s.to_string()).collect();
@@ -409,6 +409,31 @@ impl GameSession {
             None => ParryIntent::AnyParry,
         };
         let parry_outcome = ParryResolver::resolve(announced.clone(), intent);
+        if parry_outcome == ParryOutcome::Miss {
+            let shield_def = self
+                .player
+                .shield
+                .as_ref()
+                .map(|s| s.defense_bonus)
+                .unwrap_or(0) as f32;
+            let defense = self.player.stat_defense as f32 + shield_def;
+            let reduction = (defense / (defense + 50.0)).min(0.5);
+            let dmg = enemy.attack_damage * (1.0 - reduction);
+            self.player.take_damage(dmg);
+            let mut lines = vec![
+                "  ❌ Parry missed!".to_string(),
+                format!(
+                    "  \u{1f4a2} {} strikes {} \u{2014} you take {:.0} damage!",
+                    enemy.name, announced, dmg
+                ),
+            ];
+            self.combo_depth = 0;
+            if !self.player.is_alive() {
+                return self.handle_player_death(lines);
+            }
+            self.announce_next_attack(&mut lines);
+            return lines;
+        }
         let perfect = parry_outcome == ParryOutcome::PerfectParry;
 
         let mut lines = vec![narrative::fmt_parry_result(perfect, &announced)];
@@ -813,7 +838,7 @@ impl GameSession {
             "\u{2550}\u{2550}\u{2550} Shop \u{2014} Weapons \u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}".to_string(),
         ];
         for w in weapon_catalog().iter().take(8) {
-            let price = weapon_price(&w);
+            let price = weapon_price(w);
             let afford = if self.player.gold >= price {
                 ""
             } else {

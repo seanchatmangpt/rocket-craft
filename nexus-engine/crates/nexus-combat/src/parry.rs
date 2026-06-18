@@ -1,23 +1,4 @@
-use serde::{Deserialize, Serialize};
-
-/// Direction of an attack or parry input.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum AttackDir {
-    Overhead,
-    Left,
-    Right,
-}
-
-/// Outcome of a parry attempt.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum ParryOutcome {
-    /// No parry input was made — full damage taken.
-    Miss,
-    /// Parry was performed with any-direction input (or wrong direction).
-    Normal,
-    /// Parry matched the exact announced direction — zero chip damage, counter bonus unlocked.
-    Perfect,
-}
+pub use nexus_types::{AttackDir, ParryOutcome};
 
 /// Stateless resolver for parry interactions.
 pub struct ParryResolver;

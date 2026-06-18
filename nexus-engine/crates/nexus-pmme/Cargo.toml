@@ -1,0 +1,13 @@
+[package]
+name = "nexus-pmme"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+sha2 = { workspace = true }
+chrono = { workspace = true }
+nexus-types = { workspace = true }
+nexus-gundam = { workspace = true }

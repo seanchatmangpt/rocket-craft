@@ -1,0 +1,17 @@
+{
+  "operation_id": "744506ad-adbe-424b-883a-de820c53a300",
+  "timestamp": "2026-06-18T05:34:48.034439Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.9",
+    "ggen.toml:17c8deada9d9fc6c3519d637a9d569d74086449c2824e822c4db1c93d0510d51",
+    ".specify/schema/state_machines.ttl:41a8455a90383c5b997b8edf31837003046decf2ad2240f7f17d5ca758b87e5e",
+    "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a",
+    "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a"
+  ],
+  "output_hashes": [
+    "./crates/nexus-combat/src/generated_machine.rs:4812468bd80704e41a6f92b9827965832ce60414710dc91b955dea8a4fdf6a36",
+    "./crates/nexus-session/src/generated_session.rs:a7da1b32b662f7ae7750a6c08b0f21c3bb0300b996fd388781ed69bb58d2618a"
+  ],
+  "signature": "2e43ec33ce99c29cbd76b67b5b7fde9a73d8f03bdb1b35ebcd9399ac8d99b39664eae7210b80c36ea40b972a883f265372a24a022326a1658b0c7972468e3c03",
+  "previous_receipt_hash": null
+}

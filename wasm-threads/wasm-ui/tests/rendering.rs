@@ -11,7 +11,7 @@ fn log() -> Logger {
 
 #[test]
 fn test_renderer_records_draw_calls() {
-    let mut log = log();
+    let log = log();
     log.info("Given a fresh TestRenderer");
     let mut r = TestRenderer::new();
 
@@ -32,7 +32,7 @@ fn test_renderer_records_draw_calls() {
 
 #[test]
 fn renderer_draw_calls_reflect_actual_input_not_constant() {
-    let mut log = log();
+    let log = log();
     log.info("Given two different health percentages");
     let mut r = TestRenderer::new();
 
@@ -61,7 +61,7 @@ fn renderer_draw_calls_reflect_actual_input_not_constant() {
 
 #[test]
 fn render_frame_produces_correct_call_sequence() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with known values");
     let mut r = TestRenderer::new();
     let hud = HudData {
@@ -89,7 +89,7 @@ fn render_frame_produces_correct_call_sequence() {
 
 #[test]
 fn render_frame_tick_call_records_game_tick() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with game_tick=42");
     let mut r = TestRenderer::new();
     let hud = HudData {
@@ -111,7 +111,7 @@ fn render_frame_tick_call_records_game_tick() {
 
 #[test]
 fn test_renderer_call_count_starts_at_zero() {
-    let mut log = log();
+    let log = log();
     log.info("Given a freshly constructed TestRenderer");
     let r = TestRenderer::new();
 
@@ -127,7 +127,7 @@ proptest! {
         score in 0u64..u64::MAX,
         entities in 0usize..1000,
     ) {
-        let mut log = log();
+        let log = log();
         log.info("Given arbitrary HudData values");
         let mut r = TestRenderer::new();
         let hud = HudData {

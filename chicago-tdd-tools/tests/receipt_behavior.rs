@@ -1,6 +1,5 @@
 use genie_core::spec::{WorldSpec, HistoryEvent};
 use genie_core::receipt_chain::ReceiptChainManager;
-use std::collections::HashMap;
 
 #[test]
 fn should_generate_and_verify_cryptographic_receipt_chain() {

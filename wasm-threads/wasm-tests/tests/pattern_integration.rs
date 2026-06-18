@@ -189,7 +189,7 @@ fn event_log_version_increments() {
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
-enum SystemEvent { HealthChanged(u32), ScoreTick(u64) }
+enum SystemEvent { HealthChanged(u32), #[allow(dead_code)] ScoreTick(u64) }
 impl EventType for SystemEvent {
     fn topic(&self) -> &'static str {
         match self {
@@ -323,7 +323,7 @@ fn batch_pipeline_processes_all_items() {
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone)]
-struct MoveCmd { entity_id: u32, seq: u32 }
+struct MoveCmd { #[allow(dead_code)] entity_id: u32, seq: u32 }
 impl ActorMessage for MoveCmd {}
 
 /// Falsification: actor system must assign different workers for different actors.

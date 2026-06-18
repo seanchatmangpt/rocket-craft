@@ -32,30 +32,6 @@ pub enum ErrorKind {
 }
 
 impl ValidationError {
-    fn type_mismatch(node: &str, pin: &str, from: &str, to: &str) -> Self {
-        ValidationError {
-            kind: ErrorKind::TypeMismatch {
-                from_type: from.to_string(),
-                to_type: to.to_string(),
-            },
-            node_name: node.to_string(),
-            pin_name: Some(pin.to_string()),
-            message: format!(
-                "Type mismatch on '{}::{}': cannot connect {:?} to {:?}",
-                node, pin, from, to
-            ),
-        }
-    }
-
-    fn dangling_exec(node: &str, pin: &str) -> Self {
-        ValidationError {
-            kind: ErrorKind::DanglingExec,
-            node_name: node.to_string(),
-            pin_name: Some(pin.to_string()),
-            message: format!("Exec output pin '{}::{}' has no connections", node, pin),
-        }
-    }
-
     fn duplicate_name(node: &str, graph: &str) -> Self {
         ValidationError {
             kind: ErrorKind::DuplicateNodeName,
@@ -313,7 +289,7 @@ impl ValidatedBlueprint {
 mod tests {
     use super::*;
     use crate::ast::{BpGraph, BpNode, Blueprint, Pin};
-    use crate::types::{PinDirection, PinType};
+    use crate::types::PinType;
 
     // -- helpers ---------------------------------------------------------------
 

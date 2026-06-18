@@ -8,7 +8,9 @@ pub struct StringCommand(pub String);
 
 impl Command for StringCommand {
     type Error = &'static str;
-    fn command_name(&self) -> &'static str { "string_command" }
+    fn command_name(&self) -> &'static str {
+        "string_command"
+    }
 }
 
 pub trait Query: 'static {

@@ -1,0 +1,249 @@
+# Research Dossier: `gitvan`
+
+**Total Files:** 125 Ontologies (.ttl) | 0 Queries (.rq)
+**Total Volume:** 125 files
+
+## 1. Core Vocabularies (Prefixes)
+- `@prefix ex: <http://example.org/>`
+- `ai: <http://example.org/ai#>`
+- `cfg: <https://gitvan.dev/config#>`
+- `ci: <https://gitvan.dev/ci#>`
+- `dcat: <http://www.w3.org/ns/dcat#>`
+- `dct: <http://purl.org/dc/terms/>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `deploy: <https://gitvan.dev/deployment#>`
+- `dev: <https://gitvan.dev/developer#>`
+- `ex: <http://example.org/>`
+- `ex: <http://example.org/config/>`
+- `ex: <http://example.org/gitvan/hooks/>`
+- `ex: <http://example.org/invalid/>`
+- `ex: <https://example.org/>`
+- `foaf: <http://xmlns.com/foaf/0.1/>`
+- `gh: <http://example.org/git-hooks#>`
+- `gh: <https://gitvan.dev/graph-hook#>`
+- `git: <http://example.org/git#>`
+- `git: <https://gitvan.dev/git#>`
+- `gitv: <https://gitvan.dev/ontology/git#>`
+- `gov: <https://bytestar.org/ontology/byteethos/governance-specification#>`
+- `gv: <http://example.org/gitvan#>`
+- `gv: <https://gitvan.dev/ontology#>`
+- `gvc: <https://gitvan.dev/ontology/config#>`
+- `lock: <https://gitvan.dev/lock#>`
+- `metrics: <https://gitvan.dev/metrics#>`
+- `op: <https://gitvan.dev/op#>`
+- `opt: <https://gitvan.dev/workflow/optimization#>`
+- `owl: <http://www.w3.org/2002/07/owl#>`
+- `pack: <https://gitvan.dev/pack#>`
+- `perf: <http://example.org/performance#>`
+- `perf: <https://gitvan.dev/performance#>`
+- `prov: <http://www.w3.org/ns/prov#>`
+- `qa: <http://example.org/quality#>`
+- `queue: <https://gitvan.dev/queue#>`
+- `rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>`
+- `rdfs: <http://www.w3.org/2000/01/rdf-schema#>`
+- `revops: <http://gitvan.org/ontology/revops#>`
+- `sas: <https://gitvan.dev/scrum-at-scale#>`
+- `scr: <https://gitvan.dev/scrum#>`
+- `scrum: <http://example.org/scrum#>`
+- `scrum: <https://bytestar.org/ontology/ethos/canon/scrum-at-scale#>`
+- `scrum: <https://gitvan.dev/scrum#>`
+- `sec: <http://example.org/security#>`
+- `sh: <http://www.w3.org/ns/shacl#>`
+- `shacl: <http://www.w3.org/ns/shacl#>`
+- `skos: <http://www.w3.org/2004/02/skos/core#>`
+- `snap: <https://gitvan.dev/snapshot#>`
+- `spdx: <http://spdx.org/rdf/terms#>`
+- `state: <https://gitvan.dev/state#>`
+- *...and 3 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:CacheDependency`
+- `:CacheEntry`
+- `:CacheEntryGeneration`
+- `:CacheEntryShape`
+- `:CachePolicy`
+- `:CachePolicyShape`
+- `:CacheStatistics`
+- `:ChiefProductOwner`
+- `:DailyScrum`
+- `:Increment`
+- `:InvalidationRule`
+- `:InvalidationRuleShape`
+- `:ProductBacklog`
+- `:ProductBacklogItem`
+- `:ProductOwner`
+- `:QueryExecution`
+- `:ScrumMaster`
+- `:ScrumOfScrums`
+- `:ScrumOfScrumsMaster`
+- `:Sprint`
+- `:SprintBacklog`
+- `:SprintPlanning`
+- `:SprintRetrospective`
+- `:SprintReview`
+- `:SubscriptionPattern`
+- `:SubscriptionPatternShape`
+- `:TeamMember`
+- `cfg:GitStorageConfigShape`
+- `cfg:HooksConfigShape`
+- `cfg:RdfStoreConfigShape`
+- `cfg:WorkflowEngineConfigShape`
+- `ex:BIShape`
+- `ex:SprintShape`
+- `gh:ANDComposition`
+- `gh:ActionExecutionShape`
+- `gh:AuthorPattern`
+- `gh:BranchPattern`
+- `gh:CommitMessagePattern`
+- `gh:CompositePattern`
+- `gh:ConditionalPattern`
+- `gh:CountPattern`
+- `gh:EvaluationMetrics`
+- `gh:EventTrigger`
+- `gh:ExecutionResultShape`
+- `gh:FileChangePattern`
+- `gh:Hook`
+- `gh:HookConfigShape`
+- `gh:HookShape`
+- `gh:NOTComposition`
+- `gh:ORComposition`
+- *...and 187 more.*
+
+## 3. Extraction Layer (SPARQL)
+- *No queries executed in this project.*
+
+### Projected Variables (SELECT ?var)
+- *No specific projection variables identified.*
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/gitvan/SHACL_EXAMPLES.ttl` (16334 bytes)
+- `/Users/sac/gitvan/config/shacl/config-shapes.ttl` (5460 bytes)
+- `/Users/sac/gitvan/config/shacl/git-event-shapes.ttl` (5549 bytes)
+- `/Users/sac/gitvan/config/shacl/hook-shapes.ttl` (4225 bytes)
+- `/Users/sac/gitvan/config/shacl/ontology-shapes.ttl` (16853 bytes)
+- `/Users/sac/gitvan/config/shacl/pack-shapes.ttl` (5944 bytes)
+- `/Users/sac/gitvan/config/shacl/workflow-shapes.ttl` (7100 bytes)
+- `/Users/sac/gitvan/data/ontology.ttl` (873 bytes)
+- `/Users/sac/gitvan/demo-rdf-zod/graph/demo-data.ttl` (1634 bytes)
+- `/Users/sac/gitvan/demo-rdf-zod/graph/demo-ontology.ttl` (2313 bytes)
+- `/Users/sac/gitvan/examples/git-lifecycle-hooks/alert-on-merge-conflicts.ttl` (22203 bytes)
+- `/Users/sac/gitvan/examples/git-lifecycle-hooks/ci-integration.ttl` (25820 bytes)
+- `/Users/sac/gitvan/examples/git-lifecycle-hooks/deploy-on-version-tag.ttl` (15727 bytes)
+- `/Users/sac/gitvan/examples/git-lifecycle-hooks/enforce-branch-naming.ttl` (10971 bytes)
+- `/Users/sac/gitvan/examples/git-lifecycle-hooks/review-large-commits.ttl` (19345 bytes)
+- `/Users/sac/gitvan/examples/git-lifecycle-hooks/track-author-statistics.ttl` (20156 bytes)
+- `/Users/sac/gitvan/examples/nextjs-app/hooks/ai-assistant.ttl` (2975 bytes)
+- `/Users/sac/gitvan/examples/nextjs-app/hooks/auto-generate-workflows.ttl` (2010 bytes)
+- `/Users/sac/gitvan/examples/nextjs-app/hooks/performance-optimizer.ttl` (2458 bytes)
+- `/Users/sac/gitvan/examples/nextjs-app/hooks/quality-enforcer.ttl` (2648 bytes)
+- `/Users/sac/gitvan/examples/nextjs-app/hooks/security-scanner.ttl` (2637 bytes)
+- `/Users/sac/gitvan/examples/nextjs-app/hooks/self-healing-system.ttl` (2249 bytes)
+- `/Users/sac/gitvan/examples/shared-hooks/base-hooks/alert-on-hotfix.ttl` (1772 bytes)
+- `/Users/sac/gitvan/examples/shared-hooks/base-hooks/enforce-branch-naming.ttl` (1762 bytes)
+- `/Users/sac/gitvan/examples/shared-hooks/base-hooks/prevent-force-push.ttl` (1160 bytes)
+- `/Users/sac/gitvan/examples/shared-hooks/base-hooks/track-metrics.ttl` (1116 bytes)
+- `/Users/sac/gitvan/examples/shared-hooks/ci-cd-hooks/run-tests-on-push.ttl` (1100 bytes)
+- `/Users/sac/gitvan/graph/default.ttl` (834 bytes)
+- `/Users/sac/gitvan/graph/gitvan-sprint-simulation.ttl` (6213 bytes)
+- `/Users/sac/gitvan/graph/init.ttl` (1153 bytes)
+- `/Users/sac/gitvan/graph/scrum-at-scale-example-data.ttl` (3416 bytes)
+- `/Users/sac/gitvan/graph/scrum-at-scale.ttl` (7720 bytes)
+- `/Users/sac/gitvan/hooks/bug-threshold.ttl` (5990 bytes)
+- `/Users/sac/gitvan/hooks/critical-issues.ttl` (1269 bytes)
+- `/Users/sac/gitvan/hooks/developer-workflow/daily-scrum.ttl` (2569 bytes)
+- `/Users/sac/gitvan/hooks/developer-workflow/definition-of-done.ttl` (2679 bytes)
+- `/Users/sac/gitvan/hooks/developer-workflow/end-of-day.ttl` (2245 bytes)
+- `/Users/sac/gitvan/hooks/developer-workflow/file-saving.ttl` (2156 bytes)
+- `/Users/sac/gitvan/hooks/developer-workflow/sprint-planning.ttl` (2455 bytes)
+- `/Users/sac/gitvan/hooks/developer-workflow/start-of-day-enhanced.ttl` (6340 bytes)
+- `/Users/sac/gitvan/hooks/developer-workflow/start-of-day.ttl` (2146 bytes)
+- `/Users/sac/gitvan/hooks/jtbd-hooks/core-development-lifecycle/code-quality-gatekeeper.ttl` (5827 bytes)
+- `/Users/sac/gitvan/hooks/jtbd-hooks/core-development-lifecycle/dependency-vulnerability-scanner.ttl` (6666 bytes)
+- `/Users/sac/gitvan/hooks/jtbd-hooks/core-development-lifecycle/test-coverage-enforcer.ttl` (6107 bytes)
+- `/Users/sac/gitvan/hooks/jtbd-hooks/core-development-lifecycle/test-jtbd-hook.ttl` (2554 bytes)
+- `/Users/sac/gitvan/hooks/knowledge-graph-builder.ttl` (4458 bytes)
+- `/Users/sac/gitvan/hooks/resource-inspector.ttl` (5431 bytes)
+- `/Users/sac/gitvan/hooks/version-change.ttl` (1567 bytes)
+- `/Users/sac/gitvan/src/config/config-ontology.ttl` (38864 bytes)
+- `/Users/sac/gitvan/src/config/example-invalid-config.ttl` (14034 bytes)
+- `/Users/sac/gitvan/src/config/example-valid-config.ttl` (11936 bytes)
+- `/Users/sac/gitvan/src/performance/cache-ontology.ttl` (14044 bytes)
+- `/Users/sac/gitvan/src/rdf/git-ontology.ttl` (14913 bytes)
+- `/Users/sac/gitvan/src/rdf/hook-predicates.ttl` (16971 bytes)
+- `/Users/sac/gitvan/src/rdf/ontologies/lock-ontology.ttl` (7559 bytes)
+- `/Users/sac/gitvan/src/rdf/ontologies/pack-ontology.ttl` (19642 bytes)
+- `/Users/sac/gitvan/src/rdf/ontologies/performance-ontology.ttl` (18120 bytes)
+- `/Users/sac/gitvan/src/rdf/ontologies/queue-ontology.ttl` (13039 bytes)
+- `/Users/sac/gitvan/src/rdf/ontologies/revops-ontology.ttl` (22749 bytes)
+- `/Users/sac/gitvan/src/rdf/ontologies/snapshot-ontology.ttl` (10464 bytes)
+- `/Users/sac/gitvan/src/rdf/rules/code-churn-detection.ttl` (752 bytes)
+- `/Users/sac/gitvan/src/rdf/rules/code-ownership-mapping.ttl` (970 bytes)
+- `/Users/sac/gitvan/src/rdf/rules/dependency-risk-detection.ttl` (881 bytes)
+- `/Users/sac/gitvan/src/rdf/rules/performance-regression-detection.ttl` (1005 bytes)
+- `/Users/sac/gitvan/src/rdf/rules/test-coverage-warnings.ttl` (829 bytes)
+- `/Users/sac/gitvan/src/rdf/shapes/git-commit-shape.ttl` (4060 bytes)
+- `/Users/sac/gitvan/src/rdf/shapes/gitvan-core-ontology-shape.ttl` (4206 bytes)
+- `/Users/sac/gitvan/src/rdf/shapes/hook-configuration-shape.ttl` (6439 bytes)
+- `/Users/sac/gitvan/src/rdf/state-ontology.ttl` (15486 bytes)
+- `/Users/sac/gitvan/src/workflow/workflow-optimization.ttl` (14923 bytes)
+- `/Users/sac/gitvan/templates/default.ttl` (2153 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/graph/init.ttl` (1135 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/hooks/critical-issues.ttl` (1267 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/hooks/test-gap-analysis.ttl` (1068 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/hooks/test-validation-fixed.ttl` (1112 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/hooks/test-validation.ttl` (1054 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/hooks/version-change.ttl` (1565 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/test-hooks-validation/hooks/critical-issues.ttl` (1267 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/test-hooks-validation/hooks/test-gap-analysis.ttl` (1068 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/test-hooks-validation/hooks/test-validation-fixed.ttl` (1112 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/test-hooks-validation/hooks/test-validation.ttl` (1054 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/test-hooks-validation/hooks/version-change.ttl` (1565 bytes)
+- `/Users/sac/gitvan/test-hooks-validation/workflows/data-processing.ttl` (1632 bytes)
+- `/Users/sac/gitvan/test-scrum-at-scale/hooks/developer-workload-hook.ttl` (1276 bytes)
+- `/Users/sac/gitvan/test-scrum-at-scale/hooks/impediment-escalation-hook.ttl` (1208 bytes)
+- `/Users/sac/gitvan/test-scrum-at-scale/hooks/scrum-at-scale-data.ttl` (1759 bytes)
+- `/Users/sac/gitvan/test-scrum-at-scale/hooks/scrum-at-scale-ontology.ttl` (1769 bytes)
+- `/Users/sac/gitvan/test-scrum-at-scale/hooks/sprint-progress-hook.ttl` (1286 bytes)
+- `/Users/sac/gitvan/test-sparql-JFgiIz/test.ttl` (133 bytes)
+- `/Users/sac/gitvan/test-sparql-PjvTvR/test.ttl` (188 bytes)
+- `/Users/sac/gitvan/test-sparql-TeA73o/test.ttl` (133 bytes)
+- `/Users/sac/gitvan/test-sparql-TsMQpv/test.ttl` (188 bytes)
+- `/Users/sac/gitvan/test-sparql-Xip0d6/test.ttl` (188 bytes)
+- `/Users/sac/gitvan/test-sparql-Y8S9AW/test.ttl` (133 bytes)
+- `/Users/sac/gitvan/test-sparql-cm6mJX/test.ttl` (445 bytes)
+- `/Users/sac/gitvan/test-sparql-dOplMq/test.ttl` (188 bytes)
+- `/Users/sac/gitvan/test-sparql-lpGgz9/test.ttl` (133 bytes)
+- `/Users/sac/gitvan/test-sparql-xej8Cu/test.ttl` (188 bytes)
+- `/Users/sac/gitvan/test-sparql-zNo3LD/test.ttl` (445 bytes)
+- `/Users/sac/gitvan/test-turtle-HJttXS/test.ttl` (191 bytes)
+- `/Users/sac/gitvan/test-turtle-dYhVPs/test.ttl` (191 bytes)
+- `/Users/sac/gitvan/test-turtle-wMGpiE/test.ttl` (191 bytes)
+- `/Users/sac/gitvan/test/fixtures/workflows/test-workflow.ttl` (738 bytes)
+- `/Users/sac/gitvan/tests/integration/all-steps-integration.ttl` (3123 bytes)
+- `/Users/sac/gitvan/tests/turtle-test-data/malformed/malformed.ttl` (31 bytes)
+- `/Users/sac/gitvan/tests/turtle-test-data/test1.ttl` (1580 bytes)
+- `/Users/sac/gitvan/tests/turtle-test-data/test2.ttl` (218 bytes)
+- `/Users/sac/gitvan/workflow-inspection/graph/init.ttl` (1132 bytes)
+- `/Users/sac/gitvan/workflow-inspection/hooks/critical-issues.ttl` (1267 bytes)
+- `/Users/sac/gitvan/workflow-inspection/hooks/version-change.ttl` (1565 bytes)
+- `/Users/sac/gitvan/workflow-inspection/workflows/data-processing.ttl` (1632 bytes)
+- `/Users/sac/gitvan/workflows/auto-template.ttl` (800 bytes)
+- `/Users/sac/gitvan/workflows/code-generation-workflow.ttl` (3735 bytes)
+- `/Users/sac/gitvan/workflows/data-processing-workflow.ttl` (5230 bytes)
+- `/Users/sac/gitvan/workflows/data-processing.ttl` (1633 bytes)
+- `/Users/sac/gitvan/workflows/demo-interactive.ttl` (802 bytes)
+- `/Users/sac/gitvan/workflows/demo-template.ttl` (784 bytes)
+- `/Users/sac/gitvan/workflows/demo-workflow.ttl` (346 bytes)
+- `/Users/sac/gitvan/workflows/scrum-at-scale-ontology.ttl` (4822 bytes)
+- `/Users/sac/gitvan/workflows/scrum-of-scrums-workflow.ttl` (4151 bytes)
+- `/Users/sac/gitvan/workflows/scrum-team-setup-workflow.ttl` (6110 bytes)
+- `/Users/sac/gitvan/workflows/scrum-team-sprint-workflow.ttl` (4130 bytes)
+- `/Users/sac/gitvan/workflows/test-cursor-workflow-optimized.ttl` (3065 bytes)
+- `/Users/sac/gitvan/workflows/test-cursor-workflow.ttl` (873 bytes)
+- `/Users/sac/gitvan/workflows/test-workflow.ttl` (800 bytes)
+
+</details>

@@ -38,11 +38,17 @@ echo "[4/8] Triggering world manufacture and evolution..."
 
 # Create initial world intent
 cat << 'EOF' > "$CWD/init_intent.txt"
-create place room_1 name "Control Room" at (0.0, 0.0, 0.0) bounds (100.0, 100.0, 50.0)
-create actor bot_1 name "Welder Bot" role RoboticWelder in room_1
-create object cnc_1 name "CNC Alpha" class CNC_Machine in room_1
-create relationship rel_1 contains from room_1 to bot_1
-create rule rule_1 name TempCheck expression "room_1.temp < 30" severity error
+create place zone_1 name "Primitive Foundry" at (0.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)
+create place zone_2 name "Part Runner Wall" at (400.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)
+create place zone_3 name "Assembly Gantry" at (800.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)
+create place zone_4 name "Fit + Collision Bay" at (1200.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)
+create place zone_5 name "Physics Proving Ground" at (1600.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)
+create place zone_6 name "Final Reveal Platform" at (2000.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)
+create relationship rel_1_2 connects from zone_1 to zone_2
+create relationship rel_2_3 connects from zone_2 to zone_3
+create relationship rel_3_4 connects from zone_3 to zone_4
+create relationship rel_4_5 connects from zone_4 to zone_5
+create relationship rel_5_6 connects from zone_5 to zone_6
 EOF
 
 # Manufacture
@@ -53,9 +59,9 @@ EOF
 
 # Create evolution intent
 cat << 'EOF' > "$CWD/mod_intent.txt"
-create place room_2 name "Storage Room" at (200.0, 0.0, 0.0) bounds (50.0, 50.0, 30.0)
-update actor bot_1 position (20.0, -10.0, 0.0)
-create relationship rel_2 connects from room_1 to room_2
+create actor bot_1 name "Welder Bot" role RoboticWelder in zone_1
+create place zone_extra name "Extra Lab" at (2400.0, 0.0, 0.0) bounds (100.0, 100.0, 50.0)
+create relationship rel_6_extra connects from zone_6 to zone_extra
 EOF
 
 # Evolve

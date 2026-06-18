@@ -526,6 +526,14 @@ impl BlueprintBuilder {
         self.push_node(node)
     }
 
+    /// Add an integer subtract node (mutable style).
+    pub fn subtract_int(&mut self) -> NodeHandle {
+        let name = self.unique_name("SubtractInt");
+        let pos = self.next_pos();
+        let node = nodes::subtract_int(&name).at(pos.x, pos.y);
+        self.push_node(node)
+    }
+
     // ------------------------------------------------------------------
     // Mutable-style event nodes for actor lifecycle events
     // ------------------------------------------------------------------

@@ -140,6 +140,7 @@ pub enum MagicType {
     Ice,
     Dark,
     Light,
+    BeamSaber,
 }
 
 /// Equipment and item rarity tier.
@@ -171,7 +172,7 @@ pub enum TitanType {
 
 /// Gundam anime franchise series tag for unit provenance.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub enum Series {
+pub enum GundamSeries {
     WitchFromMercury,
     Seed,
     Unicorn,
@@ -182,6 +183,8 @@ pub enum Series {
     TurnA,
     BuildFighters,
 }
+
+pub type Series = GundamSeries;
 
 /// Gacha pull rarity tier for banner drops.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -219,6 +222,7 @@ impl From<MagicType> for f32 {
             MagicType::Ice       => 15.0,
             MagicType::Dark      => 35.0,
             MagicType::Light     => 25.0,
+            MagicType::BeamSaber => 40.0,
         }
     }
 }
@@ -233,6 +237,7 @@ impl TryFrom<u8> for MagicType {
             2 => Ok(MagicType::Ice),
             3 => Ok(MagicType::Dark),
             4 => Ok(MagicType::Light),
+            5 => Ok(MagicType::BeamSaber),
             other => Err(MagicTypeParseError(other)),
         }
     }

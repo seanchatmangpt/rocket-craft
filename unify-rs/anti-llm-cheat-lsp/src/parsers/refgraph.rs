@@ -32,24 +32,6 @@ pub fn extract_unwitnessed_seeds(filepath: &str, content: &str) -> Vec<Observati
     obs
 }
 
-/// Parse `// @fn_reference: <caller> -> <callee>` annotations from source.
-fn extract_fn_references(content: &str) -> Vec<(String, String)> {
-    let mut refs = Vec::new();
-    for line in content.lines() {
-        let trimmed = line.trim();
-        if let Some(rest) = trimmed.strip_prefix("// @fn_reference:") {
-            let parts: Vec<&str> = rest.splitn(2, "->").collect();
-            if parts.len() == 2 {
-                let caller = parts[0].trim().to_string();
-                let callee = parts[1].trim().to_string();
-                if !caller.is_empty() && !callee.is_empty() {
-                    refs.push((caller, callee));
-                }
-            }
-        }
-    }
-    refs
-}
 
 pub fn parse_refgraph_json(_fp: &str, _c: &str) -> Vec<Observation> {
     vec![]

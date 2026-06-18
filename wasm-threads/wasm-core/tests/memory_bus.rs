@@ -11,7 +11,7 @@ fn make_logger() -> Logger {
 
 #[test]
 fn bus_write_read_roundtrip() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a SharedMemoryBus of size 16");
     let mut bus = SharedMemoryBus::new(16);
 
@@ -24,7 +24,7 @@ fn bus_write_read_roundtrip() {
 
 #[test]
 fn bus_out_of_bounds_read_errors() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a SharedMemoryBus of size 4");
     let bus = SharedMemoryBus::new(4);
 
@@ -35,7 +35,7 @@ fn bus_out_of_bounds_read_errors() {
 
 #[test]
 fn bus_out_of_bounds_write_errors() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a SharedMemoryBus of size 4");
     let mut bus = SharedMemoryBus::new(4);
 
@@ -46,7 +46,7 @@ fn bus_out_of_bounds_write_errors() {
 
 #[test]
 fn bus_different_values_at_different_offsets() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a SharedMemoryBus of size 8");
     let mut bus = SharedMemoryBus::new(8);
 
@@ -60,7 +60,7 @@ fn bus_different_values_at_different_offsets() {
 
 #[test]
 fn bus_size_matches_requested() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a SharedMemoryBus constructed with size 32");
 
     log.info("When we inspect its size()");
@@ -73,7 +73,7 @@ fn bus_size_matches_requested() {
 proptest! {
     #[test]
     fn bus_roundtrip_arbitrary_values(offset in 0usize..8, value in i32::MIN..i32::MAX) {
-        let mut log = make_logger();
+        let log = make_logger();
         log.info(&format!("Given offset={offset} value={value}"));
         let mut bus = SharedMemoryBus::new(16);
         bus.write_i32(offset, value).unwrap();
@@ -87,7 +87,7 @@ proptest! {
         wrong   in 101i32..200,
         new_val in 201i32..300,
     ) {
-        let mut log = make_logger();
+        let log = make_logger();
         log.info(&format!("Given initial={initial} wrong={wrong} new_val={new_val}"));
         let mut bus = SharedMemoryBus::new(4);
         bus.write_i32(0, initial).unwrap();

@@ -13,3 +13,5 @@ tokio = { workspace = true }
 chicago-tdd-tools = { path = "../../chicago-tdd-tools" }
 ib4-mud = { path = "../../infinity-blade-4/mud/ib4-mud" }
 nexus-session = { path = "../../nexus-engine/crates/nexus-session" }
+nexus-combat = { path = "../../nexus-engine/crates/nexus-combat" }
+nexus-types = { path = "../../nexus-engine/crates/nexus-types" }

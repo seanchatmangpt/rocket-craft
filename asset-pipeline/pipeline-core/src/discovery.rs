@@ -13,7 +13,6 @@
 
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use std::sync::mpsc;
 
 use tracing::{debug, info, warn};
 use walkdir::WalkDir;
@@ -82,19 +81,14 @@ impl Scanner {
     pub fn scan_once(dir: &Path) -> ScanResult {
         let mut result = ScanResult::default();
 
-        let walker = WalkDir::new(dir)
-            .follow_links(false)
-            .sort_by_file_name();
+        let walker = WalkDir::new(dir).follow_links(false).sort_by_file_name();
 
         for entry in walker {
             let entry = match entry {
                 Ok(e) => e,
                 Err(err) => {
                     // The path might be partially known even on error
-                    let path = err
-                        .path()
-                        .unwrap_or(dir)
-                        .to_path_buf();
+                    let path = err.path().unwrap_or(dir).to_path_buf();
                     warn!(path = %path.display(), error = %err, "walkdir error");
                     result.errors.push((path, err.to_string()));
                     continue;
@@ -116,10 +110,7 @@ impl Scanner {
             let path = entry.path().to_path_buf();
 
             // Check extension against supported formats
-            let ext = path
-                .extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("");
+            let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
             let format = match Format::from_extension(ext) {
                 Some(f) => f,
@@ -157,7 +148,9 @@ impl Scanner {
                 "asset discovered"
             );
 
-            result.assets.push(DiscoveredAsset::new(path, hash, format, file_size_bytes));
+            result
+                .assets
+                .push(DiscoveredAsset::new(path, hash, format, file_size_bytes));
         }
 
         result
@@ -199,14 +192,15 @@ impl DirectoryWatcher {
     pub async fn run(self) -> Result<(), PipelineError> {
         use notify::{EventKind, RecursiveMode, Watcher};
 
-        // Bridge: notify's callback posts to std mpsc; we receive on the
-        // async side via spawn_blocking.
-        let (std_tx, std_rx) = mpsc::channel::<notify::Result<notify::Event>>();
+        // Bridge: notify's callback posts to tokio mpsc; we receive on the
+        // async side directly.
+        let (tokio_tx, mut tokio_rx) =
+            tokio::sync::mpsc::channel::<notify::Result<notify::Event>>(100);
 
         let mut watcher = notify::RecommendedWatcher::new(
             move |res| {
                 // Ignore send errors — receiver may have been dropped on shutdown.
-                let _ = std_tx.send(res);
+                let _ = tokio_tx.blocking_send(res);
             },
             notify::Config::default(),
         )
@@ -215,41 +209,16 @@ impl DirectoryWatcher {
         watcher
             .watch(&self.dir, RecursiveMode::Recursive)
             .map_err(|e| {
-                PipelineError::Config(format!(
-                    "failed to watch '{}': {e}",
-                    self.dir.display()
-                ))
+                PipelineError::Config(format!("failed to watch '{}': {e}", self.dir.display()))
             })?;
 
         info!(dir = %self.dir.display(), "directory watcher started");
 
-        // Move the receiver into an Arc<Mutex<>> so we can hand it into
-        // spawn_blocking across iterations.
-        let rx = std::sync::Arc::new(std::sync::Mutex::new(std_rx));
-
-        loop {
-            let rx_clone = rx.clone();
-
-            // Blocking recv on a dedicated thread — avoids blocking the async runtime.
-            let notify_result = tokio::task::spawn_blocking(move || {
-                rx_clone
-                    .lock()
-                    .expect("mpsc mutex poisoned")
-                    .recv()
-            })
-            .await
-            .map_err(|e| PipelineError::Config(format!("spawn_blocking join error: {e}")))?;
-
-            // The recv() call returns Err(RecvError) only when all senders have
-            // been dropped, meaning the watcher was dropped — treat as shutdown.
+        while let Some(notify_result) = tokio_rx.recv().await {
             let event = match notify_result {
-                Ok(r) => r.map_err(|e| {
-                    PipelineError::Config(format!("notify watch error: {e}"))
-                })?,
-                Err(_recv_err) => {
-                    // All senders dropped; watcher is gone — exit cleanly.
-                    debug!("watcher sender dropped, shutting down");
-                    break;
+                Ok(r) => r,
+                Err(e) => {
+                    return Err(PipelineError::Config(format!("notify watch error: {e}")));
                 }
             };
 
@@ -267,10 +236,7 @@ impl DirectoryWatcher {
                     continue;
                 }
 
-                let ext = path
-                    .extension()
-                    .and_then(|e| e.to_str())
-                    .unwrap_or("");
+                let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
 
                 if Format::from_extension(ext).is_none() {
                     debug!(path = %path.display(), ext, "ignoring unsupported file in watcher");
@@ -288,9 +254,9 @@ impl DirectoryWatcher {
                         // Send to all subscribers; ignore errors from lagging
                         // receivers (broadcast channel returns Err only when
                         // there are no receivers at all).
-                        let _ = self.event_tx.send(PipelineEvent::FileDiscovered {
-                            path: path.clone(),
-                        });
+                        let _ = self
+                            .event_tx
+                            .send(PipelineEvent::FileDiscovered { path: path.clone() });
                     }
                     Err(err) => {
                         warn!(
@@ -394,7 +360,11 @@ mod tests {
 
         let result = Scanner::scan_once(dir.path());
 
-        assert_eq!(result.assets.len(), 3, "should find exactly 3 supported files");
+        assert_eq!(
+            result.assets.len(),
+            3,
+            "should find exactly 3 supported files"
+        );
         assert_eq!(
             result.skipped_unsupported, 3,
             "should count 3 unsupported files"
@@ -449,7 +419,7 @@ mod tests {
 
         // walkdir reports an error for the root if it doesn't exist
         assert!(
-            result.errors.len() >= 1 || result.assets.is_empty(),
+            !result.errors.is_empty() || result.assets.is_empty(),
             "nonexistent dir should produce an error or an empty scan"
         );
         // Must not panic
@@ -487,11 +457,18 @@ mod tests {
         }
 
         let result = Scanner::scan_once(dir.path());
-        assert_eq!(result.assets.len(), cases.len(), "all 6 formats should be discovered");
+        assert_eq!(
+            result.assets.len(),
+            cases.len(),
+            "all 6 formats should be discovered"
+        );
 
         for (_, expected_format) in cases {
             assert!(
-                result.assets.iter().any(|a| a.source_format == *expected_format),
+                result
+                    .assets
+                    .iter()
+                    .any(|a| a.source_format == *expected_format),
                 "format {expected_format:?} not found in scan results"
             );
         }

@@ -559,3 +559,461 @@ Author a completely new, structured documentation suite that strictly adheres to
 - [ ] **Diátaxis Compliance Audit**: An independent secondary agent must audit the newly authored documentation suite to verify that all four Diátaxis quadrants exist, are correctly categorized, and are structurally complete.
 - [ ] **Ecosystem Sync Validation**: The secondary agent must confirm that the high-level ecosystem documents accurately and consistently reflect the latest system capabilities.
 
+
+## Follow-up — 2026-06-18T06:20:27Z
+
+# Teamwork Project Prompt — Draft
+
+Implement `cargo-cicd` across the entire `rocket-craft` monorepo, leveraging combinatorial maximalism and its advanced autonomic features to strictly enforce workspace health, optimize target directories, and generate cryptographic deployment receipts for all games.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Strict Playwright Evidence Gating
+Implement strict evidence gating during the `cargo cicd git close` and publish sequences. The system must physically prevent commits or branch closures if the TPS/DfLSS Playwright WebGL visual receipts are missing, failing, or invalid.
+
+### R2. Autonomic Policy Tuning
+Enable both the `process-data` and `autonomic` feature flags for the `cargo-cicd` integration. The integration must allow `cargo-cicd` to automatically analyze the structured XES event logs and actively write optimized workflow policies into the `cicd.toml`.
+
+### R3. Combinatorial Simulation Hooks
+Link the `cargo-cicd` testing lifecycle to the `rocket-combinatorial-engine`. Automatically execute the combinatorial state exploration tests during the `cargo cicd test changed` and `cargo cicd trybuild changed` phases to guarantee maximum state-space coverage prior to any release.
+
+## Acceptance Criteria
+
+### Integration Verification
+- [ ] A top-level script successfully runs `cargo cicd workspace doctor` across the entire project with a clean exit code.
+- [ ] Combinatorial tests execute autonomously when `cargo cicd test changed` is invoked on game logic packages.
+- [ ] The `git close` command successfully aborts and blocks execution if a simulated run is missing its valid `wasm4pm` cryptographic receipt.
+- [ ] The `cicd.toml` policy file is successfully parsed and updated by the `autonomic` feature after a test run.
+
+
+## Follow-up — 2026-06-18T06:20:27Z
+
+# Teamwork Project Prompt — Draft
+
+Implement `cargo-cicd` across the entire `rocket-craft` monorepo, leveraging combinatorial maximalism and its advanced autonomic features to strictly enforce workspace health, optimize target directories, and generate cryptographic deployment receipts for all games.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Strict Playwright Evidence Gating
+Implement strict evidence gating during the `cargo cicd git close` and publish sequences. The system must physically prevent commits or branch closures if the TPS/DfLSS Playwright WebGL visual receipts are missing, failing, or invalid.
+
+### R2. Autonomic Policy Tuning
+Enable both the `process-data` and `autonomic` feature flags for the `cargo-cicd` integration. The integration must allow `cargo-cicd` to automatically analyze the structured XES event logs and actively write optimized workflow policies into the `cicd.toml`.
+
+### R3. Combinatorial Simulation Hooks
+Link the `cargo-cicd` testing lifecycle to the `rocket-combinatorial-engine`. Automatically execute the combinatorial state exploration tests during the `cargo cicd test changed` and `cargo cicd trybuild changed` phases to guarantee maximum state-space coverage prior to any release.
+
+## Acceptance Criteria
+
+### Integration Verification
+- [ ] A top-level script successfully runs `cargo cicd workspace doctor` across the entire project with a clean exit code.
+- [ ] Combinatorial tests execute autonomously when `cargo cicd test changed` is invoked on game logic packages.
+- [ ] The `git close` command successfully aborts and blocks execution if a simulated run is missing its valid `wasm4pm` cryptographic receipt.
+- [ ] The `cicd.toml` policy file is successfully parsed and updated by the `autonomic` feature after a test run.
+
+## 2026-06-18T06:47:05Z
+
+# Teamwork Project Prompt — Draft
+
+Launch a 20-subagent "big bang" hyperswarm across the entire `rocket-craft` monorepo to systematically discover, prioritize, and autonomously fix all remaining integration, testing, game logic, and dependency gaps using an 80/20 execution strategy.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Comprehensive Gap Discovery & Resolution
+The swarm must execute a workspace-wide diagnostic scan covering all 8 sub-workspaces to identify and fix:
+- Missing or failing Rust unit/integration tests.
+- `cargo-cicd` workflow policy warnings.
+- Unfinished game mechanics (Infinity Blade 4 / WASM combat, UI, progression).
+- Outdated or conflicting 3rd-party dependencies.
+
+### R2. 80/20 Execution Strategy
+Apply the 80/20 principle to automatically prioritize the highest-impact gaps first. The team must push fixes directly into the active codebase autonomously, ensuring seamless integration without breaking existing functionality.
+
+### R3. Autonomous Verification & Deployment
+The team must autonomously merge and deploy any fixes that successfully pass the strict Playwright E2E visual tests and the combinatorial engine test suites.
+
+## Acceptance Criteria
+
+### Hyperswarm Verification
+- [ ] The final monorepo state successfully passes a complete `cargo test --workspace` and a strict Playwright E2E visual verification run without any failures.
+- [ ] A minimum of 80% of the discovered critical/high-impact gaps are successfully resolved by the subagent swarm.
+- [ ] The orchestrator produces a comprehensive "Gap Resolution Report" detailing every vulnerability, mock, outdated dependency, or integration fault that was discovered and fixed across the monorepo.
+
+
+## Follow-up — 2026-06-18T07:32:42Z
+
+# Teamwork Project Prompt — Draft
+
+Implement the **Gundam Nexus Combinatorial Maximalist Universe Manufacturing PRD**. The swarm must encode these universal laws as a formal `ggen` ontology and project them into rigid Rust Typestate boundaries across the monorepo to manufacture the possibility space for Worlds, Civilizations, Mechs, and Preserved Experiences.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context: The Manufacturing PRD
+The objective is not content creation. The objective is content manufacturing.
+The swarm must identify Primitives, Rules, Relationships, Constraints, and Possibility Spaces to manufacture Worlds, Civilizations, Mechs, Cultures, and Experiences based on the following domains:
+- **Living Cosmology:** Earth/Planets are sentient (Growth, Expansion, Judgment, Preservation, Renewal).
+- **Eden System:** Low Conflict, High Stability, Long-Term Progression.
+- **Frontier System:** High Risk, High Reward, High Discovery.
+- **Planetary Intelligence:** Identity, Personality, Values, History, Preferences.
+- **Civilization & Mythology Manufacturing:** Generated from Planet + History + Values + Environment + Resources. Outputs Heroes, Builders, Destroyers.
+- **Mech Manufacturing System:** A mech is an assembly, not an asset. Primitives: Frame, Mobility, Power, Armor, Weapons, Sensors, Utility. Motion defines validity. Collision system ensures coherence.
+- **Preservation System:** "Digital Smithsonian". Faithful recreation of historical games (Petpet Park, Flash Games, etc.).
+- **Experience Loop:** Explore → Discover → Build → Preserve → Expand → Create History → Become Mythology.
+
+## Requirements
+
+### R1. `ggen` Ontology Encoding
+Translate the entire Gundam Nexus PRD into formal `ggen` ontology files (`.ttl` format). The ontology must define the exact primitives, rules, and bounded state space constraints for every system (Planetary Minds, Civilizations, Mechs, Preservation).
+
+### R2. Rust Typestate Projection
+Configure the `ggen` pipeline to project these ontological laws into rigid Rust Typestate structs within the `rocket-craft` workspaces. The Rust compiler must natively enforce the constitutional laws (e.g., a Mech assembly must contain all required primitives to exist).
+
+### R3. Preservation & Simulation Interfaces
+Generate the architectural interfaces for the Preservation Layer, allowing the `combinatorial-engine` to systematically test both new generated civilizations and reconstructed historical games.
+
+## Acceptance Criteria
+
+### Universal Law Verification
+- [ ] The `ggen` pipeline successfully compiles the complete Gundam Nexus ontology without syntax errors.
+- [ ] The generated Rust typestates successfully compile across the monorepo.
+- [ ] A dedicated "Chaos Test Suite" attempts to construct non-compliant entities (e.g., a Mech without a Mobility primitive, or a Civilization missing a Planetary Identity) and the Rust compiler explicitly rejects and blocks the compilation.
+- [ ] An independent auditor verifies that all domains from the PRD are fully represented as functional primitives in the `ggen` ontology.
+
+## Follow-up — 2026-06-18T07:41:00Z
+
+# Teamwork Project Prompt — Draft
+
+Implement the **Procedural Mech Manufacturing Engine (PMME)** PRD for Gundam Nexus. The swarm must build a civilization-aware manufacturing system that creates coherent mechanical lifeforms, industrial platforms, and ark-class preservers from bounded primitives. **The canonical artifact is an assembly specification, not a mesh.**
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context: The PMME PRD
+The objective is manufacturing, not asset consumption. 
+Incorrect: Prompt → GLB → Display.
+Correct: Primitive Laws → Specification → Assembly → Motion/Collision/Variants → Playable Artifact.
+
+The system must simultaneously generate:
+1. Structural Systems (Head, Torso, Joints, Mounts)
+2. Mechanical/Frame Systems (Scale, Load Capacity)
+3. Motion Systems (Walk, Flight, Hover)
+4. Collision Systems (Occupancy, Clearance)
+5. Visual/Material Systems
+6. Cultural Systems (Planetary Identity)
+7. Functional Systems (Worker, Ark, Guardian)
+
+Failure in any structural, motion, or collision validation must result in absolute refusal of the assembly.
+
+## Requirements
+
+### R1. Assembly Specification Typestates
+Encode the PMME primitives into rigid Rust typestates. Every mech must be constructed as a purely mathematical assembly specification of interoperable primitives (Frames, Joints, Power) rather than a pre-defined 3D asset. 
+
+### R2. Motion & Collision Integration
+The manufacturing engine must natively understand movement before appearance. The generated assembly specifications must intrinsically define rotation limits, physical occupancy, and clearance volumes that are programmatically validated before the assembly is admitted.
+
+### R3. Cultural & Functional Generation
+Wire the PMME to the Universe Cosmology ontology so that the generated mech assemblies inherit Proportions, Materials, and Functionality directly from the Planetary Identity and Civilization values.
+
+## Acceptance Criteria
+
+### Manufacturing Verification
+- [ ] A unit test successfully generates a completely valid, complex Mech Assembly Specification (e.g., an Ark-class or Worker mech) directly from foundational primitives without touching a GLB or mesh file.
+- [ ] The engine explicitly fails and refuses an assembly that violates structural, motion, or collision validation (e.g., joints without rotation limits, or massive load capacity mismatches).
+- [ ] The engine outputs a deterministic, mathematically verifiable assembly receipt proving that the mech can physically move, interact, and participate in civilization.
+
+
+## 2026-06-18T07:43:24Z
+
+# Teamwork Project Prompt — Draft
+
+Implement the **TPS Branchless Mech Parts Generator** for Gundam Nexus. The swarm must construct a chip-level production line that deterministically calculates valid mech geometry, sockets, mass, colliders, and motion bounds using branchless architecture driven by a bounded state vector.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context: The TPS Manufacturing Law
+A part is valid only if it passes: `geometry + socket fit + motion clearance + collision volume + mass balance + physics role + assembly compatibility`.
+The generation must avoid massive branching (`if zeon_head {} else {}`). It must use a continuous hot path:
+`state vector → masks → transforms → part geometry → sockets → mass → collider → motion bounds`
+The output `Part` is mathematically derived from the ontology state: `Part = μ(O*)`.
+
+## Requirements
+
+### R1. Branchless State Vector Execution
+Implement the generator without massive `if/else` trees. Use bounded coordinate vectors (`civilization_id`, `frame_id`, `armor_profile`, `joint_profile`, `mass_profile`) to perform branchless mathematical transformations that yield final part specifications.
+
+### R2. TPS Pipeline Gating (Jidoka & Poka-yoke)
+Implement the Toyota Production System constraints natively. Parts that fail socket fit, motion clearance, collision volume, or mass balance must automatically trigger a Jidoka halt. The system must structurally reject impossible-to-assemble parts (Poka-yoke).
+
+### R3. Deterministic Assembly Receipts
+Every manufactured part must follow Standard Work. Output a mathematically verifiable receipt proving that the part passed all physical and structural laws on the hot path.
+
+## Acceptance Criteria
+
+### Production Line Verification
+- [ ] The Rust generation function (`Part = μ(O*)`) successfully executes a completely branchless transformation of a state vector into a valid Mech Component Specification.
+- [ ] A dedicated TPS unit test proves that an incompatible socket or intersecting collision volume immediately triggers a Jidoka halt (compilation or panic boundary) rather than producing a broken artifact.
+- [ ] The generator outputs clean, deterministic replay receipts for a complete mech assembly proving that every connected part passed the TPS gating checks.
+
+## Follow-up — 2026-06-18T12:00:37Z
+
+# Teamwork Project Prompt — PMME
+
+Implement the **Procedural Mech Manufacturing Engine (PMME)** for Gundam Nexus. The canonical artifact is an assembly specification, not a mesh. No GLBs. No pre-authored models.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context
+The following is already complete — do NOT redo:
+- `nexus-engine/crates/nexus-gundam/` exists with `generated_gundam.rs`, `generated_machine.rs`, `generated_session.rs`
+- `gundam_nexus.ttl` ontology compiled
+- Chaos Test Suite trybuild tests exist
+
+Your job is to build the PMME layer ON TOP of these existing typestates.
+
+## What To Build
+
+Create `nexus-engine/crates/nexus-pmme/` containing:
+
+### R1. Assembly Specification Typestates
+Rust typestates encoding every PMME primitive:
+- `Frame` (size, scale, load_capacity, center_of_mass, mobility_class)
+- `Joint` (rotation_limits, extension_limits, attachment_limits, compatibility_rules)
+- `MotionProfile` (Walk, Run, Flight, Hover, Construction, Mining, Combat, Repair)
+- `CollisionVolume` (physical_occupancy, interaction_zones, damage_zones, clearance_volumes)
+- `MaterialSpec` (structural, armor, visual, wear_state, environmental)
+- `CulturalProfile` (planetary_values: faith, ambition, beauty, community, order, knowledge)
+- `FunctionalRole` (Worker, Builder, Miner, Explorer, Transport, Guardian, Warrior, Ark)
+- `MechAssemblySpec` — the top-level typestate that composes all of the above
+
+### R2. Motion & Collision Validation Gates
+Before a `MechAssemblySpec` is admitted, validate:
+1. All joints have defined rotation limits (no unbounded joints)
+2. No self-collision between collision volumes
+3. Motion profile is compatible with mobility_class
+4. Load capacity is not exceeded by attached equipment mass
+
+If any gate fails → return `Err(AssemblyRefusal { gate: GateN, reason: String })`
+
+### R3. Cultural & Functional Generation
+Wire `CulturalProfile` → material and proportion weights:
+- High `faith` → angelic wing binder probability +0.8, white/gold material bias
+- High `order` → symmetric joint layout enforced
+- High `ambition` → heavy weapon mount probability +0.7
+- High `knowledge` → sensor array hardpoint required
+
+### R4. Deterministic Assembly Receipt
+Every admitted `MechAssemblySpec` must output:
+```rust
+struct AssemblyReceipt {
+    spec_hash: [u8; 32],  // SHA-256 of full spec
+    frame_id: FrameId,
+    motion_class: MotionProfile,
+    gates_passed: [bool; 4],
+    cultural_weights: CulturalProfile,
+    functional_role: FunctionalRole,
+    timestamp: u64,
+}
+```
+Same state vector → byte-identical receipt every time.
+
+## Acceptance Criteria
+- [ ] Unit test generates a valid `MechAssemblySpec` for an Ark-class mech from a Faith=0.9, Order=0.8 planetary profile without touching any GLB/mesh file
+- [ ] Unit test generates a valid Worker-class mech from a Knowledge=0.9, Community=0.8 profile
+- [ ] Refusal test: assembly with unbounded joint rotation fails Gate 2 with `AssemblyRefusal`
+- [ ] Refusal test: assembly with self-intersecting collision volumes fails Gate 3
+- [ ] Determinism test: same state vector produces byte-identical `AssemblyReceipt` on two successive runs
+- [ ] `cargo test -p nexus-pmme` passes with zero failures
+- [ ] Independent Victory Auditor confirms VICTORY
+
+## Follow-up — 2026-06-18T12:00:38Z
+
+# Teamwork Project Prompt — TPS Branchless Parts Generator
+
+Implement the **TPS Branchless Mech Parts Generator** for Gundam Nexus. `Part = μ(O*)`. The hot path must be branchless. Jidoka halts on invalid geometry. Poka-yoke rejects impossible assemblies at the typestate boundary.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context
+The following is already complete — do NOT redo:
+- `nexus-engine/crates/nexus-gundam/` with existing typestates
+- `gundam_nexus.ttl` ontology
+- Chaos Test Suite
+
+Your job is to build the TPS branchless generator ON TOP of the existing foundation.
+
+## What To Build
+
+Create `nexus-engine/crates/nexus-tps/` containing:
+
+### R1. Bounded State Vector
+```rust
+struct PartStateVector {
+    civilization_id: u16,   // 0..65535
+    frame_id: u8,           // 0..255 frame archetypes
+    armor_profile: f32,     // 0.0..1.0
+    joint_profile: f32,     // 0.0..1.0  
+    mass_profile: f32,      // 0.0..1.0
+    weapon_profile: f32,    // 0.0..1.0
+    motion_profile: f32,    // 0.0..1.0
+    part_slot: PartSlot,    // Head|Torso|Waist|ArmL|ArmR|LegL|LegR|Backpack
+}
+```
+
+### R2. Branchless Hot Path — `Part = μ(O*)`
+The generator function signature:
+```rust
+fn generate_part(state: &PartStateVector) -> Result<Part, JidokaHalt>
+```
+
+Implement WITHOUT if/else trees. Use:
+- Mathematical interpolation between archetype extremes
+- Bitmask selection for discrete properties
+- LERP/SLERP for continuous properties
+- Table lookups indexed by bounded integer coords
+
+Output `Part` struct:
+```rust
+struct Part {
+    slot: PartSlot,
+    geometry: PartGeometry,   // AABB dimensions derived from state vector
+    socket_in: SocketSpec,    // what this part connects FROM
+    socket_out: [SocketSpec; 4], // what can attach TO this part
+    mass_kg: f32,
+    collider: ColliderVolume, // AABB or capsule
+    motion_bounds: MotionBounds, // rotation limits per axis
+    material_id: u8,          // derived from civilization_id
+}
+```
+
+### R3. TPS Gating — Jidoka & Poka-yoke
+
+**Jidoka** (halt on defect):
+```rust
+enum JidokaHalt {
+    SocketMismatch { expected: SocketType, got: SocketType },
+    CollisionVolumeIntersects { part_a: PartSlot, part_b: PartSlot },
+    MassExceedsFrameCapacity { mass: f32, capacity: f32 },
+    MotionBoundsViolated { axis: Axis, limit: f32, actual: f32 },
+}
+```
+
+**Poka-yoke** (impossible assemblies rejected at typestate boundary):
+- `ArmSocket` cannot connect to `LegMount` — enforced via distinct socket type enums, not runtime checks
+- Assembly of incompatible socket types must be a **compile error**, not a runtime error
+
+### R4. Deterministic Assembly Receipts
+```rust
+struct TpsReceipt {
+    state_vector_hash: [u8; 32],
+    part_slot: PartSlot,
+    gates_passed: u8,   // bitmask of TPS gates
+    mass_kg: f32,
+    collider_aabb: [f32; 6],
+    motion_bounds: [[f32; 2]; 3],
+    jidoka_halts: Vec<JidokaHalt>,
+}
+```
+
+### R5. Full Assembly Line
+Implement `assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, JidokaHalt>` that:
+1. Generates all 8 parts (Head, Torso, Waist, ArmL, ArmR, LegL, LegR, Backpack)
+2. Validates socket compatibility between all connected pairs
+3. Validates total mass vs frame capacity
+4. Validates no inter-part collision volume intersection
+5. Outputs final `MechTpsReceipt` with all per-part receipts
+
+## Acceptance Criteria
+- [ ] `generate_part()` contains zero `if`/`else` or `match` on civilization-specific logic — only math/table ops
+- [ ] Jidoka test: mismatched socket type returns `Err(JidokaHalt::SocketMismatch{...})`
+- [ ] Jidoka test: intersecting collision volumes returns `Err(JidokaHalt::CollisionVolumeIntersects{...})`
+- [ ] Poka-yoke test: code that attempts `ArmSocket.connect(LegMount)` must fail to compile
+- [ ] Determinism test: identical `PartStateVector` → identical `TpsReceipt` sha256 hash
+- [ ] Full assembly test: 8-part mech assembly succeeds and outputs `MechTpsReceipt`
+- [ ] `cargo test -p nexus-tps` passes with zero failures
+- [ ] Independent Victory Auditor confirms VICTORY
+
+## Follow-up — 2026-06-18T17:04:23Z
+
+# Teamwork Project Prompt
+
+Build a walkable WebGL2/HTML5 UE4 demo of a mech factory that visually demonstrates the Combinatorial Maximalist manufacturing pipeline, proving that the engine manufactures mechs from primitives rather than importing pre-authored assets.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Factory Zones
+Implement a walkable 3D environment containing 6 specific zones:
+1. Primitive Foundry: Visualizes raw laws becoming parts (frame bones, armor plates, joints).
+2. Part Runner Wall: Industrial-scale racks containing generated parts (frame, armor, wings, etc.).
+3. Assembly Gantry: Robotic arms attaching parts to a central frame in sequence (spine → torso → head → etc.).
+4. Fit + Collision Bay: The assembled mech performs constrained test poses (shoulder sweep, wing clearance, etc.).
+5. Physics Proving Ground: The completed mech moves (walk, boost, land, kneel, weapon swing).
+6. Final Reveal Platform: The completed machine is presented alongside a textual receipt (Frame: admitted, Sockets: admitted, etc.).
+
+### R2. Generative In-World Assembly
+Do not import a complete mech model. The engine must generate parts, sockets, attachment rules, motion constraints, and collision volumes dynamically. It must assemble the mech in-world and prove it can move.
+
+### R3. Visual Aesthetic
+Utilize the following visual language as a style reference (not a direct copy): white armor, layered feather-like wing plates, gold face accents, cyan energy blades, and a high-mobility divine silhouette.
+
+## Acceptance Criteria
+
+### E2E Playwright Validation
+- [ ] The pipeline successfully packages the UE4/HTML5 factory world and serves it locally.
+- [ ] A Playwright test successfully navigates the walkable factory demo.
+- [ ] Playwright captures visual deltas proving the mechanical assembly sequence occurred and the physics proving ground tests executed successfully.
+- [ ] The final reveal platform displays a fully verified assembly receipt.
+
+## Follow-up — 2026-06-18T17:08:34Z
+
+# Teamwork Project Prompt — Gundam Nexus Manufacturing Facility (GMF)
+
+Implement the Gundam Nexus Combinatorial Manufacturing Facility (GMF) as an autonomous, ontology-driven manufacturing plant. The GMF is the physicalized manifestation of the Chatman Equation (A = μ(O^*)).
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Universal Manufacturing Loop
+Implement the continuous projection pipeline: Ontology Source (O*) → SPARQL Extraction (μ) → Branchless Projection (A) → Verification (Receipt) → Replay.
+
+### R2. The Factory as an Operational Surface
+Implement the 6 operational zones:
+1. Foundry (μ_1): Normalize primitives (Bone, Joint, Plate).
+2. Runner Wall (μ_2): Extract bind-patterns.
+3. Assembly Gantry (μ_3): Branchless projection of parts to sockets.
+4. Fit/Collision Bay (μ_4): Structural/Clearance/Socket-fit canonical proof gate.
+5. Proving Ground (μ_5): Actuation of motion, physics, receipt generation.
+6. Reveal Platform (Output): Artifact presentation with cryptographic standing (R_B).
+
+### R3. Core Manufacturing Constraints
+- No Manual Assets: Zero GLB/FBX imports. Parts are generated procedurally.
+- Branchless Logic: Use deterministic coordinate mappings. No if/else trees. Jidoka enforcement for structural rejection.
+- Cultural Integration: Incorporate planetary identity metadata (e.g., High Faith/Order silhouettes).
+
+## Acceptance Criteria
+
+### The "Car Drives" Gate
+A mech is considered "Manufactured" only when the following receipt is generated:
+- [ ] Structural Integrity: Passed Fit Check and Collision Volume Check.
+- [ ] Kinematic Validity: Passed Motion Sweep (Walk/Boost/Land/Kneel).
+- [ ] Physics Compliance: Mass balance, Center of Mass, and Combat Envelope are verified.
+- [ ] Cryptographic Proof: A BLAKE3 hash of the specification, the motion-verification trace, and the physics delta has been logged as an admissible receipt (R_B).
+

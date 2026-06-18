@@ -26,9 +26,17 @@ function initDefaultSpec() {
     if (!fs.existsSync(SPEC_PATH)) {
         console.log("Initializing default world specification...");
         const defaultIntent = [
-            "create place room_1 name \"Control Room\" at (0.0, 0.0, 0.0) bounds (100.0, 100.0, 50.0)",
-            "create actor bot_1 name \"Welder Bot\" role RoboticWelder in room_1",
-            "create object cnc_1 name \"CNC Alpha\" class CNC_Machine in room_1"
+            'create place zone_1 name "Primitive Foundry" at (0.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place zone_2 name "Part Runner Wall" at (400.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place zone_3 name "Assembly Gantry" at (800.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place zone_4 name "Fit + Collision Bay" at (1200.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place zone_5 name "Physics Proving Ground" at (1600.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place zone_6 name "Final Reveal Platform" at (2000.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create relationship rel_1_2 connects from zone_1 to zone_2',
+            'create relationship rel_2_3 connects from zone_2 to zone_3',
+            'create relationship rel_3_4 connects from zone_3 to zone_4',
+            'create relationship rel_4_5 connects from zone_4 to zone_5',
+            'create relationship rel_5_6 connects from zone_5 to zone_6'
         ].join("\n");
         
         const tempIntentPath = path.join(__dirname, 'default_intent.txt');
@@ -48,10 +56,23 @@ function initDefaultSpec() {
             console.error("Failed to compile default spec via CLI:", e.message);
             // Fallback mock spec if compiler isn't built yet
             const fallbackSpec = {
-                places: [{ id: "room_1", name: "Control Room", bounds: { center: { x: 0, y: 0, z: 0 }, half_extents: { x: 100, y: 100, z: 50 } }, properties: {} }],
-                actors: [{ id: "bot_1", name: "Welder Bot", role: "RoboticWelder", place_id: "room_1", placement: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, properties: {} }],
-                objects: [{ id: "cnc_1", name: "CNC Alpha", class: "CNC_Machine", place_id: "room_1", placement: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, properties: {} }],
-                relationships: [],
+                places: [
+                    { id: "zone_1", name: "Primitive Foundry", bounds: { center: { x: 0, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "zone_2", name: "Part Runner Wall", bounds: { center: { x: 400, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "zone_3", name: "Assembly Gantry", bounds: { center: { x: 800, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "zone_4", name: "Fit + Collision Bay", bounds: { center: { x: 1200, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "zone_5", name: "Physics Proving Ground", bounds: { center: { x: 1600, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "zone_6", name: "Final Reveal Platform", bounds: { center: { x: 2000, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} }
+                ],
+                actors: [],
+                objects: [],
+                relationships: [
+                    { id: "rel_1_2", type: "connects", source: "zone_1", target: "zone_2" },
+                    { id: "rel_2_3", type: "connects", source: "zone_2", target: "zone_3" },
+                    { id: "rel_3_4", type: "connects", source: "zone_3", target: "zone_4" },
+                    { id: "rel_4_5", type: "connects", source: "zone_4", target: "zone_5" },
+                    { id: "rel_5_6", type: "connects", source: "zone_5", target: "zone_6" }
+                ],
                 rules: [],
                 history: [{ id: "evt_init", timestamp_ms: Date.now(), activity: "Boot", details: {} }],
                 receipts: [{ key: "history_receipt_evt_init", hash: "0000000000000000000000000000000000000000000000000000000000000000", issued_at: Date.now() }]

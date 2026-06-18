@@ -1,0 +1,175 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dflss: <http://rocket-craft.com/ontology/dflss#> .
+@prefix mfg: <http://rocket-craft.com/ontology/manufacturing#> .
+
+# -----------------------------------------------------------------------------
+# DMEDI / DMAIC Phase Constraints
+# -----------------------------------------------------------------------------
+
+dflss:ProcessPhaseShape a sh:NodeShape ;
+    sh:targetClass dflss:ProcessPhase ;
+    sh:property [
+        sh:path dflss:phaseType ;
+        sh:in ("Define" "Measure" "Analyze" "Improve" "Control") ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Every process phase must explicitly belong to the DMEDI (DMAIC) lifecycle: Define, Measure, Analyze, Improve, or Control." ;
+    ] ;
+    sh:property [
+        sh:path dflss:phaseDescription ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+    ] .
+
+# -----------------------------------------------------------------------------
+# TPS Playwright Manufacturing Gate Constraints
+# -----------------------------------------------------------------------------
+
+mfg:ManufacturingGateShape a sh:NodeShape ;
+    sh:targetClass mfg:ManufacturingGate ;
+    sh:property [
+        sh:path mfg:gateNumber ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 7 ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A manufacturing gate must be numbered between 0 and 7." ;
+    ] ;
+    sh:property [
+        sh:path mfg:passed ;
+        sh:datatype xsd:boolean ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A gate must strictly evaluate to a boolean pass/fail standing." ;
+    ] .
+
+# GATE 0 — Source Admission
+mfg:Gate0Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate0SourceAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [
+        sh:path mfg:hasWorldContract ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "GATE 0: PASS only if Rocket-Craft has a declared world contract for the prompt." ;
+    ] .
+
+# GATE 1 — Unreal Artifact Admission
+mfg:Gate1Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate1UnrealArtifactAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [
+        sh:path mfg:emitsUnrealArtifacts ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "GATE 1: PASS only if Rocket-Craft emits Unreal 4-consumable world artifacts." ;
+    ] .
+
+# GATE 2 — HTML5/WASM Package Admission
+mfg:Gate2Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate2WasmPackageAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [
+        sh:path mfg:producesBrowserDeployableOutput ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "GATE 2: PASS only if the SpeculativeCoder UE4.27 HTML5 ES3 build produces browser-deployable output." ;
+    ] .
+
+# GATE 3 — Browser Load Admission
+mfg:Gate3Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate3BrowserLoadAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [
+        sh:path mfg:detectsEngineReadiness ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "GATE 3: PASS only if Playwright opens the packaged world and detects engine readiness." ;
+    ] .
+
+# GATE 4 — Visual World Admission
+mfg:Gate4Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate4VisualWorldAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [
+        sh:path mfg:showsNonErrorScene ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "GATE 4: PASS only if screenshot shows a non-error WebGL/Unreal scene." ;
+    ] .
+
+# GATE 5 — Actuation Admission
+mfg:Gate5Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate5ActuationAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [
+        sh:path mfg:keyboardInputInjected ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "GATE 5: PASS only if keyboard input is injected." ;
+    ] .
+
+# GATE 6 — Motion Admission
+mfg:Gate6Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate6MotionAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [
+        sh:path mfg:motionDeltaAboveThreshold ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "GATE 6: PASS only if after-screenshot differs from before-screenshot above threshold." ;
+    ] .
+
+# GATE 7 — Receipt Admission
+mfg:Gate7Shape a sh:NodeShape ;
+    sh:targetClass mfg:Gate7ReceiptAdmission ;
+    sh:node mfg:ManufacturingGateShape ;
+    sh:property [ sh:path mfg:recordedPrompt ; sh:minCount 1 ; sh:message "Prompt must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedContractHash ; sh:minCount 1 ; sh:message "Contract hash must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedBuildLog ; sh:minCount 1 ; sh:message "Build log must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedPackagePath ; sh:minCount 1 ; sh:message "Package path must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedScreenshots ; sh:minCount 1 ; sh:message "Screenshots must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedConsoleLogs ; sh:minCount 1 ; sh:message "Console logs must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedInputTrace ; sh:minCount 1 ; sh:message "Input trace must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedVisualDelta ; sh:minCount 1 ; sh:message "Visual delta must be recorded." ; ] ;
+    sh:property [ sh:path mfg:recordedFinalVerdict ; sh:minCount 1 ; sh:message "Final verdict must be recorded." ; ] .
+
+# -----------------------------------------------------------------------------
+# Overall Playwright Process and Routing Constraints
+# -----------------------------------------------------------------------------
+
+mfg:PlaywrightProcessShape a sh:NodeShape ;
+    sh:targetClass mfg:PlaywrightManufacturingProcess ;
+    sh:property [ sh:path mfg:hasGate0 ; sh:class mfg:Gate0SourceAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] ;
+    sh:property [ sh:path mfg:hasGate1 ; sh:class mfg:Gate1UnrealArtifactAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] ;
+    sh:property [ sh:path mfg:hasGate2 ; sh:class mfg:Gate2WasmPackageAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] ;
+    sh:property [ sh:path mfg:hasGate3 ; sh:class mfg:Gate3BrowserLoadAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] ;
+    sh:property [ sh:path mfg:hasGate4 ; sh:class mfg:Gate4VisualWorldAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] ;
+    sh:property [ sh:path mfg:hasGate5 ; sh:class mfg:Gate5ActuationAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] ;
+    sh:property [ sh:path mfg:hasGate6 ; sh:class mfg:Gate6MotionAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] ;
+    sh:property [ sh:path mfg:hasGate7 ; sh:class mfg:Gate7ReceiptAdmission ; sh:minCount 1 ; sh:maxCount 1 ; ] .
+
+mfg:FailureRoutingShape a sh:NodeShape ;
+    sh:targetClass mfg:FailureRoute ;
+    sh:property [
+        sh:path mfg:routedToCell ;
+        sh:in (
+            "UE4 fork/build cell"
+            "HTML5 packaging cell"
+            "Rocket-Craft contract cell"
+            "Unreal artifact generation cell"
+            "local serving cell"
+            "Playwright browser-load cell"
+            "WebGL/runtime cell"
+            "input-binding cell"
+            "visual-delta cell"
+            "receipt/audit cell"
+        ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Every failure must unambiguously route to a valid designated repair cell (no generic repair loops)." ;
+    ] .

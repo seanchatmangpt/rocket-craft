@@ -1,159 +1,241 @@
 # Original User Request
 
-## Initial Request — 2026-06-17T08:51:12-07:00
+## Initial Request — 2026-06-15T14:34:16-07:00
 
-Build the Genie 26 World Manufacturing Platform based on the Version Vision 2030 PRD and ARD. The platform must parse user intent, manufacture Unreal 4 world artifacts, deploy a playable world, and support operating and evolving the world over time.
+Implement a working progressive web app (PWA) integrated with a local Supabase instance, including fully functioning user authentication, profiles, player management admin dashboard, leaderboard, and end-to-end testing with Playwright.
 
 Working directory: /Users/sac/rocket-craft
 Integrity mode: benchmark
 
-## Reference Material
+## Requirements
 
-### Product Requirements Document (PRD)
+### R1. Supabase Client and PWA Authentication
+Update `pwa-staff/src/lib/supabaseClient.ts` with the local Supabase URL (`http://127.0.0.1:54321`) and anon key (`sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH`). Implement actual Supabase authentication in `pwa-staff/src/auth.ts`, `pwa-staff/src/login.ts`, `pwa-staff/src/signup.ts`, and `pwa-staff/src/profile.ts` using the Supabase JS client. Ensure that after sign-up or log-in, users are redirected to `profile.html` where their email is correctly displayed, and log-out redirects them back to `login.html`.
 
-```markdown
-# Genie 26
-## Product Requirements Document (PRD)
+### R2. HTML Asset Paths
+Fix relative asset paths in `login.html`, `signup.html`, and `profile.html` so they reference the generated dist directory as `dist/` or `./dist/` instead of `../dist/` since these files are served from the root.
 
-### Version
-Vision 2030
+### R3. DB Sync Trigger and Schema Alignment
+Create a new migration or update migrations in `supabase/migrations` to sync `auth.users` to the `public.players` table upon user registration. The `public.players` table must support storing the player's email and name/username. Update `pwa-staff/src/admin.ts` to query and display player details from the `players` table. Update `pwa-staff/src/leaderboard.ts` to fetch leaderboard entries joined with the player's username so the leaderboard displays actual player names.
 
-### Product Category
-World Manufacturing Platform
+### R4. Edge Function Implementation
+Implement the Supabase edge function `supabase/functions/submit-score/index.ts` to parse the request body, validate the score (must be a number between 0 and 1000), and save it into the database (`game_sessions` and update the player's high score in `leaderboard`).
 
----
+### R5. Local Server & E2E Testing
+Configure `local-web-server` or `npm run start` to serve the `pwa-staff` frontend on port 3000. Run the Playwright end-to-end test suite (`tests-e2e/auth.spec.ts`) against the running local server and local Supabase instance to verify the full registration, profile display, login, logout flow passes successfully.
 
-# Executive Summary
-Genie 26 enables a user to describe a world using natural language and receive a playable Unreal 4 world that can be deployed, operated, modified, and shared.
-The objective is not to generate images, videos, or temporary simulations.
-The objective is to manufacture durable operational worlds.
-Every generated world becomes a persistent asset capable of supporting exploration, operations, training, commerce, collaboration, and simulation.
+## Acceptance Criteria
 
-# Problem Statement
-Modern world creation requires specialized expertise across multiple disciplines.
-Creating a playable environment requires environment design, asset selection, gameplay implementation, navigation setup, interaction design, deployment preparation, and operational maintenance.
-This process can take weeks, months, or years.
-Users want to describe a world and begin using it immediately.
+### Authentication & UI
+- [ ] Sign-up, login, profile view, and logout flows are fully implemented using Supabase client in `pwa-staff/src`.
+- [ ] HTML pages properly load CSS and JS bundles without 404 path errors.
+- [ ] Profiles display the registered user's actual email from Supabase session.
 
-# Vision
-Any individual should be able to create a deployable Unreal 4 world using intent alone.
-A world should be generated, launched, and made operational within minutes.
-The generated world should remain editable and continuously improvable.
+### Database Sync & Edge Functions
+- [ ] Registering a user triggers a Postgres trigger that inserts the user's ID, email, and username/email prefix into the `public.players` table.
+- [ ] Admin dashboard successfully fetches and displays registered players list without Postgres column missing errors.
+- [ ] Leaderboard page successfully displays player usernames and their high scores.
+- [ ] Edge function `submit-score` writes records to `game_sessions` and updates `leaderboard` table.
 
-# Success Criteria
-A user can:
-1. Describe a world.
-2. Generate a world.
-3. Enter the world.
-4. Modify the world.
-5. Share the world.
-6. Operate the world.
-7. Improve the world over time.
-Without requiring traditional world-development workflows.
+### E2E Verification
+- [ ] Playwright E2E test `user authentication flow` runs successfully and all steps pass.
 
-# Product Principles
-- Principle 1: Worlds Over Content (manufacture worlds, not media)
-- Principle 2: Persistent Ownership (worlds remain durable assets)
-- Principle 3: Continuous Evolution (worlds improve through iteration)
-- Principle 4: Immediate Utility (worlds provide operational value immediately)
-- Principle 5: Human Intent First (intent remains the primary authoring mechanism)
+## Follow-up — 2026-06-15T16:55:03-07:00
 
-# Functional Requirements
-- World Generation: Describe world, purpose, scale, environmental characteristics, and interaction goals to generate a playable Unreal 4 world.
-- World Deployment: Launch, access, re-enter, and share worlds as a standard operation.
-- World Modification: Add/remove locations, add/remove actors, modify rules, appearance, and interactions without rebuilding from scratch.
-- World Persistence: Preserve state, structure, relationships, and modifications across sessions.
-- Multi-User Collaboration: Enter, operate, and modify worlds together.
-- World Operations: Monitor activity, manage participants, observe interactions, and review world history.
-- World Lifecycle: Support creation, operation, expansion, optimization, archival, and restoration.
-```
+Resolve all remaining gaps for production release of the Progressive Web App (PWA) with local Supabase integration and ensure 100% successful end-to-end testing with Playwright.
 
-### Architecture Requirements Document (ARD)
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
 
-```markdown
-# Genie 26
-## Architecture Requirements Document (ARD)
+## Requirements
 
-### Version
-Vision 2030
+### R1. Resolve Playwright E2E Test Failures and Browser Constraints
+- Modify the Playwright configuration in `pwa-staff/playwright.config.ts` to run E2E tests exclusively on the `chromium` browser project (removing firefox and webkit to avoid missing browser binary issues on the host system).
+- Fix the test in `pwa-staff/tests-e2e/example.spec.ts` by updating the expected title regex match from `/PWA Staff/` to `/Rocket Craft/` to match the actual application title in `index.html`.
 
-# Architectural Goal
-Transform user intent into operational Unreal 4 worlds.
-The architecture exists to manufacture, operate, and evolve worlds.
+### R2. Verify Application and Test Suite Health
+- Verify that Vitest unit tests in the `pwa-staff` workspace run and pass.
+- Verify that Playwright E2E tests run and pass without throwing browser configuration errors.
 
-# Core Architectural Model
-Intent → World Specification → World Manufacturing → World Deployment → World Operation → World Evolution
+## Acceptance Criteria
 
-# Architectural Layers
-1. Intent Layer: Receive intent, clarify intent, preserve intent, and translate intent into world requirements. Output: World specification.
-2. World Specification Layer: Represent the intended world, defining locations, actors, interactions, rules, objectives. Output: Manufacturable world definition.
-3. World Manufacturing Layer: Construct Unreal 4 worlds (build environments, assemble world structures, create navigable spaces, configure interactions, produce deployable worlds). Output: Operational world.
-4. Deployment Layer: Make worlds accessible (launch worlds, distribute worlds, manage access, support re-entry). Output: Accessible world.
-5. Operations Layer: Support ongoing use (monitor activity, maintain state, coordinate participants, track world changes). Output: Operational continuity.
-6. Evolution Layer: Improve worlds (accept modifications, expand environments, update rules, preserve continuity). Output: Improved world.
+### E2E Testing
+- [ ] Playwright E2E tests execute and pass successfully on the Chromium browser.
+- [ ] No browser launch or executable errors are present in the test logs.
+- [ ] The webServer command correctly boots the PWA on port 3000 during test execution.
 
-# Architectural Constraints
-- Constraint 1: Every world must remain editable.
-- Constraint 2: Every world must remain deployable.
-- Constraint 3: Every world must remain operational.
-- Constraint 4: World modification must preserve continuity whenever possible.
-- Constraint 5: World ownership remains with the creator.
+### Unit Testing
+- [ ] Vitest unit tests in `pwa-staff/` pass successfully.
 
-# World Model
-A world consists of: Places, Actors, Objects, Relationships, Events, Rules, History.
-```
+## Follow-up — 2026-06-15T17:31:19-07:00
 
----
+Upgrade the Rocket Craft PWA launcher with a premium cyberpunk gamer-centric UI/UX, implement a collapsible in-app developer debug HUD (DX/QoL), and add database indexes and telemetry logging to the Supabase schema.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Cyberpunk Gaming UI/UX
+- Upgrade all PWA pages (`index.html`, `login.html`, `signup.html`, `profile.html`, `admin.html`, `leaderboard.html`) using vanilla CSS to implement a premium cyberpunk neon dark mode.
+- Use glassmorphic card layouts, responsive layouts, glowing neon button hover effects, custom gaming-oriented typography, and subtle micro-animations.
+
+### R2. Collapsible In-App Developer Console HUD
+- Implement a collapsible developer debugging HUD available on all frontend pages when toggled (e.g., via a floating debug button in the corner).
+- The HUD must display:
+  - Active session details (decoded JWT values like email, user ID, role, and expiration timestamp).
+  - Quick triggers to test mock score submissions.
+  - Database stats fetched from backend endpoints (e.g., number of registered players and total game sessions).
+
+### R3. Database Optimization & Telemetry Schema
+- Create a new migration in `supabase/migrations/` that adds database indexes to:
+  - `public.players(high_score DESC)`
+  - `public.game_sessions(player_id, score)`
+- Create a `public.telemetry_logs` table in the migration:
+  - Fields: `id` (uuid primary key), `player_id` (foreign key to `players.id`, nullable for unauthenticated events), `event_type` (text, e.g., 'login', 'registration', 'profile_view', 'score_submission'), `payload` (jsonb), and `created_at` (timestamp with timezone).
+- Integrate backend client logic to log records into `public.telemetry_logs` whenever a player registers, logs in, views their profile, or submits a score.
+
+### R4. Verification & Testing
+- Update Vitest unit tests in `pwa-staff/` to cover new helper functions and console components.
+- Update Playwright E2E tests to verify that the Developer Debug HUD is present, can be toggled open, and that new page layouts load without JavaScript console errors.
+
+## Acceptance Criteria
+
+### PWA UI/UX
+- [ ] All pages render with the new cyberpunk neon dark theme, including layout grids, forms, tables, and buttons.
+- [ ] Responsive UI fits mobile, tablet, and desktop screens with zero overlapping text.
+
+### Developer HUD (DX/QoL)
+- [ ] Collapsible debug panel is present on all pages and can be toggled.
+- [ ] HUD displays decoded JWT state when user is logged in, and shows an unauthenticated state when logged out.
+- [ ] Stats display correct count of registered players.
+
+### Database & Telemetry
+- [ ] Supabase schema contains the new indexes on `players` and `game_sessions`, and the `telemetry_logs` table.
+- [ ] Performing auth operations (signup, login, logout), profile views, and score submissions creates corresponding rows in `public.telemetry_logs`.
+
+### Test Suite Execution
+- [ ] Vitest unit tests in `pwa-staff/` execute and pass successfully.
+- [ ] Playwright E2E tests execute and pass successfully on Chromium.
+
+## Follow-up — 2026-06-17T07:06:50Z
+
+Research Google DeepMind's Genie (Generative Interactive Environments / World Model) on arXiv (e.g. arXiv:2402.15391). Implement a core interactive world-model simulator in Rust, and build a Python-based pipeline that integrates TPOT2 for model optimization and DSPy for optimizing interactive player/designer LLM agents.
+
+Working directory: ~/rocket-craft
+Integrity mode: development
+
+## Requirements
+
+### R1. DeepMind Genie World Model Core in Rust
+Implement a high-performance simulation or reference model of the Genie architecture. The core must include:
+1. A spatiotemporal tokenizer representation to discretize state inputs (e.g., grid maps, 2D/3D states, or simple image frames).
+2. A Latent Action Model (LAM) that infers actions from transitions between consecutive states.
+3. A Dynamics Model that predicts the next discretized state given the current state and a (latent) action.
+
+### R2. Python Integration & TPOT2 AutoML Optimization
+Build a Python wrapper or interface to interact with the Rust world model. Use TPOT2 to automate hyperparameter tuning or pipeline optimization for the dynamics predictor or latent action classifier (e.g., optimizing predictive accuracy or convergence rates on a dataset of state trajectories).
+
+### R3. DSPy LLM Player & Designer Agent
+Create a DSPy-based interactive agent. Use DSPy to define and compile an optimized LLM prompt/program that:
+1. Acts as a player navigating the simulated world, selecting actions based on natural language commands or visual/textual feedback.
+2. Acts as a world designer, generating prompt inputs for the world model to spawn new environments.
+
+### R4. Unreal Engine 4 Export & Benchmark
+Provide a utility to export simulated world maps or state sequences into a standard JSON-based scene/actor layout format compatible with Unreal Engine 4. Include a benchmark script comparing frame-by-frame generation latency and memory footprint between the Genie world model implementation and traditional engine-like asset loads.
+
+### R5. End-to-End Validation
+Provide an automated script (`verify_world_model.sh` or `.py`) that runs the Rust simulator, executes the TPOT2 optimization, tests the DSPy agent, exports a map to UE4 format, and verifies that the entire flow completes without errors.
+
+## Acceptance Criteria
+
+### Core Implementation
+- [ ] The Rust core compiles and can load, tokenize, and predict state transitions.
+- [ ] The Python bindings/subprocess wrapper can interact with the Rust simulator to get state predictions.
+
+### Pipelines & Optimization
+- [ ] The TPOT2 AutoML search runs and successfully finds optimized parameters for the dynamics model.
+- [ ] The DSPy interactive agent successfully compiles and executes navigation instructions on the simulated environment using an LLM.
+
+### Unreal Engine 4 Export
+- [ ] The system outputs a valid JSON map file representing the generated world layout, compatible with Unreal Engine 4 import.
+
+### Verification
+- [ ] Running the verification script completes successfully, demonstrating the entire pipeline runs from end to end.
+
+## Follow-up — 2026-06-17T07:14:14Z
+
+Incorporate the "Genie 26 Vision 2030" philosophy and specification into the World Manufacturing Platform design for the Genie simulator and pipeline in `~/rocket-craft`.
+
+### Genie 26 Vision 2030 Core Principles to Incorporate:
+1. **World Manufacturing Philosophy:** Treat every generated system as a "world" that contains:
+   * **Objects** (State variables/world elements)
+   * **Actors** (Entities interacting within the world)
+   * **Relationships** (Structural bounds/hierarchies)
+   * **Events** (Transitions/Inputs)
+   * **Rules** (Physics/Constraints/Semantic Laws)
+   * **Processes** (Workflows/Execution loops)
+   * **Receipts** (Lineage, provenance, BLAKE3 receipts/cryptographic lineage, replay records)
+
+2. **Receipted Worlds:** Every world state transition and generation run must support verifiable receipts (cryptographic origin, specification alignment, operational/replay history).
+
+Ensure that the Rust simulation/dynamics model and the Python pipeline reflect these core components, allowing a user to specify a world's objects/rules and manufacture it with verifiable execution and cryptographic receipts.
+
+
+## Follow-up — 2026-06-17T07:16:57Z
+
+Implement the Genie 26 World Manufacturing Platform based on the Version Vision 2030 PRD and ARD. The platform must manufacture, deploy, operate, and evolve playable Unreal 4 worlds directly from user intent.
+
+Working directory: ~/rocket-craft
+Integrity mode: development
 
 ## Requirements
 
 ### R1. Intent & Specification Layer
-Implement parser and specification handlers to ingest natural language intent and translate it into a structured World Specification modeling:
-1. Places (bounding volumes, coordinate systems)
-2. Actors and Objects (positions, attributes)
-3. Relationships (parent-child place containment, associations)
-4. Rules (interaction behaviors, constraints)
-5. Events and History (log of edits and state transitions)
+Implement a mechanism to ingest user intent (natural language prompts) and output a structured World Specification. The specification must explicitly model the world components:
+1. Places (locations and environments)
+2. Actors (entities within the world)
+3. Objects (items and assets)
+4. Relationships (structural hierarchy and bounds)
+5. Rules (physics, constraints, and interactions)
+6. History/Events (logs of modifications and state transitions)
 
-### R2. World Manufacturing Layer
-Construct a layout compiler that translates the structured World Specification into playable Unreal 4 level layout artifacts. The output layout must represent all places, actors, and objects in a standard Unreal 4 level format (such as T3D level layouts).
+### R2. World Manufacturing (Unreal 4 Artifacts)
+Implement a manufacturing engine that takes the structured World Specification and constructs a playable, navigable Unreal 4 world artifact (e.g., scene layouts, maps, or project setups compatible with Unreal 4).
 
-### R3. Deployment & Operations Layer
-Build a deployment manager and an interactive simulator/dashboard to launch the world as a playable environment.
-- The environment must render places, actors, and objects in 3D based on the generated layout.
-- The environment must support real-time user-controlled actor/object interactions (e.g. movement, selection) and monitor participant/system activity.
-- The environment must expose operational endpoints or controls to query active world state.
+### R3. World Evolution & State Continuity
+Implement an evolution mechanism. When new user intent is received to modify an existing world, the system must update the World Specification and manufacture the updated Unreal 4 artifacts while preserving the existing state, structures, relationships, and history (no starting over from scratch).
 
-### R4. Evolution Layer
-Implement an evolver that accepts new modification prompts (add/remove places, actors, objects, or change rules) and updates the World Specification and manufactured Unreal 4 level layout. The evolution must be incremental, preserving unmodified structures, relationships, and history logs without rebuilding from scratch.
+### R4. World Deployment & Operation
+Provide support to launch/deploy the manufactured world, access/re-enter the world, and log the world's operational and modification history.
 
-### R5. E2E Verification Suite
-Provide a programmatic verification script that runs an end-to-end integration scenario:
-1. Generates a world specification and Unreal 4 layout file from an initial prompt.
-2. Deploys the interactive simulation.
-3. Evolve/modifies the active world with a modification prompt.
-4. Validates that the updated layout and simulation state preserve the original structures while applying the changes.
-
----
+### R5. Automated Verification
+Provide an automated integration script (`verify_genie.sh`) that takes a test intent prompt, generates a world, applies a modification intent to evolve it, and verifies the generated and evolved Unreal 4 artifacts for structural validity.
 
 ## Acceptance Criteria
 
-### Intent & Specification
-- [ ] Natural language commands can be parsed into a structured World Specification modeling Places, Actors, Objects, Relationships, Rules, and History.
-- [ ] A cryptographic receipt chain secures the world's history logs and state changes against tampering.
-
-### World Manufacturing
-- [ ] Compilation produces syntactically valid Unreal 4 compatible level layout files representing places as bounded environments and actors/objects as placed entities.
-
-### Deployment & Operations
-- [ ] The simulation environment can be started and renders all entities in 3D according to their specified coordinates.
-- [ ] Users can interactively control or manipulate entities within the active deployment.
+### Input & Output Validation
+- [ ] Natural language intent can be parsed into a structured World Specification modeling Places, Actors, Objects, Relationships, Rules, and History.
+- [ ] The manufacturing output is a valid Unreal 4 compatible world map/scene layout file.
 
 ### Evolution & Continuity
-- [ ] Modifying the world updates the active layouts incrementally, maintaining unchanged places and actors and updating the event/receipt history.
+- [ ] World modifications update the existing map/scene artifacts incrementally, preserving unmodified actors and relationships.
 
 ### Verification
-- [ ] The verify_genie.sh script runs the generation and evolution process on a sample case and exits with code 0 on success.
+- [ ] The `verify_genie.sh` script runs the generation and evolution process on a sample case and exits with code 0 on success.
+
+
+## Follow-up — 2026-06-17T07:25:43Z
+
+The user has set a /goal to validate the entire Genie system. The goal details are:
+"entire genie system is validated by using claude -p to create a world and then interacting with world in browser"
+
+To achieve this goal:
+1. **Web Runtime / Browser Deployment:** The manufactured Unreal 4 world artifact must have a browser runtime implementation (e.g., an HTML/JS/WebAssembly frontend, or a web dashboard representing the simulated Unreal 4 world layout) so that the user can open and interact with the manufactured world directly in a web browser.
+2. **Interactive CLI / Script:** Ensure there is a CLI/script (like `claude -p` or a direct prompt generation interface) that creates a world, launches a local web server to host it, and prints the URL to open it.
+3. **Validation:** The verification suite must demonstrate that the world can be built, hosted, and interacted with via a web interface.
+
+Update the project specification and direct the orchestrator to build a web/browser-based interactive runtime for the manufactured worlds.
 
 ## Follow-up — 2026-06-17T18:00:30Z
 
@@ -178,8 +260,8 @@ The pipeline must output a static HTML5/WebGL2/WASM Unreal 4 package. Pixel Stre
 ### R2. End-to-End Playwright Verification
 Use Playwright as the mandatory end-to-end verifier. The verification script must open the locally served HTML5 output, send movement input into the canvas, and capture screenshots before and after the input.
 
-### R3. Combinatorial Maximalism (Parallel Uncertainties)
-Launch parallel agents against every independent uncertainty. No agent may claim project verified; agents may only claim local receipts. The orchestrator admits only end-to-end receipts.
+### R3. Combinatorial Maximalism (Parallel Uncertain uncertainties)
+Launch parallel agents against every independent uncertainty. No agent may claim project victory; agents may only claim local receipts. The orchestrator admits only end-to-end receipts.
 The independent uncertainties to attack in parallel are:
 - UE4 fork setup
 - HTML5 packaging
@@ -242,7 +324,7 @@ Prompt
 
 If visual motion delta is below threshold, mark DEFECT and route repair by failure taxonomy.
 
-verified requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.
+Victory requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.
 
 ## Add this acceptance matrix
 
@@ -286,11 +368,52 @@ Every failure must route to a cell:
 - visual-delta cell
 - receipt/audit cell
 
-## The command to agents
-
-Stop proving that code exists.
+## Stop proving that code exists.
 
 Prove that the world drives.
+
+## Follow-up — 2026-06-17T19:29:01Z
+
+# Teamwork Project Prompt — Draft
+
+> Status: Launched
+> Goal: Execute the Teamwork Multi-Agent System on the problem constraints.
+
+Complete the full Rocket-Craft ecosystem by closing all remaining feature gaps across the PWA Frontend, Supabase State Persistence, Multiplatform Builds (Windows/Linux), and offline Service Worker caching.
+
+Working directory: ~/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. PWA Frontend & Canvas Integration
+The web dashboard (`pwa-staff/`) must seamlessly embed the manufactured HTML5 UE4 output. It must replace any mock visualization with the actual compiled WASM game canvas and render the cryptographic receipt upon completion.
+
+### R2. State Persistence & Authentication
+Integrate Supabase to authenticate users and persist generated `WorldSpec` contracts to the database, ensuring world history is tied to specific user accounts.
+
+### R3. Multiplatform Packaging
+Extend the headless manufacturing pipeline (currently HTML5-only) to also target Windows (`.exe`) and Linux (`.elf` or `.sh`) standalone builds for dedicated servers or native desktop clients.
+
+### R4. Offline Asset Caching
+Implement a Service Worker in the PWA to aggressively cache the heavy Unreal Engine WASM payloads and asset bundles, enabling the world to load offline after the initial play.
+
+## Acceptance Criteria
+
+### PWA & Canvas Integration
+- [ ] Playwright E2E script confirms the UE4 `<canvas>` element mounts inside the React/PWA dashboard DOM.
+- [ ] The cryptographic receipt data is visually rendered in the UI adjacent to the canvas.
+
+### State Persistence
+- [ ] Programmatic script successfully registers a mock user via Supabase Auth.
+- [ ] A test script queries the Supabase database and verifies the generated `WorldSpec` JSON was saved under the correct user ID.
+
+### Multiplatform Builds
+- [ ] The pipeline successfully emits a Windows `.exe` standalone build for a generated world.
+- [ ] The pipeline successfully emits a Linux standalone build for a generated world.
+
+### Offline Caching
+- [ ] Playwright disables network connectivity (offline mode) after initial load and confirms the UE4 application still boots successfully from the Service Worker cache.
 
 
 ## Follow-up — 2026-06-17T23:24:31Z
@@ -328,8 +451,8 @@ Clean up and replace all print statements (`println!`) in compiler scripts, FFI 
 - `unify-mcp/src/main.rs`
 - `unify/src/commands.rs` and `unify/src/main.rs`
 
-### R5. Eliminate Overclaim/verified Language
-Remove any unverified overclaiming status tags (like `zero violations`, `readdressed`, `done`) in code comments or logs.
+### R5. Eliminate Overclaim/Victory Language
+Remove any unverified overclaiming status tags (like `zero violations`, `solved`, `done`) in code comments or logs.
 
 ## Acceptance Criteria
 
@@ -409,7 +532,7 @@ Create a unified suite of command-line tools that automatically scaffolds local 
 - [ ] **Tooling**: The new Developer CLI successfully and autonomously spins up the complete local dev environment and required servers.
 - [ ] **Auditor Review**: An independent secondary agent reviews the implementation to judge that the DX/QoL improvements are satisfactory and that no verification steps were bypassed.
 
-## Follow-up — 2026-06-18T03:49:24Z
+## 2026-06-18T03:49:24Z
 
 # Teamwork Project Prompt
 
@@ -435,4 +558,391 @@ Author a completely new, structured documentation suite that strictly adheres to
 - [ ] **Executable Doctests**: The CI pipeline must successfully run `cargo test --doc` (and equivalent JS/C doc-test runners) across the entire codebase with a 100% pass rate.
 - [ ] **Diátaxis Compliance Audit**: An independent secondary agent must audit the newly authored documentation suite to verify that all four Diátaxis quadrants exist, are correctly categorized, and are structurally complete.
 - [ ] **Ecosystem Sync Validation**: The secondary agent must confirm that the high-level ecosystem documents accurately and consistently reflect the latest system capabilities.
+
+
+## Follow-up — 2026-06-18T06:20:27Z
+
+# Teamwork Project Prompt — Draft
+
+Implement `cargo-cicd` across the entire `rocket-craft` monorepo, leveraging combinatorial maximalism and its advanced autonomic features to strictly enforce workspace health, optimize target directories, and generate cryptographic deployment receipts for all games.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Strict Playwright Evidence Gating
+Implement strict evidence gating during the `cargo cicd git close` and publish sequences. The system must physically prevent commits or branch closures if the TPS/DfLSS Playwright WebGL visual receipts are missing, failing, or invalid.
+
+### R2. Autonomic Policy Tuning
+Enable both the `process-data` and `autonomic` feature flags for the `cargo-cicd` integration. The integration must allow `cargo-cicd` to automatically analyze the structured XES event logs and actively write optimized workflow policies into the `cicd.toml`.
+
+### R3. Combinatorial Simulation Hooks
+Link the `cargo-cicd` testing lifecycle to the `rocket-combinatorial-engine`. Automatically execute the combinatorial state exploration tests during the `cargo cicd test changed` and `cargo cicd trybuild changed` phases to guarantee maximum state-space coverage prior to any release.
+
+## Acceptance Criteria
+
+### Integration Verification
+- [ ] A top-level script successfully runs `cargo cicd workspace doctor` across the entire project with a clean exit code.
+- [ ] Combinatorial tests execute autonomously when `cargo cicd test changed` is invoked on game logic packages.
+- [ ] The `git close` command successfully aborts and blocks execution if a simulated run is missing its valid `wasm4pm` cryptographic receipt.
+- [ ] The `cicd.toml` policy file is successfully parsed and updated by the `autonomic` feature after a test run.
+
+
+## Follow-up — 2026-06-18T06:20:27Z
+
+# Teamwork Project Prompt — Draft
+
+Implement `cargo-cicd` across the entire `rocket-craft` monorepo, leveraging combinatorial maximalism and its advanced autonomic features to strictly enforce workspace health, optimize target directories, and generate cryptographic deployment receipts for all games.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Strict Playwright Evidence Gating
+Implement strict evidence gating during the `cargo cicd git close` and publish sequences. The system must physically prevent commits or branch closures if the TPS/DfLSS Playwright WebGL visual receipts are missing, failing, or invalid.
+
+### R2. Autonomic Policy Tuning
+Enable both the `process-data` and `autonomic` feature flags for the `cargo-cicd` integration. The integration must allow `cargo-cicd` to automatically analyze the structured XES event logs and actively write optimized workflow policies into the `cicd.toml`.
+
+### R3. Combinatorial Simulation Hooks
+Link the `cargo-cicd` testing lifecycle to the `rocket-combinatorial-engine`. Automatically execute the combinatorial state exploration tests during the `cargo cicd test changed` and `cargo cicd trybuild changed` phases to guarantee maximum state-space coverage prior to any release.
+
+## Acceptance Criteria
+
+### Integration Verification
+- [ ] A top-level script successfully runs `cargo cicd workspace doctor` across the entire project with a clean exit code.
+- [ ] Combinatorial tests execute autonomously when `cargo cicd test changed` is invoked on game logic packages.
+- [ ] The `git close` command successfully aborts and blocks execution if a simulated run is missing its valid `wasm4pm` cryptographic receipt.
+- [ ] The `cicd.toml` policy file is successfully parsed and updated by the `autonomic` feature after a test run.
+
+## 2026-06-18T06:47:05Z
+
+# Teamwork Project Prompt — Draft
+
+Launch a 20-subagent "big bang" hyperswarm across the entire `rocket-craft` monorepo to systematically discover, prioritize, and autonomously fix all remaining integration, testing, game logic, and dependency gaps using an 80/20 execution strategy.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Comprehensive Gap Discovery & Resolution
+The swarm must execute a workspace-wide diagnostic scan covering all 8 sub-workspaces to identify and fix:
+- Missing or failing Rust unit/integration tests.
+- `cargo-cicd` workflow policy warnings.
+- Unfinished game mechanics (Infinity Blade 4 / WASM combat, UI, progression).
+- Outdated or conflicting 3rd-party dependencies.
+
+### R2. 80/20 Execution Strategy
+Apply the 80/20 principle to automatically prioritize the highest-impact gaps first. The team must push fixes directly into the active codebase autonomously, ensuring seamless integration without breaking existing functionality.
+
+### R3. Autonomous Verification & Deployment
+The team must autonomously merge and deploy any fixes that successfully pass the strict Playwright E2E visual tests and the combinatorial engine test suites.
+
+## Acceptance Criteria
+
+### Hyperswarm Verification
+- [ ] The final monorepo state successfully passes a complete `cargo test --workspace` and a strict Playwright E2E visual verification run without any failures.
+- [ ] A minimum of 80% of the discovered critical/high-impact gaps are successfully resolved by the subagent swarm.
+- [ ] The orchestrator produces a comprehensive "Gap Resolution Report" detailing every vulnerability, mock, outdated dependency, or integration fault that was discovered and fixed across the monorepo.
+
+
+## Follow-up — 2026-06-18T07:32:42Z
+
+# Teamwork Project Prompt — Draft
+
+Implement the **Gundam Nexus Combinatorial Maximalist Universe Manufacturing PRD**. The swarm must encode these universal laws as a formal `ggen` ontology and project them into rigid Rust Typestate boundaries across the monorepo to manufacture the possibility space for Worlds, Civilizations, Mechs, and Preserved Experiences.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context: The Manufacturing PRD
+The objective is not content creation. The objective is content manufacturing.
+The swarm must identify Primitives, Rules, Relationships, Constraints, and Possibility Spaces to manufacture Worlds, Civilizations, Mechs, Cultures, and Experiences based on the following domains:
+- **Living Cosmology:** Earth/Planets are sentient (Growth, Expansion, Judgment, Preservation, Renewal).
+- **Eden System:** Low Conflict, High Stability, Long-Term Progression.
+- **Frontier System:** High Risk, High Reward, High Discovery.
+- **Planetary Intelligence:** Identity, Personality, Values, History, Preferences.
+- **Civilization & Mythology Manufacturing:** Generated from Planet + History + Values + Environment + Resources. Outputs Heroes, Builders, Destroyers.
+- **Mech Manufacturing System:** A mech is an assembly, not an asset. Primitives: Frame, Mobility, Power, Armor, Weapons, Sensors, Utility. Motion defines validity. Collision system ensures coherence.
+- **Preservation System:** "Digital Smithsonian". Faithful recreation of historical games (Petpet Park, Flash Games, etc.).
+- **Experience Loop:** Explore → Discover → Build → Preserve → Expand → Create History → Become Mythology.
+
+## Requirements
+
+### R1. `ggen` Ontology Encoding
+Translate the entire Gundam Nexus PRD into formal `ggen` ontology files (`.ttl` format). The ontology must define the exact primitives, rules, and bounded state space constraints for every system (Planetary Minds, Civilizations, Mechs, Preservation).
+
+### R2. Rust Typestate Projection
+Configure the `ggen` pipeline to project these ontological laws into rigid Rust Typestate structs within the `rocket-craft` workspaces. The Rust compiler must natively enforce the constitutional laws (e.g., a Mech assembly must contain all required primitives to exist).
+
+### R3. Preservation & Simulation Interfaces
+Generate the architectural interfaces for the Preservation Layer, allowing the `combinatorial-engine` to systematically test both new generated civilizations and reconstructed historical games.
+
+## Acceptance Criteria
+
+### Universal Law Verification
+- [ ] The `ggen` pipeline successfully compiles the complete Gundam Nexus ontology without syntax errors.
+- [ ] The generated Rust typestates successfully compile across the monorepo.
+- [ ] A dedicated "Chaos Test Suite" attempts to construct non-compliant entities (e.g., a Mech without a Mobility primitive, or a Civilization missing a Planetary Identity) and the Rust compiler explicitly rejects and blocks the compilation.
+- [ ] An independent auditor verifies that all domains from the PRD are fully represented as functional primitives in the `ggen` ontology.
+
+## Follow-up — 2026-06-18T07:41:00Z
+
+# Teamwork Project Prompt — Draft
+
+Implement the **Procedural Mech Manufacturing Engine (PMME)** PRD for Gundam Nexus. The swarm must build a civilization-aware manufacturing system that creates coherent mechanical lifeforms, industrial platforms, and ark-class preservers from bounded primitives. **The canonical artifact is an assembly specification, not a mesh.**
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context: The PMME PRD
+The objective is manufacturing, not asset consumption. 
+Incorrect: Prompt → GLB → Display.
+Correct: Primitive Laws → Specification → Assembly → Motion/Collision/Variants → Playable Artifact.
+
+The system must simultaneously generate:
+1. Structural Systems (Head, Torso, Joints, Mounts)
+2. Mechanical/Frame Systems (Scale, Load Capacity)
+3. Motion Systems (Walk, Flight, Hover)
+4. Collision Systems (Occupancy, Clearance)
+5. Visual/Material Systems
+6. Cultural Systems (Planetary Identity)
+7. Functional Systems (Worker, Ark, Guardian)
+
+Failure in any structural, motion, or collision validation must result in absolute refusal of the assembly.
+
+## Requirements
+
+### R1. Assembly Specification Typestates
+Encode the PMME primitives into rigid Rust typestates. Every mech must be constructed as a purely mathematical assembly specification of interoperable primitives (Frames, Joints, Power) rather than a pre-defined 3D asset. 
+
+### R2. Motion & Collision Integration
+The manufacturing engine must natively understand movement before appearance. The generated assembly specifications must intrinsically define rotation limits, physical occupancy, and clearance volumes that are programmatically validated before the assembly is admitted.
+
+### R3. Cultural & Functional Generation
+Wire the PMME to the Universe Cosmology ontology so that the generated mech assemblies inherit Proportions, Materials, and Functionality directly from the Planetary Identity and Civilization values.
+
+## Acceptance Criteria
+
+### Manufacturing Verification
+- [ ] A unit test successfully generates a completely valid, complex Mech Assembly Specification (e.g., an Ark-class or Worker mech) directly from foundational primitives without touching a GLB or mesh file.
+- [ ] The engine explicitly fails and refuses an assembly that violates structural, motion, or collision validation (e.g., joints without rotation limits, or massive load capacity mismatches).
+- [ ] The engine outputs a deterministic, mathematically verifiable assembly receipt proving that the mech can physically move, interact, and participate in civilization.
+
+
+## 2026-06-18T07:43:24Z
+
+# Teamwork Project Prompt — Draft
+
+Implement the **TPS Branchless Mech Parts Generator** for Gundam Nexus. The swarm must construct a chip-level production line that deterministically calculates valid mech geometry, sockets, mass, colliders, and motion bounds using branchless architecture driven by a bounded state vector.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context: The TPS Manufacturing Law
+A part is valid only if it passes: `geometry + socket fit + motion clearance + collision volume + mass balance + physics role + assembly compatibility`.
+The generation must avoid massive branching (`if zeon_head {} else {}`). It must use a continuous hot path:
+`state vector → masks → transforms → part geometry → sockets → mass → collider → motion bounds`
+The output `Part` is mathematically derived from the ontology state: `Part = μ(O*)`.
+
+## Requirements
+
+### R1. Branchless State Vector Execution
+Implement the generator without massive `if/else` trees. Use bounded coordinate vectors (`civilization_id`, `frame_id`, `armor_profile`, `joint_profile`, `mass_profile`) to perform branchless mathematical transformations that yield final part specifications.
+
+### R2. TPS Pipeline Gating (Jidoka & Poka-yoke)
+Implement the Toyota Production System constraints natively. Parts that fail socket fit, motion clearance, collision volume, or mass balance must automatically trigger a Jidoka halt. The system must structurally reject impossible-to-assemble parts (Poka-yoke).
+
+### R3. Deterministic Assembly Receipts
+Every manufactured part must follow Standard Work. Output a mathematically verifiable receipt proving that the part passed all physical and structural laws on the hot path.
+
+## Acceptance Criteria
+
+### Production Line Verification
+- [ ] The Rust generation function (`Part = μ(O*)`) successfully executes a completely branchless transformation of a state vector into a valid Mech Component Specification.
+- [ ] A dedicated TPS unit test proves that an incompatible socket or intersecting collision volume immediately triggers a Jidoka halt (compilation or panic boundary) rather than producing a broken artifact.
+- [ ] The generator outputs clean, deterministic replay receipts for a complete mech assembly proving that every connected part passed the TPS gating checks.
+
+
+## Follow-up — 2026-06-18T12:00:38Z
+
+# Teamwork Project Prompt — TPS Branchless Parts Generator
+
+Implement the **TPS Branchless Mech Parts Generator** for Gundam Nexus. `Part = μ(O*)`. The hot path must be branchless. Jidoka halts on invalid geometry. Poka-yoke rejects impossible assemblies at the typestate boundary.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Context
+The following is already complete — do NOT redo:
+- `nexus-engine/crates/nexus-gundam/` with existing typestates
+- `gundam_nexus.ttl` ontology
+- Chaos Test Suite
+
+Your job is to build the TPS branchless generator ON TOP of the existing foundation.
+
+## What To Build
+
+Create `nexus-engine/crates/nexus-tps/` containing:
+
+### R1. Bounded State Vector
+```rust
+struct PartStateVector {
+    civilization_id: u16,   // 0..65535
+    frame_id: u8,           // 0..255 frame archetypes
+    armor_profile: f32,     // 0.0..1.0
+    joint_profile: f32,     // 0.0..1.0  
+    mass_profile: f32,      // 0.0..1.0
+    weapon_profile: f32,    // 0.0..1.0
+    motion_profile: f32,    // 0.0..1.0
+    part_slot: PartSlot,    // Head|Torso|Waist|ArmL|ArmR|LegL|LegR|Backpack
+}
+```
+
+### R2. Branchless Hot Path — `Part = μ(O*)`
+The generator function signature:
+```rust
+fn generate_part(state: &PartStateVector) -> Result<Part, JidokaHalt>
+```
+
+Implement WITHOUT if/else trees. Use:
+- Mathematical interpolation between archetype extremes
+- Bitmask selection for discrete properties
+- LERP/SLERP for continuous properties
+- Table lookups indexed by bounded integer coords
+
+Output `Part` struct:
+```rust
+struct Part {
+    slot: PartSlot,
+    geometry: PartGeometry,   // AABB dimensions derived from state vector
+    socket_in: SocketSpec,    // what this part connects FROM
+    socket_out: [SocketSpec; 4], // what can attach TO this part
+    mass_kg: f32,
+    collider: ColliderVolume, // AABB or capsule
+    motion_bounds: MotionBounds, // rotation limits per axis
+    material_id: u8,          // derived from civilization_id
+}
+```
+
+### R3. TPS Gating — Jidoka & Poka-yoke
+
+**Jidoka** (halt on defect):
+```rust
+enum JidokaHalt {
+    SocketMismatch { expected: SocketType, got: SocketType },
+    CollisionVolumeIntersects { part_a: PartSlot, part_b: PartSlot },
+    MassExceedsFrameCapacity { mass: f32, capacity: f32 },
+    MotionBoundsViolated { axis: Axis, limit: f32, actual: f32 },
+}
+```
+
+**Poka-yoke** (impossible assemblies rejected at typestate boundary):
+- `ArmSocket` cannot connect to `LegMount` — enforced via distinct socket type enums, not runtime checks
+- Assembly of incompatible socket types must be a **compile error**, not a runtime error
+
+### R4. Deterministic Assembly Receipts
+```rust
+struct TpsReceipt {
+    state_vector_hash: [u8; 32],
+    part_slot: PartSlot,
+    gates_passed: u8,   // bitmask of TPS gates
+    mass_kg: f32,
+    collider_aabb: [f32; 6],
+    motion_bounds: [[f32; 2]; 3],
+    jidoka_halts: Vec<JidokaHalt>,
+}
+```
+
+### R5. Full Assembly Line
+Implement `assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, JidokaHalt>` that:
+1. Generates all 8 parts (Head, Torso, Waist, ArmL, ArmR, LegL, LegR, Backpack)
+2. Validates socket compatibility between all connected pairs
+3. Validates total mass vs frame capacity
+4. Validates no inter-part collision volume intersection
+5. Outputs final `MechTpsReceipt` with all per-part receipts
+
+## Acceptance Criteria
+- [ ] `generate_part()` contains zero `if`/`else` or `match` on civilization-specific logic — only math/table ops
+- [ ] Jidoka test: mismatched socket type returns `Err(JidokaHalt::SocketMismatch{...})`
+- [ ] Jidoka test: intersecting collision volumes returns `Err(JidokaHalt::CollisionVolumeIntersects{...})`
+- [ ] Poka-yoke test: code that attempts `ArmSocket.connect(LegMount)` must fail to compile
+- [ ] Determinism test: identical `PartStateVector` → identical `TpsReceipt` sha256 hash
+- [ ] Full assembly test: 8-part mech assembly succeeds and outputs `MechTpsReceipt`
+- [ ] `cargo test -p nexus-tps` passes with zero failures
+- [ ] Independent Victory Auditor confirms VICTORY
+
+## Follow-up — 2026-06-18T17:04:23Z
+
+# Teamwork Project Prompt
+
+Build a walkable WebGL2/HTML5 UE4 demo of a mech factory that visually demonstrates the Combinatorial Maximalist manufacturing pipeline, proving that the engine manufactures mechs from primitives rather than importing pre-authored assets.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Factory Zones
+Implement a walkable 3D environment containing 6 specific zones:
+1. Primitive Foundry: Visualizes raw laws becoming parts (frame bones, armor plates, joints).
+2. Part Runner Wall: Industrial-scale racks containing generated parts (frame, armor, wings, etc.).
+3. Assembly Gantry: Robotic arms attaching parts to a central frame in sequence (spine → torso → head → etc.).
+4. Fit + Collision Bay: The assembled mech performs constrained test poses (shoulder sweep, wing clearance, etc.).
+5. Physics Proving Ground: The completed mech moves (walk, boost, land, kneel, weapon swing).
+6. Final Reveal Platform: The completed machine is presented alongside a textual receipt (Frame: admitted, Sockets: admitted, etc.).
+
+### R2. Generative In-World Assembly
+Do not import a complete mech model. The engine must generate parts, sockets, attachment rules, motion constraints, and collision volumes dynamically. It must assemble the mech in-world and prove it can move.
+
+### R3. Visual Aesthetic
+Utilize the following visual language as a style reference (not a direct copy): white armor, layered feather-like wing plates, gold face accents, cyan energy blades, and a high-mobility divine silhouette.
+
+## Acceptance Criteria
+
+### E2E Playwright Validation
+- [ ] The pipeline successfully packages the UE4/HTML5 factory world and serves it locally.
+- [ ] A Playwright test successfully navigates the walkable factory demo.
+- [ ] Playwright captures visual deltas proving the mechanical assembly sequence occurred and the physics proving ground tests executed successfully.
+- [ ] The final reveal platform displays a fully verified assembly receipt.
+
+## Follow-up — 2026-06-18T17:08:34Z
+
+# Teamwork Project Prompt — Gundam Nexus Manufacturing Facility (GMF)
+
+Implement the Gundam Nexus Combinatorial Manufacturing Facility (GMF) as an autonomous, ontology-driven manufacturing plant. The GMF is the physicalized manifestation of the Chatman Equation (A = μ(O^*)).
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Universal Manufacturing Loop
+Implement the continuous projection pipeline: Ontology Source (O*) → SPARQL Extraction (μ) → Branchless Projection (A) → Verification (Receipt) → Replay.
+
+### R2. The Factory as an Operational Surface
+Implement the 6 operational zones:
+1. Foundry (μ_1): Normalize primitives (Bone, Joint, Plate).
+2. Runner Wall (μ_2): Extract bind-patterns.
+3. Assembly Gantry (μ_3): Branchless projection of parts to sockets.
+4. Fit/Collision Bay (μ_4): Structural/Clearance/Socket-fit canonical proof gate.
+5. Proving Ground (μ_5): Actuation of motion, physics, receipt generation.
+6. Reveal Platform (Output): Artifact presentation with cryptographic standing (R_B).
+
+### R3. Core Manufacturing Constraints
+- No Manual Assets: Zero GLB/FBX imports. Parts are generated procedurally.
+- Branchless Logic: Use deterministic coordinate mappings. No if/else trees. Jidoka enforcement for structural rejection.
+- Cultural Integration: Incorporate planetary identity metadata (e.g., High Faith/Order silhouettes).
+
+## Acceptance Criteria
+
+### The "Car Drives" Gate
+A mech is considered "Manufactured" only when the following receipt is generated:
+- [ ] Structural Integrity: Passed Fit Check and Collision Volume Check.
+- [ ] Kinematic Validity: Passed Motion Sweep (Walk/Boost/Land/Kneel).
+- [ ] Physics Compliance: Mass balance, Center of Mass, and Combat Envelope are verified.
+- [ ] Cryptographic Proof: A BLAKE3 hash of the specification, the motion-verification trace, and the physics delta has been logged as an admissible receipt (R_B).
 

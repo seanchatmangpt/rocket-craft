@@ -5,10 +5,10 @@ pub trait ActorHandler<M: ActorMessage> {
     type State;
     fn handle(&mut self, state: &mut Self::State, msg: M);
     fn on_start(&mut self, _state: &mut Self::State) {
-        let _active = true;
+        let _ = _state;
     }
     fn on_stop(&mut self, _state: &mut Self::State) {
-        let _stopped = true;
+        let _ = _state;
     }
 }
 

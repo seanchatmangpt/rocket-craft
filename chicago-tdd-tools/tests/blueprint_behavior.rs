@@ -30,14 +30,24 @@ fn should_verify_427_es3_blueprint_semantic_correctness() {
     let t3d = T3dSerializer::serialize(&bp);
     
     // Verify Node Classes (standard for 4.27)
-     
-     
+    assert!(t3d.contains("Begin Object Class=/Script/BlueprintGraph.K2Node_Event Name=\"BeginPlay\""), "Missing BeginPlay node or incorrect class");
+    assert!(t3d.contains("Begin Object Class=/Script/BlueprintGraph.K2Node_CallFunction Name=\"PrintString\""), "Missing PrintString node or incorrect class");
     
     // Verify ES3 compatible function references
-     
-     
+    assert!(t3d.contains("FunctionReference=(MemberParent=Class'/Script/Engine.KismetSystemLibrary',MemberName=\"PrintString\")"), "Missing or incorrect FunctionReference for PrintString");
+    assert!(t3d.contains("bOverrideFunction=True"), "Missing bOverrideFunction property on BeginPlay event");
     
-    // Verify Connections
+    // Verify Layout Format
+    assert!(t3d.contains("NodePosX="), "T3D output should specify node X position");
+    assert!(t3d.contains("NodePosY="), "T3D output should specify node Y position");
+    assert!(t3d.contains("NodeGuid="), "T3D output should specify node GUIDs");
+    assert!(t3d.contains("CustomProperties Pin"), "T3D output should define custom pin properties");
+    
+    // Verify Linkage Layout in Pin format: LinkedTo=(PrintString(<pin_guid>))
+    assert!(t3d.contains("LinkedTo=(PrintString("), "T3D should serialize the connection from BeginPlay to PrintString");
+    assert!(t3d.contains("LinkedTo=(BeginPlay("), "T3D should serialize the connection back from PrintString to BeginPlay");
+
+    // Verify Connections via AST assertion macro
     assert_connected!(bp, "EventGraph", "BeginPlay", "then", "PrintString", "execute");
 }
 
@@ -61,8 +71,10 @@ fn should_verify_actor_spawning_logic_for_427() {
     let t3d = T3dSerializer::serialize(&bp);
     
     // Verify the actor class is correctly serialized for 4.27
-     
-     
+    assert!(t3d.contains("Begin Object Class=/Script/BlueprintGraph.K2Node_CallFunction Name=\"SpawnEnemy\""), "Missing SpawnEnemy node");
+    assert!(t3d.contains("FunctionReference=(MemberParent=Class'/Script/Engine.GameplayStatics',MemberName=\"BeginSpawningActorFromClass\")"), "Incorrect function reference for SpawnActor");
+    assert!(t3d.contains("PinName=\"ActorClass\""), "Spawn node should have an ActorClass pin");
+    assert!(t3d.contains("DefaultValue=\"Class'/Script/Engine.StaticMeshActor'\""), "ActorClass default value should be set to StaticMeshActor");
 }
 
 #[test]

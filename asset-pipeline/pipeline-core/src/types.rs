@@ -1,5 +1,5 @@
-use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
+use std::path::PathBuf;
 
 // ── Typestate asset structs ───────────────────────────────────────────────────
 //
@@ -49,13 +49,13 @@ pub struct StagedAsset {
 // ── State-transition methods ──────────────────────────────────────────────────
 
 impl DiscoveredAsset {
-    pub fn new(
-        path: PathBuf,
-        hash: [u8; 32],
-        source_format: Format,
-        file_size_bytes: u64,
-    ) -> Self {
-        Self { path, hash, source_format, file_size_bytes }
+    pub fn new(path: PathBuf, hash: [u8; 32], source_format: Format, file_size_bytes: u64) -> Self {
+        Self {
+            path,
+            hash,
+            source_format,
+            file_size_bytes,
+        }
     }
 
     /// Advance to the `Validated` state (caller has already performed checks).
@@ -70,10 +70,7 @@ impl DiscoveredAsset {
 
     /// Returns the bare file stem (e.g. `"my_model"` for `"/foo/my_model.obj"`).
     pub fn name(&self) -> &str {
-        self.path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or("")
+        self.path.file_stem().and_then(|s| s.to_str()).unwrap_or("")
     }
 }
 
@@ -90,10 +87,7 @@ impl ValidatedAsset {
 
     /// Returns the bare file stem.
     pub fn name(&self) -> &str {
-        self.path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or("")
+        self.path.file_stem().and_then(|s| s.to_str()).unwrap_or("")
     }
 }
 
@@ -109,20 +103,14 @@ impl ConvertedAsset {
 
     /// Returns the bare file stem.
     pub fn name(&self) -> &str {
-        self.path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or("")
+        self.path.file_stem().and_then(|s| s.to_str()).unwrap_or("")
     }
 }
 
 impl StagedAsset {
     /// Returns the bare file stem.
     pub fn name(&self) -> &str {
-        self.path
-            .file_stem()
-            .and_then(|s| s.to_str())
-            .unwrap_or("")
+        self.path.file_stem().and_then(|s| s.to_str()).unwrap_or("")
     }
 }
 
@@ -145,37 +133,37 @@ impl Format {
     /// extensions that are not supported by this pipeline.
     pub fn from_extension(ext: &str) -> Option<Self> {
         match ext.to_lowercase().as_str() {
-            "obj"  => Some(Self::Obj),
-            "fbx"  => Some(Self::Fbx),
-            "stl"  => Some(Self::Stl),
-            "dae"  => Some(Self::Dae),
+            "obj" => Some(Self::Obj),
+            "fbx" => Some(Self::Fbx),
+            "stl" => Some(Self::Stl),
+            "dae" => Some(Self::Dae),
             "gltf" => Some(Self::Gltf),
-            "glb"  => Some(Self::Glb),
-            _      => None,
+            "glb" => Some(Self::Glb),
+            _ => None,
         }
     }
 
     /// The canonical file extension (without leading dot) for this format.
     pub fn extension(&self) -> &'static str {
         match self {
-            Self::Obj  => "obj",
-            Self::Fbx  => "fbx",
-            Self::Stl  => "stl",
-            Self::Dae  => "dae",
+            Self::Obj => "obj",
+            Self::Fbx => "fbx",
+            Self::Stl => "stl",
+            Self::Dae => "dae",
             Self::Gltf => "gltf",
-            Self::Glb  => "glb",
+            Self::Glb => "glb",
         }
     }
 
     /// Human-readable display name.
     pub fn display_name(&self) -> &'static str {
         match self {
-            Self::Obj  => "Wavefront OBJ",
-            Self::Fbx  => "Autodesk FBX",
-            Self::Stl  => "STL",
-            Self::Dae  => "COLLADA DAE",
+            Self::Obj => "Wavefront OBJ",
+            Self::Fbx => "Autodesk FBX",
+            Self::Stl => "STL",
+            Self::Dae => "COLLADA DAE",
             Self::Gltf => "glTF",
-            Self::Glb  => "glTF Binary (GLB)",
+            Self::Glb => "glTF Binary (GLB)",
         }
     }
 
@@ -256,13 +244,13 @@ mod tests {
     #[test]
     fn format_round_trip() {
         for (ext, expected) in [
-            ("obj",  Format::Obj),
-            ("OBJ",  Format::Obj),
-            ("fbx",  Format::Fbx),
-            ("stl",  Format::Stl),
-            ("dae",  Format::Dae),
+            ("obj", Format::Obj),
+            ("OBJ", Format::Obj),
+            ("fbx", Format::Fbx),
+            ("stl", Format::Stl),
+            ("dae", Format::Dae),
             ("gltf", Format::Gltf),
-            ("glb",  Format::Glb),
+            ("glb", Format::Glb),
         ] {
             let got = Format::from_extension(ext).expect("should parse");
             assert_eq!(got, expected, "extension {ext:?}");
@@ -280,12 +268,8 @@ mod tests {
 
     #[test]
     fn asset_state_transitions() {
-        let discovered = DiscoveredAsset::new(
-            PathBuf::from("/tmp/cube.obj"),
-            [0u8; 32],
-            Format::Obj,
-            1024,
-        );
+        let discovered =
+            DiscoveredAsset::new(PathBuf::from("/tmp/cube.obj"), [0u8; 32], Format::Obj, 1024);
         assert_eq!(discovered.name(), "cube");
 
         let validated = discovered.into_validated();

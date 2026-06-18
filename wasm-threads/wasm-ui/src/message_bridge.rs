@@ -45,6 +45,9 @@ pub struct MessageBridge {
     pub messages_processed: u64,
     pub last_tick: u64,
     pub entity_positions: std::collections::HashMap<u32, (f32, f32)>,
+    pub last_player_health: u32,
+    pub last_player_health_max: u32,
+    pub last_score: u64,
 }
 
 impl MessageBridge {
@@ -53,6 +56,9 @@ impl MessageBridge {
             messages_processed: 0,
             last_tick: 0,
             entity_positions: std::collections::HashMap::new(),
+            last_player_health: 0,
+            last_player_health_max: 100,
+            last_score: 0,
         }
     }
 
@@ -68,9 +74,14 @@ impl MessageBridge {
                 player_score,
             } => {
                 self.last_tick = tick;
+                let health = player_health.unwrap_or(0);
+                let health_max = player_health_max.unwrap_or(100);
+                self.last_player_health = health;
+                self.last_player_health_max = health_max;
+                self.last_score = player_score;
                 Some(HudData {
-                    player_health: player_health.unwrap_or(0),
-                    player_health_max: player_health_max.unwrap_or(100),
+                    player_health: health,
+                    player_health_max: health_max,
                     score: player_score,
                     entity_count,
                     game_tick: tick,
@@ -81,21 +92,25 @@ impl MessageBridge {
             GameToUiMessage::GameOver {
                 winner_score,
                 total_ticks,
-            } => Some(HudData {
-                player_health: 0,
-                player_health_max: 100,
-                score: winner_score,
-                entity_count: 0,
-                game_tick: total_ticks,
-                fps: 0.0,
-                messages_per_second: 0.0,
-            }),
+            } => {
+                self.last_player_health = 0;
+                self.last_score = winner_score;
+                Some(HudData {
+                    player_health: 0,
+                    player_health_max: self.last_player_health_max,
+                    score: winner_score,
+                    entity_count: 0,
+                    game_tick: total_ticks,
+                    fps: 0.0,
+                    messages_per_second: 0.0,
+                })
+            }
             GameToUiMessage::EntityMoved { entity_id, x, y } => {
                 self.entity_positions.insert(entity_id, (x, y));
                 Some(HudData {
-                    player_health: 0,
-                    player_health_max: 100,
-                    score: 0,
+                    player_health: self.last_player_health,
+                    player_health_max: self.last_player_health_max,
+                    score: self.last_score,
                     entity_count: self.entity_positions.len(),
                     game_tick: self.last_tick,
                     fps: 0.0,
@@ -105,9 +120,9 @@ impl MessageBridge {
             GameToUiMessage::EntityDied { entity_id } => {
                 self.entity_positions.remove(&entity_id);
                 Some(HudData {
-                    player_health: 0,
-                    player_health_max: 100,
-                    score: 0,
+                    player_health: self.last_player_health,
+                    player_health_max: self.last_player_health_max,
+                    score: self.last_score,
                     entity_count: self.entity_positions.len(),
                     game_tick: self.last_tick,
                     fps: 0.0,

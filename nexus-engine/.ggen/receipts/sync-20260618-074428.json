@@ -1,0 +1,19 @@
+{
+  "operation_id": "655b77e3-d8dc-4bbf-b2b5-3117e9dd32be",
+  "timestamp": "2026-06-18T07:44:28.417027Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.9",
+    "ggen.toml:5b23068dcc01d9b6c8fbf9fdd54129c3c7736f9dbd42770055eb2cb335358580",
+    ".specify/schema/combined.ttl:b2f3a476c5dc4e1ffbd37fe55ca4187434b3b965988e3edb9e050f729eeb4ab4",
+    "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a",
+    "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a",
+    "templates/gundam_nexus.rs.tera:6a1ebfb5712aa1efb209a697655d078e5d8ad4b6638b9f4721c33d139faab848"
+  ],
+  "output_hashes": [
+    "/Users/sac/rocket-craft/nexus-engine/./crates/nexus-combat/src/generated_machine.rs:4812468bd80704e41a6f92b9827965832ce60414710dc91b955dea8a4fdf6a36",
+    "/Users/sac/rocket-craft/nexus-engine/./crates/nexus-session/src/generated_session.rs:a7da1b32b662f7ae7750a6c08b0f21c3bb0300b996fd388781ed69bb58d2618a",
+    "/Users/sac/rocket-craft/nexus-engine/./crates/nexus-gundam/src/generated_gundam.rs:d50174da0042dbb243d31fe95252c72b0e4091ae5b4ee4935056dc212d0bfebc"
+  ],
+  "signature": "931221ce4211605eaf488585ff7c45cb92b3bcafb7997f625773f6d9b0052266499eba6040dee4fd4ae5817eabac2727e55ab7e96282b316737338f2086b5306",
+  "previous_receipt_hash": "3bf58216f35f4b67306b68c8a80b5f8c152273ca240181c59f182c72ac861774"
+}
