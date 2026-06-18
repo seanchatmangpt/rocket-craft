@@ -179,6 +179,19 @@ impl Hp {
     pub const ZERO: Hp = Typed(0.0, PhantomData);
 
     /// Construct an `Hp` value, returning an error if `v` is negative.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nexus_types::Hp;
+    ///
+    /// let hp = Hp::new_checked(100.0);
+    /// assert!(hp.is_ok());
+    /// assert_eq!(hp.unwrap().value(), 100.0);
+    ///
+    /// let invalid = Hp::new_checked(-5.0);
+    /// assert!(invalid.is_err());
+    /// ```
     pub fn new_checked(v: f32) -> Result<Self, TypeError> {
         if v < 0.0 {
             Err(TypeError::NegativeHealth(v))

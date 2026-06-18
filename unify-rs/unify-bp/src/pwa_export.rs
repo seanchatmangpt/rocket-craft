@@ -36,6 +36,22 @@ pub struct BlueprintPwaExporter {
 
 impl BlueprintPwaExporter {
     /// Create from a [`BlueprintPwaMetadata`] reference.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unify_bp::{BlueprintPwaExporter, BlueprintPwaMetadata};
+    ///
+    /// let meta = BlueprintPwaMetadata {
+    ///     blueprint_name: "MyActor".to_string(),
+    ///     event_names: vec!["BeginPlay".to_string()],
+    ///     variable_names: vec!["Health".to_string()],
+    ///     exec_entry_points: vec!["BeginPlay".to_string()],
+    ///     generated_at: "2026-06-18T00:00:00Z".to_string(),
+    /// };
+    /// let exporter = BlueprintPwaExporter::from_metadata(&meta);
+    /// assert_eq!(exporter.blueprint_name, "MyActor");
+    /// ```
     pub fn from_metadata(meta: &BlueprintPwaMetadata) -> Self {
         Self {
             blueprint_name: meta.blueprint_name.clone(),

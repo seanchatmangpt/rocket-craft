@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Rocket Craft is an open-source AAA gaming ecosystem architected around battle-tested Unreal Engine 4.24 technology, unified Rust-based infrastructure (rocket-sdk/rocket-cmd), semantic web foundations (unify-rs/RDF), and type-safe combinatorial game mechanics (nexus-engine). As of June 2026, we have successfully integrated Combinatorial Testing Engine, WebGL2 E2E Orchestrator, anti-LLM-cheat security scanning, parser robustness improvements, DFLSS manufacturing strategy, and unify-mcp Phase 1.
+Rocket Craft is an open-source AAA gaming ecosystem architected around battle-tested Unreal Engine 4.24 technology, unified Rust-based infrastructure (rocket-sdk/rocket-cmd), semantic web foundations (unify-rs/RDF), and type-safe combinatorial game mechanics (nexus-engine). As of June 2026, we have successfully integrated the `combinatorial-engine` state explorer, the `unify-automl` DX framework, WebGL2 E2E Orchestrator, anti-LLM-cheat security scanning, parser robustness improvements, DFLSS manufacturing strategy, and unify-mcp Phase 1.
 
 **Vision 2030** charts a path to transform Rocket Craft into a globally recognized, contributor-driven AAA engine ecosystem where:
 
@@ -97,6 +97,16 @@ The `blueprint-rs` ecosystem (core AST, builder, macros) will mature into a **fu
 - **Diff-friendly serialization:** T3D format improvements ensure that Blueprint diffs are human-readable; version control becomes practical for designer-friendly asset graphs
 
 **Milestone 2027:** Open-source unreal-rs bindings v1.0; ship blueprint reverse-engineering tool.
+
+### 2.5 AutoML DX & Combinatorial State Exploration
+
+By 2030, the BDD-driven **combinatorial-engine** and **unify-automl** abstractions will be standard parts of our continuous integration and delivery architecture, scaling game-balancing verification and setup:
+
+- **Combinatorial Aimbot Verification**: The BDD-driven `combinatorial-engine` will scale from 1,000 states to over 50,000 gameplay transitions across all titles, automatically mapping out every legal state trajectory under a unified chess-like coordinate system to identify unhandled panics or invalid states completely autonomously.
+- **Zero-Boilerplate Auto-Binding**: The discovery registry in `unify-automl` will support real-time hot-reloading. When developers declare a new game module with `@UnifyAutoBind` or `#[derive(AutoBind)]`, the MCP server will dynamically detect and register it.
+- **Self-Tuning Economies & Balance Sheets**: The game balance optimizer will autonomously run daily balance optimization loops, outputting JSON configuration matrices that dynamically adjust shop pricing, gacha probabilities, and character attributes to counter emergent player meta-strategies.
+
+**Milestone 2027:** Integrate real-time hot-reloading auto-binding into unified MCP and IDE LSP channels.
 
 ---
 
@@ -544,7 +554,8 @@ A web-based marketplace (powered by pwa-staff PWA):
 ### 2026 (Current)
 
 **Q3 2026 (Now):**
-- Combinatorial Testing Engine integrated
+- Combinatorial Testing Engine (`combinatorial-engine`) integrated
+- AutoML DX framework (`unify-automl`) deployed
 - WebGL2 E2E Orchestrator deployed
 - Anti-LLM-cheat scanner v1 live in ShooterGame
 - unify-mcp Phase 1 shipped
@@ -674,11 +685,14 @@ rocket-sdk/knhk (Law Enforcement)
   ↓
 rock-sdk/unrdf (RDF Triple Store)
   ↓
-unify-rs (Semantic Web Ecosystem, 17 crates)
+unify-rs (Semantic Web Ecosystem, 18 crates)
   ├─ unify-rdf (SPARQL queries)
   ├─ unify-mcp (Game Server tools)
   ├─ unify-lsp (IDE Integration)
-  └─ unify-codegen (Code Generation)
+  ├─ unify-codegen (Code Generation)
+  └─ unify-automl (Auto-discovery & balance optimizer)
+  
+chicago-tdd-tools (BDD framework & combinatorial-engine)
   
 nexus-engine (Game Logic, 10 crates)
   ├─ nexus-types (Unit types, IDs, typestate markers)

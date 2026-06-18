@@ -1,3 +1,11 @@
+//! # Unify AutoML Crate
+//!
+//! This crate provides the AutoML abstraction layer for the Genie World Manufacturing Platform.
+//! It includes:
+//! - **Discovery Registry**: Scanning directory trees to find components annotated with `@UnifyAutoBind` or `AutoBind` macros.
+//! - **Game Balance Auto-Optimizer**: Simulating battle outcomes via Monte Carlo simulations to find optimal stat allocations.
+//! - **CLI Integration**: Standard CLI dispatch commands for environment setup, discovery scans, optimization, and local server management.
+
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -7,24 +15,43 @@ use std::path::Path;
 // 1. DYNAMIC DISCOVERY REGISTRY
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// The `discovery` module implements dynamic discovery of game components by recursively scanning directories.
 pub mod discovery {
     use super::*;
 
+    /// A representation of a component found during dynamic discovery.
+    /// Includes its name, path, programming language, and the specific binding tag found.
     #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
     pub struct DiscoveredComponent {
+        /// The name of the discovered component.
         pub name: String,
+        /// The file path to the source file where the component is defined.
         pub file_path: String,
+        /// The programming language of the source file (e.g. Rust, C++).
         pub language: String,
+        /// The binding tag annotation found (e.g. `@UnifyAutoBind: CombatSystem`).
         pub binding_tag: String,
     }
 
+    /// The registry containing all discovered components and active workspace games.
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct ComponentRegistry {
+        /// List of all discovered game components.
         pub components: Vec<DiscoveredComponent>,
+        /// List of all detected workspace games.
         pub workspace_games: Vec<String>,
     }
 
     impl ComponentRegistry {
+        /// Creates a new empty `ComponentRegistry`.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use unify_automl::discovery::ComponentRegistry;
+        /// let registry = ComponentRegistry::new();
+        /// assert_eq!(registry.components.len(), 0);
+        /// ```
         pub fn new() -> Self {
             Self {
                 components: Vec::new(),
@@ -34,12 +61,17 @@ pub mod discovery {
     }
 
     impl Default for ComponentRegistry {
+        /// Returns the default value for a `ComponentRegistry`.
         fn default() -> Self {
             Self::new()
         }
     }
 
     /// Recursively scan a directory for Rust, C++, and C files containing `@UnifyAutoBind` comment tags or `#[derive(AutoBind)]` macros.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if directory traversal or reading fails.
     pub fn scan_directory<P: AsRef<Path>>(dir: P) -> Result<ComponentRegistry> {
         let mut registry = ComponentRegistry::new();
 
@@ -54,6 +86,11 @@ pub mod discovery {
         Ok(registry)
     }
 
+    /// Recursively traverses directories to locate candidate source files for parsing.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any subdirectory cannot be read.
     fn scan_dir_recursive(dir: &Path, components: &mut Vec<DiscoveredComponent>) -> Result<()> {
         if !dir.exists() {
             return Ok(());
@@ -83,6 +120,7 @@ pub mod discovery {
         Ok(())
     }
 
+    /// Parses the content of a single source file to identify AutoML annotations and populate components.
     fn parse_file_content(content: &str, path: &Path, components: &mut Vec<DiscoveredComponent>) {
         let file_path = path.to_string_lossy().into_owned();
         let language = match path.extension().and_then(|e| e.to_str()) {
@@ -127,6 +165,18 @@ pub mod discovery {
         }
     }
 
+    /// Extracts the component name from a `@UnifyAutoBind` tag.
+    ///
+    /// Supporting syntax like `@UnifyAutoBind(MyComp)`, `@UnifyAutoBind: AnotherComp`, or `@UnifyAutoBind CleanName`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unify_automl::discovery::extract_name_from_tag;
+    ///
+    /// let name = extract_name_from_tag("@UnifyAutoBind(HeroSystem)");
+    /// assert_eq!(name, Some("HeroSystem".to_string()));
+    /// ```
     pub fn extract_name_from_tag(tag: &str) -> Option<String> {
         let after_tag = tag.strip_prefix("@UnifyAutoBind")?.trim();
         let clean = after_tag
@@ -145,29 +195,42 @@ pub mod discovery {
 // 2. GAME BALANCE AUTO-OPTIMIZER
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// The `balancer` module handles combat balancing through Monte Carlo simulations.
 pub mod balancer {
     use super::*;
     use chicago_tdd_tools::coordinate::{GameCoordinateSystem, InfinityBladeCoordinateSystem};
     use ib4_mud::command::Command;
     use ib4_mud::session::GameSession;
 
+    /// Defines a point allocation across player stats (health, attack, defense, magic).
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct StatAllocation {
+        /// Health points allocated.
         pub health: u32,
+        /// Attack points allocated.
         pub attack: u32,
+        /// Defense points allocated.
         pub defense: u32,
+        /// Magic points allocated.
         pub magic: u32,
     }
 
+    /// The aggregated results of running a batch of Monte Carlo battle simulations.
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct SimulationResult {
+        /// The stat allocation that was simulated.
         pub allocation: StatAllocation,
+        /// The ratio of battles won by the player (0.0 to 1.0).
         pub player_win_rate: f64,
+        /// The average number of turns elapsed per battle.
         pub avg_turns: f64,
+        /// The average final health of the player in won battles.
         pub average_player_final_hp: f64,
     }
 
     /// Run Monte Carlo simulation battles with a specific stat allocation.
+    ///
+    /// This simulates matches using Siris character settings and `InfinityBladeCoordinateSystem` rules.
     pub fn simulate_battles(alloc: &StatAllocation, num_blank_battles: usize) -> SimulationResult {
         let mut player_wins = 0;
         let mut total_turns = 0;
@@ -237,6 +300,13 @@ pub mod balancer {
     }
 
     /// Optimize stat allocations to reach closest to a target win rate.
+    ///
+    /// Scans combinations of stats totaling `total_points` and selects the one
+    /// closest to `target_win_rate`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if no valid allocation can be evaluated.
     pub fn optimize_balance(
         total_points: u32,
         target_win_rate: f64,
@@ -275,17 +345,28 @@ pub mod balancer {
 // 3. CLI INTEGRATION LAYER
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// The `cli` module provides commands to interface with the AutoML system.
 pub mod cli {
     use super::*;
 
+    /// The standardized output response of a CLI command dispatch.
     #[derive(Debug, Serialize, Deserialize)]
     pub struct CliOutput {
+        /// Indicates if the command succeeded.
         pub success: bool,
+        /// Description of the command outcome.
         pub message: String,
+        /// Accompanying structured JSON data.
         pub data: serde_json::Value,
     }
 
     /// Dispatch developer CLI commands for AutoML.
+    ///
+    /// Supports `discover` and `optimize`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if commands fail or serialization fails.
     pub fn dispatch_command(args: &[String]) -> Result<CliOutput> {
         if args.is_empty() {
             return Ok(CliOutput {
@@ -338,6 +419,12 @@ pub mod cli {
     }
 
     /// Dispatch developer CLI commands for environment and server lifecycle.
+    ///
+    /// Supports `init` and `start`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if files cannot be created or the server cannot start.
     pub fn dispatch_dev_command(args: &[String]) -> Result<CliOutput> {
         if args.is_empty() {
             return Ok(CliOutput {
@@ -428,6 +515,7 @@ pub mod cli {
         }
     }
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. UNIT TESTS

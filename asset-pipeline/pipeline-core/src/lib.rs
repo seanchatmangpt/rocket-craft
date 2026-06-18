@@ -1,3 +1,8 @@
+//! # Pipeline Core
+//!
+//! Provides the core pipeline processing features for asset pipeline processing,
+//! including configurations, asset validation, conversion, staging, and event reporting.
+
 pub mod types;
 pub mod error;
 pub mod config;

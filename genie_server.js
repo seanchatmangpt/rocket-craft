@@ -1,3 +1,10 @@
+/**
+ * @file genie_server.js
+ * @description Local HTTP server serving the Genie 26 World Operating Center frontend.
+ * Provides APIs for retrieving the world specification and compile natural language prompts
+ * into Genie DSL layout commands via the unify CLI.
+ */
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -10,7 +17,11 @@ const MAP_PATH = path.join(__dirname, 'map.t3d');
 const LOG_PATH = path.join(__dirname, 'deploy.log');
 const UNIFY_BIN = path.join(__dirname, 'unify-rs', 'target', 'debug', 'unify');
 
-// Ensure a default spec exists
+/**
+ * Ensures a default world specification exists on disk.
+ * If not, compiles a default intent using the unify CLI or falls back to a mock specification.
+ * @returns {void}
+ */
 function initDefaultSpec() {
     if (!fs.existsSync(SPEC_PATH)) {
         console.log("Initializing default world specification...");
@@ -54,7 +65,12 @@ function initDefaultSpec() {
     }
 }
 
-// Serve static files
+/**
+ * Serves static web assets and packaged game builds.
+ * @param {import('http').IncomingMessage} req - The HTTP request object.
+ * @param {import('http').ServerResponse} res - The HTTP response object.
+ * @returns {void}
+ */
 function serveStatic(req, res) {
     let filePath;
     if (req.url.startsWith('/manufactured/')) {
@@ -108,7 +124,12 @@ function serveStatic(req, res) {
     });
 }
 
-// Semantic Natural Language Layout Compiler
+/**
+ * Natural language intent parser/compiler that maps user prompts to Genie DSL commands.
+ * Identifies if the prompt is raw DSL or needs to generate a fresh layout or update an existing one.
+ * @param {string} prompt - The natural language input prompt.
+ * @returns {{isRaw: boolean, dsl: string, isNewWorld: boolean}} The compiled layout instructions.
+ */
 function compilePromptToIntent(prompt) {
     const trimmed = prompt.trim();
     const lines = trimmed.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));

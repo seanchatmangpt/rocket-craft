@@ -1,3 +1,8 @@
+//! # Unify MCP Crate
+//!
+//! Provides the model context protocol (MCP) implementation for the Genie Manufacturing System,
+//! including tool registries, protocols, resource schemas, and server runtimes.
+
 pub mod anti_llm_tools;
 pub mod protocol;
 pub mod resource;

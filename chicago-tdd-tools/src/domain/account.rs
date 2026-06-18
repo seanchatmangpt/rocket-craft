@@ -1,3 +1,7 @@
+//! # Account Module
+//!
+//! Provides the `Account` struct representing bank accounts with balance manipulation operations.
+
 use clap::Subcommand;
 use crate::cli::ClapNoun;
 use anyhow::Result;
@@ -48,6 +52,16 @@ impl From<i64> for Account {
 
 impl Account {
     /// Creates a new `Account` with an initial balance of 0.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chicago_tdd_tools::Account;
+    /// let mut acc = Account::new();
+    /// assert_eq!(acc.balance(), 0);
+    /// acc.deposit(50);
+    /// assert_eq!(acc.balance(), 50);
+    /// ```
     pub fn new() -> Self {
         Self { balance: 0 }
     }

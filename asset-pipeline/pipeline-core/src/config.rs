@@ -80,6 +80,24 @@ log_level   = "info"
     /// Validate that the configuration is internally consistent.
     ///
     /// Checks that `max_file_mb` is non-zero and that `blender_bin` is non-empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pipeline_core::config::{PipelineConfig, PipelineSection};
+    /// use std::path::PathBuf;
+    ///
+    /// let cfg = PipelineConfig {
+    ///     pipeline: PipelineSection {
+    ///         watch_dir: PathBuf::from("/in"),
+    ///         output_dir: PathBuf::from("/out"),
+    ///         blender_bin: "blender".to_string(),
+    ///         max_file_mb: 100,
+    ///         log_level: "info".to_string(),
+    ///     }
+    /// };
+    /// assert!(cfg.validate().is_ok());
+    /// ```
     pub fn validate(&self) -> Result<(), PipelineError> {
         if self.pipeline.max_file_mb == 0 {
             return Err(PipelineError::Config(

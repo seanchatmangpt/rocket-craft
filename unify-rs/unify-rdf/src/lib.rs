@@ -1,3 +1,7 @@
+//! # Unify RDF Crate
+//!
+//! Exposes RDF models, stores, SHACL shape validators, and project manifest ingestion bridges.
+
 pub mod manifest;
 pub mod pipeline;
 pub mod project_bridge;

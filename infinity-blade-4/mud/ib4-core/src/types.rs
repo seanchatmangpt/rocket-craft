@@ -1,3 +1,8 @@
+//! # MUD Core Types Module
+//!
+//! Provides the primary enumerations and structures representing combat directions,
+//! states, magic types, and stats used by Siris character sessions.
+
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -98,6 +103,18 @@ impl std::error::Error for StatParseError {}
 
 impl std::str::FromStr for Stat {
     type Err = StatParseError;
+    /// Parse a string slice into a `Stat` variant.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::str::FromStr;
+    /// use ib4_core::types::Stat;
+    ///
+    /// assert_eq!(Stat::from_str("hp").unwrap(), Stat::Health);
+    /// assert_eq!(Stat::from_str("atk").unwrap(), Stat::Attack);
+    /// assert!(Stat::from_str("invalid").is_err());
+    /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
             "health" | "hp" => Ok(Stat::Health),

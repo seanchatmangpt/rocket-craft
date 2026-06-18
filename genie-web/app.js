@@ -1,4 +1,7 @@
-// Genie 26 Web Simulator Core Logic
+/**
+ * @file app.js
+ * @description Genie 26 Web Simulator Core Logic. Renders a 3D representation of the world specification using Three.js.
+ */
 
 let scene, camera, renderer, controls;
 let container;
@@ -14,7 +17,10 @@ let yaw = 0;
 let pitch = 0;
 let keysPressed = { w: false, a: false, s: false, d: false };
 
-// Initialize Three.js
+/**
+ * Initializes the Three.js scene, camera, renderer, controls, and lighting.
+ * @returns {void}
+ */
 function initThree() {
     container = document.getElementById('canvas-container');
     
@@ -100,7 +106,11 @@ function initThree() {
     animate();
 }
 
-// Frame loop
+/**
+ * Main animation and rendering loop.
+ * Updates controls and renders the scene.
+ * @returns {void}
+ */
 function animate() {
     requestAnimationFrame(animate);
     if (isWalkMode) {
@@ -111,7 +121,12 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-// Create a sprite containing text
+/**
+ * Creates a 2D canvas text sprite to overlay on top of 3D objects.
+ * @param {string} text - The text label to display.
+ * @param {string} [color='#f0f3f6'] - The hex color code of the text.
+ * @returns {THREE.Sprite} The generated text sprite.
+ */
 function createTextSprite(text, color = '#f0f3f6') {
     const canvas = document.createElement('canvas');
     canvas.width = 256;
@@ -132,7 +147,12 @@ function createTextSprite(text, color = '#f0f3f6') {
     return sprite;
 }
 
-// Build 3D mesh representation of the spec
+/**
+ * Rebuilds the entire 3D world representation based on the loaded world specification.
+ * Clears old meshes and draws places, actors, and objects.
+ * @param {Object} spec - The world specification.
+ * @returns {void}
+ */
 function rebuild3DWorld(spec) {
     // Clear old objects
     threeObjects.forEach((obj) => {
@@ -238,7 +258,11 @@ function rebuild3DWorld(spec) {
     });
 }
 
-// Select an entity and show its details
+/**
+ * Selects an entity in the UI and focuses the camera on its 3D object.
+ * @param {string} id - The entity ID to select.
+ * @returns {void}
+ */
 function selectEntity(id) {
     selectedEntityId = id;
 
@@ -315,7 +339,11 @@ function selectEntity(id) {
     }
 }
 
-// Update DOM elements with new specification data
+/**
+ * Updates DOM sidebar lists and stats with the new world specification data.
+ * @param {Object} spec - The world specification.
+ * @returns {void}
+ */
 function updateDOM(spec) {
     currentSpec = spec;
 
@@ -388,6 +416,13 @@ function updateDOM(spec) {
     });
 }
 
+/**
+ * Appends a log entry to the custom on-screen console element, formatted with
+ * a timestamp and colored according to the log type.
+ *
+ * @param {string} message - The message text to display in the console.
+ * @param {string} [type='system'] - The log type/level (e.g., 'system', 'info', 'success', 'error').
+ */
 function addConsoleLog(message, type = 'system') {
     const consoleEl = document.getElementById('log-console');
     const entry = document.createElement('div');
@@ -397,7 +432,12 @@ function addConsoleLog(message, type = 'system') {
     consoleEl.scrollTop = consoleEl.scrollHeight;
 }
 
-// Fetch initial specification
+/**
+ * Asynchronously fetches the initial world specification from the `/api/spec` endpoint,
+ * rebuilds the 3D world, updates the DOM UI controls, and logs the result.
+ *
+ * @returns {Promise<void>} A promise that resolves when the spec has been loaded and the world is rebuilt.
+ */
 async function loadSpec() {
     try {
         const res = await fetch('/api/spec');
@@ -412,7 +452,13 @@ async function loadSpec() {
     }
 }
 
-// Evolve the world via NLP prompt
+/**
+ * Asynchronously reads the natural language intent prompt from the input field,
+ * disables the evolution button to show a loading spinner, triggers the world
+ * evolution using the prompt, and resets/enables the inputs upon completion.
+ *
+ * @returns {Promise<void>} A promise that resolves when the world evolution is complete.
+ */
 async function evolveWorld() {
     const promptInput = document.getElementById('prompt-input');
     const prompt = promptInput.value.trim();
@@ -429,7 +475,15 @@ async function evolveWorld() {
     evolveBtn.querySelector('i').className = 'fa-solid fa-gears';
 }
 
-// Global function to evolve world with any prompt (both dashboard and HUD console)
+/**
+ * Asynchronously sends the natural language prompt to the `/api/evolve` API endpoint to evolve the world specification.
+ * Rebuilds the 3D world, updates the DOM with the new spec, and updates the BLAKE3 receipt.
+ * If cooking completes and a `worldUrl` is returned, displays a success overlay and redirects the browser
+ * to the Unreal Engine 4 HTML5 artifact.
+ *
+ * @param {string} promptText - The natural language intent/prompt describing the desired world changes.
+ * @returns {Promise<void>} A promise that resolves when the world has been successfully evolved and updated.
+ */
 async function evolveWorldWithPrompt(promptText) {
     if (!promptText) return;
     
@@ -508,7 +562,13 @@ async function evolveWorldWithPrompt(promptText) {
     }
 }
 
-// Check if a point is inside any Place bounds
+/**
+ * Checks whether a given 3D position falls within the bounding box of any defined Place in the current world specification.
+ * Converts between Unreal Engine coordinate conventions and Three.js coordinate conventions (Three.js -Z maps to UE Y).
+ *
+ * @param {THREE.Vector3} pos - The 3D position to check.
+ * @returns {Object|null} The place object containing the position, or null if the position is outside all places.
+ */
 function findPlaceContaining(pos) {
     if (!currentSpec) return null;
     for (const place of currentSpec.places) {
@@ -530,7 +590,11 @@ function findPlaceContaining(pos) {
     return null;
 }
 
-// Walkthrough mode logic
+/**
+ * Activates walkthrough mode. Deselects any active selections, disables orbital camera controls,
+ * teleports the camera to eye level of the first place, locks the pointer, attaches event listeners
+ * for movement/look controls, and shows the walkthrough UI overlay.
+ */
 function enterWalkMode() {
     if (isWalkMode) {
         exitWalkMode();
@@ -575,6 +639,10 @@ function enterWalkMode() {
     addConsoleLog("Entered Walkthrough Mode. Lock pointer, WASD to walk, Enter to type intent, Esc to exit.", "system");
 }
 
+/**
+ * Deactivates walkthrough mode. Re-enables orbit controls, resets the camera to the default bird's eye view,
+ * releases the pointer lock, removes mouse/keyboard listeners, and hides the walkthrough UI overlay.
+ */
 function exitWalkMode() {
     if (!isWalkMode) return;
     
@@ -600,6 +668,10 @@ function exitWalkMode() {
     addConsoleLog("Exited Walkthrough Mode.", "system");
 }
 
+/**
+ * Event handler for the `pointerlockchange` event. Detects if pointer lock was lost (e.g. by pressing Escape)
+ * and, if the console HUD input is not focused, automatically exits walkthrough mode.
+ */
 function onPointerLockChange() {
     if (document.pointerLockElement !== renderer.domElement) {
         // If console HUD input is not focused, exit walk mode
@@ -609,6 +681,13 @@ function onPointerLockChange() {
     }
 }
 
+/**
+ * Event handler for the `mousemove` event when pointer lock is active.
+ * Updates the camera's yaw and pitch rotation quaternions based on mouse movement inputs,
+ * applying sensitivity scaling and pitch angle clamping.
+ *
+ * @param {MouseEvent} event - The mouse move event object containing movement deltas.
+ */
 function handleMouseMove(event) {
     if (document.pointerLockElement !== renderer.domElement) return;
     if (document.activeElement === document.getElementById('hud-console-input')) return;
@@ -626,6 +705,10 @@ function handleMouseMove(event) {
     camera.quaternion.copy(qYaw).multiply(qPitch);
 }
 
+/**
+ * Updates the player camera position each frame during walkthrough mode based on active movement keys (W, A, S, D).
+ * Ensures collision detection against room bounds using `findPlaceContaining` and snaps the camera to floor height.
+ */
 function updateWalkthroughMovement() {
     if (!isWalkMode || !currentSpec) return;
     if (document.activeElement === document.getElementById('hud-console-input')) return;

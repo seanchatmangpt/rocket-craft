@@ -409,4 +409,30 @@ Create a unified suite of command-line tools that automatically scaffolds local 
 - [ ] **Tooling**: The new Developer CLI successfully and autonomously spins up the complete local dev environment and required servers.
 - [ ] **Auditor Review**: An independent secondary agent reviews the implementation to judge that the DX/QoL improvements are satisfactory and that no verification steps were bypassed.
 
+## Follow-up — 2026-06-18T03:49:24Z
+
+# Teamwork Project Prompt
+
+Update all high-level ecosystem documents with recent milestones (Combinatorial Testing, AutoML DX), execute a 10-phase code documentation sweep across Rust, JS, and C to inject exhaustive doctests and moduledocs, and author a complete documentation suite following the Diátaxis framework.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. High-Level Ecosystem Sync
+Update `PRESS_RELEASE.md`, `VISION_2030.md`, `CHANGELOG.md`, and other high-level ecosystem documents to accurately reflect the recently integrated Combinatorial Testing and AutoML DX systems.
+
+### R2. Exhaustive 10-Phase Code Documentation
+Execute a 10-phase documentation plan across the entire Rust, JS, and C codebase. Document absolutely everything—including internal modules, private functions, and utility scripts—ensuring no code is left unexplained. Inject executable doctests and comprehensive moduledocs into all files.
+
+### R3. Diátaxis Framework Implementation
+Author a completely new, structured documentation suite that strictly adheres to the Diátaxis framework. It must clearly separate content into the four quadrants: Tutorials, How-to Guides, Reference, and Explanation.
+
+## Acceptance Criteria
+
+### Comprehensive Verification
+- [ ] **Executable Doctests**: The CI pipeline must successfully run `cargo test --doc` (and equivalent JS/C doc-test runners) across the entire codebase with a 100% pass rate.
+- [ ] **Diátaxis Compliance Audit**: An independent secondary agent must audit the newly authored documentation suite to verify that all four Diátaxis quadrants exist, are correctly categorized, and are structurally complete.
+- [ ] **Ecosystem Sync Validation**: The secondary agent must confirm that the high-level ecosystem documents accurately and consistently reflect the latest system capabilities.
 

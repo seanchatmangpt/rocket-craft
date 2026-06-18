@@ -1,3 +1,15 @@
+//! # Chicago TDD Tools Crate
+//!
+//! This crate provides core testing, simulation, coordinate state space tracking, and logger tools for Chicago-style TDD workflows.
+//!
+//! Submodules include:
+//! - `domain`: Core domain models (accounts, transfer services, environment).
+//! - `cli`: Command line integration interfaces.
+//! - `logging`: Multiple-sink logging facilities.
+//! - `discovery`: Dynamic session verification and suite detection.
+//! - `coordinate`: Formal state space coordinate definitions.
+//! - `aimbot`: State space traversal and exploration algorithms.
+
 pub mod domain;
 pub mod cli;
 pub mod logging;
