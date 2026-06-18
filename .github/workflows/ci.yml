@@ -41,9 +41,6 @@ jobs:
   chicago-tdd-tools:
     name: Rust — test chicago-tdd-tools
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: chicago-tdd-tools
 
     steps:
       - uses: actions/checkout@v4
@@ -54,8 +51,20 @@ jobs:
         with:
           workspaces: chicago-tdd-tools
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: pwa-staff/package-lock.json
+
+      - name: Install pwa-staff dependencies
+        working-directory: pwa-staff
+        run: npm ci
+
       - name: Build
+        working-directory: chicago-tdd-tools
         run: cargo build --all-features
 
       - name: Test
+        working-directory: chicago-tdd-tools
         run: cargo test --all-features
