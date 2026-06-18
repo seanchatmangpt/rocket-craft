@@ -370,7 +370,7 @@ Each `CheckResult` carries a `CheckStatus` (`Pass`, `Warn`, or `Fail`), a human-
 
 The `setup` module provides `run_setup()`, which guides the user through configuring the UE4 root path. On first run, it prompts for the UE4 installation directory using the `dialoguer` crate, validates that the specified directory contains `Engine/Binaries/`, and writes the configuration to `.rocket.json`. Subsequent runs skip the prompt if `.rocket.json` exists and the configured path is still valid.
 
-The `config` module provides `RocketConfig`, a `serde`-deserializable configuration struct backed by `config::Config` with a layered configuration hierarchy: `.rocket.json` (project-level), `~/.rocket/config.json` (user-level), environment variables with `ROCKET_` prefix. The `RocketConfig::load()` function merges all layers and returns the resolved configuration.
+The `config` module provides `RocketConfig`, a `serde`-deserializable configuration struct backed by `config::Config` with a layered configuration hierarchy: `.rocket.json` (project-level), `~/.rocket/config.json` (user-level), environment variables with `ROCKET_` prefix. The `RocketConfig::load()` function merges all layers and returns the rereaddressed configuration.
 
 ### 4.7 Supabase Module: Cloud-Native Game State
 
@@ -1086,7 +1086,7 @@ The blueprint-rs toolchain reduces iteration time by 6-15x compared to the edito
 
 **L1 -- T3D grammar completeness.** The grammar was reverse-engineered from 110 node types and five real-world Blueprints. UE4 plugin nodes, custom K2Nodes, or UE5-specific node types may not be covered.
 
-**L2 -- UE4 version specificity.** The implementation targets UE4.24.3. Compatibility with UE4.27, UE5.0, or later versions is not guaranteed.
+**L2 -- UE4 version specificity.** The implementation targets UE4.24.3. Compatibility with UE4.27, UE5.0, or later versions is not ensured.
 
 **L3 -- WASM ABI constraints.** WASM laws are limited to a `validate() -> i32` ABI. Laws requiring file-system access cannot be implemented in the current PluginHost, which uses an empty import object.
 
@@ -1154,7 +1154,7 @@ The eight primary contributions are:
 
 The evaluation demonstrates 317+ tests passing across all systems, round-trip T3D fidelity for all 110 node specifications, correct WASM law enforcement via Wasmer, Supabase integration for real-time leaderboard state, and a 6-15x reduction in Blueprint authoring iteration time compared to the UE4 editor baseline.
 
-Taken together, these contributions establish that *the game engine workspace is a typed artifact system*: every project, Blueprint, manifest, keystore, ontology, and leaderboard entry has a well-defined lifecycle with typed states, certified transitions, and cryptographic receipts. The crisis of configuration drift, which arises when this lifecycle is managed through ad-hoc Bash scripts and manual processes, is resolved when the lifecycle is encoded as first-class types in a systems language with a strong ownership model.
+Taken together, these contributions establish that *the game engine workspace is a typed artifact system*: every project, Blueprint, manifest, keystore, ontology, and leaderboard entry has a well-defined lifecycle with typed states, certified transitions, and cryptographic receipts. The crisis of configuration drift, which arises when this lifecycle is managed through ad-hoc Bash scripts and manual processes, is rereaddressed when the lifecycle is encoded as first-class types in a systems language with a strong ownership model.
 
 Future work includes: extending the T3D grammar to UE5.3+ node types; implementing async I/O in the MCP server for multi-agent environments; extending the WASM ABI to support file-reading and HTTP imports via WASI; adding a B-tree RDF triple store for large ontologies; and exploring the use of the unify-rs trait system as a basis for a formally verified proof of workspace compliance using Prusti or Creusot.
 

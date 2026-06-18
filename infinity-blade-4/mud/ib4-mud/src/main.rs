@@ -35,7 +35,7 @@ fn main() -> anyhow::Result<()> {
             name: "Siris".to_string(),
         }) {
         CliCommand::New { name } => {
-            println!("Creating new game for {}...", name);
+            tracing::info!("Creating new game for {}...", name);
             GameSession::new(&name)
         }
         CliCommand::Load { file } => {

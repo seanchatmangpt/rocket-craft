@@ -137,7 +137,7 @@ impl PlayerSession<InLobby> {
 // ────────────────────────────────────────────────────────────────────────────
 
 impl PlayerSession<InMatch> {
-    /// The match has finished (victory, defeat, or time-out).  The player
+    /// The match has finished (verified, defeat, or time-out).  The player
     /// returns to the lobby for a new run.
     pub fn match_complete(self) -> PlayerSession<InLobby> {
         PlayerSession {

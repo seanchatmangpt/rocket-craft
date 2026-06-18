@@ -61,7 +61,7 @@ fn should_unlock_lightning_at_bloodline_3() {
     let mut p = PlayerState::new("Siris");
     p.bloodline = 2;
     BloodlineSystem::trigger_rebirth(&mut p); // now at BL3
-    assert!(p.magic_unlocks.contains(&MagicType::Lightning));
+    assert!(p.magic_unlocks.iter().any(|m| m == &MagicType::Lightning));
 }
 
 #[test]
@@ -93,7 +93,7 @@ fn should_select_tier1_perk_with_point() {
     let result = tree.select_perk(&mut p, "BloodyResolve");
     assert!(result.is_ok());
     assert_eq!(p.perk_points, 0);
-    assert!(p.selected_perks.contains(&"BloodyResolve".to_string()));
+    assert!(p.selected_perks.iter().any(|perk| perk == "BloodyResolve"));
 }
 
 #[test]

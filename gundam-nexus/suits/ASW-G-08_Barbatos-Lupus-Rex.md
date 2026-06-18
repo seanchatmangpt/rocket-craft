@@ -4,7 +4,7 @@
 **Gacha Tier:** SSR
 
 ## Lore
-The third and final evolution of the Gundam Frame unit excavated by Tekkadan, Barbatos Lupus Rex was reborn after the original Lupus took catastrophic damage during the Mars conflict. Mikazuki Augus, whose Alaya-Vijnana system was implanted directly into his spinal column — sacrificing the full movement of his right arm and leg — achieved perfect synchronization with the frame that no other pilot could replicate. The Rex form abandoned ranged weapons entirely, embracing Barbatos's nature as a ground-combat berserker with a mace the size of a battleship corridor.
+The third and final evolution of the Gundam Frame unit excavated by Tekkadan, Barbatos Lupus Rex was reborn after the original Lupus took catastrophic damage during the Mars conflict. Mikazuki Augus, whose Alaya-Vijnana system was implanted directly into his spinal column — sacrificing the full movement of his right arm and leg — achieved perfect synchronization with the frame that no other pilot could replicate. The Rex form abancompletedd ranged weapons entirely, embracing Barbatos's nature as a ground-combat berserker with a mace the size of a battleship corridor.
 
 ## Combat Stats
 | Stat | Value | Notes |
@@ -28,7 +28,7 @@ The third and final evolution of the Gundam Frame unit excavated by Tekkadan, Ba
 
 ## Signature Move: Celestial Mace Strike
 - Gesture: AVJ active → Hold 2.0s → Swipe Down (any direction) → Release
-- Effect: Overhead mace slam; 3.5× ATK damage; guaranteed ground-bounce (enemy airborne 2 turns — cannot attack); shockwave hits all adjacent enemies for 1.5× ATK
+- Effect: Overhead mace slam; 3.5× ATK damage; ensured ground-bounce (enemy airborne 2 turns — cannot attack); shockwave hits all adjacent enemies for 1.5× ATK
 - Cooldown: 130 seconds (AVJ must be active)
 - Visual: Red AVJ eye illuminates; mace glows with heat friction; crater forms on impact
 

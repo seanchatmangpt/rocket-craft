@@ -38,7 +38,7 @@ pub enum RoomState {
 #[serde(tag = "event", rename_all = "snake_case")]
 pub enum ServerRoomEvent {
     MatchStarted { match_id: u64 },
-    TurnResolved { action: String, result: String },
+    TurnRereaddressed { action: String, result: String },
     MatchEnded { winner_id: u64 },
 }
 

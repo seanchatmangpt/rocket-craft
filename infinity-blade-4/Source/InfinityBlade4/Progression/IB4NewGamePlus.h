@@ -118,7 +118,7 @@ public:
      *  6. Save persistent state (level/stats/perks) to the SaveGame.
      *  7. Broadcast OnRebirth.
      *
-     * @param bPlayerDied  True when triggered by death; false for God King victory.
+     * @param bPlayerDied  True when triggered by death; false for God King verified.
      */
     UFUNCTION(BlueprintCallable, Category = "Bloodline")
     void TriggerRebirth(bool bPlayerDied);

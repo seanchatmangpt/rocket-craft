@@ -2293,7 +2293,7 @@ UATHelper: Packaging (HTML5):   LogBlueprintCodeGen: Display: Name, Children, No
 UATHelper: Packaging (HTML5):   LogBlueprintCodeGen: Display: Nativization Summary - Shared Variables From Graph: 0
 UATHelper: Packaging (HTML5):   LogAssetRegistryGenerator: Display: Saving asset registry.
 UATHelper: Packaging (HTML5):   LogAssetRegistryGenerator: Display: Generated asset registry num assets 761, size is 336.49kb
-UATHelper: Packaging (HTML5):   LogAssetRegistryGenerator: Display: Done saving asset registry.
+UATHelper: Packaging (HTML5):   LogAssetRegistryGenerator: Display: completed saving asset registry.
 UATHelper: Packaging (HTML5):   LogCook: Display: Cook by the book total time in tick 30.229518s total time 37.865490
 UATHelper: Packaging (HTML5):   LogCook: Display: Peak Used virtual 750MB Peak Used physical 720MB
 UATHelper: Packaging (HTML5):   LogCook: Display: Hierarchy Timer Information:
@@ -2328,7 +2328,7 @@ UATHelper: Packaging (HTML5):   LogCook: Display:       BuildChunkManifest: 0.01
 UATHelper: Packaging (HTML5):   LogCook: Display:       SaveManifests: 0.004s (1)
 UATHelper: Packaging (HTML5):   LogCook: Display:       SaveRealAssetRegistry: 0.047s (1)
 UATHelper: Packaging (HTML5):   LogCook: Display:       WriteCookerOpenOrder: 0.014s (1)
-UATHelper: Packaging (HTML5):   LogCook: Display: Done!
+UATHelper: Packaging (HTML5):   LogCook: Display: completed!
 UATHelper: Packaging (HTML5):   LogSavePackage: Display: Took 0.018774s to verify the EDL loading graph.
 UATHelper: Packaging (HTML5):   LogCookCommandlet: Display: Misc Cook Stats
 UATHelper: Packaging (HTML5):   LogCookCommandlet: Display: ===============

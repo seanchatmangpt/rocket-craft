@@ -88,7 +88,7 @@ fn should_unlock_lightning_magic_at_bloodline_3() {
     let mut s = new_session();
 
     // Lightning should NOT be unlocked at BL 0
-    assert!(!s.player.magic_unlocks.contains(&MagicType::Lightning),
+    assert!(!s.player.magic_unlocks.iter().any(|m| m == &MagicType::Lightning),
         "Lightning should not be unlocked at BL 0");
 
     // Simulate reaching BL 3 by forcing 3 rebirths
@@ -104,7 +104,7 @@ fn should_unlock_lightning_magic_at_bloodline_3() {
     }
 
     if s.player.bloodline >= 3 {
-        assert!(s.player.magic_unlocks.contains(&MagicType::Lightning),
+        assert!(s.player.magic_unlocks.iter().any(|m| m == &MagicType::Lightning),
             "Lightning should be unlocked at BL 3");
     }
 }

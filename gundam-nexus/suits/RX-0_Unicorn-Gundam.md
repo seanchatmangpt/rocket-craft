@@ -27,7 +27,7 @@ Designed by Cardeas Vist as the key to the enigmatic "Laplace's Box," the RX-0 U
 
 ## Signature Move: NT-D Full Burst Saber
 - Gesture: Destroy Mode → Swipe Up → Swipe Up → Hold 2.0s → Release
-- Effect: Beam magnum fires simultaneously with beam saber extended swing; 3.5× ATK + 1× SPC damage; NT Resonance guaranteed on this hit; stolen funnel (if active) fires simultaneously
+- Effect: Beam magnum fires simultaneously with beam saber extended swing; 3.5× ATK + 1× SPC damage; NT Resonance ensured on this hit; stolen funnel (if active) fires simultaneously
 - Cooldown: 170 seconds (Destroy Mode must be active)
 - Visual: Rose-gold Psycoframe flares; suit silhouette fractures in light; beam magnum detonates
 

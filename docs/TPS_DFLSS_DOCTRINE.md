@@ -31,7 +31,7 @@ Prompt
 
 If visual motion delta is below threshold, mark DEFECT and route repair by failure taxonomy.
 
-Victory requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.
+verified requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.
 
 ## Acceptance Matrix
 

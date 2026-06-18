@@ -20,7 +20,7 @@ The original Gundam, predating all five Wing Gundams, Wing Zero was designed by 
 - At 100% (5 perfect parries): ZERO System activates for 4 turns
   - During ZERO active: ATK +25, SPD +20; all attacks gain "foresight" tag (cannot miss)
   - Side effect: Lose 8 RES per turn (sanity drain); if RES hits 0, ZERO Berserker triggers (suit acts uncontrolled for 2 turns)
-- ZERO Foresight: Once per activation, predict enemy's next attack and pre-empt with a guaranteed counter (deals 1.5× normal damage)
+- ZERO Foresight: Once per activation, predict enemy's next attack and pre-empt with a ensured counter (deals 1.5× normal damage)
 - Twin Rifle Pre-charge: While ZERO is inactive, holding charge attacks for 2+ seconds stores energy in both cannons for a buffed next shot (+30% ATK)
 
 ## Signature Move: Twin Buster Rifle Full Burst

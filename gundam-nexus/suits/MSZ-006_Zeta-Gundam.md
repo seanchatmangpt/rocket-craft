@@ -28,7 +28,7 @@ Developed by Anaheim Electronics under Project Zeta, the MSZ-006 Zeta Gundam int
 
 ## Signature Move: Wave Rider Crash
 - Gesture: Transform → Swipe Left → Swipe Left → Swipe Up (must be in Wave Rider mode)
-- Effect: Full-speed aerial ram; 2.5× (ATK+SPD)/2 damage; guaranteed knockdown; enemy stunned 1 turn
+- Effect: Full-speed aerial ram; 2.5× (ATK+SPD)/2 damage; ensured knockdown; enemy stunned 1 turn
 - Cooldown: 120 seconds (Wave Rider mode must be active to trigger)
 - Visual: Zeta unfolds wings mid-transform, crashes through enemy in streak of blue light
 

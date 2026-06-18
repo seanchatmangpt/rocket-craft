@@ -359,7 +359,7 @@
   fn anti_llm_scan_produces_consistent_results() {
       // Create temp dir with known pattern
       let dir = TempDir::new().unwrap();
-      fs::write(dir.path().join("test.rs"), "let x = tower-lsp;").unwrap();
+      fs::write(dir.path().join("test.rs"), "let x = lsp-max;").unwrap();
       
       // Scan via engine
       let obs = anti_llm_cheat_lsp::engine::scan_directory(dir.path().to_str().unwrap());

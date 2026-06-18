@@ -75,7 +75,7 @@
 │       "file_path": "src/lib.rs",        │
 │       "line": 15,                       │
 │       "kind": "raw_text",               │
-│       "construct": "tower-lsp",         │
+│       "construct": "lsp-max",         │
 │       "message": "..."                  │
 │     }                                   │
 │   ]                                     │
@@ -202,7 +202,7 @@ pub fn scan_directory_anti_llm(&mut self, dir_path: &str)
 **Human Output Example:**
 
 ```
-Audit complete: 12 warning(s), 3 blocking error(s)
+audited: 12 warning(s), 3 blocking error(s)
 
 Directory: .
 Diagnostic Count: 15

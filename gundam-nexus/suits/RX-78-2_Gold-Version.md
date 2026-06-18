@@ -28,7 +28,7 @@ The Gold Version of the RX-78-2 is not a canonical mobile suit from the Gundam u
 
 ## Signature Move: The Last Shooting (Gold Edition)
 - Gesture: Hold 2.0s → Swipe Down → Swipe Up → Draw Circle → Release
-- Effect: Gold Edition version of Last Shooting; beam rifle fires in golden beam with 3.5× ATK damage (vs. base's 2.8×); guaranteed stagger; if enemy HP below 40%, dual beam saber follow-up deals additional 2.0× ATK; leaves golden crater visual
+- Effect: Gold Edition version of Last Shooting; beam rifle fires in golden beam with 3.5× ATK damage (vs. base's 2.8×); ensured stagger; if enemy HP below 40%, dual beam saber follow-up deals additional 2.0× ATK; leaves golden crater visual
 - Cooldown: 120 seconds (reduced from base's 140s — "perfected timing")
 - Visual: Gold Fin Funnel-inspired particle trails spiral around beam; entire screen momentarily gold
 
@@ -50,7 +50,7 @@ G-Fighter Pack (Gold Edition) — exclusive gold-plated variant; ATK +12 (vs. st
 - AR Bridge ONLY: PG RX-78-2 Gold Version physical kit (primary and only intended unlock)
 - No Gacha: Gold Version does not appear on any gacha banner — it cannot be pulled
 - No Campaign: Not available through story progression
-- Emergency Protocol: Players who can verify auction purchase of the physical kit (receipt + serial number) may contact support for a one-time SSR unlock code (support discretion; not guaranteed)
+- Emergency Protocol: Players who can verify auction purchase of the physical kit (receipt + serial number) may contact support for a one-time SSR unlock code (support discretion; not ensured)
 
 ## Lore Quote
 *"The original Gundam does not need to surpass the new generation. It simply needs to be remembered — and in being remembered, it becomes eternal."* — In-game Nexus Archive, Entry 001

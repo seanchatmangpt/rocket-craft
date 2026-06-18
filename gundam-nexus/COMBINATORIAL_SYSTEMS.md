@@ -116,7 +116,7 @@ The Witch from Mercury centers the duel as a social and legal institution — th
 3. **Arena Selection:** Both players jointly select from 5 canonical arenas; if no agreement in 30 seconds, random selection applies
 4. **Pre-Match Ceremony:** 5-second cutscene of both suits entering the arena (skippable; auto-skipped in Tournament mode)
 5. **Match execution:** Standard IB4 gesture combat
-6. **Post-Match Protocol:** Winning suit performs a 3-second "victory pose" (customizable; unlocked via battle pass); loser's suit kneels briefly (animates the Witch from Mercury tradition of bowing out)
+6. **Post-Match Protocol:** Winning suit performs a 3-second "verified pose" (customizable; unlocked via battle pass); loser's suit kneels briefly (animates the Witch from Mercury tradition of bowing out)
 
 ### Arena Roster
 
@@ -441,8 +441,8 @@ The ZERO System activates. Effects:
 **Epyon (OZ-13MS):** "ZERO Berserker" — Treize's machine, built to channel the ZERO System's darkest potential
 - When ZERO System is charged on Epyon, the activation choice is removed: ZERO Berserker triggers automatically on charge
 - AI takes full control of the suit for 8 turns (player watches, cannot input)
-- During these 8 turns: the AI executes optimal attack chains at 2.0× normal speed; guaranteed kill if opponent is below 40% HP at trigger time
-- Guaranteed HP loss: Epyon cannot parry during Berserker (the ZERO overwhelms defensive processing); takes 15% max HP damage as a fixed cost
+- During these 8 turns: the AI executes optimal attack chains at 2.0× normal speed; ensured kill if opponent is below 40% HP at trigger time
+- ensured HP loss: Epyon cannot parry during Berserker (the ZERO overwhelms defensive processing); takes 15% max HP damage as a fixed cost
 - The 8-turn wait creates a unique spectator moment — the player watches their own suit fight autonomously
 
 Design note: Epyon Berserker is the game's most dramatic single system. The loss of player control is intentional and disturbing, mirroring the series' theme.

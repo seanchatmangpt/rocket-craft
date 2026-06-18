@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::{Rng, RngExt};
 use ib4_core::{enemy::EnemyInstance, player::PlayerState};
 use crate::titan::{AiDecision, TitanAI, random_dir};
 

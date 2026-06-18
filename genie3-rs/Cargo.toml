@@ -6,6 +6,8 @@ description = "Genie 3 World Model state representation and latent actions"
 workspace = "../unify-rs"
 
 [dependencies]
+tracing = "0.1"
+
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }

@@ -1,6 +1,6 @@
 use std::collections::VecDeque;
 use std::marker::PhantomData;
-use rand::{SeedableRng, Rng};
+use rand::{SeedableRng, RngExt};
 use rand::rngs::SmallRng;
 use serde::{Serialize, Deserialize};
 use ib4_core::{
@@ -31,6 +31,7 @@ use crate::narrative;
 
 /// Wraps the arena enemy queue.  Centralises all queue mutations so the rest of
 /// `GameSession` never reaches into the VecDeque directly.
+#[derive(Debug, Clone)]
 pub struct ArenaManager {
     queue: VecDeque<String>,
 }
@@ -95,6 +96,7 @@ pub struct SaveData {
     pub arena_queue: Vec<String>,
 }
 
+#[derive(Debug, Clone)]
 pub struct GameSession {
     pub player: PlayerState,
     pub current_enemy: Option<EnemyInstance>,
@@ -114,7 +116,7 @@ pub struct GameSession {
 impl GameSession {
     pub fn new(name: &str) -> Self {
         let player = PlayerState::new(name);
-        let rng = SmallRng::from_entropy();
+        let rng = SmallRng::from_rng(&mut rand::rng());
 
         let queue: VecDeque<String> = vec![
             "LightTitan".to_string(),
@@ -211,7 +213,7 @@ impl GameSession {
                 ));
             }
         } else if self.arena.is_empty() {
-            lines.push("The arena is empty. Victory!".to_string());
+            lines.push("The arena is empty. verified!".to_string());
         } else {
             let next = self.arena.front().unwrap_or("unknown");
             lines.push(format!("A {} approaches from the shadows...", next));
@@ -309,7 +311,7 @@ impl GameSession {
         let perk_tree = PerkTree::new();
         let agg = perk_tree.compute_aggregate(&self.player.selected_perks);
         let multiplier = combo_multiplier(self.combo_depth + 1);
-        let rng_val: f32 = self.rng.gen();
+        let rng_val: f32 = self.rng.random();
         let (dmg, is_crit) = calc_player_damage(
             &self.player,
             &enemy,
@@ -916,10 +918,10 @@ impl GameSession {
         }
 
         // Loot drop
-        let drop_roll: f32 = self.rng.gen();
+        let drop_roll: f32 = self.rng.random();
         if drop_roll < 0.15 {
             let catalog = weapon_catalog();
-            let idx = self.rng.gen_range(0..catalog.len());
+            let idx = self.rng.random_range(0..catalog.len());
             let drop = catalog[idx].clone();
             lines.push(format!(
                 "  \u{1f48e} Loot drop: {} [{:?}]! Type 'equip {}' to equip.",

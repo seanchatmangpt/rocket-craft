@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let (service, socket) = LspService::new(AntiLlmServer::new);
                 Server::new(stdin, stdout, socket).serve(service).await;
             } else {
-                eprintln!("Error: --stdio flag required for LSP serve mode");
+                etracing::info!("Error: --stdio flag required for LSP serve mode");
                 std::process::exit(1);
             }
         }
@@ -50,11 +50,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let diags = anti_llm_cheat_lsp::engine::evaluate_diagnostics(&obs);
             let mut diags = diags;
             diags.sort_by(|a, b| a.file_path.cmp(&b.file_path).then(a.line.cmp(&b.line)));
-            println!("--- Anti-LLM Admissibility Scan ---");
-            println!("Observations: {}", obs.len());
-            println!("Diagnostics:  {}", diags.len());
+            tracing::info!("--- Anti-LLM Admissibility Scan ---");
+            tracing::info!("Observations: {}", obs.len());
+            tracing::info!("Diagnostics:  {}", diags.len());
             for d in &diags {
-                println!("  [{}] {}:{}: {}", d.code, d.file_path, d.line, d.message);
+                tracing::info!("  [{}] {}:{}: {}", d.code, d.file_path, d.line, d.message);
             }
         }
     }

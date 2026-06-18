@@ -4,7 +4,7 @@ import re
 with open('unify-rs/unify-mcp/src/tools.rs', 'r') as f:
     tools_content = f.read()
 
-tools_resolved = re.sub(
+tools_rereaddressed = re.sub(
     r'<<<<<<< HEAD.*?=======\n(.*?)\n>>>>>>> origin/claude/[^\n]+',
     r'\1',
     tools_content,
@@ -12,7 +12,7 @@ tools_resolved = re.sub(
 )
 
 with open('unify-rs/unify-mcp/src/tools.rs', 'w') as f:
-    f.write(tools_resolved)
+    f.write(tools_rereaddressed)
 
 # Resolve unify/src/commands.rs
 with open('unify-rs/unify/src/commands.rs', 'r') as f:

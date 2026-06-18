@@ -9,7 +9,7 @@
 #include "IB4ParrySystem.generated.h"
 
 /**
- * Result returned from EvaluateParry(), describing how a parry attempt resolved.
+ * Result returned from EvaluateParry(), describing how a parry attempt rereaddressed.
  */
 UENUM(BlueprintType)
 enum class EParryResult : uint8

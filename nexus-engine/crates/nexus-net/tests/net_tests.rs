@@ -53,7 +53,7 @@ fn roundtrip_server_message_serialization() {
         ServerMessage::Disconnect { reason: "server restart".to_string() },
         ServerMessage::MatchEnded {
             winner_id: 1,
-            reason: nexus_net::protocol::MatchEndReason::Victory,
+            reason: nexus_net::protocol::MatchEndReason::Verified,
         },
     ];
 
@@ -223,7 +223,7 @@ fn room_rejects_action_when_not_active() {
     // state is WaitingForBothPlayers by default
 
     let err = room.apply_action(1, CombatAction::Dodge).unwrap_err();
-    assert!(err.to_string().contains("not active"));
+    assert!(matches!(err, nexus_net::room::RoomError::MatchNotActive));
 }
 
 #[test]
@@ -235,7 +235,7 @@ fn room_rejects_out_of_turn_action() {
 
     // It is player 1's turn; player 2 attempts to act.
     let err = room.apply_action(2, CombatAction::Dodge).unwrap_err();
-    assert!(err.to_string().contains("turn"));
+    assert!(matches!(err, nexus_net::room::RoomError::NotPlayersTurn));
 }
 
 #[test]
@@ -246,7 +246,7 @@ fn room_rejects_unknown_player() {
     room.state = RoomState::Active;
 
     let err = room.apply_action(99, CombatAction::Dodge).unwrap_err();
-    assert!(err.to_string().contains("not found"));
+    assert!(matches!(err, nexus_net::room::RoomError::PlayerNotFound));
 }
 
 #[test]

@@ -18,7 +18,7 @@ pub enum CombatEvent {
     /// An attack was blocked or missed — combo on the attacker resets.
     AttackBlocked,
 
-    /// A parry attempt was resolved.
+    /// A parry attempt was rereaddressed.
     ParrySuccess {
         outcome: ParryOutcome,
         hp_remaining: f32,

@@ -13,3 +13,17 @@ genie-core = { path = "../unify-rs/genie-core" }
 blueprint-core = { path = "../blueprint-rs/blueprint-core" }
 blueprint-testing = { path = "../blueprint-rs/blueprint-testing" }
 serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tracing = "0.1"
+
+# Game dependencies
+ib4-mud = { path = "../infinity-blade-4/mud/ib4-mud" }
+ib4-core = { path = "../infinity-blade-4/mud/ib4-core" }
+ib4-combat = { path = "../infinity-blade-4/mud/ib4-combat" }
+ib4-ai = { path = "../infinity-blade-4/mud/ib4-ai" }
+ib4-progression = { path = "../infinity-blade-4/mud/ib4-progression" }
+nexus-session = { path = "../nexus-engine/crates/nexus-session" }
+nexus-net = { path = "../nexus-engine/crates/nexus-net" }
+nexus-types = { path = "../nexus-engine/crates/nexus-types" }
+nexus-combat = { path = "../nexus-engine/crates/nexus-combat" }
+nexus-ecs = { path = "../nexus-engine/crates/nexus-ecs" }

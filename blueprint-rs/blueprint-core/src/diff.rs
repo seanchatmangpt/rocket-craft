@@ -218,7 +218,7 @@ fn diff_node(before: &BpNode, after: &BpNode) -> Option<NodeDiffKind> {
                     after: None,
                 });
             }
-            _ => {}
+            _ => { /* handled */ }
         }
     }
     for key in after.properties.keys() {

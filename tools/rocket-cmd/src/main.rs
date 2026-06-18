@@ -145,9 +145,9 @@ fn main() -> Result<()> {
             run_audit()?;
         }
         Commands::Run => {
-            println!("Launching Interactive TUI...");
+            tracing::info!("Launching Interactive TUI...");
             // TUI implementation would go here (Task 14)
-            println!("(TUI mode not fully implemented in this turn)");
+            tracing::info!("(TUI mode not fully implemented in this turn)");
         }
         Commands::Crypto { crypto_cmd } => match crypto_cmd {
             Some(CryptoSubcommands::Generate) | None => {
@@ -192,27 +192,27 @@ fn main() -> Result<()> {
 }
 
 fn run_wasm(file: &str) -> Result<()> {
-    println!("{}", "=== WASM Plugin Execution ===".bold().cyan());
+    tracing::info!("{}", "=== WASM Plugin Execution ===".bold().cyan());
     let path = PathBuf::from(file);
     if !path.exists() {
         return Err(eyre!("WASM file not found: {}", file));
     }
 
     let mut plugin_host = knhk::plugin::PluginHost::new();
-    println!("Loading plugin: {}", path.display());
+    tracing::info!("Loading plugin: {}", path.display());
     
     match plugin_host.load_law(&path) {
         Ok(law) => {
-            println!("{} Successfully loaded WASM plugin: {}", "✓".green(), knhk::Law::name(&law));
-            println!("Description: {}", knhk::Law::description(&law));
-            println!("Executing validation...");
+            tracing::info!("{} Successfully loaded WASM plugin: {}", "✓".green(), knhk::Law::name(&law));
+            tracing::info!("Description: {}", knhk::Law::description(&law));
+            tracing::info!("Executing validation...");
             match knhk::Law::validate(&law, Path::new(".")) {
-                Ok(_) => println!("{} Validation passed", "✓".green()),
-                Err(e) => println!("{} Validation failed: {}", "✗".red(), e.message),
+                Ok(_) => tracing::info!("{} Validation passed", "✓".green()),
+                Err(e) => tracing::info!("{} Validation failed: {}", "✗".red(), e.message),
             }
         }
         Err(e) => {
-            println!("{} Failed to load WASM plugin: {}", "✗".red(), e);
+            tracing::info!("{} Failed to load WASM plugin: {}", "✗".red(), e);
         }
     }
     
@@ -220,16 +220,16 @@ fn run_wasm(file: &str) -> Result<()> {
 }
 
 fn run_info() -> Result<()> {
-    println!("{}", "Rocket Craft Generative Orchestration Tool".bold().cyan());
-    println!("Version: 0.1.0");
-    println!("Stack: Ostar / ggen / Rust / UE4.24");
+    tracing::info!("{}", "Rocket Craft Generative Orchestration Tool".bold().cyan());
+    tracing::info!("Version: 0.1.0");
+    tracing::info!("Stack: Ostar / ggen / Rust / UE4.24");
     Ok(())
 }
 
 fn run_capabilities() -> Result<()> {
-    println!("{}", "=== Rocket Craft Integrated Capabilities ===".bold().cyan());
-    println!("{}", "High-level features currently integrated into the platform:".dimmed());
-    println!();
+    tracing::info!("{}", "=== Rocket Craft Integrated Capabilities ===".bold().cyan());
+    tracing::info!("{}", "High-level features currently integrated into the platform:".dimmed());
+    tracing::info!("");
 
     let capabilities = [
         ("Multiplatform Orchestration", "Unified build system for Windows, Linux, Android, and HTML5 (Web)."),
@@ -245,17 +245,17 @@ fn run_capabilities() -> Result<()> {
     ];
 
     for (i, (name, desc)) in capabilities.iter().enumerate() {
-        println!("  {:2}. {}: {}", i + 1, name.yellow().bold(), desc);
+        tracing::info!("  {:2}. {}: {}", i + 1, name.yellow().bold(), desc);
     }
 
-    println!();
-    println!("See {} for the full manifest of integrated libraries.", "capabilities/CapabilityManifest.md".blue());
+    tracing::info!("");
+    tracing::info!("See {} for the full manifest of integrated libraries.", "capabilities/CapabilityManifest.md".blue());
 
     Ok(())
 }
 
 fn run_sync() -> Result<()> {
-    println!("{}", "=== Syncing Project Manifest ===".bold().green());
+    tracing::info!("{}", "=== Syncing Project Manifest ===".bold().green());
     let mut projects = Vec::new();
     let versions_dir = Path::new("versions");
 
@@ -312,7 +312,7 @@ fn run_sync() -> Result<()> {
 
     let manifest = manifest::Manifest::new("project-manifest.json", projects);
     manifest.save().map_err(|e| eyre!("{}", e))?;
-    println!("{}", "Manifest updated successfully.".green());
+    tracing::info!("{}", "Manifest updated successfully.".green());
     Ok(())
 }
 
@@ -359,16 +359,16 @@ fn run_build(project: Option<String>, target: Option<String>, platform: Option<S
     pb.finish_and_clear();
 
     if status.success() {
-        println!("{}", "✔ Build Successful!".green().bold());
+        tracing::info!("{}", "✔ Build Successful!".green().bold());
     } else {
-        println!("{}", "✘ Build Failed.".red().bold());
+        tracing::info!("{}", "✘ Build Failed.".red().bold());
     }
 
     Ok(())
 }
 
 fn run_audit() -> Result<()> {
-    println!("{}", "=== Project Health Audit ===".bold().magenta());
+    tracing::info!("{}", "=== Project Health Audit ===".bold().magenta());
     let manifest = manifest::Manifest::load("project-manifest.json").map_err(|e| eyre!("{}", e))?;
     
     let mut engine = ComplianceEngine::new();
@@ -376,18 +376,18 @@ fn run_audit() -> Result<()> {
 
     // Load WASM plugins
     if let Err(e) = engine.load_plugins("plugins") {
-        println!("  {} Failed to load plugins: {}", "⚠".yellow(), e);
+        tracing::info!("  {} Failed to load plugins: {}", "⚠".yellow(), e);
     }
 
     for proj in manifest.projects() {
-        println!("\nProject: {}", proj.name.bold().yellow());
+        tracing::info!("\nProject: {}", proj.name.bold().yellow());
         
         let uproject_path = &proj.uproject_path;
         // 1. Check uproject exists
         if uproject_path.exists() {
-            println!("  {} uproject file found", "✓".green());
+            tracing::info!("  {} uproject file found", "✓".green());
         } else {
-            println!("  {} uproject file MISSING", "✗".red());
+            tracing::info!("  {} uproject file MISSING", "✗".red());
         }
 
         // 2. Check for missing maps (simplified)
@@ -399,17 +399,17 @@ fn run_audit() -> Result<()> {
                     .filter_map(|e| e.ok())
                     .filter(|e| e.path().extension().and_then(|s| s.to_str()) == Some("umap"))
                     .count();
-                println!("  {} Maps found: {}", "✓".green(), map_count);
+                tracing::info!("  {} Maps found: {}", "✓".green(), map_count);
             }
 
             // 3. Law Compliance (via ComplianceEngine)
-            println!("  Checking law compliance...");
+            tracing::info!("  Checking law compliance...");
             let result = engine.check_project(proj);
             if result.passed {
-                println!("    {} All laws satisfied.", "✓".green());
+                tracing::info!("    {} All laws satisfied.", "✓".green());
             } else {
                 for err in result.errors {
-                    println!("    {} Law '{}' violated: {}", "✗".red(), err.law_name, err.message);
+                    tracing::info!("    {} Law '{}' violated: {}", "✗".red(), err.law_name, err.message);
                 }
             }
         }
@@ -419,7 +419,7 @@ fn run_audit() -> Result<()> {
 }
 
 fn run_clean() -> Result<()> {
-    println!("{}", "=== Cleaning Workspace ===".bold().red());
+    tracing::info!("{}", "=== Cleaning Workspace ===".bold().red());
     let targets = ["Binaries", "Intermediate", "Saved"];
     
     let entries: Vec<_> = WalkDir::new("versions")
@@ -447,7 +447,7 @@ fn run_clean() -> Result<()> {
     }
     
     pb.finish_with_message("Cleanup complete");
-    println!("{}", "Cleanup complete.".green());
+    tracing::info!("{}", "Cleanup complete.".green());
     Ok(())
 }
 
@@ -459,9 +459,9 @@ fn run_pwa(cmd: Option<PwaSubcommands>, dir: &str, _output: Option<String>) -> R
 
     match cmd {
         Some(PwaSubcommands::Lint) => {
-            println!("{}", "=== Linting & Formatting PWA Assets ===".bold().cyan());
+            tracing::info!("{}", "=== Linting & Formatting PWA Assets ===".bold().cyan());
 
-            println!("  Running Prettier...");
+            tracing::info!("  Running Prettier...");
             let status = Command::new("npm")
                 .arg("run")
                 .arg("format")
@@ -472,7 +472,7 @@ fn run_pwa(cmd: Option<PwaSubcommands>, dir: &str, _output: Option<String>) -> R
                 return Err(eyre!("Prettier failed"));
             }
 
-            println!("  Running ESLint...");
+            tracing::info!("  Running ESLint...");
             let status = Command::new("npm")
                 .arg("run")
                 .arg("lint")
@@ -480,13 +480,13 @@ fn run_pwa(cmd: Option<PwaSubcommands>, dir: &str, _output: Option<String>) -> R
                 .status()?;
 
             if status.success() {
-                println!("{}", "✔ PWA Assets are clean!".green().bold());
+                tracing::info!("{}", "✔ PWA Assets are clean!".green().bold());
             } else {
                 return Err(eyre!("ESLint failed"));
             }
         }
         Some(PwaSubcommands::Sync) | None => {
-            println!("🚀 Syncing PWA assets in: {}", dir);
+            tracing::info!("🚀 Syncing PWA assets in: {}", dir);
 
             let mut assets = Vec::new();
             for entry in WalkDir::new(&pwa_dir) {
@@ -507,7 +507,7 @@ fn run_pwa(cmd: Option<PwaSubcommands>, dir: &str, _output: Option<String>) -> R
             });
 
             fs::write(pwa_dir.join("manifest.json"), serde_json::to_string_pretty(&manifest)?)?;
-            println!("   {} manifest.json generated.", "✓".green());
+            tracing::info!("   {} manifest.json generated.", "✓".green());
         }
     }
 
@@ -516,8 +516,8 @@ fn run_pwa(cmd: Option<PwaSubcommands>, dir: &str, _output: Option<String>) -> R
 
 
 fn run_doctor() -> Result<()> {
-    println!("{}", "Rocket Doctor - Programmatic Diagnostics".bold().cyan());
-    println!("===========================================");
+    tracing::info!("{}", "Rocket Doctor - Programmatic Diagnostics".bold().cyan());
+    tracing::info!("===========================================");
 
     let project_root = std::env::current_dir()?;
     let doctor = RocketDoctor::new(project_root);
@@ -530,22 +530,22 @@ fn run_doctor() -> Result<()> {
             CheckStatus::Fail => "✗".red(),
         };
 
-        println!("  {} {}: {}", status_str, check.name.bold(), check.message);
+        tracing::info!("  {} {}: {}", status_str, check.name.bold(), check.message);
         if let Some(details) = check.details {
-            println!("    {}", details.dimmed());
+            tracing::info!("    {}", details.dimmed());
         }
     }
 
-    println!("\nReport generated at: {}", report.timestamp);
+    tracing::info!("\nReport generated at: {}", report.timestamp);
 
     Ok(())
 }
 
 fn run_tests() -> Result<()> {
-    println!("{}", "=== Running All Tests ===".bold().cyan());
+    tracing::info!("{}", "=== Running All Tests ===".bold().cyan());
 
     // 1. Rust Workspace Tests
-    println!("\n{}", "--- Rust Workspace Tests (tools) ---".bold().yellow());
+    tracing::info!("\n{}", "--- Rust Workspace Tests (tools) ---".bold().yellow());
     let status = Command::new("cargo")
         .arg("test")
         .arg("--workspace")
@@ -556,7 +556,7 @@ fn run_tests() -> Result<()> {
     }
 
     // 2. Chicago TDD Tools Tests
-    println!("\n{}", "--- Chicago TDD Tools Tests ---".bold().yellow());
+    tracing::info!("\n{}", "--- Chicago TDD Tools Tests ---".bold().yellow());
     let status = Command::new("cargo")
         .arg("test")
         .current_dir("chicago-tdd-tools")
@@ -566,7 +566,7 @@ fn run_tests() -> Result<()> {
     }
 
     // 3. Asset Validation
-    println!("\n{}", "--- Asset Validation ---".bold().yellow());
+    tracing::info!("\n{}", "--- Asset Validation ---".bold().yellow());
     let status = Command::new("python3")
         .arg("validate-assets.py")
         .status()?;
@@ -574,7 +574,7 @@ fn run_tests() -> Result<()> {
         return Err(eyre!("Asset validation failed"));
     }
 
-    println!("\n{}", "✔ All tests passed!".green().bold());
+    tracing::info!("\n{}", "✔ All tests passed!".green().bold());
     Ok(())
 }
 
@@ -603,7 +603,7 @@ fn run_logs(file: Option<String>, lines: usize) -> Result<()> {
             .context("No log files found in non-project-files/logs")?
     };
 
-    println!("{}", format!("Tailing log: {}", log_path.display()).bold().cyan());
+    tracing::info!("{}", format!("Tailing log: {}", log_path.display()).bold().cyan());
 
     let f = fs::File::open(&log_path)?;
     let mut reader = BufReader::new(f);
@@ -647,19 +647,19 @@ fn run_logs(file: Option<String>, lines: usize) -> Result<()> {
 
 fn print_colorized(line: &str) {
     if line.to_uppercase().contains("ERROR:") || line.contains("FAILED") {
-        println!("{}", line.red());
+        tracing::info!("{}", line.red());
     } else if line.to_uppercase().contains("WARNING:") {
-        println!("{}", line.yellow());
+        tracing::info!("{}", line.yellow());
     } else if line.contains("Success:") || line.contains("BUILD SUCCESSFUL") || line.contains("COMPLETE") {
-        println!("{}", line.green());
+        tracing::info!("{}", line.green());
     } else if line.starts_with("Log") && line.contains(':') {
         let parts: Vec<&str> = line.splitn(2, ':').collect();
         if parts.len() == 2 {
-            println!("{}:{}", parts[0].cyan(), parts[1]);
+            tracing::info!("{}:{}", parts[0].cyan(), parts[1]);
         } else {
-            println!("{}", line);
+            tracing::info!("{}", line);
         }
     } else {
-        println!("{}", line);
+        tracing::info!("{}", line);
     }
 }

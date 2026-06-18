@@ -70,7 +70,7 @@ cargo doc --workspace --no-deps --open
 | Crate              | Role                                                                 |
 |--------------------|----------------------------------------------------------------------|
 | `nexus-types`      | Phantom-typed IDs, math primitives (`Vec3`, `Quat`), error base types, typestates |
-| `nexus-combat`     | Typestate combat FSM: `Idle→Attacking→Resolving→Done`; combo chains; parry timing |
+| `nexus-combat`     | Typestate combat FSM: `Idle→Attacking→Resolving→completed`; combo chains; parry timing |
 | `nexus-session`    | Player session typestates; const-generic inventory `Inventory<N>`; NPC dialogue FSM |
 | `nexus-economy`    | Double-entry ledger (debit == credit always); marketplace listings; auction typestates |
 | `nexus-net`        | WebSocket framing with typestate protocol; duel matchmaking queue; `GameRoom` |

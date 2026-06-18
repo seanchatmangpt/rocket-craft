@@ -18,7 +18,7 @@
  *      * Horizontal dominant, positive X → Right
  *      * Horizontal dominant, negative X → Left
  *      * Vertical dominant (any direction) → Overhead
- *  - The resolved EAttackDirection is forwarded to the possessed
+ *  - The rereaddressed EAttackDirection is forwarded to the possessed
  *    AIB4PlayerCharacter via OnAttackInput() / OnDodgeInput().
  *
  * Menu actions (pause, bloodline restart) are also centralized here so they

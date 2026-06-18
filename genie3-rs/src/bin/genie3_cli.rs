@@ -7,46 +7,46 @@ use std::collections::HashMap;
 use std::io::{self, Write};
 
 fn print_help() {
-    println!("Available Commands:");
-    println!("  w / forward      - Move bot_1 forward (Y += 5.0)");
-    println!("  s / backward     - Move bot_1 backward (Y -= 5.0)");
-    println!("  a / left         - Move bot_1 left (X -= 5.0)");
-    println!("  d / right        - Move bot_1 right (X += 5.0)");
-    println!("  spawn actor <id> at <x> <y> <z>");
-    println!("                   - Spawn a new actor at coordinates");
-    println!("  spawn object <id> at <x> <y> <z>");
-    println!("                   - Spawn a new object at coordinates");
-    println!("  weather <sunny|cloudy|stormy|rainy>");
-    println!("                   - Set the environment weather");
-    println!("  time <hour>      - Set the environment time of day (0.0 to 24.0)");
-    println!("  status / show    - Display complete current world state");
-    println!("  help             - Show this help menu");
-    println!("  exit / quit      - Exit the world simulation");
+    tracing::info!("Available Commands:");
+    tracing::info!("  w / forward      - Move bot_1 forward (Y += 5.0)");
+    tracing::info!("  s / backward     - Move bot_1 backward (Y -= 5.0)");
+    tracing::info!("  a / left         - Move bot_1 left (X -= 5.0)");
+    tracing::info!("  d / right        - Move bot_1 right (X += 5.0)");
+    tracing::info!("  spawn actor <id> at <x> <y> <z>");
+    tracing::info!("                   - Spawn a new actor at coordinates");
+    tracing::info!("  spawn object <id> at <x> <y> <z>");
+    tracing::info!("                   - Spawn a new object at coordinates");
+    tracing::info!("  weather <sunny|cloudy|stormy|rainy>");
+    tracing::info!("                   - Set the environment weather");
+    tracing::info!("  time <hour>      - Set the environment time of day (0.0 to 24.0)");
+    tracing::info!("  status / show    - Display complete current world state");
+    tracing::info!("  help             - Show this help menu");
+    tracing::info!("  exit / quit      - Exit the world simulation");
 }
 
 fn print_state(state: &WorldState) {
-    println!("\n--- World State (Step {}) ---", state.step_index);
-    println!("Time: {:.1}h | Weather: {:?}", state.environment.time_of_day, state.environment.weather);
-    println!("Places:");
+    tracing::info!("\n--- World State (Step {}) ---", state.step_index);
+    tracing::info!("Time: {:.1}h | Weather: {:?}", state.environment.time_of_day, state.environment.weather);
+    tracing::info!("Places:");
     for p in &state.places {
         let bounds = &p.bounds;
-        println!("  - Place '{}' ({}) bounds center: {:?}, half_extents: {:?}", p.id, p.name, bounds.center, bounds.half_extents);
+        tracing::info!("  - Place '{}' ({}) bounds center: {:?}, half_extents: {:?}", p.id, p.name, bounds.center, bounds.half_extents);
     }
-    println!("Actors:");
+    tracing::info!("Actors:");
     for a in &state.actors {
-        println!("  - Actor '{}' ({}) position: {:?} in Place: {:?}", a.id, a.name, a.position, a.place_id);
+        tracing::info!("  - Actor '{}' ({}) position: {:?} in Place: {:?}", a.id, a.name, a.position, a.place_id);
     }
-    println!("Objects:");
+    tracing::info!("Objects:");
     for o in &state.objects {
-        println!("  - Object '{}' ({}) position: {:?} in Place: {:?}", o.id, o.name, o.transform.position, o.place_id);
+        tracing::info!("  - Object '{}' ({}) position: {:?} in Place: {:?}", o.id, o.name, o.transform.position, o.place_id);
     }
-    println!("-----------------------------\n");
+    tracing::info!("-----------------------------\n");
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("====================================================");
-    println!("      Genie 3 World Builder Interactive CLI");
-    println!("====================================================");
+    tracing::info!("====================================================");
+    tracing::info!("      Genie 3 World Builder Interactive CLI");
+    tracing::info!("====================================================");
 
     // Initialize Default WorldState
     let mut state = WorldState::new();
@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         match cmd.as_str() {
             "exit" | "quit" | "q" => {
-                println!("Exiting World Simulation. Goodbye!");
+                tracing::info!("Exiting World Simulation. Goodbye!");
                 break;
             }
             "help" | "h" | "?" => {
@@ -120,10 +120,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match engine.execute_command(&state, &sim_cmd, 0.1) {
                     Ok(next) => {
                         state = next;
-                        println!("Success: Moved bot_1 forward.");
+                        tracing::info!("Success: Moved bot_1 forward.");
                         print_state(&state);
                     }
-                    Err(e) => println!("Error: {}", e),
+                    Err(e) => tracing::info!("Error: {}", e),
                 }
             }
             "s" | "backward" => {
@@ -135,10 +135,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match engine.execute_command(&state, &sim_cmd, 0.1) {
                     Ok(next) => {
                         state = next;
-                        println!("Success: Moved bot_1 backward.");
+                        tracing::info!("Success: Moved bot_1 backward.");
                         print_state(&state);
                     }
-                    Err(e) => println!("Error: {}", e),
+                    Err(e) => tracing::info!("Error: {}", e),
                 }
             }
             "a" | "left" => {
@@ -150,10 +150,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match engine.execute_command(&state, &sim_cmd, 0.1) {
                     Ok(next) => {
                         state = next;
-                        println!("Success: Moved bot_1 left.");
+                        tracing::info!("Success: Moved bot_1 left.");
                         print_state(&state);
                     }
-                    Err(e) => println!("Error: {}", e),
+                    Err(e) => tracing::info!("Error: {}", e),
                 }
             }
             "d" | "right" => {
@@ -165,15 +165,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match engine.execute_command(&state, &sim_cmd, 0.1) {
                     Ok(next) => {
                         state = next;
-                        println!("Success: Moved bot_1 right.");
+                        tracing::info!("Success: Moved bot_1 right.");
                         print_state(&state);
                     }
-                    Err(e) => println!("Error: {}", e),
+                    Err(e) => tracing::info!("Error: {}", e),
                 }
             }
             "spawn" => {
                 if parts.len() < 7 || parts[3] != "at" {
-                    println!("Usage: spawn [actor|object] <id> at <x> <y> <z>");
+                    tracing::info!("Usage: spawn [actor|object] <id> at <x> <y> <z>");
                     continue;
                 }
                 let spawn_type = parts[1].to_lowercase();
@@ -197,10 +197,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     match engine.execute_command(&state, &sim_cmd, 0.1) {
                         Ok(next) => {
                             state = next;
-                            println!("Success: Spawned actor '{}' at {:?}", id, position);
+                            tracing::info!("Success: Spawned actor '{}' at {:?}", id, position);
                             print_state(&state);
                         }
-                        Err(e) => println!("Error: {}", e),
+                        Err(e) => tracing::info!("Error: {}", e),
                     }
                 } else if spawn_type == "object" {
                     let mut props = HashMap::new();
@@ -215,18 +215,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     match engine.execute_command(&state, &sim_cmd, 0.1) {
                         Ok(next) => {
                             state = next;
-                            println!("Success: Spawned object '{}' at {:?}", id, position);
+                            tracing::info!("Success: Spawned object '{}' at {:?}", id, position);
                             print_state(&state);
                         }
-                        Err(e) => println!("Error: {}", e),
+                        Err(e) => tracing::info!("Error: {}", e),
                     }
                 } else {
-                    println!("Invalid spawn type. Use 'actor' or 'object'.");
+                    tracing::info!("Invalid spawn type. Use 'actor' or 'object'.");
                 }
             }
             "weather" => {
                 if parts.len() < 2 {
-                    println!("Usage: weather <sunny|cloudy|stormy|rainy>");
+                    tracing::info!("Usage: weather <sunny|cloudy|stormy|rainy>");
                     continue;
                 }
                 let weather_str = parts[1].to_lowercase();
@@ -236,7 +236,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "stormy" => Weather::Stormy,
                     "rainy" => Weather::Rainy,
                     _ => {
-                        println!("Unknown weather type. Defaulting to Sunny.");
+                        tracing::info!("Unknown weather type. Defaulting to Sunny.");
                         Weather::Sunny
                     }
                 };
@@ -244,15 +244,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match engine.execute_command(&state, &sim_cmd, 0.1) {
                     Ok(next) => {
                         state = next;
-                        println!("Success: Weather changed to {:?}", weather_str);
+                        tracing::info!("Success: Weather changed to {:?}", weather_str);
                         print_state(&state);
                     }
-                    Err(e) => println!("Error: {}", e),
+                    Err(e) => tracing::info!("Error: {}", e),
                 }
             }
             "time" => {
                 if parts.len() < 2 {
-                    println!("Usage: time <hour>");
+                    tracing::info!("Usage: time <hour>");
                     continue;
                 }
                 let time_val: f32 = parts[1].parse().unwrap_or(12.0);
@@ -260,14 +260,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 match engine.execute_command(&state, &sim_cmd, 0.0) {
                     Ok(next) => {
                         state = next;
-                        println!("Success: Time set to {:.2}", time_val);
+                        tracing::info!("Success: Time set to {:.2}", time_val);
                         print_state(&state);
                     }
-                    Err(e) => println!("Error: {}", e),
+                    Err(e) => tracing::info!("Error: {}", e),
                 }
             }
             _ => {
-                println!("Unknown command. Type 'help' for options.");
+                tracing::info!("Unknown command. Type 'help' for options.");
             }
         }
     }

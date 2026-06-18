@@ -92,7 +92,7 @@ impl SessionStateMarker for Disconnected {}
 /// Compile-time marker for a valid auction-house transaction phase.
 pub trait EconomyStateMarker: private::Sealed {}
 
-/// A bid has been submitted but not yet resolved.
+/// A bid has been submitted but not yet rereaddressed.
 pub struct PendingBid;
 /// The auction house has accepted the highest bid.
 pub struct BidAccepted;

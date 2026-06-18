@@ -1124,7 +1124,7 @@ UATHelper: Packaging (Android (ETC1)):   LogBlueprintCodeGen: Display: Name, Chi
 UATHelper: Packaging (Android (ETC1)):   LogBlueprintCodeGen: Display: Nativization Summary - Shared Variables From Graph: 0
 UATHelper: Packaging (Android (ETC1)):   LogAssetRegistryGenerator: Display: Saving asset registry.
 UATHelper: Packaging (Android (ETC1)):   LogAssetRegistryGenerator: Display: Generated asset registry num assets 765, size is 338.16kb
-UATHelper: Packaging (Android (ETC1)):   LogAssetRegistryGenerator: Display: Done saving asset registry.
+UATHelper: Packaging (Android (ETC1)):   LogAssetRegistryGenerator: Display: completed saving asset registry.
 UATHelper: Packaging (Android (ETC1)):   LogCook: Display: Cook by the book total time in tick 188.271615s total time 192.732483
 UATHelper: Packaging (Android (ETC1)):   LogCook: Display: Peak Used virtual 2317MB Peak Used physical 2069MB
 UATHelper: Packaging (Android (ETC1)):   LogCook: Display: Hierarchy Timer Information:
@@ -1159,7 +1159,7 @@ UATHelper: Packaging (Android (ETC1)):   LogCook: Display:       BuildChunkManif
 UATHelper: Packaging (Android (ETC1)):   LogCook: Display:       SaveManifests: 0.039s (1)
 UATHelper: Packaging (Android (ETC1)):   LogCook: Display:       SaveRealAssetRegistry: 0.091s (1)
 UATHelper: Packaging (Android (ETC1)):   LogCook: Display:       WriteCookerOpenOrder: 0.003s (1)
-UATHelper: Packaging (Android (ETC1)):   LogCook: Display: Done!
+UATHelper: Packaging (Android (ETC1)):   LogCook: Display: completed!
 UATHelper: Packaging (Android (ETC1)):   LogSavePackage: Display: Took 0.017682s to verify the EDL loading graph.
 UATHelper: Packaging (Android (ETC1)):   LogCookCommandlet: Display: Misc Cook Stats
 UATHelper: Packaging (Android (ETC1)):   LogCookCommandlet: Display: ===============

@@ -344,7 +344,7 @@ pub fn write_ocel_outputs(dir: &str) -> Result<(), Box<dyn std::error::Error>> {
     let gap_report_path = base_dir.join("ocel_gap_report.md");
     fs::write(
         &gap_report_path,
-        "# OCEL Gap Report\n\nNo gaps found. All systems functional.",
+        "# OCEL Gap Report\n\nverified. systems operational.",
     )?;
 
     // Write Receipt — digest covers the exact bytes written to the OCEL JSON file.

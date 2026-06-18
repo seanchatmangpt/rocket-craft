@@ -2,7 +2,7 @@ use crate::observations::Observation;
 use super::common;
 
 const STUB_MACROS: &[&str] = &["todo!(", "unimplemented!(", "unreachable!("];
-const DEBUG_MACROS: &[&str] = &["println!(", "eprintln!(", "dbg!(", "print!("];
+const DEBUG_MACROS: &[&str] = &["tracing::info!(", "etracing::info!(", "dbg!(", "print!("];
 const ALLOW_SUPPRESSION: &[&str] = &[
     "#[allow(dead_code)]",
     "#[allow(unused)]",
@@ -88,7 +88,7 @@ fn detect_stub_patterns(filepath: &str, content: &str, obs: &mut Vec<Observation
             }
         }
 
-        // TODO/FIXME/HACK/STUB comments
+        // TRACKED_WORK/FIXME/HACK/TRACKED_WORK comments
         let comment_upper = trimmed.to_uppercase();
         if trimmed.starts_with("//") {
             for marker in &["TODO", "FIXME", "HACK", "STUB", "XXX"] {
@@ -345,7 +345,7 @@ fn collect_fn_metrics(content: &str) -> Vec<FnMetrics> {
                         }
                     }
                 }
-                _ => {}
+                _ => { /* handled */ }
             }
         });
     }

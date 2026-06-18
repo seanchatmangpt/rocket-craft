@@ -138,7 +138,7 @@ public:
      * Play the attack montage section that corresponds to Direction at the
      * given combo depth. Combo depth is clamped to [0, 2] for a 3-level chain.
      *
-     * @param Direction  - Overhead / Left / Right resolved from swipe gesture.
+     * @param Direction  - Overhead / Left / Right rereaddressed from swipe gesture.
      * @param InComboDepth - 0-based depth within the combo chain.
      */
     UFUNCTION(BlueprintCallable, Category = "Animation|Combat")

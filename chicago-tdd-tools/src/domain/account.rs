@@ -33,7 +33,7 @@ impl ClapNoun for Account {
                 self.withdraw(amount).map_err(|e| anyhow::anyhow!(e))?;
             }
             AccountVerb::Balance => {
-                println!("Current balance: {}", self.balance);
+                tracing::info!("Current balance: {}", self.balance);
             }
         }
         Ok(())

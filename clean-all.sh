@@ -18,7 +18,7 @@ for target in "${TARGETS[@]}"; do
     find "$SCRIPT_DIR/versions" -type d -name "$target" -prune -print0 | while IFS= read -r -d '' dir; do
         echo "Deleting: $dir"
         rm -rf "$dir"
-    done
-done
+    completed
+completed
 
 echo "Cleanup complete."

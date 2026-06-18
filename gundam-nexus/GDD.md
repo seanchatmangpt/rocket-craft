@@ -213,7 +213,7 @@ This is Turn A's DNA: the revelation that all timelines are real, all runs are r
 | **Unicorn** | NT-D Destroy Mode | Newtype Resonance Gauge reaches 100% | 30-second duration; suit visually transforms (Unicorn mode to Destroy mode); all stats +50%; Funnel/Bit weapons auto-fire; combo multiplier x2; cooldown: 3 minutes after deactivation | IB4 transformation: full suit model swap mid-fight; gesture inputs during NT-D gain +1 effective swipe distance (i.e., short swipes register as full swipes) | NT-D + SEED Mode: forbidden combination — activating both simultaneously locks both for 30 seconds (balance mechanism); NT-D + Newtype Flash: resonance burst fires from ALL active funnels simultaneously (AOE mode); NT-D + Trans-Am: "Shining" state — gold GN particles + psychoframe light, visually spectacular, mechanically the highest damage ceiling in the game (18 DPS multiplier for 8 seconds before both end) |
 | **Gundam 00** | Trans-Am | Reach combo depth 4 (4 unbroken hits in one chain) | 3-turn duration (or 15 seconds in real-time PvP); all stats x3; GN particle emission doubles; suit turns red with gold trim; deactivates early if combo chain breaks | IB4 combo chain counter appears as GN particle gauge; depth 4 reached by executing any 4 gestures without being parried or taking damage; particle gauge visual fills with each hit | Trans-Am + Striker Pack Swap: can swap packs during Trans-Am without breaking combo chain (unique permission — no other mechanic allows mid-chain non-attack inputs); Trans-Am + Newtype Flash: each Flash during Trans-Am restores 5% Resonance Gauge |
 | **Wing** | ZERO System | Fully charge ZERO Gauge (built by taking damage) | AI combat assistance activates: auto-parry succeeds on 60% of incoming attacks; player loses control of suit movement (AI pathfinds); player retains control of attack gesture direction only; duration: 12 seconds; 4-minute cooldown | IB4 relinquishment: during ZERO System, the suit moves autonomously; player sees gesture prompts overlaid on AI-controlled movement; correct gesture execution during AI movement = Wing Zero Combo (highest per-hit damage in game, 8-10 hits) | ZERO System + NT-D: incompatible — if both gauges fill simultaneously, ZERO System takes priority (design note: Wing Zero piloting an NT-D-active Unicorn would be a narrative event, not a balance feature); ZERO System + Alaya-Vijnana: AV parry precision applies to the AI-controlled auto-parries during ZERO System, giving 85% parry rate instead of 60% |
-| **Iron-Blooded Orphans** | Alaya-Vijnana System | Available at any time (no gauge) | Activating AV: enhances next parry to 100% success rate; costs 10 HP (flat, unaffected by any multiplier); 1-second recovery between uses; AV can be chained (3 consecutive uses costs 30 HP and activates Calamity Weapon enhanced strike) | IB4 precise parry: AV parry activates via double-tap on shield icon vs. single-tap for standard parry; double-tap within the standard parry window guarantees deflection; outside the window, AV costs HP but still fails (not a perfect parry) | AV + Newtype Flash: AV-guaranteed parry that occurs within 3-frame window still triggers Newtype Flash (the only way to guarantee Flash outside of natural timing); AV + GUND-Format: HP costs stack; using AV 3 times while GUND-Format active can put pilot below 15% HP — extreme high-risk play style |
+| **Iron-Blooded Orphans** | Alaya-Vijnana System | Available at any time (no gauge) | Activating AV: enhances next parry to 100% success rate; costs 10 HP (flat, unaffected by any multiplier); 1-second recovery between uses; AV can be chained (3 consecutive uses costs 30 HP and activates Calamity Weapon enhanced strike) | IB4 precise parry: AV parry activates via double-tap on shield icon vs. single-tap for standard parry; double-tap within the standard parry window guarantees deflection; outside the window, AV costs HP but still fails (not a perfect parry) | AV + Newtype Flash: AV-ensured parry that occurs within 3-frame window still triggers Newtype Flash (the only way to guarantee Flash outside of natural timing); AV + GUND-Format: HP costs stack; using AV 3 times while GUND-Format active can put pilot below 15% HP — extreme high-risk play style |
 | **Turn A** | Black History | Complete campaign; enter NG+ | All prior campaign runs are stored as canonical dimension records; each run unlocks new lore codex entries; NG+ dialogue trees reference prior runs; Apotheosis's behavior changes based on how many times the Liminal has defeated it | IB4 meta-progression: run count stored in server; lore codex visually styled as dimensional archive hologram; NG+ suits start with 10% stat bonuses per prior completion (capped at 5 runs, +50% max) | Black History + Newtype Flash: in NG+ runs, Newtype Flash visions show memories from prior player runs, not just franchise lore (personalized system requiring server-side run history); Black History + NT-D: in run 3+, NT-D Destroy Mode visual becomes black-and-white (Turn A color scheme homage) |
 | **Build Fighters** | Gunpla Builder | Always active (between-match system) | Full part-by-part construction from 6 categories; parts have 4 stats (ATK, DEF, SPD, TRK); visual customization independent of stats; AR scan unlocks physical kit parts; Plavsky Particle visual upgrade applies prismatic light effects to custom builds | IB4 suit selection: Gunpla Builder outputs flow directly into combat loadout; a fully custom suit uses the gesture grammar of its dominant-series parts (e.g., a suit with RX-78-2 torso and Wing Zero arms uses UC gesture set for body and Wing gesture set for arm attacks) | Builder + Striker Pack: custom suits can be assigned custom Striker Packs using Builder parts (a Builder suit can have a Launcher Pack backpack as its Backpack category part); Builder + Black History: in NG+, Builder parts discovered in run 1 are available from the start of run 2 |
 
@@ -287,7 +287,7 @@ Parry is the highest-skill expression in the IB4 engine. It is not a block — i
 
 **Alaya-Vijnana Parry:**
 - Activation: Double-tap Shield icon
-- Window: Any timing (guaranteed deflect if double-tap is registered)
+- Window: Any timing (ensured deflect if double-tap is registered)
 - Cost: 10 HP flat
 - Note: If executed within the 3-frame Perfect Parry window, still triggers Newtype Flash
 - Note: If executed outside standard parry window (late), still deflects but does NOT stagger and does NOT trigger Newtype Flash
@@ -602,7 +602,7 @@ Each suit consists of exactly 6 parts. Each part belongs to one category.
 
 | Method | Parts Available | Acquisition Rate | Notes |
 |--------|----------------|-----------------|-------|
-| Campaign drops | Common and Uncommon parts | Guaranteed per chapter completion | 180+ unique parts across 5 acts |
+| Campaign drops | Common and Uncommon parts | ensured per chapter completion | 180+ unique parts across 5 acts |
 | Daily mission rewards | Common parts | 2-3 per day | Drives daily engagement |
 | Duel Arena ranking | Rare cosmetic-only parts | Season end reward | No stat advantage |
 | Gacha (Standard Banner) | Common to Rare stat parts | 0.8% Legendary rate, pity at 80 pulls | Standard pull economy |
@@ -1248,7 +1248,7 @@ Gundam Nexus is not free-to-play in the predatory sense. It is free-to-access wi
 **Gacha (Standard Banner):**
 - Cost: 160 Premium Crystal per pull; 10-pull pack: 1,440 (10% discount)
 - Premium Crystal pricing: $0.99 for 80 (effectively $1.99 per pull at standard; $1.80 per pull at 10-pack)
-- Pity: Guaranteed Legendary part at 80 pulls (hard pity); 50% chance at 40 (soft pity)
+- Pity: ensured Legendary part at 80 pulls (hard pity); 50% chance at 40 (soft pity)
 - F2P Crystal earn rate: approximately 15 pulls per month from campaign + daily missions + Duel Arena
 
 **Gacha (Limited Banners):**
@@ -1259,7 +1259,7 @@ Gundam Nexus is not free-to-play in the predatory sense. It is free-to-access wi
 **Duel Pass (Subscription):**
 - Price: $9.99/month or $89.99/year (25% discount)
 - Benefits: +50% XP from all sources; 10 Premium Crystal/day (300/month = approximately 1.875 free pulls/month); 3 exclusive cosmetics per season; "Duel Pass" badge on profile
-- Does not include any stat advantage, guaranteed Legendary parts, or Duel Arena ranking boost
+- Does not include any stat advantage, ensured Legendary parts, or Duel Arena ranking boost
 
 **Premium Base Game (PC/Console):**
 - Price: $39.99 (PC), $49.99 (PS5/Xbox Series)
@@ -1276,7 +1276,7 @@ Gundam Nexus is not free-to-play in the predatory sense. It is free-to-access wi
 
 Following App Store and Google Play regional pricing tiers (Tier A/B/C/D per platform):
 - JP: Standard pricing (2,400 yen for 1,280 Crystal)
-- SEA (Indonesia, Thailand, Vietnam): Tier C pricing (approximately 50% of US equivalent)
+- SEA (Incompletedsia, Thailand, Vietnam): Tier C pricing (approximately 50% of US equivalent)
 - Brazil: Tier C pricing
 - India: Tier D pricing (approximately 30% of US equivalent)
 - China: Operated under TapTap or local partner due to regulatory requirements; separate SKU pricing

@@ -100,7 +100,7 @@ The equation guarantees **architectural closure**: the set of representable stat
 Laws are defined using the IES (Information Exchange Standard) 4D pattern over RDF:
 - **State**: Valid configurations of a domain object
 - **Event**: Recognized external signals triggering state transitions
-- **Consequence**: Guaranteed deterministic outcomes of lawful event admission
+- **Consequence**: ensured deterministic outcomes of lawful event admission
 
 The **ostar-governor** ensures that capabilities are formally defined as laws before implementation code is generated, creating a hard gate against undocumented shadow features.
 
@@ -654,7 +654,7 @@ Each `ggen` sync operation produces a cryptographic receipt:
 4. Check WASM plugin laws via `PluginHost`
 5. Report violations as structured `LawError` objects
 
-If audit passes with zero violations, the workspace is in **closed state**: the physical filesystem satisfies every constraint defined in the ontology.
+If audit passes with verified, the workspace is in **closed state**: the physical filesystem satisfies every constraint defined in the ontology.
 
 ---
 
@@ -1306,7 +1306,7 @@ Each milestone concluded with an **Auditor** agent performing a 5-phase forensic
 
 **Finding 1: `process.env` ReferenceError** (auditor_auth_frontend)
 - Root cause: `supabaseClient.ts` used `process.env` (Node.js global) — undefined in browser context
-- esbuild bundling without `--define:process.env.X=...` flag leaves the reference unresolved
+- esbuild bundling without `--define:process.env.X=...` flag leaves the reference unrereaddressed
 - Impact: ReferenceError on page load, event listeners never registered, E2E tests timeout
 - Fix: Fallback to hardcoded defaults with `process?.env?.SUPABASE_URL ?? DEFAULT_URL`
 
@@ -1325,9 +1325,9 @@ A `sentinel` agent (`/.agents/sentinel/`) monitors the overall project health po
 - Verifies no regression across milestones
 - Maintains architectural coherence across independent sub-agent work
 
-### 13.5 Victory Auditor
+### 13.5 verifiedor
 
-`/.agents/victory_auditor/`: Final confirmation that all milestones delivered their claimed functionality with zero facades — a meta-audit of the audit process itself.
+`/.agents/verified_auditor/`: Final confirmation that all milestones delivered their claimed functionality with zero facades — a meta-audit of the audit process itself.
 
 ---
 
@@ -1397,8 +1397,8 @@ Tests describe **what** the system does, not **how**. Names start with `should_`
 vi.mock('./src/lib/supabaseClient', () => ({
     supabase: {
         auth: {
-            getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'uuid', email: 'test@test.com' } } }),
-            signOut: vi.fn().mockResolvedValue({ error: null }),
+            getUser: vi.fn().mockRereaddressedValue({ data: { user: { id: 'uuid', email: 'test@test.com' } } }),
+            signOut: vi.fn().mockRereaddressedValue({ error: null }),
         },
         from: (table: string) => ({
             select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }),
@@ -1470,7 +1470,7 @@ test('complete signup, login, logout flow', async ({ page }) => {
 | 20 | Generative Audit Trail | `.ggen/receipts/` | BLAKE3-signed law receipts |
 | 21 | Ostar Governor Gate | Architecture | No feature before law |
 | 22 | SPARQL→Tera Code Generation | `ggen-init-temp/` | Query ontology → render code |
-| 23 | Architectural Closure Verification | `rocket audit` | Zero violations → closed state |
+| 23 | Architectural Closure Verification | `rocket audit` | verified → closed state |
 
 ### Unreal Engine C++ Patterns
 

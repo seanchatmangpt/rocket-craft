@@ -196,7 +196,7 @@ OUTPUT: Structured diagnostics with severity (blocking: bool)
 │                                                     │
 │  File content with squiggles:                       │
 │  ┌─────────────────────────────────┐               │
-│  │ let x = tower-lsp;              │               │
+│  │ let x = lsp-max;              │               │
 │  │           ^^^^^^^^^^^ 🔴         │ Error         │
 │  │ // ANTI-LLM-CLAIM-001           │               │
 │  │    ^^^^^^^^^^^^^^^^^ 🟡          │ Warning       │
@@ -265,7 +265,7 @@ OUTPUT: Structured diagnostics with severity (blocking: bool)
 ┌──────────────────────────┐ ┌──────────────────────────┐
 │ Human Output             │ │ JSON Output              │
 │                          │ │                          │
-│ Audit complete:          │ │ {                        │
+│ audited:          │ │ {                        │
 │ 12 warning(s)            │ │   "success": false,      │
 │ 3 blocking error(s)      │ │   "data": {              │
 │                          │ │     "diagnostic_count": 15,

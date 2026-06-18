@@ -25,7 +25,7 @@ class UIB4BloodlineComponent;
  *  - Equipment, Combat, and Bloodline actor components
  *  - WASD movement, attack/dodge/parry/magic input binding
  *  - Touch/swipe delegation (raw detection lives in AIB4PlayerController;
- *    this class receives resolved EAttackDirection events)
+ *    this class receives rereaddressed EAttackDirection events)
  *  - OnLevelUp BlueprintNativeEvent for bloodline progression feedback
  */
 UCLASS(BlueprintType, Blueprintable)
@@ -73,7 +73,7 @@ public:
     // Combat input handlers
     // ---------------------------------------------------------------------------
 
-    /** Dispatched by the player controller after swipe direction is resolved. */
+    /** Dispatched by the player controller after swipe direction is rereaddressed. */
     UFUNCTION(BlueprintCallable, Category = "Combat")
     void OnAttackInput(EAttackDirection Direction);
 

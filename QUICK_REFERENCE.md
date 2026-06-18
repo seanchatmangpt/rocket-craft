@@ -101,7 +101,7 @@ pub struct Observation {
     pub file_path: String,
     pub line: usize,
     pub kind: String,           // "raw_text", "test_smell", etc.
-    pub construct: String,      // "tower-lsp", "assert_contains", etc.
+    pub construct: String,      // "lsp-max", "assert_contains", etc.
     pub message: String,
 }
 ```
@@ -171,7 +171,7 @@ cargo test --workspace
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `unresolved import anti_llm_cheat_lsp` | Dependency not in Cargo.toml | Add to `[dependencies]` |
+| `unrereaddressed import anti_llm_cheat_lsp` | Dependency not in Cargo.toml | Add to `[dependencies]` |
 | `Observation not public` | API stability issue | Ensure it's `pub struct` in anti-llm-cheat-lsp |
 | `DiagnosticSet not found` | LSP types not imported | Import from `unify_lsp::diagnostic` |
 | `AntiLlmConfig not found` | Config type not imported | `use anti_llm_cheat_lsp::config::*` |

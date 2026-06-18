@@ -421,7 +421,7 @@ export class InfinityBladeHud {
       }
 
       /* ---- TITAN DEFEATED OVERLAY ---- */
-      .ib4-victory-overlay {
+      .ib4-verified-overlay {
         position: absolute;
         inset: 0;
         background: radial-gradient(circle at center, rgba(201, 162, 39, 0.18) 0%, rgba(0,0,0,0.85) 70%);
@@ -433,25 +433,25 @@ export class InfinityBladeHud {
         pointer-events: auto;
         z-index: 100;
       }
-      .ib4-victory-overlay.active { display: flex; }
-      .ib4-victory-title {
+      .ib4-verified-overlay.active { display: flex; }
+      .ib4-verified-title {
         font-size: 2.8em;
         color: var(--ib-gold);
         text-shadow: 0 0 30px rgba(201, 162, 39, 0.8), 2px 2px 0 rgba(0,0,0,0.7);
         letter-spacing: 5px;
         text-transform: uppercase;
-        animation: ib4-victory-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        animation: ib4-verified-appear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
       }
-      @keyframes ib4-victory-appear {
+      @keyframes ib4-verified-appear {
         from { transform: scale(0.3); opacity: 0; }
         to   { transform: scale(1); opacity: 1; }
       }
-      .ib4-victory-titan {
+      .ib4-verified-titan {
         font-size: 1.3em;
         color: var(--ib-text);
         letter-spacing: 2px;
       }
-      .ib4-victory-loot {
+      .ib4-verified-loot {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -460,14 +460,14 @@ export class InfinityBladeHud {
         font-size: 0.9em;
         letter-spacing: 1px;
       }
-      .ib4-victory-loot-item {
+      .ib4-verified-loot-item {
         color: var(--ib-gold-bright);
         padding: 4px 16px;
         border: 1px solid var(--ib-border);
         border-radius: 4px;
         background: rgba(0,0,0,0.5);
       }
-      .ib4-victory-continue-btn {
+      .ib4-verified-continue-btn {
         margin-top: 20px;
         padding: 12px 40px;
         background: var(--ib-panel);
@@ -481,7 +481,7 @@ export class InfinityBladeHud {
         border-radius: 4px;
         transition: background 0.2s, box-shadow 0.2s;
       }
-      .ib4-victory-continue-btn:hover {
+      .ib4-verified-continue-btn:hover {
         background: rgba(201, 162, 39, 0.15);
         box-shadow: 0 0 20px rgba(201, 162, 39, 0.5);
       }
@@ -589,11 +589,11 @@ export class InfinityBladeHud {
     this.attackFlash = attackFlash;
     root.appendChild(attackFlash);
 
-    // Victory overlay (hidden by default)
-    const victoryOverlay = document.createElement('div');
-    victoryOverlay.className = 'ib4-victory-overlay';
-    victoryOverlay.id = 'ib4-victory-overlay';
-    root.appendChild(victoryOverlay);
+    // verified overlay (hidden by default)
+    const verifiedOverlay = document.createElement('div');
+    verifiedOverlay.className = 'ib4-verified-overlay';
+    verifiedOverlay.id = 'ib4-verified-overlay';
+    root.appendChild(verifiedOverlay);
 
     // Death overlay (hidden by default)
     const deathOverlay = document.createElement('div');
@@ -926,7 +926,7 @@ export class InfinityBladeHud {
       this.bloodlineBadge.style.animation = 'none';
       void this.bloodlineBadge.offsetWidth;
       this.bloodlineBadge.style.animation =
-        'ib4-victory-appear 0.6s cubic-bezier(0.34,1.56,0.64,1) both';
+        'ib4-verified-appear 0.6s cubic-bezier(0.34,1.56,0.64,1) both';
     }
   }
 
@@ -974,38 +974,38 @@ export class InfinityBladeHud {
   }
 
   onTitanDefeated(titanName: string, loot: string[]): void {
-    const overlay = this.hudRoot?.querySelector('#ib4-victory-overlay') as HTMLElement | null;
+    const overlay = this.hudRoot?.querySelector('#ib4-verified-overlay') as HTMLElement | null;
     if (!overlay) return;
 
     overlay.innerHTML = '';
     overlay.classList.add('active');
 
     const title = document.createElement('div');
-    title.className = 'ib4-victory-title';
+    title.className = 'ib4-verified-title';
     title.textContent = 'TITAN SLAIN';
 
     const titanLabel = document.createElement('div');
-    titanLabel.className = 'ib4-victory-titan';
+    titanLabel.className = 'ib4-verified-titan';
     titanLabel.textContent = titanName;
 
     const lootWrap = document.createElement('div');
-    lootWrap.className = 'ib4-victory-loot';
+    lootWrap.className = 'ib4-verified-loot';
     const lootTitle = document.createElement('div');
     lootTitle.textContent = 'Loot Acquired:';
     lootWrap.appendChild(lootTitle);
     loot.forEach((item) => {
       const li = document.createElement('div');
-      li.className = 'ib4-victory-loot-item';
+      li.className = 'ib4-verified-loot-item';
       li.textContent = item;
       lootWrap.appendChild(li);
     });
 
     const continueBtn = document.createElement('button');
-    continueBtn.className = 'ib4-victory-continue-btn';
+    continueBtn.className = 'ib4-verified-continue-btn';
     continueBtn.textContent = 'CONTINUE';
     continueBtn.addEventListener('click', () => {
       overlay.classList.remove('active');
-      window.dispatchEvent(new CustomEvent('ib4:continue-after-victory'));
+      window.dispatchEvent(new CustomEvent('ib4:continue-after-verified'));
     });
 
     overlay.appendChild(title);

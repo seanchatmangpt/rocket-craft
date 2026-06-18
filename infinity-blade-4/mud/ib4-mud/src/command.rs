@@ -1,6 +1,6 @@
 use ib4_core::types::{AttackDir, MagicType};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
     // Combat
     Attack(AttackDir),

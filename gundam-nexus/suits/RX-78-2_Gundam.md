@@ -27,7 +27,7 @@ The original. The suit that launched everything. The RX-78-2 was developed in se
 
 ## Signature Move: Last Shooting (Beam Rifle Point-Blank)
 - Gesture: Hold 1.5s → Swipe Down → Swipe Up → Release
-- Effect: Run directly at enemy; fire beam rifle at zero range; 2.8× ATK damage; guaranteed stagger (enemy cannot act next turn); if enemy HP below 30%, additional beam saber follow-up (1.5× ATK bonus)
+- Effect: Run directly at enemy; fire beam rifle at zero range; 2.8× ATK damage; ensured stagger (enemy cannot act next turn); if enemy HP below 30%, additional beam saber follow-up (1.5× ATK bonus)
 - Cooldown: 140 seconds
 - Visual: Classic RX-78-2 charge scene; visor flares yellow; beam rifle glows
 

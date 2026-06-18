@@ -4,7 +4,7 @@ use rand::{SeedableRng, RngExt};
 use rand::rngs::SmallRng;
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Core types (self-contained — no cross-crate deps so compilation is guaranteed)
+// Core types (self-contained — no cross-crate deps so compilation is ensured)
 // ──────────────────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

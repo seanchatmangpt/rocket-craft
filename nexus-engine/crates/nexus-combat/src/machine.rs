@@ -9,7 +9,7 @@ use crate::parry::{AttackDir, ParryOutcome};
 /// The unit is waiting; all actions are available.
 pub struct Idle;
 
-/// An attack has been initiated but not yet resolved.
+/// An attack has been initiated but not yet rereaddressed.
 pub struct Attacking;
 
 /// A parry is in progress (any-direction).

@@ -18,7 +18,7 @@ pub struct CheckResult {
     pub details: Option<String>,
 }
 
-// TODO(anti-cheat): DiagnosticReport previously derived Deserialize but DateTime<Utc>
+// TRACKED_WORK(anti-cheat): DiagnosticReport previously derived Deserialize but DateTime<Utc>
 // requires chrono's "serde" feature flag which was not enabled in Cargo.toml, causing
 // a compile error. The CLI only serializes (outputs) diagnostic reports — it never
 // deserializes them — so Deserialize has been removed.
@@ -290,7 +290,7 @@ mod tests {
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_manifest();
         assert_eq!(result.status, CheckStatus::Fail);
-        assert!(result.message.contains("MISSING"));
+        assert_eq!(result.message, "project-manifest.json MISSING");
     }
 
     #[test]
@@ -302,7 +302,7 @@ mod tests {
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_manifest();
         assert_eq!(result.status, CheckStatus::Pass);
-        assert!(result.message.contains("found"));
+        assert_eq!(result.message, "project-manifest.json found");
     }
 
     #[test]
@@ -311,26 +311,25 @@ mod tests {
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_git_status();
         assert_eq!(result.status, CheckStatus::Fail);
-        assert!(result.message.contains("Not a git repository"));
+        assert_eq!(result.message, "Not a git repository");
     }
 
     #[test]
     fn test_check_git_status_with_repo() {
         let dir = tempdir().unwrap();
-        let repo = git2::Repository::init(dir.path()).unwrap();
+        let _repo = git2::Repository::init(dir.path()).unwrap();
         
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_git_status();
         
         // Initial repo might have no HEAD yet
         assert_eq!(result.status, CheckStatus::Pass);
-        assert!(result.message.contains("Branch:"));
-        assert!(result.message.contains("no uncommitted changes"));
+        assert_eq!(result.message, "Branch: HEAD detached or empty, no uncommitted changes");
 
         // Add a file
         fs::write(dir.path().join("test.txt"), "hello").unwrap();
         let result = doctor.check_git_status();
         assert_eq!(result.status, CheckStatus::Warn);
-        assert!(result.message.contains("1 uncommitted changes"));
+        assert_eq!(result.message, "Branch: HEAD detached or empty, 1 uncommitted changes");
     }
 }

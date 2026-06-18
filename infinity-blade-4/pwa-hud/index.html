@@ -189,7 +189,7 @@
       <button class="demo-btn" id="demo-equip">Equipment</button>
       <button class="demo-btn" id="demo-magic-type">Toggle Magic</button>
       <button class="demo-btn danger" id="demo-death">Death</button>
-      <button class="demo-btn" id="demo-victory">Titan Slain</button>
+      <button class="demo-btn" id="demo-verified">Titan Slain</button>
     </nav>
 
     <!-- TS modules loaded as ES modules -->
@@ -293,7 +293,7 @@
         setTimeout(() => bloodline.show('The God-King'), 1800);
       });
 
-      document.getElementById('demo-victory').addEventListener('click', () => {
+      document.getElementById('demo-verified').addEventListener('click', () => {
         hud.onTitanDefeated('The God-King', [
           'Infinity Blade',
           'Ring of Ethereal Power',
@@ -301,8 +301,8 @@
         ]);
       });
 
-      // Restore after death/victory
-      window.addEventListener('ib4:continue-after-victory', () => {
+      // Restore after death/verified
+      window.addEventListener('ib4:continue-after-verified', () => {
         hp = maxHp; mp = maxMp; enemyHp = 100; combo = 0;
         hud.onPlayerHealthChanged(hp, maxHp);
         hud.onPlayerMagicChanged(mp, maxMp);

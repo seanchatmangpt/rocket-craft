@@ -46,6 +46,6 @@ fn main() {
             println!("{}", json);
             println!("=== End JSON ===");
         }
-        Err(e) => eprintln!("JSON serialization error: {}", e),
+        Err(e) => println!("JSON serialization error: {}", e),
     }
 }

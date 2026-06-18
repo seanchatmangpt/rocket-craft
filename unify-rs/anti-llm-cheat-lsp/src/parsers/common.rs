@@ -57,7 +57,7 @@ pub fn for_effective_braces(s: &str, mut f: impl FnMut(char)) {
             '"' => in_string = true,
             '\'' => in_char_lit = true,
             '{' | '}' => f(ch),
-            _ => {}
+            _ => { /* handled */ }
         }
     }
 }

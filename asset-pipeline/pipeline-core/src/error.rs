@@ -81,8 +81,6 @@ mod tests {
             limit_mb: 500,
         };
         let msg = err.to_string();
-        assert!(msg.contains("big.obj"), "message: {msg}");
-        assert!(msg.contains("1024.0"), "message: {msg}");
-        assert!(msg.contains("500"), "message: {msg}");
+        assert_eq!(msg, "file too large: '/tmp/big.obj' is 1024.0MB, limit is 500MB");
     }
 }

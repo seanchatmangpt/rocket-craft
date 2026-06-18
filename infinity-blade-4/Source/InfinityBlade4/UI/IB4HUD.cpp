@@ -220,15 +220,15 @@ void AIB4HUD::ShowDeathScreen()
     }
 }
 
-void AIB4HUD::ShowVictoryScreen()
+void AIB4HUD::ShowverifiedScreen()
 {
     if (!HUDWidgetInstance)
     {
-        UE_LOG(LogHUD, Warning, TEXT("AIB4HUD::ShowVictoryScreen — HUDWidgetInstance is null."));
+        UE_LOG(LogHUD, Warning, TEXT("AIB4HUD::ShowverifiedScreen — HUDWidgetInstance is null."));
         return;
     }
 
-    FName FuncName(TEXT("OnVictoryScreen"));
+    FName FuncName(TEXT("OnverifiedScreen"));
     if (HUDWidgetInstance->FindFunction(FuncName))
     {
         HUDWidgetInstance->ProcessEvent(
@@ -236,12 +236,12 @@ void AIB4HUD::ShowVictoryScreen()
     }
     else
     {
-        UE_LOG(LogHUD, Log, TEXT("AIB4HUD::ShowVictoryScreen — player victorious."));
+        UE_LOG(LogHUD, Log, TEXT("AIB4HUD::ShowverifiedScreen — player victorious."));
 #if !UE_BUILD_SHIPPING
         if (GEngine)
         {
             GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green,
-                TEXT("VICTORY"));
+                TEXT("verified"));
         }
 #endif
     }

@@ -21,7 +21,7 @@ This pipeline guarantees that the executable code physically enforces the semant
 Capabilities are defined in ontology files (e.g., using the IES 4D pattern via RDF/Turtle) mapping states, events, and consequences. A law strictly defines:
 - **State**: Valid configurations of a domain object or system.
 - **Event**: Recognized external signals that can trigger state transitions.
-- **Consequence**: The guaranteed deterministic outcome of admitting a lawful event.
+- **Consequence**: The ensured deterministic outcome of admitting a lawful event.
 
 ### Governance
 The **ostar-governor** ensures that any proposed capability is formally defined as a law in the ontology before any implementation code is generated. This creates a hard gate for architectural consistency and prevents undocumented "shadow features."

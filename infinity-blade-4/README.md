@@ -14,7 +14,7 @@ The project is intentionally self-contained. Every subsystem is implemented in C
 
 ### Gesture-Based Sword Combat
 - **8-directional swipe detection** translated to three attack lanes: Overhead, Left, Right
-- Touch start/end positions are captured in `AIB4PlayerController` and resolved into `EAttackDirection` values using a configurable minimum swipe distance
+- Touch start/end positions are captured in `AIB4PlayerController` and rereaddressed into `EAttackDirection` values using a configurable minimum swipe distance
 - Keyboard/gamepad fallback bindings for desktop development
 - Combo chain up to 4 hits with increasing damage multipliers: 1× → 1.5× → 2× → 3×
 
@@ -28,7 +28,7 @@ The project is intentionally self-contained. Every subsystem is implemented in C
 - 5 equipment slots: Weapon, Shield, Helmet, Armor, Ring
 - 22+ weapon configurations plus 15+ armor sets
 - Gem socketing system managed by `UIB4EquipmentComponent`
-- Stat contributions resolved at equip time, no per-tick overhead
+- Stat contributions rereaddressed at equip time, no per-tick overhead
 
 ### Arena & Enemy AI
 - 5 unique arena maps with environmental hazards (spike traps, fire geysers, falling pillars)
@@ -111,7 +111,7 @@ Touch Event (iOS/Android)
 ### Key Types (`IB4Types.h`)
 
 ```cpp
-// Attack direction resolved from swipe gesture
+// Attack direction rereaddressed from swipe gesture
 UENUM(BlueprintType)
 enum class EAttackDirection : uint8 { Overhead, Left, Right };
 

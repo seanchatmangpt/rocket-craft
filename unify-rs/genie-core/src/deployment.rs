@@ -89,8 +89,8 @@ impl DeploymentManager {
 
         writeln!(file, "Pipeline Status: SUCCESS").map_err(|e| GenieError::Deployment(e.to_string()))?;
         
-        println!("World Factory completed. A Playable packaged browser world is now available in pwa-staff/manufactured.");
-        println!("Launch a local server in pwa-staff/manufactured to enter the world.");
+        tracing::info!("World Factory completed. A Playable packaged browser world is now available in pwa-staff/manufactured.");
+        tracing::info!("Launch a local server in pwa-staff/manufactured to enter the world.");
 
         Ok(())
     }

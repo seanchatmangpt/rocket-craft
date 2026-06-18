@@ -39,7 +39,7 @@ pub struct StdoutSink;
 
 impl LogSink for StdoutSink {
     fn log(&self, level: LogLevel, message: &str) {
-        println!("[{}] {}", level, message);
+        tracing::info!("[{}] {}", level, message);
     }
 }
 

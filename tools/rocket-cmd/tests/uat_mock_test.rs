@@ -13,9 +13,9 @@ fn test_uat_execution_mock() -> Result<()> {
     // Define the expected call to UAT
     mock_executor.expect_exec()
         .withf(|command, args| {
-            command.contains("AutomationTool") && 
-            args.contains(&"-cook".to_string()) &&
-            args.contains(&"-build".to_string())
+            command.ends_with("AutomationTool") && 
+            args.iter().any(|a| a == "-cook") &&
+            args.iter().any(|a| a == "-build")
         })
         .times(1)
         .returning(|_, _| Ok("Build Successful".to_string()));

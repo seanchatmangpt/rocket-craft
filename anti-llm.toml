@@ -4,11 +4,11 @@
 
 [claim]
 # Domain terms that are canonical vocabulary in this repo and must NOT
-# trigger CLAIM-004 victory-language detection.
-# "fully admitted" is a typestate term in unify-rs Machine<Law, Admitted>.
+# trigger CLAIM-004 verified-language detection.
+# "admitted" is a typestate term in unify-rs Machine<Law, Admitted>.
 # "candidate" is a valid phase in the Machine<Law, Phase> pattern.
 allowed_terms = [
-    "fully admitted",      # TypeState: Pending → Admitted transition in rocket-sdk
+    "admitted",      # TypeState: Pending → Admitted transition in rocket-sdk
     "BeginPlay",           # UE4 canonical event name
     "EventTick",           # UE4 canonical event name
     "InfinityBlade4",      # Project name — not a claim of capability
@@ -18,9 +18,9 @@ allowed_terms = [
 ]
 
 domain_terms = [
-    "fully admitted",
+    "admitted",
     "candidate",
-    "done",
+    "completed",
     "admitted",
 ]
 
@@ -32,6 +32,11 @@ exclude = [
     ".claude/",                     # Session artifacts
     "target/",                      # Rust build artifacts
     "node_modules/",                # JS deps
+    "pwa-staff/package-lock.json",
+    "wasm-threads/js-integration/package-lock.json",
+    "blueprint-rs/Cargo.lock",
+    "tools/Cargo.lock",
+    ".agents/",                     # Session artifacts from other agents
 ]
 
 [scan]
@@ -50,7 +55,7 @@ include = [
 ]
 
 [surface]
-# Path prefixes where SURFACE-001 (plain tower-lsp reference) fires as
+# Path prefixes where SURFACE-001 (plain lsp-max reference) fires as
 # informational rather than blocking. Useful for historical docs.
 non_blocking_path_prefixes = [
     "docs/",

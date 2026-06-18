@@ -312,13 +312,13 @@ impl EngineResult<Evaluated> {
 /// CANNOT: enrich, evaluate, dedupe again, transition further
 impl EngineResult<Deduped> {
     /// Emit final, deduplicated diagnostics.
-    /// Guaranteed (file_path, line, code) uniqueness.
+    /// ensured (file_path, line, code) uniqueness.
     pub fn emit(&self) -> Vec<AntiLlmDiagnostic> {
         self.diagnostics.clone()
     }
 
     /// Emit only blocking diagnostics (errors).
-    /// Guaranteed unique by (file_path, line, code).
+    /// ensured unique by (file_path, line, code).
     pub fn emit_blocking(&self) -> Vec<AntiLlmDiagnostic> {
         self.diagnostics
             .iter()
@@ -328,7 +328,7 @@ impl EngineResult<Deduped> {
     }
 
     /// Emit only warning diagnostics.
-    /// Guaranteed unique by (file_path, line, code).
+    /// ensured unique by (file_path, line, code).
     pub fn emit_warnings(&self) -> Vec<AntiLlmDiagnostic> {
         self.diagnostics
             .iter()
@@ -447,7 +447,7 @@ pub mod after {
         fail_on_blocking: bool,
     ) -> Result<serde_json::Value, Box<dyn std::error::Error>> {
         // Type-safe pipeline: each step transforms the state
-        // Result is EngineResult<Deduped> — guaranteed unique
+        // Result is EngineResult<Deduped> — ensured unique
         let result = EngineResult::from_directory_scan(dir_path)
             .enrich()
             .evaluate(&crate::config::AntiLlmConfig::default())
@@ -792,12 +792,12 @@ pub mod pipeline_example {
             .evaluate(config)
             .dedupe();
 
-        // Result is EngineResult<Deduped> — guaranteed unique
+        // Result is EngineResult<Deduped> — ensured unique
         let diagnostics = result.emit();
         let (blocking, warnings) = result.diagnostic_counts();
 
-        println!(
-            "Audit complete: {} blocking, {} warnings",
+        tracing::info!(
+            "audited: {} blocking, {} warnings",
             blocking, warnings
         );
 
@@ -817,7 +817,7 @@ pub mod pipeline_example {
         // emit() is valid here (EngineResult<Evaluated>)
         let diagnostics_pre_dedup = result.emit();
 
-        println!("Pre-dedup count: {}", diagnostics_pre_dedup.len());
+        tracing::info!("Pre-dedup count: {}", diagnostics_pre_dedup.len());
 
         Ok(diagnostics_pre_dedup)
     }
@@ -835,7 +835,7 @@ pub mod pipeline_example {
         // Only emit blocking diagnostics
         let blocking = result.emit_blocking();
 
-        println!("Blocking diagnostics: {}", blocking.len());
+        tracing::info!("Blocking diagnostics: {}", blocking.len());
 
         Ok(blocking)
     }

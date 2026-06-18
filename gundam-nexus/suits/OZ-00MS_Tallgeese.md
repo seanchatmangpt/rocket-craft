@@ -23,7 +23,7 @@ The great-grandfather of every OZ mobile suit and the spiritual ancestor of the 
   - G-Force mechanic is unique to Tallgeese; no other suit has it
 - Prototype Data: Passive — against any OZ-derived mobile suit (enemy faction OZ units in story mode), Tallgeese deals +20% damage (counter-analysis of own descendants)
 - Dober Gun: Semi-charged ranged weapon; Swipe Down + Hold 1.0s → fires at full caliber
-  - Full caliber: 2.5× ATK; ignores 30% DEF; knockback guaranteed
+  - Full caliber: 2.5× ATK; ignores 30% DEF; knockback ensured
   - Quick draw (no charge): 1.5× ATK; instant; no knockback
 - Vernier Dash: SPD burst ability — triple SPD for 1 turn (cooldown: 10 turns); creates shockwave on arrival (0.5× ATK AoE, small radius)
 

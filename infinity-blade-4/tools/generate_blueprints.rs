@@ -33,7 +33,7 @@ use blueprint_core::types::PinType;
 // Helper: emit a titled separator to stdout between blueprints
 // ---------------------------------------------------------------------------
 fn section(title: &str) {
-    println!("\n; ===== {} =====\n", title);
+    tracing::info!("\n; ===== {} =====\n", title);
 }
 
 // ---------------------------------------------------------------------------
@@ -504,17 +504,17 @@ fn build_magic_casting() -> String {
 // ---------------------------------------------------------------------------
 fn main() {
     section("BP_CombatChain");
-    println!("{}", build_combat_chain());
+    tracing::info!("{}", build_combat_chain());
 
     section("BP_EquipmentPickup");
-    println!("{}", build_equipment_pickup());
+    tracing::info!("{}", build_equipment_pickup());
 
     section("BP_BloodlineLevelUp");
-    println!("{}", build_bloodline_level_up());
+    tracing::info!("{}", build_bloodline_level_up());
 
     section("BP_TitanBossFight");
-    println!("{}", build_titan_boss_fight());
+    tracing::info!("{}", build_titan_boss_fight());
 
     section("BP_MagicCasting");
-    println!("{}", build_magic_casting());
+    tracing::info!("{}", build_magic_casting());
 }

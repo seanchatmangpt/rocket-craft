@@ -15,6 +15,7 @@ pub struct AiDecision {
     pub applies_qip_scar: bool,
 }
 
+#[derive(Debug, Clone)]
 pub struct TitanAI {
     /// Counts down from 5 after a weapon throw; throw is available when 0.
     pub weapon_throw_cooldown: u32,

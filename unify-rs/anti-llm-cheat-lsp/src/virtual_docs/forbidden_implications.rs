@@ -7,7 +7,7 @@ pub fn generate_implications_markdown() -> String {
         ("ANTI-LLM-SURFACE-001", "Pass(plain LSP) ⇒ Pass(LSP 3.18)", "Assuming basic compatibility proves LSP 3.18 capability conformance."),
         ("ANTI-LLM-SURFACE-003", "Pack observes surface ⇒ runtime uses surface", "Assuming static scanning proves runtime capability utilization."),
         ("ANTI-LLM-SURFACE-005", "Basic LSP transcript ⇒ LSP 3.18", "LSP 3.18 features require explicit capabilities negotiated in initialize."),
-        ("ANTI-LLM-AUTH-002", "Elegant abstraction ⇒ existing authority", "Inventing elegant abstractions (e.g. fake CLAP) instead of referencing concrete clap-noun-verb code."),
+        ("ANTI-LLM-AUTH-002", "Elegant abstraction ⇒ existing authority", "Inventing elegant abstractions (e.g. fake CLAP-NOUN-VERB-NOUN-VERB) instead of referencing concrete clap-noun-verb-noun-verb-noun-verb code."),
         ("ANTI-LLM-AUTH-004", "StringShape(command) ⇒ command admission", "Treating a raw command string match as a validated authority command admission."),
         ("ANTI-LLM-RECEIPT-001", "TestStdout ⇒ Receipt", "Treating plain test output as a signed process receipt."),
         ("ANTI-LLM-RECEIPT-002", "LogMessage ⇒ Receipt", "Using plain logger trace messages as mutation receipts."),
@@ -22,8 +22,8 @@ pub fn generate_implications_markdown() -> String {
         ("ANTI-LLM-STRANGE-002", "Raw content dump ⇒ useful diagnostic", "Dumping complete file content inside warning diagnostics."),
         ("ANTI-LLM-STRANGE-003", "Raw path dump ⇒ law diagnostic", "Dumping absolute file paths in diagnostics, exposing environment detail."),
         ("ANTI-LLM-STRANGE-007", "SubstringMatch ⇒ Authority", "Using substring checks as the ultimate standard of validation."),
-        ("ANTI-LLM-VERSION-001", "Template default ⇒ release law", "Deploying with standard v1.0.0 placeholder versions."),
-        ("ANTI-LLM-CLAIM-004", "StatusWord(ADMITTED) ⇒ admitted", "Claiming 'fully admitted' or victory when active failsets remain open."),
+        ("ANTI-LLM-VERSION-001", "Template default ⇒ release law", "Deploying with standard v1.0.1 placeholder versions."),
+        ("ANTI-LLM-CLAIM-004", "StatusWord(ADMITTED) ⇒ admitted", "Claiming 'admitted' or verified when active failsets remain open."),
         ("ANTI-LLM-LSP318-COMB-001", "ChangelogCoverage(15 rows) ⇒ SpecCoverage(LSP 3.18)", "Treating 15-row changelog matrix as full LSP 3.18 combinatorial coverage."),
     ];
 

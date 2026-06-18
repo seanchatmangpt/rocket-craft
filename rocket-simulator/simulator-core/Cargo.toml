@@ -13,6 +13,7 @@ anyhow = "1.0"
 thiserror = "1.0"
 colored = "2.1"
 getrandom = { version = "0.2", features = ["js"] }
+tracing = "0.1"
 
 [dev-dependencies]
 tempfile = "3.27.0"

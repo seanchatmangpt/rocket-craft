@@ -29,7 +29,7 @@ The marriage of the 0 Gundam's twin GN Drives in a single frame, Gundam 00 repre
 
 ## Signature Move: Trans-Am Raiser Sword
 - Gesture: Trans-Am active + 0 Raiser docked → Swipe Left → Swipe Right → Hold 1.0s → Release
-- Effect: 00 Raiser forms Raiser Sword (GN particle blade the size of a warship); 4× ATK + 2× SPC damage; guaranteed crit; slices through all active enemy barriers; enemy DEF halved for 4 turns
+- Effect: 00 Raiser forms Raiser Sword (GN particle blade the size of a warship); 4× ATK + 2× SPC damage; ensured crit; slices through all active enemy barriers; enemy DEF halved for 4 turns
 - Cooldown: 200 seconds (Trans-Am must be active; 0 Raiser must be docked)
 - Visual: Twin GN Drives glow simultaneously; massive particle blade extends from emitter; vertical slash
 

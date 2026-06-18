@@ -179,8 +179,8 @@ And ensure `unify-rs/Cargo.toml` workspace declares `anti-llm-cheat-lsp` as a me
       "file_path": "src/lib.rs",
       "line": 15,
       "kind": "raw_text",
-      "construct": "tower-lsp",
-      "message": "Raw text pattern 'tower-lsp' detected"
+      "construct": "lsp-max",
+      "message": "Raw text pattern 'lsp-max' detected"
     }
   ]
 }
@@ -459,7 +459,7 @@ pub fn cmd_audit(
         }),
         success,
         message: if success {
-            Some(format!("Audit complete: {} warning(s), {} blocking error(s)", warning_count, blocking_count))
+            Some(format!("audited: {} warning(s), {} blocking error(s)", warning_count, blocking_count))
         } else {
             Some(format!("Audit FAILED: {} blocking error(s) detected", blocking_count))
         },
@@ -499,7 +499,7 @@ unify audit --json
 ### CLI Output Example
 
 ```
-Audit complete: 12 warning(s), 3 blocking error(s)
+audited: 12 warning(s), 3 blocking error(s)
 
 Directory: .
 Diagnostic Count: 15
@@ -509,7 +509,7 @@ Warnings: 12
 Blocking Diagnostics:
   ANTI-LLM-CLAIM-001 (src/engine.rs:150)
     Tower-LLP raw text detected
-    Required Correction: Remove hardcoded tower-lsp string literal
+    Required Correction: Remove hardcoded lsp-max string literal
     Required Next Proof: Verify no LSP-specific imports remain
 
 ...
@@ -597,15 +597,15 @@ mod tests {
     #[test]
     fn anti_llm_admission_gate_rejects_blocked_pattern() {
         let dir = TempDir::new().unwrap();
-        // Write a file with a known blocking pattern (e.g., tower-lsp if it's blocking)
+        // Write a file with a known blocking pattern (e.g., lsp-max if it's blocking)
         fs::write(
             dir.path().join("lib.rs"),
-            "// TODO: tower-lsp integration",
+            "// TODO: lsp-max integration",
         ).unwrap();
         
         let gate = AntiLlmAdmissionGate::new(Default::default());
         let result = gate.admit(&dir.path().to_path_buf());
-        // This will depend on whether tower-lsp is marked as blocking
+        // This will depend on whether lsp-max is marked as blocking
         // Adjust test based on actual rule configuration
     }
 }
@@ -811,11 +811,11 @@ These types are already public; no changes needed to anti-llm-cheat-lsp's API.
 #[test]
 fn audit_scan_detects_raw_text_patterns() {
     let dir = TempDir::new().unwrap();
-    fs::write(dir.path().join("test.rs"), "let x = tower-lsp;").unwrap();
+    fs::write(dir.path().join("test.rs"), "let x = lsp-max;").unwrap();
     
     let obs = anti_llm_cheat_lsp::engine::scan_directory(dir.path().to_str().unwrap());
     assert!(obs.len() > 0);
-    assert!(obs.iter().any(|o| o.construct.contains("tower-lsp")));
+    assert!(obs.iter().any(|o| o.construct.contains("lsp-max")));
 }
 
 #[test]

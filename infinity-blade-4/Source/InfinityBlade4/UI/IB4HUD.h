@@ -15,7 +15,7 @@ class UUserWidget;
  *  - Instantiate and manage the UMG widget hierarchy on BeginPlay.
  *  - Draw debug diagnostics in development / debug builds via DrawHUD().
  *  - Expose Blueprint-callable helpers for full-screen transition overlays
- *    (bloodline transition, death screen, victory screen).
+ *    (bloodline transition, death screen, verified screen).
  *  - Bridge to the PWA combat HUD by calling into the UMG widget when
  *    combo information changes.
  *
@@ -86,11 +86,11 @@ public:
     void ShowDeathScreen();
 
     /**
-     * Display the victory screen after defeating the current arena's Titan.
+     * Display the verified screen after defeating the current arena's Titan.
      * Fades in the score summary and presents the loot reward panel.
      */
     UFUNCTION(BlueprintCallable, Category = "HUD|Transition")
-    void ShowVictoryScreen();
+    void ShowverifiedScreen();
 
     // -----------------------------------------------------------------------
     // Combo display

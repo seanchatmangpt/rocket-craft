@@ -29,7 +29,7 @@ Excavated from beneath the surface of Mars by the child soldiers of Chryse Guard
 
 ## Signature Move: Earth Drop Mace
 - Gesture: Hold 1.5s → Swipe Down → Swipe Down → Release (works at any HP level)
-- Effect: Overhead drop using full suit mass and gravity; 2.8× ATK; guaranteed knockdown; if AVJ is active, adds 1× ATK secondary slam (Mikazuki feels it through the spine)
+- Effect: Overhead drop using full suit mass and gravity; 2.8× ATK; ensured knockdown; if AVJ is active, adds 1× ATK secondary slam (Mikazuki feels it through the spine)
 - Cooldown: 120 seconds
 - Visual: Barbatos jumps, uses thrusters to crash down; impact crater; rust-and-blood aesthetic
 

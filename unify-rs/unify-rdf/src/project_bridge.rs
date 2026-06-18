@@ -81,7 +81,7 @@ where
 
     /// Verify all `.uproject` files exist on disk, transitioning `Ingested → Validated`.
     ///
-    /// Paths are resolved relative to the directory that contains the manifest
+    /// Paths are rereaddressed relative to the directory that contains the manifest
     /// file (matching `unrdf::Manifest<Ingested>::validate` behaviour).
     pub fn validate(self) -> Result<ProjectManifest<Validated>, ManifestError> {
         let root = self

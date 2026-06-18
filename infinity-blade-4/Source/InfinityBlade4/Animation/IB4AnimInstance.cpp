@@ -120,7 +120,7 @@ void UIB4AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
         if (IB4PC)
         {
             // TouchStartPosition is the cached screen-space start; the controller
-            // stores the last resolved swipe delta. We read the raw touch positions
+            // stores the last rereaddressed swipe delta. We read the raw touch positions
             // and compute a normalised 2D direction for the blend space.
             // The controller exposes DetectSwipeDirection(); we replicate the delta here.
             // In shipping, this would be driven by a delegate rather than polling.

@@ -38,7 +38,7 @@ fi
 # Screening Question 3: Problem Articulation
 echo ""
 echo "❓ Question 3/5: Can you explain your problem in ONE sentence?"
-echo "   (No 100-page documents. Just the core job-to-be-done.)"
+echo "   (No 100-page documents. Just the core job-to-be-completed.)"
 echo "   Say it out loud, then answer (yes/no):"
 read -r q3
 if [[ "$q3" != "yes" ]]; then

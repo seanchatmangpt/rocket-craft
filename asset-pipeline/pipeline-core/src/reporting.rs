@@ -139,12 +139,12 @@ impl Reporter {
         let duration = run.finished_at
             .map(|end| (end - run.started_at).num_milliseconds())
             .unwrap_or(0);
-        println!("\n\u{2500}\u{2500}\u{2500} Pipeline Run Summary \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}");
-        println!("  \u{2713} Staged:  {}", run.total_success);
-        println!("  \u{2717} Failed:  {}", run.total_failed);
-        println!("  \u{2298} Skipped: {}", run.total_skipped);
-        println!("  Duration:  {}ms", duration);
-        println!("\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\n");
+        tracing::info!("\n\u{2500}\u{2500}\u{2500} Pipeline Run Summary \u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}");
+        tracing::info!("  \u{2713} Staged:  {}", run.total_success);
+        tracing::info!("  \u{2717} Failed:  {}", run.total_failed);
+        tracing::info!("  \u{2298} Skipped: {}", run.total_skipped);
+        tracing::info!("  Duration:  {}ms", duration);
+        tracing::info!("\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\u{2500}\n");
     }
 }
 
@@ -191,7 +191,8 @@ mod tests {
 
         assert!(reporter.manifest_path.exists());
         let content = std::fs::read_to_string(&reporter.manifest_path).unwrap();
-        assert!(content.contains("\"version\""));
+        let parsed: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(parsed["version"], "1.0");
     }
 
     #[test]

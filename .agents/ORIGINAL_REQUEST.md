@@ -465,6 +465,44 @@ Remove any unverified overclaiming status tags (like `zero violations`, `solved`
 - [ ] The `anti-llm-cheat-lsp` compliance scanner returns 0 errors/violations across the entire codebase.
 - [ ] The E2E Playwright test suite passes successfully.
 
+## Follow-up — 2026-06-18T00:30:26Z
+
+# Teamwork Project Prompt
+
+Build a combinatorial testing engine using `chicago-tdd-tools` in Rust that discovers all game servers and Infinity Blade code in the project. The engine must systematically simulate all possible game logic states and permutations for all the actual games in this project, functioning like an "aimbot" that automatically explores the entire game state space to ensure nothing is left untested.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Combinatorial Test Engine Construction
+Use Rust and `chicago-tdd-tools` to build an engine capable of discovering and hooking into all game servers and Infinity Blade simulation code within the `rocket-craft` codebase. 
+
+### R2. Systematic State Exploration
+The engine must simulate and traverse all possible game states, moves, and logic branches for the specific games found in this project (achieving combinatorial maximalism).
+
+## Acceptance Criteria
+
+### Combinatorial Verification
+- [ ] A Rust binary exists that, when run, automatically loads the game logic and systematically executes a combinatorial simulation across all discovered games.
+- [ ] The engine produces a verifiable log, matrix, or report demonstrating that the entire permutation space of game rules, entities, and moves was explored without encountering unhandled panics or invalid states.
+- [ ] The test coverage and state traversal run completely autonomously from start to finish.
+
+## Follow-up — 2026-06-18T00:31:39Z
+
+Additional context regarding the Combinatorial Maximalism engine:
+
+"it is like the chess coor system" (referring to the chess coordinate system).
+
+## Follow-up — 2026-06-18T00:39:32Z
+
+Critical directive from user:
+
+"make sure to distrust all first responses"
+
+Adopt a stance of absolute skepticism. Do not accept the first successful test run or the first implementation at face value. Actively verify, cross-check, and assume initial results may be flawed or a false positive until rigorously proven otherwise.
+
 
 
 

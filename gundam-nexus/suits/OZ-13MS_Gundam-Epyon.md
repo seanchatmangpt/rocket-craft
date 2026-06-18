@@ -22,14 +22,14 @@ Built by Treize Khushrenada as his personal instrument of war and given to Heero
 - ZERO Berserker Mode: Unlike Wing Zero's ZERO which the pilot can resist, Epyon's ZERO has lower sanity threshold
   - Triggers at 3 perfect parries (vs. Wing Zero's 5) — faster, less controllable
   - Berserker Active (4 turns): AI takes FULL control — player input disabled; suit executes optimal melee combo automatically; cannot be stopped
-  - Guaranteed kill on non-boss enemies during Berserker; guaranteed 150 damage vs. bosses (cannot be reduced by DEF or RES)
+  - ensured kill on non-boss enemies during Berserker; ensured 150 damage vs. bosses (cannot be reduced by DEF or RES)
   - After Berserker: Returns to player control; RES -30 for 5 turns (ZERO hangover)
 - Mobile Armor Form: Double-tap dodge → mobile armor dragon form for 2 turns (SPD +40, immune to ground attacks; DEF +20; cannot attack normally — only ramming)
 - Heat Rod Mastery: Burn stacks accumulate; at 3 stacks, Burn becomes "Inferno" (8 damage per turn; 4 turns; enemy -10 DEF while burning)
 
 ## Signature Move: Epyon Heat Whip Full Extension
 - Gesture: Swipe Right (full screen width) → Hold 1.0s → Release (melee range only)
-- Effect: Heat rod extends to maximum range; wraps around enemy; 3.0× ATK + Inferno burn guaranteed; enemy immobilized for 2 turns (cannot dodge or parry); if ZERO Berserker is active, deals 4.5× ATK instead
+- Effect: Heat rod extends to maximum range; wraps around enemy; 3.0× ATK + Inferno burn ensured; enemy immobilized for 2 turns (cannot dodge or parry); if ZERO Berserker is active, deals 4.5× ATK instead
 - Cooldown: 145 seconds
 - Visual: Red heat rod glows white-hot; wraps enemy in electrical burn; Zechs's visor glows red
 

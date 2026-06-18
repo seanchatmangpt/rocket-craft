@@ -305,7 +305,8 @@ mod tests {
             hash_hex: "abc123".to_string(),
         };
         let json = serde_json::to_string(&event).expect("serialize");
-        assert!(json.contains("\"event\":\"validation_passed\""));
-        assert!(json.contains("abc123"));
+        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed["event"], "validation_passed");
+        assert_eq!(parsed["hash_hex"], "abc123");
     }
 }

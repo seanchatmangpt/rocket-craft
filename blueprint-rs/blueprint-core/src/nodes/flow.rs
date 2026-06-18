@@ -130,7 +130,7 @@ pub fn while_loop_node(name: impl Into<String>) -> BpNode {
 /// - `execute`      — exec input
 /// - `Reset`        — exec input (re-arms the node)
 /// - `then`         — exec output
-/// - `bStartClosed` — bool input (if true the node starts in the closed/done state)
+/// - `bStartClosed` — bool input (if true the node starts in the closed/completed state)
 pub fn do_once_node(name: impl Into<String>) -> BpNode {
     BpNode::new(CLASS_DO_ONCE, name)
         .with_pin(exec_in("execute"))

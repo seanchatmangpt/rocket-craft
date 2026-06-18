@@ -20,6 +20,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.0",
     "@rolldown/binding-darwin-arm64": "^1.1.1",
     "@types/node": "^25.9.3",

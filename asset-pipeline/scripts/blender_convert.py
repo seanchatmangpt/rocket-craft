@@ -159,7 +159,7 @@ def main():
 
     size_kb = os.path.getsize(args.output) / 1024
     print(
-        f"[blender_convert] Done. Output: {args.output} ({size_kb:.1f} KB)",
+        f"[blender_convert] completed. Output: {args.output} ({size_kb:.1f} KB)",
         file=sys.stderr
     )
 

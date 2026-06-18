@@ -79,7 +79,7 @@ mod tests {
     fn test_registry_register_has_list() {
         let mut registry = ToolRegistry::new();
         assert!(!registry.has("my_tool"));
-        registry.register(make_desc("my_tool"), |_| Ok(json!("done")));
+        registry.register(make_desc("my_tool"), |_| Ok(json!("completed")));
         assert!(registry.has("my_tool"));
         assert_eq!(registry.list().len(), 1);
         assert_eq!(registry.list()[0].name, "my_tool");

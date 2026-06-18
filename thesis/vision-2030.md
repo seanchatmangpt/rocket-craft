@@ -352,8 +352,8 @@ O(|code|) pattern matching — the same asymptotic complexity as reading the fil
 
 **The Anti-LLM-Cheat LSP** (`lsp-max`):
 A six-layer self-sealing canary:
-1. Text Scanner — Aho-Corasick, 21 raw smell patterns (forbidden: `tower-lsp`, `CLAP`, debug identifiers)
-2. Tree-Sitter AST Parser — unsafe patterns, plain tower-lsp imports, `unwrap()`
+1. Text Scanner — Aho-Corasick, 21 raw smell patterns (forbidden: `lsp-max`, `CLAP-NOUN-VERB-NOUN-VERB`, debug identifiers)
+2. Tree-Sitter AST Parser — unsafe patterns, plain lsp-max imports, `unwrap()`
 3. Cargo Manifest Validator — dependency compliance
 4. Markdown Parser — unverified claims
 5. JSON-RPC Transcript Analyzer — capability initialization validation
@@ -1147,7 +1147,7 @@ Each stage emits OCEL events, BLAKE3 receipts, and named refusals. The decommiss
 | un-test-utils | JavaScript | AST self-healing CLI testing | Agent/Test | Active |
 | citty-test-utils | JavaScript | 1000x DX CLI testing (UnJS) | Agent/Test | Active |
 | unlsp | TypeScript | LSP tooling (private) | Agent | Private |
-| tower-lsp-composition | Rust | LSP composition patterns (private) | Agent | Private |
+| lsp-max-composition | Rust | LSP composition patterns (private) | Agent | Private |
 | process-intelligence | TeX | Research foundry + SPR thesis | Semantic | Active |
 | linkedin-public-canon | — | CONSTRUCT8 IP publication | Public | Private |
 | truex | TypeScript | TypeScript OCEL types from ontology | Type | Private |
@@ -1204,6 +1204,6 @@ This is the Process-Mining Constitution. This is the CodeManufactory. This is th
 
 ---
 
-*Synthesized from 30 repositories updated May–June 2026. Research corpus: lsp-max, ggen, clap-noun-verb, cargo-cicd, mac-artifact-cleaner, homebrew-ggen, wasm4pm, wasm4pm-compat, bcinr, clnrm, chicago-tdd-tools, un-test-utils, citty-test-utils, dteam, zoeapp, pcp, dspygen, chatmangpt, capability-map, process-intelligence, linkedin-public-canon, truex, zoela, speckit-ralph, mcpp, powlv2lsp, unlsp, tower-lsp-composition, stpnt, affidavit, rocket-craft.*
+*Synthesized from 30 repositories updated May–June 2026. Research corpus: lsp-max, ggen, clap-noun-verb, cargo-cicd, mac-artifact-cleaner, homebrew-ggen, wasm4pm, wasm4pm-compat, bcinr, clnrm, chicago-tdd-tools, un-test-utils, citty-test-utils, dteam, zoeapp, pcp, dspygen, chatmangpt, capability-map, process-intelligence, linkedin-public-canon, truex, zoela, speckit-ralph, mcpp, powlv2lsp, unlsp, lsp-max-composition, stpnt, affidavit, rocket-craft.*
 
 *Methodology: 5 parallel research agents × 6 repositories each, WebFetch via raw.githubusercontent.com and api.github.com, combinatorial maximalism applied — no repo, file, pattern, quote, or concept omitted.*

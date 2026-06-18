@@ -20,7 +20,7 @@ This is the first major story boss fight. Jara reveals the existence of the Arch
                    [UNDERCROFT: QIP Reactor]
 ```
 
-**Landing Platform:** Narrow ledge in open storm. Lightning strikes every 12s in random positions (avoidable with dodge timing, not guaranteed). Sets tone.
+**Landing Platform:** Narrow ledge in open storm. Lightning strikes every 12s in random positions (avoidable with dodge timing, not ensured). Sets tone.
 
 **Outer Nave:** Two-lane approach with enemy archers on elevated rails. Teaches upward swipe to deflect projectiles (overhead strike sends magic bolts back).
 

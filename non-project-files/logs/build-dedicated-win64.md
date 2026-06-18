@@ -845,7 +845,7 @@ UATHelper: Packaging (Windows (64-bit)):   LogBlueprintCodeGen: Display: Name, C
 UATHelper: Packaging (Windows (64-bit)):   LogBlueprintCodeGen: Display: Nativization Summary - Shared Variables From Graph: 0
 UATHelper: Packaging (Windows (64-bit)):   LogAssetRegistryGenerator: Display: Saving asset registry.
 UATHelper: Packaging (Windows (64-bit)):   LogAssetRegistryGenerator: Display: Generated asset registry num assets 759, size is 337.12kb
-UATHelper: Packaging (Windows (64-bit)):   LogAssetRegistryGenerator: Display: Done saving asset registry.
+UATHelper: Packaging (Windows (64-bit)):   LogAssetRegistryGenerator: Display: completed saving asset registry.
 UATHelper: Packaging (Windows (64-bit)):   LogCook: Display: Cook by the book total time in tick 8.461094s total time 14.177194
 UATHelper: Packaging (Windows (64-bit)):   LogCook: Display: Peak Used virtual 590MB Peak Used physical 561MB
 UATHelper: Packaging (Windows (64-bit)):   LogCook: Display: Hierarchy Timer Information:
@@ -880,7 +880,7 @@ UATHelper: Packaging (Windows (64-bit)):   LogCook: Display:       BuildChunkMan
 UATHelper: Packaging (Windows (64-bit)):   LogCook: Display:       SaveManifests: 0.005s (1)
 UATHelper: Packaging (Windows (64-bit)):   LogCook: Display:       SaveRealAssetRegistry: 0.048s (1)
 UATHelper: Packaging (Windows (64-bit)):   LogCook: Display:       WriteCookerOpenOrder: 0.004s (1)
-UATHelper: Packaging (Windows (64-bit)):   LogCook: Display: Done!
+UATHelper: Packaging (Windows (64-bit)):   LogCook: Display: completed!
 UATHelper: Packaging (Windows (64-bit)):   LogSavePackage: Display: Took 0.009744s to verify the EDL loading graph.
 UATHelper: Packaging (Windows (64-bit)):   LogCookCommandlet: Display: Misc Cook Stats
 UATHelper: Packaging (Windows (64-bit)):   LogCookCommandlet: Display: ===============

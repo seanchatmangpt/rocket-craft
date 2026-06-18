@@ -27,7 +27,7 @@ The culmination of every CE mobile suit design philosophy, Mighty Strike Freedom
 
 ## Signature Move: Mighty Full Burst
 - Gesture: Enter Mighty Form → Hold 2.5s → Swipe Right → Swipe Right → Release
-- Effect: 12-weapon salvo; 6× ATK per hit; 2 hits guaranteed; targets cannot block during animation (1.5s lockout); total 12× ATK potential
+- Effect: 12-weapon salvo; 6× ATK per hit; 2 hits ensured; targets cannot block during animation (1.5s lockout); total 12× ATK potential
 - Cooldown: 210 seconds (Mighty Form must be active)
 - Visual: Wings unfold to maximum span; golden SEED aura detonates across battlefield
 

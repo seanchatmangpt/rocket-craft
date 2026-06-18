@@ -125,7 +125,7 @@ protected:
     /**
      * Apply incoming combat damage directly to Health.
      * Bypasses TakeDamage (no defense reduction) — used when the damage
-     * amount has already been fully resolved by the combat system.
+     * amount has already been fully rereaddressed by the combat system.
      */
     UFUNCTION(BlueprintCallable, Category = "Character|Combat")
     void ReceiveCombatDamage(float DamageAmount);

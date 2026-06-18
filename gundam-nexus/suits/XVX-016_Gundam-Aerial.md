@@ -25,7 +25,7 @@ Built by Elnora Samelin (Prospera Mercury) as a vessel for her daughter Ericht's
   - Score 2 (25%): Shell units unlock — remote bits extend ATK range by 30%
   - Score 3 (50%): Permet barrier active — blocks one attack per 5 turns (Eri's choice, not player's)
   - Score 4 (75%): Eri co-pilots — SPD +20, auto-dodges one attack per 4 turns
-  - Score 5 (100%): Full GUND sync — all attacks deal +40% damage; Eri takes over combo finishers (AI-controlled, guaranteed perfect execution)
+  - Score 5 (100%): Full GUND sync — all attacks deal +40% damage; Eri takes over combo finishers (AI-controlled, ensured perfect execution)
   - Score 6 (beyond 100%): Emergency threshold — Suletta and Eri merge temporally; 8-turn window, all stats +50, then Permet burnout (ATK/DEF/SPD halved for remainder of match)
 - Shell Unit Formation: At Score 2+, shell bits form different patterns based on player gesture
   - Swipe Right: Line formation (piercing shot, 2× ATK)

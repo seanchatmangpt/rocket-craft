@@ -65,7 +65,7 @@ impl SimulationEngine {
         std::fs::create_dir_all(&artifact_dir)?;
         
         let artifact_path = self.contract.generate_artifact(&artifact_dir)?;
-        println!("Generated UE4 world artifact: {}", artifact_path.display());
+        tracing::info!("Generated UE4 world artifact: {}", artifact_path.display());
         
         Ok(())
     }

@@ -102,7 +102,7 @@ impl LayoutCompiler {
         };
 
         format!(
-            "      Begin Actor Class={class_path} Name={actor_name} Archetype={class_path}'{archetype_path}'\n\
+            "      Begin Actor Class={class_name} Name={actor_name} Archetype={class_name}'{archetype_path}'\n\
             \x20        Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0\n\
             \x20        End Object\n\
             \x20        Begin Object Name=\"StaticMeshComponent0\"\n\
@@ -115,7 +115,7 @@ impl LayoutCompiler {
             \x20        RootComponent=StaticMeshComponent0\n\
             \x20        ActorLabel=\"{label}\"\n\
             \x20     End Actor\n",
-            class_path = class_path,
+            class_name = class_name,
             actor_name = actor_name,
             archetype_path = archetype_path,
             x = abs_x,
@@ -145,7 +145,7 @@ impl LayoutCompiler {
         };
 
         format!(
-            "      Begin Actor Class={class_path} Name={actor_name} Archetype={class_path}'{archetype_path}'\n\
+            "      Begin Actor Class={class_name} Name={actor_name} Archetype={class_name}'{archetype_path}'\n\
             \x20        Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0\n\
             \x20        End Object\n\
             \x20        Begin Object Name=\"StaticMeshComponent0\"\n\
@@ -158,7 +158,7 @@ impl LayoutCompiler {
             \x20        RootComponent=StaticMeshComponent0\n\
             \x20        ActorLabel=\"{label}\"\n\
             \x20     End Actor\n",
-            class_path = class_path,
+            class_name = class_name,
             actor_name = actor_name,
             archetype_path = archetype_path,
             x = abs_x,

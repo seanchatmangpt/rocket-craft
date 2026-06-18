@@ -438,7 +438,7 @@ impl EngineResult<Evaluated> {
 /// Cannot: enrich, evaluate, dedupe again, transition further
 impl EngineResult<Deduped> {
     /// Emit final, deduplicated diagnostics.
-    /// Guaranteed (file_path, line, code) uniqueness.
+    /// ensured (file_path, line, code) uniqueness.
     pub fn emit(&self) -> Vec<AntiLlmDiagnostic> {
         self.diagnostics.clone()
     }
@@ -565,7 +565,7 @@ pub fn cmd_audit(dir_path: &str, blocking_only: bool, fail_on_blocking: bool)
         .evaluate(&AntiLlmConfig::default())
         .dedupe();
 
-    // At this point, result is EngineResult<Deduped> — guaranteed unique, safe to emit
+    // At this point, result is EngineResult<Deduped> — ensured unique, safe to emit
     let diagnostics = if blocking_only {
         result.emit_blocking()
     } else {

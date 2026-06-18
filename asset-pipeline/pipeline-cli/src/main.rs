@@ -89,7 +89,7 @@ async fn main() -> Result<()> {
 
     match cli.command {
         Commands::InitConfig => {
-            println!("{}", PipelineConfig::example_toml());
+            tracing::info!("{}", PipelineConfig::example_toml());
         }
 
         Commands::Status { output } => {
@@ -98,14 +98,14 @@ async fn main() -> Result<()> {
             match reporter.load_or_create() {
                 Ok(manifest) => {
                     if manifest.runs.is_empty() {
-                        println!("No pipeline runs recorded in {}", out_dir.display());
+                        tracing::info!("No pipeline runs recorded in {}", out_dir.display());
                     } else {
                         let last = manifest.runs.last().unwrap();
-                        println!("Last run: {} runs total", manifest.runs.len());
+                        tracing::info!("Last run: {} runs total", manifest.runs.len());
                         Reporter::print_summary(last);
                     }
                 }
-                Err(e) => eprintln!("Could not read manifest: {e}"),
+                Err(e) => tracing::info!("Could not read manifest: {e}"),
             }
         }
 

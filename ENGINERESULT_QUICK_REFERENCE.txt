@@ -82,7 +82,7 @@ AFTER (Safe — Type-Enforced):
     .evaluate(&config)
     .dedupe();
 
-  let unique = result.emit();  // Guaranteed unique!
+  let unique = result.emit();  // ensured unique!
 
 ================================================================================
 IMPOSSIBLE OPERATIONS (Compile-Time Errors)

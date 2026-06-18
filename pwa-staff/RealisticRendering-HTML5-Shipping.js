@@ -96,6 +96,8 @@
 
   function runGame() {
     console.log('Game Assets Decoded:', gameDataText);
+    window.UE4_EngineReady = true;
+    console.log('window.UE4_EngineReady set to true.');
     if (loadingOverlay) loadingOverlay.style.display = 'none';
     if (canvas) canvas.style.display = 'block';
 
@@ -133,6 +135,15 @@
       ];
       const nextIdx = Math.floor(Math.random() * colors.length);
       lightColor = colors[nextIdx];
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyW' || e.code === 'ArrowUp') {
+        lightY -= 10;
+      }
+      if (e.code === 'Space') {
+        lightX += 10;
+      }
     });
 
     function getSegments() {

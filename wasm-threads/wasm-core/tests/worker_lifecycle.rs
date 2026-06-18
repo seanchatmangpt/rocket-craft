@@ -35,7 +35,7 @@ fn worker_pause_resume_cycle() {
     let running = paused.resume();
 
     log.info("Then the worker can be terminated without error");
-    let _done = running.terminate();
+    let _completed = running.terminate();
 }
 
 #[test]

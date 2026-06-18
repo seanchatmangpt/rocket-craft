@@ -96,6 +96,8 @@
 
   function runGame() {
     console.log('Game Assets Decoded:', gameDataText);
+    window.UE4_EngineReady = true;
+    console.log('window.UE4_EngineReady set to true.');
     if (loadingOverlay) loadingOverlay.style.display = 'none';
     if (canvas) canvas.style.display = 'block';
 

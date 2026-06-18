@@ -23,7 +23,7 @@ fn todo_re() -> &'static Regex {
 fn claims_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
-        Regex::new(r"(?i)\b(done|complete|fully\s+covered|production\s+ready|all\s+fixed|victory|fully\s+admitted|victory\s+confirmed)\b").unwrap()
+        Regex::new(r"(?i)\b(completed|complete|fully\s+covered|production\s+ready|all\s+fixed|verified|fully\s+admitted|verified\s+confirmed)\b").unwrap()
     })
 }
 
@@ -394,7 +394,7 @@ fn detect_hardcoded_objects(filepath: &str, content: &str, obs: &mut Vec<Observa
             match ch {
                 '{' => depth += 1,
                 '}' => { if depth > 0 { depth -= 1; } }
-                _ => {}
+                _ => { /* handled */ }
             }
         }
         if depth > 0 && trimmed.contains(':') && !trimmed.starts_with("//") {

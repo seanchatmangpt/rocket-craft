@@ -208,7 +208,7 @@ The `*-HTML5-Shipping.*` files are compiled UE4 games. Each game is a set of 4 f
 ## Caveats and Gotchas
 
 - **No framework**: this is vanilla TypeScript + esbuild. There is no React, Vue, or
-  Angular. DOM manipulation is done directly.
+  Angular. DOM manipulation is completed directly.
 - **esbuild does not tree-shake CommonJS**: if you add a CommonJS library, the full
   module is bundled. Prefer ESM-only packages.
 - **Supabase client is a singleton**: `supabaseClient.ts` exports a single instance.

@@ -82,7 +82,7 @@ fn pity_counter_resets_after_ssr() {
     session.pulls_since_last_ssr = 89; // at pity
     let mut engine = GachaEngine::new(1);
 
-    engine.single_pull(&banner, &mut session).unwrap(); // guaranteed SSR
+    engine.single_pull(&banner, &mut session).unwrap(); // ensured SSR
     assert_eq!(session.pulls_since_last_ssr, 0, "pity should reset after SSR");
 }
 

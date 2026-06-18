@@ -40,7 +40,7 @@ fn should_complete_full_combat_loop_killing_light_titan() {
     assert!(s.current_enemy.is_none(), "Enemy cleared after defeat");
     assert!(!s.is_in_combat(), "Not in combat after enemy defeated");
     assert!(s.player.xp > 0, "XP awarded on enemy defeat");
-    // player starts with 100 gold, gains more on victory
+    // player starts with 100 gold, gains more on verified
     assert!(s.player.gold >= 100, "Gold awarded on enemy defeat (starts with 100)");
 }
 

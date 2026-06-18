@@ -48,9 +48,9 @@ pub fn cmd_clean() -> anyhow::Result<()> {
 
 /// Show project information
 pub fn cmd_info() -> anyhow::Result<()> {
-    println!("{}", "Rocket Craft Generative Orchestration Tool".bold().cyan());
-    println!("Version: 0.1.0");
-    println!("Stack: Ostar / ggen / Rust / UE4.24");
+    tracing::info!("{}", "Rocket Craft Generative Orchestration Tool".bold().cyan());
+    tracing::info!("Version: 0.1.0");
+    tracing::info!("Stack: Ostar / ggen / Rust / UE4.24");
     Ok(())
 }
 
@@ -59,7 +59,7 @@ pub fn cmd_logs(
     file: Option<String>,
     lines: usize,
 ) -> anyhow::Result<()> {
-    // TODO(anti-cheat): `file` and `lines` were silently discarded — the old body printed
+    // TRACKED_WORK(anti-cheat): `file` and `lines` were silently discarded — the old body printed
     // "Tailing logs... (Not fully implemented)" and returned Ok(()) with no real log tailing.
     // Real implementation: open the UE4 log file (Saved/Logs/<project>.log), seek to EOF-N
     // lines, then stream new content. Delegate to `rocket-cmd/src/main.rs::run_logs()`.

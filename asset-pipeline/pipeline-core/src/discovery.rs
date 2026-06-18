@@ -402,10 +402,9 @@ mod tests {
         assert!(result.errors.is_empty(), "no errors expected");
 
         // Verify each supported file name is present
-        let names: Vec<&str> = result.assets.iter().map(|a| a.name()).collect();
-        assert!(names.contains(&"mesh"), "mesh.obj expected");
-        assert!(names.contains(&"scene"), "scene.glb expected");
-        assert!(names.contains(&"body"), "body.stl expected");
+        let mut names: Vec<&str> = result.assets.iter().map(|a| a.name()).collect();
+        names.sort_unstable();
+        assert_eq!(names, vec!["body", "mesh", "scene"]);
     }
 
     #[test]
@@ -420,9 +419,9 @@ mod tests {
         let result = Scanner::scan_once(dir.path());
 
         assert_eq!(result.assets.len(), 2);
-        let names: Vec<&str> = result.assets.iter().map(|a| a.name()).collect();
-        assert!(names.contains(&"hero"));
-        assert!(names.contains(&"ground"));
+        let mut names: Vec<&str> = result.assets.iter().map(|a| a.name()).collect();
+        names.sort_unstable();
+        assert_eq!(names, vec!["ground", "hero"]);
         // root + models + characters = 3 directories
         assert_eq!(result.scanned_dirs, 3);
     }

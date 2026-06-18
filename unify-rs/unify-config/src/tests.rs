@@ -113,7 +113,7 @@ mod tests {
     fn test_loader_from_str_toml() {
         let toml = r#"
 name = "toml-loader"
-version = "1.0.0"
+version = "1.0.1"
 
 [workspace]
 root = "/workspace"

@@ -68,11 +68,11 @@ The pity system is fully transparent, displayed in real time on every banner scr
 - At pull 70: SSR rate = 5%. At pull 75: 15%. At pull 79: 23%
 - This is communicated as a visible progress bar labeled "Resonance Building"
 
-**Hard Pity (Pull 90 — Guaranteed)**
-- Pull 90 is mathematically guaranteed to produce an SSR item
+**Hard Pity (Pull 90 — ensured)**
+- Pull 90 is mathematically ensured to produce an SSR item
 - If the banner features a rate-up SSR, there is a 50/50 chance the hard pity pull produces the featured item
-- If the 50/50 fails, the next SSR pull (which may occur at any point including the very next pull) is guaranteed to be the featured item
-- This "guaranteed featured" status persists across banners for the same banner type (limited pity carries to the next limited banner)
+- If the 50/50 fails, the next SSR pull (which may occur at any point including the very next pull) is ensured to be the featured item
+- This "ensured featured" status persists across banners for the same banner type (limited pity carries to the next limited banner)
 - Hard pity counter resets to zero after any SSR pull (soft pity counter resets at the same time)
 
 **Pity Inheritance Rules**
@@ -128,7 +128,7 @@ Credits are the premium currency used for gacha banners, battle pass purchases, 
 
 | Bundle | Credits | Price (USD) | Effective Rate | Bonus |
 |--------|---------|-------------|----------------|-------|
-| Starter Pack | 680 | $9.99 | 68/$ | None (first purchase only; includes 1 guaranteed SR) |
+| Starter Pack | 680 | $9.99 | 68/$ | None (first purchase only; includes 1 ensured SR) |
 | Regular Pack | 600 | $9.99 | 60/$ | None |
 | Mid Pack | 1640 | $24.99 | 65.6/$ | 8.5% bonus credits |
 | Large Pack | 3280 | $49.99 | 65.6/$ | 9.3% bonus credits |

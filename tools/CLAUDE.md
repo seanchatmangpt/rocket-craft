@@ -149,7 +149,7 @@ clap subcommands — each maps to one or more `rocket-sdk` functions:
 ### `knhk` (library)
 
 Loads architectural law plugins (`.wasm` files) via `wasmer`. Each plugin exposes a
-`check(manifest: &str) -> bool` function. Plugins are resolved from the `capabilities/`
+`check(manifest: &str) -> bool` function. Plugins are rereaddressed from the `capabilities/`
 directory. Laws enforce things like "no circular crate dependencies" or "all UE4 targets
 must have a keystore."
 

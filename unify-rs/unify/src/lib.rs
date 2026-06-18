@@ -32,9 +32,9 @@ mod tests {
 
     #[test]
     fn output_success_msg_has_message() {
-        let out = output::Output::success_msg("done");
+        let out = output::Output::success_msg("completed");
         assert!(out.success);
-        assert_eq!(out.message.as_deref(), Some("done"));
+        assert_eq!(out.message.as_deref(), Some("completed"));
     }
 
     #[test]

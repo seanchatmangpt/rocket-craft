@@ -1623,7 +1623,7 @@ UATHelper: Packaging (HTML5):   LogCook: Display:       BuildChunkManifest: 0.05
 UATHelper: Packaging (HTML5):   LogCook: Display:       SaveManifests: 0.006s (1)
 UATHelper: Packaging (HTML5):   LogCook: Display:       SaveRealAssetRegistry: 0.036s (1)
 UATHelper: Packaging (HTML5):   LogCook: Display:       WriteCookerOpenOrder: 0.003s (1)
-UATHelper: Packaging (HTML5):   LogCook: Display: Done!
+UATHelper: Packaging (HTML5):   LogCook: Display: completed!
 UATHelper: Packaging (HTML5):   LogSavePackage: Display: Took 0.017654s to verify the EDL loading graph.
 UATHelper: Packaging (HTML5):   LogCookCommandlet: Display: Misc Cook Stats
 UATHelper: Packaging (HTML5):   LogCookCommandlet: Display: ===============
