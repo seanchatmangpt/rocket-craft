@@ -5,6 +5,7 @@ pub mod setup;
 pub mod crypto;
 pub mod doctor;
 pub mod supabase;
+pub mod audit_affidavit;
 
 use std::path::{Path, PathBuf};
 use anyhow::Result;
