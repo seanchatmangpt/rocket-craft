@@ -209,12 +209,34 @@ pub struct Mobility {
 
 impl MechPrimitiveCategory for Mobility {}
 
+impl Default for Mobility {
+    fn default() -> Self {
+        Mobility {
+            id: "Standard Mobility".to_string(),
+            mass: 15.0,
+            occupancy: AABB::new([-0.5, -0.5, -0.5], [0.5, 0.5, 0.5]),
+            clearance: AABB::new([-0.6, -0.6, -0.6], [0.6, 0.6, 0.6]),
+            load_capacity: 100.0,
+            max_speed: 10.0,
+        }
+    }
+}
+
 // --- Mobility Typestates ---
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Walking {
     pub physical: Mobility,
     pub leg_count: u32,
+}
+
+impl Default for Walking {
+    fn default() -> Self {
+        Walking {
+            physical: Mobility::default(),
+            leg_count: 2,
+        }
+    }
 }
 
 impl MobilityTypeCategory for Walking {
@@ -236,6 +258,15 @@ impl OntologyName for Walking {
 pub struct Flight {
     pub physical: Mobility,
     pub wing_span: f32,
+}
+
+impl Default for Flight {
+    fn default() -> Self {
+        Flight {
+            physical: Mobility::default(),
+            wing_span: 12.0,
+        }
+    }
 }
 
 impl MobilityTypeCategory for Flight {

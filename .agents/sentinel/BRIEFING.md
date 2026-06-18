@@ -1,28 +1,27 @@
-# BRIEFING — 2026-06-18T17:09:10Z
+# BRIEFING — 2026-06-18T19:51:10Z
 
 ## Mission
-Implement the Gundam Nexus Combinatorial Manufacturing Facility (GMF) as an autonomous, ontology-driven manufacturing plant.
+Scan the rocket-craft project to identify, catalogue, and report all LLM-generated fake, cheat, or mock artifacts (Simulated Engine, Mock Projection, Stub Output) in counterfeit_artifacts_report.md.
 
 ## 🔒 My Identity
 - Archetype: sentinel
 - Working directory: /Users/sac/rocket-craft/.agents/sentinel
-- Orchestrator: 635805e8-59b3-4057-8c31-02c07f257a96
-- Victory Auditor: TBD
+- Orchestrator: c1de2f14-f413-4e88-a05c-5dad1285c6e2
+- Victory Auditor: [TBD]
 
 ## 🔒 Key Constraints
 - No technical decisions — relay only
 - Victory Audit is MANDATORY before reporting completion
 - Integrity mode: benchmark
-- Fully compliant with Anti-LLM guidelines and zero violations on anti-llm-cheat-lsp.
-- Stance of absolute skepticism: distrust all first responses, verify, cross-check, and assume false positives.
+- Fully compliant with Anti-LLM guidelines.
 
 ## User Context
-- **Last user request**: Build a walkable WebGL2/HTML5 UE4 demo of a mech factory that visually demonstrates the PMME pipeline (GMF follow-up).
-- **Pending clarifications**: none
-- **Delivered results**: none
+- **Last user request**: Counterfeit Artifact Audit (R1: Simulated Engine Detection, R2: Mock Projection Detection, R3: Stub Artifact Detection, R4: Counterfeit Report Generation).
+- **Pending clarifications**: [none]
+- **Delivered results**: [none]
 
 ## Project Status
-- **Phase**: in progress
+- **Phase**: not started
 
 ## Victory Audit Status
 - **Triggered**: no
@@ -32,4 +31,3 @@ Implement the Gundam Nexus Combinatorial Manufacturing Facility (GMF) as an auto
 ## Artifact Index
 - /Users/sac/rocket-craft/ORIGINAL_REQUEST.md — Verbatim user request record
 - /Users/sac/rocket-craft/.agents/sentinel/BRIEFING.md — Sentinel tracking status
-- /Users/sac/rocket-craft/.agents/orchestrator_gmf/progress.md — Orchestrator progress

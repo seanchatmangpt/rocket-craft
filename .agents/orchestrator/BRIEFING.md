@@ -1,77 +1,79 @@
-# BRIEFING — 2026-06-18T06:07:34Z
+# BRIEFING — 2026-06-18T12:51:19-07:00
 
 ## Mission
-Execute the 10-phase codebase retrofit plan to fully leverage the newly integrated `ggen`, `chicago-tdd-tools`, `unrdf`, and `lsp-max` architectures, updating the system's core capabilities.
+Audit the rocket-craft project to scan, identify, and report all LLM-generated fake, cheat, or mock artifacts that falsely claim completion of the genuine Combinatorial Maximalist requirements.
 
 ## 🔒 My Identity
 - Archetype: teamwork_preview_orchestrator
 - Roles: orchestrator, user_liaison, human_reporter, successor
 - Working directory: /Users/sac/rocket-craft/.agents/orchestrator
-- Original parent: parent (id: 6327e89d-e34c-4854-952f-a9c3d3f1ec07)
-- Original parent conversation ID: 6327e89d-e34c-4854-952f-a9c3d3f1ec07
+- Original parent: parent
+- Original parent conversation ID: 773cb9ad-30c9-4762-b7a8-5055e76bc8de
 
 ## 🔒 My Workflow
 - **Pattern**: Project Pattern
 - **Scope document**: /Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md
-1. **Decompose**: Decompose the task into milestones/phases.
-2. **Dispatch & Execute**: Spawn workers and specialists.
-3. **On failure**: Retry, Replace, Skip, Redistribute, Redesign, Escalate.
-4. **Succession**: At 16 spawns, write handoff.md, spawn successor.
+1. **Decompose**: Decompose the task into milestones.
+2. **Dispatch & Execute**: Spawn subagents for exploration, implementation, review, and audit.
+3. **On failure** (in this order):
+   - Retry: nudge stuck agent or re-send task
+   - Replace: spawn fresh agent with partial progress
+   - Skip: proceed without (only if non-critical)
+   - Redistribute: split stuck agent's remaining work
+   - Redesign: re-partition decomposition
+   - Escalate: report to parent (sub-orchestrators only, last resort)
+4. **Succession**: self-succeed at spawn count >= 16.
 - **Work items**:
-  - Phase 1: Baseline Verification [done]
-  - Phase 2: Migrate `unrdf` Git Dependencies to Local Path Dependencies [done]
-  - Phase 3: Migrate `chicago-tdd-tools` Git Dependencies to Local Path Dependencies [done]
-  - Phase 4: Verify `lsp-max` Integration & Clean Tower-LSP References [done]
-  - Phase 5: Refactor `genie-core` / `unify-rdf` Stubs and Mock Libraries [done]
-  - Phase 6: Refactor `nexus-engine` State Machines to Type-Safe `Machine<L, P>` [done]
-  - Phase 7: Configure `ggen.toml` and `.tera` Code-Generation Templates [done]
-  - Phase 8: Wire `chicago-tdd-tools` with Playwright WebGL2 Test Scripts [done]
-  - Phase 9: Automated Combinatorial Testing Execution [done]
-  - Phase 10: Forensic Auditing & Clean Verdict Release [done]
-- **Current phase**: 10
-- **Current focus**: Complete forensic audit and claim victory.
+  1. Exploration & Architecture [done]
+  2. Implementation of GMF MUD walkthrough [done]
+  3. Verification & Review [done]
+  4. Forensic Audit [done]
+  5. Counterfeit Scan [done]
+  6. Counterfeit Report Generation [in-progress]
+  7. Verification of Report [pending]
+- **Current phase**: 2
+- **Current focus**: Counterfeit Report Generation
 
 ## 🔒 Key Constraints
 - NEVER write, modify, or create source code files directly.
 - NEVER run build/test commands yourself — require workers to do so.
-- Never reuse a subagent after it has delivered its handoff — always spawn fresh.
-- Succession threshold: 16 spawns.
+- Never reuse a subagent after it has delivered its handoff — always spawn fresh
+- Do not modify or delete any files during the scan.
 
 ## Current Parent
-- Conversation ID: 0817d278-2530-4201-80db-a2ef611d396b
-- Updated: 2026-06-18T06:07:34Z
+- Conversation ID: 773cb9ad-30c9-4762-b7a8-5055e76bc8de
+- Updated: 2026-06-18T12:51:19-07:00
 
 ## Key Decisions Made
-- Initialized the 10-phase codebase retrofit project.
-- Completed all 10 phases.
-- Spawned Forensic Integrity Auditor and received a CLEAN VERDICT.
+- Initialized plan and project milestones for the Counterfeit Artifact Audit task.
 
 ## Team Roster
 | Agent | Type | Work Item | Status | Conv ID |
-|-------|------|-----------|--------|---------|
-| a8cc2d67-576d-4a0e-8463-face7c03027e | teamwork_preview_worker | Baseline Verification | completed | a8cc2d67-576d-4a0e-8463-face7c03027e |
-| f439e6dc-d3b8-456b-a0d0-c938e572bfd0 | teamwork_preview_worker | Migrate unrdf | completed | f439e6dc-d3b8-456b-a0d0-c938e572bfd0 |
-| 05987603-df7b-42a5-950c-6a5ed5573b6e | teamwork_preview_worker | Migrate chicago | completed | 05987603-df7b-42a5-950c-6a5ed5573b6e |
-| 5bd0b6e0-5850-46c4-a0f4-e0c846ed4265 | teamwork_preview_worker | Migrate lsp-max | completed | 5bd0b6e0-5850-46c4-a0f4-e0c846ed4265 |
-| 76d42451-79e2-47ab-a543-7cdf82db2bc4 | teamwork_preview_worker | Align ggen/nexus | completed | 76d42451-79e2-47ab-a543-7cdf82db2bc4 |
-| dab33b40-b362-469f-b87b-6fd27d0f5d3a | teamwork_preview_worker | Impl ggen/nexus | completed | dab33b40-b362-469f-b87b-6fd27d0f5d3a |
-| d63e50fb-1b65-4b0d-918d-a148f0ef0ce3 | teamwork_preview_worker | Verify chicago tests | completed | d63e50fb-1b65-4b0d-918d-a148f0ef0ce3 |
-| 7ae29387-8de6-405f-b400-79575df50f59 | teamwork_preview_worker | Run combinatorial | completed | 7ae29387-8de6-405f-b400-79575df50f59 |
-| 550ed2b8-4b3e-4d50-8c88-d753c22d9d3f | teamwork_preview_auditor | Forensic Audit | completed | 550ed2b8-4b3e-4d50-8c88-d753c22d9d3f |
+|---|---|---|---|---|
+| 92d8abc1-17d9-40c5-950d-27c785306298 | teamwork_preview_explorer | Codebase Research | completed | 92d8abc1-17d9-40c5-950d-27c785306298 |
+| dbd2936b-e79a-44df-8b60-a8a0571c551d | teamwork_preview_worker | GMF MUD Walkthrough Impl | completed | dbd2936b-e79a-44df-8b60-a8a0571c551d |
+| d26a8719-4b93-4623-b06e-73fa68d8f1f4 | teamwork_preview_reviewer | Code Review | completed | d26a8719-4b93-4623-b06e-73fa68d8f1f4 |
+| f280b41d-2262-442d-bf00-0bb109f3c3db | teamwork_preview_challenger | Adversarial Verification | completed | f280b41d-2262-442d-bf00-0bb109f3c3db |
+| 023fb6c3-85a2-42af-80f5-cead4a2d50f2 | teamwork_preview_auditor | Forensic Audit | completed | 023fb6c3-85a2-42af-80f5-cead4a2d50f2 |
+| a4729a91-7ef1-47b9-8782-2ee7ca0b5627 | teamwork_preview_explorer | Counterfeit Scan | completed | a4729a91-7ef1-47b9-8782-2ee7ca0b5627 |
+| ffb3ced9-b151-4d3d-9c18-a2d42a0c5d5e | teamwork_preview_worker | Counterfeit Report Generation | pending | ffb3ced9-b151-4d3d-9c18-a2d42a0c5d5e |
 
 ## Succession Status
 - Succession required: no
-- Spawn count: 9 / 16
-- Pending subagents: none
+- Spawn count: 7 / 16
+- Pending subagents: ffb3ced9-b151-4d3d-9c18-a2d42a0c5d5e
 - Predecessor: none
 - Successor: not yet spawned
 
 ## Active Timers
-- Heartbeat cron: 247ccb3c-d954-496a-b230-a51245bbbdc5/task-306
+- Heartbeat cron: c1de2f14-f413-4e88-a05c-5dad1285c6e2/task-19
 - Safety timer: none
+- On succession: kill all timers before spawning successor
+- On context truncation: run `manage_task(Action="list")` — re-create if missing
 
 ## Artifact Index
-- /Users/sac/rocket-craft/.agents/orchestrator/progress.md — progress tracker
+- /Users/sac/rocket-craft/.agents/orchestrator/progress.md — liveness heartbeat and state checkpoint
 - /Users/sac/rocket-craft/.agents/orchestrator/plan.md — execution plan
+- /Users/sac/rocket-craft/.agents/orchestrator/context.md — system context
 - /Users/sac/rocket-craft/.agents/orchestrator/BRIEFING.md — briefing document
-- /Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md — project roadmap and contracts
+- /Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md — global project index

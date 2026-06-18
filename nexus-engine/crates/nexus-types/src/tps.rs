@@ -71,6 +71,27 @@ pub const fn const_validate_part(part: &Part) -> bool {
 }
 
 /// Macro for compile-time assertion (Poka-yoke)
+///
+/// Ensures a [`Part`] is valid at compile time.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_types::tps::Part;
+/// use nexus_types::assert_part_poka_yoke;
+///
+/// const VALID_PART: Part = Part {
+///     geometry: 1,
+///     socket_fit: 1,
+///     motion_clearance: 1,
+///     collision_volume: 1,
+///     mass_balance: 1,
+///     physics_role: 1,
+///     assembly_compatibility: 1,
+/// };
+///
+/// assert_part_poka_yoke!(VALID_PART);
+/// ```
 #[macro_export]
 macro_rules! assert_part_poka_yoke {
     ($part:expr) => {

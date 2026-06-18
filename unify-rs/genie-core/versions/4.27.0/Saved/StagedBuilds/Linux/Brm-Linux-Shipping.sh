@@ -1,2 +1,3 @@
 #!/bin/sh
-echo 'MOCK LINUX SH'
+DIR="$(cd "$(dirname "$0")" && pwd)"
+"$DIR/Brm-Linux-Shipping" "$@"

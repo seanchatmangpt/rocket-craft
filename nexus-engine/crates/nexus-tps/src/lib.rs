@@ -2,6 +2,9 @@ use serde::{Serialize, Deserialize};
 use sha2::{Sha256, Digest};
 use nexus_types::tps::Part;
 
+pub mod telemetry;
+
+
 // ============================================================================
 // R1: PartSlot and PartStateVector
 // ============================================================================
@@ -345,27 +348,89 @@ impl MechTpsReceipt {
             receipt_hash,
         }
     }
+
+    /// Formats the mech assembly receipt into a highly readable, colored ASCII-art table.
+    pub fn format_receipt(&self) -> String {
+        let mut s = String::new();
+        s.push_str("\n\x1b[1;33m┌──────────────────────────────────────────────────────────────────────────────────┐\x1b[0m\n");
+        s.push_str("\x1b[1;33m│                           NEXUS MECH ASSEMBLY RECEIPT                            │\x1b[0m\n");
+        s.push_str("\x1b[1;33m├──────────┬──────────────────────┬────────────┬──────────┬─────────────┬──────────┤\x1b[0m\n");
+        s.push_str("\x1b[1;33m│ Slot     │ Dimensions (X×Y×Z m) │ Mass (kg)  │ Socket   │ Clear. (m)  │ Status   │\x1b[0m\n");
+        s.push_str("\x1b[1;33m├──────────┼──────────────────────┼────────────┼──────────┼─────────────┼──────────┤\x1b[0m\n");
+
+        let slots = [
+            "Head", "Torso", "Waist", "ArmL", "ArmR", "LegL", "LegR", "Backpack"
+        ];
+
+        for (i, part) in self.parts.iter().enumerate() {
+            let slot_name = slots.get(i).unwrap_or(&"Unknown");
+            
+            let geom = part.geometry;
+            let dim_x = ((geom) & 0xFFFF) as f32 / 100.0;
+            let dim_y = ((geom >> 16) & 0xFFFF) as f32 / 100.0;
+            let dim_z = ((geom >> 32) & 0xFFFF) as f32 / 100.0;
+            let dims_str = format!("{:.2}×{:.2}×{:.2}", dim_x, dim_y, dim_z);
+
+            let mass = part.mass_balance as f32 / 10.0;
+            let socket = format!("0x{:02X}", part.socket_fit);
+            let clearance = (part.motion_clearance & 0xFF) as f32 / 10.0;
+            
+            s.push_str(&format!(
+                "│ \x1b[1;36m{:<8}\x1b[0m │ {:<20} │ {:<10.2} │ {:<8} │ {:<11.2} │ \x1b[1;32m{:<8}\x1b[0m │\n",
+                slot_name, dims_str, mass, socket, clearance, "PASS"
+            ));
+        }
+
+        s.push_str("\x1b[1;33m├──────────┴──────────────────────┴────────────┴──────────┴─────────────┴──────────┤\x1b[0m\n");
+        
+        let total_mass_kg = self.total_mass as f32 / 10.0;
+        let capacity_kg = self.load_capacity as f32 / 10.0;
+        
+        s.push_str(&format!(
+            "│  \x1b[1mTotal Mass\x1b[0m:  {:<10.2} kg /  \x1b[1mLoad Capacity\x1b[0m:  {:<10.2} kg    \x1b[1;32m[{}]\x1b[0m       │\n",
+            total_mass_kg, capacity_kg, self.final_decision
+        ));
+        s.push_str(&format!(
+            "│  \x1b[1mLineage Hash\x1b[0m:  {:<59} │\n",
+            if self.lineage_hash.len() > 55 { format!("{}...", &self.lineage_hash[..55]) } else { self.lineage_hash.clone() }
+        ));
+        s.push_str(&format!(
+            "│  \x1b[1mReceipt Hash\x1b[0m:  {:<59} │\n",
+            if self.receipt_hash.len() > 55 { format!("{}...", &self.receipt_hash[..55]) } else { self.receipt_hash.clone() }
+        ));
+        s.push_str("\x1b[1;33m└──────────────────────────────────────────────────────────────────────────────────┘\x1b[0m\n");
+        s
+    }
 }
 
 pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, JidokaHalt> {
+    tracing::info!("Initializing mech assembly sequence...");
+
     // 1. Structure Verification: unique and complete slot allocation
+    tracing::info!("Gate 1: Structure Verification. Validating slot configurations...");
     let mut parts_map = [None; 8];
     for v in vectors.iter() {
         let idx = v.part_slot as usize;
         if idx >= 8 {
+            tracing::error!("Assembly structure defect: slot index {:?} out of bounds", v.part_slot);
             panic!("Assembly structure defect: slot index out of bounds");
         }
         if parts_map[idx].is_some() {
+            tracing::error!("Assembly structure defect: duplicate slot configuration for {:?}", v.part_slot);
             panic!("Assembly structure defect: duplicate slot");
         }
-        parts_map[idx] = Some((v, generate_part(v)?));
+        let part = generate_part(v)?;
+        tracing::debug!("Successfully generated part for slot {:?}", v.part_slot);
+        parts_map[idx] = Some((v, part));
     }
 
-    for p in parts_map.iter() {
+    for (idx, p) in parts_map.iter().enumerate() {
         if p.is_none() {
+            tracing::error!("Assembly structure defect: missing slot configuration at index {}", idx);
             panic!("Assembly structure defect: missing slot");
         }
     }
+    tracing::info!("Gate 1: Structure Verification [PASSED]");
 
     let head = parts_map[PartSlot::Head as usize].unwrap().1;
     let torso = parts_map[PartSlot::Torso as usize].unwrap().1;
@@ -377,29 +442,46 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
     let backpack = parts_map[PartSlot::Backpack as usize].unwrap().1;
 
     // 2. Socket Mating Gate
+    tracing::info!("Gate 2: Socket Mating Verification. Verifying part connector interfaces...");
     if (head.socket_fit & 0x0F) != (torso.socket_fit & 0x0F) {
-        return Err(JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Head });
+        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Head };
+        tracing::error!("Jidoka Halt at Socket Gate: {}", err);
+        return Err(err);
     }
     if (waist.socket_fit & 0x0F) != (torso.socket_fit & 0x0F) {
-        return Err(JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Waist });
+        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Waist };
+        tracing::error!("Jidoka Halt at Socket Gate: {}", err);
+        return Err(err);
     }
     if (arm_l.socket_fit & 0xF0) != (torso.socket_fit & 0xF0) {
-        return Err(JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::ArmL });
+        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::ArmL };
+        tracing::error!("Jidoka Halt at Socket Gate: {}", err);
+        return Err(err);
     }
     if (arm_r.socket_fit & 0xF0) != (torso.socket_fit & 0xF0) {
-        return Err(JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::ArmR });
+        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::ArmR };
+        tracing::error!("Jidoka Halt at Socket Gate: {}", err);
+        return Err(err);
     }
     if (leg_l.socket_fit & 0x0F) != (waist.socket_fit & 0x0F) {
-        return Err(JidokaHalt::SocketMismatch { expected: SocketType::Waist, got: SocketType::LegL });
+        let err = JidokaHalt::SocketMismatch { expected: SocketType::Waist, got: SocketType::LegL };
+        tracing::error!("Jidoka Halt at Socket Gate: {}", err);
+        return Err(err);
     }
     if (leg_r.socket_fit & 0x0F) != (waist.socket_fit & 0x0F) {
-        return Err(JidokaHalt::SocketMismatch { expected: SocketType::Waist, got: SocketType::LegR });
+        let err = JidokaHalt::SocketMismatch { expected: SocketType::Waist, got: SocketType::LegR };
+        tracing::error!("Jidoka Halt at Socket Gate: {}", err);
+        return Err(err);
     }
     if (backpack.socket_fit & 0xF0) != (torso.socket_fit & 0xF0) {
-        return Err(JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Backpack });
+        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Backpack };
+        tracing::error!("Jidoka Halt at Socket Gate: {}", err);
+        return Err(err);
     }
+    tracing::info!("Gate 2: Socket Mating Verification [PASSED]");
 
     // 3. Collision and Clearance Gate
+    tracing::info!("Gate 3: Collision and Clearance Verification. Check volume clearance...");
     let get_radius = |part: &Part| -> f32 {
         ((part.collision_volume & 0xFF) as f32) / 100.0 + ((part.motion_clearance & 0xFF) as f32) / 200.0
     };
@@ -429,12 +511,16 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
 
             let combined_radius = get_radius(&part_a) + get_radius(&part_b);
             if combined_radius > distance {
-                return Err(JidokaHalt::CollisionVolumeIntersects { part_a: slot_a, part_b: slot_b });
+                let err = JidokaHalt::CollisionVolumeIntersects { part_a: slot_a, part_b: slot_b };
+                tracing::error!("Jidoka Halt at Collision Gate: {}", err);
+                return Err(err);
             }
         }
     }
+    tracing::info!("Gate 3: Collision and Clearance Verification [PASSED]");
 
     // 4. Mass and Frame Capacity Gate
+    tracing::info!("Gate 4: Mass and Frame Capacity Verification. Checking payload thresholds...");
     let total_mass: u64 = parts_map.iter().map(|p| p.unwrap().1.mass_balance).sum();
     
     // Extract leg dimensions for capacity calculation
@@ -445,11 +531,14 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
     
     let load_capacity = (leg_l_val.wrapping_add(leg_r_val)).wrapping_mul(7) / 2;
     if total_mass > load_capacity {
-        return Err(JidokaHalt::MassExceedsFrameCapacity {
+        let err = JidokaHalt::MassExceedsFrameCapacity {
             mass: total_mass as f32,
             capacity: load_capacity as f32,
-        });
+        };
+        tracing::error!("Jidoka Halt at Mass Gate: {}", err);
+        return Err(err);
     }
+    tracing::info!("Gate 4: Mass and Frame Capacity Verification [PASSED]");
 
     // Assembly Complete: Produce Receipts
     let parts_vec: Vec<Part> = parts_map.iter().map(|p| p.unwrap().1).collect();
@@ -459,16 +548,24 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
         "CollisionGate".to_string(),
         "MassGate".to_string(),
     ];
-    let timestamp = chrono::Utc::now().to_rfc3339();
+    let timestamp = if std::env::var("NEXUS_TEST_DETERMINISTIC").is_ok() {
+        "2026-06-18T12:00:00Z".to_string()
+    } else {
+        chrono::Utc::now().to_rfc3339()
+    };
 
-    Ok(MechTpsReceipt::generate(
+    let receipt = MechTpsReceipt::generate(
         parts_vec,
         passed_gates,
         "APPROVED".to_string(),
         total_mass,
         load_capacity,
         timestamp,
-    ))
+    );
+
+    tracing::info!(target: "receipt", "{}", receipt.format_receipt());
+
+    Ok(receipt)
 }
 
 // ============================================================================

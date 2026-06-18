@@ -27,6 +27,7 @@ nexus-net = { path = "../nexus-engine/crates/nexus-net" }
 nexus-types = { path = "../nexus-engine/crates/nexus-types" }
 nexus-combat = { path = "../nexus-engine/crates/nexus-combat" }
 nexus-ecs = { path = "../nexus-engine/crates/nexus-ecs" }
+nexus-mud = { path = "../nexus-engine/crates/nexus-mud" }
 
 [workspace]
 

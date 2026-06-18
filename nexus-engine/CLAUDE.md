@@ -89,6 +89,16 @@ compile. Example combat machine:
 CombatMachine<Idle> -> CombatMachine<Attacking> -> CombatMachine<Resolving>
 ```
 
+### Builders & Transition Errors
+Construct compile-time safe typestates using their respective builders to perform validation checks:
+- `CombatMachineBuilder`: Validate HP bounds.
+- `PlayerSessionBuilder`: Validate pilot names.
+- `ConnectionBuilder`: Configure network details.
+- `AuctionBuilder`: Validate reserve and starting prices.
+- `MechBuilder`/`CivilizationBuilder`/`MechAssemblySpecBuilder`: Assemble parts.
+
+For dynamic runtime FSM checking (e.g. from network packets), map states to enum values (`CombatState`, `SessionState`, etc.) and return custom transition errors (e.g., `CombatTransitionError`) explaining the failure reasons.
+
 ### Const-Generic Inventory
 ```rust
 Inventory<const N: usize>  // capacity is a compile-time constant

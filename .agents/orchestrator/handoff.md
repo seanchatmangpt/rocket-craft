@@ -1,31 +1,39 @@
-# Orchestrator Handoff: Deep Architecture Migration Complete
+# Orchestrator Handoff (State Dump) — Hard Handoff
+
+This document details the final state of the Gundam Manufacturing Facility (GMF) MUD Walkthrough project. All milestones are complete, verified by reviewer/challenger subagents, and audited with a CLEAN verdict by the Forensic Integrity Auditor.
 
 ## Milestone State
-- **Phase 1: Baseline Verification** — **DONE** (All cargo workspaces compile and tests pass successfully)
-- **Phase 2: Migrate `unrdf` Git Dependencies** — **DONE** (All git URL dependencies redirected to local `/Users/sac/rocket-craft/tools/unrdf`)
-- **Phase 3: Migrate `chicago-tdd-tools` Git Dependencies** — **DONE** (All git URL dependencies redirected to local `/Users/sac/rocket-craft/chicago-tdd-tools`)
-- **Phase 4: Verify `lsp-max` Integration** — **DONE** (`anti-llm-cheat-lsp` fully migrated from `tower-lsp` to workspace `lsp-max` dependencies)
-- **Phase 5: Refactor `genie-core` / `unify-rdf` Stubs** — **DONE** (Grep scans verified 0 stubs or dummy placeholders exist in core engine logic)
-- **Phase 6: Refactor `nexus-engine` State Machines** — **DONE** (`CombatMachine` and `PlayerSession` migrated to type-safe generated `Machine<L, P>` kernels)
-- **Phase 7: Configure `ggen.toml` and `.tera` templates** — **DONE** (`ggen sync` successfully drives state machine code generation from `.specify/schema/state_machines.ttl`)
-- **Phase 8: Wire Playwright WebGL2 Test Scripts** — **DONE** (TDD runner executes Playwright visual delta tests and generates cryptographic receipts)
-- **Phase 9: Automated Combinatorial Testing Execution** — **DONE** (`combinatorial-engine` executed successfully with 2004 states explored and 9879 transitions generated)
-- **Phase 10: Forensic Auditing & Clean Verdict Release** — **DONE** (Independent Forensic Auditor completed full compliance review and issued a **CLEAN VERDICT**)
+| Milestone | Description | Status |
+|---|---|---|
+| Milestone 1 | Exploration & Architecture Definition | DONE |
+| Milestone 2 | Implementation of GMF MUD walkthrough | DONE |
+| Milestone 3 | Verification & Review | DONE |
+| Milestone 4 | Forensic Audit | DONE |
 
 ## Active Subagents
-- **None**. All dispatched subagents (workers, explorers, and auditor) have successfully completed their tasks and are retired.
+- **None**: All subagents have successfully completed their tasks and delivered their handoffs. They are permanently retired.
+  - Explorer: `92d8abc1-17d9-40c5-950d-27c785306298` (completed)
+  - Worker: `dbd2936b-e79a-44df-8b60-a8a0571c551d` (completed)
+  - Reviewer: `d26a8719-4b93-4623-b06e-73fa68d8f1f4` (completed)
+  - Challenger: `f280b41d-2262-442d-bf00-0bb109f3c3db` (completed)
+  - Auditor: `023fb6c3-85a2-42af-80f5-cead4a2d50f2` (completed)
 
 ## Pending Decisions
-- **None**. All requirements and implementation details have been fully resolved and verified.
+- **None**: All design goals, topography, exits, mech parts, sockets, and validation rules have been resolved and implemented without unresolved issues.
 
 ## Remaining Work
-- **None**. The 10-phase codebase retrofit plan is 100% complete and fully verified.
+- **None**: The project is 100% complete and fully verified.
 
 ## Key Artifacts
-- **Progress Tracker**: `/Users/sac/rocket-craft/.agents/orchestrator/progress.md`
-- **Execution Plan**: `/Users/sac/rocket-craft/.agents/orchestrator/plan.md`
-- **Briefing Document**: `/Users/sac/rocket-craft/.agents/orchestrator/BRIEFING.md`
-- **Project Roadmap**: `/Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md`
-- **Auditor Handoff Report**: `/Users/sac/rocket-craft/.agents/victory_auditor_deep_migration/handoff.md`
-- **Combinatorial Report**: `/Users/sac/rocket-craft/chicago-tdd-tools/combinatorial_report.json`
-- **Cryptographic Receipt**: `/Users/sac/rocket-craft/pwa-staff/test-results/tps-dflss-receipt.json`
+- **Progress Log**: `/Users/sac/rocket-craft/.agents/orchestrator/progress.md`
+- **Briefing Log**: `/Users/sac/rocket-craft/.agents/orchestrator/BRIEFING.md`
+- **Project Index**: `/Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md`
+- **MUD Engine Core**: `/Users/sac/rocket-craft/nexus-engine/crates/nexus-mud/src/lib.rs`
+- **Integration Tests**: `/Users/sac/rocket-craft/nexus-engine/crates/nexus-mud/tests/adversarial_tests.rs`
+- **Adversarial Tests**: `/Users/sac/rocket-craft/nexus-engine/crates/nexus-mud/tests/challenger_tests.rs`
+- **Explorer Report**: `/Users/sac/rocket-craft/.agents/teamwork_preview_explorer_gmf/handoff.md`
+- **Worker Report**: `/Users/sac/rocket-craft/.agents/teamwork_preview_worker_gmf/handoff.md`
+- **Reviewer Report**: `/Users/sac/rocket-craft/.agents/reviewer_gmf/handoff.md`
+- **Challenger Report**: `/Users/sac/rocket-craft/.agents/challenger_gmf/handoff.md`
+- **Auditor Handoff**: `/Users/sac/rocket-craft/.agents/teamwork_preview_auditor_gmf/handoff.md`
+- **Auditor Report**: `/Users/sac/rocket-craft/.agents/teamwork_preview_auditor_gmf/audit_report.md`

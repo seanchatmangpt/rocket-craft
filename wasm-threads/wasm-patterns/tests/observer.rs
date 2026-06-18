@@ -11,6 +11,7 @@ fn log() -> Logger {
 }
 
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 enum UiEvent {
     ButtonClicked(String),
     HealthChanged(u32),

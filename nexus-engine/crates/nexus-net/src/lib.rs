@@ -8,3 +8,8 @@ pub mod matchmaking;
 pub mod message_codec;
 pub mod protocol;
 pub mod room;
+
+pub use connection::{
+    Connection, ConnectionBuilder, ConnectionState, ConnectionTransitionError,
+    Disconnected, Handshaking, Connected, Authenticated, InLobby, InMatch,
+};

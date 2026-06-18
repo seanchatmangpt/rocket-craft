@@ -35,6 +35,27 @@ pub struct Dodging;
 /// Only valid state transitions are representable at compile time.
 /// Illegal sequences (e.g. attacking while dodging, resolving a parry
 /// that was never started) are simply not constructible.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_combat::machine::{CombatMachine, Idle};
+/// use nexus_combat::parry::AttackDir;
+///
+/// // Create unit
+/// let unit = CombatMachine::new(100.0);
+/// assert_eq!(unit.hp, 100.0);
+///
+/// // Idle -> Attacking transition
+/// let (attacking, dir) = unit.begin_attack(AttackDir::Overhead);
+/// assert_eq!(dir, AttackDir::Overhead);
+///
+/// // Attacking -> Idle transition on hit
+/// let mut enemy_hp = 50.0;
+/// let idle = attacking.resolve_hit(15.0, &mut enemy_hp);
+/// assert_eq!(enemy_hp, 35.0);
+/// assert_eq!(idle.combo_depth, 1);
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct CombatMachine<S> {
     pub hp: f32,
@@ -42,6 +63,119 @@ pub struct CombatMachine<S> {
     /// Current combo depth (capped at 5 for the standard machine).
     pub combo_depth: u32,
     state: PhantomData<S>,
+}
+
+/// Errors arising from invalid CombatMachine construction.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+pub enum CombatBuildError {
+    /// Health must be positive.
+    #[error("initial health must be specified and non-negative (got {0})")]
+    InvalidHealth(f32),
+
+    /// Max health must be >= current health.
+    #[error("maximum health ({max}) cannot be less than initial health ({hp})")]
+    InvalidMaxHealth {
+        /// The initial health configured.
+        hp: f32,
+        /// The maximum health configured.
+        max: f32,
+    },
+}
+
+/// A builder for [`CombatMachine`] to simplify configuration and validate initial values.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_combat::machine::{CombatMachineBuilder, Idle};
+///
+/// let machine = CombatMachineBuilder::new()
+///     .hp(100.0)
+///     .max_hp(120.0)
+///     .combo_depth(0)
+///     .build()
+///     .unwrap();
+///
+/// assert_eq!(machine.hp, 100.0);
+/// assert_eq!(machine.max_hp, 120.0);
+/// ```
+#[derive(Debug, Clone)]
+pub struct CombatMachineBuilder {
+    hp: Option<f32>,
+    max_hp: Option<f32>,
+    combo_depth: u32,
+}
+
+impl CombatMachineBuilder {
+    /// Create a new builder with default parameters.
+    pub fn new() -> Self {
+        Self {
+            hp: None,
+            max_hp: None,
+            combo_depth: 0,
+        }
+    }
+
+    /// Set the initial HP of the unit.
+    pub fn hp(mut self, hp: f32) -> Self {
+        self.hp = Some(hp);
+        self
+    }
+
+    /// Set the maximum HP of the unit. If not set, defaults to initial HP.
+    pub fn max_hp(mut self, max_hp: f32) -> Self {
+        self.max_hp = Some(max_hp);
+        self
+    }
+
+    /// Set the initial combo depth.
+    pub fn combo_depth(mut self, depth: u32) -> Self {
+        self.combo_depth = depth;
+        self
+    }
+
+    /// Validate the parameters and build a [`CombatMachine`] in [`Idle`] state.
+    pub fn build(self) -> Result<CombatMachine<Idle>, CombatBuildError> {
+        let hp = self.hp.ok_or(CombatBuildError::InvalidHealth(0.0))?;
+        if hp < 0.0 {
+            return Err(CombatBuildError::InvalidHealth(hp));
+        }
+        let max_hp = self.max_hp.unwrap_or(hp);
+        if max_hp < hp {
+            return Err(CombatBuildError::InvalidMaxHealth { hp, max: max_hp });
+        }
+        Ok(CombatMachine {
+            hp,
+            max_hp,
+            combo_depth: self.combo_depth,
+            state: PhantomData,
+        })
+    }
+}
+
+impl Default for CombatMachineBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Represents the dynamic runtime state of a combat unit.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum CombatState {
+    Idle,
+    Attacking,
+    Parrying,
+    PerfectParrying,
+    Dodging,
+}
+
+/// Errors returned when a state transition is invalid.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+#[error("Illegal combat transition: cannot transition from {current:?} to {target:?}. Reason: {reason}")]
+pub struct CombatTransitionError {
+    pub current: CombatState,
+    pub target: CombatState,
+    pub reason: String,
 }
 
 // ---------------------------------------------------------------------------

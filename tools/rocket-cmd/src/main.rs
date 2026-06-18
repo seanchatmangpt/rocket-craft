@@ -15,6 +15,8 @@ use rocket_sdk::error;
 use rocket_sdk::audit_affidavit::{AuditEvent, record_audit, persist_receipt};
 mod compliance;
 pub mod lock;
+pub mod inspect;
+pub mod registry;
 
 use color_eyre::eyre::{eyre, ContextCompat, Result};
 use error::RocketError;
@@ -109,6 +111,31 @@ enum Commands {
         #[arg(short, long)]
         file: String,
     },
+    /// Inspect MUD saved states, receipts, and OCEL event trails interactively
+    Inspect {
+        /// Optional path to a specific JSON file to inspect directly
+        file: Option<String>,
+        /// Only show a count summary of all detected files and exit
+        #[arg(short, long)]
+        summary: bool,
+    },
+    /// Manage ontology registry (copy catalogue, index O-crates)
+    Registry {
+        #[command(subcommand)]
+        cmd: RegistrySubcommands,
+    },
+}
+
+#[derive(Subcommand)]
+enum RegistrySubcommands {
+    /// Consolidate ontology files from all_semantic_files.txt into the catalogue
+    Copy {
+        /// Optional custom path to the manifest file
+        #[arg(short, long, default_value = "all_semantic_files.txt")]
+        manifest: String,
+    },
+    /// Index O-crates in the ontology catalogue and build registry index.json
+    Index,
 }
 
 #[derive(Subcommand)]
@@ -128,6 +155,13 @@ enum PwaSubcommands {
 }
 
 fn main() -> Result<()> {
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stdout)
+        .with_target(false)
+        .without_time()
+        .with_level(false)
+        .init();
+
     color_eyre::install()?;
     let cli = Cli::parse();
 
@@ -193,6 +227,17 @@ fn main() -> Result<()> {
         }
         Commands::Wasm { file } => {
             run_wasm(&file)?;
+        }
+        Commands::Inspect { file, summary } => {
+            inspect::run_inspect(file.as_deref(), summary).map_err(|e| eyre!("{}", e))?;
+        }
+        Commands::Registry { cmd } => match cmd {
+            RegistrySubcommands::Copy { manifest } => {
+                registry::run_copy(&manifest).map_err(|e| eyre!("{}", e))?;
+            }
+            RegistrySubcommands::Index => {
+                registry::run_index().map_err(|e| eyre!("{}", e))?;
+            }
         }
     }
 
@@ -604,16 +649,88 @@ fn run_tests() -> Result<()> {
     }
 
     // 3. Asset Validation
-    tracing::info!("\n{}", "--- Asset Validation ---".bold().yellow());
-    let status = Command::new("python3")
-        .arg("validate-assets.py")
-        .status()?;
-    if !status.success() {
-        return Err(eyre!("Asset validation failed"));
-    }
+    run_asset_validation()?;
 
     tracing::info!("\n{}", "✔ All tests passed!".green().bold());
     Ok(())
+}
+
+fn run_asset_validation() -> Result<()> {
+    tracing::info!("\n{}", "--- Asset Validation (Rust Native) ---".bold().yellow());
+    
+    let forbidden_patterns = ["Highrise", "Brm-HTML5-Shipping"];
+    let ignore_dirs = [
+        ".git", ".agents", "non-project-files", "pwa-staff", "versions", "docs",
+        "tools", "chicago-tdd-tools", "unify-rs", "target", "scratch"
+    ];
+    let ignore_files = [
+        "validate-assets.py", "ROCKET_CRAFT_AUDIT.md", "README.md", "HELP.md", "CLAUDE.md", "DFLSS.md"
+    ];
+    let ignore_extensions = [
+        "log", "lock", "json", "md", "txt", "js", "applescript", "sh", "bat", "yml", "yaml", "toml"
+    ];
+    
+    let mut issues_found = false;
+    let project_root = std::env::current_dir()?;
+
+    for entry in WalkDir::new(&project_root)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        if !entry.file_type().is_file() {
+            continue;
+        }
+
+        let path = entry.path();
+        let rel_path = path.strip_prefix(&project_root).unwrap_or(path);
+
+        // Skip ignored directories
+        let mut skip_dir = false;
+        for d in &ignore_dirs {
+            if rel_path.components().any(|c| c.as_os_str() == *d) {
+                skip_dir = true;
+                break;
+            }
+        }
+        if skip_dir {
+            continue;
+        }
+
+        // Skip ignored file extensions
+        if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
+            if ignore_extensions.contains(&ext) {
+                continue;
+            }
+        }
+
+        // Skip ignored files
+        if let Some(filename) = path.file_name().and_then(|s| s.to_str()) {
+            if ignore_files.contains(&filename) {
+                continue;
+            }
+        }
+
+        // Read file content (skip binary files safely)
+        if let Ok(content) = fs::read_to_string(path) {
+            for pattern in &forbidden_patterns {
+                if content.contains(pattern) {
+                    for (line_idx, line) in content.lines().enumerate() {
+                        if line.contains(pattern) {
+                            tracing::warn!("  [!] ALERT: Found reference to '{}' in {}:{}", pattern, rel_path.display(), line_idx + 1);
+                            issues_found = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if issues_found {
+        Err(eyre!("Asset validation failed. Known missing assets are still referenced."))
+    } else {
+        tracing::info!("RESULT: Validation PASSED. No known missing asset references found.");
+        Ok(())
+    }
 }
 
 fn run_logs(file: Option<String>, lines: usize) -> Result<()> {

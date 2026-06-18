@@ -69,12 +69,13 @@ cd pwa-staff && npm run build     # esbuild TS + postcss CSS → dist/
 cd pwa-staff && npm start         # local-web-server on :3000
 ```
 
-### Validation Scripts
+### Validation & Registry Tools
 
 ```bash
-python3 validate-assets.py        # grep for known-missing asset refs (pre-commit)
-python3 check-dependencies.py     # verify WebSocketNetworking + VaRest plugins exist
-python3 check-dependencies.py /path/to/UE4  # explicit engine path
+./rocket test                     # Run all test suites + native asset validation
+./rocket doctor                   # Run programmatic environment & dependency verification
+./copy_catalogue                  # Consolidate ontology files (delegates to `rocket registry copy`)
+./index_o_crates                  # Index O-crates (delegates to `rocket registry index`)
 ```
 
 ### Asset Pipeline (in worktree)
@@ -98,6 +99,8 @@ Each state has only the transition methods that are legal from that state. The s
 - `nexus-engine/crates/nexus-combat/src/machine.rs` (`CombatMachine<Idle/Attacking/Parrying/…>`)
 - `unify-rs/unify-rdf/src/project_bridge.rs` (`ProjectManifest<Pending/Ingested/Validated>`)
 - `tools/rocket-sdk` (`Machine<Law, Phase>` with Law traits for domain rules)
+
+To simplify constructing these machines safely, builders are provided (e.g. `CombatMachineBuilder`, `PlayerSessionBuilder`, `ConnectionBuilder`, `AuctionBuilder`, `MechBuilder`, `CivilizationBuilder`, `MechAssemblySpecBuilder`). For dynamic, network-driven state transitions, runtime state enums (`CombatState`, `SessionState`, etc.) and transition errors (e.g., `CombatTransitionError`) describe failures cleanly.
 
 The `rocket-sdk` formalises this as `Machine<L: Law, P>` where `L` is a trait that defines `validate()` and `P` is a phase struct (Input → Validated → Admitted). `ggen` code-generates these skeletons from Ostar ontology definitions.
 
@@ -169,13 +172,13 @@ All projects and their `uproject_path`/`targets` are the authoritative source in
 |---|---|---|
 | Rust stable | Yes | `rustup`; `tools/` uses edition 2024 |
 | Node.js 20.x | Yes | `pwa-staff` only |
-| Python 3.x | Yes | `validate-assets.py`, `check-dependencies.py` |
+| Python 3.x | Yes | Only used inside Blender for asset-pipeline (.py scripts) |
 | Unreal Engine 4.24 | Yes (UE builds) | Set `UE4_ROOT`; uses UE4.24.3-HTML5 build with WebSocketNetworking + VaRest plugins |
 | Blender | Yes (asset-pipeline) | Set `BLENDER_PATH` or ensure `blender` in PATH; macOS: `/Applications/Blender.app/Contents/MacOS/blender` |
 | Android SDK | Optional | Only for Android platform builds |
 | Docker | Optional | Local Supabase (`supabase start`) at `127.0.0.1:54321` |
 
-`check-dependencies.py` reads `UE_ROOT` env var (fallback: cwd) to verify plugin presence.
+Rocket Doctor checks the configured `UE4_ROOT` path and verifies local plugin presence.
 
 HTML5 UE4 networking standardises on port **8889** via `WebSocketNetworking` plugin. In production, Nginx terminates TLS on 443 and proxies to `ws://localhost:8889`.
 
@@ -185,8 +188,8 @@ HTML5 UE4 networking standardises on port **8889** via `WebSocketNetworking` plu
 
 1. Work on branch `claude/inspiring-hamilton-jfww9e`; never force-push main/master.
 2. Commit message format: `feat(scope): description` or `fix(scope): description`.
-3. Before committing: `python3 validate-assets.py` (blocks refs to `Highrise` or `Brm-HTML5-Shipping`).
-4. For UE-plugin changes: `python3 check-dependencies.py` with `UE4_ROOT` set.
+3. Before committing: run `./rocket test` (blocks refs to `Highrise` or `Brm-HTML5-Shipping` using native asset validation).
+4. For UE-plugin changes: run `./rocket doctor` to diagnose environment setup.
 5. `./rocket audit` runs semantic law compliance via WASM-loaded knhk plugins.
 
 ### CI (`.github/workflows/ci.yml`)

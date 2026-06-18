@@ -2671,6 +2671,7 @@ name = "rocket-cmd"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "blake3",
  "cargo_metadata",
  "chrono",
  "clap",
@@ -2690,8 +2691,10 @@ dependencies = [
  "rust-ini",
  "serde",
  "serde_json",
+ "sha2",
  "thiserror 1.0.69",
  "tracing",
+ "tracing-subscriber",
  "un-test-utils",
  "unrdf",
  "walkdir",

@@ -1,0 +1,19 @@
+[package]
+name = "gmf-ocel-adapter"
+version = "0.1.0"
+edition = "2021"
+description = "Thin adapter: GMF physical events → OCEL 2.0 event stream for wasm4pm ingestion"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1"
+chrono = { version = "0.4", features = ["serde"] }
+
+nexus-tps    = { path = "../nexus-engine/crates/nexus-tps" }
+nexus-types  = { path = "../nexus-engine/crates/nexus-types" }
+
+[dev-dependencies]
+serde_json = "1.0"
+
+[workspace]

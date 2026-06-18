@@ -145,7 +145,7 @@ impl WorldCoherenceGate {
         }
 
         // Rules check
-        let rule_entity_re = regex::Regex::new(r"\b([a-zA-Z0-9_-]+)\.").unwrap();
+        let rule_entity_re = regex::Regex::new(r"\b([a-zA-Z_][a-zA-Z0-9_-]*)\.").unwrap();
         for rule in &spec.rules {
             for cap in rule_entity_re.captures_iter(&rule.expression) {
                 let potential_id = &cap[1];

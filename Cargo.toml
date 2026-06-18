@@ -20,6 +20,8 @@ path = "src/bin/cargo-cicd.rs"
 resolver = "2"
 members = [
     "rocket-simulator/simulator-core",
+    "tools/gait-wasm",
+    "tools/standalone-tps",
 ]
 exclude = [
     "unify-rs",
@@ -29,6 +31,8 @@ exclude = [
     "nexus-engine",
     "blueprint-rs",
     "tools",
+    "temp-hash-check",
+    "wasm4pm-compat",
 ]
 
 [workspace.dependencies]
@@ -44,4 +48,14 @@ rand        = "0.10"
 lsp-max          = "26.6.9"
 lsp-max-protocol = "26.6.9"
 lsp-max-runtime  = "26.6.9"
+
+[profile.dev]
+opt-level = 0
+debug = true
+split-debuginfo = "unpacked"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 16
 

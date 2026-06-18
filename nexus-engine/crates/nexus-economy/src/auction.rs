@@ -25,6 +25,24 @@ pub struct Bid {
 }
 
 /// An auction parameterised by its current lifecycle state `S`.
+///
+/// Only valid operations are representable at compile time.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_economy::auction::{Auction, OpenForBids};
+///
+/// let auction = Auction::new(
+///     1,
+///     101,
+///     "Gundam Armor Fragment".to_string(),
+///     150,
+///     Some(200),
+///     24
+/// );
+/// assert_eq!(auction.item_name, "Gundam Armor Fragment");
+/// ```
 pub struct Auction<S> {
     pub id: u64,
     pub seller_id: u64,
@@ -34,6 +52,170 @@ pub struct Auction<S> {
     pub current_bid: Option<Bid>,
     pub ends_at: DateTime<Utc>,
     _state: PhantomData<S>,
+}
+
+/// Errors arising from invalid Auction construction.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+pub enum AuctionBuildError {
+    /// Item name cannot be empty.
+    #[error("item_name is required and cannot be empty")]
+    EmptyItemName,
+
+    /// Starting price must be > 0.
+    #[error("starting_price must be positive")]
+    ZeroStartingPrice,
+
+    /// Reserve price cannot be lower than the starting price.
+    #[error("reserve_price ({reserve}) cannot be less than starting_price ({starting})")]
+    ReserveBelowStarting {
+        /// The starting price.
+        starting: u32,
+        /// The reserve price.
+        reserve: u32,
+    },
+
+    /// The duration must be positive.
+    #[error("duration_hours must be positive")]
+    InvalidDuration,
+}
+
+/// A builder for [`Auction`] to simplify initialization and validate starting conditions.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_economy::auction::{AuctionBuilder, OpenForBids};
+///
+/// let auction = AuctionBuilder::new()
+///     .id(1)
+///     .seller_id(101)
+///     .item_name("Luna Titanium".to_string())
+///     .starting_price(100)
+///     .duration_hours(12)
+///     .build()
+///     .unwrap();
+///
+/// assert_eq!(auction.starting_price, 100);
+/// ```
+#[derive(Debug, Clone)]
+pub struct AuctionBuilder {
+    id: Option<u64>,
+    seller_id: Option<u64>,
+    item_name: Option<String>,
+    starting_price: Option<u32>,
+    reserve_price: Option<u32>,
+    duration_hours: Option<i64>,
+}
+
+impl AuctionBuilder {
+    /// Create a new builder with default parameters.
+    pub fn new() -> Self {
+        Self {
+            id: None,
+            seller_id: None,
+            item_name: None,
+            starting_price: None,
+            reserve_price: None,
+            duration_hours: Some(24),
+        }
+    }
+
+    /// Set the auction ID.
+    pub fn id(mut self, id: u64) -> Self {
+        self.id = Some(id);
+        self
+    }
+
+    /// Set the seller player ID.
+    pub fn seller_id(mut self, seller_id: u64) -> Self {
+        self.seller_id = Some(seller_id);
+        self
+    }
+
+    /// Set the name of the item being auctioned.
+    pub fn item_name(mut self, name: String) -> Self {
+        self.item_name = Some(name);
+        self
+    }
+
+    /// Set the starting price in gold.
+    pub fn starting_price(mut self, price: u32) -> Self {
+        self.starting_price = Some(price);
+        self
+    }
+
+    /// Set the reserve price in gold (optional).
+    pub fn reserve_price(mut self, reserve: u32) -> Self {
+        self.reserve_price = Some(reserve);
+        self
+    }
+
+    /// Set the duration of the auction in hours. Defaults to 24 hours.
+    pub fn duration_hours(mut self, hours: i64) -> Self {
+        self.duration_hours = Some(hours);
+        self
+    }
+
+    /// Validate the parameters and build an [`Auction`] in [`OpenForBids`] state.
+    pub fn build(self) -> Result<Auction<OpenForBids>, AuctionBuildError> {
+        let id = self.id.unwrap_or(0);
+        let seller_id = self.seller_id.unwrap_or(0);
+        let item_name = self.item_name.ok_or(AuctionBuildError::EmptyItemName)?;
+        if item_name.trim().is_empty() {
+            return Err(AuctionBuildError::EmptyItemName);
+        }
+        let starting_price = self.starting_price.ok_or(AuctionBuildError::ZeroStartingPrice)?;
+        if starting_price == 0 {
+            return Err(AuctionBuildError::ZeroStartingPrice);
+        }
+        if let Some(reserve) = self.reserve_price {
+            if reserve < starting_price {
+                return Err(AuctionBuildError::ReserveBelowStarting {
+                    starting: starting_price,
+                    reserve,
+                });
+            }
+        }
+        let duration = self.duration_hours.unwrap_or(24);
+        if duration <= 0 {
+            return Err(AuctionBuildError::InvalidDuration);
+        }
+
+        Ok(Auction {
+            id,
+            seller_id,
+            item_name,
+            starting_price,
+            reserve_price: self.reserve_price,
+            current_bid: None,
+            ends_at: Utc::now() + chrono::Duration::hours(duration),
+            _state: PhantomData,
+        })
+    }
+}
+
+impl Default for AuctionBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Represents the dynamic runtime state of an auction.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum AuctionState {
+    OpenForBids,
+    BidAccepted,
+    AuctionClosed,
+    AuctionCancelled,
+}
+
+/// Errors returned when an auction transition is invalid at runtime.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+#[error("Illegal auction state transition: cannot transition from {current:?} to {target:?}. Reason: {reason}")]
+pub struct AuctionTransitionError {
+    pub current: AuctionState,
+    pub target: AuctionState,
+    pub reason: String,
 }
 
 // ── Escrow helpers ─────────────────────────────────────────────────────────────

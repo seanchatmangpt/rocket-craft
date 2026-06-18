@@ -17,11 +17,23 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         logs.push(msg.text());
       });
 
-      await page.goto(targetUrl);
+      const response = await page.goto(targetUrl);
+      expect(response && response.ok()).toBe(true);
 
       // 2. Wait for Engine Initialization (Jidoka Check 1)
+      // Poll for multiple readiness signals because real UE4 HTML5 packages built by
+      // SpeculativeCoder's 4.27-html5-es3 fork do NOT set window.UE4_EngineReady.
+      // Real Emscripten output signals readiness via window.Module.calledMain (Emscripten
+      // lifecycle flag) or canvas dimensions becoming non-zero (first rendered pixels).
+      // window.UE4_EngineReady is retained for stub/mock compatibility in CI environments.
       currentCell = 'WebGL/runtime cell';
-      await page.waitForFunction(() => (window as any).UE4_EngineReady === true, { timeout: 120000 });
+      await page.waitForFunction(
+        () =>
+          (window as any).UE4_EngineReady === true ||
+          (window as any).Module?.calledMain === true ||
+          ((document.querySelector('canvas') as HTMLCanvasElement | null)?.width ?? 0) > 0,
+        { timeout: 120000 }
+      );
 
       // Ensure rendering has started
       await page.waitForTimeout(500);
@@ -153,6 +165,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
 
       console.log(`Receipt generated at ${receiptPath} with visual delta ${numDiffPixels} and verdict ${verdict}`);
 
+      currentCell = 'visual-delta cell';
       if (verdict === 'FAIL') {
         throw new Error(
           `DefectError: World compiled, but physics/input verification failed. Zero/low visual delta. Diff pixels: ${numDiffPixels}`

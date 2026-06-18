@@ -13,12 +13,12 @@ pub fn run_setup() -> anyhow::Result<()> {
     let ue4_root = find_ue4_root(&config)?;
     
     if let Some(root) = ue4_root {
-        info!("Found Unreal Engine 4.24 at: {:?}", root);
+        info!("Found Unreal Engine 4.27 HTML5 ES3 at: {:?}", root);
         config.ue4_root = Some(root);
         config.save()?;
         info!("Configuration saved to .rocket.json");
     } else {
-        error!("Could not find Unreal Engine 4.24 root.");
+        error!("Could not find Unreal Engine 4.27 HTML5 ES3 root.");
         return Err(anyhow::anyhow!("UE4 root not found"));
     }
 
@@ -46,19 +46,19 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
     // 3. Search common locations
     let common_paths = if cfg!(windows) {
         vec![
-            PathBuf::from("ue4-4.24.3-html5"),
-            PathBuf::from("C:\\Program Files\\Epic Games\\UE_4.24"),
-            PathBuf::from("D:\\ue-engines\\4.24-html\\myengine"),
+            PathBuf::from("UnrealEngine-HTML5-ES3"),
+            PathBuf::from("C:\\Program Files\\Epic Games\\UE_4.27"),
+            PathBuf::from("D:\\ue-engines\\4.27-html\\myengine"),
         ]
     } else if cfg!(target_os = "macos") {
         vec![
-            PathBuf::from("ue4-4.24.3-html5"),
-            PathBuf::from("/Users/Shared/Epic Games/UE_4.24"),
+            PathBuf::from("UnrealEngine-HTML5-ES3"),
+            PathBuf::from("/Users/Shared/Epic Games/UE_4.27"),
         ]
     } else {
         // Linux
         vec![
-            PathBuf::from("ue4-4.24.3-html5"),
+            PathBuf::from("UnrealEngine-HTML5-ES3"),
             PathBuf::from("/opt/UnrealEngine"),
         ]
     };
@@ -83,7 +83,7 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
             .collect();
         options.push("Enter path manually...".to_string());
 
-        let selection = Select::new("Select Unreal Engine 4.24 root:", options).prompt()?;
+        let selection = Select::new("Select Unreal Engine 4.27 HTML5 ES3 root:", options).prompt()?;
 
         if selection == "Enter path manually..." {
             prompt_manual_path()
@@ -96,7 +96,7 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
 }
 
 fn prompt_manual_path() -> anyhow::Result<Option<PathBuf>> {
-    let input = Text::new("Please enter the path to your Unreal Engine 4.24 root:").prompt()?;
+    let input = Text::new("Please enter the path to your Unreal Engine 4.27 HTML5 ES3 root:").prompt()?;
     
     let path = PathBuf::from(input);
     if validate_ue4_root(&path) {

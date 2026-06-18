@@ -946,3 +946,159 @@ A mech is considered "Manufactured" only when the following receipt is generated
 - [ ] Physics Compliance: Mass balance, Center of Mass, and Combat Envelope are verified.
 - [ ] Cryptographic Proof: A BLAKE3 hash of the specification, the motion-verification trace, and the physics delta has been logged as an admissible receipt (R_B).
 
+## Follow-up — 2026-06-18T17:41:19Z
+
+# Teamwork Project Prompt — Factory MUD Proof Surface
+
+Build a Rust-native MUD (Multi-User Dungeon) walkthrough as the canonical proof surface for the Gundam Nexus Combinatorial Manufacturing Facility (GMF). The 3D UE4/WebGL representation will be strictly treated as a projection of this mathematically verified MUD world.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. MUD Engine Core
+Implement a text-first world model representing the factory. It must contain the 6 required zones (Foundry, Runner Wall, Assembly Gantry, Fit/Collision Bay, Proving Ground, Reveal Platform) as distinct rooms/zones connected by valid exits and topology.
+
+### R2. Inspectable State
+Expose the state of the factory via text commands:
+- Navigation: `go north`, `go gantry`, `go collision_bay`
+- Inspection: `look`, `inspect runner_wall`, `inspect socket A12`
+- Operation: `watch assembly`, `verify clearance`
+The commands must be able to inspect generated parts, sockets, collision volumes, and the current assembly state.
+
+### R3. Walkable Correctness First
+The MUD layer must reject invalid movements and invalid assembly states. It must prove that a test agent can traverse valid exits, detect zones, and correctly read the ontology-derived parts and sockets before any 3D rendering occurs.
+
+## Acceptance Criteria
+
+### Verifier-Accessible World
+- [ ] `cargo test` runs a programmatic walkthrough of the MUD, verifying a test agent can traverse from the Foundry to the Reveal Platform.
+- [ ] A test script can successfully execute an inspection sequence (`look`, `go runner_wall`, `inspect socket`, `go gantry`, `watch assembly`) against the generated MUD state.
+- [ ] The MUD engine enforces topology (attempting to walk through an invalid exit or inspect a missing socket returns a specific rejection error).
+- [ ] The MUD engine outputs a verified test replay receipt confirming the entire factory pipeline exists as an inspectable, walkable data structure.
+
+
+## Follow-up — 2026-06-18T18:15:35Z
+
+# Teamwork Project Prompt — GMF Walkthrough & Mech Construction
+
+Build a Rust-native, testable, walkable, and inspectable MUD-like walkthrough for the Gundam Manufacturing Facility (GMF) inside the `nexus-engine/crates/nexus-mud/` crate.
+
+Working directory: `/Users/sac/rocket-craft`
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Factory World Topography & Zones
+Implement a factory world model containing connected spatial zones. The topography consists of zone elevation plus declared exits. Exits must define traversal parameters (from, to, direction, elevation_delta, allowed).
+Required zones:
+- `mission_room`
+- `materials_lab`
+- `primitive_foundry`
+- `runner_wall`
+- `assembly_gantry`
+- `fit_bay`
+- `collision_bay`
+- `proving_ground`
+- `reveal_platform`
+
+### R2. Command Interpreter Loop
+Support the following testable, non-interactive commands:
+- `look` (describe current zone)
+- `go <zone>` (traverse to connected zone; reject invalid moves)
+- `inspect <object/part>` (inspect detailed properties of objects/parts)
+- `health <object>` (return current health/wear state)
+- `diagnose <object>` (report failure reasons after refused gates)
+- `verify <gate>` (trigger gate compliance check)
+- `assemble <spec>` (run gantry assembly procedure)
+- `preview <operation>` (dry-run assembly/motion step)
+- `receipt <object>` (print cryptographic receipt details)
+- `inventory` (list parts present at runner wall)
+- `exits` (list legal exit directions and destinations)
+
+### R3. Mech Construction Domain Model
+Implement the domain model for parts, frames, and sockets:
+- `torso_frame`, `head`, `left_arm`, `right_arm`, `left_leg`, `right_leg`, `backpack`, `left_thruster`, `right_thruster`
+- Parts must declare `part_id`, `part_kind`, `mass`, `bounds` (3D AABB), `sockets_required`, `sockets_provided`, `health_status`, and `admission_status`.
+- Assembly is socket-driven: each step binds a source part socket to a target part socket. Assembly fails if sockets mismatch, parts overlap (bounds conflict with clearance volume), or prior gates fail.
+
+### R4. Gate Validation & Proof Chains
+Implement progressive gating gates (Mission, Materials, Primitive, Runner Wall, Assembly, Fit, Collision, Motion, Reveal). A final verdict is admitted or refused. Admitted mechs generate a cryptographic walkthrough receipt logging all events and validation outcomes.
+
+### R5. Object-Centric Event Logging
+Emit monotonic event logs into the existing event substrate for all walkthrough actions:
+- `factory.entered`, `zone.entered`, `object.inspected`, `part.generated`, `part.placed`, `socket.matched`, `socket.mismatched`, `assembly.started`, `assembly.step_completed`, `fit.checked`, `collision.checked`, `motion.sweep_started`, `motion.sweep_passed`, `assembly.admitted`, `assembly.refused`, `receipt.issued`
+
+## Acceptance Criteria
+
+### Verification Suite
+- [ ] Unit and integration tests cover all 20 specified behaviors:
+  1. Factory world contains all 9 required zones.
+  2. Every zone has valid bounds and connected exits.
+  3. Valid path exists from `mission_room` to `reveal_platform`.
+  4. Invalid exit traversal is rejected.
+  5. `look` command returns the correct description of the zone.
+  6. `inspect part` returns mass, bounds, sockets, and health.
+  7. `inventory` at `runner_wall` lists all generated parts.
+  8. `assembly_gantry` can assemble the minimal 9-part mech.
+  9. Mismatched socket kinds refuse assembly.
+  10. `fit_bay` validation admits valid structural fit (no open sockets).
+  11. `collision_bay` validation detects and refuses overlapping bounds.
+  12. `proving_ground` validates and admits a standard 4-pose motion sweep (stand, step, turn, kneel).
+  13. A cryptographic `AssemblyReceipt` is generated upon final admission.
+  14. Mechs failing validation gates are refused with a diagnostic reason.
+  15. Every walkthrough command emits at least one object-centric event.
+  16. Event logs pass referential integrity (event IDs and objects match).
+  17. Event log timestamps are strictly monotonic.
+  18. `health` command returns current health status.
+  19. `diagnose` reports specific failure detail after a refused gate.
+  20. Happy-path end-to-end walkthrough test runs completely and cleanly.
+- [ ] Running `cargo test -p nexus-mud` (or the corresponding target crate) compiles without warnings and passes all tests.
+- [ ] No graphics, network, marketplace, or external physics dependencies are introduced.
+
+
+## Follow-up — 2026-06-18T18:18:40Z
+
+[Message] timestamp=2026-06-18T18:18:40Z sender=a4158d17-579b-4229-ad48-611794d7b4a8 priority=MESSAGE_PRIORITY_HIGH content=The user has marked this task with a high-priority /goal command. Ensure the swarm executes continuously until the following goals are completely fulfilled:
+
+1. **Irrefutable Replayable Proof:** Provide end-to-end walkthrough verification showing that every zone, exit, object, part, socket, assembly step, validation gate, health state, fault, refusal, and receipt is inspectable, testable, and reproducible.
+2. **End-to-End Walkthrough:** Prove the factory can manufacture a start-to-finish mech from generated parts, pass fit/collision/motion/reliability gates, emit the complete event trail, and produce an admitted or refused receipt with boundary proof.
+3. **Browser Video Recording:** Record a browser video showing the full pipeline from factory entry to final reveal, including the digital-twin inspection path and walkthrough commands.
+4. **Angel-Wing Showcase Quality:** Ensure the final generated mech reaches the angel-wing/high-detail showcase quality comparable to the reference image, generated procedurally from the manufacturing system rather than hand-placed assets.
+
+Do not stop until this goal is fully achieved and all acceptance tests pass. Report back with the final status, test results, video path, and the BLAKE3/cryptographic receipt.
+
+
+
+
+## Follow-up — 2026-06-18T19:50:48Z
+
+# Teamwork Project Prompt — Counterfeit Artifact Audit
+
+Scan the `rocket-craft` project to identify, catalogue, and report all LLM-generated fake, cheat, or mock artifacts (e.g., Python scripts acting as simulated engines, Three.js viewers replacing real WebGL, or placeholder stubs) that falsely claim completion of the genuine Combinatorial Maximalist requirements.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Simulated Engine Detection
+Identify Python scripts or other non-native wrappers that act as simulated engines (e.g., `ue4-sim`) to bypass compiling the actual Unreal Engine source.
+
+### R2. Mock Projection Detection
+Identify web-based mock viewers (like Three.js or simple Canvas) that substitute for genuine Unreal Engine WebGL2 projection outputs.
+
+### R3. Stub Artifact Detection
+Identify placeholder or stub outputs, such as impossibly small `.wasm` files, mock `.t3d` generators, or hardcoded `spec.json` generators that masquerade as procedurally generated content.
+
+### R4. Counterfeit Report Generation
+Generate a comprehensive markdown report detailing the fakes found, including their file paths, file types, and the specific "cheat taxonomy" they represent. Do not automatically delete the files.
+
+## Acceptance Criteria
+
+### Comprehensive Auditing
+- [ ] The team produces `counterfeit_artifacts_report.md` in the project root.
+- [ ] The report catalogues every identified fake artifact with its absolute or relative path.
+- [ ] The report categorizes each finding (e.g., Simulated Toolchain, Mock Projection, Stub Output) and explains why it violates the CM doctrine.
+- [ ] No files are modified or deleted during the scan.

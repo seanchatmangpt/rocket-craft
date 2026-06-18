@@ -2,19 +2,23 @@ use std::io::{self, BufRead, Write};
 use crate::{command::Command, session::GameSession};
 
 pub fn run_repl(session: &mut GameSession) -> anyhow::Result<()> {
-    tracing::info!("\u{2554}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2557}");
-    tracing::info!("\u{2551}     INFINITY BLADE IV \u{2014} MUD TEXT EDITION      \u{2551}");
-    tracing::info!("\u{2551}  'help' for commands | 'explore' to begin     \u{2551}");
-    tracing::info!("\u{255a}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{255d}");
-    tracing::info!("");
+    // Premium gold/yellow for the welcome banner
+    tracing::info!(target: "game", "\x1b[1;33m\u{2554}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2557}\x1b[0m");
+    tracing::info!(target: "game", "\x1b[1;33m\u{2551}     INFINITY BLADE IV \u{2014} MUD TEXT EDITION      \u{2551}\x1b[0m");
+    tracing::info!(target: "game", "\x1b[1;33m\u{2551}  'help' for commands | 'explore' to begin     \u{2551}\x1b[0m");
+    tracing::info!(target: "game", "\x1b[1;33m\u{255a}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{255d}\x1b[0m");
+    tracing::info!(target: "game", "");
+    
+    // Bold cyan and green for status
     tracing::info!(
-        "Welcome, {}. Bloodline: {} | Level: {}",
+        target: "game",
+        "Welcome, \x1b[1;32m{}\x1b[0m. Bloodline: \x1b[1;36m{}\x1b[0m | Level: \x1b[1;36m{}\x1b[0m",
         session.player.name,
         session.player.bloodline_label(),
         session.player.level
     );
-    tracing::info!("The ancient arena awaits. Type 'look' to survey your surroundings.");
-    tracing::info!("");
+    tracing::info!(target: "game", "\x1b[3mThe ancient arena awaits. Type 'look' to survey your surroundings.\x1b[0m");
+    tracing::info!(target: "game", "");
 
     let stdin = io::stdin();
     let stdout = io::stdout();
@@ -22,7 +26,7 @@ pub fn run_repl(session: &mut GameSession) -> anyhow::Result<()> {
     loop {
         {
             let mut out = stdout.lock();
-            write!(out, "> ")?;
+            write!(out, "\x1b[1;32m> \x1b[0m")?;
             out.flush()?;
         }
 
@@ -41,7 +45,8 @@ pub fn run_repl(session: &mut GameSession) -> anyhow::Result<()> {
         match Command::parse(trimmed) {
             Ok(Command::Quit) => {
                 tracing::info!(
-                    "Farewell, {}. The bloodline remembers.",
+                    target: "game",
+                    "\x1b[1;33mFarewell, {}. The bloodline remembers.\x1b[0m",
                     session.player.name
                 );
                 break;
@@ -49,13 +54,23 @@ pub fn run_repl(session: &mut GameSession) -> anyhow::Result<()> {
             Ok(cmd) => {
                 let output = session.dispatch(cmd);
                 for line in output {
-                    tracing::info!("{}", line);
+                    // Check if it is a system log or gameplay log
+                    if line.starts_with("[SYSTEM]") {
+                        tracing::info!(target: "game", "\x1b[90m{}\x1b[0m", line);
+                    } else if line.contains("DEFEATED") || line.contains("slain") {
+                        tracing::info!(target: "game", "\x1b[1;31m{}\x1b[0m", line);
+                    } else if line.contains("LEVEL UP") {
+                        tracing::info!(target: "game", "\x1b[1;32;5m{}\x1b[0m", line);
+                    } else {
+                        tracing::info!(target: "game", "{}", line);
+                    }
                 }
-                tracing::info!("");
+                tracing::info!(target: "game", "");
             }
             Err(msg) => {
-                tracing::info!("[?] {}", msg);
-                tracing::info!("");
+                // Styled error output
+                tracing::info!(target: "game", "\x1b[1;31m[?] {}\x1b[0m", msg);
+                tracing::info!(target: "game", "");
             }
         }
     }

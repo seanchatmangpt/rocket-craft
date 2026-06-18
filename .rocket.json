@@ -1,0 +1,11 @@
+{
+  "ue4_root": "/Users/sac/ue-4.27-html5-es3",
+  "default_platform": "HTML5",
+  "projects": {
+    "Brm": {
+      "uproject": "versions/4.27.0/Brm.uproject",
+      "platforms": ["HTML5"],
+      "targets": ["Brm"]
+    }
+  }
+}

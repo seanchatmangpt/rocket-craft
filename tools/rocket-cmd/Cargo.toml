@@ -29,6 +29,9 @@ knhk = { path = "../knhk" }
 unrdf = { path = "../unrdf" }
 wasmer = { version = "4.4.0", default-features = false, features = ["sys", "singlepass", "wat"] }
 tracing = "0.1.44"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+sha2 = "0.10"
+blake3 = "1.5"
 
 [dev-dependencies]
 un-test-utils = { path = "../un-test-utils" }

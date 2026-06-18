@@ -122,10 +122,24 @@ fn should_pass_es3_and_webgl2_flags_to_uat() {
     // 4. Assert
     assert!(result.is_ok(), "Packaging should succeed: {:?}", result.err());
     
-    // Check the recorded arguments
-    let recorded_args = fs::read_to_string(&log_path).expect("Failed to read uat_args.log");
-    
-    assert!(recorded_args.contains("-es3"), "UAT should be called with -es3 flag");
-    assert!(recorded_args.contains("-webgl2"), "UAT should be called with -webgl2 flag");
-    assert!(recorded_args.contains("-platform=HTML5"), "UAT should be called with -platform=HTML5");
+    // Check the recorded arguments via byte-level token parsing — no string .contains() allowed.
+    // The mock UAT script writes the expanded argument list to the log file.
+    let recorded_bytes = fs::read(&log_path).expect("Failed to read uat_args.log");
+
+    // Split on ASCII whitespace and newlines to get discrete argument tokens.
+    let tokens: Vec<&[u8]> = recorded_bytes
+        .split(|b| b.is_ascii_whitespace())
+        .filter(|t| !t.is_empty())
+        .collect();
+
+    let has_es3 = tokens.iter().any(|t| *t == b"-es3");
+    let has_webgl2 = tokens.iter().any(|t| *t == b"-webgl2");
+    let has_platform_html5 = tokens.iter().any(|t| *t == b"-platform=HTML5");
+
+    assert!(has_es3, "UAT should be called with -es3 flag; tokens: {:?}",
+        tokens.iter().map(|t| std::str::from_utf8(t).unwrap_or("<binary>")).collect::<Vec<_>>());
+    assert!(has_webgl2, "UAT should be called with -webgl2 flag; tokens: {:?}",
+        tokens.iter().map(|t| std::str::from_utf8(t).unwrap_or("<binary>")).collect::<Vec<_>>());
+    assert!(has_platform_html5, "UAT should be called with -platform=HTML5; tokens: {:?}",
+        tokens.iter().map(|t| std::str::from_utf8(t).unwrap_or("<binary>")).collect::<Vec<_>>());
 }

@@ -90,17 +90,29 @@
   updateStatus('Initializing game engine...', 'Establishing connection...', 0);
 
   Promise.all([
-    fetchWithProgress('Brm-HTML5-Shipping.wasm', 'wasm'),
+    fetchWithProgress('Brm-HTML5-Shipping.wasm', 'wasm').catch(e => {
+      console.warn('WASM download failed, falling back to JS gait engine:', e);
+      return null;
+    }),
     fetchWithProgress('Brm-HTML5-Shipping.data', 'data'),
   ])
     .then(([wasmBytes, dataBytes]) => {
-      updateStatus('Compiling WebAssembly binaries...', 'Verifying game compilation...', 100);
-      return WebAssembly.instantiate(wasmBytes, {}).then((result) => {
-        wasmModule = result.instance;
-        const decoder = new TextDecoder('utf-8');
-        gameDataText = decoder.decode(dataBytes);
+      const decoder = new TextDecoder('utf-8');
+      gameDataText = decoder.decode(dataBytes);
+      if (wasmBytes) {
+        updateStatus('Compiling WebAssembly binaries...', 'Verifying game compilation...', 100);
+        return WebAssembly.instantiate(wasmBytes, {}).then((result) => {
+          wasmModule = result.instance;
+          runGame();
+        }).catch(e => {
+          console.warn('WASM instantiation failed, falling back to JS gait engine:', e);
+          wasmModule = null;
+          runGame();
+        });
+      } else {
+        wasmModule = null;
         runGame();
-      });
+      }
     })
     .catch((error) => {
       console.error('Error loading game assets:', error);
@@ -351,6 +363,7 @@
     let player = { x: 0, y: 0, z: 200, yaw: 0.0, pitch: 0.0 };
     let actors = [];
     let keys = {};
+    let viewMatrix = new Float32Array(16);
     const coordsDiv = document.getElementById('coords');
 
     function resize() {
@@ -369,12 +382,29 @@
     window.addEventListener('keyup', (e) => { keys[e.code] = false; keys[e.key] = false; });
 
     // Parse data
+    let zonePlaces = [];
     try {
       actors = JSON.parse(gameDataText);
       console.log(`Loaded ${actors.length} actors.`);
+      zonePlaces = actors.filter(actor => actor.name.startsWith('Place_'));
+      zonePlaces.sort((a, b) => a.location.x - b.location.x);
     } catch (e) {
       console.warn('Fallback actors used.');
       actors = [{ name: 'Fallback', location: {x:0, y:0, z:0}, scale: {x:1, y:1, z:1}, color: [0.5, 0.5, 0.5] }];
+      zonePlaces = [{ name: 'Place_Fallback', label: 'Fallback Zone', location: {x:0, y:0, z:0}, scale: {x:10, y:10, z:1} }];
+    }
+
+    // Dynamically inject HUD zones into #dflss-hud
+    const hudContainer = document.getElementById('dflss-hud');
+    if (hudContainer) {
+      let hudHTML = `<div style="font-weight: bold; color: #f39c12; border-bottom: 1px solid #f39c12; padding-bottom: 5px; margin-bottom: 8px; text-transform: uppercase;">TPS/DfLSS Factory HUD</div>`;
+      hudHTML += `<div id="hud-status" style="font-weight: bold; color: #00ff66; margin-bottom: 10px;">Pipeline Status: ACTIVE_RUNNING</div>`;
+      for (let i = 0; i < zonePlaces.length; i++) {
+        const zoneNum = i + 1;
+        const zoneName = zonePlaces[i].label || zonePlaces[i].name;
+        hudHTML += `<div id="hud-zone-${zoneNum}" style="margin: 4px 0; color: #aaa;">[ ] Zone ${zoneNum}: ${zoneName}</div>`;
+      }
+      hudContainer.innerHTML = hudHTML;
     }
 
     // Default part translations and rotations for the skeletal hierarchy
@@ -397,6 +427,96 @@
       left_leg: [0, 0, 0],
       right_leg: [0, 0, 0]
     };
+
+    function drawCubePart(cx, cy, cz, rx, ry, rz, sx, sy, sz, color) {
+      const wgX = cy;
+      const wgY = cz;
+      const wgZ = -cx;
+      const modelMatrix = new Float32Array(16);
+      mat4.identity(modelMatrix);
+      mat4.translate(modelMatrix, modelMatrix, [wgX, wgY, wgZ]);
+      if (ry) mat4.rotateX(modelMatrix, modelMatrix, ry);
+      if (rz) mat4.rotateY(modelMatrix, modelMatrix, rz);
+      if (rx) mat4.rotateZ(modelMatrix, modelMatrix, -rx);
+      mat4.scale(modelMatrix, modelMatrix, [sy, sz, sx]);
+      const mvMatrix = new Float32Array(16);
+      mat4.multiply(mvMatrix, viewMatrix, modelMatrix);
+      gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, mvMatrix);
+      gl.uniform3fv(programInfo.uniformLocations.color, color);
+      gl.bindVertexArray(vao);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+    }
+
+    function drawMech(cx, cy, cz, time, animType, color) {
+      const sec = time > 100000 ? time / 1000 : time;
+      let headRot = [0, 0, 0];
+      let lArmRot = [0, 0, 0];
+      let rArmRot = [0, 0, 0];
+      let lLegRot = [0, 0, 0];
+      let rLegRot = [0, 0, 0];
+      let wingAngle = 0.2;
+      let lArmOffset = [0, -22, 30];
+      let rArmOffset = [0, 22, 30];
+      let lLegOffset = [0, -12, 0];
+      let rLegOffset = [0, 12, 0];
+      let wingOffset = 0;
+      let headOffset = [0, 0, 60];
+      if (animType === 'gantry') {
+        const cycle = sec % 8;
+        if (cycle < 1) {
+          lLegOffset[2] -= (1 - cycle) * 100;
+        }
+        if (cycle < 2) {
+          rLegOffset[2] -= (2 - cycle) * 100;
+        }
+        if (cycle < 3) {
+          headOffset[2] += (3 - cycle) * 100;
+        }
+        if (cycle < 4) {
+          lArmOffset[1] -= (4 - cycle) * 100;
+        }
+        if (cycle < 5) {
+          rArmOffset[1] += (5 - cycle) * 100;
+        }
+        if (cycle < 6) {
+          wingOffset = (6 - cycle) * 100;
+        }
+      } else if (animType === 'fit') {
+        headRot[2] = Math.sin(sec * 2) * 0.5;
+        lArmRot[1] = 0.5;
+      } else if (animType === 'proving') {
+        lLegRot[1] = Math.sin(sec * 6) * 0.6;
+        rLegRot[1] = -Math.sin(sec * 6) * 0.6;
+        lArmRot[1] = -Math.sin(sec * 6) * 0.4;
+        rArmRot[1] = Math.sin(sec * 6) * 0.4;
+      } else if (animType === 'reveal') {
+        wingAngle = 0.4 + Math.sin(sec * 1.5) * 0.15;
+        headRot[1] = 0.1;
+      }
+      drawCubePart(cx, cy, cz + 30, 0, 0, 0, 20, 30, 40, color);
+      drawCubePart(cx + headOffset[0], cy + headOffset[1], cz + headOffset[2], headRot[0], headRot[1], headRot[2], 12, 12, 12, color);
+      drawCubePart(cx + headOffset[0] + 6, cy + headOffset[1], cz + headOffset[2] + 8, headRot[0], headRot[1], headRot[2], 8, 3, 3, [1.0, 0.84, 0.0]);
+      drawCubePart(cx + lArmOffset[0], cy + lArmOffset[1], cz + lArmOffset[2], lArmRot[0], lArmRot[1], lArmRot[2], 8, 8, 30, color);
+      drawCubePart(cx + rArmOffset[0], cy + rArmOffset[1], cz + rArmOffset[2], rArmRot[0], rArmRot[1], rArmRot[2], 8, 8, 30, color);
+      drawCubePart(cx + lLegOffset[0], cy + lLegOffset[1], cz + lLegOffset[2], lLegRot[0], lLegRot[1], lLegRot[2], 10, 10, 35, color);
+      drawCubePart(cx + rLegOffset[0], cy + rLegOffset[1], cz + rLegOffset[2], rLegRot[0], rLegRot[1], rLegRot[2], 10, 10, 35, color);
+      drawCubePart(cx - 15 - wingOffset, cy, cz + 35, 0, 0, 0, 10, 16, 25, [0.2, 0.2, 0.2]);
+      const leftWingColor = [color[0] * 0.8, color[1] * 0.8, color[2] * 0.8];
+      drawCubePart(cx - 20 - wingOffset, cy - 15, cz + 45, 0, -wingAngle, 0, 6, 25, 8, leftWingColor);
+      drawCubePart(cx - 25 - wingOffset, cy - 20, cz + 35, 0, -wingAngle * 1.5, 0, 5, 20, 8, leftWingColor);
+      drawCubePart(cx - 30 - wingOffset, cy - 25, cz + 25, 0, -wingAngle * 2.0, 0, 4, 15, 8, leftWingColor);
+      const rightWingColor = leftWingColor;
+      drawCubePart(cx - 20 - wingOffset, cy + 15, cz + 45, 0, wingAngle, 0, 6, 25, 8, rightWingColor);
+      drawCubePart(cx - 25 - wingOffset, cy + 20, cz + 35, 0, wingAngle * 1.5, 0, 5, 20, 8, rightWingColor);
+      drawCubePart(cx - 30 - wingOffset, cy + 25, cz + 25, 0, wingAngle * 2.0, 0, 4, 15, 8, rightWingColor);
+      let bladePos = [
+        cx + rArmOffset[0] + Math.cos(rArmRot[1]) * 25,
+        cy + rArmOffset[1],
+        cz + rArmOffset[2] - Math.sin(rArmRot[1]) * 25
+      ];
+      drawCubePart(bladePos[0], bladePos[1], bladePos[2], rArmRot[0], rArmRot[1], rArmRot[2], 40, 2, 6, [0.0, 1.0, 1.0]);
+    }
 
     // Recursive / Hierarchical skeletal renderer
     function renderSkeletalMech(viewMatrix, baseWorldTranslation, partRotations, partTranslations, isWireframe, baseYaw, spotlightIntensity) {
@@ -495,26 +615,48 @@
       if (keys['Space']) { /* Jumping or fly behavior */ }
 
       // Dynamic Active Zone Index Calculation
-      let activeZone = 1;
-      if (player.x < 200) activeZone = 1;
-      else if (player.x < 600) activeZone = 2;
-      else if (player.x < 1000) activeZone = 3;
-      else if (player.x < 1400) activeZone = 4;
-      else if (player.x < 1800) activeZone = 5;
-      else activeZone = 6;
+      let activeZoneIdx = -1;
+      let minDistance = Infinity;
+      let nearestZoneIdx = 0;
+      const px = player.x;
+      const py = player.y;
 
-      // Highlight HUD elements
-      for (let i = 1; i <= 6; i++) {
+      for (let idx = 0; idx < zonePlaces.length; idx++) {
+        const zone = zonePlaces[idx];
+        const halfX = zone.scale.x * 50;
+        const halfY = (zone.scale.y || zone.scale.x) * 50;
+        const xMin = zone.location.x - halfX;
+        const xMax = zone.location.x + halfX;
+        const yMin = zone.location.y - halfY;
+        const yMax = zone.location.y + halfY;
+
+        // Check if player is inside the horizontal boundaries
+        if (px >= xMin && px <= xMax && py >= yMin && py <= yMax) {
+          activeZoneIdx = idx;
+        }
+
+        // Keep track of the nearest zone center in case player is outside all zones
+        const dx = px - zone.location.x;
+        const dy = py - zone.location.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < minDistance) {
+          minDistance = dist;
+          nearestZoneIdx = idx;
+        }
+      }
+
+      if (activeZoneIdx === -1) {
+        activeZoneIdx = nearestZoneIdx;
+      }
+      
+      const activeZone = activeZoneIdx + 1;
+      const activeZonePlace = zonePlaces[activeZoneIdx];
+
+      // Highlight HUD elements dynamically
+      for (let i = 1; i <= zonePlaces.length; i++) {
         const hudEl = document.getElementById(`hud-zone-${i}`);
         if (hudEl) {
-          let zoneName = '';
-          if (i === 1) zoneName = 'Primitive Foundry';
-          else if (i === 2) zoneName = 'Part Runner Wall';
-          else if (i === 3) zoneName = 'Assembly Gantry';
-          else if (i === 4) zoneName = 'Fit + Collision Bay';
-          else if (i === 5) zoneName = 'Physics Proving Ground';
-          else if (i === 6) zoneName = 'Final Reveal Platform';
-
+          const zoneName = zonePlaces[i - 1].label || zonePlaces[i - 1].name;
           if (i === activeZone) {
             hudEl.style.color = '#00ff66';
             hudEl.style.fontWeight = 'bold';
@@ -545,231 +687,110 @@
       mat4.perspective(projectionMatrix, (45 * Math.PI) / 180, canvas.width / canvas.height, 0.1, 5000.0);
 
       gl.useProgram(programInfo.program);
-      gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-
-      // Compute View Matrix
-      const viewMatrix = new Float32Array(16);
+      gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);      // Compute View Matrix
       mat4.identity(viewMatrix);
       mat4.rotateX(viewMatrix, viewMatrix, -player.pitch);
       mat4.rotateY(viewMatrix, viewMatrix, -player.yaw);
       mat4.translate(viewMatrix, viewMatrix, [-player.x, -player.y, -player.z]);
 
-      // Render default environment actors
+      // Render default environment actors and special GMF assets
       actors.forEach(actor => {
-        const modelViewMatrix = new Float32Array(16);
-        mat4.identity(modelViewMatrix);
-        mat4.rotateX(modelViewMatrix, modelViewMatrix, -player.pitch);
-        mat4.rotateY(modelViewMatrix, modelViewMatrix, -player.yaw);
-        mat4.translate(modelViewMatrix, modelViewMatrix, [-player.x, -player.y, -player.z]);
+        const cx = actor.location.x;
+        const cy = actor.location.y;
+        const cz = actor.location.z;
 
-        mat4.translate(modelViewMatrix, modelViewMatrix, [actor.location.x, actor.location.y, actor.location.z]);
-        mat4.scale(modelViewMatrix, modelViewMatrix, [actor.scale.x * 50, actor.scale.y * 50, actor.scale.z * 50]);
-
-        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
-        
-        let color = [0.0, 0.4, 0.8];
-        if (actor.name.toLowerCase().includes('bot')) color = [0.0, 0.9, 0.3];
-        gl.uniform3fv(programInfo.uniformLocations.color, color);
-
-        gl.bindVertexArray(vao);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-      });
-
-      // --- ZONE Visual Behaviors ---
-
-      // 1. Foundry: parts spin and float in space (x < 200)
-      const floatingParts = [
-        { name: 'spine', translation: [-50, 0, 80 + Math.sin(sec * 2) * 10], rotation: [sec * 0.5, sec * 0.7, sec * 0.3], scale: [15, 12, 10], color: [0.6, 0.6, 0.7] },
-        { name: 'torso', translation: [-25, 30, 100 + Math.sin(sec * 2 + 1) * 10], rotation: [sec * 0.6, sec * 0.4, sec * 0.8], scale: [22, 16, 15], color: [0.7, 0.3, 0.3] },
-        { name: 'head', translation: [0, 50, 120 + Math.sin(sec * 2 + 2) * 10], rotation: [sec * 0.3, sec * 0.9, sec * 0.2], scale: [8, 8, 8], color: [0.8, 0.8, 0.2] },
-        { name: 'left_arm', translation: [25, 30, 100 + Math.sin(sec * 2 + 3) * 10], rotation: [sec * 0.8, sec * 0.2, sec * 0.5], scale: [6, 6, 20], color: [0.3, 0.7, 0.3] },
-        { name: 'right_arm', translation: [50, 0, 80 + Math.sin(sec * 2 + 4) * 10], rotation: [sec * 0.4, sec * 0.6, sec * 0.9], scale: [6, 6, 20], color: [0.3, 0.7, 0.3] },
-        { name: 'left_leg', translation: [-35, -30, 60 + Math.sin(sec * 2 + 5) * 10], rotation: [sec * 0.9, sec * 0.3, sec * 0.4], scale: [7, 7, 25], color: [0.3, 0.3, 0.7] },
-        { name: 'right_leg', translation: [35, -30, 60 + Math.sin(sec * 2 + 6) * 10], rotation: [sec * 0.2, sec * 0.8, sec * 0.6], scale: [7, 7, 25], color: [0.3, 0.3, 0.7] }
-      ];
-      floatingParts.forEach(part => {
-        const modelMatrix = new Float32Array(16);
-        mat4.identity(modelMatrix);
-        mat4.translate(modelMatrix, modelMatrix, part.translation);
-        mat4.rotateX(modelMatrix, modelMatrix, part.rotation[0]);
-        mat4.rotateY(modelMatrix, modelMatrix, part.rotation[1]);
-        mat4.rotateZ(modelMatrix, modelMatrix, part.rotation[2]);
-        mat4.scale(modelMatrix, modelMatrix, part.scale);
-
-        const modelViewMatrix = new Float32Array(16);
-        mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
-        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
-        gl.uniform3fv(programInfo.uniformLocations.color, part.color);
-        gl.bindVertexArray(vao);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-      });
-
-      // 2. Runner Wall: parts aligned on vertical grid (200 <= x < 600)
-      const wallParts = [
-        { name: 'head', translation: [330, 80, 120], scale: [8, 8, 8], color: [0.8, 0.8, 0.2] },
-        { name: 'torso', translation: [400, 80, 120], scale: [22, 16, 15], color: [0.7, 0.3, 0.3] },
-        { name: 'spine', translation: [470, 80, 120], scale: [15, 12, 10], color: [0.6, 0.6, 0.7] },
-        { name: 'left_arm', translation: [310, 80, 60], scale: [6, 6, 20], color: [0.3, 0.7, 0.3] },
-        { name: 'right_arm', translation: [370, 80, 60], scale: [6, 6, 20], color: [0.3, 0.7, 0.3] },
-        { name: 'left_leg', translation: [430, 80, 60], scale: [7, 7, 25], color: [0.3, 0.3, 0.7] },
-        { name: 'right_leg', translation: [490, 80, 60], scale: [7, 7, 25], color: [0.3, 0.3, 0.7] }
-      ];
-      wallParts.forEach(part => {
-        const modelMatrix = new Float32Array(16);
-        mat4.identity(modelMatrix);
-        mat4.translate(modelMatrix, modelMatrix, part.translation);
-        mat4.scale(modelMatrix, modelMatrix, part.scale);
-
-        const modelViewMatrix = new Float32Array(16);
-        mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
-        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
-        gl.uniform3fv(programInfo.uniformLocations.color, part.color);
-        gl.bindVertexArray(vao);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-      });
-
-      // 3. Assembly Gantry: parts fly and snap sequentially (600 <= x < 1000)
-      const t_cycle = sec % 8;
-      const gantryParts = [
-        { name: 'spine', parent: null, localTrans: [0, 0, 80], flyFrom: [-100, 100, 200], scale: [15, 12, 10], color: [0.6, 0.6, 0.7], snapTime: 1 },
-        { name: 'torso', parent: 'spine', localTrans: [0, 0, 20], flyFrom: [100, 100, 200], scale: [22, 16, 15], color: [0.7, 0.3, 0.3], snapTime: 2 },
-        { name: 'head', parent: 'torso', localTrans: [0, 0, 20], flyFrom: [0, 150, 180], scale: [8, 8, 8], color: [0.8, 0.8, 0.2], snapTime: 3 },
-        { name: 'left_arm', parent: 'torso', localTrans: [-18, 0, 5], flyFrom: [-150, 0, 150], scale: [6, 6, 20], color: [0.3, 0.7, 0.3], snapTime: 4 },
-        { name: 'right_arm', parent: 'torso', localTrans: [18, 0, 5], flyFrom: [150, 0, 150], scale: [6, 6, 20], color: [0.3, 0.7, 0.3], snapTime: 5 },
-        { name: 'left_leg', parent: 'spine', localTrans: [-10, 0, -25], flyFrom: [-80, -100, 50], scale: [7, 7, 25], color: [0.3, 0.3, 0.7], snapTime: 6 },
-        { name: 'right_leg', parent: 'spine', localTrans: [10, 0, -25], flyFrom: [80, -100, 50], scale: [7, 7, 25], color: [0.3, 0.3, 0.7], snapTime: 7 }
-      ];
-
-      const gantryBaseMatrix = new Float32Array(16);
-      mat4.identity(gantryBaseMatrix);
-      mat4.translate(gantryBaseMatrix, gantryBaseMatrix, [800, 0, 0]);
-
-      const computedGantryMatrices = {};
-      gantryParts.forEach(part => {
-        const localPos = [0, 0, 0];
-        const localRot = [0, 0, 0];
-        if (t_cycle >= part.snapTime) {
-          localPos[0] = part.localTrans[0];
-          localPos[1] = part.localTrans[1];
-          localPos[2] = part.localTrans[2];
-        } else if (t_cycle >= part.snapTime - 1) {
-          const t_interp = t_cycle - (part.snapTime - 1);
-          const ease = 1 - Math.pow(1 - t_interp, 3);
-          localPos[0] = part.flyFrom[0] * (1 - ease) + part.localTrans[0] * ease;
-          localPos[1] = part.flyFrom[1] * (1 - ease) + part.localTrans[1] * ease;
-          localPos[2] = part.flyFrom[2] * (1 - ease) + part.localTrans[2] * ease;
-          localRot[0] = (1 - ease) * 3.0;
-          localRot[1] = (1 - ease) * 2.0;
+        // Draw the floor if it's a place/floor
+        if (actor.name.startsWith("Place_") || actor.mesh === "Cube" || actor.name.toLowerCase().includes("place")) {
+          const modelViewMatrix = new Float32Array(16);
+          mat4.identity(modelViewMatrix);
+          mat4.rotateX(modelViewMatrix, modelViewMatrix, -player.pitch);
+          mat4.rotateY(modelViewMatrix, modelViewMatrix, -player.yaw);
+          mat4.translate(modelViewMatrix, modelViewMatrix, [-player.x, -player.y, -player.z]);
+          mat4.translate(modelViewMatrix, modelViewMatrix, [cx, cy, cz]);
+          mat4.scale(modelViewMatrix, modelViewMatrix, [actor.scale.x * 50, actor.scale.y * 50, actor.scale.z * 50]);
+          gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
+          gl.uniform3fv(programInfo.uniformLocations.color, [0.15, 0.15, 0.18]); // dark grey metal floor
+          gl.bindVertexArray(vao);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+          gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
         } else {
-          localPos[0] = part.flyFrom[0];
-          localPos[1] = part.flyFrom[1];
-          localPos[2] = part.flyFrom[2];
-          localRot[0] = 3.0;
-          localRot[1] = 2.0;
+          // Draw other default actors (bots, props)
+          const modelViewMatrix = new Float32Array(16);
+          mat4.identity(modelViewMatrix);
+          mat4.rotateX(modelViewMatrix, modelViewMatrix, -player.pitch);
+          mat4.rotateY(modelViewMatrix, modelViewMatrix, -player.yaw);
+          mat4.translate(modelViewMatrix, modelViewMatrix, [-player.x, -player.y, -player.z]);
+          mat4.translate(modelViewMatrix, modelViewMatrix, [cx, cy, cz]);
+          mat4.scale(modelViewMatrix, modelViewMatrix, [actor.scale.x * 50, actor.scale.y * 50, actor.scale.z * 50]);
+          gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
+          let color = [0.0, 0.4, 0.8];
+          if (actor.name.toLowerCase().includes('bot')) color = [0.0, 0.9, 0.3];
+          gl.uniform3fv(programInfo.uniformLocations.color, color);
+          gl.bindVertexArray(vao);
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+          gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
         }
 
-        const localMatrix = new Float32Array(16);
-        mat4.identity(localMatrix);
-        mat4.translate(localMatrix, localMatrix, localPos);
-        mat4.rotateX(localMatrix, localMatrix, localRot[0]);
-        mat4.rotateY(localMatrix, localMatrix, localRot[1]);
-
-        const worldMatrix = new Float32Array(16);
-        if (part.parent) {
-          const parentWorld = computedGantryMatrices[part.parent];
-          mat4.multiply(worldMatrix, parentWorld, localMatrix);
-        } else {
-          mat4.multiply(worldMatrix, gantryBaseMatrix, localMatrix);
+        // Draw special zone-specific assets
+        if (actor.name === 'Place_foundry') {
+          // Draw furnace and fire door
+          drawCubePart(cx, cy, cz + 60, 0, 0, 0, 80, 80, 80, [0.25, 0.25, 0.25]);
+          const doorPulse = 0.8 + Math.sin(sec * 4) * 0.2;
+          drawCubePart(cx + 41, cy, cz + 40, 0, 0, 0, 2, 30, 40, [1.0 * doorPulse, 0.3 * doorPulse, 0.0]);
         }
-        computedGantryMatrices[part.name] = worldMatrix;
+        else if (actor.name === 'Place_runner_wall') {
+          // Draw vertical racks and hanging parts
+          drawCubePart(cx, cy - 60, cz + 80, 0, 0, 0, 10, 10, 160, [0.3, 0.3, 0.3]);
+          drawCubePart(cx, cy + 60, cz + 80, 0, 0, 0, 10, 10, 160, [0.3, 0.3, 0.3]);
+          drawCubePart(cx, cy, cz + 150, 0, 0, 0, 8, 120, 8, [0.3, 0.3, 0.3]);
+          drawCubePart(cx, cy, cz + 80, 0, 0, 0, 8, 120, 8, [0.3, 0.3, 0.3]);
+          
+          drawCubePart(cx, cy - 30, cz + 110, sec, 0, 0, 12, 12, 12, [0.8, 0.3, 0.3]);
+          drawCubePart(cx, cy, cz + 110, 0, sec, 0, 15, 8, 25, [0.3, 0.3, 0.8]);
+          drawCubePart(cx, cy + 30, cz + 110, 0, 0, sec, 8, 15, 15, [0.3, 0.8, 0.3]);
+        }
+        else if (actor.name === 'Place_gantry') {
+          // Draw support frame and mech in gantry mode
+          drawCubePart(cx - 70, cy - 70, cz + 100, 0, 0, 0, 10, 10, 200, [0.4, 0.4, 0.4]);
+          drawCubePart(cx - 70, cy + 70, cz + 100, 0, 0, 0, 10, 10, 200, [0.4, 0.4, 0.4]);
+          drawCubePart(cx + 70, cy - 70, cz + 100, 0, 0, 0, 10, 10, 200, [0.4, 0.4, 0.4]);
+          drawCubePart(cx + 70, cy + 70, cz + 100, 0, 0, 0, 10, 10, 200, [0.4, 0.4, 0.4]);
+          drawCubePart(cx, cy - 70, cz + 200, 0, 0, 0, 150, 8, 8, [0.4, 0.4, 0.4]);
+          drawCubePart(cx, cy + 70, cz + 200, 0, 0, 0, 150, 8, 8, [0.4, 0.4, 0.4]);
+          drawCubePart(cx - 70, cy, cz + 200, 0, 0, 0, 8, 150, 8, [0.4, 0.4, 0.4]);
+          drawCubePart(cx + 70, cy, cz + 200, 0, 0, 0, 8, 150, 8, [0.4, 0.4, 0.4]);
 
-        const modelMatrix = new Float32Array(16);
-        mat4.identity(modelMatrix);
-        mat4.scale(modelMatrix, worldMatrix, part.scale);
+          drawMech(cx, cy, cz + 30, time, 'gantry', [0.8, 0.4, 0.4]);
+        }
+        else if (actor.name === 'Place_fit_bay') {
+          // Draw scanning arch and mech in fit mode
+          drawCubePart(cx, cy - 80, cz + 90, 0, 0, 0, 12, 12, 180, [0.2, 0.2, 0.25]);
+          drawCubePart(cx, cy + 80, cz + 90, 0, 0, 0, 12, 12, 180, [0.2, 0.2, 0.25]);
+          drawCubePart(cx, cy, cz + 180, 0, 0, 0, 12, 160, 12, [0.2, 0.2, 0.25]);
+          
+          const sweepY = Math.sin(sec * 2) * 75;
+          drawCubePart(cx, cy + sweepY, cz + 90, 0, 0, 0, 2, 10, 160, [0.0, 1.0, 0.3]);
 
-        const modelViewMatrix = new Float32Array(16);
-        mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
+          drawMech(cx, cy, cz + 30, time, 'fit', [0.4, 0.4, 0.8]);
+        }
+        else if (actor.name === 'Place_proving_ground') {
+          // Draw path and walk mech
+          drawCubePart(cx, cy, cz + 1, 0, 0, 0, 120, 40, 2, [0.1, 0.1, 0.1]);
+          const pathOffset = Math.sin(sec * 1.5) * 50;
+          drawMech(cx + pathOffset, cy, cz + 30, time, 'proving', [0.4, 0.8, 0.4]);
+        }
+        else if (actor.name === 'Place_reveal_platform') {
+          // Draw pedestal and standing mech
+          drawCubePart(cx, cy, cz + 5, 0, 0, 0, 60, 60, 10, [0.3, 0.3, 0.35]);
+          drawCubePart(cx, cy, cz + 150, 0, 0, 0, 12, 12, 300, [1.0, 1.0, 0.3]);
+          
+          drawMech(cx, cy, cz + 10, time, 'reveal', [0.9, 0.9, 0.9]);
 
-        gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix);
-        gl.uniform3fv(programInfo.uniformLocations.color, part.color);
-        gl.bindVertexArray(vao);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+          // Floating receipt panel
+          const receiptPulse = Math.sin(sec * 3) * 5;
+          drawCubePart(cx + 40, cy + 40, cz + 80 + receiptPulse, 0.2, -0.2, sec * 0.5, 5, 30, 20, [0.0, 0.8, 1.0]);
+        }
       });
-
-      // 4. Fit + Collision Bay: sweep/oscillate joints & collision outline boxes (1000 <= x < 1400)
-      const collisionRotations = {
-        spine: [0, 0, 0],
-        torso: [0, 0, 0],
-        head: [0, Math.sin(sec * 2.0) * 0.4, 0],
-        left_arm: [Math.sin(sec * 3.0) * 0.8, 0, Math.cos(sec * 2.0) * 0.5],
-        right_arm: [-Math.sin(sec * 3.0) * 0.8, 0, -Math.cos(sec * 2.0) * 0.5],
-        left_leg: [Math.sin(sec * 4.0) * 0.6, 0, 0],
-        right_leg: [-Math.sin(sec * 4.0) * 0.6, 0, 0]
-      };
-      renderSkeletalMech(viewMatrix, [1200, 0, 0], collisionRotations, defaultPartTranslations, true, 0, 1.0);
-
-      // 5. Physics Proving Ground: player movement & leg walk cycle (1400 <= x < 1800)
-      const isMoving = keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] || keys['W'] || keys['S'] || keys['A'] || keys['D'] || keys['ArrowLeft'] || keys['ArrowRight'];
-      const isSpace = keys['Space'] || keys['spacebar'] || keys[' '];
-      const provingRotations = {
-        spine: [0, 0, 0],
-        torso: [0, 0, 0],
-        head: [0, 0, 0],
-        left_arm: [0, 0, 0],
-        right_arm: [0, 0, 0],
-        left_leg: [0, 0, 0],
-        right_leg: [0, 0, 0]
-      };
-      if (isMoving) {
-        provingRotations.left_leg[0] = Math.sin(sec * 12.0) * 0.7;
-        provingRotations.right_leg[0] = -Math.sin(sec * 12.0) * 0.7;
-        provingRotations.left_arm[0] = -Math.sin(sec * 12.0) * 0.4;
-        provingRotations.right_arm[0] = Math.sin(sec * 12.0) * 0.4;
-      }
-      if (isSpace) {
-        provingRotations.left_arm[2] = 1.3;
-        provingRotations.right_arm[2] = -1.3;
-        provingRotations.left_leg[0] = -0.5;
-        provingRotations.right_leg[0] = -0.5;
-      }
-      if (activeZone === 5) {
-        const playerMechPos = [player.x + Math.cos(player.yaw) * 120, player.y + Math.sin(player.yaw) * 120, 0];
-        renderSkeletalMech(viewMatrix, playerMechPos, provingRotations, defaultPartTranslations, false, player.yaw - Math.PI / 2, 1.0);
-      }
-
-      // 6. Final Reveal Platform: rotating completed mech under spotlight (x >= 1800)
-      // Pedestal base
-      const pedestalModel = new Float32Array(16);
-      mat4.identity(pedestalModel);
-      mat4.translate(pedestalModel, pedestalModel, [2000, 0, 5]);
-      mat4.scale(pedestalModel, pedestalModel, [60, 60, 10]);
-      const pedestalMV = new Float32Array(16);
-      mat4.multiply(pedestalMV, viewMatrix, pedestalModel);
-      gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, pedestalMV);
-      gl.uniform3fv(programInfo.uniformLocations.color, [0.3, 0.3, 0.35]);
-      gl.bindVertexArray(vao);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-      gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-
-      // Spotlight beam visual helper (yellow wireframe cone)
-      const spotlightModel = new Float32Array(16);
-      mat4.identity(spotlightModel);
-      mat4.translate(spotlightModel, spotlightModel, [2000, 0, 150]);
-      mat4.scale(spotlightModel, spotlightModel, [25, 25, 150]);
-      const spotlightMV = new Float32Array(16);
-      mat4.multiply(spotlightMV, viewMatrix, spotlightModel);
-      gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrix, false, spotlightMV);
-      gl.uniform3fv(programInfo.uniformLocations.color, [1.0, 1.0, 0.3]);
-      gl.bindVertexArray(vao);
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, lineIndexBuffer);
-      gl.drawElements(gl.LINES, 24, gl.UNSIGNED_SHORT, 0);
-
-      // Rotating mech standing on pedestal
-      renderSkeletalMech(viewMatrix, [2000, 0, 10], defaultPartRotations, defaultPartTranslations, false, sec * 0.6, 2.0);
 
       requestAnimationFrame(render);
     }

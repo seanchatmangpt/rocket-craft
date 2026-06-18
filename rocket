@@ -1,17 +1,51 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 # rocket - Unified Rocket Craft Management Tool (Rust Wrapper)
+set -euo pipefail
 
-set -e
+# Resolve script directory dynamically
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_PATH="${PROJECT_ROOT}/tools/target/release/rocket-cmd"
 
-PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
-BIN_PATH="$PROJECT_ROOT/tools/target/release/rocket-cmd"
-
-# Build the tool if it doesn't exist
-if [ ! -f "$BIN_PATH" ]; then
-    echo "Building Rocket Craft tools (release)..."
-    cd "$PROJECT_ROOT/tools/rocket-cmd" && cargo build --release > /dev/null
-    cd "$PROJECT_ROOT"
+# Color support check
+if [ -t 1 ] && [ "${NO_COLOR:-}" = "" ]; then
+    BOLD="\033[1m"
+    RED="\033[31m"
+    GREEN="\033[32m"
+    BLUE="\033[34m"
+    RESET="\033[0m"
+else
+    BOLD=""
+    RED=""
+    GREEN=""
+    BLUE=""
+    RESET=""
 fi
 
-# Pass all arguments to the Rust binary
-exec "$BIN_PATH" "$@"
+log_info() { echo -e "${BLUE}${BOLD}[INFO]${RESET} $*"; }
+log_success() { echo -e "${GREEN}${BOLD}[SUCCESS]${RESET} $*"; }
+log_error() { echo -e "${RED}${BOLD}[ERROR]${RESET} $*" >&2; }
+
+# Build the tool if the release binary does not exist
+if [ ! -f "${BIN_PATH}" ]; then
+    log_info "Release binary not found. Building Rocket Craft command-line tool..."
+    
+    # Run cargo build in a subshell to keep directory state clean
+    (
+        cd "${PROJECT_ROOT}/tools/rocket-cmd"
+        if ! cargo build --release > /dev/null 2>&1; then
+            log_error "Failed to build rocket-cmd. Please check cargo build errors."
+            exit 1
+        fi
+    )
+    
+    if [ -f "${BIN_PATH}" ]; then
+        log_success "Rocket Craft CLI tool built successfully."
+    else
+        log_error "Build completed but target binary not found at ${BIN_PATH}."
+        exit 1
+    fi
+fi
+
+# Execute the Rust binary directly, passing all command-line arguments
+exec "${BIN_PATH}" "$@"

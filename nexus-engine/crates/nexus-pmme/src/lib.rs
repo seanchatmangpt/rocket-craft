@@ -173,6 +173,67 @@ impl<State, P> PartialEq for MechAssemblySpec<State, P> {
 
 // --- Builder Pattern with Typestates ---
 
+/// A typestate-enforced builder for configuring a [`MechAssemblySpec`].
+///
+/// Every single field must be explicitly set before `build()` becomes available.
+/// This prevents runtime errors related to missing components.
+///
+/// # Examples
+///
+/// ```
+/// use std::marker::PhantomData;
+/// use nexus_pmme::{
+///     MechAssemblySpecBuilder, Frame, Joint, Power, MotionProfile,
+///     CollisionVolume, MaterialSpec, CulturalProfile, PlanetaryValues,
+///     FunctionalRole, Set, Unset
+/// };
+/// use nexus_gundam::generated_gundam::{Earth, AABB};
+///
+/// let frame = Frame {
+///     id: "TestFrame".to_string(),
+///     size: [5.0, 5.0, 5.0],
+///     scale: 1.0,
+///     load_capacity: 1000.0,
+///     center_of_mass: [0.0, 1.0, 0.0],
+///     mobility_class: "Walking".to_string(),
+/// };
+/// let joints = vec![];
+/// let power = Power { mass: 50.0, energy_capacity: 500.0, output: 50.0 };
+/// let motion = MotionProfile::Walk;
+/// let collision = CollisionVolume {
+///     physical_occupancy: AABB::new([-2.5, 0.0, -2.5], [2.5, 5.0, 2.5]),
+///     clearance_volumes: AABB::new([-3.5, -1.0, -3.5], [3.5, 6.0, 3.5]),
+///     interaction_zones: vec![],
+///     damage_zones: vec![],
+/// };
+/// let material = MaterialSpec {
+///     structural: "Titanium".to_string(),
+///     armor: "Chobham".to_string(),
+///     visual: "Gray".to_string(),
+///     wear_state: 0.0,
+///     environmental: "Standard".to_string(),
+/// };
+/// let culture = CulturalProfile {
+///     planetary_values: PlanetaryValues {
+///         faith: 0.5, ambition: 0.5, beauty: 0.5, community: 0.5, order: 0.5, knowledge: 0.5
+///     },
+///     _marker: PhantomData::<Earth>,
+/// };
+/// let role = FunctionalRole::Worker;
+///
+/// let spec = MechAssemblySpecBuilder::new()
+///     .frame(frame)
+///     .joints(joints)
+///     .power(power)
+///     .motion_profile(motion)
+///     .collision_volume(collision)
+///     .material_spec(material)
+///     .cultural_profile(culture)
+///     .functional_role(role)
+///     .build();
+///
+/// assert_eq!(spec.frame.id, "TestFrame");
+/// ```
 pub struct MechAssemblySpecBuilder<
     P,
     FrameState = Unset,

@@ -1,5 +1,5 @@
 {
-  "event_types": [
+  "eventTypes": [
     {
       "attributes": [],
       "name": "RepositoryScanned"
@@ -31,110 +31,106 @@
   ],
   "events": [
     {
-      "activity": "RepositoryScanned",
       "attributes": [],
       "id": "ev_repo_scan",
       "relationships": [
         {
-          "event_id": "ev_repo_scan",
-          "object_id": "repo_lsp_max",
+          "objectId": "repo_lsp_max",
           "qualifier": "repository"
         }
-      ]
+      ],
+      "time": "2026-06-18T19:10:25.896590Z",
+      "type": "RepositoryScanned"
     },
     {
-      "activity": "FileObserved",
       "attributes": [],
       "id": "ev_file_obs",
       "relationships": [
         {
-          "event_id": "ev_file_obs",
-          "object_id": "file_server_rs",
+          "objectId": "file_server_rs",
           "qualifier": "observed_file"
         }
-      ]
+      ],
+      "time": "2026-06-18T19:10:25.896590Z",
+      "type": "FileObserved"
     },
     {
-      "activity": "DiagnosticEmitted",
       "attributes": [],
       "id": "ev_diag_emit",
       "relationships": [
         {
-          "event_id": "ev_diag_emit",
-          "object_id": "range_server_rs_1",
+          "objectId": "range_server_rs_1",
           "qualifier": "range"
         },
         {
-          "event_id": "ev_diag_emit",
-          "object_id": "diag_code_ocel_001",
+          "objectId": "diag_code_ocel_001",
           "qualifier": "code"
         },
         {
-          "event_id": "ev_diag_emit",
-          "object_id": "forbidden_imp_ocel_001",
+          "objectId": "forbidden_imp_ocel_001",
           "qualifier": "forbidden_implication"
         },
         {
-          "event_id": "ev_diag_emit",
-          "object_id": "cp_ocel_compat_001",
+          "objectId": "cp_ocel_compat_001",
           "qualifier": "checkpoint"
         }
-      ]
+      ],
+      "time": "2026-06-18T19:10:25.896591Z",
+      "type": "DiagnosticEmitted"
     },
     {
-      "activity": "ReceiptValidated",
       "attributes": [],
       "id": "ev_receipt_val",
       "relationships": [
         {
-          "event_id": "ev_receipt_val",
-          "object_id": "receipt_ocel_json",
+          "objectId": "receipt_ocel_json",
           "qualifier": "receipt"
         },
         {
-          "event_id": "ev_receipt_val",
-          "object_id": "digest_ocel_json",
+          "objectId": "digest_ocel_json",
           "qualifier": "digest"
         },
         {
-          "event_id": "ev_receipt_val",
-          "object_id": "cp_ocel_compat_001",
+          "objectId": "cp_ocel_compat_001",
           "qualifier": "checkpoint"
         }
-      ]
+      ],
+      "time": "2026-06-18T19:10:25.896603Z",
+      "type": "ReceiptValidated"
     },
     {
-      "activity": "Lsp318FeatureExercised",
       "attributes": [],
       "id": "ev_lsp318",
       "relationships": [
         {
-          "event_id": "ev_lsp318",
-          "object_id": "feature_row_001",
+          "objectId": "feature_row_001",
           "qualifier": "feature_row"
         }
-      ]
+      ],
+      "time": "2026-06-18T19:10:25.896604Z",
+      "type": "Lsp318FeatureExercised"
     },
     {
-      "activity": "NegativeControlExecuted",
       "attributes": [],
       "id": "ev_neg_control",
       "relationships": [
         {
-          "event_id": "ev_neg_control",
-          "object_id": "fixture_changelog_laundering",
+          "objectId": "fixture_changelog_laundering",
           "qualifier": "fixture"
         }
-      ]
+      ],
+      "time": "2026-06-18T19:10:25.896604Z",
+      "type": "NegativeControlExecuted"
     },
     {
-      "activity": "FailsetUpdated",
       "attributes": [],
       "id": "ev_failset",
-      "relationships": []
+      "relationships": [],
+      "time": "2026-06-18T19:10:25.896604Z",
+      "type": "FailsetUpdated"
     }
   ],
-  "object_types": [
+  "objectTypes": [
     {
       "attributes": [],
       "name": "Repository"
@@ -188,193 +184,171 @@
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "name",
-            "value": "lsp-max"
-          }
+          "name": "name",
+          "time": "2026-06-18T19:10:25.896561Z",
+          "value": "lsp-max"
         },
         {
-          "type": "String",
-          "value": {
-            "name": "path",
-            "value": "/Users/sac/lsp-max"
-          }
+          "name": "path",
+          "time": "2026-06-18T19:10:25.896585Z",
+          "value": "/Users/sac/lsp-max"
         }
       ],
       "id": "repo_lsp_max",
-      "object_type": "Repository"
+      "relationships": [],
+      "type": "Repository"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "name",
-            "value": "anti-llm-cheat-lsp"
-          }
+          "name": "name",
+          "time": "2026-06-18T19:10:25.896585Z",
+          "value": "anti-llm-cheat-lsp"
         }
       ],
       "id": "crate_anti_llm_cheat_lsp",
-      "object_type": "Crate"
+      "relationships": [],
+      "type": "Crate"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "path",
-            "value": "examples/anti-llm-cheat-lsp/src/server.rs"
-          }
+          "name": "path",
+          "time": "2026-06-18T19:10:25.896586Z",
+          "value": "examples/anti-llm-cheat-lsp/src/server.rs"
         }
       ],
       "id": "file_server_rs",
-      "object_type": "File"
+      "relationships": [],
+      "type": "File"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "file",
-            "value": "examples/anti-llm-cheat-lsp/src/server.rs"
-          }
+          "name": "file",
+          "time": "2026-06-18T19:10:25.896586Z",
+          "value": "examples/anti-llm-cheat-lsp/src/server.rs"
         },
         {
-          "type": "Integer",
-          "value": {
-            "name": "line",
-            "value": 42
-          }
+          "name": "line",
+          "time": "2026-06-18T19:10:25.896586Z",
+          "value": 42
         }
       ],
       "id": "range_server_rs_1",
-      "object_type": "FileRange"
+      "relationships": [],
+      "type": "FileRange"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "name",
-            "value": "OCEL-COMPAT-001"
-          }
+          "name": "name",
+          "time": "2026-06-18T19:10:25.896586Z",
+          "value": "OCEL-COMPAT-001"
         },
         {
-          "type": "String",
-          "value": {
-            "name": "status",
-            "value": "PROCESS_EVIDENCE_COMPLETE"
-          }
+          "name": "status",
+          "time": "2026-06-18T19:10:25.896588Z",
+          "value": "PROCESS_EVIDENCE_COMPLETE"
         }
       ],
       "id": "cp_ocel_compat_001",
-      "object_type": "Checkpoint"
+      "relationships": [],
+      "type": "Checkpoint"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "code",
-            "value": "ANTI-LLM-OCEL-001"
-          }
+          "name": "code",
+          "time": "2026-06-18T19:10:25.896588Z",
+          "value": "ANTI-LLM-OCEL-001"
         }
       ],
       "id": "diag_code_ocel_001",
-      "object_type": "DiagnosticCode"
+      "relationships": [],
+      "type": "DiagnosticCode"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "implication",
-            "value": "DiagnosticEmitted => ProcessEvidenceRecorded"
-          }
+          "name": "implication",
+          "time": "2026-06-18T19:10:25.896589Z",
+          "value": "DiagnosticEmitted => ProcessEvidenceRecorded"
         }
       ],
       "id": "forbidden_imp_ocel_001",
-      "object_type": "ForbiddenImplication"
+      "relationships": [],
+      "type": "ForbiddenImplication"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "code",
-            "value": "ANTI-LLM-OCEL-001"
-          }
+          "name": "code",
+          "time": "2026-06-18T19:10:25.896589Z",
+          "value": "ANTI-LLM-OCEL-001"
         },
         {
-          "type": "String",
-          "value": {
-            "name": "message",
-            "value": "Diagnostic emitted without corresponding OCEL process event"
-          }
+          "name": "message",
+          "time": "2026-06-18T19:10:25.896589Z",
+          "value": "Diagnostic emitted without corresponding OCEL process event"
         }
       ],
       "id": "diag_instance_1",
-      "object_type": "Diagnostic"
+      "relationships": [],
+      "type": "Diagnostic"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "path",
-            "value": "examples/anti-llm-cheat-lsp/ocel/anti_llm_cheat_lsp_ocel.receipt.json"
-          }
+          "name": "path",
+          "time": "2026-06-18T19:10:25.896589Z",
+          "value": "examples/anti-llm-cheat-lsp/ocel/anti_llm_cheat_lsp_ocel.receipt.json"
         }
       ],
       "id": "receipt_ocel_json",
-      "object_type": "Receipt"
+      "relationships": [],
+      "type": "Receipt"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "algorithm",
-            "value": "BLAKE3"
-          }
+          "name": "algorithm",
+          "time": "2026-06-18T19:10:25.896589Z",
+          "value": "BLAKE3"
         },
         {
-          "type": "String",
-          "value": {
-            "name": "value",
-            "value": "temp_val"
-          }
+          "name": "value",
+          "time": "2026-06-18T19:10:25.896589Z",
+          "value": "temp_val"
         }
       ],
       "id": "digest_ocel_json",
-      "object_type": "Digest"
+      "relationships": [],
+      "type": "Digest"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "name",
-            "value": "lsp318-feature-row-001"
-          }
+          "name": "name",
+          "time": "2026-06-18T19:10:25.896590Z",
+          "value": "lsp318-feature-row-001"
         }
       ],
       "id": "feature_row_001",
-      "object_type": "Lsp318FeatureRow"
+      "relationships": [],
+      "type": "Lsp318FeatureRow"
     },
     {
       "attributes": [
         {
-          "type": "String",
-          "value": {
-            "name": "name",
-            "value": "fixture-changelog-laundering"
-          }
+          "name": "name",
+          "time": "2026-06-18T19:10:25.896590Z",
+          "value": "fixture-changelog-laundering"
         }
       ],
       "id": "fixture_changelog_laundering",
-      "object_type": "NegativeControlFixture"
+      "relationships": [],
+      "type": "NegativeControlFixture"
     }
   ]
 }

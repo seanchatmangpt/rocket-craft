@@ -34,7 +34,9 @@ enum Commands {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    simulator_core::telemetry::init_telemetry();
     let cli = Cli::parse();
+
 
     // Default workspace root to parent directory if not provided
     let workspace_root = cli.workspace_root.unwrap_or_else(|| {
@@ -59,18 +61,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::RunE2e { name, world_seed } => {
             let contract = RocketContract::new(name, world_seed);
             let engine = SimulationEngine::new(contract, workspace_root);
-
-            println!("Starting E2E simulation coordination natively in Rust...");
+            tracing::info!("Starting E2E simulation coordination natively in Rust...");
             let receipt = engine.run_e2e_simulation()?;
-            println!("E2E Simulation SUCCESSful!");
-            println!("Receipt details:");
-            println!("  Verdict: {}", receipt.verdict);
-            println!("  Visual Delta: {}", receipt.visual_delta);
-            println!("  Contract Hash: {}", receipt.contract_hash);
-            if let Some(sig) = receipt.signature {
-                println!("  Signature: {}", sig);
-            }
+            tracing::info!("E2E Simulation completed successfully!");
+
+            tracing::info!(target: "receipt", "
+┌────────────────────────────────────────────────────────┐
+│            PLAYWRIGHT E2E SIMULATION RECEIPT           │
+├─────────────────┬──────────────────────────────────────┤
+│ Contract Hash   │ {:<36} │
+│ Visual Delta    │ {:<36} │
+│ Verdict         │ \x1b[1;32m{:<36}\x1b[0m │
+│ Timestamp       │ {:<36} │
+│ Signature       │ {:<36} │
+└────────────────────────────────────────────────────────┘",
+                receipt.contract_hash,
+                format!("{} px", receipt.visual_delta),
+                receipt.verdict,
+                receipt.timestamp,
+                receipt.signature.as_deref().unwrap_or("NONE")
+            );
         }
     }
+
     Ok(())
 }

@@ -46,6 +46,7 @@ impl RocketDoctor {
             self.check_manifest(),
             self.check_versions_dir(),
             self.check_ue4_root(),
+            self.check_ue4_plugins(),
             self.check_ggen(),
             self.check_anti_llm_cheat_lsp(),
         ];
@@ -266,6 +267,85 @@ impl RocketDoctor {
                 status: CheckStatus::Warn,
                 message: "UE4 root not configured".to_string(),
                 details: Some("Run 'rocket setup' to configure Unreal Engine path.".to_string()),
+            }
+        }
+    }
+
+    fn check_ue4_plugins(&self) -> CheckResult {
+        let mut ue4_root = None;
+        let rocket_json = self.project_root.join(".rocket.json");
+        if rocket_json.exists() {
+            if let Ok(content) = std::fs::read_to_string(&rocket_json) {
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&content) {
+                    if let Some(root) = v.get("ue4_root").and_then(|r| r.as_str()) {
+                        ue4_root = Some(PathBuf::from(root));
+                    }
+                }
+            }
+        }
+        if ue4_root.is_none() {
+            if let Ok(root) = std::env::var("UE4_ROOT") {
+                ue4_root = Some(PathBuf::from(root));
+            } else if let Ok(root) = std::env::var("UE_ROOT") {
+                ue4_root = Some(PathBuf::from(root));
+            }
+        }
+
+        let root_path = match ue4_root {
+            Some(p) => p,
+            None => {
+                return CheckResult {
+                    name: "UE4 Plugins".to_string(),
+                    status: CheckStatus::Warn,
+                    message: "Skipped: UE4 root not configured, cannot verify plugins".to_string(),
+                    details: None,
+                };
+            }
+        };
+
+        // Check WebSocketNetworking
+        let ws_paths = vec![
+            "Engine/Plugins/Runtime/Networking/WebSocketNetworking/WebSocketNetworking.uplugin",
+            "Engine/Plugins/Networking/WebSocketNetworking/WebSocketNetworking.uplugin",
+            "Engine/Plugins/WebSocketNetworking/WebSocketNetworking.uplugin",
+        ];
+        let mut ws_ok = false;
+        for rel in &ws_paths {
+            if root_path.join(rel).exists() {
+                ws_ok = true;
+                break;
+            }
+        }
+
+        // Check VaRest
+        let varest_paths = vec![
+            "Engine/Plugins/Marketplace/VaRest/VaRest.uplugin",
+            "Engine/Plugins/VaRest/VaRest.uplugin",
+        ];
+        let mut varest_ok = false;
+        for rel in &varest_paths {
+            if root_path.join(rel).exists() {
+                varest_ok = true;
+                break;
+            }
+        }
+
+        if ws_ok && varest_ok {
+            CheckResult {
+                name: "UE4 Plugins".to_string(),
+                status: CheckStatus::Pass,
+                message: "Found required plugins: WebSocketNetworking, VaRest".to_string(),
+                details: None,
+            }
+        } else {
+            let mut missing = Vec::new();
+            if !ws_ok { missing.push("WebSocketNetworking"); }
+            if !varest_ok { missing.push("VaRest"); }
+            CheckResult {
+                name: "UE4 Plugins".to_string(),
+                status: CheckStatus::Fail,
+                message: format!("Missing plugins: {}", missing.join(", ")),
+                details: Some("Ensure your UE4.24 build includes WebSocketNetworking and VaRest plugins.".to_string()),
             }
         }
     }

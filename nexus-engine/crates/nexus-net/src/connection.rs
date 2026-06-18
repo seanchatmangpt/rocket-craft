@@ -37,6 +37,25 @@ pub struct InMatch;
 /// The type parameter `S` is a zero-sized marker that encodes the current
 /// protocol state.  Fields are intentionally `pub` so higher-level server code
 /// can read them without boilerplate accessors.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_net::connection::{Connection, Disconnected, Connected};
+///
+/// // Create a default disconnected connection
+/// let conn = Connection::new();
+/// assert!(conn.player_id.is_none());
+///
+/// // Disconnected -> Handshaking -> Connected transition sequence
+/// let handshaking = conn.begin_handshake();
+/// let connected = handshaking.complete();
+///
+/// // Connected -> Authenticated transition
+/// let authenticated = connected.authenticate(101, 9999);
+/// assert_eq!(authenticated.player_id, Some(101));
+/// assert_eq!(authenticated.session_id, Some(9999));
+/// ```
 pub struct Connection<S> {
     /// Populated after successful `Authenticate` flow.
     pub player_id: Option<u64>,
@@ -51,6 +70,122 @@ pub struct Connection<S> {
     /// Active match id when in the `InMatch` state; `None` otherwise.
     pub match_id: Option<u64>,
     _state: PhantomData<S>,
+}
+
+/// A builder for [`Connection`] in the [`Disconnected`] state.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_net::connection::{Connection, ConnectionBuilder, Disconnected};
+///
+/// let conn = ConnectionBuilder::new()
+///     .player_id(7)
+///     .session_id(777)
+///     .latency_ms(15)
+///     .build();
+///
+/// assert_eq!(conn.player_id, Some(7));
+/// assert_eq!(conn.session_id, Some(777));
+/// assert_eq!(conn.latency_ms, 15);
+/// ```
+#[derive(Debug, Clone)]
+pub struct ConnectionBuilder {
+    player_id: Option<u64>,
+    session_id: Option<u64>,
+    latency_ms: u32,
+    messages_sent: u64,
+    messages_received: u64,
+    match_id: Option<u64>,
+}
+
+impl ConnectionBuilder {
+    /// Create a new builder with default parameters.
+    pub fn new() -> Self {
+        Self {
+            player_id: None,
+            session_id: None,
+            latency_ms: 0,
+            messages_sent: 0,
+            messages_received: 0,
+            match_id: None,
+        }
+    }
+
+    /// Set the player ID.
+    pub fn player_id(mut self, player_id: u64) -> Self {
+        self.player_id = Some(player_id);
+        self
+    }
+
+    /// Set the session ID.
+    pub fn session_id(mut self, session_id: u64) -> Self {
+        self.session_id = Some(session_id);
+        self
+    }
+
+    /// Set the initial latency estimate.
+    pub fn latency_ms(mut self, latency_ms: u32) -> Self {
+        self.latency_ms = latency_ms;
+        self
+    }
+
+    /// Set the messages sent count.
+    pub fn messages_sent(mut self, count: u64) -> Self {
+        self.messages_sent = count;
+        self
+    }
+
+    /// Set the messages received count.
+    pub fn messages_received(mut self, count: u64) -> Self {
+        self.messages_received = count;
+        self
+    }
+
+    /// Set the current match ID.
+    pub fn match_id(mut self, match_id: u64) -> Self {
+        self.match_id = Some(match_id);
+        self
+    }
+
+    /// Build the connection in [`Disconnected`] state.
+    pub fn build(self) -> Connection<Disconnected> {
+        Connection {
+            player_id: self.player_id,
+            session_id: self.session_id,
+            latency_ms: self.latency_ms,
+            messages_sent: self.messages_sent,
+            messages_received: self.messages_received,
+            match_id: self.match_id,
+            _state: PhantomData,
+        }
+    }
+}
+
+impl Default for ConnectionBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Represents the dynamic runtime state of a WebSocket connection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum ConnectionState {
+    Disconnected,
+    Handshaking,
+    Connected,
+    Authenticated,
+    InLobby,
+    InMatch,
+}
+
+/// Errors returned when a connection transition is invalid at runtime.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+#[error("Illegal connection state transition: cannot transition from {current:?} to {target:?}. Reason: {reason}")]
+pub struct ConnectionTransitionError {
+    pub current: ConnectionState,
+    pub target: ConnectionState,
+    pub reason: String,
 }
 
 // ── Internal helper ───────────────────────────────────────────────────────────

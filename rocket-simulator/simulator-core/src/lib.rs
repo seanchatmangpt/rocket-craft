@@ -1,6 +1,9 @@
 use anyhow::Result;
 use blake3::Hasher;
 use serde::{Deserialize, Serialize};
+
+pub mod telemetry;
+
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]

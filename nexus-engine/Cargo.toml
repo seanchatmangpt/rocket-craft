@@ -14,6 +14,7 @@ members = [
     "crates/nexus-gundam",
     "crates/nexus-pmme",
     "crates/nexus-tps",
+    "crates/nexus-mud",
 ]
 
 [workspace.dependencies]
@@ -65,3 +66,4 @@ nexus-integration = { path = "crates/nexus-integration" }
 nexus-gundam = { path = "crates/nexus-gundam" }
 nexus-pmme = { path = "crates/nexus-pmme" }
 nexus-tps = { path = "crates/nexus-tps" }
+nexus-mud = { path = "crates/nexus-mud" }

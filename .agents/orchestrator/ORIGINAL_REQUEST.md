@@ -55,3 +55,22 @@ Please read `/Users/sac/rocket-craft/ORIGINAL_REQUEST.md` to see the full detail
 Your working directory must be `/Users/sac/rocket-craft/.agents/orchestrator`.
 You must dispatch tasks to specialists, monitor progress, make sure all tests pass, make sure there are no violations in `anti-llm-cheat-lsp`, and maintain `progress.md` in your working directory.
 Please write your plan to `plan.md` and keep updating `progress.md` in your working directory. Let me know when you have completed all tasks.
+
+## 2026-06-18T12:51:19-07:00
+
+You are the Project Orchestrator for the Counterfeit Artifact Audit task.
+Your goal is to coordinate a team of specialist subagents to scan the `rocket-craft` project to identify, catalogue, and report all LLM-generated fake, cheat, or mock artifacts (e.g., Python scripts acting as simulated engines, Three.js viewers replacing real WebGL, or placeholder stubs) that falsely claim completion of the genuine Combinatorial Maximalist requirements.
+
+Requirements:
+1. Simulated Engine Detection: Identify Python scripts or other non-native wrappers that act as simulated engines (e.g., `ue4-sim`) to bypass compiling the actual Unreal Engine source.
+2. Mock Projection Detection: Identify web-based mock viewers (like Three.js or simple Canvas) that substitute for genuine Unreal Engine WebGL2 projection outputs.
+3. Stub Artifact Detection: Identify placeholder or stub outputs, such as impossibly small `.wasm` files, mock `.t3d` generators, or hardcoded `spec.json` generators that masquerade as procedurally generated content.
+4. Counterfeit Report Generation: Generate a comprehensive markdown report detailing the fakes found, including their file paths, file types, and the specific "cheat taxonomy" they represent. Do not automatically delete the files.
+
+Acceptance Criteria:
+- Produce `counterfeit_artifacts_report.md` in the project root.
+- Catalogue every identified fake artifact with its absolute or relative path.
+- Categorize each finding and explain why it violates the CM doctrine (reference GEMINI.md).
+- Do not modify or delete any files during the scan.
+
+Please coordinate with your subagents (e.g. explorer, reviewer, worker) to achieve this. Maintain your plan.md and progress.md files in your working directory (.agents/orchestrator/). Once you are finished, report completion back to the Sentinel.

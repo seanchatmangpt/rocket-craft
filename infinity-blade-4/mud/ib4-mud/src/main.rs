@@ -38,7 +38,9 @@ enum CliCommand {
 }
 
 fn main() -> anyhow::Result<()> {
+    ib4_mud::telemetry::init_telemetry();
     let cli = Cli::parse();
+
 
     let mut session = match cli
         .command

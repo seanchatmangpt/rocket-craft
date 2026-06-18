@@ -35,7 +35,7 @@ if %ERRORLEVEL% neq 0 (
             pause
             exit /b 1
         )
-    else (
+    ) else (
         echo Error: Failed to download rustup-init.exe
         echo Please install Rust manually from https://rustup.rs/
         pause

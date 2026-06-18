@@ -22,6 +22,41 @@ pub struct Mech<Mob> {
     pub class: String,
 }
 
+/// A builder for constructing a custom Gundam/Mech assembly with typestate safety.
+///
+/// Only mechs with a set mobility component can be built.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_gundam::builder::{MechBuilder, Set, Unset};
+/// use nexus_gundam::generated_gundam::{Frame, Power, Armor, Flight, Mobility, AABB};
+///
+/// let frame = Frame::default();
+/// let power = Power::default();
+/// let armor = Armor::default();
+/// let mobility = Flight {
+///     physical: Mobility {
+///         id: "FlightModule".to_string(),
+///         mass: 100.0,
+///         occupancy: AABB::default(),
+///         clearance: AABB::default(),
+///         load_capacity: 1000.0,
+///         max_speed: 150.0,
+///     },
+///     wing_span: 12.0,
+/// };
+///
+/// let mech = MechBuilder::new()
+///     .with_frame(frame)
+///     .with_power(power)
+///     .with_armor(armor)
+///     .with_mobility(mobility)
+///     .with_class("AerialGuardian")
+///     .build();
+///
+/// assert_eq!(mech.class, "AerialGuardian");
+/// ```
 #[derive(Debug, Clone)]
 pub struct MechBuilder<MobilityState> {
     pub frame: Option<Frame>,
@@ -36,6 +71,7 @@ pub struct MechBuilder<MobilityState> {
 }
 
 impl MechBuilder<Unset> {
+    /// Create a new empty `MechBuilder` where mobility is unset.
     pub fn new() -> Self {
         Self {
             frame: None,
@@ -360,6 +396,23 @@ pub struct Civilization<Plan> {
     pub resources: Vec<String>,
 }
 
+/// A builder for creating custom civilizations on planets with typestate-enforced rules.
+///
+/// Only civilizations with a declared planet can be built.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_gundam::builder::{CivilizationBuilder, Set, Unset};
+/// use nexus_gundam::generated_gundam::Earth;
+///
+/// let earth_civ = CivilizationBuilder::new()
+///     .with_planet(Earth)
+///     .with_name("United Earth Sphere Alliance")
+///     .build();
+///
+/// assert_eq!(earth_civ.name, "United Earth Sphere Alliance");
+/// ```
 #[derive(Debug, Clone)]
 pub struct CivilizationBuilder<PlanetState> {
     pub planet: PlanetState,
@@ -371,6 +424,7 @@ pub struct CivilizationBuilder<PlanetState> {
 }
 
 impl CivilizationBuilder<Unset> {
+    /// Create a new `CivilizationBuilder` with planet unset.
     pub fn new() -> Self {
         Self {
             planet: Unset,
