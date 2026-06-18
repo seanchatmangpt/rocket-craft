@@ -1,5 +1,5 @@
 use crate::types::{Bounds3D, Rotation3D, Transform, Vector3};
-use crate::world::{Actor, Object, Weather, WorldState, LatentAction};
+use crate::world::{Actor, LatentAction, Object, Weather, WorldState};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -72,9 +72,21 @@ fn get_vector3_property(
             return vec;
         }
         if let Some(obj) = val.as_object() {
-            let x = obj.get("x").and_then(|v| v.as_f64()).map(|f| f as f32).unwrap_or(default.x);
-            let y = obj.get("y").and_then(|v| v.as_f64()).map(|f| f as f32).unwrap_or(default.y);
-            let z = obj.get("z").and_then(|v| v.as_f64()).map(|f| f as f32).unwrap_or(default.z);
+            let x = obj
+                .get("x")
+                .and_then(|v| v.as_f64())
+                .map(|f| f as f32)
+                .unwrap_or(default.x);
+            let y = obj
+                .get("y")
+                .and_then(|v| v.as_f64())
+                .map(|f| f as f32)
+                .unwrap_or(default.y);
+            let z = obj
+                .get("z")
+                .and_then(|v| v.as_f64())
+                .map(|f| f as f32)
+                .unwrap_or(default.z);
             return Vector3::new(x, y, z);
         }
     }
@@ -83,13 +95,21 @@ fn get_vector3_property(
 
 /// Computes the bounding box of an Actor.
 pub fn get_actor_bounds(actor: &Actor) -> Bounds3D {
-    let half_extents = get_vector3_property(&actor.properties, "half_extents", Vector3::new(0.5, 0.5, 1.0));
+    let half_extents = get_vector3_property(
+        &actor.properties,
+        "half_extents",
+        Vector3::new(0.5, 0.5, 1.0),
+    );
     Bounds3D::new(actor.position, half_extents)
 }
 
 /// Computes the bounding box of an Object.
 pub fn get_object_bounds(object: &Object) -> Bounds3D {
-    let base_extents = get_vector3_property(&object.properties, "half_extents", Vector3::new(1.0, 1.0, 1.0));
+    let base_extents = get_vector3_property(
+        &object.properties,
+        "half_extents",
+        Vector3::new(1.0, 1.0, 1.0),
+    );
     let half_extents = Vector3::new(
         base_extents.x * object.transform.scale.x,
         base_extents.y * object.transform.scale.y,
@@ -143,7 +163,11 @@ impl SimulationEngine {
         }
 
         // 2. Spatial Consistency: Avoid Overlap
-        let actor_half_extents = get_vector3_property(&actor.properties, "half_extents", Vector3::new(0.5, 0.5, 1.0));
+        let actor_half_extents = get_vector3_property(
+            &actor.properties,
+            "half_extents",
+            Vector3::new(0.5, 0.5, 1.0),
+        );
         let proposed_actor_bounds = Bounds3D::new(proposed_position, actor_half_extents);
 
         // Check collision with other actors
@@ -229,7 +253,8 @@ impl SimulationEngine {
             return Err(format!("Actor ID '{}' is already in use", id));
         }
 
-        let half_extents = get_vector3_property(properties, "half_extents", Vector3::new(0.5, 0.5, 1.0));
+        let half_extents =
+            get_vector3_property(properties, "half_extents", Vector3::new(0.5, 0.5, 1.0));
         let proposed_bounds = Bounds3D::new(position, half_extents);
 
         for other_actor in &state.actors {
@@ -267,7 +292,8 @@ impl SimulationEngine {
             return Err(format!("Object ID '{}' is already in use", id));
         }
 
-        let base_extents = get_vector3_property(properties, "half_extents", Vector3::new(1.0, 1.0, 1.0));
+        let base_extents =
+            get_vector3_property(properties, "half_extents", Vector3::new(1.0, 1.0, 1.0));
         let half_extents = Vector3::new(
             base_extents.x * transform.scale.x,
             base_extents.y * transform.scale.y,
@@ -307,14 +333,22 @@ impl SimulationEngine {
     ) -> Result<WorldState, String> {
         let mut next_state = state.clone();
 
-        let actor = state
-            .get_actor(&action.actor_id)
-            .ok_or_else(|| format!("Actor with ID '{}' not found in WorldState", action.actor_id))?;
+        let actor = state.get_actor(&action.actor_id).ok_or_else(|| {
+            format!(
+                "Actor with ID '{}' not found in WorldState",
+                action.actor_id
+            )
+        })?;
 
         let proposed_position = actor.position.add(&action.movement);
         let proposed_rotation = actor.rotation.add(&action.rotation);
 
-        self.validate_movement(state, &action.actor_id, proposed_position, proposed_rotation)?;
+        self.validate_movement(
+            state,
+            &action.actor_id,
+            proposed_position,
+            proposed_rotation,
+        )?;
 
         next_state.apply_latent_action(action)?;
         next_state.step(time_delta_hours);
@@ -332,11 +366,22 @@ impl SimulationEngine {
         let mut next_state = state.clone();
 
         match command {
-            SimulationCommand::MoveActor { actor_id, movement, rotation } => {
+            SimulationCommand::MoveActor {
+                actor_id,
+                movement,
+                rotation,
+            } => {
                 let action = LatentAction::new(actor_id, *movement, *rotation);
                 return self.step(state, &action, time_delta_hours);
             }
-            SimulationCommand::SpawnActor { id, name, actor_type, position, rotation, properties } => {
+            SimulationCommand::SpawnActor {
+                id,
+                name,
+                actor_type,
+                position,
+                rotation,
+                properties,
+            } => {
                 self.validate_spawn_actor(state, id, *position, properties)?;
                 let mut actor = Actor::new(id, name, actor_type, *position);
                 actor.rotation = rotation.unwrap_or_default();
@@ -345,7 +390,13 @@ impl SimulationEngine {
                 next_state.recalculate_actor_place(id);
                 next_state.step(time_delta_hours);
             }
-            SimulationCommand::SpawnObject { id, name, class, transform, properties } => {
+            SimulationCommand::SpawnObject {
+                id,
+                name,
+                class,
+                transform,
+                properties,
+            } => {
                 self.validate_spawn_object(state, id, *transform, properties)?;
                 let mut object = Object::new(id, name, class, *transform);
                 object.properties = properties.clone();
@@ -372,7 +423,10 @@ impl SimulationEngine {
             }
             SimulationCommand::ChangeTime { time_of_day } => {
                 if *time_of_day < 0.0 || *time_of_day >= 24.0 {
-                    return Err(format!("Invalid time of day: {:.2}. Must be in [0.0, 24.0)", time_of_day));
+                    return Err(format!(
+                        "Invalid time of day: {:.2}. Must be in [0.0, 24.0)",
+                        time_of_day
+                    ));
                 }
                 next_state.environment.time_of_day = *time_of_day;
                 next_state.step_index += 1;

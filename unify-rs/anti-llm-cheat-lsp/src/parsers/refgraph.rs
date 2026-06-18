@@ -23,10 +23,7 @@ pub fn extract_unwitnessed_seeds(filepath: &str, content: &str) -> Vec<Observati
                     kind: "unwitnessed_seed".to_string(),
                     construct: fn_name.clone(),
                     context: trimmed.to_string(),
-                    message: format!(
-                        "Symbol '{}' declared @unwitnessed — failset seed",
-                        fn_name
-                    ),
+                    message: format!("Symbol '{}' declared @unwitnessed — failset seed", fn_name),
                 });
             }
         }

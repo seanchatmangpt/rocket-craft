@@ -34,7 +34,10 @@ pub struct Bounds3D {
 impl Bounds3D {
     /// Create a new Bounds3D.
     pub fn new(center: Vector3, half_extents: Vector3) -> Self {
-        Self { center, half_extents }
+        Self {
+            center,
+            half_extents,
+        }
     }
 }
 

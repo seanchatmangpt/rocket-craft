@@ -34,7 +34,10 @@ pub struct CoverageSurface {
 impl CoverageSurface {
     /// Create an empty surface tracker.
     pub fn new() -> Self {
-        Self { total: HashSet::new(), exercised: HashSet::new() }
+        Self {
+            total: HashSet::new(),
+            exercised: HashSet::new(),
+        }
     }
 
     /// Declare a known path on the code surface (must be called before
@@ -57,7 +60,11 @@ impl CoverageSurface {
         if self.total.is_empty() {
             return 0.0;
         }
-        let exercised = self.total.iter().filter(|p| self.exercised.contains(*p)).count();
+        let exercised = self
+            .total
+            .iter()
+            .filter(|p| self.exercised.contains(*p))
+            .count();
         (exercised as f64 / self.total.len() as f64) * 100.0
     }
 
@@ -80,7 +87,10 @@ impl CoverageSurface {
 
     /// Number of paths that were exercised.
     pub fn exercised_count(&self) -> usize {
-        self.total.iter().filter(|p| self.exercised.contains(*p)).count()
+        self.total
+            .iter()
+            .filter(|p| self.exercised.contains(*p))
+            .count()
     }
 
     /// Build a [`CoverageReport`] snapshot.

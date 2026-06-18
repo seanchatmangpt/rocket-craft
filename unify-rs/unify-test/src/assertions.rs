@@ -64,7 +64,9 @@ macro_rules! assert_in_range {
         assert!(
             val >= lo && val <= hi,
             "expected {} to be in [{}, {}]",
-            val, lo, hi
+            val,
+            lo,
+            hi
         );
     }};
 }
@@ -102,11 +104,7 @@ macro_rules! assert_eq_trimmed {
     ($left:expr, $right:expr) => {{
         let l = $left.trim();
         let r = $right.trim();
-        assert_eq!(
-            l, r,
-            "strings differ after trimming: {:?} vs {:?}",
-            l, r
-        );
+        assert_eq!(l, r, "strings differ after trimming: {:?} vs {:?}", l, r);
     }};
 }
 

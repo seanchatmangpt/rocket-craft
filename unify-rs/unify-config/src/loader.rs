@@ -59,7 +59,8 @@ impl ConfigLoader {
             }
         }
         Err(ConfigError::Parse(
-            "No unify configuration file found (tried unify.toml, unify.json, .unify/config.toml)".to_string(),
+            "No unify configuration file found (tried unify.toml, unify.json, .unify/config.toml)"
+                .to_string(),
         ))
     }
 }

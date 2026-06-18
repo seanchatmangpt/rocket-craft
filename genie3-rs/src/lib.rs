@@ -3,14 +3,16 @@
 //! This crate provides the data structures to model places, actors, objects,
 //! latent actions (translation and rotation), and environment parameters.
 
+pub mod simulation;
 pub mod types;
 pub mod world;
-pub mod simulation;
 
 // Re-exports for convenience
+pub use simulation::{
+    get_actor_bounds, get_object_bounds, SimulationCommand, SimulationConfig, SimulationEngine,
+};
 pub use types::{Bounds3D, Rotation3D, Transform, Vector3};
 pub use world::{Actor, Environment, LatentAction, Object, Place, Weather, WorldState};
-pub use simulation::{SimulationConfig, SimulationCommand, SimulationEngine, get_actor_bounds, get_object_bounds};
 
 #[cfg(test)]
 mod tests {
@@ -129,9 +131,13 @@ mod tests {
         let mut state = WorldState::new();
 
         // 1. Create a Place with bounds
-        let room_bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
+        let room_bounds =
+            Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
         let mut room = Place::new("room_1", "Control Room", room_bounds);
-        room.properties.insert("hard_containment".to_string(), serde_json::Value::Bool(true));
+        room.properties.insert(
+            "hard_containment".to_string(),
+            serde_json::Value::Bool(true),
+        );
         state.places.push(room);
 
         // 2. Spawn two actors
@@ -139,7 +145,10 @@ mod tests {
         actor1.place_id = Some("room_1".to_string());
         // Set dimensions (extents) for collision
         let mut actor1_props = HashMap::new();
-        actor1_props.insert("half_extents".to_string(), serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}));
+        actor1_props.insert(
+            "half_extents".to_string(),
+            serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}),
+        );
         actor1_props.insert("max_speed".to_string(), serde_json::json!(5.0));
         actor1.properties = actor1_props;
         state.actors.push(actor1);
@@ -147,40 +156,78 @@ mod tests {
         let mut actor2 = Actor::new("actor_2", "Bot 2", "Drone", Vector3::new(5.0, 0.0, 0.0));
         actor2.place_id = Some("room_1".to_string());
         let mut actor2_props = HashMap::new();
-        actor2_props.insert("half_extents".to_string(), serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}));
+        actor2_props.insert(
+            "half_extents".to_string(),
+            serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}),
+        );
         actor2.properties = actor2_props;
         state.actors.push(actor2);
 
         let engine = SimulationEngine::default();
 
         // Check validation: Movement of actor1 to (4.0, 0.0, 0.0) should overlap with actor2 at 5.0 (bounds overlap because 4+1 >= 5-1)
-        let res = engine.validate_movement(&state, "actor_1", Vector3::new(4.0, 0.0, 0.0), Rotation3D::default());
+        let res = engine.validate_movement(
+            &state,
+            "actor_1",
+            Vector3::new(4.0, 0.0, 0.0),
+            Rotation3D::default(),
+        );
         assert!(res.is_err());
         assert!(res.unwrap_err().contains("overlap with another Actor"));
 
         // Check validation: Movement of actor1 to (2.0, 0.0, 0.0) is safe (distance 2 <= speed limit 5)
-        let res = engine.validate_movement(&state, "actor_1", Vector3::new(2.0, 0.0, 0.0), Rotation3D::default());
+        let res = engine.validate_movement(
+            &state,
+            "actor_1",
+            Vector3::new(2.0, 0.0, 0.0),
+            Rotation3D::default(),
+        );
         assert!(res.is_ok());
 
         // Check validation: Teleportation prevention (actor1 trying to move by 6.0 units, limit is 5.0)
-        let res = engine.validate_movement(&state, "actor_1", Vector3::new(6.0, 0.0, 0.0), Rotation3D::default());
+        let res = engine.validate_movement(
+            &state,
+            "actor_1",
+            Vector3::new(6.0, 0.0, 0.0),
+            Rotation3D::default(),
+        );
         assert!(res.is_err());
         assert!(res.unwrap_err().contains("exceeds speed limit"));
 
         // Check validation: Bounded containment violation (moving actor1 outside room_1 bounds [0-10, 0-10, 0-10])
         // Since room_1 has hard_containment: true, actor cannot move to (12.0, 0.0, 0.0)
         // Adjust actor1's max_speed first to allow the distance
-        state.get_actor_mut("actor_1").unwrap().properties.insert("max_speed".to_string(), serde_json::json!(20.0));
-        let res = engine.validate_movement(&state, "actor_1", Vector3::new(12.0, 0.0, 0.0), Rotation3D::default());
+        state
+            .get_actor_mut("actor_1")
+            .unwrap()
+            .properties
+            .insert("max_speed".to_string(), serde_json::json!(20.0));
+        let res = engine.validate_movement(
+            &state,
+            "actor_1",
+            Vector3::new(12.0, 0.0, 0.0),
+            Rotation3D::default(),
+        );
         assert!(res.is_err());
         let err_msg = res.unwrap_err();
-        assert!(err_msg.contains("violate hard containment") || err_msg.contains("extend beyond the hard containment"));
+        assert!(
+            err_msg.contains("violate hard containment")
+                || err_msg.contains("extend beyond the hard containment")
+        );
 
         // 3. Test spawning validation
         // Attempting to spawn overlapping actor
         let mut spawn_props = HashMap::new();
-        spawn_props.insert("half_extents".to_string(), serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}));
-        let res = engine.validate_spawn_actor(&state, "actor_3", Vector3::new(0.5, 0.0, 0.0), &spawn_props);
+        spawn_props.insert(
+            "half_extents".to_string(),
+            serde_json::json!({"x": 1.0, "y": 1.0, "z": 1.0}),
+        );
+        let res = engine.validate_spawn_actor(
+            &state,
+            "actor_3",
+            Vector3::new(0.5, 0.0, 0.0),
+            &spawn_props,
+        );
         assert!(res.is_err());
 
         // 4. Test command execution
@@ -190,7 +237,10 @@ mod tests {
             rotation: Rotation3D::default(),
         };
         let next_state = engine.execute_command(&state, &cmd, 0.1).unwrap();
-        assert_eq!(next_state.get_actor("actor_1").unwrap().position, Vector3::new(2.0, 0.0, 0.0));
+        assert_eq!(
+            next_state.get_actor("actor_1").unwrap().position,
+            Vector3::new(2.0, 0.0, 0.0)
+        );
         assert_eq!(next_state.step_index, 1);
     }
 }

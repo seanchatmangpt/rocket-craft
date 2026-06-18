@@ -1,4 +1,4 @@
-use crate::{Triple, Term, TripleStore};
+use crate::{Term, Triple, TripleStore};
 
 /// Lifecycle state: manifest path known but not yet loaded.
 #[derive(Debug)]
@@ -57,10 +57,8 @@ where
     /// The manifest file must be a JSON object with a `projects` array whose
     /// items each have `name`, `uproject_path`, and `targets` fields.
     pub fn ingest(self) -> Result<ProjectManifest<Ingested>, ManifestError> {
-        let content = std::fs::read_to_string(&self.state.path)
-            .map_err(ManifestError::Io)?;
-        let raw: RawManifest = serde_json::from_str(&content)
-            .map_err(ManifestError::Json)?;
+        let content = std::fs::read_to_string(&self.state.path).map_err(ManifestError::Io)?;
+        let raw: RawManifest = serde_json::from_str(&content).map_err(ManifestError::Json)?;
         Ok(ProjectManifest {
             state: Ingested {
                 path: self.state.path,
@@ -554,9 +552,7 @@ mod tests {
 
         // Brm has name + path + 3 targets = 5 triples
         let executor = PatternExecutor(&store);
-        let bindings = executor
-            .select("SELECT * WHERE { ?s ?p ?o }")
-            .unwrap();
+        let bindings = executor.select("SELECT * WHERE { ?s ?p ?o }").unwrap();
         assert_eq!(bindings.len(), 5);
 
         // Check that the subject IRI for Brm appears

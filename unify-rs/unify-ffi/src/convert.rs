@@ -43,7 +43,8 @@ impl FromFfi for String {
 
 impl FromFfi for bool {
     fn from_ffi(v: &FfiValue) -> FfiResult<Self> {
-        v.as_bool().ok_or_else(|| FfiError::invalid_arg("expected bool"))
+        v.as_bool()
+            .ok_or_else(|| FfiError::invalid_arg("expected bool"))
     }
 }
 
@@ -62,9 +63,7 @@ pub fn json_to_ffi(v: &serde_json::Value) -> FfiValue {
             }
         }
         serde_json::Value::String(s) => FfiValue::Str(s.clone()),
-        serde_json::Value::Array(arr) => {
-            FfiValue::Array(arr.iter().map(json_to_ffi).collect())
-        }
+        serde_json::Value::Array(arr) => FfiValue::Array(arr.iter().map(json_to_ffi).collect()),
         serde_json::Value::Object(obj) => {
             let mut map = HashMap::new();
             for (k, val) in obj {
@@ -83,9 +82,7 @@ pub fn ffi_to_json(v: &FfiValue) -> serde_json::Value {
         FfiValue::Int(i) => serde_json::Value::Number((*i).into()),
         FfiValue::Float(f) => serde_json::json!(*f),
         FfiValue::Str(s) => serde_json::Value::String(s.clone()),
-        FfiValue::Array(arr) => {
-            serde_json::Value::Array(arr.iter().map(ffi_to_json).collect())
-        }
+        FfiValue::Array(arr) => serde_json::Value::Array(arr.iter().map(ffi_to_json).collect()),
         FfiValue::Object(obj) => {
             let mut map = serde_json::Map::new();
             for (k, val) in obj {

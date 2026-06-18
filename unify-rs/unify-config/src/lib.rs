@@ -1,18 +1,18 @@
-pub mod manifest;
-pub mod sections;
 pub mod loader;
-pub mod validate;
+pub mod manifest;
 pub mod merge;
+pub mod sections;
 mod tests;
+pub mod validate;
 
+pub use loader::{ConfigFormat, ConfigLoader};
 pub use manifest::UnifyManifest;
-pub use sections::{
-    WorkspaceConfig, CodegenConfig, LspConfig, LspServerConfig,
-    CliConfig, TestConfig, OtelConfig, RdfConfig,
-};
-pub use loader::{ConfigLoader, ConfigFormat};
-pub use validate::{ManifestValidator, ManifestViolation};
 pub use merge::ConfigMerge;
+pub use sections::{
+    CliConfig, CodegenConfig, LspConfig, LspServerConfig, OtelConfig, RdfConfig, TestConfig,
+    WorkspaceConfig,
+};
+pub use validate::{ManifestValidator, ManifestViolation};
 
 #[derive(Debug, thiserror::Error)]
 pub enum ConfigError {

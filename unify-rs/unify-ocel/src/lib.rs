@@ -256,17 +256,10 @@ impl OcelLogBuilder {
     }
 
     /// Create an object instance and return its generated ID.
-    pub fn add_object(
-        &mut self,
-        object_type: &str,
-        attrs: Vec<(&str, OcelValue)>,
-    ) -> String {
+    pub fn add_object(&mut self, object_type: &str, attrs: Vec<(&str, OcelValue)>) -> String {
         self.object_counter += 1;
         let id = format!("obj-{}", self.object_counter);
-        let attributes = attrs
-            .into_iter()
-            .map(|(k, v)| (k.to_owned(), v))
-            .collect();
+        let attributes = attrs.into_iter().map(|(k, v)| (k.to_owned(), v)).collect();
         self.log.objects.push(OcelObject {
             id: id.clone(),
             object_type: object_type.to_owned(),
@@ -286,10 +279,7 @@ impl OcelLogBuilder {
     ) -> String {
         self.event_counter += 1;
         let id = format!("evt-{}", self.event_counter);
-        let attributes = attrs
-            .into_iter()
-            .map(|(k, v)| (k.to_owned(), v))
-            .collect();
+        let attributes = attrs.into_iter().map(|(k, v)| (k.to_owned(), v)).collect();
         let relationships = relationships
             .into_iter()
             .map(|(oid, q)| OcelRelationship {
@@ -380,8 +370,11 @@ impl<'a> OcelQuery<'a> {
             Some(e) => e,
             None => return Vec::new(),
         };
-        let ids: std::collections::HashSet<&str> =
-            event.relationships.iter().map(|r| r.object_id.as_str()).collect();
+        let ids: std::collections::HashSet<&str> = event
+            .relationships
+            .iter()
+            .map(|r| r.object_id.as_str())
+            .collect();
         self.log
             .objects
             .iter()
@@ -434,32 +427,50 @@ pub fn example_rocket_build_log() -> OcelLog {
     let mut b = OcelLogBuilder::new();
 
     // Object types
-    b.add_object_type("UeProject", vec![
-        ("name", OcelAttrType::String),
-        ("engine_version", OcelAttrType::String),
-    ]);
-    b.add_object_type("Artifact", vec![
-        ("path", OcelAttrType::String),
-        ("size_bytes", OcelAttrType::Integer),
-    ]);
-    b.add_object_type("Environment", vec![
-        ("os", OcelAttrType::String),
-        ("ready", OcelAttrType::Boolean),
-    ]);
+    b.add_object_type(
+        "UeProject",
+        vec![
+            ("name", OcelAttrType::String),
+            ("engine_version", OcelAttrType::String),
+        ],
+    );
+    b.add_object_type(
+        "Artifact",
+        vec![
+            ("path", OcelAttrType::String),
+            ("size_bytes", OcelAttrType::Integer),
+        ],
+    );
+    b.add_object_type(
+        "Environment",
+        vec![
+            ("os", OcelAttrType::String),
+            ("ready", OcelAttrType::Boolean),
+        ],
+    );
 
     // Objects
-    let proj = b.add_object("UeProject", vec![
-        ("name", OcelValue::String("RocketCraft".into())),
-        ("engine_version", OcelValue::String("5.3.0".into())),
-    ]);
-    let artifact = b.add_object("Artifact", vec![
-        ("path", OcelValue::String("/dist/RocketCraft.pak".into())),
-        ("size_bytes", OcelValue::Integer(0)),
-    ]);
-    let env = b.add_object("Environment", vec![
-        ("os", OcelValue::String("linux".into())),
-        ("ready", OcelValue::Boolean(false)),
-    ]);
+    let proj = b.add_object(
+        "UeProject",
+        vec![
+            ("name", OcelValue::String("RocketCraft".into())),
+            ("engine_version", OcelValue::String("5.3.0".into())),
+        ],
+    );
+    let artifact = b.add_object(
+        "Artifact",
+        vec![
+            ("path", OcelValue::String("/dist/RocketCraft.pak".into())),
+            ("size_bytes", OcelValue::Integer(0)),
+        ],
+    );
+    let env = b.add_object(
+        "Environment",
+        vec![
+            ("os", OcelValue::String("linux".into())),
+            ("ready", OcelValue::Boolean(false)),
+        ],
+    );
 
     // Events
     b.add_event(
@@ -474,7 +485,12 @@ pub fn example_rocket_build_log() -> OcelLog {
         vec![("checks_passed", OcelValue::Integer(12))],
         vec![(&env, "checked"), (&proj, "context")],
     );
-    b.update_attribute(&env, "ready", OcelValue::Boolean(true), "2024-03-01T08:01:30Z");
+    b.update_attribute(
+        &env,
+        "ready",
+        OcelValue::Boolean(true),
+        "2024-03-01T08:01:30Z",
+    );
 
     b.add_event(
         "project:audit",
@@ -491,7 +507,12 @@ pub fn example_rocket_build_log() -> OcelLog {
         ],
         vec![(&proj, "built"), (&env, "used"), (&artifact, "produced")],
     );
-    b.update_attribute(&artifact, "size_bytes", OcelValue::Integer(2_048_000_000), "2024-03-01T08:08:04Z");
+    b.update_attribute(
+        &artifact,
+        "size_bytes",
+        OcelValue::Integer(2_048_000_000),
+        "2024-03-01T08:08:04Z",
+    );
 
     b.add_event(
         "artifact:export",
@@ -511,34 +532,52 @@ pub fn example_blueprint_authoring_log() -> OcelLog {
     let mut b = OcelLogBuilder::new();
 
     // Object types
-    b.add_object_type("Blueprint", vec![
-        ("name", OcelAttrType::String),
-        ("version", OcelAttrType::Integer),
-        ("admitted", OcelAttrType::Boolean),
-    ]);
-    b.add_object_type("ReceiptChain", vec![
-        ("chain_id", OcelAttrType::String),
-        ("length", OcelAttrType::Integer),
-    ]);
-    b.add_object_type("ExportTarget", vec![
-        ("format", OcelAttrType::String),
-        ("path", OcelAttrType::String),
-    ]);
+    b.add_object_type(
+        "Blueprint",
+        vec![
+            ("name", OcelAttrType::String),
+            ("version", OcelAttrType::Integer),
+            ("admitted", OcelAttrType::Boolean),
+        ],
+    );
+    b.add_object_type(
+        "ReceiptChain",
+        vec![
+            ("chain_id", OcelAttrType::String),
+            ("length", OcelAttrType::Integer),
+        ],
+    );
+    b.add_object_type(
+        "ExportTarget",
+        vec![
+            ("format", OcelAttrType::String),
+            ("path", OcelAttrType::String),
+        ],
+    );
 
     // Objects
-    let bp = b.add_object("Blueprint", vec![
-        ("name", OcelValue::String("RocketStage1".into())),
-        ("version", OcelValue::Integer(1)),
-        ("admitted", OcelValue::Boolean(false)),
-    ]);
-    let chain = b.add_object("ReceiptChain", vec![
-        ("chain_id", OcelValue::String("rc-0001".into())),
-        ("length", OcelValue::Integer(0)),
-    ]);
-    let target = b.add_object("ExportTarget", vec![
-        ("format", OcelValue::String("json".into())),
-        ("path", OcelValue::String("/exports/stage1.json".into())),
-    ]);
+    let bp = b.add_object(
+        "Blueprint",
+        vec![
+            ("name", OcelValue::String("RocketStage1".into())),
+            ("version", OcelValue::Integer(1)),
+            ("admitted", OcelValue::Boolean(false)),
+        ],
+    );
+    let chain = b.add_object(
+        "ReceiptChain",
+        vec![
+            ("chain_id", OcelValue::String("rc-0001".into())),
+            ("length", OcelValue::Integer(0)),
+        ],
+    );
+    let target = b.add_object(
+        "ExportTarget",
+        vec![
+            ("format", OcelValue::String("json".into())),
+            ("path", OcelValue::String("/exports/stage1.json".into())),
+        ],
+    );
 
     // Events
     b.add_event(
@@ -553,8 +592,18 @@ pub fn example_blueprint_authoring_log() -> OcelLog {
         vec![("gate_score", OcelValue::Float(0.97))],
         vec![(&bp, "admitted"), (&chain, "receipted_by")],
     );
-    b.update_attribute(&bp, "admitted", OcelValue::Boolean(true), "2024-04-10T09:05:01Z");
-    b.update_attribute(&chain, "length", OcelValue::Integer(1), "2024-04-10T09:05:01Z");
+    b.update_attribute(
+        &bp,
+        "admitted",
+        OcelValue::Boolean(true),
+        "2024-04-10T09:05:01Z",
+    );
+    b.update_attribute(
+        &chain,
+        "length",
+        OcelValue::Integer(1),
+        "2024-04-10T09:05:01Z",
+    );
 
     b.add_event(
         "blueprint:serialize",
@@ -637,7 +686,12 @@ mod tests {
         let mut b = OcelLogBuilder::new();
         b.add_object_type("Sensor", vec![("value", OcelAttrType::Float)]);
         let sid = b.add_object("Sensor", vec![("value", OcelValue::Float(0.0))]);
-        b.update_attribute(&sid, "value", OcelValue::Float(42.5), "2024-06-01T12:00:00Z");
+        b.update_attribute(
+            &sid,
+            "value",
+            OcelValue::Float(42.5),
+            "2024-06-01T12:00:00Z",
+        );
         let log = b.build();
         let obj = &log.objects[0];
         assert_eq!(obj.attribute_history.len(), 1);
@@ -684,14 +738,20 @@ mod tests {
     fn ocel_json_contains_object_types_key() {
         let log = rocket_log();
         let json = log.to_ocel_json();
-        assert!(json.contains("objectTypes"), "OCEL 2.0 JSON must contain 'objectTypes' key");
+        assert!(
+            json.contains("objectTypes"),
+            "OCEL 2.0 JSON must contain 'objectTypes' key"
+        );
     }
 
     #[test]
     fn ocel_json_contains_events_key() {
         let log = blueprint_log();
         let json = log.to_ocel_json();
-        assert!(json.contains("\"events\""), "JSON must contain events array");
+        assert!(
+            json.contains("\"events\""),
+            "JSON must contain events array"
+        );
     }
 
     #[test]
@@ -865,9 +925,20 @@ mod tests {
     fn blueprint_log_attribute_history_recorded() {
         let log = blueprint_log();
         // The Blueprint object gets "admitted" updated
-        let bp = log.objects.iter().find(|o| o.object_type == "Blueprint").unwrap();
-        assert!(!bp.attribute_history.is_empty(), "Blueprint should have attribute history");
-        let admitted_change = bp.attribute_history.iter().find(|c| c.name == "admitted").unwrap();
+        let bp = log
+            .objects
+            .iter()
+            .find(|o| o.object_type == "Blueprint")
+            .unwrap();
+        assert!(
+            !bp.attribute_history.is_empty(),
+            "Blueprint should have attribute history"
+        );
+        let admitted_change = bp
+            .attribute_history
+            .iter()
+            .find(|c| c.name == "admitted")
+            .unwrap();
         assert_eq!(admitted_change.value, OcelValue::Boolean(true));
     }
 

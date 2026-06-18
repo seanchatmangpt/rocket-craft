@@ -1,0 +1,15 @@
+[package]
+name = "unify-automl"
+version = "0.1.0"
+edition = "2021"
+description = "AutoML abstraction layer: discovery registry, balancer, and CLI integration"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+chicago-tdd-tools = { path = "../../chicago-tdd-tools" }
+ib4-mud = { path = "../../infinity-blade-4/mud/ib4-mud" }
+nexus-session = { path = "../../nexus-engine/crates/nexus-session" }

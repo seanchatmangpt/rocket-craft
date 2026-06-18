@@ -4,24 +4,24 @@
 //! physical and logical state of manufactured worlds, along with their
 //! lifecycle interfaces (parsing, validation, compilation, evolution).
 
-pub mod spec;
-pub mod errors;
-pub mod parser;
-pub mod laws;
-pub mod receipt_chain;
-pub mod layout;
-pub mod evolution;
 pub mod deployment;
+pub mod errors;
+pub mod evolution;
+pub mod laws;
+pub mod layout;
+pub mod parser;
+pub mod receipt_chain;
+pub mod spec;
 
 // Re-exports for convenience
-pub use errors::GenieError;
-pub use spec::WorldSpec;
-pub use parser::IntentParser;
-pub use laws::{WorldCoherenceLaw, WorldCoherenceGate};
-pub use receipt_chain::ReceiptChainManager;
-pub use layout::LayoutCompiler;
-pub use evolution::WorldEvolver;
 pub use deployment::DeploymentManager;
+pub use errors::GenieError;
+pub use evolution::WorldEvolver;
+pub use laws::{WorldCoherenceGate, WorldCoherenceLaw};
+pub use layout::LayoutCompiler;
+pub use parser::IntentParser;
+pub use receipt_chain::ReceiptChainManager;
+pub use spec::WorldSpec;
 
 use std::path::Path;
 

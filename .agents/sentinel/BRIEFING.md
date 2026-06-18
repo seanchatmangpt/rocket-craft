@@ -1,13 +1,13 @@
-# BRIEFING — 2026-06-18T00:53:24Z
+# BRIEFING — 2026-06-18T02:35:00Z
 
 ## Mission
-Build a combinatorial testing engine using chicago-tdd-tools in Rust to discover game servers/Infinity Blade code and systematically simulate states.
+Build a comprehensive AutoML-style abstraction layer for game discovery, auto-binding, combinatorial balance optimization, and a developer CLI.
 
 ## 🔒 My Identity
 - Archetype: sentinel
 - Working directory: /Users/sac/rocket-craft/.agents/sentinel
-- Orchestrator: 1c1df7a9-5af6-418d-97dd-cfae0e9bc7fc
-- Victory Auditor: 48b73f81-8c66-4a32-a41c-34db447083f0
+- Orchestrator: 318b4db1-56fc-46d7-887a-719259e672ed
+- Victory Auditor: d7d38246-391a-4935-8055-d0bfef0e77e6
 
 ## 🔒 Key Constraints
 - No technical decisions — relay only
@@ -17,9 +17,9 @@ Build a combinatorial testing engine using chicago-tdd-tools in Rust to discover
 - Stance of absolute skepticism: distrust all first responses, verify, cross-check, and assume false positives.
 
 ## User Context
-- **Last user request**: Build a combinatorial testing engine using chicago-tdd-tools in Rust, systematically simulate states for actual games. Addendum: engine should utilize a mapping/coordinate system akin to the chess coordinate system. Adopter directive: adopt a stance of absolute skepticism ("distrust all first responses").
+- **Last user request**: Research games in rocket-craft, build AutoML-style abstraction layer providing dynamic discovery/auto-binding, balance auto-optimizer, and developer CLI.
 - **Pending clarifications**: none
-- **Delivered results**: Combinatorial testing engine binary, Chess-like state coordinate systems for Infinity Blade 4 MUD and Gundam Nexus, autonomous BFS aimbot simulation report showing 2001 unique states and 9840 transitions.
+- **Delivered results**: AutoML-style abstraction layer in `unify-automl` with auto-binding, Monte Carlo balance tuning engine, and CLI environment tooling. Verified by 8 unit and integration tests passing.
 
 ## Project Status
 - **Phase**: complete
@@ -32,7 +32,6 @@ Build a combinatorial testing engine using chicago-tdd-tools in Rust to discover
 ## Artifact Index
 - /Users/sac/rocket-craft/ORIGINAL_REQUEST.md — Verbatim user request record
 - /Users/sac/rocket-craft/.agents/sentinel/BRIEFING.md — Sentinel tracking status
-- /Users/sac/rocket-craft/.agents/orchestrator_combinatorial_testing/plan.md — Orchestrator's project plan
-- /Users/sac/rocket-craft/.agents/orchestrator_combinatorial_testing/progress.md — Orchestrator's project progress
-- /Users/sac/rocket-craft/.agents/victory_auditor_combinatorial_testing/context.md — Victory Auditor's initialization context
-- /Users/sac/rocket-craft/.agents/victory_auditor_combinatorial_testing/report.md — Victory Auditor's confirmation report
+- /Users/sac/rocket-craft/.agents/sentinel/handoff.md — Sentinel handoff report
+- /Users/sac/rocket-craft/.agents/orchestrator_automl/handoff.md — Orchestrator handoff report
+- /Users/sac/rocket-craft/.agents/victory_auditor_automl/handoff.md — Victory Auditor handoff report

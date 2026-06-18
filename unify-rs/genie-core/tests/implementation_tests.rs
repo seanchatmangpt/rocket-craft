@@ -1,18 +1,22 @@
 use genie_core::{
-    spec::{WorldSpec, Bounds3D, Vector3, Place, Actor, Object},
-    layout::LayoutCompiler,
-    evolution::WorldEvolver,
     deployment::DeploymentManager,
-    receipt_chain::ReceiptChainManager,
+    evolution::WorldEvolver,
+    layout::LayoutCompiler,
     parse_intent,
+    receipt_chain::ReceiptChainManager,
+    spec::{Actor, Bounds3D, Object, Place, Vector3, WorldSpec},
 };
 use std::fs;
 
 #[test]
 fn test_layout_compiler_custom_class_paths() {
     let mut spec = WorldSpec::new();
-    let bounds = Bounds3D::new(Vector3::new(100.0, -100.0, 50.0), Vector3::new(200.0, 200.0, 50.0));
-    spec.places.push(Place::new("sector_7", "Sector Seven Floor", bounds));
+    let bounds = Bounds3D::new(
+        Vector3::new(100.0, -100.0, 50.0),
+        Vector3::new(200.0, 200.0, 50.0),
+    );
+    spec.places
+        .push(Place::new("sector_7", "Sector Seven Floor", bounds));
 
     // Actor with relative role (not starting with /)
     let mut actor1 = Actor::new("spy_1", "Infiltrator", "Agent", "sector_7");
@@ -20,7 +24,12 @@ fn test_layout_compiler_custom_class_paths() {
     spec.actors.push(actor1);
 
     // Actor with absolute role (starting with /)
-    let mut actor2 = Actor::new("spy_2", "Master spy", "/Game/BP_MasterSpy.BP_MasterSpy_C", "sector_7");
+    let mut actor2 = Actor::new(
+        "spy_2",
+        "Master spy",
+        "/Game/BP_MasterSpy.BP_MasterSpy_C",
+        "sector_7",
+    );
     actor2.placement.position = Vector3::new(30.0, 40.0, 0.0);
     spec.actors.push(actor2);
 
@@ -43,12 +52,12 @@ fn test_layout_compiler_custom_class_paths() {
     // Assert actors
     assert!(t3d.contains("Actor_spy_1"));
     assert!(t3d.contains("BP_Agent_C"));
-    assert!(t3d.contains("/Game/BP_Agent.BP_Agent_C"));
+    assert!(t3d.contains("/Game/BP_Agent.Default__BP_Agent_C"));
     assert!(t3d.contains("ActorLabel=\"Infiltrator\""));
 
     assert!(t3d.contains("Actor_spy_2"));
     assert!(t3d.contains("BP_MasterSpy_C"));
-    assert!(t3d.contains("/Game/BP_MasterSpy.BP_MasterSpy_C"));
+    assert!(t3d.contains("/Game/BP_MasterSpy.Default__BP_MasterSpy_C"));
 
     // Assert objects
     assert!(t3d.contains("Object_term_1"));
@@ -78,7 +87,10 @@ fn test_world_evolver_complex_intent() {
 
     // Evolve again with receipt chaining
     ReceiptChainManager::generate_receipt_chain(&mut evolved, b"test_salt").unwrap();
-    assert!(ReceiptChainManager::verify_receipt_chain(&evolved, b"test_salt"));
+    assert!(ReceiptChainManager::verify_receipt_chain(
+        &evolved,
+        b"test_salt"
+    ));
 }
 
 #[test]
@@ -87,7 +99,10 @@ fn test_deployment_manager_files_and_logs() {
         std::env::set_var("UE4_ROOT", "/Users/sac/ue4-sim");
     }
     let mut spec = WorldSpec::new();
-    let bounds = Bounds3D::new(Vector3::new(10.0, 10.0, 10.0), Vector3::new(10.0, 10.0, 10.0));
+    let bounds = Bounds3D::new(
+        Vector3::new(10.0, 10.0, 10.0),
+        Vector3::new(10.0, 10.0, 10.0),
+    );
     spec.places.push(Place::new("p1", "Test Room", bounds));
 
     let project_root = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
@@ -98,7 +113,7 @@ fn test_deployment_manager_files_and_logs() {
     let _ = fs::create_dir_all(&manufactured_dir);
     let spec_json_path = manufactured_dir.join("spec.json");
     let receipt_path = manufactured_dir.join("receipt.json");
-    
+
     let html_path = manufactured_dir.join("Brm-HTML5-Shipping.html");
     let js_path = manufactured_dir.join("Brm-HTML5-Shipping.js");
     let wasm_path = manufactured_dir.join("Brm-HTML5-Shipping.wasm");
@@ -127,20 +142,35 @@ fn test_deployment_manager_files_and_logs() {
     // 1. Verify deployment log append
     assert!(log_path.exists(), "deploy.log was not created");
     let log_content = fs::read_to_string(&log_path).unwrap();
-    assert!(log_content.contains("Genie 26 Deployment Log"), "Log missing header");
+    assert!(
+        log_content.contains("Genie 26 Deployment Log"),
+        "Log missing header"
+    );
     assert!(log_content.contains("Place: p1"), "Log missing Place info");
-    assert!(log_content.contains("Pipeline Status: SUCCESS"), "Log missing SUCCESS status");
+    assert!(
+        log_content.contains("Pipeline Status: SUCCESS"),
+        "Log missing SUCCESS status"
+    );
 
     // 2. Verify spec.json output
     assert!(spec_json_path.exists(), "spec.json was not created");
     let spec_content = fs::read_to_string(&spec_json_path).unwrap();
-    assert!(spec_content.contains("p1"), "spec.json does not contain place id 'p1'");
-    assert!(spec_content.contains("Test Room"), "spec.json does not contain place name 'Test Room'");
+    assert!(
+        spec_content.contains("p1"),
+        "spec.json does not contain place id 'p1'"
+    );
+    assert!(
+        spec_content.contains("Test Room"),
+        "spec.json does not contain place name 'Test Room'"
+    );
 
     // 3. Verify receipt.json output
     assert!(receipt_path.exists(), "receipt.json was not created");
     let receipt_content = fs::read_to_string(&receipt_path).unwrap();
-    assert!(receipt_content.contains("success"), "receipt.json status is not success");
+    assert!(
+        receipt_content.contains("success"),
+        "receipt.json status is not success"
+    );
 
     // 4. Verify generated staged HTML5/WASM files under pwa-staff/manufactured
     assert!(html_path.exists(), "HTML5 file was not generated");

@@ -1,8 +1,8 @@
-use crate::spec::{
-    WorldSpec, Place, Actor, Object, Relationship, RelationshipType,
-    Rule, RuleSeverity, Vector3, Bounds3D
-};
 use crate::errors::GenieError;
+use crate::spec::{
+    Actor, Bounds3D, Object, Place, Relationship, RelationshipType, Rule, RuleSeverity, Vector3,
+    WorldSpec,
+};
 use regex::Regex;
 
 /// Parser for the Genie 26 natural language intent commands using Regex.
@@ -26,9 +26,9 @@ impl IntentParser {
             r#"^create\s+object\s+(\S+)\s+name\s+((?:"[^"]*")|(?:'[^']*')|(?:\S+))\s+class\s+(\S+)\s+in\s+(\S+)$"#
         ).map_err(|e| GenieError::Parse(format!("Regex compile error: {}", e)))?;
 
-        let relationship_re = Regex::new(
-            r"^create\s+relationship\s+(\S+)\s+(\S+)\s+from\s+(\S+)\s+to\s+(\S+)$"
-        ).map_err(|e| GenieError::Parse(format!("Regex compile error: {}", e)))?;
+        let relationship_re =
+            Regex::new(r"^create\s+relationship\s+(\S+)\s+(\S+)\s+from\s+(\S+)\s+to\s+(\S+)$")
+                .map_err(|e| GenieError::Parse(format!("Regex compile error: {}", e)))?;
 
         let rule_re = Regex::new(
             r#"^create\s+rule\s+(\S+)\s+name\s+((?:"[^"]*")|(?:'[^']*')|(?:\S+))\s+expression\s+((?:"[^"]*")|(?:'[^']*')|(?:\S+))\s+severity\s+(\S+)$"#
@@ -45,14 +45,26 @@ impl IntentParser {
                 let caps = place_re.captures(trimmed).unwrap();
                 let id = caps[1].to_string();
                 let name = strip_quotes(&caps[2]);
-                
-                let x = caps[3].parse::<f32>().map_err(|e| GenieError::Parse(format!("Line {}: invalid x: {}", line_num, e)))?;
-                let y = caps[4].parse::<f32>().map_err(|e| GenieError::Parse(format!("Line {}: invalid y: {}", line_num, e)))?;
-                let z = caps[5].parse::<f32>().map_err(|e| GenieError::Parse(format!("Line {}: invalid z: {}", line_num, e)))?;
-                
-                let w = caps[6].parse::<f32>().map_err(|e| GenieError::Parse(format!("Line {}: invalid width: {}", line_num, e)))?;
-                let l = caps[7].parse::<f32>().map_err(|e| GenieError::Parse(format!("Line {}: invalid length: {}", line_num, e)))?;
-                let h = caps[8].parse::<f32>().map_err(|e| GenieError::Parse(format!("Line {}: invalid height: {}", line_num, e)))?;
+
+                let x = caps[3].parse::<f32>().map_err(|e| {
+                    GenieError::Parse(format!("Line {}: invalid x: {}", line_num, e))
+                })?;
+                let y = caps[4].parse::<f32>().map_err(|e| {
+                    GenieError::Parse(format!("Line {}: invalid y: {}", line_num, e))
+                })?;
+                let z = caps[5].parse::<f32>().map_err(|e| {
+                    GenieError::Parse(format!("Line {}: invalid z: {}", line_num, e))
+                })?;
+
+                let w = caps[6].parse::<f32>().map_err(|e| {
+                    GenieError::Parse(format!("Line {}: invalid width: {}", line_num, e))
+                })?;
+                let l = caps[7].parse::<f32>().map_err(|e| {
+                    GenieError::Parse(format!("Line {}: invalid length: {}", line_num, e))
+                })?;
+                let h = caps[8].parse::<f32>().map_err(|e| {
+                    GenieError::Parse(format!("Line {}: invalid height: {}", line_num, e))
+                })?;
 
                 let bounds = Bounds3D::new(Vector3::new(x, y, z), Vector3::new(w, l, h));
                 spec.places.push(Place::new(id, name, bounds));
@@ -88,7 +100,8 @@ impl IntentParser {
                     other => RelationshipType::Custom(other.to_string()),
                 };
 
-                spec.relationships.push(Relationship::new(id, rel_type, source, target));
+                spec.relationships
+                    .push(Relationship::new(id, rel_type, source, target));
             } else if rule_re.is_match(trimmed) {
                 let caps = rule_re.captures(trimmed).unwrap();
                 let id = caps[1].to_string();
@@ -100,15 +113,19 @@ impl IntentParser {
                     "info" => RuleSeverity::Info,
                     "warning" => RuleSeverity::Warning,
                     "error" => RuleSeverity::Error,
-                    other => return Err(GenieError::Parse(format!("Line {}: unknown rule severity: {}", line_num, other))),
+                    other => {
+                        return Err(GenieError::Parse(format!(
+                            "Line {}: unknown rule severity: {}",
+                            line_num, other
+                        )))
+                    }
                 };
 
                 spec.rules.push(Rule::new(id, name, expression, severity));
             } else {
                 return Err(GenieError::Parse(format!(
                     "Line {}: Command did not match any known pattern: '{}'",
-                    line_num,
-                    trimmed
+                    line_num, trimmed
                 )));
             }
         }
@@ -120,7 +137,9 @@ impl IntentParser {
 /// Helper function to strip surrounding double or single quotes from a parsed string value.
 fn strip_quotes(s: &str) -> String {
     let trimmed = s.trim();
-    if (trimmed.starts_with('"') && trimmed.ends_with('"')) || (trimmed.starts_with('\'') && trimmed.ends_with('\'')) {
+    if (trimmed.starts_with('"') && trimmed.ends_with('"'))
+        || (trimmed.starts_with('\'') && trimmed.ends_with('\''))
+    {
         if trimmed.len() >= 2 {
             return trimmed[1..trimmed.len() - 1].to_string();
         }

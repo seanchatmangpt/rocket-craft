@@ -33,7 +33,10 @@ pub fn dispatch(name: String, input: String) -> napi::Result<String> {
 pub fn version() -> napi::Result<String> {
     match unify_version_ffi() {
         Ok(val) => Ok(ffi_value_to_string(val)),
-        Err(e) => Err(napi::Error::new(napi::Status::GenericFailure, e.to_string())),
+        Err(e) => Err(napi::Error::new(
+            napi::Status::GenericFailure,
+            e.to_string(),
+        )),
     }
 }
 
@@ -53,7 +56,10 @@ pub fn list_commands() -> napi::Result<Vec<String>> {
             Ok(names)
         }
         Ok(other) => Ok(vec![ffi_value_to_string(other)]),
-        Err(e) => Err(napi::Error::new(napi::Status::GenericFailure, e.to_string())),
+        Err(e) => Err(napi::Error::new(
+            napi::Status::GenericFailure,
+            e.to_string(),
+        )),
     }
 }
 

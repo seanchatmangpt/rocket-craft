@@ -1,7 +1,7 @@
+use super::common;
 use crate::observations::Observation;
 use regex::Regex;
 use std::sync::OnceLock;
-use super::common;
 
 // ── Compiled-once regex statics ───────────────────────────────────────────────
 
@@ -77,7 +77,6 @@ fn promise_no_catch_re() -> &'static Regex {
     RE.get_or_init(|| Regex::new(r"\.then\s*\((?:[^()]+|\([^()]*\))*\)\s*;").unwrap())
 }
 
-
 fn stub_fn_re() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     // Arrow or regular function that returns only a literal: () => 0  /  function foo() { return null; }
@@ -87,8 +86,10 @@ fn stub_fn_re() -> &'static Regex {
 }
 
 fn is_js_test_path(filepath: &str) -> bool {
-    filepath.contains(".test.") || filepath.contains(".spec.")
-        || filepath.contains("/test/") || filepath.contains("/tests/")
+    filepath.contains(".test.")
+        || filepath.contains(".spec.")
+        || filepath.contains("/test/")
+        || filepath.contains("/tests/")
         || filepath.contains("__tests__")
         || filepath.contains("fixtures/")
 }
@@ -108,15 +109,18 @@ pub fn parse_typescript(filepath: &str, content: &str) -> Vec<Observation> {
         || filepath.contains("tests/");
 
     let in_test = is_js_test_path(filepath);
-    let is_js = filepath.ends_with(".js") || filepath.ends_with(".jsx")
-        || filepath.ends_with(".mjs") || filepath.ends_with(".cjs");
+    let is_js = filepath.ends_with(".js")
+        || filepath.ends_with(".jsx")
+        || filepath.ends_with(".mjs")
+        || filepath.ends_with(".cjs");
 
     for (line_idx, line) in content.lines().enumerate() {
         let line_num = line_idx + 1;
         let trimmed = line.trim();
 
         // Skip comment-only lines for most checks
-        let is_comment = trimmed.starts_with("//") || trimmed.starts_with("*") || trimmed.starts_with("/*");
+        let is_comment =
+            trimmed.starts_with("//") || trimmed.starts_with("*") || trimmed.starts_with("/*");
 
         if let Some(mat) = ts_ignore_re().find(line) {
             obs.push(Observation {
@@ -230,7 +234,8 @@ pub fn parse_typescript(filepath: &str, content: &str) -> Vec<Observation> {
                     kind: "js_debug_artifact".to_string(),
                     construct: "console.log".to_string(),
                     context: trimmed.to_string(),
-                    message: "console.log/warn/error debug artifact left in production code".to_string(),
+                    message: "console.log/warn/error debug artifact left in production code"
+                        .to_string(),
                 });
             }
         }
@@ -264,7 +269,8 @@ pub fn parse_typescript(filepath: &str, content: &str) -> Vec<Observation> {
                     kind: "js_legacy".to_string(),
                     construct: "var".to_string(),
                     context: trimmed.to_string(),
-                    message: "var declaration — use let/const; var signals legacy or stubbed code".to_string(),
+                    message: "var declaration — use let/const; var signals legacy or stubbed code"
+                        .to_string(),
                 });
             }
         }
@@ -281,7 +287,9 @@ pub fn parse_typescript(filepath: &str, content: &str) -> Vec<Observation> {
                     kind: "js_hack".to_string(),
                     construct: "setTimeout(fn,0)".to_string(),
                     context: trimmed.to_string(),
-                    message: "setTimeout(fn, 0) deferred execution hack — masks async ordering bugs".to_string(),
+                    message:
+                        "setTimeout(fn, 0) deferred execution hack — masks async ordering bugs"
+                            .to_string(),
                 });
             }
         }
@@ -393,7 +401,11 @@ fn detect_hardcoded_objects(filepath: &str, content: &str, obs: &mut Vec<Observa
         for ch in trimmed.chars() {
             match ch {
                 '{' => depth += 1,
-                '}' => { if depth > 0 { depth -= 1; } }
+                '}' => {
+                    if depth > 0 {
+                        depth -= 1;
+                    }
+                }
                 _ => { /* handled */ }
             }
         }

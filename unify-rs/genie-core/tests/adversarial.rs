@@ -1,7 +1,6 @@
 use genie_core::spec::{
-    WorldSpec, Place, Actor, Object, Relationship, RelationshipType,
-    Rule, RuleSeverity, HistoryEvent, Process, ProcessStep,
-    Vector3, Bounds3D, Placement
+    Actor, Bounds3D, HistoryEvent, Object, Place, Placement, Process, ProcessStep, Relationship,
+    RelationshipType, Rule, RuleSeverity, Vector3, WorldSpec,
 };
 
 #[test]
@@ -52,32 +51,54 @@ fn test_duplicate_ids_permitted() {
     let mut spec = WorldSpec::new();
 
     let bounds = Bounds3D::default();
-    spec.places.push(Place::new("room_1", "Control Room A", bounds));
-    spec.places.push(Place::new("room_1", "Control Room B", bounds)); // duplicate ID
+    spec.places
+        .push(Place::new("room_1", "Control Room A", bounds));
+    spec.places
+        .push(Place::new("room_1", "Control Room B", bounds)); // duplicate ID
 
     assert_eq!(spec.places.len(), 2);
     assert_eq!(spec.places[0].id, spec.places[1].id);
 
-    spec.actors.push(Actor::new("actor_1", "Welder 1", "RoboticWelder", "room_1"));
-    spec.actors.push(Actor::new("actor_1", "Welder 2", "RoboticWelder", "room_1")); // duplicate ID
+    spec.actors
+        .push(Actor::new("actor_1", "Welder 1", "RoboticWelder", "room_1"));
+    spec.actors
+        .push(Actor::new("actor_1", "Welder 2", "RoboticWelder", "room_1")); // duplicate ID
 
     assert_eq!(spec.actors.len(), 2);
     assert_eq!(spec.actors[0].id, spec.actors[1].id);
 
-    spec.objects.push(Object::new("obj_1", "CNC A", "CNC", "room_1"));
-    spec.objects.push(Object::new("obj_1", "CNC B", "CNC", "room_1")); // duplicate ID
+    spec.objects
+        .push(Object::new("obj_1", "CNC A", "CNC", "room_1"));
+    spec.objects
+        .push(Object::new("obj_1", "CNC B", "CNC", "room_1")); // duplicate ID
 
     assert_eq!(spec.objects.len(), 2);
     assert_eq!(spec.objects[0].id, spec.objects[1].id);
 
-    spec.relationships.push(Relationship::new("rel_1", RelationshipType::Contains, "room_1", "actor_1"));
-    spec.relationships.push(Relationship::new("rel_1", RelationshipType::Contains, "room_1", "obj_1")); // duplicate ID
+    spec.relationships.push(Relationship::new(
+        "rel_1",
+        RelationshipType::Contains,
+        "room_1",
+        "actor_1",
+    ));
+    spec.relationships.push(Relationship::new(
+        "rel_1",
+        RelationshipType::Contains,
+        "room_1",
+        "obj_1",
+    )); // duplicate ID
 
     assert_eq!(spec.relationships.len(), 2);
     assert_eq!(spec.relationships[0].id, spec.relationships[1].id);
 
-    spec.rules.push(Rule::new("rule_1", "Rule A", "true", RuleSeverity::Error));
-    spec.rules.push(Rule::new("rule_1", "Rule B", "false", RuleSeverity::Warning)); // duplicate ID
+    spec.rules
+        .push(Rule::new("rule_1", "Rule A", "true", RuleSeverity::Error));
+    spec.rules.push(Rule::new(
+        "rule_1",
+        "Rule B",
+        "false",
+        RuleSeverity::Warning,
+    )); // duplicate ID
 
     assert_eq!(spec.rules.len(), 2);
     assert_eq!(spec.rules[0].id, spec.rules[1].id);
@@ -104,7 +125,7 @@ fn test_floating_point_boundaries_serialization() {
     // serialization of NaN and Infinity returns an error because JSON specification
     // does not allow them.
     let serialized_res = serde_json::to_string(&spec);
-    
+
     // We document how serde_json behaves out of the box with NaN / Infinity.
     // If it fails, it's a serialization vulnerability/bug unless caught.
     // If it succeeds, it might produce `null` in JSON which then fails deserialization.
@@ -130,9 +151,10 @@ fn test_negative_values_and_physical_boundaries() {
     // Bounds3D with negative half extents
     let invalid_bounds = Bounds3D::new(
         Vector3::new(0.0, 0.0, 0.0),
-        Vector3::new(-10.0, -10.0, -10.0) // physically invalid negative half-extents
+        Vector3::new(-10.0, -10.0, -10.0), // physically invalid negative half-extents
     );
-    spec.places.push(Place::new("room_1", "Negative Room", invalid_bounds));
+    spec.places
+        .push(Place::new("room_1", "Negative Room", invalid_bounds));
 
     // Process step with negative duration
     let mut process = Process::new("proc_1", "Process");
@@ -157,7 +179,7 @@ fn test_referential_integrity_violations() {
         "rel_1",
         RelationshipType::Contains,
         "non_existent_place",
-        "non_existent_actor"
+        "non_existent_actor",
     ));
 
     // Actor refers to non-existent place
@@ -165,7 +187,7 @@ fn test_referential_integrity_violations() {
         "actor_1",
         "Welder",
         "RoboticWelder",
-        "non_existent_place"
+        "non_existent_place",
     ));
 
     // Object refers to non-existent place
@@ -173,7 +195,7 @@ fn test_referential_integrity_violations() {
         "obj_1",
         "CNC",
         "CNC_Machine",
-        "non_existent_place"
+        "non_existent_place",
     ));
 
     // Rule refers to non-existent entities in expression
@@ -181,7 +203,7 @@ fn test_referential_integrity_violations() {
         "rule_1",
         "Invalid Rule",
         "non_existent_place.temperature > 50",
-        RuleSeverity::Error
+        RuleSeverity::Error,
     ));
 
     // Process step assigned actor is non-existent
@@ -205,8 +227,14 @@ fn test_referential_integrity_violations() {
     assert_eq!(loaded.relationships[0].source, "non_existent_place");
     assert_eq!(loaded.actors[0].place_id, "non_existent_place");
     assert_eq!(loaded.objects[0].place_id, "non_existent_place");
-    assert_eq!(loaded.processes[0].steps[0].assigned_actor.as_deref(), Some("non_existent_actor"));
-    assert_eq!(loaded.history[0].actor_id.as_deref(), Some("non_existent_actor"));
+    assert_eq!(
+        loaded.processes[0].steps[0].assigned_actor.as_deref(),
+        Some("non_existent_actor")
+    );
+    assert_eq!(
+        loaded.history[0].actor_id.as_deref(),
+        Some("non_existent_actor")
+    );
 }
 
 #[test]
@@ -218,7 +246,7 @@ fn test_relationship_cycles_and_self_reference() {
         "rel_1",
         RelationshipType::Contains,
         "place_a",
-        "place_a"
+        "place_a",
     ));
 
     // Place A adjacent to Place B, Place B adjacent to Place A (normal, symmetric)
@@ -226,13 +254,13 @@ fn test_relationship_cycles_and_self_reference() {
         "rel_2",
         RelationshipType::AdjacentTo,
         "place_a",
-        "place_b"
+        "place_b",
     ));
     spec.relationships.push(Relationship::new(
         "rel_3",
         RelationshipType::AdjacentTo,
         "place_b",
-        "place_a"
+        "place_a",
     ));
 
     // Place A contains Place B, Place B contains Place A (impossible containment cycle)
@@ -240,13 +268,13 @@ fn test_relationship_cycles_and_self_reference() {
         "rel_4",
         RelationshipType::Contains,
         "place_a",
-        "place_b"
+        "place_b",
     ));
     spec.relationships.push(Relationship::new(
         "rel_5",
         RelationshipType::Contains,
         "place_b",
-        "place_a"
+        "place_a",
     ));
 
     let json = serde_json::to_string(&spec).unwrap();
@@ -262,8 +290,12 @@ fn test_process_step_numbering_disorder() {
     // Steps have duplicate and out of order step numbers
     process.steps.push(ProcessStep::new(2, "Step 2", 10.0));
     process.steps.push(ProcessStep::new(1, "Step 1", 5.0));
-    process.steps.push(ProcessStep::new(2, "Duplicate Step 2", 15.0));
-    process.steps.push(ProcessStep::new(100, "Gap Step 100", 20.0));
+    process
+        .steps
+        .push(ProcessStep::new(2, "Duplicate Step 2", 15.0));
+    process
+        .steps
+        .push(ProcessStep::new(100, "Gap Step 100", 20.0));
 
     spec.processes.push(process);
 

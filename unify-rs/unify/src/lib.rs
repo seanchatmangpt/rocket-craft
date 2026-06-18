@@ -62,8 +62,7 @@ mod tests {
 
     #[test]
     fn cmd_receipt_produces_hash_in_output() {
-        let out = commands::cmd_receipt("foo", "hello world")
-            .expect("cmd_receipt should succeed");
+        let out = commands::cmd_receipt("foo", "hello world").expect("cmd_receipt should succeed");
         assert!(out.success);
         let hash = out.data["hash"].as_str().expect("hash must be a string");
         assert!(!hash.is_empty(), "hash must not be empty");
@@ -73,7 +72,9 @@ mod tests {
     fn cmd_info_returns_version_info() {
         let out = commands::cmd_info().expect("cmd_info should succeed");
         assert!(out.success);
-        let crates = out.data["crates"].as_array().expect("crates must be an array");
+        let crates = out.data["crates"]
+            .as_array()
+            .expect("crates must be an array");
         assert!(!crates.is_empty());
     }
 
@@ -112,8 +113,8 @@ mod tests {
 
     #[test]
     fn cli_parses_info() {
-        let cli = app::Cli::try_parse_from(["unify", "info"])
-            .expect("should parse info subcommand");
+        let cli =
+            app::Cli::try_parse_from(["unify", "info"]).expect("should parse info subcommand");
         assert!(matches!(cli.command, app::Commands::Info));
     }
 

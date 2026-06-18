@@ -1,7 +1,7 @@
-use std::path::PathBuf;
-use std::process::Command;
 use anyhow::Result;
 use std::fs;
+use std::path::PathBuf;
+use std::process::Command;
 
 pub struct PackageOptions {
     pub source_t3d: PathBuf,
@@ -38,14 +38,16 @@ impl WasmPackager {
             if path_bat.exists() {
                 path_bat
             } else {
-                self.engine_path.join("Engine/Binaries/DotNET/AutomationTool.exe")
+                self.engine_path
+                    .join("Engine/Binaries/DotNET/AutomationTool.exe")
             }
         } else {
             let path_sh = self.engine_path.join("Engine/Build/BatchFiles/RunUAT.sh");
             if path_sh.exists() {
                 path_sh
             } else {
-                self.engine_path.join("Engine/Binaries/DotNET/AutomationTool")
+                self.engine_path
+                    .join("Engine/Binaries/DotNET/AutomationTool")
             }
         }
     }
@@ -63,26 +65,32 @@ impl WasmPackager {
         let editor_path = self.get_editor_path();
 
         let mut editor_cmd = Command::new(&editor_path);
-        editor_cmd.arg(self.project_uproject.display().to_string())
+        editor_cmd
+            .arg(self.project_uproject.display().to_string())
             .arg("-run=ImportAssets")
             .arg(format!("-source={}", options.source_t3d.display()))
             .arg(format!("-dest=Game/Content/Maps/{}", options.map_name))
             .arg("-NoUI")
             .arg("-stdout")
             .arg("-AllowCommandletRendering");
-            
-        let status = editor_cmd.status()
+
+        let status = editor_cmd
+            .status()
             .map_err(|e| anyhow::anyhow!("Failed to run asset import command: {}", e))?;
         if !status.success() {
-            return Err(anyhow::anyhow!("Asset import command failed with exit code: {:?}", status.code()));
+            return Err(anyhow::anyhow!(
+                "Asset import command failed with exit code: {:?}",
+                status.code()
+            ));
         }
 
         // Step 2: Build and Package
         let uat_path = self.get_uat_path();
-        
+
         let mut uat_cmd = Command::new(&uat_path);
 
-        uat_cmd.arg("BuildCookRun")
+        uat_cmd
+            .arg("BuildCookRun")
             .arg(format!("-project={}", self.project_uproject.display()))
             .arg("-noP4")
             .arg("-platform=HTML5")
@@ -99,10 +107,14 @@ impl WasmPackager {
             .arg("-es3")
             .arg("-webgl2");
 
-        let status = uat_cmd.status()
+        let status = uat_cmd
+            .status()
             .map_err(|e| anyhow::anyhow!("Failed to run UAT packaging command: {}", e))?;
         if !status.success() {
-            return Err(anyhow::anyhow!("UAT packaging command failed with exit code: {:?}", status.code()));
+            return Err(anyhow::anyhow!(
+                "UAT packaging command failed with exit code: {:?}",
+                status.code()
+            ));
         }
 
         // Create the destination dir
@@ -164,25 +176,31 @@ impl WasmPackager {
         let editor_path = self.get_editor_path();
 
         let mut editor_cmd = Command::new(&editor_path);
-        editor_cmd.arg(self.project_uproject.display().to_string())
+        editor_cmd
+            .arg(self.project_uproject.display().to_string())
             .arg("-run=ImportAssets")
             .arg(format!("-source={}", options.source_t3d.display()))
             .arg(format!("-dest=Game/Content/Maps/{}", options.map_name))
             .arg("-NoUI")
             .arg("-stdout")
             .arg("-AllowCommandletRendering");
-            
-        let status = editor_cmd.status()
+
+        let status = editor_cmd
+            .status()
             .map_err(|e| anyhow::anyhow!("Failed to run asset import command: {}", e))?;
         if !status.success() {
-            return Err(anyhow::anyhow!("Asset import command failed with exit code: {:?}", status.code()));
+            return Err(anyhow::anyhow!(
+                "Asset import command failed with exit code: {:?}",
+                status.code()
+            ));
         }
 
         // Step 2: Build and Package for Win64
         let uat_path = self.get_uat_path();
 
         let mut uat_cmd = Command::new(&uat_path);
-        uat_cmd.arg("BuildCookRun")
+        uat_cmd
+            .arg("BuildCookRun")
             .arg(format!("-project={}", self.project_uproject.display()))
             .arg("-noP4")
             .arg("-platform=Win64")
@@ -197,10 +215,14 @@ impl WasmPackager {
             .arg("-targetplatform=Win64")
             .arg("-utf8output");
 
-        let status = uat_cmd.status()
+        let status = uat_cmd
+            .status()
             .map_err(|e| anyhow::anyhow!("Failed to run UAT packaging command: {}", e))?;
         if !status.success() {
-            return Err(anyhow::anyhow!("UAT packaging command failed with exit code: {:?}", status.code()));
+            return Err(anyhow::anyhow!(
+                "UAT packaging command failed with exit code: {:?}",
+                status.code()
+            ));
         }
 
         // Create the destination dir under destination_dir/win64
@@ -244,7 +266,10 @@ impl WasmPackager {
             // UE4 sometimes uses the project name differently for the executable
             // but for Win64 Shipping it's usually ProjectName-Windows-Shipping.exe or just ProjectName.exe
             // Actually, let's just check if ANY .exe exists if the specific one doesn't
-            if !win64_dest_dir.read_dir()?.any(|e| e.map(|entry| entry.path().extension().and_then(|s| s.to_str()) == Some("exe")).unwrap_or(false)) {
+            if !win64_dest_dir.read_dir()?.any(|e| {
+                e.map(|entry| entry.path().extension().and_then(|s| s.to_str()) == Some("exe"))
+                    .unwrap_or(false)
+            }) {
                 return Err(anyhow::anyhow!(
                     "Expected Win64 executable not found in: {}",
                     win64_dest_dir.display()
@@ -260,25 +285,31 @@ impl WasmPackager {
         let editor_path = self.get_editor_path();
 
         let mut editor_cmd = Command::new(&editor_path);
-        editor_cmd.arg(self.project_uproject.display().to_string())
+        editor_cmd
+            .arg(self.project_uproject.display().to_string())
             .arg("-run=ImportAssets")
             .arg(format!("-source={}", options.source_t3d.display()))
             .arg(format!("-dest=Game/Content/Maps/{}", options.map_name))
             .arg("-NoUI")
             .arg("-stdout")
             .arg("-AllowCommandletRendering");
-            
-        let status = editor_cmd.status()
+
+        let status = editor_cmd
+            .status()
             .map_err(|e| anyhow::anyhow!("Failed to run asset import command: {}", e))?;
         if !status.success() {
-            return Err(anyhow::anyhow!("Asset import command failed with exit code: {:?}", status.code()));
+            return Err(anyhow::anyhow!(
+                "Asset import command failed with exit code: {:?}",
+                status.code()
+            ));
         }
 
         // Step 2: Build and Package for Linux
         let uat_path = self.get_uat_path();
 
         let mut uat_cmd = Command::new(&uat_path);
-        uat_cmd.arg("BuildCookRun")
+        uat_cmd
+            .arg("BuildCookRun")
             .arg(format!("-project={}", self.project_uproject.display()))
             .arg("-noP4")
             .arg("-platform=Linux")
@@ -293,10 +324,14 @@ impl WasmPackager {
             .arg("-targetplatform=Linux")
             .arg("-utf8output");
 
-        let status = uat_cmd.status()
+        let status = uat_cmd
+            .status()
             .map_err(|e| anyhow::anyhow!("Failed to run UAT packaging command: {}", e))?;
         if !status.success() {
-            return Err(anyhow::anyhow!("UAT packaging command failed with exit code: {:?}", status.code()));
+            return Err(anyhow::anyhow!(
+                "UAT packaging command failed with exit code: {:?}",
+                status.code()
+            ));
         }
 
         // Create the destination dir under destination_dir/linux
@@ -338,10 +373,13 @@ impl WasmPackager {
         let sh_path = linux_dest_dir.join(format!("{}-Linux-Shipping.sh", project_name));
         if !sh_path.exists() {
             // Also check for just ProjectName.sh or no extension binary
-            if !linux_dest_dir.read_dir()?.any(|e| e.map(|entry| {
-                let name = entry.file_name().to_string_lossy().to_string();
-                name.contains(project_name.as_str()) || name.ends_with(".sh")
-            }).unwrap_or(false)) {
+            if !linux_dest_dir.read_dir()?.any(|e| {
+                e.map(|entry| {
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    name.contains(project_name.as_str()) || name.ends_with(".sh")
+                })
+                .unwrap_or(false)
+            }) {
                 return Err(anyhow::anyhow!(
                     "Expected Linux script/binary not found in: {}",
                     linux_dest_dir.display()

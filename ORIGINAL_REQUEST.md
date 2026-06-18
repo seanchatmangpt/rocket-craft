@@ -380,3 +380,33 @@ Critical directive from user:
 
 Adopt a stance of absolute skepticism. Do not accept the first successful test run or the first implementation at face value. Actively verify, cross-check, and assume initial results may be flawed or a false positive until rigorously proven otherwise.
 
+
+## Follow-up — 2026-06-18T02:18:00Z
+
+# Teamwork Project Prompt
+
+Research all the games within the `rocket-craft` repository and build a comprehensive "AutoML"-style abstraction layer. This layer must provide automatic discovery and configuration, game balance optimization, and a massive upgrade to Developer Experience (DX) and Quality of Life (QoL) via automated CLI tooling.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Dynamic Discovery & Auto-Binding
+Implement an abstraction layer that automatically detects, configures, and registers new game components, servers, and logic across the codebase to completely eliminate boilerplate wiring.
+
+### R2. Game Balance Auto-Optimizer
+Build an "AutoML"-style tuning engine that autonomously runs combinatorial game simulations to dynamically optimize and balance in-game stats, logic, and economies.
+
+### R3. Developer CLI & Environment Tooling
+Create a unified suite of command-line tools that automatically scaffolds local development environments and seamlessly manages server lifecycles for all games.
+
+## Acceptance Criteria
+
+### Comprehensive Verification
+- [ ] **Auto-Binding**: A programmatic test suite proves that the auto-config layer successfully detects and wires up an unconfigured game component completely without manual intervention.
+- [ ] **Optimization**: The balance engine successfully runs a full simulation loop and outputs a mathematically tuned configuration matrix for game stats.
+- [ ] **Tooling**: The new Developer CLI successfully and autonomously spins up the complete local dev environment and required servers.
+- [ ] **Auditor Review**: An independent secondary agent reviews the implementation to judge that the DX/QoL improvements are satisfactory and that no verification steps were bypassed.
+
+

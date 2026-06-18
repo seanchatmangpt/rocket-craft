@@ -9,7 +9,9 @@ pub struct StateMaximalist<T: Clone + std::fmt::Debug> {
 impl<T: Clone + std::fmt::Debug> StateMaximalist<T> {
     /// Create an empty tracker.
     pub fn new() -> Self {
-        Self { history: Vec::new() }
+        Self {
+            history: Vec::new(),
+        }
     }
 
     /// Snapshot the current state under the given label.

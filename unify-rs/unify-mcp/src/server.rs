@@ -30,10 +30,7 @@ impl McpServer {
     pub fn with_tool(
         mut self,
         desc: ToolDescriptor,
-        handler: impl Fn(serde_json::Value) -> Result<serde_json::Value, String>
-            + Send
-            + Sync
-            + 'static,
+        handler: impl Fn(serde_json::Value) -> Result<serde_json::Value, String> + Send + Sync + 'static,
     ) -> Self {
         self.tools.register(desc, handler);
         self
@@ -61,22 +58,20 @@ impl McpServer {
     /// Dispatch a parsed JSON-RPC request to the appropriate handler.
     fn dispatch(&self, req: JsonRpcRequest) -> JsonRpcResponse {
         match req.method.as_str() {
-            "initialize" => {
-                JsonRpcResponse::ok(
-                    req.id,
-                    json!({
-                        "protocolVersion": "2024-11-05",
-                        "capabilities": {
-                            "tools": {},
-                            "resources": {}
-                        },
-                        "serverInfo": {
-                            "name": self.server_info.name,
-                            "version": self.server_info.version
-                        }
-                    }),
-                )
-            }
+            "initialize" => JsonRpcResponse::ok(
+                req.id,
+                json!({
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {
+                        "tools": {},
+                        "resources": {}
+                    },
+                    "serverInfo": {
+                        "name": self.server_info.name,
+                        "version": self.server_info.version
+                    }
+                }),
+            ),
             "tools/list" => {
                 let tools: Vec<serde_json::Value> = self
                     .tools

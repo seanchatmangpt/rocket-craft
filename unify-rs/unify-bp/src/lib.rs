@@ -1,19 +1,19 @@
-pub mod gate;
-pub mod receipt;
-pub mod codegen;
-pub mod ocel;
 pub mod classify;
+pub mod codegen;
+pub mod gate;
+pub mod ocel;
 pub mod pwa_export;
-pub use pwa_export::{BlueprintPwaMetadata, BlueprintPwaExporter, PwaBundle};
+pub mod receipt;
+pub use pwa_export::{BlueprintPwaExporter, BlueprintPwaMetadata, PwaBundle};
 
 #[cfg(test)]
 mod tests {
-    use blueprint_core::{Blueprint, BlueprintBuilder};
-    use crate::gate::BlueprintAdmissionGate;
-    use crate::receipt::BlueprintReceiptChain;
+    use crate::classify::{BlueprintGenerateCmd, BlueprintValidateCmd, Classify};
     use crate::codegen::{BlueprintCodegen, BlueprintSpec, VarSpec};
+    use crate::gate::BlueprintAdmissionGate;
     use crate::ocel::BlueprintOcelBridge;
-    use crate::classify::{Classify, BlueprintGenerateCmd, BlueprintValidateCmd};
+    use crate::receipt::BlueprintReceiptChain;
+    use blueprint_core::{Blueprint, BlueprintBuilder};
 
     // -----------------------------------------------------------------------
     // Helpers

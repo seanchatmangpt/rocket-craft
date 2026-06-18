@@ -1,5 +1,5 @@
-use crate::observations::Observation;
 use super::common;
+use crate::observations::Observation;
 
 const STUB_MACROS: &[&str] = &["todo!(", "unimplemented!(", "unreachable!("];
 const DEBUG_MACROS: &[&str] = &["tracing::info!(", "etracing::info!(", "dbg!(", "print!("];
@@ -47,7 +47,10 @@ fn detect_stub_patterns(filepath: &str, content: &str, obs: &mut Vec<Observation
                     kind: "rust_stub".to_string(),
                     construct: stub.trim_end_matches('(').to_string(),
                     context: trimmed.to_string(),
-                    message: format!("Stub macro '{}' — function not implemented", stub.trim_end_matches('(')),
+                    message: format!(
+                        "Stub macro '{}' — function not implemented",
+                        stub.trim_end_matches('(')
+                    ),
                 });
             }
         }
@@ -65,7 +68,10 @@ fn detect_stub_patterns(filepath: &str, content: &str, obs: &mut Vec<Observation
                         kind: "rust_debug_artifact".to_string(),
                         construct: mac.trim_end_matches('(').to_string(),
                         context: trimmed.to_string(),
-                        message: format!("Debug macro '{}' left in production code", mac.trim_end_matches('(')),
+                        message: format!(
+                            "Debug macro '{}' left in production code",
+                            mac.trim_end_matches('(')
+                        ),
                     });
                 }
             }
@@ -102,7 +108,10 @@ fn detect_stub_patterns(filepath: &str, content: &str, obs: &mut Vec<Observation
                         kind: "rust_todo_comment".to_string(),
                         construct: marker.to_string(),
                         context: trimmed.to_string(),
-                        message: format!("Unresolved '{}' comment — placeholder left in code", marker),
+                        message: format!(
+                            "Unresolved '{}' comment — placeholder left in code",
+                            marker
+                        ),
                     });
                     break;
                 }
@@ -120,7 +129,8 @@ fn detect_stub_patterns(filepath: &str, content: &str, obs: &mut Vec<Observation
                 kind: "rust_stub".to_string(),
                 construct: "empty_wildcard_arm".to_string(),
                 context: trimmed.to_string(),
-                message: "Empty catch-all match arm `_ => {}` silently swallows unhandled cases".to_string(),
+                message: "Empty catch-all match arm `_ => {}` silently swallows unhandled cases"
+                    .to_string(),
             });
         }
     }
@@ -174,7 +184,10 @@ fn detect_stub_functions(filepath: &str, content: &str, obs: &mut Vec<Observatio
                     kind: "rust_stub".to_string(),
                     construct: "stub_function".to_string(),
                     context: trimmed.to_string(),
-                    message: format!("Function '{}' is a single-line stub returning a constant or empty body", name),
+                    message: format!(
+                        "Function '{}' is a single-line stub returning a constant or empty body",
+                        name
+                    ),
                 });
             }
         }
@@ -225,7 +238,8 @@ fn detect_risky_patterns(filepath: &str, content: &str, obs: &mut Vec<Observatio
                     kind: "risky_pattern".to_string(),
                     construct: "lazy_static_env".to_string(),
                     context: trimmed.to_string(),
-                    message: "lazy_static/once_cell initialization from env var detected".to_string(),
+                    message: "lazy_static/once_cell initialization from env var detected"
+                        .to_string(),
                 });
             }
         }
@@ -357,11 +371,7 @@ fn collect_fn_metrics(content: &str) -> Vec<FnMetrics> {
     metrics
 }
 
-fn check_fn_thresholds(
-    filepath: &str,
-    metrics: &[FnMetrics],
-    obs: &mut Vec<Observation>,
-) {
+fn check_fn_thresholds(filepath: &str, metrics: &[FnMetrics], obs: &mut Vec<Observation>) {
     for m in metrics {
         if m.line_count > 80 {
             obs.push(Observation {

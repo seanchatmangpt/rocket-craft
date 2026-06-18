@@ -30,7 +30,10 @@ impl ManifestValidator {
         if !Self::is_semver_like(&manifest.version) {
             violations.push(ManifestViolation::new(
                 "version",
-                format!("version '{}' does not look like a semver string (expected X.Y.Z)", manifest.version),
+                format!(
+                    "version '{}' does not look like a semver string (expected X.Y.Z)",
+                    manifest.version
+                ),
             ));
         }
 

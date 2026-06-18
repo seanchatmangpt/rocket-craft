@@ -1,10 +1,10 @@
-use genie_core::spec::{
-    WorldSpec, Place, Actor, Object, Relationship, RelationshipType,
-    Rule, RuleSeverity, HistoryEvent, Vector3, Bounds3D
-};
-use genie_core::laws::{WorldCoherenceGate, spec_to_triples, get_genie_shacl_shapes};
-use genie_core::receipt_chain::ReceiptChainManager;
+use genie_core::laws::{get_genie_shacl_shapes, spec_to_triples, WorldCoherenceGate};
 use genie_core::parse_intent;
+use genie_core::receipt_chain::ReceiptChainManager;
+use genie_core::spec::{
+    Actor, Bounds3D, HistoryEvent, Object, Place, Relationship, RelationshipType, Rule,
+    RuleSeverity, Vector3, WorldSpec,
+};
 use unify_rdf::shacl::validate as shacl_validate;
 
 #[test]
@@ -30,7 +30,10 @@ fn test_milestone2_intent_parser_success() {
     assert_eq!(spec.places[0].id, "room_1");
     assert_eq!(spec.places[0].name, "Control Room");
     assert_eq!(spec.places[0].bounds.center, Vector3::new(0.0, 10.0, 0.0));
-    assert_eq!(spec.places[0].bounds.half_extents, Vector3::new(10.0, 10.0, 5.0));
+    assert_eq!(
+        spec.places[0].bounds.half_extents,
+        Vector3::new(10.0, 10.0, 5.0)
+    );
 
     assert_eq!(spec.actors.len(), 1);
     assert_eq!(spec.actors[0].id, "bot_1");
@@ -67,13 +70,26 @@ fn test_milestone2_intent_parser_unsupported_severity() {
 #[test]
 fn test_milestone2_validation_gate_success() {
     let mut spec = WorldSpec::new();
-    
+
     let bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
-    spec.places.push(Place::new("room_1", "Control Room", bounds));
-    spec.actors.push(Actor::new("bot_1", "Welder Bot", "RoboticWelder", "room_1"));
-    spec.objects.push(Object::new("cnc_1", "CNC Alpha", "CNC_Machine", "room_1"));
-    spec.relationships.push(Relationship::new("rel_1", RelationshipType::Contains, "room_1", "bot_1"));
-    spec.rules.push(Rule::new("rule_1", "TempCheck", "room_1.temp < 30", RuleSeverity::Error));
+    spec.places
+        .push(Place::new("room_1", "Control Room", bounds));
+    spec.actors
+        .push(Actor::new("bot_1", "Welder Bot", "RoboticWelder", "room_1"));
+    spec.objects
+        .push(Object::new("cnc_1", "CNC Alpha", "CNC_Machine", "room_1"));
+    spec.relationships.push(Relationship::new(
+        "rel_1",
+        RelationshipType::Contains,
+        "room_1",
+        "bot_1",
+    ));
+    spec.rules.push(Rule::new(
+        "rule_1",
+        "TempCheck",
+        "room_1.temp < 30",
+        RuleSeverity::Error,
+    ));
 
     let gate = WorldCoherenceGate::new();
     let res = gate.validate(&spec);
@@ -86,23 +102,39 @@ fn test_milestone2_validation_gate_finite_float_failure() {
 
     // NaN center coordinates
     let mut spec = WorldSpec::new();
-    let invalid_bounds = Bounds3D::new(Vector3::new(f32::NAN, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
-    spec.places.push(Place::new("room_1", "NaN Center Place", invalid_bounds));
+    let invalid_bounds = Bounds3D::new(
+        Vector3::new(f32::NAN, 0.0, 0.0),
+        Vector3::new(10.0, 10.0, 10.0),
+    );
+    spec.places
+        .push(Place::new("room_1", "NaN Center Place", invalid_bounds));
 
     let res = gate.validate(&spec);
     assert!(res.is_err());
     let errs = res.err().unwrap();
-    assert!(errs.iter().any(|e| e.contains("Floating-point Safety")), "Expected float safety error, got: {:?}", errs);
+    assert!(
+        errs.iter().any(|e| e.contains("Floating-point Safety")),
+        "Expected float safety error, got: {:?}",
+        errs
+    );
 
     // Infinity half extents
     let mut spec = WorldSpec::new();
-    let invalid_bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(f32::INFINITY, 10.0, 10.0));
-    spec.places.push(Place::new("room_2", "Inf Extent Place", invalid_bounds));
+    let invalid_bounds = Bounds3D::new(
+        Vector3::new(0.0, 0.0, 0.0),
+        Vector3::new(f32::INFINITY, 10.0, 10.0),
+    );
+    spec.places
+        .push(Place::new("room_2", "Inf Extent Place", invalid_bounds));
 
     let res = gate.validate(&spec);
     assert!(res.is_err());
     let errs = res.err().unwrap();
-    assert!(errs.iter().any(|e| e.contains("Floating-point Safety")), "Expected float safety error, got: {:?}", errs);
+    assert!(
+        errs.iter().any(|e| e.contains("Floating-point Safety")),
+        "Expected float safety error, got: {:?}",
+        errs
+    );
 }
 
 #[test]
@@ -112,7 +144,7 @@ fn test_milestone2_validation_gate_containment_cycle_failure() {
     // Cycle via parent_place_id: room_1 parent is room_2, room_2 parent is room_1
     let mut spec = WorldSpec::new();
     let bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
-    
+
     let mut p1 = Place::new("room_1", "Room 1", bounds);
     p1.parent_place_id = Some("room_2".to_string());
     let mut p2 = Place::new("room_2", "Room 2", bounds);
@@ -124,19 +156,37 @@ fn test_milestone2_validation_gate_containment_cycle_failure() {
     let res = gate.validate(&spec);
     assert!(res.is_err());
     let errs = res.err().unwrap();
-    assert!(errs.iter().any(|e| e.contains("Containment")), "Expected containment cycle error, got: {:?}", errs);
+    assert!(
+        errs.iter().any(|e| e.contains("Containment")),
+        "Expected containment cycle error, got: {:?}",
+        errs
+    );
 
     // Cycle via Contains relationships: room_1 Contains room_2, room_2 Contains room_1
     let mut spec = WorldSpec::new();
     spec.places.push(Place::new("room_1", "Room 1", bounds));
     spec.places.push(Place::new("room_2", "Room 2", bounds));
-    spec.relationships.push(Relationship::new("rel_1", RelationshipType::Contains, "room_1", "room_2"));
-    spec.relationships.push(Relationship::new("rel_2", RelationshipType::Contains, "room_2", "room_1"));
+    spec.relationships.push(Relationship::new(
+        "rel_1",
+        RelationshipType::Contains,
+        "room_1",
+        "room_2",
+    ));
+    spec.relationships.push(Relationship::new(
+        "rel_2",
+        RelationshipType::Contains,
+        "room_2",
+        "room_1",
+    ));
 
     let res = gate.validate(&spec);
     assert!(res.is_err());
     let errs = res.err().unwrap();
-    assert!(errs.iter().any(|e| e.contains("Containment")), "Expected containment cycle error, got: {:?}", errs);
+    assert!(
+        errs.iter().any(|e| e.contains("Containment")),
+        "Expected containment cycle error, got: {:?}",
+        errs
+    );
 }
 
 #[test]
@@ -145,23 +195,37 @@ fn test_milestone2_validation_gate_referential_integrity_failure() {
 
     // Actor points to non-existent place
     let mut spec = WorldSpec::new();
-    spec.actors.push(Actor::new("bot_1", "Welder", "Role", "ghost_room"));
+    spec.actors
+        .push(Actor::new("bot_1", "Welder", "Role", "ghost_room"));
 
     let res = gate.validate(&spec);
     assert!(res.is_err());
     let errs = res.err().unwrap();
-    assert!(errs.iter().any(|e| e.contains("Referential Integrity")), "Expected integrity error, got: {:?}", errs);
+    assert!(
+        errs.iter().any(|e| e.contains("Referential Integrity")),
+        "Expected integrity error, got: {:?}",
+        errs
+    );
 
     // Relationship refers to non-existent source
     let mut spec = WorldSpec::new();
     let bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
     spec.places.push(Place::new("room_1", "Room", bounds));
-    spec.relationships.push(Relationship::new("rel_1", RelationshipType::Contains, "ghost_source", "room_1"));
+    spec.relationships.push(Relationship::new(
+        "rel_1",
+        RelationshipType::Contains,
+        "ghost_source",
+        "room_1",
+    ));
 
     let res = gate.validate(&spec);
     assert!(res.is_err());
     let errs = res.err().unwrap();
-    assert!(errs.iter().any(|e| e.contains("Referential Integrity")), "Expected integrity error, got: {:?}", errs);
+    assert!(
+        errs.iter().any(|e| e.contains("Referential Integrity")),
+        "Expected integrity error, got: {:?}",
+        errs
+    );
 }
 
 #[test]
@@ -177,15 +241,21 @@ fn test_milestone2_validation_gate_duplicate_ids_failure() {
     let res = gate.validate(&spec);
     assert!(res.is_err());
     let errs = res.err().unwrap();
-    assert!(errs.iter().any(|e| e.contains("Duplicate Entity ID")), "Expected duplicate ID error, got: {:?}", errs);
+    assert!(
+        errs.iter().any(|e| e.contains("Duplicate Entity ID")),
+        "Expected duplicate ID error, got: {:?}",
+        errs
+    );
 }
 
 #[test]
 fn test_milestone2_shacl_validation() {
     let mut spec = WorldSpec::new();
     let bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));
-    spec.places.push(Place::new("room_1", "Control Room", bounds));
-    spec.actors.push(Actor::new("bot_1", "Welder Bot", "RoboticWelder", "room_1"));
+    spec.places
+        .push(Place::new("room_1", "Control Room", bounds));
+    spec.actors
+        .push(Actor::new("bot_1", "Welder Bot", "RoboticWelder", "room_1"));
 
     let store = spec_to_triples(&spec);
     let shapes = get_genie_shacl_shapes();
@@ -202,7 +272,7 @@ fn test_milestone2_receipt_chaining() {
     spec.history.push(HistoryEvent::new("evt_3", 1500, "Check")); // Out of order timestamp
 
     let salt = b"genie_salt";
-    
+
     // Generate receipt chain
     let res = ReceiptChainManager::generate_receipt_chain(&mut spec, salt);
     assert!(res.is_ok());

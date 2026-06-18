@@ -36,19 +36,28 @@ impl<State: Clone + std::fmt::Debug> Scenario<State> {
 
     /// Append a *given* (setup) step.
     pub fn given(mut self, name: impl Into<String>, f: impl Fn(&mut State) + 'static) -> Self {
-        self.steps.push(ScenarioStep { name: name.into(), f: Box::new(f) });
+        self.steps.push(ScenarioStep {
+            name: name.into(),
+            f: Box::new(f),
+        });
         self
     }
 
     /// Append a *when* (action) step.
     pub fn when(mut self, name: impl Into<String>, f: impl Fn(&mut State) + 'static) -> Self {
-        self.steps.push(ScenarioStep { name: name.into(), f: Box::new(f) });
+        self.steps.push(ScenarioStep {
+            name: name.into(),
+            f: Box::new(f),
+        });
         self
     }
 
     /// Append a *then* (assertion) step.
     pub fn then(mut self, name: impl Into<String>, f: impl Fn(&mut State) + 'static) -> Self {
-        self.steps.push(ScenarioStep { name: name.into(), f: Box::new(f) });
+        self.steps.push(ScenarioStep {
+            name: name.into(),
+            f: Box::new(f),
+        });
         self
     }
 
@@ -82,7 +91,12 @@ impl<State: Clone + std::fmt::Debug> Scenario<State> {
             }
         }
 
-        ScenarioResult { name, steps_run: total, passed: true, error: None }
+        ScenarioResult {
+            name,
+            steps_run: total,
+            passed: true,
+            error: None,
+        }
     }
 
     /// Like [`run`], but panics with an informative message on failure.
@@ -125,9 +139,7 @@ mod tests {
 
     #[test]
     fn run_returns_passed_true_when_no_panics() {
-        let result = Scenario::new("trivial", ())
-            .given("noop", |_| {})
-            .run();
+        let result = Scenario::new("trivial", ()).given("noop", |_| {}).run();
         assert!(result.passed);
         assert!(result.error.is_none());
     }

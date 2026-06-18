@@ -5,9 +5,9 @@
 //! the integration tests exercise.
 
 use serde::{Deserialize, Serialize};
-use unify_receipts::receipt::Receipt;
 use unify_rdf::store::TripleStore;
 use unify_rdf::triple::Triple;
+use unify_receipts::receipt::Receipt;
 
 // ============================================================================
 // Receipt chain (abstraction over Vec<Receipt>)
@@ -159,7 +159,10 @@ pub struct AdmissionGate {
 impl AdmissionGate {
     /// Create a new gate in the **open** state.
     pub fn open(name: impl Into<String>) -> Self {
-        AdmissionGate { name: name.into(), open: true }
+        AdmissionGate {
+            name: name.into(),
+            open: true,
+        }
     }
 
     /// Returns `true` when the gate is open (allows entry).
@@ -191,7 +194,10 @@ pub struct ReceiptEnvelope {
 
 impl ReceiptEnvelope {
     pub fn wrap(receipt: Receipt, service_tag: impl Into<String>) -> Self {
-        ReceiptEnvelope { receipt, service_tag: service_tag.into() }
+        ReceiptEnvelope {
+            receipt,
+            service_tag: service_tag.into(),
+        }
     }
 
     /// Create a new envelope re-tagged for a different service (same receipt).
@@ -221,7 +227,10 @@ pub struct ReceiptBuilder {
 
 impl ReceiptBuilder {
     pub fn new(key: impl Into<String>) -> Self {
-        ReceiptBuilder { key: key.into(), data: Vec::new() }
+        ReceiptBuilder {
+            key: key.into(),
+            data: Vec::new(),
+        }
     }
 
     pub fn with_data(mut self, data: &[u8]) -> Self {
@@ -250,8 +259,8 @@ pub enum LifecycleState {
 impl LifecycleState {
     fn rank(&self) -> u8 {
         match self {
-            LifecycleState::Raw      => 0,
-            LifecycleState::Parsed   => 1,
+            LifecycleState::Raw => 0,
+            LifecycleState::Parsed => 1,
             LifecycleState::Admitted => 2,
             LifecycleState::Exported => 3,
         }
@@ -261,8 +270,8 @@ impl LifecycleState {
 impl std::fmt::Display for LifecycleState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let s = match self {
-            LifecycleState::Raw      => "Raw",
-            LifecycleState::Parsed   => "Parsed",
+            LifecycleState::Raw => "Raw",
+            LifecycleState::Parsed => "Parsed",
             LifecycleState::Admitted => "Admitted",
             LifecycleState::Exported => "Exported",
         };
@@ -279,7 +288,9 @@ pub struct LifecycleTracker {
 
 impl LifecycleTracker {
     pub fn new() -> Self {
-        LifecycleTracker { history: vec![LifecycleState::Raw] }
+        LifecycleTracker {
+            history: vec![LifecycleState::Raw],
+        }
     }
 
     pub fn state(&self) -> LifecycleState {
@@ -295,7 +306,10 @@ impl LifecycleTracker {
         if next_rank != current_rank + 1 {
             return Err(format!(
                 "Invalid transition: {:?} → {:?} (ranks {} → {})",
-                self.state(), next, current_rank, next_rank
+                self.state(),
+                next,
+                current_rank,
+                next_rank
             ));
         }
         self.history.push(next);
@@ -389,11 +403,17 @@ impl ConformanceScore {
     }
 
     pub fn perfect() -> Self {
-        ConformanceScore { precision: 1.0, recall: 1.0 }
+        ConformanceScore {
+            precision: 1.0,
+            recall: 1.0,
+        }
     }
 
     pub fn zero() -> Self {
-        ConformanceScore { precision: 0.0, recall: 0.0 }
+        ConformanceScore {
+            precision: 0.0,
+            recall: 0.0,
+        }
     }
 
     /// F₁ measure (harmonic mean of precision and recall).
@@ -414,9 +434,9 @@ impl ConformanceScore {
 /// Returns a pre-built [`ReceiptChain`] with 3 receipts.
 pub fn sample_receipt_chain() -> ReceiptChain {
     let mut chain = ReceiptChain::new();
-    chain.append(Receipt::new("cap:read",  b"read-payload"));
+    chain.append(Receipt::new("cap:read", b"read-payload"));
     chain.append(Receipt::new("cap:write", b"write-payload"));
-    chain.append(Receipt::new("cap:exec",  b"exec-payload"));
+    chain.append(Receipt::new("cap:exec", b"exec-payload"));
     chain
 }
 
@@ -424,8 +444,14 @@ pub fn sample_receipt_chain() -> ReceiptChain {
 pub fn sample_ocel_log() -> OcelLog {
     OcelLog {
         objects: vec![
-            OcelObject { id: "obj-a".into(), object_type: "Item".into() },
-            OcelObject { id: "obj-b".into(), object_type: "Order".into() },
+            OcelObject {
+                id: "obj-a".into(),
+                object_type: "Item".into(),
+            },
+            OcelObject {
+                id: "obj-b".into(),
+                object_type: "Order".into(),
+            },
         ],
         events: vec![
             OcelEvent {
@@ -457,16 +483,31 @@ pub fn sample_event_log() -> EventLog {
             Trace {
                 case_id: "case-001".into(),
                 events: vec![
-                    Event { name: "start".into(),    timestamp: 100 },
-                    Event { name: "process".into(),  timestamp: 200 },
-                    Event { name: "complete".into(), timestamp: 300 },
+                    Event {
+                        name: "start".into(),
+                        timestamp: 100,
+                    },
+                    Event {
+                        name: "process".into(),
+                        timestamp: 200,
+                    },
+                    Event {
+                        name: "complete".into(),
+                        timestamp: 300,
+                    },
                 ],
             },
             Trace {
                 case_id: "case-002".into(),
                 events: vec![
-                    Event { name: "start".into(),    timestamp: 400 },
-                    Event { name: "complete".into(), timestamp: 500 },
+                    Event {
+                        name: "start".into(),
+                        timestamp: 400,
+                    },
+                    Event {
+                        name: "complete".into(),
+                        timestamp: 500,
+                    },
                 ],
             },
         ],
@@ -487,11 +528,11 @@ pub fn sample_rdf_store() -> TripleStore {
     }
 
     // 5 attribute triples
-    store.add(Triple::new("http://ex/Hero",     "http://ex/level", "10"));
-    store.add(Triple::new("http://ex/Villain",  "http://ex/level", "20"));
-    store.add(Triple::new("http://ex/NPC",      "http://ex/level", "1"));
-    store.add(Triple::new("http://ex/Merchant", "http://ex/gold",  "500"));
-    store.add(Triple::new("http://ex/Guard",    "http://ex/rank",  "sergeant"));
+    store.add(Triple::new("http://ex/Hero", "http://ex/level", "10"));
+    store.add(Triple::new("http://ex/Villain", "http://ex/level", "20"));
+    store.add(Triple::new("http://ex/NPC", "http://ex/level", "1"));
+    store.add(Triple::new("http://ex/Merchant", "http://ex/gold", "500"));
+    store.add(Triple::new("http://ex/Guard", "http://ex/rank", "sergeant"));
 
     store
 }

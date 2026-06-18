@@ -3,7 +3,7 @@
 //! These panicking helpers produce informative messages when integration
 //! invariants are violated, making test failures easier to diagnose.
 
-use crate::fixtures::{ReceiptChain, OcelLog, EventLog, validate_ocel};
+use crate::fixtures::{validate_ocel, EventLog, OcelLog, ReceiptChain};
 
 /// Assert that every receipt in the chain has a non-empty key and a non-empty
 /// hash, and that the chain is not empty.
@@ -31,8 +31,14 @@ pub fn assert_chain_valid(chain: &ReceiptChain) {
 /// Assert that an OCEL log has at least one object and at least one event,
 /// and that no events reference unknown objects.
 pub fn assert_ocel_valid(log: &OcelLog) {
-    assert!(!log.objects.is_empty(), "OcelLog must have at least one object");
-    assert!(!log.events.is_empty(), "OcelLog must have at least one event");
+    assert!(
+        !log.objects.is_empty(),
+        "OcelLog must have at least one object"
+    );
+    assert!(
+        !log.events.is_empty(),
+        "OcelLog must have at least one event"
+    );
 
     let violations = validate_ocel(log);
     assert!(
@@ -56,12 +62,12 @@ pub fn assert_receipt_count(chain: &ReceiptChain, expected: usize) {
 /// Assert that an event log has no violations (non-empty traces, events with
 /// non-empty names, and monotone timestamps within each trace).
 pub fn assert_no_pm_violations(log: &EventLog) {
-    assert!(!log.traces.is_empty(), "EventLog must have at least one trace");
+    assert!(
+        !log.traces.is_empty(),
+        "EventLog must have at least one trace"
+    );
     for trace in &log.traces {
-        assert!(
-            !trace.case_id.is_empty(),
-            "Trace has an empty case_id"
-        );
+        assert!(!trace.case_id.is_empty(), "Trace has an empty case_id");
         for event in &trace.events {
             assert!(
                 !event.name.is_empty(),

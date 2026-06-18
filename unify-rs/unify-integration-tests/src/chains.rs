@@ -3,15 +3,15 @@
 //! Each `run_*_chain` function exercises a cross-crate pipeline from start to
 //! finish and returns a [`ChainResult`] summarising what happened.
 
-use unify_receipts::receipt::Receipt;
+use unify_rdf::pipeline::{OntologyPipeline, PipelineConfig};
+use unify_rdf::sparql::{PatternExecutor, SparqlExecutor};
 use unify_rdf::store::TripleStore;
 use unify_rdf::triple::Triple;
-use unify_rdf::sparql::{PatternExecutor, SparqlExecutor};
-use unify_rdf::pipeline::{OntologyPipeline, PipelineConfig};
+use unify_receipts::receipt::Receipt;
 
 use crate::fixtures::{
-    ReceiptChain, EventLog, Trace, Event,
-    LifecycleTracker, LifecycleState, AdmissionGate, event_log_to_ocel,
+    event_log_to_ocel, AdmissionGate, Event, EventLog, LifecycleState, LifecycleTracker,
+    ReceiptChain, Trace,
 };
 
 /// Summary of a completed (or failed) pipeline chain run.
@@ -60,15 +60,22 @@ pub fn run_event_to_receipt_chain() -> Result<ChainResult, String> {
             Trace {
                 case_id: "case-A".into(),
                 events: vec![
-                    Event { name: "init".into(), timestamp: 1000 },
-                    Event { name: "process".into(), timestamp: 2000 },
+                    Event {
+                        name: "init".into(),
+                        timestamp: 1000,
+                    },
+                    Event {
+                        name: "process".into(),
+                        timestamp: 2000,
+                    },
                 ],
             },
             Trace {
                 case_id: "case-B".into(),
-                events: vec![
-                    Event { name: "init".into(), timestamp: 3000 },
-                ],
+                events: vec![Event {
+                    name: "init".into(),
+                    timestamp: 3000,
+                }],
             },
         ],
     };
@@ -85,10 +92,7 @@ pub fn run_event_to_receipt_chain() -> Result<ChainResult, String> {
     let mut chain = ReceiptChain::new();
     for ocel_event in &ocel_log.events {
         let payload = format!("{}:{}", ocel_event.event_type, ocel_event.timestamp);
-        let receipt = Receipt::new(
-            format!("ocel:{}", ocel_event.id),
-            payload.as_bytes(),
-        );
+        let receipt = Receipt::new(format!("ocel:{}", ocel_event.id), payload.as_bytes());
         chain.append(receipt);
     }
     result.steps_completed += 1;
@@ -220,16 +224,31 @@ pub fn run_pm_validation_chain() -> Result<ChainResult, String> {
             Trace {
                 case_id: "trace-001".into(),
                 events: vec![
-                    Event { name: "A".into(), timestamp: 100 },
-                    Event { name: "B".into(), timestamp: 200 },
-                    Event { name: "C".into(), timestamp: 300 },
+                    Event {
+                        name: "A".into(),
+                        timestamp: 100,
+                    },
+                    Event {
+                        name: "B".into(),
+                        timestamp: 200,
+                    },
+                    Event {
+                        name: "C".into(),
+                        timestamp: 300,
+                    },
                 ],
             },
             Trace {
                 case_id: "trace-002".into(),
                 events: vec![
-                    Event { name: "A".into(), timestamp: 400 },
-                    Event { name: "C".into(), timestamp: 500 },
+                    Event {
+                        name: "A".into(),
+                        timestamp: 400,
+                    },
+                    Event {
+                        name: "C".into(),
+                        timestamp: 500,
+                    },
                 ],
             },
         ],
@@ -243,7 +262,9 @@ pub fn run_pm_validation_chain() -> Result<ChainResult, String> {
     // Step 3: validate OCEL — no dangling references expected
     let violations = crate::fixtures::validate_ocel(&ocel_log);
     if !violations.is_empty() {
-        result.errors.push(format!("OCEL violations: {:?}", violations));
+        result
+            .errors
+            .push(format!("OCEL violations: {:?}", violations));
         return Err(format!("OCEL validation failed: {:?}", violations));
     }
     result.steps_completed += 1;

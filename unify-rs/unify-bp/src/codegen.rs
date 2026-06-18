@@ -1,6 +1,6 @@
 //! RdfToBlueprintCodegen — generate Blueprints from declarative specs.
 
-use blueprint_core::{Blueprint, BlueprintBuilder, VarType, T3dSerializer, JsonSerializer};
+use blueprint_core::{Blueprint, BlueprintBuilder, JsonSerializer, T3dSerializer, VarType};
 
 /// Spec for a Blueprint variable.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
@@ -36,7 +36,11 @@ impl BlueprintCodegen {
             builder.add_variable_mut(
                 &var.name,
                 vt,
-                if var.default.is_empty() { None } else { Some(var.default.clone()) },
+                if var.default.is_empty() {
+                    None
+                } else {
+                    Some(var.default.clone())
+                },
             );
         }
 
@@ -50,9 +54,15 @@ impl BlueprintCodegen {
                         builder.exec_connect(&ev, &ps);
                     }
                 }
-                "end_play" => { builder.end_play_node(); }
-                "tick" => { builder.tick_node(); }
-                other => { builder.custom_event_node(other); }
+                "end_play" => {
+                    builder.end_play_node();
+                }
+                "tick" => {
+                    builder.tick_node();
+                }
+                other => {
+                    builder.custom_event_node(other);
+                }
             }
         }
 
