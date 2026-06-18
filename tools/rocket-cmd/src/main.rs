@@ -12,6 +12,7 @@ use rocket_sdk::crypto;
 use rocket_sdk::manifest;
 use rocket_sdk::setup;
 use rocket_sdk::error;
+use rocket_sdk::audit_affidavit::{AuditEvent, record_audit, persist_receipt};
 mod compliance;
 
 use color_eyre::eyre::{eyre, ContextCompat, Result};
@@ -370,7 +371,7 @@ fn run_build(project: Option<String>, target: Option<String>, platform: Option<S
 fn run_audit() -> Result<()> {
     tracing::info!("{}", "=== Project Health Audit ===".bold().magenta());
     let manifest = manifest::Manifest::load("project-manifest.json").map_err(|e| eyre!("{}", e))?;
-    
+
     let mut engine = ComplianceEngine::new();
     engine.add_law(Box::new(AndroidKeystoreLaw));
 
@@ -379,9 +380,11 @@ fn run_audit() -> Result<()> {
         tracing::info!("  {} Failed to load plugins: {}", "⚠".yellow(), e);
     }
 
+    let mut audit_events: Vec<AuditEvent> = Vec::new();
+
     for proj in manifest.projects() {
         tracing::info!("\nProject: {}", proj.name.bold().yellow());
-        
+
         let uproject_path = &proj.uproject_path;
         // 1. Check uproject exists
         if uproject_path.exists() {
@@ -408,13 +411,39 @@ fn run_audit() -> Result<()> {
             if result.passed {
                 tracing::info!("    {} All laws satisfied.", "✓".green());
             } else {
-                for err in result.errors {
+                for err in &result.errors {
                     tracing::info!("    {} Law '{}' violated: {}", "✗".red(), err.law_name, err.message);
                 }
             }
+
+            audit_events.push(AuditEvent {
+                project_name: result.project_name,
+                passed: result.passed,
+                violations: result.errors.into_iter()
+                    .map(|e| (e.law_name, e.message))
+                    .collect(),
+            });
         }
     }
-    
+
+    // Assemble an affidavit provenance receipt covering this audit run.
+    tracing::info!("\n{}", "=== Affidavit Receipt ===".bold().cyan());
+    match record_audit(&audit_events) {
+        Ok(receipt) => {
+            tracing::info!(
+                "  {} Chain sealed — {} event(s), hash: {}",
+                "✓".green(),
+                receipt.events.len(),
+                &receipt.chain_hash.as_hex()[..16]
+            );
+            match persist_receipt(&receipt, Path::new(".")) {
+                Ok(path) => tracing::info!("  {} Written: {}", "✓".green(), path.display()),
+                Err(e) => tracing::info!("  {} Could not persist receipt: {}", "⚠".yellow(), e),
+            }
+        }
+        Err(e) => tracing::info!("  {} Affidavit assembly failed: {}", "⚠".yellow(), e),
+    }
+
     Ok(())
 }
 
