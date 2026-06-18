@@ -1,0 +1,608 @@
+================================================================================
+ONTOLOGY INTEGRATION INDEX FOR ROCKET CRAFT
+Quick reference: ontologies mapped to specific files and implementation guidance
+================================================================================
+
+================================================================================
+BY ROCKET-CRAFT MODULE
+================================================================================
+
+tools/rocket-sdk/src/error.rs
+  RELEVANT ONTOLOGIES:
+    - RDFS/OWL (error hierarchy classification)
+    - SKOS (error type concepts and relationships)
+    - PROV-O (error event attribution)
+
+  INTEGRATION: Create error hierarchy RDF:
+    http://rocket-craft.org/error/RocketError rdfs:subClassOf skos:Concept .
+    http://rocket-craft.org/error/ProjectNotFound rdfs:subClassOf http://rocket-craft.org/error/RocketError .
+
+  NEXT STEPS:
+    1. Export RocketError variants as RDF triples
+    2. Build SKOS concept scheme for error categories
+    3. Log error occurrences with PROV-O activities
+
+tools/rocket-sdk/src/manifest.rs
+  RELEVANT ONTOLOGIES:
+    - SHACL (project manifest validation)
+    - SPARQL (manifest querying)
+    - OWL (manifest schema constraints)
+
+  INTEGRATION: Define SHACL shape for manifest:
+    :ManifestShape sh:property [
+      sh:path ue4:projects ;
+      sh:minCount 1
+    ] .
+
+  NEXT STEPS:
+    1. Extend shacl.rs with full W3C SHACL 1.0 support
+    2. Validate manifest against shapes before ingestion
+    3. Export validated manifest as RDF
+
+tools/knhk/src/receipt.rs
+  RELEVANT ONTOLOGIES:
+    - PROV-O (activity/entity attribution)
+    - PROV-M (constraint validation)
+    - Dublin Core (metadata)
+
+  INTEGRATION: Model receipt as PROV entity:
+    <receipt:001> prov:wasGeneratedBy <law_check> ;
+      prov:wasAttributedTo <knhk_plugin> ;
+      prov:hadMember [
+        prov:value "blake3_hash_hex" ;
+        prov:role <receipt/hash>
+      ] .
+
+  NEXT STEPS:
+    1. Integrate PROV-O vocabulary into Receipt struct
+    2. Chain receipts using prov:wasInformedBy
+    3. Export receipt log as RDF/Turtle
+
+tools/rocket-cmd/src/compliance.rs
+  RELEVANT ONTOLOGIES:
+    - PROV-O (compliance check provenance)
+    - EARL (assertion results)
+    - SQALE (quality gate metrics)
+
+  INTEGRATION: Record compliance results as EARL assertions:
+    <assertion:law_001> a earl:Assertion ;
+      earl:subject <project:ShooterGame> ;
+      earl:test <law:AndroidKeystoreLaw> ;
+      earl:result [ earl:outcome earl:Pass ] .
+
+  NEXT STEPS:
+    1. Generate EARL assertions for each law check
+    2. Wire compliance results to quality gates (SQALE)
+    3. Export compliance report as RDF
+
+================================================================================
+
+unify-rs/unify-rdf/src/shacl.rs
+  RELEVANT ONTOLOGIES:
+    - SHACL (W3C Shape Constraint Language) - PRIMARY
+    - SPARQL (validation queries)
+    - OWL (class/property constraints)
+
+  INTEGRATION: Expand ShaclShape enum:
+    enum ShaclConstraint {
+      MinCount { path: Term, count: usize },
+      MaxCount { path: Term, count: usize },
+      Pattern { path: Term, regex: String },  // NEW
+      In { path: Term, values: Vec<Term> },   // NEW
+      Closed { ignored_props: Vec<Term> },    // NEW
+      TargetClass { class: Term },            // NEW
+    }
+
+  NEXT STEPS:
+    1. Implement full W3C SHACL 1.0 spec (15+ constraint types)
+    2. Add SPARQL-based validation rules
+    3. Generate SHACL violations with full node/path/message
+    4. Integrate with project_bridge validation
+
+unify-rs/unify-rdf/src/sparql.rs
+  RELEVANT ONTOLOGIES:
+    - SPARQL (W3C Query Language) - ALREADY IMPLEMENTED
+    - PROV-O (audit queries)
+    - OWL (semantic queries)
+
+  NEXT STEPS:
+    1. Add pre-built query library for common audits:
+       - "List all error types"
+       - "Trace compliance checks for project X"
+       - "Find all entities created by agent Y"
+    2. Export query results as OCEL events
+    3. Expose queries via unify-mcp as tools
+
+unify-rs/unify-rdf/src/project_bridge.rs
+  RELEVANT ONTOLOGIES:
+    - SHACL (ProjectManifest validation in Validated state)
+    - PROV-O (ingestion/validation provenance)
+    - OWL (project/target class hierarchy)
+
+  INTEGRATION: Add provenance tracking:
+    pub struct Validated {
+      pub path: std::path::PathBuf,
+      pub projects: Vec<UeProject>,
+      pub validation_receipt: Receipt,  // NEW: PROV chain
+      pub validation_shapes: Vec<ShaclShape>,  // NEW
+    }
+
+  NEXT STEPS:
+    1. Generate Receipt on successful validation
+    2. Chain receipts to previous manifest versions
+    3. Export Validated projects as RDF triples with PROV metadata
+
+================================================================================
+
+unify-rs/unify-receipts/src/receipt.rs
+  RELEVANT ONTOLOGIES:
+    - PROV-O (W3C Provenance) - PRIMARY
+    - PROV-M (constraint ordering)
+    - Dublin Core (metadata)
+
+  INTEGRATION: Extend Receipt struct:
+    pub struct Receipt {
+      pub key: String,
+      pub hash: String,
+      pub issued_at: u64,
+      pub prov_activity: Option<String>,    // NEW: PROV-O activity URI
+      pub prov_wasinformedby: Option<String>,  // NEW: previous receipt hash
+      pub metadata: BTreeMap<String, String>,  // NEW: DC metadata
+    }
+
+  NEXT STEPS:
+    1. Implement PROV-O serialization (RDF/JSON-LD)
+    2. Add BLAKE3 receipt chaining for immutability proof
+    3. Export receipt audit trail as PROV document
+    4. Build receipt verification tool (PROV-M constraints)
+
+unify-rs/unify-ocel/src/lib.rs
+  RELEVANT ONTOLOGIES:
+    - OCEL 2.0 (Object-Centric Event Log) - PRIMARY
+    - XES (process mining format)
+    - PROV-O (event attribution)
+
+  INTEGRATION: OCEL 2.0 JSON schema already supports:
+    {
+      "event_id": "...",
+      "event_type": "Manifest.Ingested",
+      "timestamp": "2026-06-18T04:12:00Z",
+      "omap": {              // object map (OCEL 2.0 key feature)
+        "manifest": [...],
+        "projects": [...]
+      },
+      "attributes": {...}    // event properties
+    }
+
+  NEXT STEPS:
+    1. Standardize OCEL 2.0 export format
+    2. Add XES export option for legacy tools
+    3. Link OCEL events to PROV-O activities
+    4. Feed events to unify-pm for process discovery
+
+unify-rs/unify-pm/src/lib.rs (Process Mining)
+  RELEVANT ONTOLOGIES:
+    - OCEL 2.0 (event logs)
+    - XES (process mining input)
+    - SQALE (quality metrics output)
+
+  INTEGRATION: Discover process models from OCEL:
+    Input: OCEL event stream from unify-ocel
+    Output: Process graph + variants + metrics
+
+    pub struct DiscoveredProcess {
+      pub variant_frequency: BTreeMap<Vec<String>, usize>,
+      pub metrics: ProcessMetrics {
+        variant_count: usize,
+        event_count: usize,
+        duration_stats: Stats,
+      },
+    }
+
+  NEXT STEPS:
+    1. Implement Inductive Miner (PM) algorithm
+    2. Generate PNML (Petri Net Markup Language) output
+    3. Map discovered processes back to SQALE quality gates
+    4. Report bottlenecks and anomalies
+
+unify-rs/unify-test/src/tracker.rs
+  RELEVANT ONTOLOGIES:
+    - OCEL 2.0 (test execution events)
+    - EARL (test result assertions)
+    - Test Ontology (TEO) (test case documentation)
+
+  INTEGRATION: Log test execution:
+    pub fn record_test_event(
+      test_id: &str,
+      status: TestStatus,
+      duration_ms: u64,
+      coverage_delta: f32,
+    ) {
+      // Emit OCEL event
+      ocel.add_event(OcelEvent {
+        event_type: "Test.Executed",
+        omap: { test: [test_id], workspace: [...] },
+        attributes: {
+          result: status.to_string(),
+          duration_ms,
+          coverage_delta,
+        },
+      });
+
+      // Emit EARL assertion
+      rdf_store.add(Triple {
+        subject: test_result_uri,
+        predicate: "earl:outcome".into(),
+        object: match status { Pass => "earl:Pass", ... }
+      });
+    }
+
+  NEXT STEPS:
+    1. Integrate OCEL 2.0 event emission
+    2. Generate EARL assertions per test
+    3. Link EARL results to TEO test cases
+    4. Export test metrics via SQALE
+
+unify-rs/unify-lsp/src/diagnostic.rs
+  RELEVANT ONTOLOGIES:
+    - SKOS (error classification)
+    - OWL (error hierarchy)
+    - EARL (assertion results)
+
+  INTEGRATION: Map error types to LSP diagnostics:
+    fn error_to_diagnostic(err: RocketError) -> Diagnostic {
+      let severity = match err {
+        RocketError::ProjectNotFound(_) => DiagnosticSeverity::Error,
+        RocketError::Ue4RootNotSet => DiagnosticSeverity::Error,
+        // Query SKOS concept scheme for severity mapping
+      };
+
+      // Classify using SKOS:
+      let classification = skos_store.query(&format!(
+        "SELECT ?broader WHERE {{ {} skos:broader ?broader }}", error_uri
+      ));
+
+      Diagnostic {
+        range: ...,
+        severity,
+        code: Some(error_uri.to_string()),
+        message: err.to_string(),
+        // Map to EARL assertion
+        tags: classification,
+      }
+    }
+
+  NEXT STEPS:
+    1. Build SKOS error concept scheme
+    2. Export LSP diagnostics as EARL assertions
+    3. Link diagnostics to error documentation
+
+unify-rs/unify-mcp/src/rocket_tools.rs
+  RELEVANT ONTOLOGIES:
+    - SPARQL (project state queries)
+    - PROV-O (tool execution attribution)
+    - OWL (tool capability definitions)
+
+  INTEGRATION: Expose RDF queries as MCP tools:
+    {
+      name: "rocket/manifest/list-projects",
+      description: "List all UE4 projects",
+      input_schema: {...},
+      // Powered by SPARQL:
+      // SELECT ?project ?target WHERE {
+      //   ?project rdf:type ue4:Project;
+      //           ue4:targets ?target
+      // }
+    }
+
+  NEXT STEPS:
+    1. Expose SPARQL query editor as MCP tool
+    2. Add PROV-O attribution to tool results
+    3. Log tool execution in OCEL
+
+nexus-engine/crates/nexus-types/src/errors.rs
+  RELEVANT ONTOLOGIES:
+    - RDFS/OWL (error class hierarchy)
+    - QUDT (bounded numeric types)
+    - SKOS (error concepts)
+
+  INTEGRATION: Export type constraints as RDF:
+    http://rocket-craft.org/nexus/Health rdf:type qudt:QuantityKind ;
+      <http://rocket-craft.org/bounds/min> "0.0" ;
+      <http://rocket-craft.org/bounds/max> "10000.0" ;
+      rdfs:comment "Health points must be non-negative" .
+
+    http://rocket-craft.org/error/NegativeHealth
+      rdfs:subClassOf http://rocket-craft.org/error/TypeError ;
+      <http://rocket-craft.org/constrains> http://rocket-craft.org/nexus/Health .
+
+  NEXT STEPS:
+    1. Export TypeError/GameError variants as RDF classes
+    2. Link errors to QUDT type constraints
+    3. Build SHACL shapes to prevent invalid state transitions
+
+nexus-engine/crates/nexus-combat/src/machine.rs
+  RELEVANT ONTOLOGIES:
+    - OWL (state machine class hierarchy)
+    - PROV-M (state transition constraints)
+    - OCEL 2.0 (combat event logging)
+
+  INTEGRATION: Model typestate as OWL:
+    nexus:CombatMachine_Idle a owl:Class ;
+      rdfs:comment "Combat machine in idle state" .
+
+    nexus:canTransitionTo a owl:ObjectProperty ;
+      rdfs:domain nexus:CombatMachine_Idle ;
+      rdfs:range nexus:CombatMachine_Attacking .
+
+    # PROV-M constraint: illegal transition causes error
+    nexus:attack a prov:Activity ;
+      prov:type nexus:StateTransition ;
+      prov:used nexus:CombatMachine_Parrying ;  # ERROR: invalid source state
+      prov:generated nexus:CombatMachine_Attacking .
+
+  NEXT STEPS:
+    1. Model all typestate transitions as OWL property hierarchies
+    2. Add PROV-M validation to transition verification
+    3. Log combat events to OCEL (Idle->Attacking->Resolving)
+    4. Query combat history via SPARQL
+
+chicago-tdd-tools
+  RELEVANT ONTOLOGIES:
+    - Test Ontology (TEO) (test case formalization)
+    - EARL (result reporting)
+    - OCEL 2.0 (test execution events)
+
+  INTEGRATION: Structure test framework output:
+    - Emit OCEL events for each test scenario
+    - Generate EARL assertions for pass/fail
+    - Export test case specifications as TEO RDF
+
+  NEXT STEPS:
+    1. Instrument chicago-tdd-tools to emit OCEL events
+    2. Wire EARL output to result reporter
+    3. Create TEO definitions for BDD scenarios
+
+================================================================================
+BY ONTOLOGY / STANDARD
+================================================================================
+
+SHACL (W3C Shape Constraint Language)
+  https://www.w3.org/TR/shacl/
+  PRIMARY IMPLEMENTATION: unify-rs/unify-rdf/src/shacl.rs
+  SECONDARY: tools/rocket-sdk/src/manifest.rs, unify-rs/unify-rdf/src/project_bridge.rs
+
+  CURRENT STATUS: Partially implemented (MinCount, MaxCount, Datatype, NodeKind)
+  MISSING: Pattern, In, Closed, TargetClass, SPARQL rules
+
+  PRIORITY: HIGH (validation layer foundation)
+
+  IMPLEMENTATION STEPS:
+    1. Add Pattern constraint (regex validation)
+    2. Add In constraint (enumerated values)
+    3. Add Closed constraint (no extra properties)
+    4. Support SPARQL-based rules
+    5. Generate proper sh:ValidationReport output
+
+---
+
+SPARQL (W3C Query Language)
+  https://www.w3.org/TR/sparql11-query/
+  PRIMARY IMPLEMENTATION: unify-rs/unify-rdf/src/sparql.rs
+  SECONDARY: unify-rs/unify-mcp/src/rocket_tools.rs
+
+  CURRENT STATUS: Basic implementation exists
+  MISSING: Full SPARQL 1.1 compliance, federated queries, UPDATE
+
+  PRIORITY: MEDIUM (already working; expand query library)
+
+  IMPLEMENTATION STEPS:
+    1. Build query library for common audits
+    2. Add query result export (CSV, JSON, RDF)
+    3. Expose queries as MCP tools
+
+---
+
+PROV-O (W3C Provenance Ontology)
+  https://www.w3.org/TR/prov-o/
+  PRIMARY IMPLEMENTATION: unify-rs/unify-receipts/src/receipt.rs, tools/knhk/src/receipt.rs
+  SECONDARY: unify-rs/unify-rdf/src/project_bridge.rs, tools/rocket-cmd/src/compliance.rs
+
+  CURRENT STATUS: Ad-hoc receipt structures; no PROV-O integration
+  MISSING: Full PROV-O model (Activity, Entity, Agent, Delegation), RDF serialization
+
+  PRIORITY: HIGH (audit trail foundation)
+
+  IMPLEMENTATION STEPS:
+    1. Extend Receipt struct with PROV-O fields (activity URI, agent, timestamp)
+    2. Implement RDF/Turtle export
+    3. Build receipt chaining (prov:wasInformedBy)
+    4. Add PROV-M constraint validation
+    5. Create audit trail exporter
+
+---
+
+OCEL 2.0 (Object-Centric Event Logs)
+  https://ocel2.org/
+  PRIMARY IMPLEMENTATION: unify-rs/unify-ocel/src/lib.rs
+  SECONDARY: unify-rs/unify-test/src/tracker.rs, tools/rocket-cmd/src/compliance.rs
+
+  CURRENT STATUS: Framework exists; standardization needed
+  MISSING: Full OCEL 2.0 JSON schema compliance, XES export
+
+  PRIORITY: HIGH (event logging foundation for process mining)
+
+  IMPLEMENTATION STEPS:
+    1. Standardize JSON schema to OCEL 2.0 spec
+    2. Add XES export for legacy tools
+    3. Integrate with unify-pm (process discovery)
+    4. Link OCEL events to PROV-O activities
+    5. Build OCEL query API
+
+---
+
+EARL (Evaluation and Reporting Language)
+  https://www.w3.org/WAI/test-evaluate/earl/
+  PRIMARY IMPLEMENTATION: chicago-tdd-tools, unify-rs/unify-test/src/tracker.rs
+  SECONDARY: tools/rocket-cmd/src/compliance.rs
+
+  CURRENT STATUS: Not implemented
+  MISSING: EARL assertion generation, RDF serialization
+
+  PRIORITY: MEDIUM (test result standardization)
+
+  IMPLEMENTATION STEPS:
+    1. Define EARL assertion structure in code
+    2. Generate assertions for each test result
+    3. Serialize to RDF/Turtle
+    4. Link to SPARQL query results
+
+---
+
+SKOS (Simple Knowledge Organization System)
+  https://www.w3.org/TR/skos-reference/
+  PRIMARY IMPLEMENTATION: tools/rocket-sdk/src/error.rs (proposed)
+  SECONDARY: unify-rs/unify-lsp/src/diagnostic.rs
+
+  CURRENT STATUS: Not implemented
+  MISSING: Error concept scheme, classification hierarchy
+
+  PRIORITY: LOW-MEDIUM (error classification)
+
+  IMPLEMENTATION STEPS:
+    1. Create error.skos RDF file with concept scheme
+    2. Map error types to SKOS concepts
+    3. Use SKOS for error severity/category classification
+    4. Query concept hierarchy in LSP diagnostics
+
+---
+
+OWL 2 (Web Ontology Language)
+  https://www.w3.org/TR/owl2-overview/
+  PRIMARY IMPLEMENTATION: nexus-engine types, state machines (proposed)
+  SECONDARY: unify-rs/unify-sem/src/lib.rs
+
+  CURRENT STATUS: Not implemented
+  MISSING: OWL class definitions, property restrictions
+
+  PRIORITY: LOW-MEDIUM (type system formalization)
+
+  IMPLEMENTATION STEPS:
+    1. Export typestate machines as OWL classes
+    2. Define property restrictions for state transitions
+    3. Create disjointness constraints (e.g., Idle disjoint with Attacking)
+    4. Use OWL reasoning for state validation
+
+---
+
+QUDT (Quantities, Units, Dimensions and Types)
+  https://www.qudt.org/
+  PRIMARY IMPLEMENTATION: nexus-engine/crates/nexus-types/src/lib.rs (proposed)
+  SECONDARY: nexus-engine/crates/nexus-gfx/src/math.rs
+
+  CURRENT STATUS: Not implemented
+  MISSING: Unit/quantity definitions, bounds documentation
+
+  PRIORITY: LOW (type documentation)
+
+  IMPLEMENTATION STEPS:
+    1. Import QUDT ontology
+    2. Annotate phantom types (Hp, Gold, TimeDilation)
+    3. Define bounds using QUDT extensions
+    4. Export type documentation as RDF
+
+---
+
+SQALE (Software Quality Assessment and Evaluation)
+  https://www.sqale.org/
+  PRIMARY IMPLEMENTATION: unify-rs/unify-pm/src/lib.rs (proposed)
+  SECONDARY: tools/rocket-cmd/src/main.rs (doctor enhancement)
+
+  CURRENT STATUS: Not implemented
+  MISSING: Quality metric aggregation, gate engine
+
+  PRIORITY: MEDIUM (quality monitoring)
+
+  IMPLEMENTATION STEPS:
+    1. Define SQALE metric portfolio (coverage, complexity, duplication)
+    2. Collect metrics from cargo clippy, test runners, profilers
+    3. Aggregate by workspace/crate
+    4. Build quality gate enforcer
+
+---
+
+Test Ontology (TEO)
+  https://www.w3.org/2006/03/test-ontology
+  PRIMARY IMPLEMENTATION: chicago-tdd-tools, nexus-engine/crates/nexus-tests/
+
+  CURRENT STATUS: Not implemented
+  MISSING: Test case RDF definitions, requirement traceability
+
+  PRIORITY: LOW-MEDIUM (test documentation)
+
+  IMPLEMENTATION STEPS:
+    1. Export test cases as TEO RDF triples
+    2. Link tests to code/requirements
+    3. Generate test coverage matrix
+
+---
+
+Dublin Core (DCMI)
+  http://purl.org/dc/elements/1.1/
+  PRIMARY IMPLEMENTATION: unify-rs/unify-receipts/, unify-rs/unify-ocel/
+
+  CURRENT STATUS: Not implemented
+  MISSING: Metadata annotation, resource attribution
+
+  PRIORITY: LOW (metadata tagging)
+
+  IMPLEMENTATION STEPS:
+    1. Add DC metadata to all resources (created, modified, creator)
+    2. Annotate artifacts with dc:language, dc:license
+    3. Track dc:isVersionOf relationships
+
+================================================================================
+QUICK START: TOP 3 PRIORITY INTEGRATIONS
+================================================================================
+
+1. SHACL EXPANSION (unify-rs/unify-rdf/src/shacl.rs)
+   Effort: 2-3 days
+   Impact: Manifest/config validation
+
+   Code changes:
+   - Add Pattern, In, Closed variants to ShaclConstraint enum
+   - Implement constraint checking logic
+   - Generate proper sh:ValidationReport RDF output
+
+   Tests:
+   - Test each constraint type with valid/invalid inputs
+   - Verify SHACL report structure
+
+2. PROV-O RECEIPT INTEGRATION (unify-rs/unify-receipts/)
+   Effort: 3-4 days
+   Impact: Audit trail formalization
+
+   Code changes:
+   - Extend Receipt struct with PROV-O fields
+   - Implement RDF serialization
+   - Build receipt chaining mechanism
+
+   Tests:
+   - Verify PROV-O RDF output validates against W3C schema
+   - Test receipt chain immutability
+
+3. OCEL 2.0 STANDARDIZATION (unify-rs/unify-ocel/)
+   Effort: 2-3 days
+   Impact: Event log standardization, process mining foundation
+
+   Code changes:
+   - Align JSON schema to OCEL 2.0 spec
+   - Add XES export option
+   - Integrate with unify-pm
+
+   Tests:
+   - Validate OCEL 2.0 JSON against schema
+   - Test XES conversion roundtrip
+
+================================================================================
+EOF
