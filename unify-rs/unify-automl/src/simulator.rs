@@ -153,3 +153,86 @@ impl TypestateAimbot {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn bot() -> TypestateAimbot {
+        TypestateAimbot::new()
+    }
+
+    // ── brute_force_coordinates ────────────────────────────────────────────────
+
+    #[test]
+    fn empty_sequence_returns_initial_hp() {
+        let (player_hp, target_hp) = bot().brute_force_coordinates(100.0, 80.0, 10.0, 15.0, []).unwrap();
+        assert!((player_hp - 100.0).abs() < 1e-4);
+        assert!((target_hp - 80.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn attack_overhead_then_resolve_hit_reduces_target_hp() {
+        let (_, target_hp) = bot()
+            .brute_force_coordinates(100.0, 100.0, 10.0, 20.0, ["attack:overhead", "resolve:hit"])
+            .unwrap();
+        assert!(target_hp < 100.0, "target should have taken damage");
+    }
+
+    #[test]
+    fn attack_blocked_leaves_target_hp_unchanged() {
+        let (_, target_hp) = bot()
+            .brute_force_coordinates(100.0, 100.0, 10.0, 20.0, ["attack:left", "resolve:blocked"])
+            .unwrap();
+        assert!((target_hp - 100.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn parry_sequence_does_not_panic() {
+        let result = bot().brute_force_coordinates(
+            100.0, 100.0, 10.0, 15.0,
+            ["parry", "resolve:parry:perfect"],
+        );
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn dodge_sequence_does_not_panic() {
+        let result = bot().brute_force_coordinates(
+            100.0, 100.0, 10.0, 15.0,
+            ["dodge", "resolve:dodge"],
+        );
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn illegal_transition_returns_err() {
+        // resolve:hit from Idle is not a valid transition
+        let result = bot().brute_force_coordinates(100.0, 100.0, 10.0, 15.0, ["resolve:hit"]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn unknown_coordinate_returns_err() {
+        let result = bot().brute_force_coordinates(100.0, 100.0, 10.0, 15.0, ["fly:north"]);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn sequence_ending_mid_attack_returns_err() {
+        // Ending in Attacking state (not Idle/Dead) should error
+        let result = bot().brute_force_coordinates(
+            100.0, 100.0, 10.0, 15.0,
+            ["attack:overhead"],
+        );
+        assert!(result.is_err());
+    }
+
+    // ── combinatorial_brute_force ──────────────────────────────────────────────
+
+    #[test]
+    fn combinatorial_brute_force_completes_without_error() {
+        let result = bot().combinatorial_brute_force();
+        assert!(result.is_ok());
+    }
+}
