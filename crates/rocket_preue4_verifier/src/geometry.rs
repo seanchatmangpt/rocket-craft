@@ -95,3 +95,128 @@ pub fn validate_assembly(parts: &[GeometryEnvelope]) -> Vec<(String, RefusalReas
     }
     failures
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::semantic_lod::LodClass;
+
+    fn valid_aabb() -> Aabb {
+        Aabb { min: [0.0, 0.0, 0.0], max: [1.0, 1.0, 1.0] }
+    }
+
+    fn invalid_aabb() -> Aabb {
+        Aabb { min: [1.0, 0.0, 0.0], max: [0.0, 1.0, 1.0] } // min.x > max.x
+    }
+
+    fn base_envelope(family: PartFamily) -> GeometryEnvelope {
+        GeometryEnvelope {
+            part_id: "test-part".into(),
+            family,
+            bounds: valid_aabb(),
+            sockets: Vec::new(),
+            clearance_zones: Vec::new(),
+            lod_required_features: Vec::new(),
+        }
+    }
+
+    // ── Aabb::is_valid ────────────────────────────────────────────────────────
+
+    #[test]
+    fn aabb_is_valid_when_min_le_max() {
+        assert!(valid_aabb().is_valid());
+    }
+
+    #[test]
+    fn aabb_is_invalid_when_min_gt_max_on_x() {
+        assert!(!invalid_aabb().is_valid());
+    }
+
+    #[test]
+    fn aabb_degenerate_zero_size_is_valid() {
+        let a = Aabb { min: [1.0, 1.0, 1.0], max: [1.0, 1.0, 1.0] };
+        assert!(a.is_valid());
+    }
+
+    // ── GeometryEnvelope::validate ────────────────────────────────────────────
+
+    #[test]
+    fn valid_frame_passes_validation() {
+        let e = base_envelope(PartFamily::Frame);
+        assert!(e.validate().is_ok());
+    }
+
+    #[test]
+    fn invalid_bounds_returns_geometry_error() {
+        let mut e = base_envelope(PartFamily::Frame);
+        e.bounds = invalid_aabb();
+        let err = e.validate().unwrap_err();
+        assert!(matches!(err, crate::error::RefusalReason::GeometryValidationFailed { .. }));
+    }
+
+    #[test]
+    fn weapon_mount_with_no_sockets_returns_error() {
+        let e = base_envelope(PartFamily::WeaponMount);
+        assert!(matches!(
+            e.validate().unwrap_err(),
+            crate::error::RefusalReason::MissingSocket { .. }
+        ));
+    }
+
+    #[test]
+    fn weapon_mount_with_socket_passes() {
+        let mut e = base_envelope(PartFamily::WeaponMount);
+        e.sockets.push(SocketMount {
+            socket_id: "S0".into(),
+            mount_point: [0.0, 0.0, 0.0],
+        });
+        assert!(e.validate().is_ok());
+    }
+
+    #[test]
+    fn armor_panel_with_crown_feature_and_no_clearance_returns_error() {
+        let mut e = base_envelope(PartFamily::ArmorPanel);
+        e.lod_required_features.push(SemanticFeature {
+            feature_id: "wing-edge".into(),
+            required_for_lod: LodClass::Crown,
+        });
+        // no clearance zones → should fail
+        assert!(matches!(
+            e.validate().unwrap_err(),
+            crate::error::RefusalReason::MotionClearanceViolation { .. }
+        ));
+    }
+
+    #[test]
+    fn armor_panel_with_crown_feature_and_clearance_zone_passes() {
+        let mut e = base_envelope(PartFamily::ArmorPanel);
+        e.lod_required_features.push(SemanticFeature {
+            feature_id: "wing-edge".into(),
+            required_for_lod: LodClass::Crown,
+        });
+        e.clearance_zones.push(ClearanceZone {
+            zone_id: "Z0".into(),
+            bounds: valid_aabb(),
+        });
+        assert!(e.validate().is_ok());
+    }
+
+    #[test]
+    fn armor_panel_with_non_crown_features_needs_no_clearance() {
+        let mut e = base_envelope(PartFamily::ArmorPanel);
+        e.lod_required_features.push(SemanticFeature {
+            feature_id: "wing-detail".into(),
+            required_for_lod: LodClass::Secondary,
+        });
+        // no clearance zones and non-CROWN feature → should pass
+        assert!(e.validate().is_ok());
+    }
+
+    // ── PartFamily variants ───────────────────────────────────────────────────
+
+    #[test]
+    fn part_family_variants_are_distinct() {
+        assert_ne!(PartFamily::Frame, PartFamily::Shoulder);
+        assert_ne!(PartFamily::WeaponMount, PartFamily::ArmorPanel);
+    }
+}
