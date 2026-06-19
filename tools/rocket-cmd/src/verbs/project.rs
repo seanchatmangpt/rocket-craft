@@ -277,99 +277,188 @@ fn do_test() -> Result<Value> {
     Ok(serde_json::json!({"status": "ok"}))
 }
 
+/// Returns true when `rel_path` should be skipped during asset validation.
+///
+/// Skips paths whose components include an ignored directory name, whose
+/// extension is in the ignore list, or whose filename is explicitly excluded.
+pub fn asset_path_should_skip(
+    rel_path: &std::path::Path,
+    ignore_dirs: &[&str],
+    ignore_files: &[&str],
+    ignore_extensions: &[&str],
+) -> bool {
+    if ignore_dirs.iter().any(|d| rel_path.components().any(|c| c.as_os_str() == *d)) {
+        return true;
+    }
+    if let Some(ext) = rel_path.extension().and_then(|s| s.to_str()) {
+        if ignore_extensions.contains(&ext) {
+            return true;
+        }
+    }
+    if let Some(name) = rel_path.file_name().and_then(|s| s.to_str()) {
+        if ignore_files.contains(&name) {
+            return true;
+        }
+    }
+    false
+}
+
+/// Scan `content` for any of `patterns`, returning `(line_number_1based, pattern)` for each hit.
+pub fn scan_forbidden_content<'a>(content: &str, patterns: &[&'a str]) -> Vec<(usize, &'a str)> {
+    let mut hits = Vec::new();
+    for pattern in patterns {
+        if content.contains(pattern) {
+            for (idx, line) in content.lines().enumerate() {
+                if line.contains(pattern) {
+                    hits.push((idx + 1, *pattern));
+                }
+            }
+        }
+    }
+    hits
+}
+
 fn do_asset_validation() -> Result<Value> {
     use std::fs;
     use walkdir::WalkDir;
     tracing::info!("\n--- Asset Validation (Rust Native) ---");
     let forbidden_patterns = ["Highrise", "Brm-HTML5-Shipping"];
     let ignore_dirs = [
-        ".git",
-        ".agents",
-        "non-project-files",
-        "pwa-staff",
-        "versions",
-        "docs",
-        "tools",
-        "chicago-tdd-tools",
-        "unify-rs",
-        "target",
-        "scratch",
+        ".git", ".agents", "non-project-files", "pwa-staff", "versions",
+        "docs", "tools", "chicago-tdd-tools", "unify-rs", "target", "scratch",
     ];
     let ignore_files = [
-        "validate-assets.py",
-        "ROCKET_CRAFT_AUDIT.md",
-        "README.md",
-        "HELP.md",
-        "CLAUDE.md",
-        "DFLSS.md",
+        "validate-assets.py", "ROCKET_CRAFT_AUDIT.md", "README.md",
+        "HELP.md", "CLAUDE.md", "DFLSS.md",
     ];
     let ignore_extensions = [
-        "log",
-        "lock",
-        "json",
-        "md",
-        "txt",
-        "js",
-        "applescript",
-        "sh",
-        "bat",
-        "yml",
-        "yaml",
-        "toml",
+        "log", "lock", "json", "md", "txt", "js",
+        "applescript", "sh", "bat", "yml", "yaml", "toml",
     ];
     let mut issues_found = false;
     let project_root = std::env::current_dir()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{}", e)))?;
-    for entry in WalkDir::new(&project_root)
-        .into_iter()
-        .filter_map(|e| e.ok())
-    {
-        if !entry.file_type().is_file() {
-            continue;
-        }
+    for entry in WalkDir::new(&project_root).into_iter().filter_map(|e| e.ok()) {
+        if !entry.file_type().is_file() { continue; }
         let path = entry.path();
         let rel_path = path.strip_prefix(&project_root).unwrap_or(path);
-        if ignore_dirs
-            .iter()
-            .any(|d| rel_path.components().any(|c| c.as_os_str() == *d))
-        {
+        if asset_path_should_skip(rel_path, &ignore_dirs, &ignore_files, &ignore_extensions) {
             continue;
         }
-        if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
-            if ignore_extensions.contains(&ext) {
-                continue;
-            }
-        }
-        if let Some(filename) = path.file_name().and_then(|s| s.to_str()) {
-            if ignore_files.contains(&filename) {
-                continue;
-            }
-        }
         if let Ok(content) = fs::read_to_string(path) {
-            for pattern in &forbidden_patterns {
-                if content.contains(pattern) {
-                    for (line_idx, line) in content.lines().enumerate() {
-                        if line.contains(pattern) {
-                            tracing::warn!(
-                                "  ALERT: Found reference to '{}' in {}:{}",
-                                pattern,
-                                rel_path.display(),
-                                line_idx + 1
-                            );
-                            issues_found = true;
-                        }
-                    }
-                }
+            for (line_num, pattern) in scan_forbidden_content(&content, &forbidden_patterns) {
+                tracing::warn!(
+                    "  ALERT: Found reference to '{}' in {}:{}",
+                    pattern, rel_path.display(), line_num
+                );
+                issues_found = true;
             }
         }
     }
     if issues_found {
-        Err(clap_noun_verb::NounVerbError::execution_error(
-            "Asset validation failed.".to_string(),
-        ))
+        Err(clap_noun_verb::NounVerbError::execution_error("Asset validation failed.".to_string()))
     } else {
         tracing::info!("RESULT: Validation PASSED.");
         Ok(serde_json::json!({"status": "ok"}))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::Path;
+
+    const DIRS: &[&str] = &[".git", "target", "versions", "tools"];
+    const FILES: &[&str] = &["README.md", "CLAUDE.md"];
+    const EXTS: &[&str] = &["log", "json", "md", "toml"];
+
+    // ── asset_path_should_skip ────────────────────────────────────────────────
+
+    #[test]
+    fn skip_ignored_dir_component() {
+        assert!(asset_path_should_skip(Path::new("target/debug/foo.rs"), DIRS, FILES, EXTS));
+        assert!(asset_path_should_skip(Path::new(".git/config"), DIRS, FILES, EXTS));
+    }
+
+    #[test]
+    fn skip_ignored_extension() {
+        assert!(asset_path_should_skip(Path::new("some/path/file.log"), DIRS, FILES, EXTS));
+        assert!(asset_path_should_skip(Path::new("Cargo.toml"), DIRS, FILES, EXTS));
+    }
+
+    #[test]
+    fn skip_ignored_filename() {
+        assert!(asset_path_should_skip(Path::new("some/dir/README.md"), DIRS, FILES, EXTS));
+        assert!(asset_path_should_skip(Path::new("CLAUDE.md"), DIRS, FILES, EXTS));
+    }
+
+    #[test]
+    fn does_not_skip_normal_rust_file() {
+        assert!(!asset_path_should_skip(Path::new("src/lib.rs"), DIRS, FILES, EXTS));
+    }
+
+    #[test]
+    fn does_not_skip_cpp_file_outside_ignored_dirs() {
+        assert!(!asset_path_should_skip(
+            Path::new("Source/MyGame/Combat.cpp"), DIRS, FILES, EXTS
+        ));
+    }
+
+    #[test]
+    fn nested_non_ignored_dir_does_not_trigger_skip() {
+        // "versions" dir must be a path component, not a substring of a component
+        assert!(!asset_path_should_skip(
+            Path::new("adventure/world.cpp"), DIRS, FILES, EXTS
+        ));
+    }
+
+    // ── scan_forbidden_content ────────────────────────────────────────────────
+
+    #[test]
+    fn detects_single_pattern_single_line() {
+        let hits = scan_forbidden_content("Hello Highrise world\n", &["Highrise"]);
+        assert_eq!(hits.len(), 1);
+        assert_eq!(hits[0], (1, "Highrise"));
+    }
+
+    #[test]
+    fn detects_pattern_on_correct_line_number() {
+        let content = "line one\nHere is Brm-HTML5-Shipping reference\nline three\n";
+        let hits = scan_forbidden_content(content, &["Brm-HTML5-Shipping"]);
+        assert_eq!(hits.len(), 1);
+        assert_eq!(hits[0].0, 2);
+    }
+
+    #[test]
+    fn returns_empty_when_no_match() {
+        let hits = scan_forbidden_content("clean content\nno forbidden words\n", &["Highrise"]);
+        assert!(hits.is_empty());
+    }
+
+    #[test]
+    fn detects_multiple_patterns_in_same_content() {
+        let content = "Highrise ref\nBrm-HTML5-Shipping ref\n";
+        let hits = scan_forbidden_content(content, &["Highrise", "Brm-HTML5-Shipping"]);
+        assert_eq!(hits.len(), 2);
+    }
+
+    #[test]
+    fn detects_pattern_appearing_twice_on_different_lines() {
+        let content = "Highrise first\nmore text\nHighrise again\n";
+        let hits = scan_forbidden_content(content, &["Highrise"]);
+        assert_eq!(hits.len(), 2);
+        assert_eq!(hits[0].0, 1);
+        assert_eq!(hits[1].0, 3);
+    }
+
+    #[test]
+    fn empty_content_returns_empty() {
+        assert!(scan_forbidden_content("", &["Highrise"]).is_empty());
+    }
+
+    #[test]
+    fn empty_patterns_returns_empty() {
+        assert!(scan_forbidden_content("some content with Highrise\n", &[]).is_empty());
     }
 }
 
