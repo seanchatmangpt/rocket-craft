@@ -211,4 +211,56 @@ mod tests {
         assert!(buf[0].contains("WARN"));
         assert!(buf[1].contains("ERROR"));
     }
+
+    #[test]
+    fn file_sink_creates_file() {
+        let temp = NamedTempFile::new().unwrap();
+        let path = temp.path().to_owned();
+        let sink = FileSink::new(&path).unwrap();
+        sink.log(LogLevel::Info, "hello from file sink");
+        let content = fs::read_to_string(&path).unwrap();
+        assert!(content.contains("hello from file sink"));
+    }
+
+    #[test]
+    fn file_sink_fails_on_nonexistent_dir() {
+        let result = FileSink::new("/nonexistent/dir/__test_log__.txt");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn tui_buffer_sink_accumulates_messages() {
+        let (sink, buf) = TuiBufferSink::new();
+        sink.log(LogLevel::Info, "alpha");
+        sink.log(LogLevel::Warn, "beta");
+        sink.log(LogLevel::Error, "gamma");
+        let locked = buf.lock().unwrap();
+        assert_eq!(locked.len(), 3);
+        assert!(locked[0].contains("alpha"));
+        assert!(locked[2].contains("gamma"));
+    }
+
+    #[test]
+    fn logger_no_sinks_does_not_panic() {
+        let logger = Logger::new();
+        logger.debug("no-op debug");
+        logger.info("no-op info");
+        logger.warn("no-op warn");
+        logger.error("no-op error");
+    }
+
+    #[test]
+    fn logger_debug_level_passes_all_messages() {
+        let mut logger = Logger::with_level(LogLevel::Debug);
+        let (tui_sink, buffer) = TuiBufferSink::new();
+        logger.add_sink(Box::new(tui_sink));
+
+        logger.debug("d");
+        logger.info("i");
+        logger.warn("w");
+        logger.error("e");
+
+        let buf = buffer.lock().unwrap();
+        assert_eq!(buf.len(), 4);
+    }
 }

@@ -197,3 +197,43 @@ jobs:
 
       - name: Test
         run: cargo test --workspace
+
+  tools:
+    name: Rust — tools (rocket-sdk + rocket-cmd)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  asset-pipeline:
+    name: Rust — asset-pipeline
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: asset-pipeline
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: asset-pipeline
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
