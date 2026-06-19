@@ -832,3 +832,120 @@ pub mod poka_yoke {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── branchless_clamp01 ────────────────────────────────────────────────────
+
+    #[test]
+    fn clamp01_positive_within_range_unchanged() {
+        assert!((branchless_clamp01(0.5) - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn clamp01_zero_is_zero() {
+        assert_eq!(branchless_clamp01(0.0), 0.0);
+    }
+
+    #[test]
+    fn clamp01_one_is_one() {
+        assert_eq!(branchless_clamp01(1.0), 1.0);
+    }
+
+    #[test]
+    fn clamp01_negative_clamps_to_zero() {
+        assert_eq!(branchless_clamp01(-5.0), 0.0);
+    }
+
+    #[test]
+    fn clamp01_above_one_clamps_to_one() {
+        assert_eq!(branchless_clamp01(1.5), 1.0);
+    }
+
+    // ── branchless_lerp ───────────────────────────────────────────────────────
+
+    #[test]
+    fn lerp_at_t0_returns_a() {
+        assert!((branchless_lerp(10.0, 20.0, 0.0) - 10.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn lerp_at_t1_returns_b() {
+        assert!((branchless_lerp(10.0, 20.0, 1.0) - 20.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn lerp_at_half_returns_midpoint() {
+        assert!((branchless_lerp(0.0, 100.0, 0.5) - 50.0).abs() < 1e-4);
+    }
+
+    #[test]
+    fn lerp_same_endpoints_returns_that_value() {
+        assert!((branchless_lerp(7.0, 7.0, 0.3) - 7.0).abs() < 1e-5);
+    }
+
+    // ── PartStateVector / generate_part ──────────────────────────────────────
+
+    fn valid_state(slot: PartSlot) -> PartStateVector {
+        PartStateVector {
+            civilization_id: 0,
+            frame_id: 0,
+            armor_profile: 0.5,
+            joint_profile: 0.5,
+            mass_profile: 0.5,
+            weapon_profile: 0.5,
+            motion_profile: 50.0,
+            part_slot: slot,
+        }
+    }
+
+    #[test]
+    fn generate_part_succeeds_for_valid_head_state() {
+        let result = generate_part(&valid_state(PartSlot::Head));
+        assert!(result.is_ok(), "valid head state must succeed: {:?}", result.err());
+    }
+
+    #[test]
+    fn generate_part_succeeds_for_all_slots() {
+        let slots = [
+            PartSlot::Head, PartSlot::Torso, PartSlot::Waist,
+            PartSlot::ArmL, PartSlot::ArmR, PartSlot::LegL, PartSlot::LegR,
+            PartSlot::Backpack,
+        ];
+        for slot in slots {
+            let r = generate_part(&valid_state(slot));
+            assert!(r.is_ok(), "slot {slot:?} must generate successfully");
+        }
+    }
+
+    #[test]
+    fn generate_part_rejects_negative_armor_profile() {
+        let mut state = valid_state(PartSlot::Torso);
+        state.armor_profile = -0.1;
+        assert!(matches!(generate_part(&state), Err(JidokaHalt::MotionBoundsViolated { .. })));
+    }
+
+    #[test]
+    fn generate_part_rejects_armor_profile_above_1() {
+        let mut state = valid_state(PartSlot::Torso);
+        state.armor_profile = 1.5;
+        assert!(matches!(generate_part(&state), Err(JidokaHalt::MotionBoundsViolated { .. })));
+    }
+
+    #[test]
+    fn generate_part_rejects_motion_profile_above_100() {
+        let mut state = valid_state(PartSlot::LegL);
+        state.motion_profile = 101.0;
+        assert!(matches!(generate_part(&state), Err(JidokaHalt::MotionBoundsViolated { .. })));
+    }
+
+    // ── PartSlot discriminants ────────────────────────────────────────────────
+
+    #[test]
+    fn part_slot_discriminants_are_0_through_7() {
+        assert_eq!(PartSlot::Head as u8, 0);
+        assert_eq!(PartSlot::Backpack as u8, 7);
+    }
+}
