@@ -886,3 +886,81 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
     write_pipeline_receipt(&project, &result);
     Ok(result)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::TempDir;
+
+    fn html_with_body(body_content: &str) -> String {
+        format!("<html><body>{body_content}</body></html>")
+    }
+
+    #[test]
+    fn patch_injects_script_before_body_close() {
+        let dir = TempDir::new().unwrap();
+        let html_path = dir.path().join("Game.html");
+        fs::write(&html_path, html_with_body("<canvas id='canvas'></canvas>")).unwrap();
+
+        patch_html_for_ui_input(dir.path());
+
+        let patched = fs::read_to_string(&html_path).unwrap();
+        assert!(patched.contains("rocket-html5: suppress"), "must contain the patch sentinel");
+        assert!(patched.contains("requestPointerLock"), "must patch requestPointerLock");
+        assert!(patched.ends_with("</html>"), "file structure preserved");
+    }
+
+    #[test]
+    fn patch_is_idempotent() {
+        let dir = TempDir::new().unwrap();
+        let html_path = dir.path().join("Game.html");
+        fs::write(&html_path, html_with_body("<canvas></canvas>")).unwrap();
+
+        patch_html_for_ui_input(dir.path());
+        let after_first = fs::read_to_string(&html_path).unwrap();
+
+        patch_html_for_ui_input(dir.path());
+        let after_second = fs::read_to_string(&html_path).unwrap();
+
+        assert_eq!(after_first, after_second, "second patch must not change the file");
+    }
+
+    #[test]
+    fn patch_skips_non_html_files() {
+        let dir = TempDir::new().unwrap();
+        let wasm_path = dir.path().join("Game.wasm");
+        let js_path = dir.path().join("Game.js");
+        let wasm_content = b"\x00asm";
+        let js_content = b"Module = {}";
+        fs::write(&wasm_path, wasm_content).unwrap();
+        fs::write(&js_path, js_content).unwrap();
+
+        patch_html_for_ui_input(dir.path()); // must not crash or modify non-HTML
+
+        assert_eq!(fs::read(&wasm_path).unwrap(), wasm_content);
+        assert_eq!(fs::read(&js_path).unwrap(), js_content);
+    }
+
+    #[test]
+    fn patch_handles_empty_dir() {
+        let dir = TempDir::new().unwrap();
+        // Must not panic on an empty directory
+        patch_html_for_ui_input(dir.path());
+    }
+
+    #[test]
+    fn patch_handles_multiple_html_files() {
+        let dir = TempDir::new().unwrap();
+        for name in &["Brm.html", "index.html"] {
+            fs::write(dir.path().join(name), html_with_body("<canvas></canvas>")).unwrap();
+        }
+
+        patch_html_for_ui_input(dir.path());
+
+        for name in &["Brm.html", "index.html"] {
+            let content = fs::read_to_string(dir.path().join(name)).unwrap();
+            assert!(content.contains("rocket-html5: suppress"), "{name} must be patched");
+        }
+    }
+}
