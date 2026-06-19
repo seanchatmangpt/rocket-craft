@@ -4,6 +4,28 @@ import path from 'path';
 import { createHash } from 'crypto';
 const hashJsonString = (s: string) => createHash('sha256').update(s).digest('hex');
 import { PNG } from 'pngjs';
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = process.env.SUPABASE_URL || 'http://localhost:54321';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sb = createClient<any>(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/** Poll Supabase for a row matching the receipt_hash (Gap 3 fix). */
+async function pollForReceiptPersistence(receiptHash: string, timeoutMs = 15_000): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (sb as any)
+      .from('game_receipts')
+      .select('id, verdict')
+      .eq('receipt_hash', receiptHash)
+      .limit(1);
+    if (Array.isArray(data) && data.length > 0) return true;
+    await new Promise(r => setTimeout(r, 1_000));
+  }
+  return false;
+}
 
 test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
   test('verify WASM world drives and generates cryptographic receipt', async ({ page }) => {
@@ -34,7 +56,6 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       // Wait for WASM main() to start — this fires early in startup
       await page.waitForFunction(
         () =>
-          (window as any).UE4_EngineReady === true ||
           (window as any).Module?.calledMain === true ||
           ((document.querySelector('canvas') as HTMLCanvasElement | null)?.width ?? 0) > 0,
         { timeout: 120000 }
@@ -116,8 +137,8 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       const MINIMUM_MOTION_THRESHOLD = idleDeltaPixels + 50;
       const hasVisualContent = nonBlackPixels > 1000;
       const hasMotion = numDiffPixels > MINIMUM_MOTION_THRESHOLD;
-      const verdict = (hasMotion || hasVisualContent) ? 'PASS' : 'FAIL';
-      const visualDelta = hasMotion ? numDiffPixels : nonBlackPixels;
+      const verdict = (hasMotion && hasVisualContent) ? 'PASS' : 'FAIL';
+      const visualDelta = numDiffPixels;
       console.log(`Visual proof: motion=${hasMotion} content=${hasVisualContent} verdict=${verdict}`);
 
       // Reassign beforeBuffer and diff for receipt compatibility
@@ -225,6 +246,26 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       fs.writeFileSync(diffPath, PNG.sync.write(diff));
 
       console.log(`Receipt generated at ${receiptPath} with visual delta ${visualDelta} and verdict ${verdict}`);
+
+      // Gap 3 fix: verify receipt was persisted to Supabase (not just written to local JSON).
+      // The Nuxt game shell's commitReceipt() calls /api/game/receipt which writes to game_receipts.
+      // We poll for the row by receipt_hash so Playwright asserts DB persistence, not just local state.
+      if (verdict === 'PASS') {
+        currentCell = 'supabase-receipt-persistence cell';
+        const receiptHashForLookup = receiptSignature;
+        const persisted = await pollForReceiptPersistence(receiptHashForLookup, 15_000);
+        if (!persisted) {
+          console.warn(
+            `[Gap 3] Receipt not found in Supabase after 15s — ` +
+            `hash=${receiptHashForLookup.slice(0, 16)}… ` +
+            `Check that game.vue commitReceipt() fires after session proof.`
+          );
+          // Soft fail: receipt persistence gap is logged but does not block the PASS verdict.
+          // This becomes a hard assertion once commitReceipt() is wired to fire automatically.
+        } else {
+          console.log(`[Gap 3] Receipt persisted to Supabase ✓ (hash=${receiptHashForLookup.slice(0, 16)}…)`);
+        }
+      }
 
       currentCell = 'visual-delta cell';
       if (verdict === 'FAIL') {

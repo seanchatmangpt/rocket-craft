@@ -135,6 +135,36 @@ fi
 "$CWD/rocket" receipt validate --file "$RECEIPT"
 log_success "Receipt validated: $RECEIPT"
 
+# Gap 6 — Cook-to-game hash cross-check.
+# The cook pipeline writes cook-receipt.json with an output_hash (BLAKE3/SHA-256 of Brm.wasm).
+# The Playwright tps-dflss receipt also records output_hash via the same wasm hash function.
+# If both are present, they MUST agree — a mismatch means the game loaded a different binary
+# than the one that was cooked and verified.
+log_info "[6/5] Cross-checking cook-receipt hash vs game receipt hash..."
+COOK_RECEIPT="$ARCHIVE_DIR/cook-receipt.json"
+if [ -f "$COOK_RECEIPT" ] && [ -f "$RECEIPT" ]; then
+  COOK_HASH=$(python3 -c "import json; d=json.load(open('$COOK_RECEIPT')); print(d.get('output_hash',''))" 2>/dev/null || echo "")
+  GAME_HASH=$(python3 -c "import json; d=json.load(open('$RECEIPT')); print(d.get('output_hash',''))" 2>/dev/null || echo "")
+  if [ -z "$COOK_HASH" ] || [ -z "$GAME_HASH" ]; then
+    log_warn "Cook-to-game hash cross-check skipped — one or both output_hash fields missing"
+    log_warn "  cook receipt output_hash: '${COOK_HASH:-<empty>}'"
+    log_warn "  game receipt output_hash: '${GAME_HASH:-<empty>}'"
+  elif [ "$COOK_HASH" = "$GAME_HASH" ]; then
+    log_success "Cook-to-game hash cross-check PASS — same binary served and played"
+    log_success "  output_hash: $COOK_HASH"
+  else
+    log_error "Cook-to-game hash MISMATCH — binary substitution detected!"
+    log_error "  cook output_hash: $COOK_HASH"
+    log_error "  game output_hash: $GAME_HASH"
+    log_error "  Ensure verify_html5_pipeline.sh serves the same .wasm that rocket html5 cook produced."
+    exit 1
+  fi
+else
+  log_warn "Cook-to-game hash cross-check skipped — missing receipt file(s)"
+  log_warn "  cook receipt: $COOK_RECEIPT ($([ -f "$COOK_RECEIPT" ] && echo "found" || echo "missing"))"
+  log_warn "  game receipt: $RECEIPT ($([ -f "$RECEIPT" ] && echo "found" || echo "missing"))"
+fi
+
 echo -e "${BOLD}${CYAN}============================================${RESET}"
 if [ $PLAYWRIGHT_EXIT -eq 0 ]; then
   log_success "Stage 6 COMPLETE — real WebGL2 pipeline proven"

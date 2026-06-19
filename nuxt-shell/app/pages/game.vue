@@ -84,7 +84,7 @@ async function downloadHashedOcelLog() {
 </script>
 
 <template>
-  <main class="game-shell">
+  <main class="game-shell" :data-session-id="dbSessionId || undefined">
     <!-- DOM HUD — lives in Nuxt, not UE4 -->
     <header class="shell-header" role="banner" aria-label="Mission control header">
       <span class="brand">ROCKET-CRAFT</span>
