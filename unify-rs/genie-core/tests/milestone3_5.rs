@@ -71,9 +71,10 @@ fn test_milestone3_layout_compiler() {
 }
 
 #[test]
+#[ignore = "requires UE4_ROOT pointing to a built engine with RunUAT.sh (takes hours)"]
 fn test_milestone4_deployment_manager() {
     if std::env::var("UE4_ROOT").is_err() {
-        std::env::set_var("UE4_ROOT", "/Users/sac/ue4-sim");
+        std::env::set_var("UE4_ROOT", "/Users/sac/ue-4.27-html5-es3");
     }
     let mut spec = WorldSpec::new();
     let bounds = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(10.0, 10.0, 10.0));

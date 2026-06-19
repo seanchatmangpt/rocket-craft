@@ -94,9 +94,12 @@ fn test_world_evolver_complex_intent() {
 }
 
 #[test]
+#[ignore = "requires UE4_ROOT pointing to a built engine with RunUAT.sh (takes hours); \
+            run manually: cargo test -p genie-core -- --ignored test_deployment_manager_files_and_logs"]
 fn test_deployment_manager_files_and_logs() {
+    // Use the real engine root if set; fall back only for manual invocation
     if std::env::var("UE4_ROOT").is_err() {
-        std::env::set_var("UE4_ROOT", "/Users/sac/ue4-sim");
+        std::env::set_var("UE4_ROOT", "/Users/sac/ue-4.27-html5-es3");
     }
     let mut spec = WorldSpec::new();
     let bounds = Bounds3D::new(

@@ -61,6 +61,8 @@ test-rust:
     cd nexus-engine && cargo test --all
     cd blueprint-rs && cargo test --all
     cd chicago-tdd-tools && cargo test --all-features
+    cd unify-rs && cargo test --all
+    cd infinity-blade-4/mud && cargo test --all
 
 # Run pwa-staff unit tests (vitest)
 test-pwa:
