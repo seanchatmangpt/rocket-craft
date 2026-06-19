@@ -198,4 +198,37 @@ mod tests {
         let rsa = pkey.rsa().expect("Private key is not an RSA key");
         assert_eq!(rsa.size(), 256, "RSA key size is not 2048 bits");
     }
+
+    #[test]
+    fn manage_placeholder_creates_file_when_missing() {
+        let dir = tempdir().unwrap();
+        let ks = dir.path().join("test.keystore").to_str().unwrap().to_string();
+        manage_placeholder(&ks).unwrap();
+        let placeholder = format!("{}.placeholder", ks);
+        assert!(Path::new(&placeholder).exists(), "placeholder not created");
+        let content = fs::read_to_string(&placeholder).unwrap();
+        assert!(content.contains("placeholder"), "placeholder file content wrong");
+    }
+
+    #[test]
+    fn manage_placeholder_idempotent() {
+        let dir = tempdir().unwrap();
+        let ks = dir.path().join("k.keystore").to_str().unwrap().to_string();
+        manage_placeholder(&ks).unwrap();
+        manage_placeholder(&ks).unwrap(); // second call must not panic or error
+        let count = dir.path().read_dir().unwrap().count();
+        assert_eq!(count, 1, "second call must not create extra files");
+    }
+
+    #[test]
+    fn check_status_does_not_panic() {
+        // check_status() reads filenames from cwd — just assert it doesn't panic.
+        let _ = check_status();
+    }
+
+    #[test]
+    fn generate_keystore_nonexistent_dir_returns_error() {
+        let result = generate_keystore("/nonexistent/dir/k.keystore", "alias", "pw");
+        assert!(result.is_err());
+    }
 }

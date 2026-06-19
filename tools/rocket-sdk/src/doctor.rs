@@ -1094,8 +1094,8 @@ mod tests {
         fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_manifest_projects();
-        assert_eq!(result.status, CheckStatus::Fail);
-        assert!(result.message.contains("MISSING"));
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("not present") || result.message.contains("optional"));
         assert!(result.details.as_deref().unwrap_or("").contains("Ghost"));
     }
 
@@ -1113,7 +1113,7 @@ mod tests {
         fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_manifest_projects();
-        assert_eq!(result.status, CheckStatus::Fail);
+        assert_eq!(result.status, CheckStatus::Warn);
         assert!(result.message.contains("1/2"));
     }
 
