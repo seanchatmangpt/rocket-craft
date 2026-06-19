@@ -286,6 +286,12 @@ pub struct LifecycleTracker {
     history: Vec<LifecycleState>,
 }
 
+impl Default for LifecycleTracker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl LifecycleTracker {
     pub fn new() -> Self {
         LifecycleTracker {

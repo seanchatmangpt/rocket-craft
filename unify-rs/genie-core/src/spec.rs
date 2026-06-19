@@ -309,10 +309,11 @@ impl HistoryEvent {
 }
 
 /// Status of an operational process.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ProcessStatus {
     /// Not yet started.
+    #[default]
     Pending,
     /// Currently running in the simulation or plant.
     Active,
@@ -320,12 +321,6 @@ pub enum ProcessStatus {
     Completed,
     /// Terminated due to errors or failures.
     Failed,
-}
-
-impl Default for ProcessStatus {
-    fn default() -> Self {
-        ProcessStatus::Pending
-    }
 }
 
 /// A single step within a Process workflow.

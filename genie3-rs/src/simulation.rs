@@ -123,15 +123,16 @@ pub struct SimulationEngine {
     pub config: SimulationConfig,
 }
 
+impl Default for SimulationEngine {
+    fn default() -> Self {
+        Self::new(SimulationConfig::default())
+    }
+}
+
 impl SimulationEngine {
     /// Create a new SimulationEngine with custom configuration.
     pub fn new(config: SimulationConfig) -> Self {
         Self { config }
-    }
-
-    /// Create a new SimulationEngine with default configuration.
-    pub fn default() -> Self {
-        Self::new(SimulationConfig::default())
     }
 
     /// Validates the transition of an actor to a new position.

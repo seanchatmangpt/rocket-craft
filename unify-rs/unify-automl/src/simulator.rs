@@ -13,6 +13,12 @@ pub enum CombatStateEnum {
 
 pub struct TypestateAimbot;
 
+impl Default for TypestateAimbot {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TypestateAimbot {
     pub fn new() -> Self {
         Self

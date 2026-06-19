@@ -55,18 +55,19 @@ impl LanguageServer for AntiLlmServer {
             }
         }
 
-        let mut caps = ServerCapabilities::default();
-        caps.text_document_sync =
-            Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::FULL));
-        caps.code_action_provider = Some(CodeActionProviderCapability::Simple(true));
-        caps.completion_provider = Some(CompletionOptions {
-            resolve_provider: Some(false),
-            trigger_characters: Some(vec!["#".to_string()]),
+        let caps = ServerCapabilities {
+            text_document_sync: Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::FULL)),
+            code_action_provider: Some(CodeActionProviderCapability::Simple(true)),
+            completion_provider: Some(CompletionOptions {
+                resolve_provider: Some(false),
+                trigger_characters: Some(vec!["#".to_string()]),
+                ..Default::default()
+            }),
+            code_lens_provider: Some(CodeLensOptions {
+                resolve_provider: Some(true),
+            }),
             ..Default::default()
-        });
-        caps.code_lens_provider = Some(CodeLensOptions {
-            resolve_provider: Some(true),
-        });
+        };
 
         Ok(InitializeResult {
             capabilities: caps,

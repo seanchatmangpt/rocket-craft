@@ -29,6 +29,12 @@ pub struct CombinatorialCoordinateGenerator {
     pub boundaries: Vec<OntologyBoundary>,
 }
 
+impl Default for CombinatorialCoordinateGenerator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl CombinatorialCoordinateGenerator {
     pub fn new() -> Self {
         Self {
