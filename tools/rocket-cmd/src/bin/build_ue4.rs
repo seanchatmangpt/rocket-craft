@@ -37,12 +37,16 @@ struct Args {
     stall_secs: u64,
 
     /// Run clang -fsyntax-only preflight on HTML5 platform sources before invoking UBT
-    #[arg(long, default_value_t = true)]
+    #[arg(long, default_value_t = false)]
     preflight: bool,
 
     /// Skip ShaderCompileWorker and UnrealPak (faster, editor-only)
     #[arg(long)]
     editor_only: bool,
+
+    /// Extra flags passed directly to UnrealBuildTool (e.g. -DisableAdaptiveUnityBuild)
+    #[arg(last = true)]
+    ubt_args: Vec<String>,
 }
 
 fn home_log() -> String {
@@ -170,7 +174,7 @@ fn main() -> Result<()> {
 
     for target in targets {
         log!("--- Building: {} Mac Development ---", target);
-        let result = build_target(target, &build_sh, args.stall_secs, &mut log_file)?;
+        let result = build_target(target, &build_sh, args.stall_secs, &args.ubt_args, &mut log_file)?;
 
         let ok = result.success;
         let stalled = result.stalled;
@@ -312,6 +316,7 @@ fn build_target(
     target: &str,
     build_sh: &Path,
     stall_secs: u64,
+    ubt_args: &[String],
     log_file: &mut fs::File,
 ) -> Result<TargetResult> {
     let start = Instant::now();
@@ -322,6 +327,7 @@ fn build_target(
         .arg(target)
         .arg("Mac")
         .arg("Development")
+        .args(ubt_args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()

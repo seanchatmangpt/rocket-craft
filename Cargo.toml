@@ -22,6 +22,7 @@ members = [
     "rocket-simulator/simulator-core",
     "tools/gait-wasm",
     "tools/standalone-tps",
+    "crates/rocket_preue4_verifier",
 ]
 exclude = [
     "unify-rs",
