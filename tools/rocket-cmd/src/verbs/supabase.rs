@@ -390,6 +390,37 @@ fn compute_conformance(sessions: &[serde_json::Value]) -> serde_json::Value {
     })
 }
 
+/// Close stale game sessions — sessions alive but with no events for >N minutes.
+///
+/// Invariant (from LieDetector pattern): is_alive=TRUE sessions must have had
+/// an ocel_event INSERT within the last timeout_minutes minutes. Sessions that
+/// violate this were not properly closed (browser crash, tab close, etc.).
+///
+/// Calls the close_stale_sessions() Postgres function (migration 000008).
+///
+/// # Arguments
+/// * `timeout_minutes` - Minutes of inactivity before a session is stale (default: 10)
+#[verb("cleanup", "supabase")]
+fn supabase_cleanup(timeout_minutes: Option<u32>) -> Result<Value> {
+    let svc = make_service()?;
+    let rt = new_runtime()?;
+    let timeout = timeout_minutes.unwrap_or(10);
+    let rows = rt.block_on(svc.close_stale_sessions(timeout))
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+    if rows.is_empty() {
+        println!("[cleanup] No stale sessions found (timeout={}m).", timeout);
+    } else {
+        println!("[cleanup] Closed {} stale session(s):", rows.len());
+        for r in &rows {
+            println!("  session={} age={}m events={}",
+                r["closed_session_id"].as_str().unwrap_or("?"),
+                r["age_minutes"].as_f64().unwrap_or(0.0),
+                r["event_count"].as_u64().unwrap_or(0));
+        }
+    }
+    Ok(serde_json::json!({ "closed": rows.len(), "timeout_minutes": timeout, "sessions": rows }))
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

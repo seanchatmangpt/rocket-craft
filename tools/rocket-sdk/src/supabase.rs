@@ -181,6 +181,26 @@ impl SupabaseService {
         (checks, health)
     }
 
+    /// Call close_stale_sessions(timeout_minutes) Postgres function.
+    pub async fn close_stale_sessions(&self, timeout_minutes: u32) -> Result<Vec<serde_json::Value>> {
+        let url = format!("{}/rest/v1/rpc/close_stale_sessions", self.url);
+        let body = serde_json::json!({ "p_timeout_minutes": timeout_minutes });
+        let resp = self.client
+            .post(&url)
+            .headers(self.rest_headers())
+            .json(&body)
+            .send()
+            .await
+            .context("close_stale_sessions RPC failed")?;
+        if resp.status().is_success() {
+            Ok(resp.json::<Vec<serde_json::Value>>().await?)
+        } else {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("close_stale_sessions {status}: {msg}");
+        }
+    }
+
     /// Fetch session_lifecycle_summary view (distinct activities per session).
     /// Used by `rocket supabase conformance` to compute Van der Aalst metrics.
     pub async fn fetch_session_lifecycle_summary(&self, limit: u32) -> Result<Vec<serde_json::Value>> {
