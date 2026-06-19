@@ -217,3 +217,109 @@ pub struct Projectile {
 }
 
 // MagicType imported from nexus_types
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Health ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn health_new_starts_at_full() {
+        let h = Health::new(100.0);
+        assert_eq!(h.current, 100.0);
+        assert_eq!(h.max, 100.0);
+        assert!(h.is_alive());
+    }
+
+    #[test]
+    fn health_take_damage_reduces_current() {
+        let mut h = Health::new(100.0);
+        h.take_damage(30.0);
+        assert_eq!(h.current, 70.0);
+        assert!(h.is_alive());
+    }
+
+    #[test]
+    fn health_take_damage_clamps_at_zero_not_negative() {
+        let mut h = Health::new(50.0);
+        h.take_damage(999.0);
+        assert_eq!(h.current, 0.0);
+        assert!(!h.is_alive());
+    }
+
+    #[test]
+    fn health_heal_increases_current() {
+        let mut h = Health::new(100.0);
+        h.take_damage(40.0);
+        h.heal(20.0);
+        assert_eq!(h.current, 80.0);
+    }
+
+    #[test]
+    fn health_heal_does_not_exceed_max() {
+        let mut h = Health::new(100.0);
+        h.take_damage(10.0);
+        h.heal(999.0);
+        assert_eq!(h.current, 100.0);
+    }
+
+    #[test]
+    fn health_hp_percent_full_is_one() {
+        let h = Health::new(100.0);
+        assert!((h.hp_percent() - 1.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn health_hp_percent_half() {
+        let mut h = Health::new(100.0);
+        h.take_damage(50.0);
+        assert!((h.hp_percent() - 0.5).abs() < 1e-5);
+    }
+
+    // ── AttackPower ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn attack_power_total_is_base_plus_bonus() {
+        let ap = AttackPower { base: 30.0, bonus: 10.0 };
+        assert_eq!(ap.total(), 40.0);
+    }
+
+    #[test]
+    fn attack_power_zero_bonus_total_equals_base() {
+        let ap = AttackPower { base: 25.0, bonus: 0.0 };
+        assert_eq!(ap.total(), 25.0);
+    }
+
+    // ── Defense ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn defense_total_is_base_plus_bonus() {
+        let d = Defense { base: 10.0, bonus: 5.0 };
+        assert_eq!(d.total(), 15.0);
+    }
+
+    // ── Position / Rotation::identity ────────────────────────────────────────
+
+    #[test]
+    fn position_default_is_origin() {
+        let p = Position { x: 0.0, y: 0.0, z: 0.0 };
+        assert_eq!(p.x, 0.0);
+    }
+
+    #[test]
+    fn rotation_identity_has_unit_w() {
+        let r = Rotation::identity();
+        // Unit quaternion: w component should be 1.0
+        assert!((r.qw - 1.0).abs() < 1e-5, "identity w must be 1.0, got {}", r.qw);
+    }
+
+    // ── ComboState ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn combo_state_default_is_zero() {
+        let c = ComboState::default();
+        assert_eq!(c.depth, 0);
+        assert_eq!(c.idle_turns, 0);
+    }
+}

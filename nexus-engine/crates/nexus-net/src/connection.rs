@@ -332,3 +332,121 @@ impl Connection<InMatch> {
         Self::from_base(b)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn disconnected() -> Connection<Disconnected> {
+        ConnectionBuilder::new().player_id(1).session_id(100).build()
+    }
+
+    // ── builder ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn builder_sets_player_and_session_id() {
+        let c = ConnectionBuilder::new().player_id(7).session_id(77).build();
+        assert_eq!(c.player_id, Some(7));
+        assert_eq!(c.session_id, Some(77));
+    }
+
+    #[test]
+    fn builder_default_latency_is_zero() {
+        let c = ConnectionBuilder::new().build();
+        assert_eq!(c.latency_ms, 0);
+    }
+
+    #[test]
+    fn builder_latency_ms_is_set() {
+        let c = ConnectionBuilder::new().latency_ms(42).build();
+        assert_eq!(c.latency_ms, 42);
+    }
+
+    // ── Disconnected → Handshaking ────────────────────────────────────────────
+
+    #[test]
+    fn begin_handshake_transitions_to_handshaking() {
+        let c = disconnected();
+        let h = c.begin_handshake();
+        // Handshaking state has a `complete()` method — presence confirms typestate
+        let _ = h.complete();
+    }
+
+    // ── Handshaking → Connected → Authenticated ───────────────────────────────
+
+    #[test]
+    fn handshaking_complete_then_authenticate() {
+        let c = disconnected();
+        let authenticated = c.begin_handshake().complete().authenticate(99, 999);
+        assert_eq!(authenticated.player_id, Some(99));
+        assert_eq!(authenticated.session_id, Some(999));
+    }
+
+    // ── Handshaking → Disconnected (fail) ─────────────────────────────────────
+
+    #[test]
+    fn handshaking_fail_returns_to_disconnected() {
+        let c = disconnected();
+        let back = c.begin_handshake().fail();
+        // Can start handshake again from Disconnected
+        let _ = back.begin_handshake();
+    }
+
+    // ── Authenticated → InLobby ───────────────────────────────────────────────
+
+    #[test]
+    fn authenticated_can_join_lobby() {
+        let c = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby();
+        // InLobby has enter_match — presence confirms typestate
+        let _ = c.enter_match(42);
+    }
+
+    // ── InLobby → InMatch ─────────────────────────────────────────────────────
+
+    #[test]
+    fn in_lobby_enters_match_sets_match_id() {
+        let c = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby()
+            .enter_match(777);
+        assert_eq!(c.current_match_id(), 777);
+    }
+
+    // ── InLobby → Authenticated (leave lobby) ────────────────────────────────
+
+    #[test]
+    fn in_lobby_can_leave_back_to_authenticated() {
+        let auth = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby()
+            .leave_lobby();
+        // Back to Authenticated: can join lobby again
+        let _ = auth.join_lobby();
+    }
+
+    // ── Disconnect from any state ─────────────────────────────────────────────
+
+    #[test]
+    fn authenticated_disconnect_returns_to_disconnected() {
+        let back = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .disconnect();
+        let _ = back.begin_handshake(); // Disconnected state confirmed
+    }
+
+    #[test]
+    fn in_lobby_disconnect_returns_to_disconnected() {
+        let back = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby()
+            .disconnect();
+        let _ = back.begin_handshake();
+    }
+}
