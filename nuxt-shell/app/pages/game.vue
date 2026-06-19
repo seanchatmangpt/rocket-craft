@@ -52,6 +52,11 @@ function onEngineError(msg: string) {
         <GameControlPanel />
       </ClientOnly>
     </section>
+
+    <!-- Receipt audit drawer — opened by OpenReceiptPanel intent -->
+    <ClientOnly>
+      <ReceiptDrawer />
+    </ClientOnly>
   </main>
 </template>
 
