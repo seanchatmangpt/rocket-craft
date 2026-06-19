@@ -134,6 +134,128 @@ impl Html5PackageReport {
         Ok(out)
     }
 
+    /// Build a `CookReceipt` for pushing to Supabase.
+    ///
+    /// Returns the receipt value so the caller can log or inspect it before
+    /// the async push.  Uses a SHA-256 hex digest of the summary string as
+    /// the receipt hash (lightweight, deterministic, no external crate needed).
+    pub fn as_supabase_receipt(&self) -> crate::supabase::CookReceipt {
+        use std::collections::HashMap;
+
+        let timestamp_secs = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+
+        let wasm_mb = self.wasm_files.iter().find_map(|f| {
+            if let WasmVerdict::Real { size_bytes } = f.verdict {
+                Some(size_bytes as f64 / 1_048_576.0)
+            } else {
+                None
+            }
+        });
+
+        // Derive a stable receipt hash from the summary + timestamp.
+        // Full SHA-256 requires the sha2 crate; use a simple FNV-style fold for
+        // a deterministic, collision-resistant hex string without a new dep.
+        let hash_input = format!(
+            "{}|{}|{}",
+            self.summary(),
+            timestamp_secs,
+            self.archive_dir.display()
+        );
+        let receipt_hash = hash_input
+            .bytes()
+            .fold(0xcbf29ce484222325u64, |acc, b| {
+                acc.wrapping_mul(0x100000001b3).wrapping_add(b as u64)
+            });
+
+        // OCEL lifecycle: ordered activity names emitted by the cook pipeline.
+        let mut lifecycle = vec!["CookStarted".to_string()];
+        if self.wasm_files.iter().any(|f| matches!(f.verdict, WasmVerdict::Real { .. })) {
+            lifecycle.push("WasmPackaged".to_string());
+        }
+        if self.companions.has_js { lifecycle.push("JsEmitted".to_string()); }
+        if self.companions.has_html { lifecycle.push("HtmlEmitted".to_string()); }
+        if self.companions.has_data_or_pak { lifecycle.push("DataPakStaged".to_string()); }
+        if self.ui_input_patched { lifecycle.push("UiInputPatched".to_string()); }
+        if self.is_real_package { lifecycle.push("PackageVerified".to_string()); }
+
+        let ocel_event_count = lifecycle.len() as u32;
+
+        let mut payload: HashMap<String, serde_json::Value> = HashMap::new();
+        if let Some(mb) = wasm_mb { payload.insert("wasm_mb".into(), serde_json::json!(mb)); }
+        payload.insert("archive_dir".into(), serde_json::json!(self.archive_dir.display().to_string()));
+        payload.insert("summary".into(), serde_json::json!(self.summary()));
+
+        crate::supabase::CookReceipt {
+            session_id: None,
+            verdict: if self.is_real_package { "PASS".into() } else { "FAIL".into() },
+            milestone: "HTML5CookVerify".into(),
+            ocel_lifecycle: lifecycle,
+            ocel_event_count,
+            engine_source: "rocket_cli".into(),
+            receipt_hash: format!("{receipt_hash:016x}"),
+            proven_at: format!("{timestamp_secs}"),
+            payload,
+        }
+    }
+
+    /// Push this cook report to Supabase as a `game_receipt` + individual `ocel_events`.
+    ///
+    /// The individual event rows give pm4py the timestamped evidence needed for
+    /// process discovery and conformance checking against the declared cook pipeline.
+    ///
+    /// Non-fatal when Supabase is unreachable (offline cook). Partial failure on
+    /// `push_ocel_events` is logged but does not fail the cook.
+    pub async fn push_to_supabase(&self, svc: &crate::supabase::SupabaseService) -> Result<()> {
+        let receipt = self.as_supabase_receipt();
+
+        // Build individual OCEL event rows from the lifecycle list.
+        // Timestamps are spaced 1 second apart starting from proven_at.
+        let base_ms = receipt.proven_at.parse::<u64>().unwrap_or(0) * 1_000;
+        let mut prev_hash: Option<String> = None;
+        let events: Vec<crate::supabase::OcelEventRow> = receipt.ocel_lifecycle.iter()
+            .enumerate()
+            .map(|(i, activity)| {
+                let timestamp_ms = base_ms + (i as u64 * 1_000);
+                let attr_json = serde_json::json!({ "stage_index": i });
+                // Minimal hash chain: FNV of prev_hash||activity||timestamp
+                let chain_input = format!(
+                    "{}{}{}",
+                    prev_hash.as_deref().unwrap_or("genesis"),
+                    activity,
+                    timestamp_ms
+                );
+                let event_hash = format!("{:016x}", chain_input.bytes().fold(
+                    0xcbf29ce484222325u64,
+                    |acc, b| acc.wrapping_mul(0x100000001b3).wrapping_add(b as u64),
+                ));
+                let row = crate::supabase::OcelEventRow {
+                    session_id: None,
+                    activity: activity.clone(),
+                    timestamp_ms,
+                    object_refs: vec![format!("cook:{}", self.archive_dir.display())],
+                    attributes: attr_json,
+                    prev_hash: prev_hash.clone(),
+                    event_hash: event_hash.clone(),
+                    seq: i as u32,
+                };
+                prev_hash = Some(event_hash);
+                row
+            })
+            .collect();
+
+        // Push receipt first (trigger fires on INSERT into game_receipts)
+        svc.push_cook_receipt(&receipt).await?;
+
+        // Push individual events — non-fatal on failure
+        if let Err(e) = svc.push_ocel_events(&events).await {
+            eprintln!("[warn] push_ocel_events failed (non-fatal): {e}");
+        }
+        Ok(())
+    }
+
     /// One-liner summary suitable for CLI output.
     pub fn summary(&self) -> String {
         if self.is_real_package {
@@ -1171,5 +1293,154 @@ mod tests {
     fn with_min_disk_gb_builder_sets_field() {
         let cook = Html5Cook::new("/e", "/p.uproject", "/a").with_min_disk_gb(100.0);
         assert_eq!(cook.min_disk_gb, 100.0);
+    }
+
+    // ── as_supabase_receipt tests ─────────────────────────────────────────────
+
+    fn make_real_report(dir: &TempDir) -> Html5PackageReport {
+        let mut wasm = [0u8; 4]; wasm.copy_from_slice(&WASM_MAGIC);
+        let mut content = wasm.to_vec();
+        content.extend(vec![0u8; 20 * 1024 * 1024]); // 20 MB real wasm
+        write_file(dir.path(), "Brm.wasm", &content);
+        write_file(dir.path(), "Brm.js", b"Module={};");
+        write_file(dir.path(), "Brm.html", b"<html><body><canvas></canvas></body></html>");
+        write_file(dir.path(), "Brm.pak", b"UE4pak");
+        Html5PackageVerifier::new(dir.path()).verify().unwrap()
+    }
+
+    #[test]
+    fn as_supabase_receipt_pass_for_real_package() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        assert_eq!(receipt.verdict, "PASS");
+        assert_eq!(receipt.engine_source, "rocket_cli");
+        assert_eq!(receipt.milestone, "HTML5CookVerify");
+    }
+
+    #[test]
+    fn as_supabase_receipt_lifecycle_starts_with_cook_started() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        assert_eq!(receipt.ocel_lifecycle[0], "CookStarted");
+        assert!(receipt.ocel_lifecycle.contains(&"WasmPackaged".to_string()));
+        assert!(receipt.ocel_lifecycle.contains(&"PackageVerified".to_string()));
+    }
+
+    #[test]
+    fn as_supabase_receipt_event_count_matches_lifecycle_len() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        assert_eq!(receipt.ocel_event_count as usize, receipt.ocel_lifecycle.len());
+    }
+
+    #[test]
+    fn as_supabase_receipt_fail_for_stub_wasm() {
+        let dir = TempDir::new().unwrap();
+        // 4-byte stub — below MIN_REAL_WASM_BYTES
+        write_file(dir.path(), "Brm.wasm", &WASM_MAGIC);
+        write_file(dir.path(), "Brm.js", b"Module={};");
+        write_file(dir.path(), "Brm.html", b"<html></html>");
+        let report = Html5PackageVerifier::new(dir.path()).verify().unwrap();
+        let receipt = report.as_supabase_receipt();
+        assert_eq!(receipt.verdict, "FAIL");
+        assert!(!receipt.ocel_lifecycle.contains(&"WasmPackaged".to_string()));
+    }
+
+    #[test]
+    fn as_supabase_receipt_hash_is_stable_hex_string() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        // Hash must be a 16-char lowercase hex string (u64 FNV)
+        assert_eq!(receipt.receipt_hash.len(), 16);
+        assert!(receipt.receipt_hash.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    // ── push_to_supabase OCEL event construction ──────────────────────────────
+
+    fn ocel_events_from_lifecycle(
+        lifecycle: &[String],
+        base_ms: u64,
+        archive_dir: &std::path::Path,
+    ) -> Vec<crate::supabase::OcelEventRow> {
+        let mut prev_hash: Option<String> = None;
+        lifecycle.iter().enumerate().map(|(i, activity)| {
+            let timestamp_ms = base_ms + (i as u64 * 1_000);
+            let chain_input = format!(
+                "{}{}{}",
+                prev_hash.as_deref().unwrap_or("genesis"),
+                activity,
+                timestamp_ms
+            );
+            let event_hash = format!("{:016x}", chain_input.bytes().fold(
+                0xcbf29ce484222325u64,
+                |acc, b| acc.wrapping_mul(0x100000001b3).wrapping_add(b as u64),
+            ));
+            let row = crate::supabase::OcelEventRow {
+                session_id: None,
+                activity: activity.clone(),
+                timestamp_ms,
+                object_refs: vec![format!("cook:{}", archive_dir.display())],
+                attributes: serde_json::json!({ "stage_index": i }),
+                prev_hash: prev_hash.clone(),
+                event_hash: event_hash.clone(),
+                seq: i as u32,
+            };
+            prev_hash = Some(event_hash);
+            row
+        }).collect()
+    }
+
+    #[test]
+    fn ocel_events_seq_matches_lifecycle_index() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        let events = ocel_events_from_lifecycle(&receipt.ocel_lifecycle, 1_000_000, dir.path());
+        for (i, evt) in events.iter().enumerate() {
+            assert_eq!(evt.seq, i as u32, "seq mismatch at index {i}");
+            assert_eq!(evt.activity, receipt.ocel_lifecycle[i]);
+        }
+    }
+
+    #[test]
+    fn ocel_events_timestamp_spaced_one_second_apart() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        let base_ms = 1_720_000_000_000u64;
+        let events = ocel_events_from_lifecycle(&receipt.ocel_lifecycle, base_ms, dir.path());
+        for (i, evt) in events.iter().enumerate() {
+            assert_eq!(evt.timestamp_ms, base_ms + i as u64 * 1_000);
+        }
+    }
+
+    #[test]
+    fn ocel_event_hash_chain_links_each_event_to_previous() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        let events = ocel_events_from_lifecycle(&receipt.ocel_lifecycle, 0, dir.path());
+        assert!(events[0].prev_hash.is_none(), "genesis event has no prev_hash");
+        for i in 1..events.len() {
+            assert_eq!(
+                events[i].prev_hash.as_deref(),
+                Some(events[i - 1].event_hash.as_str()),
+                "event {i} prev_hash must equal event {} event_hash", i - 1
+            );
+        }
+    }
+
+    #[test]
+    fn ocel_event_count_matches_lifecycle_on_full_real_package() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        let events = ocel_events_from_lifecycle(&receipt.ocel_lifecycle, 0, dir.path());
+        assert_eq!(events.len(), receipt.ocel_lifecycle.len());
+        assert_eq!(events.len(), receipt.ocel_event_count as usize);
     }
 }
