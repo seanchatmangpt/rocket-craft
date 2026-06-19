@@ -433,3 +433,174 @@ pub enum AuctionError {
     #[error("ledger error: {0}")]
     LedgerError(String),
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ledger::Ledger;
+
+    fn funded_ledger(player_id: u64, amount: u32) -> Ledger {
+        let mut ledger = Ledger::new();
+        ledger.award_gold(player_id, amount, "test setup").unwrap();
+        ledger
+    }
+
+    fn open_auction(seller_id: u64, start: u32, reserve: Option<u32>) -> Auction<OpenForBids> {
+        AuctionBuilder::new()
+            .id(1)
+            .seller_id(seller_id)
+            .item_name("Luna Titanium Armor".into())
+            .starting_price(start)
+            .reserve_price(reserve.unwrap_or(start))
+            .duration_hours(24)
+            .build()
+            .unwrap()
+    }
+
+    // ── AuctionBuilder validation ─────────────────────────────────────────────
+
+    #[test]
+    fn builder_requires_item_name() {
+        let result = AuctionBuilder::new()
+            .seller_id(1)
+            .starting_price(100)
+            .build();
+        assert!(matches!(result, Err(AuctionBuildError::EmptyItemName)));
+    }
+
+    #[test]
+    fn builder_requires_positive_starting_price() {
+        let result = AuctionBuilder::new()
+            .item_name("x".into())
+            .starting_price(0)
+            .build();
+        assert!(matches!(result, Err(AuctionBuildError::ZeroStartingPrice)));
+    }
+
+    #[test]
+    fn builder_rejects_reserve_below_starting() {
+        let result = AuctionBuilder::new()
+            .item_name("x".into())
+            .starting_price(200)
+            .reserve_price(100)
+            .build();
+        assert!(matches!(
+            result,
+            Err(AuctionBuildError::ReserveBelowStarting { .. })
+        ));
+    }
+
+    #[test]
+    fn builder_valid_auction_has_no_current_bid() {
+        let a = AuctionBuilder::new()
+            .id(1)
+            .seller_id(10)
+            .item_name("Gundam".into())
+            .starting_price(50)
+            .duration_hours(24)
+            .build()
+            .unwrap();
+        assert!(a.current_bid.is_none());
+        assert_eq!(a.starting_price, 50);
+    }
+
+    // ── place_bid ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn seller_cannot_bid_on_own_auction() {
+        let mut a = open_auction(1, 100, None);
+        let mut ledger = funded_ledger(1, 500);
+        let err = a.place_bid(1, 100, &mut ledger).unwrap_err();
+        assert!(matches!(err, AuctionError::SellerCannotBid));
+    }
+
+    #[test]
+    fn bid_below_starting_price_rejected() {
+        let mut a = open_auction(1, 100, None);
+        let mut ledger = funded_ledger(2, 500);
+        let err = a.place_bid(2, 50, &mut ledger).unwrap_err();
+        assert!(matches!(err, AuctionError::BidTooLow { minimum: 100, .. }));
+    }
+
+    #[test]
+    fn valid_first_bid_locks_funds_in_escrow() {
+        let mut a = open_auction(1, 100, None);
+        let mut ledger = funded_ledger(2, 500);
+        a.place_bid(2, 100, &mut ledger).unwrap();
+        // Bidder's wallet reduced by bid amount
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(2)), 400);
+        // Escrow account credited
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(ESCROW_ID)), 100);
+    }
+
+    #[test]
+    fn outbid_refunds_previous_bidder() {
+        let mut a = open_auction(1, 100, None);
+        let mut ledger = funded_ledger(2, 500);
+        ledger.award_gold(3, 500, "test").unwrap();
+
+        a.place_bid(2, 100, &mut ledger).unwrap();
+        a.place_bid(3, 106, &mut ledger).unwrap(); // 5% above 100 = min 105
+
+        // Player 2 refunded to original balance
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(2)), 500);
+        // Player 3's bid in escrow
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(ESCROW_ID)), 106);
+    }
+
+    // ── close ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn close_with_no_bids_leaves_ledger_unchanged() {
+        let a = open_auction(1, 100, None);
+        let mut ledger = Ledger::new();
+        a.close(&mut ledger).unwrap();
+        assert_eq!(ledger.total_balance(), 0);
+    }
+
+    #[test]
+    fn close_with_winning_bid_pays_seller_minus_fee() {
+        let mut a = open_auction(1, 100, Some(100));
+        let mut ledger = funded_ledger(2, 500);
+        a.place_bid(2, 100, &mut ledger).unwrap();
+        a.close(&mut ledger).unwrap();
+
+        // 5% fee = 5; seller gets 95
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 95);
+        assert_eq!(ledger.balance_of(AccountType::AuctionHouse), 5);
+        assert_eq!(ledger.total_balance(), 0);
+    }
+
+    #[test]
+    fn close_when_reserve_not_met_refunds_bidder() {
+        let mut a = open_auction(1, 100, Some(500)); // reserve = 500, bid = 100
+        let mut ledger = funded_ledger(2, 500);
+        a.place_bid(2, 100, &mut ledger).unwrap();
+        a.close(&mut ledger).unwrap();
+
+        // Bidder refunded
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(2)), 500);
+        assert_eq!(ledger.total_balance(), 0);
+    }
+
+    // ── cancel ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn cancel_with_active_bid_refunds_bidder() {
+        let mut a = open_auction(1, 100, None);
+        let mut ledger = funded_ledger(2, 500);
+        a.place_bid(2, 100, &mut ledger).unwrap();
+        a.cancel(&mut ledger).unwrap();
+
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(2)), 500);
+        assert_eq!(ledger.total_balance(), 0);
+    }
+
+    #[test]
+    fn cancel_with_no_bids_is_noop_on_ledger() {
+        let a = open_auction(1, 100, None);
+        let mut ledger = Ledger::new();
+        a.cancel(&mut ledger).unwrap();
+        assert_eq!(ledger.total_balance(), 0);
+    }
+}
