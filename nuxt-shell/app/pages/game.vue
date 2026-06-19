@@ -4,10 +4,46 @@ useHead({ title: 'Rocket-Craft — Mission Control' });
 // Wire keyboard intents — auto-cleaned on unmount by VueUse useEventListener
 useRocketKeyboard();
 
+// Wire touch/swipe intents for mobile — tap, swipe, long-press → RocketIntent
+const canvasRef = ref<HTMLElement | null>(null);
+useRocketTouchInput(canvasRef);
+
 const { isEngineReady } = useRocketUe4Bridge();
 
 // OCEL process-mining proof: isPlaying is derived from the event log, not a flag
 const { isPlaying, events: ocelEvents, exportOcelLog } = useGameSessionOcel();
+
+// Lifecycle is the ordered list of unique activity names — used by the server to verify lawful OCEL process
+const lifecycle = computed(() => [...new Set(ocelEvents.value.map(e => e.activity))]);
+
+// Persist OCEL events to Supabase with hash chaining for pm4py conformance replay
+const { syncedCount, syncError, dbSessionId } = useGameSessionPersistence();
+
+// Commit receipt through server route (server validates OCEL lifecycle before writing)
+async function commitReceipt() {
+  const log = exportOcelLog();
+  const receiptHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(log)))
+    .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+  if (!dbSessionId.value) return;
+
+  const result = await $fetch('/api/game/receipt', {
+    method: 'POST',
+    body: {
+      session_id: dbSessionId.value,
+      ocel_lifecycle: lifecycle.value,
+      ocel_event_count: ocelEvents.value.length,
+      engine_source: isEngineReady.value ? 'real_ue4' : 'unknown',
+      receipt_hash: receiptHash,
+      milestone: 'GameSessionProof',
+      payload: { exported_log: log },
+    },
+  }).catch(() => null);
+
+  if (result) {
+    console.info(`[rocket-craft] Receipt ${result.verdict} — ${result.reason}`);
+  }
+}
 
 const engineStatus = computed(() => {
   if (isPlaying.value) return `LIVE — ${ocelEvents.value.length} events`;
@@ -46,6 +82,12 @@ function downloadOcelLog() {
         :data-is-playing="isPlaying"
         data-testid="engine-status"
       >{{ engineStatus }}</span>
+      <span
+        v-if="syncedCount > 0 || syncError"
+        class="sync-status"
+        :class="{ error: !!syncError }"
+        :title="syncError ?? `${syncedCount} events persisted to Supabase`"
+      >{{ syncError ? '⚠ sync err' : `↑ ${syncedCount}` }}</span>
       <nav class="shell-nav" aria-label="Shell navigation">
         <button
           v-if="isPlaying"
@@ -54,13 +96,22 @@ function downloadOcelLog() {
           data-testid="ocel-export-btn"
           @click="downloadOcelLog"
         >↓ OCEL</button>
-        <NuxtLink to="/receipt">Receipts</NuxtLink>
+        <button
+          v-if="isPlaying && dbSessionId"
+          class="receipt-commit"
+          title="Commit session receipt — server verifies OCEL lifecycle"
+          data-testid="receipt-commit-btn"
+          @click="commitReceipt"
+        >✓ Commit</button>
+        <NuxtLink to="/receipts">Receipts</NuxtLink>
+        <NuxtLink to="/leaderboard">Leaderboard</NuxtLink>
         <NuxtLink to="/profile">Profile</NuxtLink>
         <NuxtLink to="/login">Auth</NuxtLink>
       </nav>
     </header>
 
-    <!-- UE4 canvas — browser-only, no SSR -->
+    <!-- UE4 canvas — touch target + browser-only rendering -->
+    <div ref="canvasRef" class="canvas-wrapper">
     <ClientOnly>
       <UE4Canvas
         script-src="/manufactured/Brm.UE4.js"
@@ -74,6 +125,7 @@ function downloadOcelLog() {
         </div>
       </template>
     </ClientOnly>
+    </div>
 
     <!-- DOM game controls — accessible, Playwright-testable -->
     <section class="game-controls" aria-label="Game controls">
@@ -111,6 +163,8 @@ function downloadOcelLog() {
 .engine-status { font-size: 0.75rem; color: #666; }
 .engine-status.ready { color: #00c853; }
 .engine-status.live { color: #00f0ff; font-weight: bold; }
+.sync-status { font-size: 0.7rem; color: #00c853; opacity: 0.7; }
+.sync-status.error { color: #ff4444; }
 .ocel-export {
   background: none; border: 1px solid #00f0ff; color: #00f0ff;
   font-size: 0.75rem; padding: 0.15rem 0.5rem; cursor: pointer; border-radius: 2px;
