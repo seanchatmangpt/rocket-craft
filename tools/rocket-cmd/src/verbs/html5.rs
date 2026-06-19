@@ -768,8 +768,10 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
 
     let total_secs = pipeline_start.elapsed().as_secs_f64();
     println!("[DONE] HTML5 pipeline complete for {project} ({:.0}s total)", total_secs);
-    println!("  → Run 'rocket html5 serve --project {project}' to serve");
-    println!("  → Run 'rocket html5 open --project {project}' to open in browser");
+    println!("  → serve + open in one shot:");
+    println!("      rocket html5 serve --project {project} --background && rocket html5 open --project {project}");
+    println!("  → stop the background server:");
+    println!("      rocket html5 stop");
 
     Ok(serde_json::json!({
         "project": project,
