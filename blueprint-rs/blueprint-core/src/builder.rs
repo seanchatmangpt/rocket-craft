@@ -1014,4 +1014,50 @@ mod tests {
         assert!(json.contains("Mana"));
         assert!(json.contains("Stamina"));
     }
+
+    #[test]
+    fn bool_variable_appears_in_json() {
+        let bp = BlueprintBuilder::new("FlagActor", "Actor")
+            .variable("IsAlive", VarType::Bool, Some("true".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("IsAlive"), "bool variable name must appear in JSON");
+    }
+
+    #[test]
+    fn string_variable_appears_in_json() {
+        let bp = BlueprintBuilder::new("DialogActor", "Actor")
+            .variable("GreetingText", VarType::String, Some("Hello".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("GreetingText"), "string variable must appear in JSON");
+    }
+
+    #[test]
+    fn call_function_node_appears_in_t3d() {
+        let t3d = BlueprintBuilder::new("AbilityActor", "Actor")
+            .begin_play(|ev| {
+                ev.call("ActivateAbility", vec!["AbilityIndex".into()]);
+            })
+            .to_t3d();
+        assert!(t3d.contains("ActivateAbility"), "function call must appear in T3D");
+    }
+
+    #[test]
+    fn t3d_output_is_non_empty() {
+        // Even an empty blueprint should produce some T3D output (header at minimum)
+        let t3d = BlueprintBuilder::new("WeaponActor", "StaticMeshActor")
+            .to_t3d();
+        assert!(!t3d.is_empty(), "T3D output must not be empty");
+    }
+
+    #[test]
+    fn begin_play_and_tick_both_appear() {
+        let t3d = BlueprintBuilder::new("DualEventActor", "Actor")
+            .begin_play(|ev| { ev.print("begin"); })
+            .tick(|ev| { ev.call("UpdateState", vec![]); })
+            .to_t3d();
+        assert!(t3d.contains("ReceiveBeginPlay") || t3d.contains("BeginPlay"),
+            "begin play must be present");
+        assert!(t3d.contains("ReceiveTick") || t3d.contains("Tick"),
+            "tick must be present");
+    }
 }
