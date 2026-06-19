@@ -98,7 +98,8 @@ if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1; then
   sleep 1
 fi
 
-(cd "$SERVE_DIR" && python3 -m http.server $PORT --bind 127.0.0.1 >/tmp/html5-server.log 2>&1) &
+# Use rocket html5 serve — sends COOP/COEP headers required for SharedArrayBuffer
+("$CWD/tools/target/release/rocket-cmd" html5 serve --project Brm --port $PORT >/tmp/html5-server.log 2>&1) &
 SERVER_PID=$!
 trap 'log_info "Stopping HTTP server (PID $SERVER_PID)"; kill "$SERVER_PID" 2>/dev/null || true' EXIT
 
