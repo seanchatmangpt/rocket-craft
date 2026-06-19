@@ -396,6 +396,25 @@ fn do_html5_preflight(project: Option<String>) -> Result<Value> {
     add("Rosetta (arch -x86_64)", arch_ok,
         if arch_ok { "Rosetta present".into() } else { "Rosetta not available — required on Apple Silicon".into() });
 
+    // 7. emsdk bundled Python — path: <emsdk>/emsdk-*/python/<ver>/bin/python3
+    //    UBT reads PYTHON env var first; this is what HTML5Setup.sh activates via
+    //    `emsdk activate`. Verify it exists so cook doesn't fail silently.
+    let emsdk_python = {
+        walkdir::WalkDir::new(&emsdk)
+            .max_depth(5)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .find(|e| {
+                let name = e.file_name().to_string_lossy();
+                name == "python3" && e.path().parent().map(|p| p.ends_with("bin")).unwrap_or(false)
+            })
+            .map(|e| e.into_path())
+    };
+    let emsdk_python_ok = emsdk_python.as_ref().map(|p| p.exists()).unwrap_or(false);
+    add("emsdk Python", emsdk_python_ok,
+        emsdk_python.as_ref().map(|p| format!("{}", p.display()))
+            .unwrap_or_else(|| "not found — emsdk may need setup: run 'rocket html5 setup'".into()));
+
     let verdict = if overall_ok { "READY" } else { "NOT READY" };
     println!("\n[{verdict}] Preflight complete");
 
