@@ -1,0 +1,41 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/typestates#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Cooking & WASM Typestates Ontology" ;
+    rdfs:comment "Ontology representing typestates for compilation, cooking, and WASM packaging." .
+
+ue4:Typestate a owl:Class ;
+    rdfs:label "Typestate" ;
+    rdfs:comment "Representational class for build/deployment pipeline typestates." .
+
+ue4:CookingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "CookingTypestate" ;
+    rdfs:comment "State representing the asset cooking process." .
+
+ue4:LinkingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "LinkingTypestate" ;
+    rdfs:comment "State representing compilation linking." .
+
+ue4:WasmPackagingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "WasmPackagingTypestate" ;
+    rdfs:comment "State representing HTML5/WASM packaging." .
+
+ue4:hasCookingState a rdf:Property ;
+    rdfs:label "hasCookingState" ;
+    rdfs:comment "Relates an asset or project to its cooking status." .
+
+ue4:hasLinkingState a rdf:Property ;
+    rdfs:label "hasLinkingState" ;
+    rdfs:comment "Relates a component/module to its compile linking state." .
+
+ue4:hasPackagingState a rdf:Property ;
+    rdfs:label "hasPackagingState" ;
+    rdfs:comment "Relates a level/world to its final HTML5/WASM packaging state." .

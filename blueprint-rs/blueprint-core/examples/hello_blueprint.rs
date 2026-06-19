@@ -21,7 +21,11 @@ fn main() {
 
     // Add variables (Health: int, PlayerName: string)
     builder.add_variable_mut("Health", VarType::Int, Some("100".to_string()));
-    builder.add_variable_mut("PlayerName", VarType::String, Some("BlueprintPlayer".to_string()));
+    builder.add_variable_mut(
+        "PlayerName",
+        VarType::String,
+        Some("BlueprintPlayer".to_string()),
+    );
 
     // Wire up: BeginPlay → PrintString #1 → PrintString #2
     let begin_play = builder.begin_play_node();

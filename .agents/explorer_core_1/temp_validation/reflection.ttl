@@ -1,0 +1,34 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+# --- Ontology Declaration ---
+ue4:ReflectionOntology a owl:Ontology ;
+    rdfs:label "UE4 Reflection Metadata Ontology" ;
+    rdfs:comment "Ontology representing the reflection metadata of C++ UClasses, UFunctions, and UProperties." .
+
+ue4:UField a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UField" ;
+    rdfs:comment "Base class for reflection fields." .
+
+ue4:UStruct a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UStruct" ;
+    rdfs:comment "Reflection representation of structure structures and aggregates." .
+
+ue4:UClass a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UClass" ;
+    rdfs:comment "Reflection metadata for a C++ class." .
+
+ue4:UFunction a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UFunction" ;
+    rdfs:comment "Reflection metadata for a C++ function call." .
+
+ue4:UProperty a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UProperty" ;
+    rdfs:comment "Reflection metadata for a member variable/property." .

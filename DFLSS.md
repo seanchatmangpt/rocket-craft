@@ -862,7 +862,7 @@ Add a new crate `unify-mcp` implementing the Model Context Protocol.
 - Maintenance burden (MCP-aware reviewers needed)
 
 ## Timeline
-4 weeks to MVP.
+4 weeks to mathematically guaranteed equilibrium validation.
 ```
 
 ### 3. Breaking Change Policy

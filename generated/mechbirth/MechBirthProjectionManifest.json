@@ -1,0 +1,82 @@
+[
+  {
+    "projection_id": "PROJ-001",
+    "source_powl_step": "SelectFrame",
+    "source_receipt": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f",
+    "object_id": "Mech-001",
+    "projection_type": "SetMeshVariant",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_MechFrame",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-002",
+    "source_powl_step": "GenerateSocketTopology",
+    "source_receipt": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099",
+    "object_id": "Mech-001",
+    "projection_type": "SetMeshVariant",
+    "semantic_lod_class": "Crown",
+    "ue4_target_surface": "BP_MechSocket",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-003",
+    "source_powl_step": "GenerateArmorPanels",
+    "source_receipt": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e",
+    "object_id": "Mech-001",
+    "projection_type": "SetMaterialMask",
+    "semantic_lod_class": "Secondary",
+    "ue4_target_surface": "BP_ArmorPanel",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-004",
+    "source_powl_step": "GenerateRig",
+    "source_receipt": "2ac9b1a01aa977ac897ba5ce1067f7351b85e75a3f62ff3589961735d9e9885f",
+    "object_id": "Mech-001",
+    "projection_type": "SetAnimationParam",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_MechRig",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-005",
+    "source_powl_step": "GenerateMotionFamily",
+    "source_receipt": "534dfa6e18e2d4c618f5967405682afd23520abb2e1a0dec5490f44654755e3e",
+    "object_id": "Mech-001",
+    "projection_type": "SetAnimationParam",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_MotionFamily",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-006",
+    "source_powl_step": "GenerateSkinLayers",
+    "source_receipt": "37a3b3064feef9c7396b5a9e48b8a81e75071fb3bb2f9424d902e1cb98a1de18",
+    "object_id": "Mech-001",
+    "projection_type": "SetMaterialMask",
+    "semantic_lod_class": "Secondary",
+    "ue4_target_surface": "BP_SkinLayer",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-007",
+    "source_powl_step": "PackageProjectionArtifacts",
+    "source_receipt": "4813ec598987e9a8b2f0915457f314541d2937b84e70352a8c92eaf06fabda5c",
+    "object_id": "Mech-001",
+    "projection_type": "SetVisibilityBatch",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_MechProjection",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-008",
+    "source_powl_step": "EmitReceipt",
+    "source_receipt": "b6d06e9cd41edc26f9eae69297bc8ef8e37c2fb8be5d5030605e8d5aa5af75c9",
+    "object_id": "Mech-001",
+    "projection_type": "SetDebugReceiptOverlay",
+    "semantic_lod_class": "Crown",
+    "ue4_target_surface": "BP_ReceiptOverlay",
+    "admission_status": "ADMITTED"
+  }
+]

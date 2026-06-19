@@ -1,0 +1,663 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/typestates#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Cooking & WASM Typestates Ontology" ;
+    rdfs:comment "Ontology representing typestates for compilation, cooking, and WASM packaging." .
+
+ue4:Typestate a owl:Class ;
+    rdfs:label "Typestate" ;
+    rdfs:comment "Representational class for build/deployment pipeline typestates." .
+
+ue4:CookingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "CookingTypestate" ;
+    rdfs:comment "State representing the asset cooking process." .
+
+ue4:LinkingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "LinkingTypestate" ;
+    rdfs:comment "State representing compilation linking." .
+
+ue4:WasmPackagingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "WasmPackagingTypestate" ;
+    rdfs:comment "State representing HTML5/WASM packaging." .
+
+ue4:hasCookingState a owl:ObjectProperty, rdf:Property ;
+    rdfs:label "hasCookingState" ;
+    rdfs:comment "Relates an asset or project to its cooking status." .
+
+ue4:hasLinkingState a owl:ObjectProperty, rdf:Property ;
+    rdfs:label "hasLinkingState" ;
+    rdfs:comment "Relates a component/module to its compile linking state." .
+
+ue4:hasPackagingState a owl:ObjectProperty, rdf:Property ;
+    rdfs:label "hasPackagingState" ;
+    rdfs:comment "Relates a level/world to its final HTML5/WASM packaging state." .
+
+# =========================================================================
+# Asset Cooking Pipeline Extension Types & Classes
+# =========================================================================
+
+ue4:TargetPlatform a owl:Class ;
+    rdfs:label "TargetPlatform" ;
+    rdfs:comment "A target deployment platform for compilation, cooking, and packaging." .
+
+ue4:AssetPlatformRepresentation a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "AssetPlatformRepresentation" ;
+    rdfs:comment "The platform-specific cooked representation of a source asset." .
+
+# Target Platform Individuals
+ue4:Platform_HTML5 a ue4:TargetPlatform ;
+    rdfs:label "Platform_HTML5" ;
+    rdfs:comment "HTML5 / WebGL / WASM target platform." .
+
+ue4:Platform_WindowsNoEditor a ue4:TargetPlatform ;
+    rdfs:label "Platform_WindowsNoEditor" ;
+    rdfs:comment "Windows Desktop standalone client target platform." .
+
+ue4:Platform_Android a ue4:TargetPlatform ;
+    rdfs:label "Platform_Android" ;
+    rdfs:comment "Android mobile target platform." .
+
+# Source Asset Classes (under core UObject)
+ue4:UStaticMesh a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UStaticMesh" ;
+    rdfs:comment "Represents static polygonal geometry assets." .
+
+ue4:USoundWave a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "USoundWave" ;
+    rdfs:comment "Represents raw imported audio wave assets." .
+
+# =========================================================================
+# Cooking Status Individuals (Instances of CookingTypestate)
+# =========================================================================
+
+ue4:CookState_Uncooked a ue4:CookingTypestate ;
+    rdfs:label "CookState_Uncooked" ;
+    rdfs:comment "The asset exists only in its source/uncooked format." .
+
+ue4:CookState_Cooking a ue4:CookingTypestate ;
+    rdfs:label "CookState_Cooking" ;
+    rdfs:comment "The asset is currently undergoing cooker translation." .
+
+ue4:CookState_Cooked a ue4:CookingTypestate ;
+    rdfs:label "CookState_Cooked" ;
+    rdfs:comment "The asset has successfully compiled into target platform binary format." .
+
+ue4:CookState_Failed a ue4:CookingTypestate ;
+    rdfs:label "CookState_Failed" ;
+    rdfs:comment "The cooker failed to process the asset (e.g. out of memory, corrupt source file)." .
+
+ue4:CookState_Stale a ue4:CookingTypestate ;
+    rdfs:label "CookState_Stale" ;
+    rdfs:comment "Source asset has been modified, and the cooked cache needs to be regenerated." .
+
+# =========================================================================
+# Compression Profiles & Enums
+# =========================================================================
+
+ue4:CompressionProfile a owl:Class ;
+    rdfs:label "CompressionProfile" ;
+    rdfs:comment "Configuration specifications applied during the cook translation phase." .
+
+ue4:TextureCompressionProfile a owl:Class ;
+    rdfs:subClassOf ue4:CompressionProfile ;
+    rdfs:label "TextureCompressionProfile" ;
+    rdfs:comment "Compression rules governing raw texture arrays." .
+
+ue4:MeshCompressionProfile a owl:Class ;
+    rdfs:subClassOf ue4:CompressionProfile ;
+    rdfs:label "MeshCompressionProfile" ;
+    rdfs:comment "Simplification and index buffer layout profiles for geometry." .
+
+ue4:AudioCompressionProfile a owl:Class ;
+    rdfs:subClassOf ue4:CompressionProfile ;
+    rdfs:label "AudioCompressionProfile" ;
+    rdfs:comment "Codec options and quality profiles for sound waves." .
+
+# Format Enums
+ue4:ETextureFormat a owl:Class ;
+    rdfs:label "ETextureFormat" ;
+    rdfs:comment "Texture compression format standards." .
+
+ue4:TexFormat_DXT1 a ue4:ETextureFormat ; rdfs:label "TexFormat_DXT1" ; rdfs:comment "BC1 compression for opaque colors." .
+ue4:TexFormat_DXT5 a ue4:ETextureFormat ; rdfs:label "TexFormat_DXT5" ; rdfs:comment "BC3 compression with alpha channels." .
+ue4:TexFormat_ASTC_4x4 a ue4:ETextureFormat ; rdfs:label "TexFormat_ASTC_4x4" ; rdfs:comment "ASTC compression at 4x4 block size (high quality mobile/WASM)." .
+ue4:TexFormat_ASTC_8x8 a ue4:ETextureFormat ; rdfs:label "TexFormat_ASTC_8x8" ; rdfs:comment "ASTC compression at 8x8 block size (lower quality, smaller footprint)." .
+ue4:TexFormat_ETC2 a ue4:ETextureFormat ; rdfs:label "TexFormat_ETC2" ; rdfs:comment "Standard OpenGL ES 3.0 texture compression." .
+ue4:TexFormat_BC7 a ue4:ETextureFormat ; rdfs:label "TexFormat_BC7" ; rdfs:comment "High-quality desktop-only BC7 compression." .
+ue4:TexFormat_RGBA8 a ue4:ETextureFormat ; rdfs:label "TexFormat_RGBA8" ; rdfs:comment "Uncompressed raw color array." .
+
+ue4:EMeshFormat a owl:Class ;
+    rdfs:label "EMeshFormat" ;
+    rdfs:comment "Cooked mesh serialization layout." .
+
+ue4:MeshFormat_Standard a ue4:EMeshFormat ; rdfs:label "MeshFormat_Standard" ; rdfs:comment "Standard vertex, index, and LOD channels." .
+ue4:MeshFormat_Nanite a ue4:EMeshFormat ; rdfs:label "MeshFormat_Nanite" ; rdfs:comment "Unreal Engine 5 virtualized geometry clusters (unsupported in standard UE4/WebGL)." .
+ue4:MeshFormat_CompressedIndices a ue4:EMeshFormat ; rdfs:label "MeshFormat_CompressedIndices" ; rdfs:comment "Optimized triangle index ordering and compression." .
+
+ue4:EAudioFormat a owl:Class ;
+    rdfs:label "EAudioFormat" ;
+    rdfs:comment "Target compression formats for raw sound streams." .
+
+ue4:AudioFormat_OggVorbis a ue4:EAudioFormat ; rdfs:label "AudioFormat_OggVorbis" ; rdfs:comment "Ogg Vorbis compression (highly recommended for WASM)." .
+ue4:AudioFormat_ADPCM a ue4:EAudioFormat ; rdfs:label "AudioFormat_ADPCM" ; rdfs:comment "Low-CPU compression codec." .
+ue4:AudioFormat_PCM a ue4:EAudioFormat ; rdfs:label "AudioFormat_PCM" ; rdfs:comment "Uncompressed WAV audio data." .
+ue4:AudioFormat_Bink a ue4:EAudioFormat ; rdfs:label "AudioFormat_Bink" ; rdfs:comment "Bink Audio compression codec." .
+
+ue4:ECollisionComplexity a owl:Class ;
+    rdfs:label "ECollisionComplexity" ;
+    rdfs:comment "Collision representation generated during cook." .
+
+ue4:Complexity_Default a ue4:ECollisionComplexity ; rdfs:label "Complexity_Default" .
+ue4:Complexity_UseSimpleAsComplex a ue4:ECollisionComplexity ; rdfs:label "Complexity_UseSimpleAsComplex" .
+ue4:Complexity_UseComplexAsSimple a ue4:ECollisionComplexity ; rdfs:label "Complexity_UseComplexAsSimple" .
+
+# =========================================================================
+# Linking and WASM Memory Layout Classes
+# =========================================================================
+
+ue4:WasmMemoryLayout a owl:Class ;
+    rdfs:label "WasmMemoryLayout" ;
+    rdfs:comment "Memory allocation layout configuration for WASM/HTML5 compiles." .
+
+ue4:CompilerOptimizationLevel a owl:Class ;
+    rdfs:label "CompilerOptimizationLevel" ;
+    rdfs:comment "Reified compiler optimization levels defining target behavior." .
+
+ue4:LinkingConfiguration a owl:Class ;
+    rdfs:label "LinkingConfiguration" ;
+    rdfs:comment "Structural configuration that governs compilation linking." .
+
+# Optimization Individuals
+ue4:Opt_O0 a ue4:CompilerOptimizationLevel ;
+    rdfs:label "O0" ;
+    ue4:optFlag "-O0" ;
+    ue4:favorsSize false ;
+    ue4:favorsPerformance false .
+
+ue4:Opt_O1 a ue4:CompilerOptimizationLevel ;
+    rdfs:label "O1" ;
+    ue4:optFlag "-O1" ;
+    ue4:favorsSize false ;
+    ue4:favorsPerformance false .
+
+ue4:Opt_O2 a ue4:CompilerOptimizationLevel ;
+    rdfs:label "O2" ;
+    ue4:optFlag "-O2" ;
+    ue4:favorsSize false ;
+    ue4:favorsPerformance true .
+
+ue4:Opt_O3 a ue4:CompilerOptimizationLevel ;
+    rdfs:label "O3" ;
+    ue4:optFlag "-O3" ;
+    ue4:favorsSize false ;
+    ue4:favorsPerformance true .
+
+ue4:Opt_Os a ue4:CompilerOptimizationLevel ;
+    rdfs:label "Os" ;
+    ue4:optFlag "-Os" ;
+    ue4:favorsSize true ;
+    ue4:favorsPerformance true .
+
+ue4:Opt_Oz a ue4:CompilerOptimizationLevel ;
+    rdfs:label "Oz" ;
+    ue4:optFlag "-Oz" ;
+    ue4:favorsSize true ;
+    ue4:favorsPerformance false .
+
+# =========================================================================
+# Packaging and RHI Target Config Classes
+# =========================================================================
+
+ue4:BuildConfiguration a owl:Class ;
+    rdfs:label "BuildConfiguration" ;
+    rdfs:comment "Specifies the compile-time optimization, symbol, and logging policies." .
+
+ue4:PackagingTarget a owl:Class ;
+    rdfs:label "PackagingTarget" ;
+    rdfs:comment "Holds build, cooking, and packaging settings for a target world deployment." .
+
+ue4:RHIProfile a owl:Class ;
+    rdfs:label "RHIProfile" ;
+    rdfs:comment "Specifies target rendering hardware interface limits and extension configuration." .
+
+ue4:StaticBakingConfiguration a owl:Class ;
+    rdfs:label "StaticBakingConfiguration" ;
+    rdfs:comment "Baking policy configuration mapping semantic graphs to compiler artifacts." .
+
+ue4:SemanticAssetReference a owl:Class ;
+    rdfs:label "SemanticAssetReference" ;
+    rdfs:comment "Declares a reference to asset packages handled by Unreal. Holds no binary mesh or raw texture data in RDF." .
+
+# Build Configurations
+ue4:Config_Debug a ue4:BuildConfiguration ;
+    rdfs:label "Debug" ;
+    rdfs:comment "Debug configuration. Optimizations disabled, full debug symbols, logging enabled." ;
+    ue4:bOptimize false ;
+    ue4:bEnableSymbols true ;
+    ue4:bDisableLogging false ;
+    ue4:bEnableDebugConsole true .
+
+ue4:Config_Development a ue4:BuildConfiguration ;
+    rdfs:label "Development" ;
+    rdfs:comment "Development configuration. Optimizations enabled, symbols enabled, logging enabled." ;
+    ue4:bOptimize true ;
+    ue4:bEnableSymbols true ;
+    ue4:bDisableLogging false ;
+    ue4:bEnableDebugConsole true .
+
+ue4:Config_Shipping a ue4:BuildConfiguration ;
+    rdfs:label "Shipping" ;
+    rdfs:comment "Shipping configuration. Optimizations enabled, symbols stripped, logging stripped, console disabled." ;
+    ue4:bOptimize true ;
+    ue4:bEnableSymbols false ;
+    ue4:bDisableLogging true ;
+    ue4:bEnableDebugConsole false .
+
+# Standard RHI Profiles
+ue4:WebGL2_RHI_Profile a ue4:RHIProfile ;
+    rdfs:label "WebGL 2.0 Profile" ;
+    ue4:hasRenderAPI ue4:RHI_WebGL2 ;
+    ue4:glslVersion "300 es" ;
+    ue4:bUseInstancedArrays true ;
+    ue4:bEnableWebGLVsync true .
+
+ue4:OpenGLES3_RHI_Profile a ue4:RHIProfile ;
+    rdfs:label "OpenGL ES 3.0 Profile" ;
+    ue4:hasRenderAPI ue4:RHI_OpenGL_ES3 ;
+    ue4:glslVersion "300 es" ;
+    ue4:bUseInstancedArrays true ;
+    ue4:bEnableWebGLVsync true .
+
+# =========================================================================
+# Properties & Relationships (Object Properties)
+# =========================================================================
+
+ue4:hasRepresentation a owl:ObjectProperty ;
+    rdfs:label "hasRepresentation" ;
+    rdfs:comment "Relates a raw asset to its platform-specific representation." ;
+    rdfs:domain ue4:UObject ;
+    rdfs:range ue4:AssetPlatformRepresentation .
+
+ue4:hasAsset a owl:ObjectProperty ;
+    rdfs:label "hasAsset" ;
+    rdfs:comment "Relates a platform representation back to its raw UObject." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range ue4:UObject ;
+    owl:inverseOf ue4:hasRepresentation .
+
+ue4:targetPlatform a owl:ObjectProperty ;
+    rdfs:label "targetPlatform" ;
+    rdfs:comment "Relates an asset representation to its target platform." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range ue4:TargetPlatform .
+
+ue4:hasCompressionProfile a owl:ObjectProperty ;
+    rdfs:label "hasCompressionProfile" ;
+    rdfs:comment "Relates a platform representation to its compression profile settings." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range ue4:CompressionProfile .
+
+ue4:textureFormat a owl:ObjectProperty ;
+    rdfs:label "textureFormat" ;
+    rdfs:comment "The format encoding used for texture compression." ;
+    rdfs:domain ue4:TextureCompressionProfile ;
+    rdfs:range ue4:ETextureFormat .
+
+ue4:meshFormat a owl:ObjectProperty ;
+    rdfs:label "meshFormat" ;
+    rdfs:comment "The target mesh geometry format." ;
+    rdfs:domain ue4:MeshCompressionProfile ;
+    rdfs:range ue4:EMeshFormat .
+
+ue4:meshCollisionComplexity a owl:ObjectProperty ;
+    rdfs:label "meshCollisionComplexity" ;
+    rdfs:comment "Target collision complexity setting." ;
+    rdfs:domain ue4:MeshCompressionProfile ;
+    rdfs:range ue4:ECollisionComplexity .
+
+ue4:audioFormat a owl:ObjectProperty ;
+    rdfs:label "audioFormat" ;
+    rdfs:comment "The format encoding used for audio compression." ;
+    rdfs:domain ue4:AudioCompressionProfile ;
+    rdfs:range ue4:EAudioFormat .
+
+ue4:hasLinkingConfiguration a owl:ObjectProperty ;
+    rdfs:label "hasLinkingConfiguration" ;
+    rdfs:comment "Relates a LinkingTypestate to its compiler configuration." ;
+    rdfs:domain ue4:LinkingTypestate ;
+    rdfs:range ue4:LinkingConfiguration .
+
+ue4:hasMemoryLayout a owl:ObjectProperty ;
+    rdfs:label "hasMemoryLayout" ;
+    rdfs:comment "Relates a linking configuration to its WASM memory layout." ;
+    rdfs:domain ue4:LinkingConfiguration ;
+    rdfs:range ue4:WasmMemoryLayout .
+
+ue4:hasOptimizationLevel a owl:ObjectProperty ;
+    rdfs:label "hasOptimizationLevel" ;
+    rdfs:comment "Relates a linking configuration to its optimization level." ;
+    rdfs:domain ue4:LinkingConfiguration ;
+    rdfs:range ue4:CompilerOptimizationLevel .
+
+ue4:targetWorld a owl:ObjectProperty ;
+    rdfs:label "targetWorld" ;
+    rdfs:comment "Relates a packaging target to the target UWorld being packaged." ;
+    rdfs:domain ue4:PackagingTarget ;
+    rdfs:range ue4:UWorld .
+
+ue4:buildConfiguration a owl:ObjectProperty ;
+    rdfs:label "buildConfiguration" ;
+    rdfs:comment "Relates a packaging target to a build configuration." ;
+    rdfs:domain ue4:PackagingTarget ;
+    rdfs:range ue4:BuildConfiguration .
+
+ue4:targetRHIProfile a owl:ObjectProperty ;
+    rdfs:label "targetRHIProfile" ;
+    rdfs:comment "Links a packaging target to its target RHI profile." ;
+    rdfs:domain ue4:PackagingTarget ;
+    rdfs:range ue4:RHIProfile .
+
+ue4:hasRenderAPI a owl:ObjectProperty ;
+    rdfs:label "hasRenderAPI" ;
+    rdfs:comment "Links the RHI profile to an ERenderAPI instance." ;
+    rdfs:domain ue4:RHIProfile ;
+    rdfs:range ue4:ERenderAPI .
+
+ue4:hasStaticBaking a owl:ObjectProperty ;
+    rdfs:label "hasStaticBaking" ;
+    rdfs:comment "Links a packaging target to its static baking configuration." ;
+    rdfs:domain ue4:PackagingTarget ;
+    rdfs:range ue4:StaticBakingConfiguration .
+
+# =========================================================================
+# Properties & Relationships (Datatype Properties)
+# =========================================================================
+
+ue4:cookedPath a owl:DatatypeProperty ;
+    rdfs:label "cookedPath" ;
+    rdfs:comment "Physical cooked file path on the host build system." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:string .
+
+ue4:cookedHash a owl:DatatypeProperty ;
+    rdfs:label "cookedHash" ;
+    rdfs:comment "BLAKE3 cryptographic signature of the cooked binary." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:string .
+
+ue4:lastCookedTime a owl:DatatypeProperty ;
+    rdfs:label "lastCookedTime" ;
+    rdfs:comment "Timestamp of the last successful cook run." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:dateTime .
+
+ue4:headerSize a owl:DatatypeProperty ;
+    rdfs:label "headerSize" ;
+    rdfs:comment "Size of the .uasset header file in bytes." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:long .
+
+ue4:exportsSize a owl:DatatypeProperty ;
+    rdfs:label "exportsSize" ;
+    rdfs:comment "Size of the .uexp export registry in bytes." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:long .
+
+ue4:bulkDataSize a owl:DatatypeProperty ;
+    rdfs:label "bulkDataSize" ;
+    rdfs:comment "Size of external .ubulk stream arrays in bytes." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:long .
+
+ue4:textureWidth a owl:DatatypeProperty ;
+    rdfs:label "textureWidth" ;
+    rdfs:comment "Width of texture representation in pixels." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:integer .
+
+ue4:textureHeight a owl:DatatypeProperty ;
+    rdfs:label "textureHeight" ;
+    rdfs:comment "Height of texture representation in pixels." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:integer .
+
+ue4:mipmapCount a owl:DatatypeProperty ;
+    rdfs:label "mipmapCount" ;
+    rdfs:comment "Number of levels generated in the mipmap chain." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:integer .
+
+ue4:maxTextureSize a owl:DatatypeProperty ;
+    rdfs:label "maxTextureSize" ;
+    rdfs:comment "Max allowable dimension clamp configuration." ;
+    rdfs:domain ue4:TextureCompressionProfile ;
+    rdfs:range xsd:integer .
+
+ue4:sRGB a owl:DatatypeProperty ;
+    rdfs:label "sRGB" ;
+    rdfs:comment "sRGB color profile setting." ;
+    rdfs:domain ue4:TextureCompressionProfile ;
+    rdfs:range xsd:boolean .
+
+ue4:generateMipmaps a owl:DatatypeProperty ;
+    rdfs:label "generateMipmaps" ;
+    rdfs:comment "Mipmap compilation flag." ;
+    rdfs:domain ue4:TextureCompressionProfile ;
+    rdfs:range xsd:boolean .
+
+ue4:vertexCount a owl:DatatypeProperty ;
+    rdfs:label "vertexCount" ;
+    rdfs:comment "Number of active vertices in the representation." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:integer .
+
+ue4:triangleCount a owl:DatatypeProperty ;
+    rdfs:label "triangleCount" ;
+    rdfs:comment "Number of indices-based triangles in the representation." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:integer .
+
+ue4:lodCount a owl:DatatypeProperty ;
+    rdfs:label "lodCount" ;
+    rdfs:comment "Number of Level-of-Detail geometry structures." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:integer .
+
+ue4:useFullPrecisionUVs a owl:DatatypeProperty ;
+    rdfs:label "useFullPrecisionUVs" ;
+    rdfs:comment "UV resolution encoding setting (32-bit floats vs 16-bit halfs)." ;
+    rdfs:domain ue4:MeshCompressionProfile ;
+    rdfs:range xsd:boolean .
+
+ue4:enableBuildAdjacencyBuffer a owl:DatatypeProperty ;
+    rdfs:label "enableBuildAdjacencyBuffer" ;
+    rdfs:comment "Tessellation support buffer generation." ;
+    rdfs:domain ue4:MeshCompressionProfile ;
+    rdfs:range xsd:boolean .
+
+ue4:audioQuality a owl:DatatypeProperty ;
+    rdfs:label "audioQuality" ;
+    rdfs:comment "Encoding quality parameter (0-100)." ;
+    rdfs:domain ue4:AudioCompressionProfile ;
+    rdfs:range xsd:integer .
+
+ue4:sampleRate a owl:DatatypeProperty ;
+    rdfs:label "sampleRate" ;
+    rdfs:comment "Frequency in Hertz." ;
+    rdfs:domain ue4:AudioCompressionProfile ;
+    rdfs:range xsd:integer .
+
+ue4:channelCount a owl:DatatypeProperty ;
+    rdfs:label "channelCount" ;
+    rdfs:comment "Audio channels count." ;
+    rdfs:domain ue4:AudioCompressionProfile ;
+    rdfs:range xsd:integer .
+
+ue4:streamedAudioChunks a owl:DatatypeProperty ;
+    rdfs:label "streamedAudioChunks" ;
+    rdfs:comment "Number of chunks streamed externally." ;
+    rdfs:domain ue4:AssetPlatformRepresentation ;
+    rdfs:range xsd:integer .
+
+ue4:wasmStackSize a owl:DatatypeProperty ;
+    rdfs:label "wasmStackSize" ;
+    rdfs:comment "Size of the WASM stack in bytes (Emscripten STACK_SIZE)." ;
+    rdfs:domain ue4:WasmMemoryLayout ;
+    rdfs:range xsd:integer .
+
+ue4:wasmInitialMemory a owl:DatatypeProperty ;
+    rdfs:label "wasmInitialMemory" ;
+    rdfs:comment "Initial WASM heap size in bytes (Emscripten INITIAL_MEMORY)." ;
+    rdfs:domain ue4:WasmMemoryLayout ;
+    rdfs:range xsd:integer .
+
+ue4:wasmMaximumMemory a owl:DatatypeProperty ;
+    rdfs:label "wasmMaximumMemory" ;
+    rdfs:comment "Maximum WASM heap limit in bytes (Emscripten MAXIMUM_MEMORY)." ;
+    rdfs:domain ue4:WasmMemoryLayout ;
+    rdfs:range xsd:integer .
+
+ue4:wasmAllowMemoryGrowth a owl:DatatypeProperty ;
+    rdfs:label "wasmAllowMemoryGrowth" ;
+    rdfs:comment "Boolean flag indicating if WASM heap is allowed to grow." ;
+    rdfs:domain ue4:WasmMemoryLayout ;
+    rdfs:range xsd:boolean .
+
+ue4:wasmExportedSymbol a owl:DatatypeProperty ;
+    rdfs:label "wasmExportedSymbol" ;
+    rdfs:comment "An exported function name exposed by the WASM module." ;
+    rdfs:domain ue4:WasmMemoryLayout ;
+    rdfs:range xsd:string .
+
+ue4:buildMode a owl:DatatypeProperty ;
+    rdfs:label "buildMode" ;
+    rdfs:comment "The target configuration mode for the build." ;
+    rdfs:domain ue4:LinkingConfiguration ;
+    rdfs:range xsd:string .
+
+ue4:optFlag a owl:DatatypeProperty ;
+    rdfs:label "optFlag" ;
+    rdfs:comment "Command line optimization flag." ;
+    rdfs:domain ue4:CompilerOptimizationLevel ;
+    rdfs:range xsd:string .
+
+ue4:favorsSize a owl:DatatypeProperty ;
+    rdfs:label "favorsSize" ;
+    rdfs:comment "Indicates if the optimization level prioritizes reducing binary size." ;
+    rdfs:domain ue4:CompilerOptimizationLevel ;
+    rdfs:range xsd:boolean .
+
+ue4:favorsPerformance a owl:DatatypeProperty ;
+    rdfs:label "favorsPerformance" ;
+    rdfs:comment "Indicates if the optimization level prioritizes execution speed." ;
+    rdfs:domain ue4:CompilerOptimizationLevel ;
+    rdfs:range xsd:boolean .
+
+ue4:targetPlatformName a owl:DatatypeProperty ;
+    rdfs:label "targetPlatformName" ;
+    rdfs:comment "Specifies target deployment environment string." ;
+    rdfs:domain ue4:PackagingTarget ;
+    rdfs:range xsd:string .
+
+ue4:glslVersion a owl:DatatypeProperty ;
+    rdfs:label "glslVersion" ;
+    rdfs:comment "Target shading language version string." ;
+    rdfs:domain ue4:RHIProfile ;
+    rdfs:range xsd:string .
+
+ue4:bUseInstancedArrays a owl:DatatypeProperty ;
+    rdfs:label "bUseInstancedArrays" ;
+    rdfs:comment "Enables WebGL hardware-accelerated geometry instancing." ;
+    rdfs:domain ue4:RHIProfile ;
+    rdfs:range xsd:boolean .
+
+ue4:bEnableWebGLVsync a owl:DatatypeProperty ;
+    rdfs:label "bEnableWebGLVsync" ;
+    rdfs:comment "Instructs WASM wrapper to synchronize canvas flips with browser screen vsync." ;
+    rdfs:domain ue4:RHIProfile ;
+    rdfs:range xsd:boolean .
+
+ue4:isStaticallyBaked a owl:DatatypeProperty ;
+    rdfs:label "isStaticallyBaked" ;
+    rdfs:comment "Enforces compile-time static injection (eliminating runtime REST queries)." ;
+    rdfs:domain ue4:StaticBakingConfiguration ;
+    rdfs:range xsd:boolean .
+
+ue4:headerOutputPath a owl:DatatypeProperty ;
+    rdfs:label "headerOutputPath" ;
+    rdfs:comment "Relative or absolute path for generated C++ headers." ;
+    rdfs:domain ue4:StaticBakingConfiguration ;
+    rdfs:range xsd:string .
+
+ue4:dataTableOutputPath a owl:DatatypeProperty ;
+    rdfs:label "dataTableOutputPath" ;
+    rdfs:comment "Relative or absolute path for generated Unreal Engine DataTables." ;
+    rdfs:domain ue4:StaticBakingConfiguration ;
+    rdfs:range xsd:string .
+
+ue4:bomOutputPath a owl:DatatypeProperty ;
+    rdfs:label "bomOutputPath" ;
+    rdfs:comment "Relative or absolute path for Render Bill of Materials (BOM)." ;
+    rdfs:domain ue4:StaticBakingConfiguration ;
+    rdfs:range xsd:string .
+
+ue4:walkthroughOutputPath a owl:DatatypeProperty ;
+    rdfs:label "walkthroughOutputPath" ;
+    rdfs:comment "Relative or absolute path for Playwright walkthrough coordinate list." ;
+    rdfs:domain ue4:StaticBakingConfiguration ;
+    rdfs:range xsd:string .
+
+ue4:byteClassMatrixOutputPath a owl:DatatypeProperty ;
+    rdfs:label "byteClassMatrixOutputPath" ;
+    rdfs:comment "Relative or absolute path for byte-class matrices." ;
+    rdfs:domain ue4:StaticBakingConfiguration ;
+    rdfs:range xsd:string .
+
+ue4:receiptOutputPath a owl:DatatypeProperty ;
+    rdfs:label "receiptOutputPath" ;
+    rdfs:comment "Relative or absolute path for build/run cryptographic BLAKE3 receipts." ;
+    rdfs:domain ue4:StaticBakingConfiguration ;
+    rdfs:range xsd:string .
+
+ue4:ueProjectAssetPath a owl:DatatypeProperty ;
+    rdfs:label "ueProjectAssetPath" ;
+    rdfs:comment "Path of the asset in the Unreal content directory." ;
+    rdfs:domain ue4:SemanticAssetReference ;
+    rdfs:range xsd:string .
+
+# Properties for BuildConfiguration boolean flags:
+ue4:bOptimize a owl:DatatypeProperty ;
+    rdfs:label "bOptimize" ;
+    rdfs:comment "Specifies if code optimizations are enabled." ;
+    rdfs:domain ue4:BuildConfiguration ;
+    rdfs:range xsd:boolean .
+
+ue4:bEnableSymbols a owl:DatatypeProperty ;
+    rdfs:label "bEnableSymbols" ;
+    rdfs:comment "Specifies if debug symbols are enabled." ;
+    rdfs:domain ue4:BuildConfiguration ;
+    rdfs:range xsd:boolean .
+
+ue4:bDisableLogging a owl:DatatypeProperty ;
+    rdfs:label "bDisableLogging" ;
+    rdfs:comment "Specifies if logging is disabled." ;
+    rdfs:domain ue4:BuildConfiguration ;
+    rdfs:range xsd:boolean .
+
+ue4:bEnableDebugConsole a owl:DatatypeProperty ;
+    rdfs:label "bEnableDebugConsole" ;
+    rdfs:comment "Specifies if debug console is enabled." ;
+    rdfs:domain ue4:BuildConfiguration ;
+    rdfs:range xsd:boolean .
+

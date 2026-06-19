@@ -1,0 +1,70 @@
+# Custom SPARQL rules proposed for ggen.toml under [[validation.rules]]
+
+[[validation.rules]]
+name = "RuleJ"
+description = "Material Instance Parent Chain Acyclicity: A material instance parent chain cannot reference itself."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+ASK {
+  FILTER NOT EXISTS {
+    ?mi ue4:parentMaterial+ ?mi .
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleK"
+description = "Material Instance Parent Chain Rootedness: A material instance parent chain must eventually resolve to a base UMaterial."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ASK {
+  FILTER NOT EXISTS {
+    ?mi a ?miClass .
+    ?miClass rdfs:subClassOf* ue4:UMaterialInstance .
+    FILTER NOT EXISTS {
+      ?mi ue4:parentMaterial+ ?root .
+      ?root a ?rootClass .
+      ?rootClass rdfs:subClassOf* ue4:UMaterial .
+    }
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleL"
+description = "RHI fallback loop: The primary rendering API and fallback rendering API cannot be the same."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+ASK {
+  FILTER NOT EXISTS {
+    ?subsystem ue4:primaryRHI ?rhi .
+    ?subsystem ue4:fallbackRHI ?rhi .
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleM"
+description = "WASM WebGL compliance defect: A rendering subsystem operating under a WASM / HTML5 target world must support WebGL 2.0 (OpenGL ES3) or WebGL 1.0."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ASK {
+  FILTER NOT EXISTS {
+    ?world ue4:hasSubsystem ?subsystem .
+    ?world ue4:hasPackagingState ?state .
+    ?state a ?stateType .
+    ?stateType rdfs:subClassOf* ue4:WasmPackagingTypestate .
+    FILTER NOT EXISTS {
+      ?subsystem ue4:supportsRHI ue4:RHI_WebGL2 .
+    }
+    FILTER NOT EXISTS {
+      ?subsystem ue4:supportsRHI ue4:RHI_OpenGL_ES3 .
+    }
+    FILTER NOT EXISTS {
+      ?subsystem ue4:supportsRHI ue4:RHI_WebGL .
+    }
+  }
+}
+"""

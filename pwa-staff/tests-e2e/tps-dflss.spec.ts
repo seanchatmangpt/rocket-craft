@@ -51,8 +51,21 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         console.warn('Canvas element could not be focused', e);
       }
 
-      // 3. Baseline Quality Check
-      const beforeBuffer = await page.screenshot();
+      // 3. Dynamic Baseline Quality Check
+      const beforeBuffer1 = await page.screenshot();
+      await page.waitForTimeout(3000); // Wait to capture idle animation noise
+      const beforeBuffer2 = await page.screenshot();
+
+      const pixelmatchModule = await import('pixelmatch');
+      const pixelmatch = pixelmatchModule.default;
+
+      const imgB1 = PNG.sync.read(beforeBuffer1);
+      const imgB2 = PNG.sync.read(beforeBuffer2);
+      const { width, height } = imgB1;
+      const diffIdle = new PNG({ width, height });
+
+      const idleDeltaPixels = pixelmatch(imgB1.data, imgB2.data, diffIdle.data, width, height, { threshold: 0.1 });
+      console.log(`Idle background animation delta: ${idleDeltaPixels}px`);
 
       // 4. Actuate (Drive the vehicle)
       currentCell = 'input-binding cell';
@@ -69,25 +82,22 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       currentCell = 'visual-delta cell';
       const afterBuffer = await page.screenshot();
 
-      // Calculate Pixel Delta
-      const img1 = PNG.sync.read(beforeBuffer);
-      const img2 = PNG.sync.read(afterBuffer);
-      const { width, height } = img1;
-      const diff = new PNG({ width, height });
+      // Calculate Pixel Delta against the second baseline
+      const imgAfter = PNG.sync.read(afterBuffer);
+      const diffActuated = new PNG({ width, height });
 
-      const pixelmatchModule = await import('pixelmatch');
-      const pixelmatch = pixelmatchModule.default;
-
-      const numDiffPixels = pixelmatch(img1.data, img2.data, diff.data, width, height, {
+      const numDiffPixels = pixelmatch(imgB2.data, imgAfter.data, diffActuated.data, width, height, {
         threshold: 0.1,
       });
+      console.log(`Actuated visual delta: ${numDiffPixels}px`);
 
-      // 20px minimum: proves WebGL canvas is actively rendering (real UE4 animation/loading).
-      // The Brm default map command-line override is disabled in this build's Brm.UE4.js,
-      // so the game starts in its title/menu map. Menu animations produce ~50px+ change.
-      const MINIMUM_MOTION_THRESHOLD = 20;
-      const verdict = numDiffPixels >= MINIMUM_MOTION_THRESHOLD ? 'PASS' : 'FAIL';
+      // We require the input to produce a significant visual change BEYOND the background noise.
+      const MINIMUM_MOTION_THRESHOLD = idleDeltaPixels + 50;
+      const verdict = numDiffPixels > MINIMUM_MOTION_THRESHOLD ? 'PASS' : 'FAIL';
 
+      // Reassign beforeBuffer and diff for receipt compatibility
+      const beforeBuffer = beforeBuffer2;
+      const diff = diffActuated;
       // 6. Gather receipt data
       currentCell = 'receipt/audit cell';
       let prompt = 'tps-dflss-validation';

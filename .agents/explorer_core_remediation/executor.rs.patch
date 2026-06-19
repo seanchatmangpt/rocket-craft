@@ -1,0 +1,30 @@
+--- crates/ggen-core/src/codegen/executor.rs
++++ crates/ggen-core/src/codegen/executor.rs
+@@ -548,2 +548,22 @@
+         }
+ 
++        // Check SHACL shape validation
++        if !manifest_data.validation.shacl.is_empty() {
++            let mut shacl_passed = true;
++            let mut shacl_detail = format!("{} SHACL shape files", manifest_data.validation.shacl.len());
++            let mut pipeline =
++                GenerationPipeline::new(manifest_data.clone(), base_path.to_path_buf());
++            match pipeline
++                .load_ontology()
++                .and_then(|_| pipeline.execute_inference_rules().map(|_| ()))
++                .and_then(|_| pipeline.execute_shacl_validation())
++            {
++                Ok(()) => {}
++                Err(e) => {
++                    shacl_passed = false;
++                    shacl_detail = e.to_string();
++                }
++            }
++            validations.push(ValidationCheck {
++                check: "SHACL validation".to_string(),
++                passed: shacl_passed,
++                details: Some(shacl_detail),
++            });
++        }
++
+         let all_passed = validations.iter().all(|v| v.passed);

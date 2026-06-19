@@ -1,0 +1,568 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+# Rule: Public classes must have an rdfs:label (at least 1)
+ue4:ClassLabelShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Public classes must have at least one rdfs:label." ;
+    ] .
+
+# Rule: Public classes should have an rdfs:comment description (Warning severity)
+ue4:ClassCommentShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:path rdfs:comment ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Public classes should have an rdfs:comment description." ;
+    ] .
+
+# Rule: Namespace sanity (subjects must use resolvable public IRIs, not private/opaque ones)
+ue4:NamespaceSanityShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class , rdf:Property , owl:ObjectProperty , owl:DatatypeProperty ;
+    sh:nodeKind sh:IRI ;
+    sh:pattern "^https?://" ;
+    sh:message "Namespace sanity violation: Subjects must use resolvable public IRIs (starting with http:// or https://), not private/opaque ones like urn:private:." .
+
+# Enforce UFunctionParameter properties
+ue4:UFunctionParameterShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UFunctionParameter ;
+    sh:property [
+        sh:path ue4:parameterOf ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UFunction ;
+        sh:message "A function parameter must belong to exactly one UFunction." ;
+    ] ;
+    sh:property [
+        sh:path ue4:parameterDirection ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:PinDirection ;
+        sh:message "A parameter must have exactly one direction of type PinDirection." ;
+    ] ;
+    sh:property [
+        sh:path ue4:parameterIndex ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 0 ;
+        sh:message "A parameter must have a single non-negative integer parameterIndex." ;
+    ] .
+
+# Enforce UEdGraphPin properties
+ue4:UEdGraphPinShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:property [
+        sh:path ue4:pinOf ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UEdGraphNode ;
+        sh:message "A pin must belong to exactly one UEdGraphNode." ;
+    ] ;
+    sh:property [
+        sh:path ue4:pinDirection ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:BinaryPinDirection ;
+        sh:message "A pin must have exactly one direction, strictly Input or Output." ;
+    ] ;
+    sh:property [
+        sh:path ue4:pinCategory ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "exec" "bool" "byte" "int" "float" "double" "name" "string" "text" "object" "class" "struct" "interface" "delegate" ) ;
+        sh:message "A pin must have a single data category string, limited to standard categories." ;
+    ] .
+
+# Rule A: Pin Connection Direction Check
+ue4:PinConnectionDirectionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Pin connection direction mismatch: A pin cannot be connected to another pin of the same direction." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other
+            WHERE {
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other .
+                $this ue4:pinDirection ?dir .
+                ?other ue4:pinDirection ?dir .
+            } ORDER BY $this ?other
+        """ ;
+    ] .
+
+# Rule B: Graph Isolation Check
+ue4:PinConnectionGraphShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Graph isolation violation: Connected pins must belong to nodes within the same UEdGraph." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other
+            WHERE {
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other .
+                $this ue4:pinOf/ue4:nodeOf ?graph1 .
+                ?other ue4:pinOf/ue4:nodeOf ?graph2 .
+                FILTER (?graph1 != ?graph2)
+            } ORDER BY $this ?other
+        """ ;
+    ] .
+
+# Rule C: Function Call Parameter Mapping Target Integrity
+ue4:FunctionCallPinMappingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Pin mapping mismatch: Pin maps to a parameter that does not belong to the node's target called function." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?param ?func ?node
+            WHERE {
+                $this ue4:pinOf ?node .
+                ?node (ue4:callsFunction|ue4:calledFunction) ?func .
+                $this ue4:mapsToParameter ?param .
+                FILTER NOT EXISTS {
+                    { ?func ue4:hasParameter ?param }
+                    UNION
+                    { ?param ue4:parameterOf ?func }
+                }
+            } ORDER BY $this ?param
+        """ ;
+    ] .
+
+# Rule D: Pin Parameter Direction Match
+ue4:PinParameterDirectionMatchShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Pin and parameter direction mismatch: Input pins must map to Input/InOut parameters; Output pins must map to Output/InOut/Return parameters." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?param ?pinDir ?paramDir
+            WHERE {
+                $this ue4:mapsToParameter ?param .
+                $this ue4:pinDirection ?pinDir .
+                ?param ue4:parameterDirection ?paramDir .
+                FILTER (
+                    ( ?pinDir = <https://rocket-craft.io/ontology/ue4/Input> && ?paramDir != <https://rocket-craft.io/ontology/ue4/Input> && ?paramDir != <https://rocket-craft.io/ontology/ue4/InOut> ) ||
+                    ( ?pinDir = <https://rocket-craft.io/ontology/ue4/Output> && ?paramDir != <https://rocket-craft.io/ontology/ue4/Output> && ?paramDir != <https://rocket-craft.io/ontology/ue4/InOut> && ?paramDir != <https://rocket-craft.io/ontology/ue4/Return> )
+                )
+            } ORDER BY $this ?param
+        """ ;
+    ] .
+
+# Rule E: Exec vs. Data Pin Separation
+ue4:ExecPinConnectionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Execution pin mismatch: An execution pin ('exec') can only connect to another execution pin." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other
+            WHERE {
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other .
+                $this ue4:pinCategory "exec" .
+                ?other ue4:pinCategory ?cat .
+                FILTER (?cat != "exec")
+            } ORDER BY $this ?other
+        """ ;
+    ] .
+
+# =========================================================================
+# MILESTONE 2 ADDITIONS: SHACL SHAPES
+# =========================================================================
+
+# Rule F: Character must have exactly 1 hasCookingState of type CookingTypestate
+ue4:CharacterCookingStateShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "A character must have exactly one cooking state of type CookingTypestate." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this a ?class .
+                ?class rdfs:subClassOf* ue4:ACharacter .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:hasCookingState ?state .
+                        ?state a/rdfs:subClassOf* ue4:CookingTypestate .
+                    }
+                }
+                UNION
+                {
+                    $this ue4:hasCookingState ?state1 .
+                    ?state1 a/rdfs:subClassOf* ue4:CookingTypestate .
+                    $this ue4:hasCookingState ?state2 .
+                    ?state2 a/rdfs:subClassOf* ue4:CookingTypestate .
+                    FILTER (?state1 != ?state2)
+                }
+            }
+        """ ;
+    ] .
+
+# Rule G: World must have exactly 1 hasPackagingState of type WasmPackagingTypestate
+ue4:WorldPackagingStateShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "A world must have exactly one packaging state of type WasmPackagingTypestate." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this a ?class .
+                ?class rdfs:subClassOf* ue4:UWorld .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:hasPackagingState ?state .
+                        ?state a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                    }
+                }
+                UNION
+                {
+                    $this ue4:hasPackagingState ?state1 .
+                    ?state1 a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                    $this ue4:hasPackagingState ?state2 .
+                    ?state2 a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                    FILTER (?state1 != ?state2)
+                }
+            }
+        """ ;
+    ] .
+
+# Rule H: Input execution pins on function call nodes must be connected
+ue4:InputExecPinConnectedShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Input execution pin on a function call node must be connected to an execution pin." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this ue4:pinOf ?node .
+                ?node a/rdfs:subClassOf* ue4:UK2Node .
+                $this ue4:pinDirection ue4:Input .
+                $this ue4:pinCategory "exec" .
+                FILTER NOT EXISTS { $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other }
+            } ORDER BY $this
+        """ ;
+    ] .
+
+# Scene Component Dynamic Rendering parameter shapes
+ue4:SceneComponentRenderingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:USceneComponent ;
+    sh:property [
+        sh:path ue4:interactionDistanceClass ;
+        sh:datatype xsd:float ;
+        sh:message "interactionDistanceClass must be a float." ;
+    ] ;
+    sh:property [
+        sh:path ue4:materialClass ;
+        sh:datatype xsd:string ;
+        sh:message "materialClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:instancingClass ;
+        sh:datatype xsd:string ;
+        sh:message "instancingClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:silhouetteImportanceClass ;
+        sh:datatype xsd:string ;
+        sh:message "silhouetteImportanceClass must be a string." ;
+    ] .
+
+# =========================================================================
+# Additional Custom Shapes
+# =========================================================================
+
+# Variable getter/setter nodes reference a valid property
+ue4:VariableGetNodePropertyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UK2Node_VariableGet ;
+    sh:property [
+        sh:path ue4:referencedProperty ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UProperty ;
+        sh:message "A variable getter or setter node must reference exactly one valid UProperty." ;
+    ] .
+
+ue4:VariableSetNodePropertyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UK2Node_VariableSet ;
+    sh:property [
+        sh:path ue4:referencedProperty ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UProperty ;
+        sh:message "A variable getter or setter node must reference exactly one valid UProperty." ;
+    ] .
+
+# Rule: Input pin connection count limit (at most 1 connection)
+ue4:InputPinConnectionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Input pin connection count limit: Input pins cannot be connected to more than 1 other pin." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other1 ?other2
+            WHERE {
+                $this ue4:pinDirection ue4:Input .
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other1 .
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other2 .
+                FILTER (?other1 != ?other2)
+            } ORDER BY $this ?other1 ?other2
+        """ ;
+    ] .
+
+# Rule: Node Parentage (exactly 1 nodeOf pointing to a valid UEdGraph)
+ue4:UEdGraphNodeParentageShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "A node must belong to exactly one UEdGraph: All UEdGraphNode instances must have exactly one nodeOf pointing to a valid UEdGraph." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this a ?class .
+                ?class rdfs:subClassOf* ue4:UEdGraphNode .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:nodeOf ?graph .
+                        ?graph a/rdfs:subClassOf* ue4:UEdGraph .
+                    }
+                }
+                UNION
+                {
+                    $this ue4:nodeOf ?graph1 .
+                    ?graph1 a/rdfs:subClassOf* ue4:UEdGraph .
+                    $this ue4:nodeOf ?graph2 .
+                    ?graph2 a/rdfs:subClassOf* ue4:UEdGraph .
+                    FILTER (?graph1 != ?graph2)
+                }
+            } ORDER BY $this
+        """ ;
+    ] .
+
+# Replicated Rendering property shapes for USkeletalMeshComponent (no RDFS reasoning)
+ue4:USkeletalMeshComponentRenderingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:USkeletalMeshComponent ;
+    sh:property [
+        sh:path ue4:interactionDistanceClass ;
+        sh:datatype xsd:float ;
+        sh:message "interactionDistanceClass must be a float." ;
+    ] ;
+    sh:property [
+        sh:path ue4:materialClass ;
+        sh:datatype xsd:string ;
+        sh:message "materialClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:instancingClass ;
+        sh:datatype xsd:string ;
+        sh:message "instancingClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:silhouetteImportanceClass ;
+        sh:datatype xsd:string ;
+        sh:message "silhouetteImportanceClass must be a string." ;
+    ] .
+
+# Replicated Rendering property shapes for UBoxComponent (no RDFS reasoning)
+ue4:UBoxComponentRenderingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UBoxComponent ;
+    sh:property [
+        sh:path ue4:interactionDistanceClass ;
+        sh:datatype xsd:float ;
+        sh:message "interactionDistanceClass must be a float." ;
+    ] ;
+    sh:property [
+        sh:path ue4:materialClass ;
+        sh:datatype xsd:string ;
+        sh:message "materialClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:instancingClass ;
+        sh:datatype xsd:string ;
+        sh:message "instancingClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:silhouetteImportanceClass ;
+        sh:datatype xsd:string ;
+        sh:message "silhouetteImportanceClass must be a string." ;
+    ] .
+
+# =========================================================================
+# RENDERING SUBSYSTEM TOPOLOGY & WEBGL/RHI FALLBACK SHAPES (PROPOSED)
+# =========================================================================
+
+# Rule I: Material Instance Parent Verification
+ue4:UMaterialInstanceParentShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialInstance , ue4:UMaterialInstanceConstant , ue4:UMaterialInstanceDynamic ;
+    sh:property [
+        sh:path ue4:parentMaterial ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UMaterialInterface ;
+        sh:message "A material instance must have exactly one parentMaterial of type UMaterialInterface." ;
+    ] .
+
+# Rule J: Material Instance Parent Chain Acyclicity & Rootedness
+ue4:MaterialInstanceAcyclicityShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialInstance , ue4:UMaterialInstanceConstant , ue4:UMaterialInstanceDynamic ;
+    sh:sparql [
+        sh:message "Material inheritance loop detected: A material instance parent chain cannot reference itself." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?next
+            WHERE {
+                $this ue4:parentMaterial+ $this .
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "Root material missing: A material instance parent chain must eventually resolve to a base UMaterial." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                FILTER NOT EXISTS {
+                    $this ue4:parentMaterial+ ?root .
+                    ?root a/rdfs:subClassOf* ue4:UMaterial .
+                }
+            }
+        """ ;
+    ] .
+
+# Rule K: Material Parameter Override Name Matching
+ue4:MaterialInstanceParameterOverrideShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialInstance , ue4:UMaterialInstanceConstant , ue4:UMaterialInstanceDynamic ;
+    sh:sparql [
+        sh:message "Orphan parameter override: Overridden parameter name does not match any parameter defined in the root UMaterial or parent chain." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?paramVal ?paramName
+            WHERE {
+                $this ue4:hasParameterValue ?paramVal .
+                ?paramVal ue4:parameterName ?paramName .
+                FILTER NOT EXISTS {
+                    $this ue4:parentMaterial* ?ancestor .
+                    {
+                        ?ancestor a/rdfs:subClassOf* ue4:UMaterial .
+                        ?ancestor ue4:definesParameter ?paramDef .
+                        ?paramDef rdfs:label ?paramName .
+                    }
+                    UNION
+                    {
+                        ?ancestor a/rdfs:subClassOf* ue4:UMaterial .
+                        ?ancestor ue4:definesParameter ?paramDef .
+                        ?paramDef ue4:parameterName ?paramName .
+                    }
+                }
+            } ORDER BY $this ?paramVal
+        """ ;
+    ] .
+
+# Rule L: Rendering Subsystem RHI Support and Fallback Loops
+ue4:URenderingSubsystemRHIShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URenderingSubsystem ;
+    sh:property [
+        sh:path ue4:primaryRHI ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:ERenderAPI ;
+        sh:message "A rendering subsystem must have exactly one primary RHI of type ERenderAPI." ;
+    ] ;
+    sh:property [
+        sh:path ue4:fallbackRHI ;
+        sh:maxCount 1 ;
+        sh:class ue4:ERenderAPI ;
+        sh:message "A rendering subsystem can have at most one fallback RHI of type ERenderAPI." ;
+    ] ;
+    sh:sparql [
+        sh:message "RHI fallback loop: The primary rendering API and fallback rendering API cannot be the same." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?primary
+            WHERE {
+                $this ue4:primaryRHI ?primary .
+                $this ue4:fallbackRHI ?primary .
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RHI support mismatch: The primary or fallback RHI must be in the list of supported RHIs for the subsystem." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?rhi
+            WHERE {
+                {
+                    $this ue4:primaryRHI ?rhi .
+                    FILTER NOT EXISTS { $this ue4:supportsRHI ?rhi }
+                }
+                UNION
+                {
+                    $this ue4:fallbackRHI ?rhi .
+                    FILTER NOT EXISTS { $this ue4:supportsRHI ?rhi }
+                }
+            } ORDER BY $this ?rhi
+        """ ;
+    ] .
+
+# Rule M: WASM WebGL Fallback Compliance
+ue4:WasmSubsystemWebGLFallbackShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URenderingSubsystem ;
+    sh:sparql [
+        sh:message "WASM WebGL compliance defect: A rendering subsystem operating under a WASM / HTML5 target world must support WebGL 2.0 (OpenGL ES3) or WebGL 1.0." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                ?world ue4:hasSubsystem $this .
+                ?world ue4:hasPackagingState ?state .
+                ?state a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                
+                FILTER NOT EXISTS { $this ue4:supportsRHI ue4:RHI_WebGL2 . }
+                FILTER NOT EXISTS { $this ue4:supportsRHI ue4:RHI_OpenGL_ES3 . }
+                FILTER NOT EXISTS { $this ue4:supportsRHI ue4:RHI_WebGL . }
+            }
+        """ ;
+    ] .

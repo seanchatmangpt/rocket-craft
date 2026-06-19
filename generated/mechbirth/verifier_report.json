@@ -1,0 +1,47 @@
+{
+  "milestone": "GC-MECHBIRTH-002",
+  "status": "PARTIAL_ALIVE_CANDIDATE",
+  "scoped_status": "RUST_PREUE4_GAME_LAW_ALIVE_UNDER_SCOPE",
+  "inputs": [
+    "/Users/sac/powlv2lsp/samples/MechBirth.powl",
+    "/Users/sac/powlv2lsp/out.json"
+  ],
+  "generated_artifacts": [
+    "MechBirthSteps.h",
+    "MechBirthSteps.rs",
+    "MechBirthProjectionRows.csv",
+    "MechBirthSocketTopology.csv",
+    "MechBirthSkinLayers.csv",
+    "MechBirthMotionFamilies.csv",
+    "MechBirthLODClasses.csv",
+    "MechBirthAuthorityClasses.csv",
+    "MechBirthTransitionTable.csv",
+    "MechBirthPredictionRules.csv",
+    "MechBirthReceiptManifest.json",
+    "MechBirthProjectionManifest.json",
+    "MechBirthOCELSeed.json"
+  ],
+  "tests": [
+    {"suite": "chaos_mechbirth", "passed": 6, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"suite": "integration_mechbirth", "passed": 7, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"suite": "stress_authority_fields", "passed": 3, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"suite": "unit_authority", "passed": 28, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"suite": "unit_geometry_motion", "passed": 19, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"suite": "unit_lod", "passed": 10, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"suite": "unit_prediction", "passed": 11, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"suite": "unit_receipts", "passed": 20, "failed": 0, "status": "VERIFIED_UNDER_SCOPE"},
+    {"total_passed": 104, "total_failed": 0}
+  ],
+  "benchmarks": [
+    {"name": "bench_authority_kernels", "status": "DECLARED", "note": "criterion benches declared; criterion run deferred (requires --benches flag and nightly-free harness)"}
+  ],
+  "jidoka_events": [],
+  "residuals": [
+    "ggen_artifact_lowering: hand-generated surrogates, not ggen-manufactured",
+    "ue4_projection: no rendered surface",
+    "signing_layer: tamper-evident, not cryptographically signed",
+    "simdE_ffi: C SIMDe FFI kernel deferred to GC-MECHBIRTH-003",
+    "stress_1M: 1M cell stress test deferred pending dev machine capacity check",
+    "wasm4pm_playground: @wasm4pm/testing build blocked by nuxt postinstall"
+  ]
+}

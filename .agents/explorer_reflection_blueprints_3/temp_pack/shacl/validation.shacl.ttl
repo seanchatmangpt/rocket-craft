@@ -1,0 +1,35 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+# Rule: Public classes must have an rdfs:label (at least 1)
+ue4:ClassLabelShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Public classes must have at least one rdfs:label." ;
+    ] .
+
+# Rule: Public classes should have an rdfs:comment description (Warning severity)
+ue4:ClassCommentShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class ;
+    sh:property [
+        sh:path rdfs:comment ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Public classes should have an rdfs:comment description." ;
+    ] .
+
+# Rule: Namespace sanity (subjects must use resolvable public IRIs, not private/opaque ones)
+ue4:NamespaceSanityShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class , rdf:Property , owl:ObjectProperty , owl:DatatypeProperty ;
+    sh:nodeKind sh:IRI ;
+    sh:pattern "^https?://" ;
+    sh:message "Namespace sanity violation: Subjects must use resolvable public IRIs (starting with http:// or https://), not private/opaque ones like urn:private:." .

@@ -37,7 +37,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     simulator_core::telemetry::init_telemetry();
     let cli = Cli::parse();
 
-
     // Default workspace root to parent directory if not provided
     let workspace_root = cli.workspace_root.unwrap_or_else(|| {
         let current = std::env::current_dir().unwrap();

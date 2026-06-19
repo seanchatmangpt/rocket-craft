@@ -1,0 +1,175 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+# =========================================================================
+# UE4 Subsystems Extensions: GameInstance & Subsystem Subclasses
+# =========================================================================
+
+ue4:UGameInstance a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UGameInstance" ;
+    rdfs:comment "High-level manager object for an instance of the running game." .
+
+ue4:UWorldSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UWorldSubsystem" ;
+    rdfs:comment "Subsystem that is tied to the lifecycle of a UWorld." .
+
+ue4:UGameInstanceSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UGameInstanceSubsystem" ;
+    rdfs:comment "Subsystem that is tied to the lifecycle of a UGameInstance." .
+
+ue4:UEngineSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UEngineSubsystem" ;
+    rdfs:comment "Subsystem that is tied to the lifecycle of the UEngine." .
+
+ue4:hasSubsystem a owl:ObjectProperty ;
+    rdfs:label "hasSubsystem" ;
+    rdfs:comment "Relates a UWorld or UGameInstance to a USubsystem active within it." ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( ue4:UWorld ue4:UGameInstance )
+    ] ;
+    rdfs:range ue4:USubsystem .
+
+# =========================================================================
+# Networking Subsystem Domains: Replication
+# =========================================================================
+
+ue4:ELifetimeCondition a owl:Class ;
+    rdfs:subClassOf ue4:UEnum ;
+    rdfs:label "ELifetimeCondition" ;
+    rdfs:comment "Enumeration specifying replication conditions for properties." .
+
+ue4:COND_None a ue4:ELifetimeCondition ;
+    rdfs:label "COND_None" ;
+    rdfs:comment "Default replication condition: replicate to all connections." .
+
+ue4:COND_InitialOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_InitialOnly" ;
+    rdfs:comment "Replicate only on initial connection/creation." .
+
+ue4:COND_OwnerOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_OwnerOnly" ;
+    rdfs:comment "Replicate only to the owner connection." .
+
+ue4:COND_SkipOwner a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SkipOwner" ;
+    rdfs:comment "Replicate to all connections except the owner." .
+
+ue4:COND_SimulatedOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SimulatedOnly" ;
+    rdfs:comment "Replicate only to simulated proxy connections." .
+
+ue4:COND_AutonomousOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_AutonomousOnly" ;
+    rdfs:comment "Replicate only to autonomous proxy connections." .
+
+ue4:COND_SimulatedOrOwner a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SimulatedOrOwner" ;
+    rdfs:comment "Replicate to simulated proxy or owner connection." .
+
+ue4:COND_Custom a ue4:ELifetimeCondition ;
+    rdfs:label "COND_Custom" ;
+    rdfs:comment "Custom replication condition managed by game logic." .
+
+ue4:COND_ReplayOrOwner a ue4:ELifetimeCondition ;
+    rdfs:label "COND_ReplayOrOwner" ;
+    rdfs:comment "Replicate to owner connection or replay stream." .
+
+ue4:COND_ReplayOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_ReplayOnly" ;
+    rdfs:comment "Replicate only to replay streams." .
+
+ue4:COND_SimulatedOnlyNoReplay a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SimulatedOnlyNoReplay" ;
+    rdfs:comment "Replicate to simulated proxies but not replays." .
+
+ue4:COND_SkipOwnerNoReplay a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SkipOwnerNoReplay" ;
+    rdfs:comment "Replicate to everyone except owner, excluding replays." .
+
+ue4:COND_Never a ue4:ELifetimeCondition ;
+    rdfs:label "COND_Never" ;
+    rdfs:comment "Never replicate. Used for active overrides." .
+
+ue4:FReplicationLifetime a owl:Class ;
+    rdfs:label "FReplicationLifetime" ;
+    rdfs:comment "Represents a replication registration lifetime entry for a property." .
+
+ue4:replicatedProperty a owl:ObjectProperty ;
+    rdfs:label "replicatedProperty" ;
+    rdfs:comment "The property that is registered for replication." ;
+    rdfs:domain ue4:FReplicationLifetime ;
+    rdfs:range ue4:UProperty .
+
+ue4:lifetimeCondition a owl:ObjectProperty ;
+    rdfs:label "lifetimeCondition" ;
+    rdfs:comment "The replication condition assigned to this lifetime entry." ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( ue4:FReplicationLifetime ue4:UProperty )
+    ] ;
+    rdfs:range ue4:ELifetimeCondition .
+
+ue4:repNotifyFunction a owl:ObjectProperty ;
+    rdfs:label "repNotifyFunction" ;
+    rdfs:comment "The RepNotify callback function invoked when this property replicates." ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( ue4:FReplicationLifetime ue4:UProperty )
+    ] ;
+    rdfs:range ue4:UFunction .
+
+ue4:bReplicated a owl:DatatypeProperty ;
+    rdfs:label "bReplicated" ;
+    rdfs:comment "Direct declaration if this property is replicated." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range xsd:boolean .
+
+# =========================================================================
+# Networking Subsystem Domains: Remote Procedure Calls (RPCs)
+# =========================================================================
+
+ue4:URPC a owl:Class ;
+    rdfs:subClassOf ue4:UFunction ;
+    rdfs:label "URPC" ;
+    rdfs:comment "Base class representing a Remote Procedure Call." .
+
+ue4:UServerRPC a owl:Class ;
+    rdfs:subClassOf ue4:URPC ;
+    rdfs:label "UServerRPC" ;
+    rdfs:comment "Remote Procedure Call that is sent by a client and executed on the server." .
+
+ue4:UClientRPC a owl:Class ;
+    rdfs:subClassOf ue4:URPC ;
+    rdfs:label "UClientRPC" ;
+    rdfs:comment "Remote Procedure Call that is sent by the server and executed on the client that owns the Actor." .
+
+ue4:UNetMulticastRPC a owl:Class ;
+    rdfs:subClassOf ue4:URPC ;
+    rdfs:label "UNetMulticastRPC" ;
+    rdfs:comment "Remote Procedure Call that is sent by the server and executed on the server and all connected clients." .
+
+ue4:bReliable a owl:DatatypeProperty ;
+    rdfs:label "bReliable" ;
+    rdfs:comment "Indicates whether the RPC transmission is guaranteed and ordered." ;
+    rdfs:domain ue4:URPC ;
+    rdfs:range xsd:boolean .
+
+ue4:bWithValidation a owl:DatatypeProperty ;
+    rdfs:label "bWithValidation" ;
+    rdfs:comment "Indicates whether the RPC has a validation function that runs before execution." ;
+    rdfs:domain ue4:URPC ;
+    rdfs:range xsd:boolean .
+
+ue4:validationFunction a owl:ObjectProperty ;
+    rdfs:label "validationFunction" ;
+    rdfs:comment "Points to the UFunction containing the validation logic (e.g. SomeFunc_Validate)." ;
+    rdfs:domain ue4:URPC ;
+    rdfs:range ue4:UFunction .

@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "created_at": "2026-06-19T01:14:57.894525+00:00",
+  "ontology": {
+    "hash": "facd844565e442a4e75c1987c7b75e6b00b86275c063d84688ce671e3936bda8",
+    "timestamp": "2026-06-19T01:14:57.894512+00:00",
+    "size_bytes": 5462
+  },
+  "manifest": {
+    "hash": "e9c48738e2ad87cee976bf504e8194fd719257c63761ce03c48a6b6e195bbd59",
+    "timestamp": "2026-06-19T01:14:57.894512+00:00",
+    "size_bytes": 3793
+  },
+  "inference_rules": {
+    "infer-is-level-of": "63fd658002966b6cc6d25229a11e9b9281b2276d75f2a594672cc4c5e0299d3f",
+    "infer-is-component-of": "2532cc8bda5bb4521a64a65f81ed419784ed1c98737cdc9e308e72e0a3e98ba6"
+  },
+  "imports": {
+    "blueprints.ttl": {
+      "hash": "a46d053a19be547cf23cc19cb3c141725b547a31ab8150d63a06b8aef34a8b7c",
+      "timestamp": "2026-06-19T01:14:57.894512+00:00",
+      "size_bytes": 1008
+    },
+    "reflection.ttl": {
+      "hash": "ef322277cd402ea106d0f834e528b0d67018ac496232c8f059155afcacf48ddd",
+      "timestamp": "2026-06-19T01:14:57.894512+00:00",
+      "size_bytes": 1376
+    },
+    "subsystems.ttl": {
+      "hash": "cab38c3c3a821345b350a9105b8ecb825149d570893f48e258c04e32a8a5da0c",
+      "timestamp": "2026-06-19T01:14:57.894512+00:00",
+      "size_bytes": 1424
+    },
+    "typestates.ttl": {
+      "hash": "18fc26e7586d7f390b82fcd9c5da4f69783573fa18d960861b9d187482a2cd59",
+      "timestamp": "2026-06-19T01:14:57.894512+00:00",
+      "size_bytes": 1641
+    }
+  },
+  "files_synced": 1,
+  "sync_duration_ms": 5
+}

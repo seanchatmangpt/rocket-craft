@@ -1,0 +1,110 @@
+--- crates/ggen-core/src/validation/sparql_rules.rs
++++ crates/ggen-core/src/validation/sparql_rules.rs
+@@ -130,90 +130,51 @@
+     fn execute_rule(&self, output: &Graph, rule: &ValidationRule) -> Result<Vec<Violation>> {
+-        let query_str = rule.query.trim().to_uppercase();
+-
+-        if query_str.starts_with("ASK") {
+-            self.execute_ask_rule(output, rule)
+-        } else if query_str.starts_with("SELECT") {
+-            self.execute_select_rule(output, rule)
+-        } else {
+-            Err(ValidationError::invalid_query(
+-                &rule.id,
+-                "Query must start with ASK or SELECT",
+-            ))
+-        }
+-    }
+-
+-    fn execute_ask_rule(&self, output: &Graph, rule: &ValidationRule) -> Result<Vec<Violation>> {
+         let results = output
+             .query(&rule.query)
+             .map_err(|e| ValidationError::query_execution(&rule.id, &e.to_string()))?;
+ 
+-        let ask_result = match results {
+-            QueryResults::Boolean(b) => b,
+-            _ => {
+-                return Err(ValidationError::invalid_query(
+-                    &rule.id,
+-                    "Expected ASK query to return boolean",
+-                ))
+-            }
+-        };
+-
+-        if ask_result {
+-            Ok(Vec::new())
+-        } else {
+-            let violation = Violation::new(
+-                rule.id.clone(),
+-                ConstraintType::Cardinality,
+-                rule.message.clone(),
+-            )
+-            .with_severity(rule.severity.into());
+-            Ok(vec![violation])
+-        }
+-    }
+-
+-    fn execute_select_rule(&self, output: &Graph, rule: &ValidationRule) -> Result<Vec<Violation>> {
+-        let results = output
+-            .query(&rule.query)
+-            .map_err(|e| ValidationError::query_execution(&rule.id, &e.to_string()))?;
+-
+-        let mut violations = Vec::new();
+-
+         match results {
+-            QueryResults::Solutions(solutions) => {
++            QueryResults::Boolean(ask_result) => {
++                if ask_result {
++                    Ok(Vec::new())
++                } else {
++                    let violation = Violation::new(
++                        rule.id.clone(),
++                        ConstraintType::Cardinality,
++                        rule.message.clone(),
++                    )
++                    .with_severity(rule.severity.into());
++                    Ok(vec![violation])
++                }
++            }
++            QueryResults::Solutions(solutions) => {
++                let mut violations = Vec::new();
+                 for solution_result in solutions {
+                     let solution = solution_result
+                         .map_err(|e| ValidationError::query_execution(&rule.id, &e.to_string()))?;
+ 
+                     let focus_node = solution
+                         .get("node")
+                         .or_else(|| solution.get("s"))
+                         .map(|term| term.to_string())
+                         .unwrap_or_else(|| "unknown".to_string());
+ 
+                     let value = solution
+                         .get("value")
+                         .or_else(|| solution.get("o"))
+                         .map(|term| term.to_string());
+ 
+                     let message = if let Some(val) = value {
+                         format!("{} (value: {})", rule.message, val)
+                     } else {
+                         rule.message.clone()
+                     };
+ 
+                     let violation =
+                         Violation::new(focus_node, ConstraintType::Cardinality, message)
+                             .with_severity(rule.severity.into());
+ 
+                     violations.push(violation);
+                 }
++                Ok(violations)
+             }
+             _ => {
+                 return Err(ValidationError::invalid_query(
+                     &rule.id,
+-                    "Expected SELECT query to return solutions",
++                    "Expected ASK or SELECT query for validation rules",
+                 ))
+             }
+         }
+-
+-        Ok(violations)
+     }

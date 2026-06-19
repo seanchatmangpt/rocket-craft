@@ -1,0 +1,3 @@
+create actor bot_1 name "Welder Bot" role RoboticWelder in zone_1
+create place zone_extra name "Extra Lab" at (2400.0, 0.0, 0.0) bounds (100.0, 100.0, 50.0)
+create relationship rel_6_extra connects from zone_6 to zone_extra

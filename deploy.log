@@ -1,5 +1,5 @@
 Genie 26 Deployment Log
-Timestamp MS: 1781807365514
+Timestamp MS: 1781849999461
 Places: 7
 Actors: 1
 Place: zone_1
@@ -10,4 +10,4 @@ Place: zone_5
 Place: zone_6
 Place: zone_extra
 Initiating Headless Unreal Engine 4 Build...
-Pipeline Status: SUCCESS
+Pipeline Status: FAILED

@@ -1,0 +1,237 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+# =========================================================================
+# Networking Subsystem Validation Shapes
+# =========================================================================
+
+# Rule 1a: RPC must belong to Actor or ActorComponent class hierarchy
+ue4:RPCOnReplicatedClassShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URPC ;
+    sh:sparql [
+        sh:message "RPC defined on non-replicated class: RPC functions must belong to UClasses that are subclasses of AActor or UActorComponent." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?class
+            WHERE {
+                ?class ue4:hasFunction $this .
+                FILTER NOT EXISTS {
+                    { ?class rdfs:subClassOf* ue4:AActor }
+                    UNION
+                    { ?class rdfs:subClassOf* ue4:UActorComponent }
+                }
+            } ORDER BY $this ?class
+        """ ;
+    ] .
+
+# Rule 1b: If a class defines RPCs, instances must replicate
+ue4:RPCInstanceReplicationShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "Replication mismatch: An Actor or Component instance must replicate (bReplicates true) if its class defines one or more RPCs." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?rpc
+            WHERE {
+                $this a ?class .
+                { ?class rdfs:subClassOf* ue4:AActor }
+                UNION
+                { ?class rdfs:subClassOf* ue4:UActorComponent }
+                ?class rdfs:subClassOf* ?parentClass .
+                ?parentClass ue4:hasFunction ?rpc .
+                ?rpc a/rdfs:subClassOf* ue4:URPC .
+                FILTER NOT EXISTS {
+                    $this ue4:bReplicates true .
+                }
+            } ORDER BY $this ?rpc
+        """ ;
+    ] .
+
+# Rule 2: Validation signature constraints for WithValidation RPCs
+ue4:RPCValidationSignatureShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URPC ;
+    sh:sparql [
+        sh:message "RPC validation function return type mismatch: A validation function for a WithValidation RPC must return a Boolean." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?valFunc ?retProp
+            WHERE {
+                $this ue4:bWithValidation true ;
+                      ue4:validationFunction ?valFunc .
+                ?valFunc ue4:returnProperty ?retProp .
+                FILTER NOT EXISTS {
+                    ?retProp a/rdfs:subClassOf* ue4:UBoolProperty .
+                }
+            } ORDER BY $this ?valFunc
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RPC validation function parameter mismatch: Parameters of the validation function must match those of the RPC in index and type." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?valFunc ?rpcParam ?valParam
+            WHERE {
+                $this ue4:bWithValidation true ;
+                      ue4:validationFunction ?valFunc .
+                
+                # Get parameter of RPC
+                ?this ue4:hasParameter ?rpcParam .
+                ?rpcParam ue4:parameterIndex ?idx .
+                
+                # Check if validation parameter has same index and type
+                FILTER NOT EXISTS {
+                    ?valFunc ue4:hasParameter ?valParam .
+                    ?valParam ue4:parameterIndex ?idx .
+                    ?rpcParam ue4:propertyType ?rpcType .
+                    ?valParam ue4:propertyType ?valType .
+                    FILTER (?rpcType = ?valType)
+                }
+            } ORDER BY $this ?valFunc ?rpcParam
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RPC validation function parameter count mismatch: Parameter count of validation function must equal that of the RPC." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?valFunc
+            WHERE {
+                $this ue4:bWithValidation true ;
+                      ue4:validationFunction ?valFunc .
+                
+                # Subquery to count RPC parameters
+                {
+                    SELECT $this (COUNT(?p1) AS ?c1)
+                    WHERE { $this ue4:hasParameter ?p1 . }
+                    GROUP BY $this
+                }
+                # Subquery to count validation parameters
+                {
+                    SELECT ?valFunc (COUNT(?p2) AS ?c2)
+                    WHERE { ?valFunc ue4:hasParameter ?p2 . }
+                    GROUP BY ?valFunc
+                }
+                FILTER (?c1 != ?c2)
+            } ORDER BY $this ?valFunc
+        """ ;
+    ] .
+
+# Rule 3: Component replication requires Actor replication
+ue4:ComponentReplicationOwnerShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UActorComponent ;
+    sh:sparql [
+        sh:message "Component replication mismatch: A component cannot replicate if its owner actor is not replicated." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?actor
+            WHERE {
+                $this ue4:bReplicates true ;
+                      ue4:isComponentOf ?actor .
+                FILTER NOT EXISTS {
+                    ?actor ue4:bReplicates true .
+                }
+            } ORDER BY $this ?actor
+        """ ;
+    ] .
+
+# Rule 4: Replicated actor requires World Networking Subsystem
+ue4:WorldNetworkingSubsystemShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UWorld ;
+    sh:sparql [
+        sh:message "Networking topology violation: A world containing replicated actors must have a UNetworkingSubsystem." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?actor
+            WHERE {
+                $this ue4:hasLevel ?level .
+                ?level ue4:hasActor ?actor .
+                ?actor ue4:bReplicates true .
+                FILTER NOT EXISTS {
+                    $this ue4:hasSubsystem ?subsystem .
+                    ?subsystem a/rdfs:subClassOf* ue4:UNetworkingSubsystem .
+                }
+            } ORDER BY $this ?actor
+        """ ;
+    ] .
+
+# Rule 5a: RepNotify callback function hierarchy check (FReplicationLifetime)
+ue4:RepNotifyValidationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:FReplicationLifetime ;
+    sh:sparql [
+        sh:message "RepNotify function hierarchy mismatch: The RepNotify callback function must belong to the class hierarchy of the replicated property." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?property ?repFunc ?propClass
+            WHERE {
+                $this ue4:replicatedProperty ?property ;
+                      ue4:repNotifyFunction ?repFunc .
+                ?propClass ue4:hasProperty ?property .
+                FILTER NOT EXISTS {
+                    ?propClass rdfs:subClassOf* ?parentClass .
+                    ?parentClass ue4:hasFunction ?repFunc .
+                }
+            } ORDER BY $this ?property ?repFunc
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RepNotify function return type mismatch: RepNotify functions must return void (no returnProperty)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?repFunc ?retProp
+            WHERE {
+                $this ue4:repNotifyFunction ?repFunc .
+                ?repFunc ue4:returnProperty ?retProp .
+            } ORDER BY $this ?repFunc
+        """ ;
+    ] .
+
+# Rule 5b: Direct property RepNotify callback function hierarchy and void check
+ue4:PropertyDirectRepNotifyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UProperty ;
+    sh:sparql [
+        sh:message "RepNotify function hierarchy mismatch (direct Property check): The RepNotify callback function must belong to the class hierarchy of the property." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?repFunc ?propClass
+            WHERE {
+                $this ue4:repNotifyFunction ?repFunc .
+                ?propClass ue4:hasProperty $this .
+                FILTER NOT EXISTS {
+                    ?propClass rdfs:subClassOf* ?parentClass .
+                    ?parentClass ue4:hasFunction ?repFunc .
+                }
+            } ORDER BY $this ?repFunc
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RepNotify function return type mismatch (direct Property check): RepNotify functions must return void." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?repFunc ?retProp
+            WHERE {
+                $this ue4:repNotifyFunction ?repFunc .
+                ?repFunc ue4:returnProperty ?retProp .
+            } ORDER BY $this ?repFunc
+        """ ;
+    ] .

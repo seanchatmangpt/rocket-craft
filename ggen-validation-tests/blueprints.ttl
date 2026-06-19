@@ -1,0 +1,328 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/blueprints#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Blueprint Graphs Ontology" ;
+    rdfs:comment "Ontology representing Blueprint execution graphs and node networks." .
+
+# =========================================================================
+# Blueprint Core Classes
+# =========================================================================
+
+ue4:UBlueprint a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UBlueprint" ;
+    rdfs:comment "A class that represents a Blueprint asset, containing graphs, variables, and compiled class metadata." .
+
+ue4:UEdGraph a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraph" ;
+    rdfs:comment "Graph of nodes representing Blueprint logic or configuration graphs." .
+
+ue4:UEdGraphNode a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraphNode" ;
+    rdfs:comment "Base class for all nodes in an editor graph." .
+
+ue4:UEdGraphPin a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraphPin" ;
+    rdfs:comment "Represents a connection pin on a UEdGraphNode." .
+
+ue4:UK2Node a owl:Class ;
+    rdfs:subClassOf ue4:UEdGraphNode ;
+    rdfs:label "UK2Node" ;
+    rdfs:comment "A node representing Kismet (Blueprint) execution logic." .
+
+# =========================================================================
+# Common UK2Node Subclasses
+# =========================================================================
+
+ue4:UK2Node_Event a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Event" ;
+    rdfs:comment "Blueprint node representing an event entry point (e.g. BeginPlay, Tick)." .
+
+ue4:UK2Node_CustomEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Event ;
+    rdfs:label "UK2Node_CustomEvent" ;
+    rdfs:comment "Blueprint node representing a user-defined custom event entry point." .
+
+ue4:UK2Node_CallFunction a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_CallFunction" ;
+    rdfs:comment "Blueprint node that invokes a callable C++ or Blueprint function." .
+
+ue4:UK2Node_CommutativeAssociativeBinaryOperator a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_CallFunction ;
+    rdfs:label "UK2Node_CommutativeAssociativeBinaryOperator" ;
+    rdfs:comment "Blueprint node for commutative math operations (e.g. Addition, Multiplication) supporting variable input counts." .
+
+ue4:UK2Node_Variable a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Variable" ;
+    rdfs:comment "Base Blueprint node for accessing member variables (getters and setters)." .
+
+ue4:UK2Node_VariableGet a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Variable ;
+    rdfs:label "UK2Node_VariableGet" ;
+    rdfs:comment "Blueprint node representing a variable read operation (getter)." .
+
+ue4:UK2Node_VariableSet a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Variable ;
+    rdfs:label "UK2Node_VariableSet" ;
+    rdfs:comment "Blueprint node representing a variable write operation (setter)." .
+
+ue4:UK2Node_ExecutionSequence a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_ExecutionSequence" ;
+    rdfs:comment "Blueprint node that triggers connected output execution pins sequentially." .
+
+ue4:UK2Node_IfThenElse a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_IfThenElse" ;
+    rdfs:comment "Blueprint node representing a conditional branch (If/Then/Else)." .
+
+ue4:UK2Node_DynamicCast a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_DynamicCast" ;
+    rdfs:comment "Blueprint node that attempts to cast an object reference to a specific type." .
+
+ue4:UK2Node_Literal a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Literal" ;
+    rdfs:comment "Blueprint node representing a hardcoded literal value (e.g. Integer, Float, String)." .
+
+ue4:UK2Node_InputKeyEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_InputKeyEvent" ;
+    rdfs:comment "Blueprint node representing keyboard key pressed/released events." .
+
+ue4:UK2Node_InputAction a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_InputAction" ;
+    rdfs:comment "Blueprint node representing a mapped input action execution sequence." .
+
+ue4:UK2Node_InputAxisEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_InputAxisEvent" ;
+    rdfs:comment "Blueprint node representing a continuous axis input event (providing a float AxisValue)." .
+
+ue4:UK2Node_Knot a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Knot" ;
+    rdfs:comment "Blueprint node representing a reroute node." .
+
+ue4:UK2Node_Select a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Select" ;
+    rdfs:comment "Blueprint node representing a select node." .
+
+ue4:UK2Node_MacroInstance a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_MacroInstance" ;
+    rdfs:comment "Blueprint node representing an instance of a macro." .
+
+ue4:UK2Node_Composite a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Composite" ;
+    rdfs:comment "Blueprint node representing a composite/collapsed graph of nodes." .
+
+ue4:UK2Node_Timeline a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Timeline" ;
+    rdfs:comment "Blueprint node representing a timeline for controlling animations or values over time." .
+
+ue4:UK2Node_SpawnActorFromClass a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_SpawnActorFromClass" ;
+    rdfs:comment "Blueprint node for spawning an actor of a specified class." .
+
+ue4:UK2Node_ConstructObjectFromClass a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_ConstructObjectFromClass" ;
+    rdfs:comment "Blueprint node for constructing an object of a specified class." .
+
+ue4:UK2Node_FunctionEntry a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_FunctionEntry" ;
+    rdfs:comment "Blueprint node representing the entry point of a function." .
+
+ue4:UK2Node_FunctionResult a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_FunctionResult" ;
+    rdfs:comment "Blueprint node representing the return point/results of a function." .
+
+ue4:UK2Node_ComponentBoundEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Event ;
+    rdfs:label "UK2Node_ComponentBoundEvent" ;
+    rdfs:comment "Blueprint node representing an event bound to a component delegate." .
+
+ue4:UK2Node_AddDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_AddDelegate" ;
+    rdfs:comment "Blueprint node representing binding/adding a delegate." .
+
+ue4:UK2Node_RemoveDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_RemoveDelegate" ;
+    rdfs:comment "Blueprint node representing unbinding/removing a delegate." .
+
+ue4:UK2Node_ClearDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_ClearDelegate" ;
+    rdfs:comment "Blueprint node representing clearing all bound delegates." .
+
+ue4:UK2Node_AssignDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_AssignDelegate" ;
+    rdfs:comment "Blueprint node representing assigning/binding a delegate." .
+
+
+# =========================================================================
+# Graph & Node Topology Relationships / Properties
+# =========================================================================
+
+ue4:hasGraph a owl:ObjectProperty ;
+    rdfs:label "hasGraph" ;
+    rdfs:comment "Relates an asset or object (like a Blueprint) to a graph it contains." ;
+    rdfs:domain ue4:UObject ;
+    rdfs:range ue4:UEdGraph .
+
+ue4:hasNode a owl:ObjectProperty ;
+    rdfs:label "hasNode" ;
+    rdfs:comment "Relates a graph to a node contained within it." ;
+    rdfs:domain ue4:UEdGraph ;
+    rdfs:range ue4:UEdGraphNode .
+
+ue4:nodeOf a owl:ObjectProperty ;
+    rdfs:label "nodeOf" ;
+    rdfs:comment "Relates a node to the UEdGraph containing it." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UEdGraph ;
+    owl:inverseOf ue4:hasNode .
+
+ue4:hasPin a owl:ObjectProperty ;
+    rdfs:label "hasPin" ;
+    rdfs:comment "Relates an editor graph node to one of its input or output pins." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UEdGraphPin .
+
+ue4:pinOf a owl:ObjectProperty ;
+    rdfs:label "pinOf" ;
+    rdfs:comment "Relates a connection pin to its parent node." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UEdGraphNode ;
+    owl:inverseOf ue4:hasPin .
+
+ue4:linkedTo a owl:ObjectProperty ;
+    rdfs:label "linkedTo" ;
+    rdfs:comment "Relates a graph pin to another pin it is connected to (usually output pin linked to input pin)." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UEdGraphPin ;
+    rdfs:subPropertyOf ue4:connectedTo .
+
+ue4:connectedTo a owl:ObjectProperty , owl:SymmetricProperty ;
+    rdfs:label "connectedTo" ;
+    rdfs:comment "Represents a connection between two pins in a graph." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UEdGraphPin .
+
+ue4:pinTypeObject a owl:ObjectProperty ;
+    rdfs:label "pinTypeObject" ;
+    rdfs:comment "Relates a pin to a reflected class, struct, or enum that defines its type." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UField .
+
+ue4:pinDirection a owl:ObjectProperty ;
+    rdfs:label "pinDirection" ;
+    rdfs:comment "Specifies if a pin is Input or Output." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:PinDirection .
+
+ue4:pinCategory a owl:DatatypeProperty ;
+    rdfs:label "pinCategory" ;
+    rdfs:comment "The general category of data for the pin (e.g. exec, bool, int, float, object)." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:string .
+
+ue4:pinSubCategory a owl:DatatypeProperty ;
+    rdfs:label "pinSubCategory" ;
+    rdfs:comment "The subcategory representing additional type constraints for the pin." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:string .
+
+ue4:pinSubCategoryObject a owl:ObjectProperty ;
+    rdfs:label "pinSubCategoryObject" ;
+    rdfs:comment "For object or struct pins, references the specific class or struct type." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UStruct .
+
+ue4:defaultValue a owl:DatatypeProperty ;
+    rdfs:label "defaultValue" ;
+    rdfs:comment "The default value expression represented as a string for this pin." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:string .
+
+ue4:bIsReference a owl:DatatypeProperty ;
+    rdfs:label "bIsReference" ;
+    rdfs:comment "Indicates whether the pin represents a reference (e.g., passed-by-ref)." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:boolean .
+
+ue4:bIsConst a owl:DatatypeProperty ;
+    rdfs:label "bIsConst" ;
+    rdfs:comment "Indicates whether the pin value is const-qualified." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:boolean .
+
+ue4:nodePosX a owl:DatatypeProperty ;
+    rdfs:label "nodePosX" ;
+    rdfs:comment "The 2D x-coordinate position of this node in the graph editor." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range xsd:integer .
+
+ue4:nodePosY a owl:DatatypeProperty ;
+    rdfs:label "nodePosY" ;
+    rdfs:comment "The 2D y-coordinate position of this node in the graph editor." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range xsd:integer .
+
+# =========================================================================
+# Unification / Interoperability Relationships
+# =========================================================================
+
+ue4:calledFunction a owl:ObjectProperty ;
+    rdfs:label "calledFunction" ;
+    rdfs:comment "Relates a function call node (UK2Node_CallFunction) or event node to the reflected C++ or Blueprint UFunction metadata it calls." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UFunction .
+
+ue4:callsFunction a owl:ObjectProperty ;
+    rdfs:label "callsFunction" ;
+    rdfs:comment "Links a function call node (UK2Node) to the reflected UFunction signature." ;
+    rdfs:domain ue4:UK2Node ;
+    rdfs:range ue4:UFunction ;
+    rdfs:subPropertyOf ue4:calledFunction .
+
+ue4:mapsToParameter a owl:ObjectProperty ;
+    rdfs:label "mapsToParameter" ;
+    rdfs:comment "Maps an individual node pin to its target function parameter." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UFunctionParameter .
+
+ue4:referencedProperty a owl:ObjectProperty ;
+    rdfs:label "referencedProperty" ;
+    rdfs:comment "Relates a variable access node (UK2Node_Variable) to the reflected C++ or Blueprint UProperty metadata it reads/writes." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UProperty .
+
+ue4:targetType a owl:ObjectProperty ;
+    rdfs:label "targetType" ;
+    rdfs:comment "Relates a dynamic cast node (UK2Node_DynamicCast) to the reflected class type metadata it attempts to cast to." ;
+    rdfs:domain ue4:UK2Node_DynamicCast ;
+    rdfs:range ue4:UClass .

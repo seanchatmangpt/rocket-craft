@@ -1,0 +1,91 @@
+--- crates/ggen-core/src/codegen/pipeline.rs
++++ crates/ggen-core/src/codegen/pipeline.rs
+@@ -1322,4 +1322,51 @@
+ 
+         Ok(())
+     }
+ 
++    /// Execute SHACL shape validation rules against the loaded and inferred ontology graph.
++    ///
++    /// If there are any `Error`-severity violations, return an `Err` (aborts generation).
++    pub fn execute_shacl_validation(&mut self) -> Result<()> {
++        use crate::validation::{SparqlValidator, Severity as VSeverity};
++        
++        let shacl_paths = self.manifest.validation.shacl.clone();
++        if shacl_paths.is_empty() {
++            return Ok(());
++        }
++
++        let graph = self
++            .ontology_graph
++            .as_ref()
++            .ok_or_else(|| Error::new("Ontology graph not loaded. Call load_ontology() first."))?;
++
++        // 1. Load all SHACL shape files into a single Graph
++        let shapes_graph = Graph::new()?;
++        for shacl_path in &shacl_paths {
++            let full_path = self.base_path.join(shacl_path);
++            let content = std::fs::read_to_string(&full_path).map_err(|e| {
++                Error::new(&format!(
++                    "Failed to read SHACL shape file '{}': {}",
++                    full_path.display(),
++                    e
++                ))
++            })?;
++            shapes_graph.insert_turtle(&content)?;
++        }
++
++        // 2. Validate the ontology graph against the SHACL shapes
++        let validator = SparqlValidator::new();
++        let result = validator
++            .validate(graph, &shapes_graph)
++            .map_err(|e| Error::new(&format!("SHACL validation failed: {}", e)))?;
++
++        // 3. Process violations and push to validation_results
++        let mut error_messages = Vec::new();
++        for v in &result.violations {
++            let (sev, is_error) = match v.severity {
++                VSeverity::Violation => (ValidationSeverity::Error, true),
++                _ => (ValidationSeverity::Warning, false),
++            };
++            self.validation_results.push(ValidationResult {
++                rule_name: format!("SHACL-{}", v.focus_node),
++                passed: false,
++                message: Some(format!(
++                    "SHACL violation on focus node '{}': {} (shape: {})",
++                    v.focus_node, v.message, v.source_shape
++                )),
++                severity: sev,
++            });
++            if is_error {
++                error_messages.push(format!("Focus node '{}': {}", v.focus_node, v.message));
++            } else {
++                log::warn!(
++                    "warning[GGEN-SHACL-VALIDATION]: violation on focus node '{}': {}",
++                    v.focus_node,
++                    v.message
++                );
++            }
++        }
++
++        if !error_messages.is_empty() {
++            return Err(Error::new(&format!(
++                "error[GGEN-SHACL-VALIDATION]: {} SHACL validation violation(s) failed:\n  - {}\n  = generation aborted before writing files",
++                error_messages.len(),
++                error_messages.join("\n  - ")
++            )));
++        }
++
++        Ok(())
++    }
++
+     /// Run the complete pipeline
+@@ -1334,6 +1381,9 @@
+ 
+         // 2. Execute inference rules
+         self.execute_inference_rules()?;
++
++        // Run SHACL shape validation
++        self.execute_shacl_validation()?;
+ 
+         // 2b. Execute custom validation rules (SPARQL ASK/SELECT) against the

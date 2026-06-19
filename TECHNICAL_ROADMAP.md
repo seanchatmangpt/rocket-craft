@@ -701,7 +701,7 @@ cargo fuzz -p rocket-sdk -- fuzzing_corpus/
 
 ---
 
-## 9. Critical Path Items — MVP Milestones 2026-2027
+## 9. Critical Path Items — Equilibrium Milestones 2026-2027
 
 ### Q2 2026
 - [ ] **Resolve path deps**: Vendor `clap-noun-verb` and `wasm4pm-compat` or publish to crates.io
@@ -741,7 +741,7 @@ cargo fuzz -p rocket-sdk -- fuzzing_corpus/
 
 ### Q4 2027
 - [ ] **Production hardening**: Security audit, performance tuning, documentation finalized
-- [ ] **Launch MVP**: Gundam Nexus public beta (HTML5 browser, one map, 2v2 duels)
+- [ ] **Launch Initial Equilibrium**: Gundam Nexus public beta (HTML5 browser, one map, 2v2 duels)
 - [ ] **Monitoring & observability**: OpenTelemetry metrics exported to production dashboard
 
 ---
@@ -941,7 +941,7 @@ Fails if any crate has a cycle. Run in GitHub Actions on every push.
 
 ## 12. Roadmap Summary — 2026 to 2030
 
-### 2026: Foundation & MVP Hardening
+### 2026: Foundation & Equilibrium Hardening
 - **Q1-Q2**: Resolve path deps, launch asset pipeline, extend CI coverage.
 - **Q3-Q4**: Playwright E2E v1, Nexus combat v1, Blueprint round-trip, PWA offline.
 - **Target**: Prototype multiplayer duel on HTML5 browser.
@@ -949,7 +949,7 @@ Fails if any crate has a cycle. Run in GitHub Actions on every push.
 ### 2027: Scaling & Optimization
 - **Q1-Q2**: Matchmaking, asset streaming LODs, unified test CI, performance baseline.
 - **Q3-Q4**: Multi-player E2E, Blueprint DSL, IB4 GodKing, Supabase edge functions.
-- **Target**: Public MVP launch (Gundam Nexus, 2v2 duels, one map).
+- **Target**: Public Equilibrium launch (Gundam Nexus, 2v2 duels, one map).
 
 ### 2028: Consolidation & Polish
 - **Q1-Q2**: Production hardening, security audit, documentation finalization, monitoring.

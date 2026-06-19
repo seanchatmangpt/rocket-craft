@@ -589,7 +589,7 @@ A web-based marketplace (powered by pwa-staff PWA):
 - Creator revenue share program paying $1M+/month
 
 **Q3–Q4 2028:**
-- Cross-game SPARQL federation working; cosmetic portability MVP shipped
+- Cross-game SPARQL federation working; cosmetic portability verification complete
 - LSP Layer 2 in beta; VSCode extension >50K downloads
 - Brm launches; first game fully integrated with unify-mcp + permadeath progression
 - Esports franchising announced for ShooterGame; 12 regional franchises signed
@@ -655,7 +655,7 @@ A web-based marketplace (powered by pwa-staff PWA):
 
 | Risk | Probability | Impact | Mitigation |
 |------|---|---|---|
-| **Scope creep on game releases** | High | High | Strict milestone gates; ship MVP then iterate; "done is better than perfect" |
+| **Scope creep on game releases** | High | High | Strict milestone gates; rigorous mathematically guaranteed equilibrium validation |
 | **Infrastructure scaling bottlenecks** | Medium | High | Early stress-testing; capacity planning 6 months ahead; auto-scaling infrastructure |
 | **Talent acquisition** | High | High | Competitive salaries; remote-first; equity options for top contributors |
 

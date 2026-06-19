@@ -1,0 +1,80 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix fibo: <https://spec.edmcouncil.org/fibo/ontology/> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix eden: <https://ggen.io/ontology/eden-server/> .
+
+eden:pack a owl:Ontology ;
+    rdfs:label "Eden Manufacturing Server Ontology" ;
+    owl:imports <https://spec.edmcouncil.org/fibo/ontology/> ,
+                <http://www.w3.org/ns/sosa/> ,
+                <http://qudt.org/schema/qudt/> ,
+                <http://www.w3.org/ns/prov#> .
+
+# --- Classes ---
+eden:AssemblyComponent a owl:Class ;
+    rdfs:label "Assembly Component" ;
+    rdfs:comment "Base class for all components in the Eden Manufacturing assembly tree." ;
+    rdfs:subClassOf prov:Entity .
+
+eden:MechRoot a owl:Class ;
+    rdfs:label "Mechanical Root" ;
+    rdfs:comment "The root element of a physical mechanical assembly." ;
+    rdfs:subClassOf eden:AssemblyComponent .
+
+eden:SubAssembly a owl:Class ;
+    rdfs:label "Sub-Assembly" ;
+    rdfs:comment "A logical grouping of components forming an intermediary assembly module." ;
+    rdfs:subClassOf eden:AssemblyComponent .
+
+eden:Part a owl:Class ;
+    rdfs:label "Part" ;
+    rdfs:comment "A leaf-level mechanical component that cannot be decomposed further." ;
+    rdfs:subClassOf eden:AssemblyComponent .
+
+eden:Socket a owl:Class ;
+    rdfs:label "Socket" ;
+    rdfs:comment "A connection point within an assembly where another component (Part or Sub-Assembly) can be installed." ;
+    rdfs:subClassOf prov:Entity .
+
+# --- Properties ---
+eden:hasSocket a owl:ObjectProperty ;
+    rdfs:label "has socket" ;
+    rdfs:comment "Relates a component (like a MechRoot or SubAssembly) to a connection socket it contains." ;
+    rdfs:domain eden:AssemblyComponent ;
+    rdfs:range eden:Socket .
+
+eden:plugsInto a owl:ObjectProperty ;
+    rdfs:label "plugs into" ;
+    rdfs:comment "Relates a component (like a Part or Sub-Assembly) to the socket it is installed in." ;
+    rdfs:domain eden:AssemblyComponent ;
+    rdfs:range eden:Socket .
+
+# Reliability Twin Properties (byte-class authority types)
+eden:damageClass a owl:DatatypeProperty ;
+    rdfs:label "damage class" ;
+    rdfs:comment "A byte-class state value representing the accumulated damage on the component." ;
+    rdfs:domain eden:AssemblyComponent ;
+    rdfs:range xsd:unsignedByte .
+
+eden:stressClass a owl:DatatypeProperty ;
+    rdfs:label "stress class" ;
+    rdfs:comment "A byte-class state value representing current mechanical stress on the component." ;
+    rdfs:domain eden:AssemblyComponent ;
+    rdfs:range xsd:unsignedByte .
+
+eden:heatClass a owl:DatatypeProperty ;
+    rdfs:label "heat class" ;
+    rdfs:comment "A byte-class state value representing thermal load on the component." ;
+    rdfs:domain eden:AssemblyComponent ;
+    rdfs:range xsd:unsignedByte .
+
+eden:fatigueClass a owl:DatatypeProperty ;
+    rdfs:label "fatigue class" ;
+    rdfs:comment "A byte-class state value representing mechanical fatigue cycle range." ;
+    rdfs:domain eden:AssemblyComponent ;
+    rdfs:range xsd:unsignedByte .

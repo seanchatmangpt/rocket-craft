@@ -1,0 +1,7 @@
+socket_id,part_family,mount_point_x,mount_point_y,mount_point_z,admission_status
+SOCK-L-SHOULDER,Shoulder,-0.5,1.2,0.0,ADMITTED
+SOCK-R-SHOULDER,Shoulder,0.5,1.2,0.0,ADMITTED
+SOCK-L-WEAPON,WeaponMount,-0.8,1.0,0.2,ADMITTED
+SOCK-R-WEAPON,WeaponMount,0.8,1.0,0.2,ADMITTED
+SOCK-SPINE,Frame,0.0,0.5,0.0,ADMITTED
+SOCK-COOLING-VENT,CoolingVent,0.0,0.8,-0.3,ADMITTED

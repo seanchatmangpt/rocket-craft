@@ -1,0 +1,169 @@
+# =========================================================================
+# Custom SPARQL ASK Validation Rules for ggen.toml
+# =========================================================================
+
+[[validation.rules]]
+name = "RuleNetRPCClass"
+description = "RPC Location Constraint: RPC functions must belong to classes that are subclasses of AActor or UActorComponent."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ASK {
+  FILTER NOT EXISTS {
+    ?rpc a/rdfs:subClassOf* ue4:URPC .
+    ?class ue4:hasFunction ?rpc .
+    FILTER NOT EXISTS {
+      { ?class rdfs:subClassOf* ue4:AActor }
+      UNION
+      { ?class rdfs:subClassOf* ue4:UActorComponent }
+    }
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleNetRPCInstanceReplication"
+description = "RPC Instance Replication Constraint: Instances of classes defining RPCs must have bReplicates set to true."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ASK {
+  FILTER NOT EXISTS {
+    ?instance a ?class .
+    { ?class rdfs:subClassOf* ue4:AActor }
+    UNION
+    { ?class rdfs:subClassOf* ue4:UActorComponent }
+    ?class rdfs:subClassOf* ?parentClass .
+    ?parentClass ue4:hasFunction ?rpc .
+    ?rpc a/rdfs:subClassOf* ue4:URPC .
+    FILTER NOT EXISTS {
+      ?instance ue4:bReplicates true .
+    }
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleNetRPCValidationSignature"
+description = "RPC Validation Signature Constraint: WithValidation RPCs must have validation functions that return boolean and match the RPC's parameters."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ASK {
+  # 1. Check return type is boolean
+  FILTER NOT EXISTS {
+    ?rpc a/rdfs:subClassOf* ue4:URPC ;
+         ue4:bWithValidation true ;
+         ue4:validationFunction ?valFunc .
+    ?valFunc ue4:returnProperty ?retProp .
+    FILTER NOT EXISTS {
+      ?retProp a/rdfs:subClassOf* ue4:UBoolProperty .
+    }
+  }
+  # 2. Check parameter count mismatch
+  FILTER NOT EXISTS {
+    ?rpc a/rdfs:subClassOf* ue4:URPC ;
+         ue4:bWithValidation true ;
+         ue4:validationFunction ?valFunc .
+    {
+      SELECT ?rpc (COUNT(?p1) AS ?c1)
+      WHERE { ?rpc ue4:hasParameter ?p1 . }
+      GROUP BY ?rpc
+    }
+    {
+      SELECT ?valFunc (COUNT(?p2) AS ?c2)
+      WHERE { ?valFunc ue4:hasParameter ?p2 . }
+      GROUP BY ?valFunc
+    }
+    FILTER (?c1 != ?c2)
+  }
+  # 3. Check parameter type mismatch
+  FILTER NOT EXISTS {
+    ?rpc a/rdfs:subClassOf* ue4:URPC ;
+         ue4:bWithValidation true ;
+         ue4:validationFunction ?valFunc .
+    ?rpc ue4:hasParameter ?rpcParam .
+    ?rpcParam ue4:parameterIndex ?idx ;
+              ue4:propertyType ?rpcType .
+    FILTER NOT EXISTS {
+      ?valFunc ue4:hasParameter ?valParam .
+      ?valParam ue4:parameterIndex ?idx ;
+                ue4:propertyType ?rpcType .
+    }
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleNetComponentReplicationOwner"
+description = "Component Replication Owner Constraint: A component cannot replicate if its owner actor is not replicated."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+ASK {
+  FILTER NOT EXISTS {
+    ?component a/rdfs:subClassOf* ue4:UActorComponent ;
+               ue4:bReplicates true ;
+               ue4:isComponentOf ?actor .
+    FILTER NOT EXISTS {
+      ?actor ue4:bReplicates true .
+    }
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleNetWorldSubsystemTopology"
+description = "World Networking Subsystem Constraint: A world with replicated actors must have a UNetworkingSubsystem."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ASK {
+  FILTER NOT EXISTS {
+    ?world a/rdfs:subClassOf* ue4:UWorld ;
+           ue4:hasLevel ?level .
+    ?level ue4:hasActor ?actor .
+    ?actor ue4:bReplicates true .
+    FILTER NOT EXISTS {
+      ?world ue4:hasSubsystem ?subsystem .
+      ?subsystem a/rdfs:subClassOf* ue4:UNetworkingSubsystem .
+    }
+  }
+}
+"""
+
+[[validation.rules]]
+name = "RuleNetRepNotifyValidation"
+description = "RepNotify Function Constraint: RepNotify callback functions must belong to the property's class hierarchy and return void."
+ask = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ASK {
+  # 1. Direct property repNotify check - hierarchy
+  FILTER NOT EXISTS {
+    ?prop ue4:repNotifyFunction ?repFunc .
+    ?propClass ue4:hasProperty ?prop .
+    FILTER NOT EXISTS {
+      ?propClass rdfs:subClassOf* ?parentClass .
+      ?parentClass ue4:hasFunction ?repFunc .
+    }
+  }
+  # 2. Lifetime repNotify check - hierarchy
+  FILTER NOT EXISTS {
+    ?lifetime a/rdfs:subClassOf* ue4:FReplicationLifetime ;
+              ue4:replicatedProperty ?prop ;
+              ue4:repNotifyFunction ?repFunc .
+    ?propClass ue4:hasProperty ?prop .
+    FILTER NOT EXISTS {
+      ?propClass rdfs:subClassOf* ?parentClass .
+      ?parentClass ue4:hasFunction ?repFunc .
+    }
+  }
+  # 3. Direct/Lifetime repNotify return property check (must be void)
+  FILTER NOT EXISTS {
+    { ?prop ue4:repNotifyFunction ?repFunc }
+    UNION
+    { ?lifetime a/rdfs:subClassOf* ue4:FReplicationLifetime ; ue4:repNotifyFunction ?repFunc }
+    ?repFunc ue4:returnProperty ?retProp .
+  }
+}
+"""

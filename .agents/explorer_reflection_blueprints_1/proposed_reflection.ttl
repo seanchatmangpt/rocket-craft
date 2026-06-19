@@ -1,0 +1,240 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/reflection#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Reflection Ontology" ;
+    rdfs:comment "Ontology representing reflection and class metadata in Unreal Engine 4." .
+
+# =========================================================================
+# Core Reflection Classes
+# =========================================================================
+
+ue4:UField a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UField" ;
+    rdfs:comment "Base class for all reflection fields (properties, functions, etc.)." .
+
+ue4:UStruct a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UStruct" ;
+    rdfs:comment "Base class for all structural types containing fields, such as functions and classes." .
+
+ue4:UClass a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UClass" ;
+    rdfs:comment "Reflected metadata representation of a C++ or Blueprint class." .
+
+ue4:UScriptStruct a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UScriptStruct" ;
+    rdfs:comment "Reflected metadata representation of a C++ struct." .
+
+ue4:UFunction a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UFunction" ;
+    rdfs:comment "Reflected metadata representation of a callable function." .
+
+ue4:UEnum a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UEnum" ;
+    rdfs:comment "Reflected metadata representation of an enumeration type." .
+
+ue4:UProperty a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UProperty" ;
+    rdfs:comment "Reflected metadata representation of a class member variable." .
+
+# =========================================================================
+# Property Hierarchy
+# =========================================================================
+
+ue4:UBoolProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UBoolProperty" ;
+    rdfs:comment "Boolean variable property metadata." .
+
+ue4:UNumericProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UNumericProperty" ;
+    rdfs:comment "Base class for all numeric variable property metadata." .
+
+ue4:UByteProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UByteProperty" ;
+    rdfs:comment "Byte (uint8) variable property metadata." .
+
+ue4:UIntProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UIntProperty" ;
+    rdfs:comment "32-bit signed integer variable property metadata." .
+
+ue4:UInt64Property a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UInt64Property" ;
+    rdfs:comment "64-bit signed integer variable property metadata." .
+
+ue4:UFloatProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UFloatProperty" ;
+    rdfs:comment "Single-precision floating point variable property metadata." .
+
+ue4:UDoubleProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UDoubleProperty" ;
+    rdfs:comment "Double-precision floating point variable property metadata." .
+
+ue4:UObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UObjectProperty" ;
+    rdfs:comment "Property representing a reference to an object." .
+
+ue4:UClassProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "UClassProperty" ;
+    rdfs:comment "Property representing a reference to a class type metadata (UClass)." .
+
+ue4:USoftObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "USoftObjectProperty" ;
+    rdfs:comment "Property representing a soft (lazy-loadable) reference to an object." .
+
+ue4:USoftClassProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "USoftClassProperty" ;
+    rdfs:comment "Property representing a soft reference to a class type metadata." .
+
+ue4:UWeakObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "UWeakObjectProperty" ;
+    rdfs:comment "Property representing a weak reference to an object (does not prevent GC)." .
+
+ue4:ULazyObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "ULazyObjectProperty" ;
+    rdfs:comment "Property representing a lazy reference to an object (uses GUID to resolve)." .
+
+ue4:UInterfaceProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UInterfaceProperty" ;
+    rdfs:comment "Property representing a reference to an object implementing a specific interface." .
+
+ue4:UStructProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UStructProperty" ;
+    rdfs:comment "Property representing an inline instance of a script struct." .
+
+ue4:UArrayProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UArrayProperty" ;
+    rdfs:comment "Property representing a dynamic array of elements (TArray)." .
+
+ue4:UMapProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UMapProperty" ;
+    rdfs:comment "Property representing a key-value associative container (TMap)." .
+
+ue4:USetProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "USetProperty" ;
+    rdfs:comment "Property representing a unique elements container (TSet)." .
+
+ue4:UEnumProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UEnumProperty" ;
+    rdfs:comment "Property representing an enumeration value." .
+
+ue4:UStrProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UStrProperty" ;
+    rdfs:comment "Property representing a dynamic string (FString)." .
+
+ue4:UNameProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UNameProperty" ;
+    rdfs:comment "Property representing an asset name (FName)." .
+
+ue4:UTextProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UTextProperty" ;
+    rdfs:comment "Property representing a localized user-facing text (FText)." .
+
+ue4:UDelegateProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UDelegateProperty" ;
+    rdfs:comment "Property representing a single-cast delegate link." .
+
+ue4:UMulticastDelegateProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UMulticastDelegateProperty" ;
+    rdfs:comment "Property representing a multi-cast event delegate link." .
+
+# =========================================================================
+# Reflection Relationships / Properties
+# =========================================================================
+
+ue4:hasField a owl:ObjectProperty ;
+    rdfs:label "hasField" ;
+    rdfs:comment "Relates a struct/scope to a reflected field it defines." ;
+    rdfs:domain ue4:UStruct ;
+    rdfs:range ue4:UField .
+
+ue4:hasProperty a owl:ObjectProperty ;
+    rdfs:label "hasProperty" ;
+    rdfs:comment "Relates a struct/scope to a member variable property it defines." ;
+    rdfs:domain ue4:UStruct ;
+    rdfs:range ue4:UProperty ;
+    rdfs:subPropertyOf ue4:hasField .
+
+ue4:hasFunction a owl:ObjectProperty ;
+    rdfs:label "hasFunction" ;
+    rdfs:comment "Relates a class to a member function it defines." ;
+    rdfs:domain ue4:UClass ;
+    rdfs:range ue4:UFunction ;
+    rdfs:subPropertyOf ue4:hasField .
+
+ue4:superStruct a owl:ObjectProperty ;
+    rdfs:label "superStruct" ;
+    rdfs:comment "Relates a reflected struct to its parent struct metadata (inheritance)." ;
+    rdfs:domain ue4:UStruct ;
+    rdfs:range ue4:UStruct .
+
+ue4:propertyType a owl:ObjectProperty ;
+    rdfs:label "propertyType" ;
+    rdfs:comment "Relates a property to the type metadata defining its elements (e.g. UClass, UScriptStruct, or UEnum)." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range ue4:UField .
+
+ue4:returnProperty a owl:ObjectProperty ;
+    rdfs:label "returnProperty" ;
+    rdfs:comment "Relates a function to its return value property metadata." ;
+    rdfs:domain ue4:UFunction ;
+    rdfs:range ue4:UProperty .
+
+ue4:hasParameter a owl:ObjectProperty ;
+    rdfs:label "hasParameter" ;
+    rdfs:comment "Relates a function to one of its input/output parameter properties." ;
+    rdfs:domain ue4:UFunction ;
+    rdfs:range ue4:UProperty ;
+    rdfs:subPropertyOf ue4:hasProperty .
+
+ue4:classFlags a owl:DatatypeProperty ;
+    rdfs:label "classFlags" ;
+    rdfs:comment "EClassFlags bitmask or list of class flags representing class specifiers." ;
+    rdfs:domain ue4:UClass ;
+    rdfs:range xsd:string .
+
+ue4:functionFlags a owl:DatatypeProperty ;
+    rdfs:label "functionFlags" ;
+    rdfs:comment "EFunctionFlags bitmask or list of function flags (e.g. BlueprintCallable)." ;
+    rdfs:domain ue4:UFunction ;
+    rdfs:range xsd:string .
+
+ue4:propertyFlags a owl:DatatypeProperty ;
+    rdfs:label "propertyFlags" ;
+    rdfs:comment "EPropertyFlags bitmask or list of property flags (e.g. CPF_BlueprintVisible)." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range xsd:string .

@@ -1,0 +1,7 @@
+{% for row in results %}
+// Class: {{ row.label }}
+// Comment: {{ row.comment | default(value="No description provided") }}
+struct {{ row.label }} {
+    id: String,
+}
+{% endfor %}

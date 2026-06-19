@@ -1,49 +1,53 @@
-# Project: UE4 Universal RDF Mapping
+# Project: Swarm Audit & Pipeline Manufacturability
 
 ## Architecture
-This project represents the complete architecture and class hierarchy of Unreal Engine 4 (UE4) as a mathematically unified semantic graph in RDF (Turtle format). The output is a cohesive pack of ontologies and verification configurations stored in `/Users/sac/.ggen/packs/ue4_ontology`.
-
-The ontology architecture unifies static C++ inheritance metadata with dynamic reflection networks, Blueprint graphs, subsystem boundaries (rendering, physics, networking), and compilation/packaging typestates.
+The Project Orchestrator coordinates a multi-disciplinary swarm of subagents to audit, refine, and validate the `eden_server` and `ue4_ontology` RDF packs. This ensures that the combined graph can physically manufacture a working, multi-resolution Eden/GMF world with valid walkthroughs, byte-class typestates, and unforgeable receipts, using ONLY `ggen` as the manufacturing authority.
 
 ```
-       ┌─────────────────────────────────────────────────────────┐
-       │                 UE4 Universal Ontology                  │
-       └────────────────────────────┬────────────────────────────┘
-                                    │
-         ┌──────────────────────────┼──────────────────────────┐
-         ▼                          ▼                          ▼
-┌──────────────────┐       ┌──────────────────┐       ┌──────────────────┐
-│     core.ttl     │       │  reflection.ttl  │       │  blueprints.ttl  │
-│ (C++ Backbone)   │       │ (Reflection Meta)│       │(Blueprint Graphs)│
-└──────────────────┘       └──────────────────┘       └──────────────────┘
-         │                          │                          │
-         └──────────────────────────┼──────────────────────────┘
-                                    ▼
-                       ┌──────────────────────────┐
-                       │       subsystems.ttl     │
-                       │ (Physics, Rendering, Net)│
-                       └────────────┬─────────────┘
-                                    │
-                                    ▼
-                       ┌──────────────────────────┐
-                       │      typestates.ttl      │
-                       │ (Cooking, Linking, WASM) │
-                       └──────────────────────────┘
+                  ┌─────────────────────────────────────┐
+                  │        Project Orchestrator         │
+                  └──────────────────┬──────────────────┘
+                                     │
+         ┌───────────────────────────┼───────────────────────────┐
+         ▼                           ▼                           ▼
+┌──────────────────┐        ┌──────────────────┐        ┌──────────────────┐
+│  M1: Exploration │ ──────►│  M2: Refactoring │ ──────►│   M3: Validation │
+│   (Gap Audit)    │        │  (Ontology/DL)   │        │   (SPARQL/SHACL) │
+└──────────────────┘        └──────────────────┘        └──────────────────┘
+                                                                 │
+         ┌───────────────────────────────────────────────────────┘
+         ▼
+┌──────────────────┐        ┌──────────────────┐        ┌──────────────────┐
+│   M4: Generation │ ──────►│  M5: Verification│ ──────►│ M6: Final Audit  │
+│  (The ALIVE Proof)│       │ (Tests & Replays)│        │   & Handoff      │
+└──────────────────┘        └──────────────────┘        └──────────────────┘
 ```
 
 ## Milestones
+
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| 1 | E2E Test Suite & Infra | Design E2E validation suite, setup ggen.toml, publish TEST_READY.md | None | IN_PROGRESS (Conv: 533f9425-b3c5-4c1c-9afc-ec03bf4fb344) |
-| 2 | Core C++ Backbone | Author core.ttl modeling UObject, AActor, UActorComponent class hierarchy | M1 | PLANNED |
-| 3 | Reflection & Blueprints | Author reflection.ttl and blueprints.ttl mapping UClass metadata and Blueprint execution graphs | M2 | PLANNED |
-| 4 | Subsystem Topologies | Author subsystems.ttl mapping Rendering, Physics, and Networking domains | M3 | PLANNED |
-| 5 | Cooking & Typestates | Author typestates.ttl representing compilation and WASM packaging pipelines | M4 | PLANNED |
-| 6 | E2E Validation Pass | Verify 100% coverage and validation of all ontologies (Tiers 1-4) | M5 | PLANNED |
-| 7 | Adversarial Hardening | Implement Tier 5 adversarial testing, verify zero ontological gaps | M6 | PLANNED |
+| 1 | Exploration & Gap Audit | Audit `eden_server` and `ue4_ontology` packs against R1-R12, identify gaps, and produce Gap Report | None | DONE |
+| 2 | Ontology & DL Refactoring | Refactor schemas in strict OWL 2 DL covering gameplay, resolutions, LOD, and authority | M1 | DONE |
+| 3 | Validation & SHACL Hardening | Write SHACL shapes for all constraints and integrate custom SPARQL ASK rules in ggen.toml | M2 | DONE |
+| 4 | The ALIVE Proof Generation | Configure generation rules in ggen.toml to output the 10 required deliverables | M3 | DONE |
+| 5 | Actuation & Verification | Run tests, verify Playwright E2E visual motion delta, and check receipt signatures | M4 | IN_PROGRESS |
+| 6 | Forensic Audit & Handoff | Forensic Auditor performs final integrity verification, produce handoff | M5 | PLANNED |
 
 ## Interface Contracts
-- **Ontology Directory**: All Turtle files must reside in `/Users/sac/.ggen/packs/ue4_ontology/`.
-- **Validation Authority**: An independent execution of `ggen sync --validate-only` in the output pack folder must terminate with exit code 0.
-- **Header Generation Readiness**: The graph must contain sufficient class, property, and relation definitions to generate standard C++ class headers.
-- **Completeness**: Explicit mappings of class hierarchies (`UObject` -> `AActor` -> `APawn` -> `ACharacter`) and dynamic reflection definitions.
+- **Ontology Registries**: All Turtle files must reside in `/Users/sac/.ggen/packs/eden_server/ontology/` and `/Users/sac/.ggen/packs/ue4_ontology/`.
+- **Validation Authority**: Running `ggen sync --validate-only true` in either pack must succeed with exit code 0.
+- **Determinism**: All SPARQL Construct and Select queries must use `ORDER BY`.
+- **Layer Separation**: Generated code files must target package/consumer subdirectories (e.g. `src/`, `output/`, `models/`), not the pack root.
+- **No Cheating**: Absolutely zero hardcoded values, mock runtimes, or placeholder artifacts.
+- **The ALIVE Proof**: Using ONLY the generated ontology, SPARQL, SHACL, and `ggen` manifests, the system must generate:
+  1. A walkable GMF factory
+  2. A complete mech assembly line
+  3. A race facility
+  4. A market facility
+  5. A deterministic MUD walkthrough
+  6. Renderable artifacts with valid Render BOMs
+  7. Semantic LOD classifications
+  8. Authority typestates
+  9. Receipt paths
+  10. States-of-resolution projections

@@ -1,7 +1,7 @@
 use chrono::Local;
 use std::fmt;
-use tracing::{Event, Level, Subscriber};
 use tracing::field::Visit;
+use tracing::{Event, Level, Subscriber};
 use tracing_subscriber::{
     fmt::{
         format::{FormatEvent, FormatFields, Writer},

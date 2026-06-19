@@ -1,0 +1,28 @@
+[package]
+name = "rocket-preue4-verifier"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "GC-MECHBIRTH-002 Pre-UE4 Authority/SIMD/Prediction verifier layers"
+publish = false
+
+[[bin]]
+name = "rocket-preue4-verify"
+path = "src/bin/rocket_preue4_verify.rs"
+
+[[bench]]
+name = "bench_authority_kernels"
+path = "benches/bench_authority_kernels.rs"
+harness = false
+
+[dependencies]
+blake3      = { workspace = true }
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+clap        = { workspace = true }
+thiserror   = { workspace = true }
+anyhow      = { workspace = true }
+rand        = { workspace = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }

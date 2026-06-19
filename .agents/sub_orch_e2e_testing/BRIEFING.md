@@ -53,17 +53,18 @@ Design and implement a comprehensive, requirement-driven, opaque-box test suite 
 ## Team Roster
 | Agent | Type | Work Item | Status | Conv ID |
 |-------|------|-----------|--------|---------|
-| worker_e2e_impl | teamwork_preview_worker | Set up validation config and ggen.toml | in-progress | 84ea3584-4909-44ac-ac2d-9a5a5f88b9be |
+| worker_e2e_impl | teamwork_preview_worker | Set up validation config and ggen.toml | completed | 84ea3584-4909-44ac-ac2d-9a5a5f88b9be |
+| worker_e2e_harness | teamwork_preview_worker | Write validate_ontology.sh, TEST_INFRA.md, TEST_READY.md | completed | 70fa48a5-009a-47f0-8bb2-db53d14d534e |
 
 ## Succession Status
 - Succession required: no
-- Spawn count: 1 / 16
-- Pending subagents: 84ea3584-4909-44ac-ac2d-9a5a5f88b9be
+- Spawn count: 2 / 16
+- Pending subagents: none
 - Predecessor: none
 - Successor: not yet spawned
 
 ## Active Timers
-- Heartbeat cron: task-35
+- Heartbeat cron: killed
 - Safety timer: none
 - On succession: kill all timers before spawning successor
 - On context truncation: run manage_task(Action="list") — re-create if missing
