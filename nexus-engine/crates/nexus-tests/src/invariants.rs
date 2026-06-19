@@ -64,3 +64,83 @@ pub fn inventory_add_remove_preserves_size(initial_size: usize) -> bool {
 
     inv.len() == before_add
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── damage_floor_holds ────────────────────────────────────────────────────
+
+    #[test]
+    fn damage_floor_holds_for_normal_hit() {
+        // base=100, combo=1.5, equip=20%, armor=50 → raw=180, mitigated=max(130,1)=130
+        assert!(damage_floor_holds(100.0, 1.5, 20.0, 50.0));
+    }
+
+    #[test]
+    fn damage_floor_holds_when_armor_exceeds_raw() {
+        // raw very low, massive armor → result clamped to 1.0
+        assert!(damage_floor_holds(1.0, 1.0, 0.0, 9999.0));
+    }
+
+    #[test]
+    fn damage_floor_holds_for_zero_base() {
+        // zero base → guard returns true immediately (vacuous)
+        assert!(damage_floor_holds(0.0, 2.0, 50.0, 0.0));
+    }
+
+    #[test]
+    fn damage_floor_holds_for_negative_base() {
+        // negative base → guard returns true (treated as vacuous)
+        assert!(damage_floor_holds(-10.0, 1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn damage_floor_holds_for_maximum_hit() {
+        assert!(damage_floor_holds(10_000.0, 3.0, 100.0, 0.0));
+    }
+
+    // ── qip_scar_rebirth_at_3 ─────────────────────────────────────────────────
+
+    #[test]
+    fn qip_scar_at_0_stacks_does_not_trigger() {
+        // 0 stacks → apply_scar adds 1 → not yet triggered
+        assert!(qip_scar_rebirth_at_3(0));
+    }
+
+    #[test]
+    fn qip_scar_at_2_stacks_triggers() {
+        // 2 stacks → apply adds one → 3 → rebirth triggered
+        assert!(qip_scar_rebirth_at_3(2));
+    }
+
+    #[test]
+    fn qip_scar_at_3_stacks_vacuous_true() {
+        // stacks_before >= 3 → invariant returns true without touching tracker
+        assert!(qip_scar_rebirth_at_3(3));
+    }
+
+    // ── inventory_add_remove_preserves_size ───────────────────────────────────
+
+    #[test]
+    fn inventory_preserves_size_for_empty_start() {
+        assert!(inventory_add_remove_preserves_size(0));
+    }
+
+    #[test]
+    fn inventory_preserves_size_for_several_items() {
+        assert!(inventory_add_remove_preserves_size(5));
+    }
+
+    #[test]
+    fn inventory_preserves_size_near_capacity() {
+        // 49 items, then add + remove one → should still hold
+        assert!(inventory_add_remove_preserves_size(49));
+    }
+
+    #[test]
+    fn inventory_preserves_size_at_50_returns_true_early() {
+        // >= 50 initial items → guard returns true immediately
+        assert!(inventory_add_remove_preserves_size(50));
+    }
+}
