@@ -122,3 +122,161 @@ pub enum BattlePassError {
     #[error("reward for tier {0} not found in season")]
     RewardNotFound(u32),
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Utc;
+
+    fn season() -> BattlePassSeason {
+        let free_rewards = (1u32..=20)
+            .map(|t| PassReward {
+                tier: t,
+                reward_type: RewardType::Credits,
+                name: format!("Free T{t}"),
+                quantity: t * 100,
+            })
+            .collect();
+        let premium_rewards = (1u32..=40)
+            .map(|t| PassReward {
+                tier: t,
+                reward_type: if t > 10 { RewardType::SuitSkin } else { RewardType::Credits },
+                name: format!("Premium T{t}"),
+                quantity: t * 200,
+            })
+            .collect();
+        BattlePassSeason {
+            season_id: 1,
+            name: "Season 1".into(),
+            starts_at: Utc::now(),
+            ends_at: Utc::now(),
+            free_rewards,
+            premium_rewards,
+            cost_credits: 1000,
+        }
+    }
+
+    fn player() -> PlayerPassState {
+        PlayerPassState::new(1, 1)
+    }
+
+    // ── new / defaults ────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_player_starts_free_at_tier_0_with_no_xp() {
+        let p = player();
+        assert!(!p.is_premium);
+        assert_eq!(p.current_tier, 0);
+        assert_eq!(p.pass_xp, 0);
+        assert!(p.claimed_tiers.is_empty());
+    }
+
+    // ── activate_premium ──────────────────────────────────────────────────────
+
+    #[test]
+    fn activate_premium_sets_flag() {
+        let mut p = player();
+        p.activate_premium().unwrap();
+        assert!(p.is_premium);
+    }
+
+    #[test]
+    fn activate_premium_twice_returns_error() {
+        let mut p = player();
+        p.activate_premium().unwrap();
+        let result = p.activate_premium();
+        assert!(matches!(result, Err(BattlePassError::AlreadyPremium)));
+    }
+
+    // ── earn_xp / tier progression ───────────────────────────────────────────
+
+    #[test]
+    fn earn_xp_below_1000_does_not_advance_tier() {
+        let mut p = player();
+        let unlocked = p.earn_xp(999);
+        assert!(unlocked.is_empty());
+        assert_eq!(p.current_tier, 0);
+    }
+
+    #[test]
+    fn earn_1000_xp_unlocks_tier_1() {
+        let mut p = player();
+        let unlocked = p.earn_xp(1000);
+        assert_eq!(unlocked, vec![1]);
+        assert_eq!(p.current_tier, 1);
+    }
+
+    #[test]
+    fn earn_3000_xp_unlocks_tiers_1_to_3() {
+        let mut p = player();
+        let unlocked = p.earn_xp(3000);
+        assert_eq!(unlocked, vec![1, 2, 3]);
+        assert_eq!(p.current_tier, 3);
+    }
+
+    #[test]
+    fn earn_xp_caps_at_tier_40() {
+        let mut p = player();
+        p.earn_xp(999_999);
+        assert_eq!(p.current_tier, 40);
+    }
+
+    // ── claim_reward ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn free_player_can_claim_tier_1_free_reward() {
+        let mut p = player();
+        p.earn_xp(1000);
+        let s = season();
+        let reward = p.claim_reward(1, &s).unwrap();
+        assert_eq!(reward.tier, 1);
+        assert!(p.claimed_tiers.contains(&1));
+    }
+
+    #[test]
+    fn claiming_ahead_of_current_tier_returns_error() {
+        let mut p = player();
+        let s = season();
+        let result = p.claim_reward(5, &s);
+        assert!(matches!(result, Err(BattlePassError::TierNotReached { tier: 5, current: 0 })));
+    }
+
+    #[test]
+    fn claiming_same_tier_twice_returns_error() {
+        let mut p = player();
+        p.earn_xp(1000);
+        let s = season();
+        p.claim_reward(1, &s).unwrap();
+        let result = p.claim_reward(1, &s);
+        assert!(matches!(result, Err(BattlePassError::AlreadyClaimed(1))));
+    }
+
+    #[test]
+    fn premium_player_can_claim_tier_15_premium_reward() {
+        let mut p = player();
+        p.activate_premium().unwrap();
+        p.earn_xp(15_000);
+        let s = season();
+        let reward = p.claim_reward(15, &s).unwrap();
+        assert_eq!(reward.reward_type, RewardType::SuitSkin);
+    }
+
+    // ── unclaimed_count ───────────────────────────────────────────────────────
+
+    #[test]
+    fn unclaimed_count_equals_current_tier_when_nothing_claimed() {
+        let mut p = player();
+        p.earn_xp(3000);
+        let s = season();
+        assert_eq!(p.unclaimed_count(&s), 3);
+    }
+
+    #[test]
+    fn unclaimed_count_decrements_after_claiming() {
+        let mut p = player();
+        p.earn_xp(2000);
+        let s = season();
+        p.claim_reward(1, &s).unwrap();
+        assert_eq!(p.unclaimed_count(&s), 1);
+    }
+}
