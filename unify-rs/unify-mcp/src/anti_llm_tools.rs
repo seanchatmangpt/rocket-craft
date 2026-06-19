@@ -124,3 +124,64 @@ fn evaluate_diagnostics_descriptor() -> ToolDescriptor {
         }),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    // ── Tool descriptor shape ─────────────────────────────────────────────────
+
+    #[test]
+    fn scan_directory_descriptor_has_correct_name() {
+        let d = scan_directory_descriptor();
+        assert_eq!(d.name, "audit/scan_directory");
+    }
+
+    #[test]
+    fn scan_directory_descriptor_schema_requires_dir_path() {
+        let d = scan_directory_descriptor();
+        let required = d.input_schema["required"].as_array().unwrap();
+        assert!(required.iter().any(|v| v.as_str() == Some("dir_path")));
+    }
+
+    #[test]
+    fn evaluate_diagnostics_descriptor_has_correct_name() {
+        let d = evaluate_diagnostics_descriptor();
+        assert_eq!(d.name, "audit/evaluate_diagnostics");
+    }
+
+    #[test]
+    fn evaluate_diagnostics_descriptor_schema_requires_observations() {
+        let d = evaluate_diagnostics_descriptor();
+        let required = d.input_schema["required"].as_array().unwrap();
+        assert!(required.iter().any(|v| v.as_str() == Some("observations")));
+    }
+
+    // ── handle_scan_directory error path ──────────────────────────────────────
+
+    #[test]
+    fn handle_scan_directory_errors_without_dir_path() {
+        let result = handle_scan_directory(json!({}));
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("dir_path"));
+    }
+
+    // ── handle_evaluate_diagnostics error path ────────────────────────────────
+
+    #[test]
+    fn handle_evaluate_diagnostics_errors_without_observations() {
+        let result = handle_evaluate_diagnostics(json!({}));
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("observations"));
+    }
+
+    #[test]
+    fn handle_evaluate_diagnostics_with_empty_observations_returns_zero_counts() {
+        let result = handle_evaluate_diagnostics(json!({ "observations": [] }));
+        let val = result.unwrap();
+        assert_eq!(val["diagnostic_count"], 0);
+        assert_eq!(val["blocking_count"], 0);
+        assert_eq!(val["warning_count"], 0);
+    }
+}
