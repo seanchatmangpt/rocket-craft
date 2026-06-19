@@ -61,3 +61,60 @@ impl Output {
         parts.join("\n")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn ok_creates_successful_output_with_data() {
+        let o = Output::ok(json!({"key": "value"}));
+        assert!(o.success);
+        assert!(o.message.is_none());
+        assert_eq!(o.data, json!({"key": "value"}));
+    }
+
+    #[test]
+    fn success_msg_has_null_data_and_message() {
+        let o = Output::success_msg("all done");
+        assert!(o.success);
+        assert_eq!(o.message.as_deref(), Some("all done"));
+        assert_eq!(o.data, Value::Null);
+    }
+
+    #[test]
+    fn error_creates_failed_output_with_message() {
+        let o = Output::error("something went wrong");
+        assert!(!o.success);
+        assert_eq!(o.message.as_deref(), Some("something went wrong"));
+    }
+
+    #[test]
+    fn to_json_contains_success_and_message_fields() {
+        let o = Output::success_msg("done");
+        let json = o.to_json();
+        assert!(json.contains("\"success\":true"));
+        assert!(json.contains("done"));
+    }
+
+    #[test]
+    fn to_human_ok_prefix() {
+        let o = Output::ok(json!(null));
+        assert!(o.to_human().starts_with("[OK]"));
+    }
+
+    #[test]
+    fn to_human_error_prefix() {
+        let o = Output::error("bad");
+        assert!(o.to_human().starts_with("[ERROR]"));
+        assert!(o.to_human().contains("bad"));
+    }
+
+    #[test]
+    fn to_human_includes_data_when_not_null() {
+        let o = Output::ok(json!({"x": 1}));
+        let human = o.to_human();
+        assert!(human.contains("\"x\""));
+    }
+}

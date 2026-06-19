@@ -49,3 +49,73 @@ pub fn parse_json_rpc_transcript(filepath: &str, content: &str) -> Vec<Observati
 
     obs
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_init(with_inline_completion: bool, with_folding_range: bool) -> String {
+        let td = if with_inline_completion && with_folding_range {
+            r#"{"inlineCompletion":{},"foldingRange":{}}"#
+        } else if with_inline_completion {
+            r#"{"inlineCompletion":{}}"#
+        } else if with_folding_range {
+            r#"{"foldingRange":{}}"#
+        } else {
+            r#"{"hover":{}}"#
+        };
+        format!(
+            r#"{{"method":"initialize","params":{{"capabilities":{{"textDocument":{}}}}}}}"#,
+            td
+        )
+    }
+
+    #[test]
+    fn empty_content_produces_no_obs() {
+        assert!(parse_json_rpc_transcript("t.jsonl", "").is_empty());
+    }
+
+    #[test]
+    fn blank_lines_are_skipped() {
+        let content = "\n   \n";
+        assert!(parse_json_rpc_transcript("t.jsonl", content).is_empty());
+    }
+
+    #[test]
+    fn initialize_without_3_18_caps_produces_obs() {
+        let line = make_init(false, false);
+        let obs = parse_json_rpc_transcript("t.jsonl", &line);
+        assert_eq!(obs.len(), 1);
+        assert_eq!(obs[0].construct, "initialize without 3.18 caps");
+        assert_eq!(obs[0].line, 1);
+    }
+
+    #[test]
+    fn initialize_with_inline_completion_is_clean() {
+        let line = make_init(true, false);
+        assert!(parse_json_rpc_transcript("t.jsonl", &line).is_empty());
+    }
+
+    #[test]
+    fn initialize_with_folding_range_is_clean() {
+        let line = make_init(false, true);
+        assert!(parse_json_rpc_transcript("t.jsonl", &line).is_empty());
+    }
+
+    #[test]
+    fn non_initialize_method_is_ignored() {
+        let line = r#"{"method":"textDocument/hover","params":{}}"#;
+        assert!(parse_json_rpc_transcript("t.jsonl", line).is_empty());
+    }
+
+    #[test]
+    fn multiple_init_lines_each_checked() {
+        let bad = make_init(false, false);
+        let good = make_init(true, false);
+        let content = format!("{}\n{}", bad, good);
+        let obs = parse_json_rpc_transcript("t.jsonl", &content);
+        // only the bad line produces an obs
+        assert_eq!(obs.len(), 1);
+        assert_eq!(obs[0].line, 1);
+    }
+}
