@@ -153,3 +153,65 @@ pub fn optimize_balance(
     best_result
         .context("Failed to find any valid allocation result after pruning imbalanced coordinates")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn alloc(h: u32, a: u32, d: u32, m: u32) -> StatAllocation {
+        StatAllocation { health: h, attack: a, defense: d, magic: m }
+    }
+
+    // ── is_imbalanced ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn zero_total_points_is_never_imbalanced() {
+        assert!(!alloc(0, 0, 0, 0).is_imbalanced(0));
+    }
+
+    #[test]
+    fn balanced_allocation_is_not_imbalanced() {
+        // 1+1+1+1 = 4 points, none zero
+        assert!(!alloc(1, 1, 1, 1).is_imbalanced(4));
+    }
+
+    #[test]
+    fn zero_health_with_enough_points_is_imbalanced() {
+        // total_points >= 4 and health == 0
+        assert!(alloc(0, 2, 1, 1).is_imbalanced(4));
+    }
+
+    #[test]
+    fn zero_attack_with_enough_points_is_imbalanced() {
+        assert!(alloc(2, 0, 1, 1).is_imbalanced(4));
+    }
+
+    #[test]
+    fn zero_health_with_only_3_points_is_not_imbalanced_by_zero_rule() {
+        // total_points < 4, so zero-stat rule doesn't apply
+        // but all-in check: max(0,3,0,0)=3 == 3 and 3>1 → imbalanced
+        assert!(alloc(0, 3, 0, 0).is_imbalanced(3));
+    }
+
+    #[test]
+    fn all_points_in_one_stat_is_imbalanced_when_total_over_1() {
+        // 4 all in health — max_stat == total and total > 1
+        assert!(alloc(4, 0, 0, 0).is_imbalanced(4));
+    }
+
+    #[test]
+    fn single_point_in_one_stat_is_not_imbalanced() {
+        // total_points == 1: all-in check requires total > 1 to flag it
+        assert!(!alloc(1, 0, 0, 0).is_imbalanced(1));
+    }
+
+    // ── SimulationResult / StatAllocation are Clone + Debug ──────────────────
+
+    #[test]
+    fn stat_allocation_is_clone() {
+        let a = alloc(10, 20, 5, 5);
+        let b = a.clone();
+        assert_eq!(b.health, 10);
+        assert_eq!(b.attack, 20);
+    }
+}
