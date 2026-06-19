@@ -226,3 +226,103 @@ pub fn arena_sequence(bloodline: i32) -> Vec<&'static str> {
     seq.push("CorruptedGalath");
     seq
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── table completeness ────────────────────────────────────────────────────
+
+    #[test]
+    fn roster_is_non_empty() {
+        assert!(!all_enemies().is_empty());
+    }
+
+    #[test]
+    fn enemy_by_id_returns_known_enemies() {
+        assert!(enemy_by_id("LightTitan").is_some());
+        assert!(enemy_by_id("CorruptedGalath").is_some());
+    }
+
+    #[test]
+    fn enemy_by_id_returns_none_for_unknown() {
+        assert!(enemy_by_id("ghost-enemy-xyz").is_none());
+    }
+
+    #[test]
+    fn all_enemies_have_positive_hp_and_damage() {
+        for e in all_enemies() {
+            assert!(e.base_hp > 0.0, "{} has non-positive base_hp", e.id);
+            assert!(e.attack_damage > 0.0, "{} has non-positive attack_damage", e.id);
+        }
+    }
+
+    #[test]
+    fn all_drop_chances_are_in_range() {
+        for e in all_enemies() {
+            assert!(
+                (0.0..=1.0).contains(&e.drop_chance),
+                "{} drop_chance {} out of [0, 1]",
+                e.id, e.drop_chance
+            );
+        }
+    }
+
+    // ── spawn_enemy ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn spawn_enemy_returns_none_for_unknown_id() {
+        assert!(spawn_enemy("nonexistent", 0).is_none());
+    }
+
+    #[test]
+    fn spawn_enemy_at_bloodline_0_has_base_hp() {
+        let e = spawn_enemy("LightTitan", 0).unwrap();
+        assert_eq!(e.base_hp, 150.0);
+        assert_eq!(e.current_hp, 150.0);
+    }
+
+    #[test]
+    fn spawn_enemy_scales_hp_with_bloodline() {
+        let e0 = spawn_enemy("LightTitan", 0).unwrap();
+        let e1 = spawn_enemy("LightTitan", 1).unwrap();
+        // bloodline 1: hp_scale = 1.0 + 1 * 0.15 = 1.15
+        assert!((e1.base_hp / e0.base_hp - 1.15).abs() < 0.01);
+    }
+
+    #[test]
+    fn spawn_enemy_negative_bloodline_treated_as_zero() {
+        let e_neg = spawn_enemy("LightTitan", -5).unwrap();
+        let e0 = spawn_enemy("LightTitan", 0).unwrap();
+        assert_eq!(e_neg.base_hp, e0.base_hp, "negative bloodline must not reduce hp");
+    }
+
+    #[test]
+    fn spawn_enemy_starts_at_phase_1() {
+        let e = spawn_enemy("HeavyTitan", 0).unwrap();
+        assert_eq!(e.phase, 1);
+        assert!(!e.is_stunned);
+        assert!(!e.shield_active);
+    }
+
+    // ── arena_sequence ────────────────────────────────────────────────────────
+
+    #[test]
+    fn arena_sequence_always_ends_with_corrupted_galath() {
+        let seq = arena_sequence(0);
+        assert_eq!(seq.last(), Some(&"CorruptedGalath"));
+    }
+
+    #[test]
+    fn arena_sequence_has_four_enemies() {
+        let seq = arena_sequence(5);
+        assert_eq!(seq.len(), 4, "3 regular + CorruptedGalath");
+    }
+
+    #[test]
+    fn arena_sequence_does_not_include_galath_in_regular_slots() {
+        let seq = arena_sequence(20);
+        let regulars = &seq[..seq.len() - 1];
+        assert!(!regulars.contains(&"CorruptedGalath"));
+    }
+}
