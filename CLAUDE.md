@@ -24,13 +24,14 @@ Rocket Craft is a multi-game Unreal Engine 4.24 monorepo containing six UE4 game
 ./rocket wasm --file path/to/plugin.wasm  # Execute a WASM compliance plugin
 
 # HTML5 pipeline (Brm project — proven working, Stage 6 PASS)
-./rocket html5 preflight --project Brm  # Check prereqs (engine, emsdk, Python 3, disk, Rosetta) before cook
-./rocket html5 cook --project Brm        # UAT BuildCookRun → Brm.wasm (175 MB) in /tmp/brm-html5-archive/HTML5/
-./rocket html5 verify                    # Verify WASM magic bytes + size + companion files; writes cook-receipt.json
-./rocket html5 serve --port 8080         # Serve manufactured/ dir on :8080
-./rocket html5 open                      # Open served game in browser (finds .html automatically)
+# All verbs accept --project <Name>; archive path derived as /tmp/<name>-html5-archive/HTML5
+./rocket html5 preflight --project Brm  # 7-check gate: engine, emsdk, python3, disk≥50GB, uproject, Rosetta, emsdk-python
+./rocket html5 cook --project Brm        # UAT BuildCookRun → Brm.wasm (175 MB) in /tmp/brm-html5-archive/HTML5/; auto-verifies + writes receipt
+./rocket html5 verify --project Brm      # Verify WASM magic bytes + size + companion files; writes cook-receipt.json
+./rocket html5 serve --project Brm       # Serve with COOP/COEP headers (required for SharedArrayBuffer/wasm-threads)
+./rocket html5 open --project Brm        # Open served game in browser (finds .html automatically)
 ./rocket html5 log --lines 50            # Tail latest ue4-cook*.log (monitor running cook)
-./rocket html5 status                    # Pipeline summary: engine, emsdk, package, receipt, port, manifest, cook log
+./rocket html5 status --project Brm      # Pipeline summary: engine, emsdk, package, receipt, port, manifest, cook log
 ./verify_html5_pipeline.sh               # Full Stage 6 proof: cook → serve → Playwright → receipt PASS
 # Playwright config: pwa-staff/playwright.html5.config.ts (headless:false, Metal GPU WebGL2, timeout:240s)
 # Receipt: pwa-staff/test-results/tps-dflss-receipt.json (verdict=PASS, 362762 non-black pixels proven)
