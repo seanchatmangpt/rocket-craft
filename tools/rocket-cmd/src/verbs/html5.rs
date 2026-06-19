@@ -70,7 +70,7 @@ fn do_html5_cook(
     let uproject = root.join(&proj.uproject_path);
     let archive_dir = archive
         .map(std::path::PathBuf::from)
-        .unwrap_or_else(|| std::path::PathBuf::from("/tmp/brm-html5-archive"));
+        .unwrap_or_else(|| std::path::PathBuf::from(format!("/tmp/{}-html5-archive", proj.name.to_lowercase())));
     let engine = ue4_root();
 
     // Quick pre-cook sanity check — surface blockers before wasting 30 min
@@ -197,7 +197,7 @@ fn verify_html5(archive: Option<String>, min_mb: Option<f64>) -> Result<Value> {
     do_html5_verify(archive, min_mb)
 }
 
-fn do_html5_status() -> Result<Value> {
+fn do_html5_status(project: Option<String>) -> Result<Value> {
     let root = std::env::current_dir()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
 
@@ -210,8 +210,10 @@ fn do_html5_status() -> Result<Value> {
     let emsdk = engine.join("Engine/Platforms/HTML5/Build/emsdk");
     let emsdk_ok = emsdk.exists();
 
-    // 3. Package verification
-    let archive = "/tmp/brm-html5-archive/HTML5";
+    // 3. Package verification — derive archive path from project name if given
+    let project_name = project.as_deref().unwrap_or("brm");
+    let archive = format!("/tmp/{}-html5-archive/HTML5", project_name.to_lowercase());
+    let archive = archive.as_str();
     let pkg_report = rocket_sdk::Html5PackageVerifier::new(archive)
         .verify()
         .ok();
@@ -327,8 +329,8 @@ fn do_html5_status() -> Result<Value> {
 /// Reports: engine root, emsdk, last cooked package verdict, serve port availability,
 /// and project manifest presence. Use before running `html5 cook` or `html5 serve`.
 #[verb("status", "html5")]
-fn status_html5() -> Result<Value> {
-    do_html5_status()
+fn status_html5(project: Option<String>) -> Result<Value> {
+    do_html5_status(project)
 }
 
 fn do_html5_preflight(project: Option<String>) -> Result<Value> {
