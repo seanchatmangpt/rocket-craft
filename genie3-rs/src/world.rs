@@ -321,3 +321,115 @@ impl WorldState {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::{Bounds3D, Rotation3D, Transform, Vector3};
+
+    fn sample_actor() -> Actor {
+        Actor::new("a1", "Hero", "Player", Vector3::new(0.0, 0.0, 0.0))
+    }
+
+    // ── Environment ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn environment_default_is_sunny_midday() {
+        let env = Environment::default();
+        assert_eq!(env.weather, Weather::Sunny);
+        assert_eq!(env.time_of_day, 12.0);
+    }
+
+    #[test]
+    fn step_time_advances() {
+        let mut env = Environment::new(Weather::Cloudy, 10.0);
+        env.step_time(3.0);
+        assert_eq!(env.time_of_day, 13.0);
+    }
+
+    #[test]
+    fn step_time_wraps_past_24() {
+        let mut env = Environment::new(Weather::Sunny, 23.0);
+        env.step_time(2.0);
+        assert!((env.time_of_day - 1.0).abs() < 1e-5);
+    }
+
+    // ── WorldState ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_world_is_empty() {
+        let ws = WorldState::new();
+        assert!(ws.actors.is_empty());
+        assert!(ws.places.is_empty());
+        assert_eq!(ws.step_index, 0);
+    }
+
+    #[test]
+    fn get_actor_returns_none_when_absent() {
+        let ws = WorldState::new();
+        assert!(ws.get_actor("nobody").is_none());
+    }
+
+    #[test]
+    fn get_actor_finds_by_id() {
+        let mut ws = WorldState::new();
+        ws.actors.push(sample_actor());
+        assert!(ws.get_actor("a1").is_some());
+        assert!(ws.get_actor("a2").is_none());
+    }
+
+    #[test]
+    fn step_increments_step_index_and_time() {
+        let mut ws = WorldState::new();
+        ws.step(1.0);
+        assert_eq!(ws.step_index, 1);
+        assert!((ws.environment.time_of_day - 13.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn apply_latent_action_moves_actor() {
+        let mut ws = WorldState::new();
+        ws.actors.push(sample_actor());
+        let action = LatentAction::new("a1", Vector3::new(1.0, 0.0, 0.0), Rotation3D::default());
+        ws.apply_latent_action(&action).unwrap();
+        let pos = ws.get_actor("a1").unwrap().position;
+        assert!((pos.x - 1.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn apply_latent_action_error_on_missing_actor() {
+        let mut ws = WorldState::new();
+        let action =
+            LatentAction::new("ghost", Vector3::new(0.0, 0.0, 0.0), Rotation3D::default());
+        assert!(ws.apply_latent_action(&action).is_err());
+    }
+
+    #[test]
+    fn validate_coherence_passes_on_empty_world() {
+        assert!(WorldState::new().validate_coherence().is_ok());
+    }
+
+    #[test]
+    fn validate_coherence_fails_when_actor_references_missing_place() {
+        let mut ws = WorldState::new();
+        let mut actor = sample_actor();
+        actor.place_id = Some("nonexistent-place".into());
+        ws.actors.push(actor);
+        assert!(ws.validate_coherence().is_err());
+    }
+
+    #[test]
+    fn validate_coherence_passes_when_actor_place_exists() {
+        let mut ws = WorldState::new();
+        let place = Place::new(
+            "zone-1",
+            "Zone One",
+            Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(5.0, 5.0, 5.0)),
+        );
+        ws.places.push(place);
+        let mut actor = sample_actor();
+        actor.place_id = Some("zone-1".into());
+        ws.actors.push(actor);
+        assert!(ws.validate_coherence().is_ok());
+    }
+}
