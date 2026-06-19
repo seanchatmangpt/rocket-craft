@@ -79,6 +79,8 @@ export default defineNuxtConfig({
     // Server-only (not exposed to browser)
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
     otlpCollectorUrl: process.env.OTLP_COLLECTOR_URL ?? 'http://localhost:4318',
+    // Ed25519 public key for receipt signature verification (set ROCKET_SIGNING_PUBKEY in .env)
+    rocketSigningPubkey: process.env.ROCKET_SIGNING_PUBKEY ?? '',
     public: {
       supabaseUrl: process.env.SUPABASE_URL ?? 'http://localhost:54321',
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY ?? '',
