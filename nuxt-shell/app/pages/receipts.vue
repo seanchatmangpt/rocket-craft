@@ -83,6 +83,30 @@ const verdictColor = (v: string) => v === 'PASS' ? '#00c853' : v === 'FAIL' ? '#
 const shortHash = (h: string | null) => h ? h.slice(0, 14) + '…' : '—';
 const shortId = (id: string | null) => id ? id.slice(0, 8) : '—';
 
+// Evidence pack download — triggers POST /api/game/evidence-pack and saves JSON
+const packDownloading = ref<Record<string, boolean>>({});
+async function downloadEvidencePack(r: ReceiptRow) {
+  if (!r.session_id) return;
+  packDownloading.value[r.id] = true;
+  try {
+    const pack = await $fetch('/api/game/evidence-pack', {
+      method: 'POST',
+      body: { session_id: r.session_id },
+    });
+    const blob = new Blob([JSON.stringify(pack, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `evidence-pack-${r.session_id.slice(0, 8)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch {
+    // Session may have no events — silently skip
+  } finally {
+    packDownloading.value[r.id] = false;
+  }
+}
+
 const sigLabel: Record<string, string> = {
   verifying: '…',
   ok: '✓ Ed25519',
@@ -214,6 +238,13 @@ const chainLabel: Record<string, string> = {
               :download="`ocel2-${r.session_id.slice(0, 8)}.json`"
               title="Download OCEL 2.0 JSON for pm4py"
             >↓ OCEL</a>
+            <button
+              v-if="r.session_id"
+              class="proof-link proof-btn"
+              :title="packDownloading[r.id] ? 'Generating…' : 'Download tamper-evident evidence pack (BLAKE3)'"
+              :disabled="packDownloading[r.id]"
+              @click="downloadEvidencePack(r)"
+            >{{ packDownloading[r.id] ? '…' : '↓ Pack' }}</button>
             <button
               v-if="r.session_id && r.verdict === 'PASS' && !finality[r.id]"
               class="proof-link proof-btn"
