@@ -2465,4 +2465,105 @@ mod tests {
         assert!(blocked.is_err());
         assert!(matches!(blocked.unwrap_err(), MudError::GateBlocked(_)));
     }
+
+    // ── Zone unit tests ─────────────────────────────────────────────────────
+
+    #[test]
+    fn zone_all_returns_nine_zones() {
+        assert_eq!(Zone::all().len(), 9, "GMF has exactly 9 factory zones");
+    }
+
+    #[test]
+    fn zone_parse_canonical_names() {
+        assert_eq!(Zone::parse("mission room"), Some(Zone::MissionRoom));
+        assert_eq!(Zone::parse("materials lab"), Some(Zone::MaterialsLab));
+        assert_eq!(Zone::parse("assembly gantry"), Some(Zone::AssemblyGantry));
+        assert_eq!(Zone::parse("reveal platform"), Some(Zone::RevealPlatform));
+    }
+
+    #[test]
+    fn zone_parse_short_aliases() {
+        assert_eq!(Zone::parse("mission"), Some(Zone::MissionRoom));
+        assert_eq!(Zone::parse("runner"), Some(Zone::RunnerWall));
+        assert_eq!(Zone::parse("reveal"), Some(Zone::RevealPlatform));
+    }
+
+    #[test]
+    fn zone_parse_unknown_returns_none() {
+        assert_eq!(Zone::parse("hangar"), None);
+        assert_eq!(Zone::parse(""), None);
+        assert_eq!(Zone::parse("zone 0"), None);
+    }
+
+    #[test]
+    fn zone_elevation_is_its_ordinal() {
+        assert_eq!(Zone::MissionRoom.elevation(), 0);
+        assert_eq!(Zone::RevealPlatform.elevation(), 8);
+        assert_eq!(Zone::AssemblyGantry.elevation(), 4);
+    }
+
+    #[test]
+    fn zone_to_str_round_trips_through_parse() {
+        for zone in Zone::all() {
+            let s = zone.to_str();
+            assert_eq!(Zone::parse(s), Some(zone), "to_str/parse round-trip failed for {:?}", zone);
+        }
+    }
+
+    #[test]
+    fn zone_description_is_non_empty_for_all_zones() {
+        for zone in Zone::all() {
+            assert!(!zone.description().is_empty(), "description missing for {:?}", zone);
+        }
+    }
+
+    // ── AABB unit tests ─────────────────────────────────────────────────────
+
+    #[test]
+    fn aabb_overlapping_boxes_intersect() {
+        let a = AABB { min_x: 0.0, max_x: 2.0, min_y: 0.0, max_y: 2.0, min_z: 0.0, max_z: 2.0 };
+        let b = AABB { min_x: 1.0, max_x: 3.0, min_y: 1.0, max_y: 3.0, min_z: 1.0, max_z: 3.0 };
+        assert!(a.intersects(&b));
+    }
+
+    #[test]
+    fn aabb_non_overlapping_boxes_do_not_intersect() {
+        let a = AABB { min_x: 0.0, max_x: 1.0, min_y: 0.0, max_y: 1.0, min_z: 0.0, max_z: 1.0 };
+        let b = AABB { min_x: 2.0, max_x: 3.0, min_y: 2.0, max_y: 3.0, min_z: 2.0, max_z: 3.0 };
+        assert!(!a.intersects(&b));
+    }
+
+    #[test]
+    fn aabb_touching_at_face_does_not_intersect() {
+        // Touching exactly at face: max_x == min_x (open interval)
+        let a = AABB { min_x: 0.0, max_x: 1.0, min_y: 0.0, max_y: 1.0, min_z: 0.0, max_z: 1.0 };
+        let b = AABB { min_x: 1.0, max_x: 2.0, min_y: 0.0, max_y: 1.0, min_z: 0.0, max_z: 1.0 };
+        assert!(!a.intersects(&b), "touching at face only should not intersect");
+    }
+
+    // ── parse_command unit tests ────────────────────────────────────────────
+
+    #[test]
+    fn parse_command_look() {
+        let cmd = parse_command("look").unwrap();
+        assert!(matches!(cmd, MudCommand::Look));
+    }
+
+    #[test]
+    fn parse_command_inventory() {
+        let cmd = parse_command("inventory").unwrap();
+        assert!(matches!(cmd, MudCommand::Inventory));
+    }
+
+    #[test]
+    fn parse_command_go_zone() {
+        let cmd = parse_command("go mission_room").unwrap();
+        assert!(matches!(cmd, MudCommand::Go(ref s) if s == "mission_room"));
+    }
+
+    #[test]
+    fn parse_command_unknown_returns_error() {
+        let result = parse_command("fly to moon");
+        assert!(result.is_err());
+    }
 }
