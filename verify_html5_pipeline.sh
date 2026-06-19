@@ -65,6 +65,17 @@ fi
 "$CWD/rocket" wasm verify --file "$WASM_FILE"
 log_success "WASM artifact: $WASM_FILE"
 
+# rocket html5 verify writes cook-receipt.json alongside the archive
+"$CWD/rocket" html5 verify --project Brm 2>/dev/null | grep -E "^\[" || true
+if [ -f "$ARCHIVE_DIR/cook-receipt.json" ]; then
+  COOK_VERDICT=$(python3 -c "import json,sys; d=json.load(open('$ARCHIVE_DIR/cook-receipt.json')); print(d.get('verdict','UNKNOWN'))" 2>/dev/null || echo "UNKNOWN")
+  if [ "$COOK_VERDICT" = "PASS" ]; then
+    log_success "Cook receipt: $ARCHIVE_DIR/cook-receipt.json (verdict=$COOK_VERDICT)"
+  else
+    log_warn "Cook receipt verdict: $COOK_VERDICT (non-blocking)"
+  fi
+fi
+
 # 2. Stage the HTML5 files to pwa-staff/manufactured/ for serving
 log_info "[2/5] Staging HTML5 package to pwa-staff/manufactured/..."
 SERVE_DIR="$CWD/pwa-staff/manufactured"
