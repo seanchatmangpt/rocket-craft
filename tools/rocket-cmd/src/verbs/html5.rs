@@ -295,8 +295,12 @@ fn do_html5_status(project: Option<String>) -> Result<Value> {
         })
     });
 
-    // 4. Serve port availability
+    // 4. Serve port availability + background serve PID
     let port_free = std::net::TcpListener::bind("0.0.0.0:8080").is_ok();
+    let pid_file = pid_file_for_port(8080);
+    let background_pid: Option<u32> = std::fs::read_to_string(&pid_file)
+        .ok()
+        .and_then(|s| s.trim().parse().ok());
 
     // 5. Manifest projects
     let manifest_result = rocket_sdk::RocketContext::load(&root);
@@ -353,7 +357,9 @@ fn do_html5_status(project: Option<String>) -> Result<Value> {
     println!("[{}] Package: {} ({})", pkg_verdict, archive,
         wasm_mb.map(|mb| format!("{mb:.1} MB")).unwrap_or_else(|| "n/a".into()));
     println!("[{}] Receipt: {}", receipt_verdict, if receipt.is_some() { receipt_path.display().to_string() } else { "not found (run 'rocket html5 verify')".into() });
-    println!("[{}] Port 8080: {}", if port_free { "FREE" } else { "IN USE" }, if port_free { "available for serve" } else { "already bound" });
+    println!("[{}] Port 8080: {}{}", if port_free { "FREE" } else { "IN USE" },
+        if port_free { "available for serve" } else { "already bound" },
+        background_pid.map(|pid| format!(" (background PID {pid} — stop with: rocket html5 stop)")).unwrap_or_default());
     println!("[INFO] Projects: {present_projects}/{total_projects} present on disk");
     if let Some(ref log) = cook_log {
         println!("[INFO] Last cook log: {}  (run 'rocket html5 log' to tail)", log.display());
@@ -378,6 +384,7 @@ fn do_html5_status(project: Option<String>) -> Result<Value> {
             "present": receipt.is_some(),
         },
         "port_8080_free": port_free,
+        "background_serve_pid": background_pid,
         "manifest": {
             "total_projects": total_projects,
             "present_projects": present_projects,
