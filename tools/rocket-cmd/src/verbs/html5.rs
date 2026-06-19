@@ -189,9 +189,35 @@ fn serve_html5(dir: Option<String>, port: Option<u16>, project: Option<String>, 
 /// * `project` - Project name as declared in project-manifest.json (e.g. Brm)
 /// * `archive` - Output directory for the packaged HTML5 build (default: /tmp/brm-html5-archive)
 /// * `config` - Build configuration: Development or Shipping (default: Development)
+/// * `dry_run` - Print the UAT command that would be run without executing it
 #[verb("cook", "html5")]
-fn cook_html5(project: String, archive: Option<String>, config: Option<String>) -> Result<Value> {
+fn cook_html5(project: String, archive: Option<String>, config: Option<String>, dry_run: Option<bool>) -> Result<Value> {
+    if dry_run.unwrap_or(false) {
+        return do_html5_cook_dry_run(project, archive, config);
+    }
     do_html5_cook(project, archive, config)
+}
+
+fn do_html5_cook_dry_run(project: String, archive: Option<String>, config: Option<String>) -> Result<Value> {
+    let root = std::env::current_dir()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+    let ctx = rocket_sdk::RocketContext::load(&root)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+    let proj = ctx.manifest.projects().iter()
+        .find(|p| p.name == project)
+        .ok_or_else(|| clap_noun_verb::NounVerbError::execution_error(format!("project '{project}' not found")))?;
+    let uproject = root.join(&proj.uproject_path);
+    let archive_dir = archive
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| std::path::PathBuf::from(format!("/tmp/{}-html5-archive", proj.name.to_lowercase())));
+    let engine = ue4_root();
+
+    let cook = rocket_sdk::Html5Cook::new(&engine, &uproject, &archive_dir)
+        .with_client_config(config.unwrap_or_else(|| "Development".to_string()));
+    let args = cook.command_args();
+    let cmd_str = args.join(" \\\n  ");
+    println!("[dry-run] Would execute:\n  {cmd_str}");
+    Ok(serde_json::json!({ "dry_run": true, "command": args }))
 }
 
 fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>, project: Option<String>) -> Result<Value> {

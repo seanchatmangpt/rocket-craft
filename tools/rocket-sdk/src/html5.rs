@@ -312,6 +312,36 @@ impl Html5Cook {
         failures
     }
 
+    /// Return the UAT command-line arguments that `run()` would execute, without running them.
+    ///
+    /// Useful for `--dry-run` mode: print the exact command so the user can verify flags
+    /// before committing to a 30+ minute build. The returned vec is `[executable, arg1, ...]`.
+    pub fn command_args(&self) -> Vec<String> {
+        let run_uat = self.engine_root.join("Engine/Build/BatchFiles/RunUAT.sh");
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+        let cook_log = format!("{home}/ue4-cook-latest.log");
+        vec![
+            "arch".into(),
+            "-x86_64".into(),
+            "/bin/bash".into(),
+            run_uat.to_string_lossy().into_owned(),
+            "BuildCookRun".into(),
+            format!("-project={}", self.project.display()),
+            "-noP4".into(),
+            "-platform=HTML5".into(),
+            format!("-clientconfig={}", self.client_config),
+            "-cook".into(),
+            "-build".into(),
+            "-stage".into(),
+            "-pak".into(),
+            "-package".into(),
+            "-archive".into(),
+            "-IgnoreCookErrors".into(),
+            format!("-archivedirectory={}", self.archive_dir.display()),
+            format!("-log={cook_log}"),
+        ]
+    }
+
     /// Run the cook and verify the output is a real package.
     /// Returns the package report; call `report.is_real_package` to confirm success.
     pub fn run_and_verify(&self) -> Result<Html5PackageReport> {
@@ -902,6 +932,39 @@ mod tests {
     }
 
     #[test]
+    // ── Html5Cook::command_args ──────────────────────────────────────────────
+
+    #[test]
+    fn command_args_contains_builcookrun_and_platform() {
+        let cook = Html5Cook::new("/fake/engine", "/fake/Game.uproject", "/tmp/archive");
+        let args = cook.command_args();
+        assert!(args.iter().any(|a| a == "BuildCookRun"), "must include BuildCookRun verb");
+        assert!(args.iter().any(|a| a == "-platform=HTML5"), "must include -platform=HTML5");
+    }
+
+    #[test]
+    fn command_args_includes_configured_client_config() {
+        let cook = Html5Cook::new("/engine", "/g.uproject", "/archive")
+            .with_client_config("Shipping");
+        let args = cook.command_args();
+        assert!(args.iter().any(|a| a == "-clientconfig=Shipping"), "must include -clientconfig=Shipping");
+    }
+
+    #[test]
+    fn command_args_includes_archive_dir() {
+        let cook = Html5Cook::new("/engine", "/g.uproject", "/my/archive/dir");
+        let args = cook.command_args();
+        assert!(args.iter().any(|a| a.contains("/my/archive/dir")), "archive dir must appear in args");
+    }
+
+    #[test]
+    fn command_args_includes_runuat_path() {
+        let cook = Html5Cook::new("/my/engine", "/g.uproject", "/archive");
+        let args = cook.command_args();
+        assert!(args.iter().any(|a| a.contains("RunUAT.sh")), "RunUAT.sh path must appear in args");
+        assert!(args.iter().any(|a| a.contains("/my/engine")), "engine root must appear in RunUAT path");
+    }
+
     fn discover_emsdk_python_returns_none_when_emsdk_absent() {
         let dir = TempDir::new().unwrap();
         let found = discover_emsdk_python(dir.path());
