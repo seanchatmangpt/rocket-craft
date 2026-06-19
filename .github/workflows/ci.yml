@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
   chicago-tdd-tools:
-    name: Rust — test chicago-tdd-tools
+    name: Rust — chicago-tdd-tools
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -47,9 +47,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: dtolnay/rust-toolchain@stable
-
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: chicago-tdd-tools
@@ -59,3 +57,103 @@ jobs:
 
       - name: Test
         run: cargo test --all-features
+
+  nexus-engine:
+    name: Rust — nexus-engine
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nexus-engine
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: nexus-engine
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  wasm-threads:
+    name: Rust — wasm-threads
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: wasm-threads
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: wasm-threads
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  unify-rs:
+    name: Rust — unify-rs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: unify-rs
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: unify-rs
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  blueprint-rs:
+    name: Rust — blueprint-rs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blueprint-rs
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: blueprint-rs
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  ib4-mud:
+    name: Rust — infinity-blade-4 MUD
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infinity-blade-4/mud
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: infinity-blade-4/mud
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
