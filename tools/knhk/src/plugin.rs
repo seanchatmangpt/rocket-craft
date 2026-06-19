@@ -108,3 +108,63 @@ impl Law for WasmLaw {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::receipt::Receipt;
+
+    fn make_receipt(name: &str, passed: bool) -> Receipt {
+        Receipt::new("test.wasm".into(), name, passed, if passed { "ok" } else { "fail" })
+    }
+
+    #[test]
+    fn new_host_has_no_receipts() {
+        let host = PluginHost::new();
+        assert!(host.receipts().is_empty());
+    }
+
+    #[test]
+    fn default_host_has_no_receipts() {
+        let host = PluginHost::default();
+        assert!(host.receipts().is_empty());
+    }
+
+    #[test]
+    fn record_receipt_appends() {
+        let mut host = PluginHost::new();
+        host.record_receipt(make_receipt("LawA", true));
+        host.record_receipt(make_receipt("LawB", false));
+        assert_eq!(host.receipts().len(), 2);
+        assert_eq!(host.receipts()[0].law_name, "LawA");
+        assert_eq!(host.receipts()[1].law_name, "LawB");
+    }
+
+    #[test]
+    fn receipts_preserves_pass_fail() {
+        let mut host = PluginHost::new();
+        host.record_receipt(make_receipt("Pass", true));
+        host.record_receipt(make_receipt("Fail", false));
+        assert!(host.receipts()[0].passed);
+        assert!(!host.receipts()[1].passed);
+    }
+
+    #[test]
+    fn load_law_returns_error_for_missing_file() {
+        let mut host = PluginHost::new();
+        let result = host.load_law(Path::new("/nonexistent/path/law.wasm"));
+        assert!(result.is_err());
+        let err = result.err().unwrap();
+        let msg = format!("{err:#}");
+        assert!(msg.contains("law.wasm"), "error should mention the path, got: {msg}");
+    }
+
+    #[test]
+    fn load_law_returns_error_for_invalid_wasm() {
+        let tmp = tempfile::NamedTempFile::new().unwrap();
+        std::fs::write(tmp.path(), b"this is not wasm").unwrap();
+        let mut host = PluginHost::new();
+        let result = host.load_law(tmp.path());
+        assert!(result.is_err());
+    }
+}
