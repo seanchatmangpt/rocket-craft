@@ -90,3 +90,73 @@ impl BlueprintReceiptChain {
         !self.receipts.is_empty()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use blueprint_core::Blueprint;
+
+    fn make_bp() -> Blueprint {
+        Blueprint::new("HeroActor", "Actor")
+    }
+
+    // ── BlueprintReceiptChain::new ────────────────────────────────────────────
+
+    #[test]
+    fn new_chain_is_empty_and_invalid() {
+        let chain = BlueprintReceiptChain::new();
+        assert!(!chain.is_valid());
+        assert!(chain.chain().is_empty());
+    }
+
+    // ── record_generation ────────────────────────────────────────────────────
+
+    #[test]
+    fn record_generation_adds_receipt() {
+        let mut chain = BlueprintReceiptChain::new();
+        chain.record_generation(&make_bp());
+        assert_eq!(chain.chain().len(), 1);
+        assert!(chain.is_valid());
+    }
+
+    #[test]
+    fn record_generation_key_contains_blueprint_name() {
+        let mut chain = BlueprintReceiptChain::new();
+        let r = chain.record_generation(&make_bp());
+        assert!(r.key.contains("HeroActor"));
+        assert!(r.key.contains("blueprint.generate"));
+    }
+
+    #[test]
+    fn record_generation_hash_is_deterministic() {
+        let bp = make_bp();
+        let mut c1 = BlueprintReceiptChain::new();
+        let mut c2 = BlueprintReceiptChain::new();
+        assert_eq!(c1.record_generation(&bp).hash, c2.record_generation(&bp).hash);
+    }
+
+    // ── record_validation ────────────────────────────────────────────────────
+
+    #[test]
+    fn record_validation_passed_key_contains_passed() {
+        let mut chain = BlueprintReceiptChain::new();
+        let r = chain.record_validation(&make_bp(), true);
+        assert!(r.key.contains("passed"));
+    }
+
+    #[test]
+    fn record_validation_failed_key_contains_failed() {
+        let mut chain = BlueprintReceiptChain::new();
+        let r = chain.record_validation(&make_bp(), false);
+        assert!(r.key.contains("failed"));
+    }
+
+    #[test]
+    fn chain_accumulates_all_receipts() {
+        let mut chain = BlueprintReceiptChain::new();
+        let bp = make_bp();
+        chain.record_generation(&bp);
+        chain.record_validation(&bp, true);
+        assert_eq!(chain.chain().len(), 2);
+    }
+}
