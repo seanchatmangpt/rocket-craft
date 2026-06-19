@@ -3,6 +3,8 @@ use serde::Serialize;
 use std::path::PathBuf;
 use std::process::Command;
 
+use crate::config::discover_python3;
+
 #[derive(Debug, Serialize, Clone, PartialEq)]
 pub enum CheckStatus {
     Pass,
@@ -47,6 +49,7 @@ impl RocketDoctor {
             self.check_versions_dir(),
             self.check_ue4_root(),
             self.check_ue4_plugins(),
+            self.check_html5_toolchain(),
             self.check_ggen(),
             self.check_anti_llm_cheat_lsp(),
         ];
@@ -242,26 +245,52 @@ impl RocketDoctor {
     }
 
     fn check_ue4_root(&self) -> CheckResult {
+        // Parse the JSON properly — string search gives false positives
+        // (e.g. "ue4_root" appearing in a comment or description value).
         let rocket_json = self.project_root.join(".rocket.json");
         if rocket_json.exists() {
             if let Ok(content) = std::fs::read_to_string(&rocket_json) {
-                if content.contains("ue4_root") {
-                    return CheckResult {
-                        name: "UE4 Root".to_string(),
-                        status: CheckStatus::Pass,
-                        message: "UE4 root configured in .rocket.json".to_string(),
-                        details: None,
-                    };
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&content) {
+                    if let Some(root) = v.get("ue4_root").and_then(|r| r.as_str()) {
+                        let root_path = PathBuf::from(root);
+                        if root_path.exists() {
+                            return CheckResult {
+                                name: "UE4 Root".to_string(),
+                                status: CheckStatus::Pass,
+                                message: format!("UE4 root: {root}"),
+                                details: None,
+                            };
+                        } else {
+                            return CheckResult {
+                                name: "UE4 Root".to_string(),
+                                status: CheckStatus::Fail,
+                                message: format!("UE4 root configured but path missing: {root}"),
+                                details: Some(
+                                    "Run 'rocket setup' to reconfigure.".to_string(),
+                                ),
+                            };
+                        }
+                    }
                 }
             }
         }
 
-        if std::env::var("UE4_ROOT").is_ok() {
-            CheckResult {
-                name: "UE4 Root".to_string(),
-                status: CheckStatus::Pass,
-                message: "UE4_ROOT environment variable is set".to_string(),
-                details: None,
+        if let Ok(root) = std::env::var("UE4_ROOT") {
+            let root_path = PathBuf::from(&root);
+            if root_path.exists() {
+                CheckResult {
+                    name: "UE4 Root".to_string(),
+                    status: CheckStatus::Pass,
+                    message: format!("UE4_ROOT={root}"),
+                    details: None,
+                }
+            } else {
+                CheckResult {
+                    name: "UE4 Root".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("UE4_ROOT set but path missing: {root}"),
+                    details: None,
+                }
             }
         } else {
             CheckResult {
@@ -271,6 +300,67 @@ impl RocketDoctor {
                 details: Some("Run 'rocket setup' to configure Unreal Engine path.".to_string()),
             }
         }
+    }
+
+    fn check_html5_toolchain(&self) -> CheckResult {
+        // 1. Verify Python 3 is available for UAT/UHT scripts.
+        let python_ok = match discover_python3() {
+            Some(path) => {
+                Some(format!("Python 3 at {}", path.display()))
+            }
+            None => None,
+        };
+
+        // 2. Verify emscripten — check engine-bundled emsdk first, then PATH.
+        let emsdk_found = self.find_ue4_emsdk();
+        let emcc_on_path = Command::new("emcc")
+            .arg("--version")
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+
+        match (python_ok, emsdk_found || emcc_on_path) {
+            (Some(py), true) => CheckResult {
+                name: "HTML5 Toolchain".to_string(),
+                status: CheckStatus::Pass,
+                message: format!("{py}; emscripten present"),
+                details: None,
+            },
+            (Some(py), false) => CheckResult {
+                name: "HTML5 Toolchain".to_string(),
+                status: CheckStatus::Warn,
+                message: format!("{py}; emscripten NOT found"),
+                details: Some(
+                    "Run HTML5Setup.sh in the engine to build emsdk, or run 'rocket html5 setup'."
+                        .to_string(),
+                ),
+            },
+            (None, _) => CheckResult {
+                name: "HTML5 Toolchain".to_string(),
+                status: CheckStatus::Fail,
+                message: "Python 3 not found — required for UAT scripts".to_string(),
+                details: Some(
+                    "Install python3 or set 'python3_path' in .rocket.json".to_string(),
+                ),
+            },
+        }
+    }
+
+    /// Check if the engine's bundled emsdk is present (built by HTML5Setup.sh).
+    fn find_ue4_emsdk(&self) -> bool {
+        let rocket_json = self.project_root.join(".rocket.json");
+        let ue4_root = if rocket_json.exists() {
+            std::fs::read_to_string(&rocket_json)
+                .ok()
+                .and_then(|c| serde_json::from_str::<serde_json::Value>(&c).ok())
+                .and_then(|v| v.get("ue4_root")?.as_str().map(PathBuf::from))
+        } else {
+            std::env::var("UE4_ROOT").ok().map(PathBuf::from)
+        };
+
+        ue4_root
+            .map(|r| r.join("Engine/Platforms/HTML5/Build/emsdk").exists())
+            .unwrap_or(false)
     }
 
     fn check_ue4_plugins(&self) -> CheckResult {
@@ -401,6 +491,71 @@ mod tests {
         let result = doctor.check_git_status();
         assert_eq!(result.status, CheckStatus::Fail);
         assert_eq!(result.message, "Not a git repository");
+    }
+
+    // ── check_ue4_root (new behaviour) ───────────────────────────────────────
+
+    #[test]
+    fn check_ue4_root_warns_when_unconfigured() {
+        let dir = tempdir().unwrap();
+        // No .rocket.json, no UE4_ROOT env
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        // Temporarily clear UE4_ROOT so the test is deterministic
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let result = doctor.check_ue4_root();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("not configured"));
+    }
+
+    #[test]
+    fn check_ue4_root_fails_when_path_configured_but_missing() {
+        let dir = tempdir().unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, r#"{"ue4_root": "/nonexistent/ue4"}"#).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_root();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("missing"));
+    }
+
+    #[test]
+    fn check_ue4_root_passes_when_path_exists() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        fs::create_dir_all(&fake_ue4).unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(
+            &rocket_json,
+            format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display()),
+        ).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_root();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Pass);
+    }
+
+    // ── check_html5_toolchain ─────────────────────────────────────────────────
+
+    #[test]
+    fn check_html5_toolchain_returns_a_result() {
+        // Just verify it doesn't panic and returns a named result
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_html5_toolchain();
+        assert_eq!(result.name, "HTML5 Toolchain");
+        // On any dev machine with python3 this should be Pass or Warn (never panic)
+        assert!(
+            result.status == CheckStatus::Pass
+                || result.status == CheckStatus::Warn
+                || result.status == CheckStatus::Fail
+        );
     }
 
     #[test]

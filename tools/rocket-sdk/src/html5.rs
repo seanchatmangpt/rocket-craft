@@ -2,8 +2,9 @@ use anyhow::{bail, Context, Result};
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus, Stdio};
 
+use crate::config::discover_python3;
+
 const GIT_WRAPPER_DIR: &str = "/tmp/ubt-git-wrapper";
-const PYTHON: &str = "/usr/local/bin/python3.11";
 
 pub struct Html5Cook {
     pub engine_root: PathBuf,
@@ -34,6 +35,13 @@ impl Html5Cook {
             bail!("RunUAT.sh not found at {}", run_uat.display());
         }
 
+        // Resolve Python 3 at runtime — never hardcode a path.
+        let python3 = discover_python3().ok_or_else(|| {
+            anyhow::anyhow!(
+                "Python 3 not found. Install python3 or set 'python3_path' in .rocket.json."
+            )
+        })?;
+
         // UHT computes CURRENT_FILE_ID relative to the parent of the project directory.
         // If that parent dir starts with a digit (e.g. versions/4.27.0/), all generated
         // macros start with a digit — invalid C identifier. Create a symlink with a
@@ -60,7 +68,7 @@ impl Html5Cook {
                 "-IgnoreCookErrors",
                 &format!("-archivedirectory={}", self.archive_dir.display()),
             ])
-            .env("PYTHON", PYTHON)
+            .env("PYTHON", python3.to_str().unwrap_or("python3"))
             .env("PATH", &path_with_wrapper)
             .env("MONO_THREADS_SUSPEND", "preemptive")
             .env("MONO_GC_PARAMS", "nursery-size=64m")
@@ -111,11 +119,17 @@ impl Html5Setup {
             ])
             .status();
 
+        let python3 = discover_python3().ok_or_else(|| {
+            anyhow::anyhow!(
+                "Python 3 not found. Install python3 or set 'python3_path' in .rocket.json."
+            )
+        })?;
+
         let path_with_wrapper = prepend_to_path(GIT_WRAPPER_DIR);
 
         let status = Command::new("/opt/homebrew/bin/bash")
             .arg(&setup_sh)
-            .env("PYTHON", PYTHON)
+            .env("PYTHON", python3.to_str().unwrap_or("python3"))
             .env("PATH", &path_with_wrapper)
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
