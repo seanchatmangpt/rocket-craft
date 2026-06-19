@@ -9,6 +9,10 @@ BOLD='\033[1m'
 RESET='\033[0m'
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# Prefer rocket root if available (walks manifest, not hard-coded ../../)
+if command -v rocket &>/dev/null; then
+  REPO_ROOT="$(rocket root 2>/dev/null || echo "$REPO_ROOT")"
+fi
 EXPECTED_BRANCH="claude/inspiring-hamilton-jfww9e"
 
 echo ""
