@@ -22,6 +22,13 @@ Rocket Craft is a multi-game Unreal Engine 4.24 monorepo containing six UE4 game
 ./rocket pwa lint       # ESLint + Prettier on pwa-staff
 ./rocket crypto generate  # Generate Android keystores
 ./rocket wasm --file path/to/plugin.wasm  # Execute a WASM compliance plugin
+
+# HTML5 pipeline (Brm project — proven working, Cook 7)
+./rocket html5 cook --project Brm        # UAT BuildCookRun → Brm.wasm (175 MB) in /tmp/brm-html5-archive/HTML5/
+./rocket html5 serve --port 8080         # Serve manufactured/ dir on :8080
+./verify_html5_pipeline.sh               # Full Stage 6 proof: cook → serve → Playwright → receipt PASS
+# Playwright config: pwa-staff/playwright.html5.config.ts (headless:false, Metal GPU WebGL2, timeout:180s)
+# Receipt: pwa-staff/test-results/tps-dflss-receipt.json (verdict=PASS, visualDelta≥20)
 ```
 
 ### Per-Workspace Rust
