@@ -3,6 +3,37 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  // COOP/COEP required for SharedArrayBuffer (UE4 wasm-threads).
+  // In dev: Vite proxy forwards /manufactured/** to the UE4 asset server (port 8080).
+  vite: {
+    server: {
+      headers: {
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+      },
+      proxy: {
+        '/manufactured': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+          // Strip /manufactured prefix so Brm.wasm is fetched as /Brm.wasm on the asset server
+          rewrite: (path: string) => path.replace(/^\/manufactured/, ''),
+        },
+      },
+    },
+  },
+
+  // COOP/COEP for production/SSR (nitro route rules)
+  nitro: {
+    routeRules: {
+      '/**': {
+        headers: {
+          'Cross-Origin-Opener-Policy': 'same-origin',
+          'Cross-Origin-Embedder-Policy': 'require-corp',
+        },
+      },
+    },
+  },
+
   modules: [
     '@nuxt/ui',       // 125+ accessible components: forms, dashboard, drawer, toast, command palette, chat
     '@vueuse/nuxt',   // auto-imports all VueUse composables (useEventListener, useFullscreen, etc.)

@@ -22,42 +22,21 @@ fn do_html5_setup() -> Result<Value> {
 }
 
 // Inline Python server with COOP/COEP headers (required for SharedArrayBuffer/wasm-threads).
-// Automatically redirects / and /index.html to the game HTML file so the user sees
-// the real game, not a directory listing.
+// This is a background ASSET server only — Nuxt shell is the entry point, not this server.
+// The Nuxt dev server proxies /manufactured/** → this port.
 const COEP_SERVER_SCRIPT: &str = r#"
-import http.server, sys, os, glob
-
-# Find the game HTML file (first *.html that isn't a helper script)
-def find_game_html():
-    candidates = [f for f in glob.glob("*.html")
-                  if not f.startswith("Run") and not f.startswith("Utility")]
-    return candidates[0] if candidates else None
-
-GAME_HTML = find_game_html()
+import http.server, sys
 
 class CoepHandler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        # Redirect bare / and /index.html to the game HTML file
-        if GAME_HTML and self.path in ('/', '/index.html', ''):
-            self.send_response(302)
-            self.send_header("Location", f"/{GAME_HTML}")
-            self.send_header("Cross-Origin-Opener-Policy", "same-origin")
-            self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
-            self.end_headers()
-            return
-        super().do_GET()
-
     def end_headers(self):
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         super().end_headers()
-
     def log_message(self, fmt, *args):
         pass  # suppress per-request noise
 
 port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
-game_url = f"http://localhost:{port}/{GAME_HTML}" if GAME_HTML else f"http://localhost:{port}/"
-print(f"Serving {GAME_HTML or '(no html found)'} on {game_url} (COOP/COEP enabled)", flush=True)
+print(f"[asset-server] UE4 assets on http://0.0.0.0:{port} (proxied via Nuxt /manufactured/)", flush=True)
 with http.server.HTTPServer(("0.0.0.0", port), CoepHandler) as httpd:
     httpd.serve_forever()
 "#;
@@ -448,7 +427,14 @@ fn do_html5_status(project: Option<String>) -> Result<Value> {
         .and_then(|v| v["verdict"].as_str().map(str::to_string))
         .unwrap_or_else(|| "NONE".to_string());
 
-    let overall = if engine_ok && pkg_verdict == "REAL" { "READY" } else { "NOT READY" };
+    // 8. Nuxt shell status (port 3000) — the real game entry point
+    let nuxt_port = 3000u16;
+    let nuxt_up = std::net::TcpStream::connect(format!("127.0.0.1:{nuxt_port}")).is_ok();
+    let nuxt_game_url = format!("http://localhost:{nuxt_port}/game");
+
+    let overall = if engine_ok && pkg_verdict == "REAL" && nuxt_up { "READY" }
+        else if engine_ok && pkg_verdict == "REAL" { "ASSETS READY — start Nuxt shell" }
+        else { "NOT READY" };
 
     println!("=== HTML5 Pipeline Status ===");
     println!("[{}] Engine: {}", if engine_ok { "PASS" } else { "FAIL" }, engine.display());
@@ -456,14 +442,21 @@ fn do_html5_status(project: Option<String>) -> Result<Value> {
     println!("[{}] Package: {} ({})", pkg_verdict, archive,
         wasm_mb.map(|mb| format!("{mb:.1} MB")).unwrap_or_else(|| "n/a".into()));
     println!("[{}] Receipt: {}", receipt_verdict, if receipt.is_some() { receipt_path.display().to_string() } else { "not found (run 'rocket html5 verify')".into() });
-    println!("[{}] Port 8080: {}{}", if port_free { "FREE" } else { "IN USE" },
-        if port_free { "available for serve" } else { "already bound" },
-        background_pid.map(|pid| format!(" (background PID {pid} — stop with: rocket html5 stop)")).unwrap_or_default());
+    println!("[{}] UE4 asset server port 8080: {}{}",
+        if port_free { "FREE" } else { "SERVING" },
+        if port_free { "start with: rocket html5 serve --project Brm" } else { "running" },
+        background_pid.map(|pid| format!(" (PID {pid})")).unwrap_or_default());
+    println!("[{}] Nuxt shell port {nuxt_port}: {}",
+        if nuxt_up { "UP" } else { "DOWN" },
+        if nuxt_up { nuxt_game_url.as_str() } else { "start with: cd nuxt-shell && pnpm dev" });
     println!("[INFO] Projects: {present_projects}/{total_projects} present on disk");
     if let Some(ref log) = cook_log {
         println!("[INFO] Last cook log: {}  (run 'rocket html5 log' to tail)", log.display());
     }
-    println!("\n[{overall}] Pipeline is {}", overall.to_lowercase());
+    println!("\n[{overall}]");
+    if nuxt_up {
+        println!("  Game URL: {nuxt_game_url}");
+    }
 
     Ok(serde_json::json!({
         "overall": overall,
@@ -482,8 +475,16 @@ fn do_html5_status(project: Option<String>) -> Result<Value> {
             "verdict": receipt_verdict,
             "present": receipt.is_some(),
         },
-        "port_8080_free": port_free,
-        "background_serve_pid": background_pid,
+        "nuxt_shell": {
+            "port": nuxt_port,
+            "up": nuxt_up,
+            "game_url": if nuxt_up { Some(nuxt_game_url) } else { None },
+        },
+        "ue4_asset_server": {
+            "port": 8080,
+            "port_free": port_free,
+            "background_pid": background_pid,
+        },
         "manifest": {
             "total_projects": total_projects,
             "present_projects": present_projects,
@@ -665,44 +666,35 @@ fn open_in_browser(url: &str) -> std::result::Result<(), String> {
     }
 }
 
-/// Open the served HTML5 game in the default browser
+/// Open the Nuxt shell game in the default browser.
 ///
-/// Requires `html5 serve` to already be running. Opens the first `.html`
-/// file found in the archive directory in the system browser.
+/// The Nuxt shell (port 3000, /game route) is the entry point — NOT the raw UE4 asset
+/// server. This command verifies the Nuxt shell is actually responding before opening.
 ///
 /// # Arguments
-/// * `archive` - Package directory (default: /tmp/brm-html5-archive/HTML5)
-/// * `port` - Port the server is listening on (default: 8080)
+/// * `nuxt_port` - Nuxt dev server port (default: 3000)
 #[verb("open", "html5")]
-fn open_html5(archive: Option<String>, port: Option<u16>, project: Option<String>) -> Result<Value> {
-    let dir = archive.unwrap_or_else(|| {
-        let name = project.as_deref().unwrap_or("brm").to_lowercase();
-        format!("/tmp/{name}-html5-archive/HTML5")
-    });
-    let port = port.unwrap_or(8080);
+fn open_html5(nuxt_port: Option<u16>, project: Option<String>) -> Result<Value> {
+    let _ = project; // reserved for future multi-project support
+    let port = nuxt_port.unwrap_or(3000);
+    let url = format!("http://localhost:{port}/game");
 
-    // Find the first .html file in the archive dir
-    let html_file = std::fs::read_dir(&dir)
-        .ok()
-        .and_then(|mut entries| {
-            entries.find_map(|e| {
-                let e = e.ok()?;
-                let name = e.file_name().to_string_lossy().to_string();
-                if name.ends_with(".html") { Some(name) } else { None }
-            })
-        });
+    // Verify the Nuxt shell is actually up before opening — never give a URL that doesn't work
+    let reachable = std::net::TcpStream::connect(format!("127.0.0.1:{port}")).is_ok();
+    if !reachable {
+        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "Nuxt shell is not running on port {port}. \
+            Start it with: cd nuxt-shell && pnpm dev"
+        )));
+    }
 
-    let url = match html_file {
-        Some(file) => format!("http://localhost:{port}/{file}"),
-        None => format!("http://localhost:{port}/"),
-    };
-
-    println!("Opening: {url}");
+    println!("[open] Nuxt shell verified on port {port}");
+    println!("[open] Opening: {url}");
 
     open_in_browser(&url)
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(e))?;
 
-    Ok(serde_json::json!({ "url": url }))
+    Ok(serde_json::json!({ "url": url, "verified": true }))
 }
 
 /// Send SIGTERM to a background process by PID, removing the PID file on success.
