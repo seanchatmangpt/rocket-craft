@@ -244,43 +244,23 @@ impl Html5PackageReport {
     pub async fn push_to_supabase(&self, svc: &crate::supabase::SupabaseService) -> Result<()> {
         let receipt = self.as_supabase_receipt();
 
-        // Build individual OCEL event rows from the lifecycle list.
-        // Timestamps are spaced 1 second apart starting from proven_at.
-        // Hash chain uses BLAKE3 so verify_event_chain RPC can check cook events
-        // alongside browser events.
-        let base_ms = receipt.proven_at.parse::<u64>().unwrap_or(0) * 1_000;
-        let mut prev_hash: Option<String> = None;
+        // Build OCEL event rows using ChainedOcelEmitter — single source of truth
+        // for the BLAKE3 chain formula, shared with session-seed and browser clients.
         let cook_obj = format!("cook:{}", self.archive_dir.display());
-        let mut events: Vec<crate::supabase::OcelEventRow> = Vec::new();
+        let base_ms = receipt.proven_at.parse::<u64>().unwrap_or(0) * 1_000;
+        let mut emitter = crate::supabase::ChainedOcelEmitter::new(
+            self.cook_session_id.clone(),
+            cook_obj,
+        );
         for (i, activity) in receipt.ocel_lifecycle.iter().enumerate() {
             let timestamp_ms = base_ms + (i as u64 * 1_000);
-            let attr_json = serde_json::json!({ "stage_index": i });
-            // BLAKE3 chain: matches the formula verify_event_chain and the browser use.
-            // Canonical input: sorted-key JSON object, same as useHashChain.computeEventHash.
-            let chain_payload = serde_json::json!({
-                "data": { "object_refs": [&cook_obj], "attributes": { "stage_index": i } },
-                "id": format!("cook-{i}"),
-                "prev_hash": prev_hash,
-                "timestamp": chrono::DateTime::from_timestamp((timestamp_ms / 1000) as i64, 0)
-                    .map(|dt| dt.to_rfc3339())
-                    .unwrap_or_default(),
-                "type": activity,
-            });
-            let payload_str = serde_json::to_string(&chain_payload).unwrap_or_default();
-            let event_hash: String = blake3::hash(payload_str.as_bytes()).to_hex().to_string();
-            let row = crate::supabase::OcelEventRow {
-                session_id: self.cook_session_id.clone(),
-                activity: activity.clone(),
+            emitter.emit(
+                activity.as_str(),
                 timestamp_ms,
-                object_refs: vec![cook_obj.clone()],
-                attributes: attr_json,
-                prev_hash: prev_hash.clone(),
-                event_hash: event_hash.clone(),
-                seq: i as u32,
-            };
-            prev_hash = Some(event_hash);
-            events.push(row);
+                serde_json::json!({ "stage_index": i }),
+            );
         }
+        let events = emitter.into_events();
 
         // Push OCEL events first so the session has evidence before the receipt lands.
         // Non-fatal on failure — the receipt is the authoritative record.

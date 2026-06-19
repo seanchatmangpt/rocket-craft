@@ -423,6 +423,182 @@ impl SupabaseService {
         }
         Ok(())
     }
+
+    /// Fetch a session-replay proof from the Nuxt server API.
+    /// Returns per-event chain verification (chain_ok per event).
+    /// Calls GET /api/game/session-replay?session_id=<sid> on the Nuxt server.
+    pub async fn fetch_session_replay(
+        &self,
+        nuxt_base_url: &str,
+        session_id: &str,
+    ) -> Result<serde_json::Value> {
+        let url = format!("{nuxt_base_url}/api/game/session-replay?session_id={session_id}");
+        let resp = self.client
+            .get(&url)
+            .send()
+            .await
+            .context("GET session-replay failed")?;
+        if resp.status().is_success() {
+            Ok(resp.json::<serde_json::Value>().await?)
+        } else {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("session-replay {status}: {msg}");
+        }
+    }
+
+    /// Generate and fetch an evidence pack from the Nuxt server API.
+    /// Returns the full tamper-evident bundle (OCEL2 + chain_proof + receipt + pack_hash).
+    /// Calls POST /api/game/evidence-pack on the Nuxt server.
+    pub async fn fetch_evidence_pack(
+        &self,
+        nuxt_base_url: &str,
+        session_id: &str,
+    ) -> Result<serde_json::Value> {
+        let url = format!("{nuxt_base_url}/api/game/evidence-pack");
+        let body = serde_json::json!({ "session_id": session_id });
+        let resp = self.client
+            .post(&url)
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&body)?)
+            .send()
+            .await
+            .context("POST evidence-pack failed")?;
+        if resp.status().is_success() {
+            Ok(resp.json::<serde_json::Value>().await?)
+        } else {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("evidence-pack {status}: {msg}");
+        }
+    }
+
+    /// Fetch ranked leaderboard rows from the Nuxt server API.
+    /// Calls GET /api/game/leaderboard?limit=<n> on the Nuxt server.
+    pub async fn fetch_leaderboard_api(
+        &self,
+        nuxt_base_url: &str,
+        limit: u32,
+    ) -> Result<Vec<serde_json::Value>> {
+        let url = format!("{nuxt_base_url}/api/game/leaderboard?limit={limit}");
+        let resp = self.client
+            .get(&url)
+            .send()
+            .await
+            .context("GET /api/game/leaderboard failed")?;
+        if resp.status().is_success() {
+            let body = resp.json::<serde_json::Value>().await?;
+            Ok(body["rows"].as_array().cloned().unwrap_or_default())
+        } else {
+            Ok(vec![])
+        }
+    }
+}
+
+/// Builds a BLAKE3-chained sequence of OcelEventRow values.
+///
+/// Each call to `emit()` computes the event hash as:
+///   BLAKE3(canonical_json({ "data": {...}, "id": id, "prev_hash": prev, "timestamp": ts, "type": activity }))
+/// and threads `prev_hash` automatically so callers cannot skip the chain.
+///
+/// This is the single source of truth for the chain formula. Both `html5.rs`
+/// and any future emitter must use this type rather than hand-rolling the chain.
+pub struct ChainedOcelEmitter {
+    session_id: Option<String>,
+    object_ref: String,
+    prev_hash: Option<String>,
+    seq: u32,
+    events: Vec<OcelEventRow>,
+}
+
+impl ChainedOcelEmitter {
+    pub fn new(session_id: Option<String>, object_ref: impl Into<String>) -> Self {
+        Self {
+            session_id,
+            object_ref: object_ref.into(),
+            prev_hash: None,
+            seq: 0,
+            events: Vec::new(),
+        }
+    }
+
+    /// Emit one event into the chain. Returns the event_hash for the caller to record.
+    pub fn emit(
+        &mut self,
+        activity: impl Into<String>,
+        timestamp_ms: u64,
+        attributes: serde_json::Value,
+    ) -> String {
+        let activity = activity.into();
+        let id = format!("{}-{}", activity.to_lowercase().replace(' ', "-"), self.seq);
+        let timestamp = chrono::DateTime::from_timestamp((timestamp_ms / 1000) as i64, 0)
+            .map(|dt| dt.to_rfc3339())
+            .unwrap_or_default();
+
+        // Canonical JSON — sorted keys, same formula as useHashChain.computeEventHash in TypeScript
+        let chain_payload = serde_json::json!({
+            "data": {
+                "attributes": attributes,
+                "object_refs": [self.object_ref],
+            },
+            "id": id,
+            "prev_hash": self.prev_hash,
+            "timestamp": timestamp,
+            "type": activity,
+        });
+        // Sort keys to ensure canonical ordering
+        let payload_str = canonical_json(&chain_payload);
+        let event_hash: String = blake3::hash(payload_str.as_bytes()).to_hex().to_string();
+
+        self.events.push(OcelEventRow {
+            session_id: self.session_id.clone(),
+            activity,
+            timestamp_ms,
+            object_refs: vec![self.object_ref.clone()],
+            attributes,
+            prev_hash: self.prev_hash.clone(),
+            event_hash: event_hash.clone(),
+            seq: self.seq,
+        });
+
+        self.prev_hash = Some(event_hash.clone());
+        self.seq += 1;
+        event_hash
+    }
+
+    /// Returns the hash of the last emitted event (the chain tip).
+    pub fn chain_tip(&self) -> Option<&str> {
+        self.prev_hash.as_deref()
+    }
+
+    /// Consume the emitter and return the built event rows.
+    pub fn into_events(self) -> Vec<OcelEventRow> {
+        self.events
+    }
+}
+
+/// Serialize a JSON value with recursively sorted object keys (canonical form).
+/// Matches TypeScript's JSON.stringify(obj, Object.keys(obj).sort()) pattern.
+fn canonical_json(value: &serde_json::Value) -> String {
+    match value {
+        serde_json::Value::Object(map) => {
+            let mut keys: Vec<&String> = map.keys().collect();
+            keys.sort();
+            let pairs: Vec<String> = keys
+                .iter()
+                .map(|k| {
+                    let v = canonical_json(&map[*k]);
+                    format!("{}:{}", serde_json::to_string(k).unwrap_or_default(), v)
+                })
+                .collect();
+            format!("{{{}}}", pairs.join(","))
+        }
+        serde_json::Value::Array(arr) => {
+            let items: Vec<String> = arr.iter().map(canonical_json).collect();
+            format!("[{}]", items.join(","))
+        }
+        other => serde_json::to_string(other).unwrap_or_default(),
+    }
 }
 
 #[cfg(test)]
@@ -509,5 +685,54 @@ mod tests {
         let v = serde_json::to_value(&evt).unwrap();
         assert_eq!(v["activity"], "WasmPackaged");
         assert_eq!(v["seq"], 1);
+    }
+
+    #[test]
+    fn chained_ocel_emitter_chains_correctly() {
+        let mut emitter = ChainedOcelEmitter::new(Some("sess-001".into()), "cook:test");
+        let h0 = emitter.emit("CookStarted", 1_000_000, serde_json::json!({"stage": 0}));
+        let h1 = emitter.emit("WasmPackaged", 1_001_000, serde_json::json!({"stage": 1}));
+        let events = emitter.into_events();
+
+        assert_eq!(events.len(), 2);
+        assert_eq!(events[0].prev_hash, None);
+        assert_eq!(events[1].prev_hash, Some(h0.clone()));
+        assert_eq!(events[0].event_hash, h0);
+        assert_eq!(events[1].event_hash, h1);
+        assert_ne!(h0, h1);
+        // BLAKE3 produces 64 lowercase hex chars
+        assert_eq!(h0.len(), 64);
+        assert!(h0.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn chained_ocel_emitter_chain_tip_tracks_last_hash() {
+        let mut emitter = ChainedOcelEmitter::new(None, "obj");
+        assert!(emitter.chain_tip().is_none());
+        let h = emitter.emit("Start", 0, serde_json::json!({}));
+        assert_eq!(emitter.chain_tip(), Some(h.as_str()));
+    }
+
+    #[test]
+    fn canonical_json_sorts_keys() {
+        let v = serde_json::json!({"z": 1, "a": 2, "m": 3});
+        let s = canonical_json(&v);
+        // Keys must appear in sorted order: a, m, z
+        let a_pos = s.find("\"a\"").unwrap();
+        let m_pos = s.find("\"m\"").unwrap();
+        let z_pos = s.find("\"z\"").unwrap();
+        assert!(a_pos < m_pos && m_pos < z_pos);
+    }
+
+    #[test]
+    fn chained_ocel_emitter_seq_increments() {
+        let mut emitter = ChainedOcelEmitter::new(None, "obj");
+        emitter.emit("A", 0, serde_json::json!({}));
+        emitter.emit("B", 1000, serde_json::json!({}));
+        emitter.emit("C", 2000, serde_json::json!({}));
+        let events = emitter.into_events();
+        assert_eq!(events[0].seq, 0);
+        assert_eq!(events[1].seq, 1);
+        assert_eq!(events[2].seq, 2);
     }
 }

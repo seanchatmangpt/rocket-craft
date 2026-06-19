@@ -390,6 +390,101 @@ fn compute_conformance(sessions: &[serde_json::Value]) -> serde_json::Value {
     })
 }
 
+/// Walk every event in a session and verify the BLAKE3 hash chain event-by-event.
+///
+/// Stronger than `chain-verify` (which only checks the tip via Postgres RPC):
+/// this calls the Nuxt `/api/game/session-replay` endpoint and reports each event's
+/// chain status individually, so a break is pinned to the exact sequence number.
+///
+/// # Arguments
+/// * `session_id` - Session UUID to verify (required)
+/// * `nuxt_url`   - Nuxt server base URL (default: http://localhost:3000)
+#[verb("session-replay", "supabase")]
+fn supabase_session_replay(session_id: String, nuxt_url: Option<String>) -> Result<Value> {
+    let svc = make_service().unwrap_or_else(|_| {
+        rocket_sdk::supabase::SupabaseService::new(
+            "http://localhost:54321".into(), "".into()
+        )
+    });
+    let nuxt = nuxt_url.unwrap_or_else(|| "http://localhost:3000".to_string());
+    let rt = new_runtime()?;
+    let result = rt.block_on(svc.fetch_session_replay(&nuxt, &session_id))
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    let intact = result["chain_intact"].as_bool().unwrap_or(false);
+    let total = result["total_events"].as_u64().unwrap_or(0);
+    let broken_at = result["first_break_at"].as_u64();
+    let tip = result["chain_tip"].as_str().unwrap_or("?");
+
+    println!("=== Session Replay — Chain Proof ===");
+    println!("Session:     {session_id}");
+    println!("Events:      {total}");
+    println!("Chain:       {}", if intact { "INTACT" } else { "BROKEN" });
+    if let Some(b) = broken_at {
+        println!("First break: seq={b}");
+    }
+    println!("Chain tip:   {}…", &tip[..tip.len().min(20)]);
+
+    if let Some(events) = result["events"].as_array() {
+        let broken: Vec<_> = events.iter().filter(|e| !e["chain_ok"].as_bool().unwrap_or(true)).collect();
+        if broken.is_empty() {
+            println!("\n[PROVEN] All {total} events verified in chain");
+        } else {
+            println!("\n[BROKEN] {} broken link(s):", broken.len());
+            for e in &broken {
+                println!("  seq={}  activity={}  expected={}",
+                    e["seq"].as_u64().unwrap_or(0),
+                    e["activity"].as_str().unwrap_or("?"),
+                    e["expected_prev_hash"].as_str().unwrap_or("null"));
+            }
+        }
+    }
+    Ok(result)
+}
+
+/// Generate and download a tamper-evident evidence pack for a session.
+///
+/// The pack bundles OCEL 2.0 log + per-event chain proof + receipt + BLAKE3 pack_hash.
+/// Verifiable offline — no database access needed after download.
+///
+/// # Arguments
+/// * `session_id` - Session UUID to export (required)
+/// * `out`        - Output path (default: evidence-pack-<prefix>.json)
+/// * `nuxt_url`   - Nuxt server base URL (default: http://localhost:3000)
+#[verb("evidence-pack", "supabase")]
+fn supabase_evidence_pack(session_id: String, out: Option<String>, nuxt_url: Option<String>) -> Result<Value> {
+    let svc = make_service().unwrap_or_else(|_| {
+        rocket_sdk::supabase::SupabaseService::new(
+            "http://localhost:54321".into(), "".into()
+        )
+    });
+    let nuxt = nuxt_url.unwrap_or_else(|| "http://localhost:3000".to_string());
+    let rt = new_runtime()?;
+    let pack = rt.block_on(svc.fetch_evidence_pack(&nuxt, &session_id))
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    let prefix = &session_id[..8.min(session_id.len())];
+    let path = out.unwrap_or_else(|| format!("evidence-pack-{prefix}.json"));
+    let json = serde_json::to_string_pretty(&pack)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+    std::fs::write(&path, &json)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    let intact = pack["manifest"]["chain_intact"].as_bool().unwrap_or(false);
+    let events = pack["manifest"]["total_events"].as_u64().unwrap_or(0);
+    let pack_hash = pack["pack_hash"].as_str().unwrap_or("?");
+    let verdict = pack["manifest"]["verdict"].as_str().unwrap_or("none");
+
+    println!("=== Evidence Pack ===");
+    println!("Session:    {session_id}");
+    println!("Events:     {events}");
+    println!("Chain:      {}", if intact { "INTACT" } else { "BROKEN" });
+    println!("Verdict:    {verdict}");
+    println!("Pack hash:  {}…  (BLAKE3)", &pack_hash[..pack_hash.len().min(20)]);
+    println!("Written:    {path}");
+    Ok(pack)
+}
+
 /// Close stale game sessions — sessions alive but with no events for >N minutes.
 ///
 /// Invariant (from LieDetector pattern): is_alive=TRUE sessions must have had
