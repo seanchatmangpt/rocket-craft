@@ -143,3 +143,103 @@ impl GameState<GameOver> {
         GameState::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Initializing → Running ────────────────────────────────────────────────
+
+    #[test]
+    fn new_state_starts_at_tick_zero() {
+        let s = GameState::<Initializing>::new();
+        assert_eq!(s.tick, 0);
+        assert_eq!(s.elapsed_ms, 0);
+    }
+
+    #[test]
+    fn default_equals_new() {
+        let s: GameState<Initializing> = Default::default();
+        assert_eq!(s.tick, 0);
+    }
+
+    #[test]
+    fn start_transitions_to_running() {
+        let running = GameState::<Initializing>::new().start();
+        assert!(running.is_running());
+        assert_eq!(running.tick, 0);
+    }
+
+    // ── Running ticks ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn tick_increments_counter_and_elapsed() {
+        let mut s = GameState::<Initializing>::new().start();
+        s.tick(16);
+        assert_eq!(s.tick, 1);
+        assert_eq!(s.elapsed_ms, 16);
+        s.tick(16);
+        assert_eq!(s.tick, 2);
+        assert_eq!(s.elapsed_ms, 32);
+    }
+
+    // ── Running → Paused ─────────────────────────────────────────────────────
+
+    #[test]
+    fn pause_preserves_tick_and_elapsed() {
+        let mut running = GameState::<Initializing>::new().start();
+        running.tick(100);
+        let paused = running.pause();
+        assert!(paused.is_paused());
+        assert_eq!(paused.tick, 1);
+        assert_eq!(paused.elapsed_ms, 100);
+    }
+
+    // ── Paused → Running ─────────────────────────────────────────────────────
+
+    #[test]
+    fn resume_from_paused_is_running() {
+        let mut s = GameState::<Initializing>::new().start();
+        s.tick(50);
+        let resumed = s.pause().resume();
+        assert!(resumed.is_running());
+        assert_eq!(resumed.elapsed_ms, 50);
+    }
+
+    // ── Running → GameOver ────────────────────────────────────────────────────
+
+    #[test]
+    fn game_over_from_running_preserves_tick() {
+        let mut s = GameState::<Initializing>::new().start();
+        s.tick(200);
+        let over = s.game_over();
+        assert_eq!(over.total_ticks(), 1);
+    }
+
+    #[test]
+    fn winner_score_is_zero_with_no_players() {
+        let over = GameState::<Initializing>::new().start().game_over();
+        assert_eq!(over.winner_score(), 0);
+    }
+
+    // ── GameOver → Initializing (restart) ────────────────────────────────────
+
+    #[test]
+    fn restart_gives_fresh_initializing_state() {
+        let mut s = GameState::<Initializing>::new().start();
+        s.tick(999);
+        let restarted = s.game_over().restart();
+        assert_eq!(restarted.tick, 0);
+        assert_eq!(restarted.elapsed_ms, 0);
+    }
+
+    // ── Paused → GameOver ─────────────────────────────────────────────────────
+
+    #[test]
+    fn game_over_from_paused_state() {
+        let mut s = GameState::<Initializing>::new().start();
+        s.tick(10);
+        let over = s.pause().game_over();
+        assert_eq!(over.total_ticks(), 1);
+    }
+}
