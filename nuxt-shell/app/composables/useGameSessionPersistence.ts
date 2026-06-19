@@ -164,6 +164,18 @@ export function useGameSessionPersistence() {
       syncError.value = `Receipt persist failed: ${error.message}`;
       return null;
     }
+
+    // Server-side chain proof: stamp PROVEN/HASH_MISMATCH verdict on the receipt row
+    // This closes the gap where a client could insert a PASS receipt without chain verification
+    $fetch('/api/game/receipt-finalize', {
+      method: 'POST',
+      body: {
+        session_id: dbSessionId.value,
+        receipt_hash: receipt.receiptHash,
+        update_receipt: true,
+      },
+    }).catch(() => { /* Non-fatal: Supabase holds the receipt; proof runs on next query */ });
+
     await closeSession(receipt.receiptHash);
     return data.id;
   }

@@ -19,35 +19,38 @@ interface SessionSummary {
   session_ended_at: string | null;
 }
 
+interface ProfileResponse {
+  player: PlayerRow | null;
+  rank: number | null;
+  sessions: SessionSummary[];
+  totals: { total_events: number; sessions_with_proof: number };
+}
+
 const player = ref<PlayerRow | null>(null);
 const sessions = ref<SessionSummary[]>([]);
 const leaderboardRank = ref<number | null>(null);
+const totals = ref({ total_events: 0, sessions_with_proof: 0 });
 const loading = ref(true);
 
 async function loadProfile() {
   if (!user.value) { loading.value = false; return; }
+  loading.value = true;
 
+  // Upsert profile row (idempotent — sets up players record on first login)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sb = client as any;
+  await (client as any).rpc('upsert_player_profile', { p_username: null }).catch(() => null);
 
-  // Upsert player profile row on first login (idempotent via ON CONFLICT)
-  await sb.rpc('upsert_player_profile', { p_username: null }).catch(() => null);
-
-  const [playerRes, sessionsRes, rankRes] = await Promise.all([
-    // players.auth_user_id FK = Supabase auth user UUID; not players.id PK
-    sb.from('players').select('id, username, high_score, created_at').eq('auth_user_id', user.value.id).single(),
-    sb.from('game_sessions')
-      .select('id, is_alive, ocel_event_count, engine_source, session_started_at, session_ended_at')
-      .eq('player_id', user.value.id)
-      .order('session_started_at', { ascending: false })
-      .limit(10),
-    sb.from('leaderboard').select('rank').eq('player_id', user.value.id).single(),
-  ]);
-
-  player.value = playerRes.data;
-  sessions.value = sessionsRes.data ?? [];
-  leaderboardRank.value = rankRes.data?.rank ?? null;
-  loading.value = false;
+  try {
+    const data = await $fetch<ProfileResponse>(`/api/game/profile?player_id=${user.value.id}`);
+    player.value = data.player;
+    sessions.value = data.sessions;
+    leaderboardRank.value = data.rank;
+    totals.value = data.totals;
+  } catch {
+    // Profile not found yet (new user) — silent, player.value stays null
+  } finally {
+    loading.value = false;
+  }
 }
 
 async function signOut() {
@@ -59,8 +62,6 @@ async function signOut() {
 onMounted(loadProfile);
 watch(user, loadProfile);
 
-const totalEvents = computed(() => sessions.value.reduce((sum, s) => sum + (s.ocel_event_count ?? 0), 0));
-const passedSessions = computed(() => sessions.value.filter(s => s.ocel_event_count > 0).length);
 const memberSince = computed(() => player.value ? new Date(player.value.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '');
 </script>
 
@@ -106,8 +107,8 @@ const memberSince = computed(() => player.value ? new Date(player.value.created_
       <section class="sessions-card card">
         <h3>Recent Sessions</h3>
         <div class="session-stats">
-          <span>{{ totalEvents.toLocaleString() }} total OCEL events</span>
-          <span>{{ passedSessions }} sessions with proof</span>
+          <span>{{ totals.total_events.toLocaleString() }} total OCEL events</span>
+          <span>{{ totals.sessions_with_proof }} sessions with proof</span>
         </div>
         <ul class="session-list">
           <li v-for="s in sessions" :key="s.id" class="session-row">

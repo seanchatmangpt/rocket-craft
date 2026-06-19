@@ -399,6 +399,42 @@ describe('GET /api/game/session-replay', () => {
   });
 });
 
+// ── /api/game/profile ─────────────────────────────────────────────────────────
+describe('GET /api/game/profile', () => {
+  it('rejects missing player_id', async () => {
+    if (MOCK) return;
+    const { status } = await get('/api/game/profile');
+    expect(status).toBe(400);
+  });
+
+  it('returns null player for unknown UUID (new user)', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/profile?player_id=00000000-0000-0000-0000-000000000001');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    // Unknown user: no player row, empty sessions, no rank
+    expect(body.player).toBeNull();
+    expect(Array.isArray(body.sessions)).toBe(true);
+    expect(body.rank).toBeNull();
+    expect(typeof body.totals.total_events).toBe('number');
+    expect(typeof body.totals.sessions_with_proof).toBe('number');
+  });
+
+  it('contract: response has player|null, rank|null, sessions[], totals', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/profile?player_id=00000000-0000-0000-0000-000000000002');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    // Shape contract regardless of whether player exists
+    expect('player' in body).toBe(true);
+    expect('rank' in body).toBe(true);
+    expect(Array.isArray(body.sessions)).toBe(true);
+    expect(typeof body.totals).toBe('object');
+    expect(typeof body.totals.total_events).toBe('number');
+    expect(typeof body.totals.sessions_with_proof).toBe('number');
+  });
+});
+
 beforeAll(() => {
   if (!MOCK) {
     console.log(`[pipeline-api.test] Running against ${BASE}`);

@@ -23,6 +23,8 @@ import { createClient } from '@supabase/supabase-js';
 interface FinalizeBody {
   session_id: string;
   receipt_hash: string;
+  /** Optional: update the matching game_receipts row with the proven verdict */
+  update_receipt?: boolean;
 }
 
 export default defineEventHandler(async (event) => {
@@ -102,13 +104,25 @@ export default defineEventHandler(async (event) => {
   }
 
   const chainTipMatches = tipRow.event_hash === body.receipt_hash;
+  const verdict = chainTipMatches ? 'PROVEN' : 'HASH_MISMATCH';
+
+  // Optionally stamp the verdict back onto the game_receipts row
+  // (used by persistReceipt composable to close the loop server-side)
+  if (body.update_receipt) {
+    await sb
+      .from('game_receipts')
+      .update({ verdict, proven_at: new Date().toISOString() })
+      .eq('session_id', body.session_id)
+      .eq('receipt_hash', body.receipt_hash);
+    // Non-fatal: if no matching row exists yet the composable hasn't inserted it
+  }
 
   return {
     session_id: body.session_id,
     chain_verified: true,
     chain_tip_matches_hash: chainTipMatches,
     broken_at: null,
-    verdict: chainTipMatches ? 'PROVEN' : 'HASH_MISMATCH',
+    verdict,
     chain_tip: tipRow.event_hash,
     receipt_hash: body.receipt_hash,
     tip_seq: tipRow.seq,
