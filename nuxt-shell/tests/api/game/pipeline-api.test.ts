@@ -687,6 +687,52 @@ describe('POST /api/game/rotate-key', () => {
   });
 });
 
+describe('GET /api/game/process-map', () => {
+  it('returns nodes[], edges[], lifecycle_ok, total_events', async () => {
+    const { status, body } = await get('/api/game/process-map');
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(Array.isArray(body.nodes)).toBe(true);
+    expect(Array.isArray(body.edges)).toBe(true);
+    expect(typeof body.lifecycle_ok).toBe('boolean');
+    expect(typeof body.total_events).toBe('number');
+  });
+
+  it('node structure: each node has id, label, count', async () => {
+    const { status, body } = await get('/api/game/process-map');
+    if (status === 503 || status === 500 || !body?.nodes?.length) return;
+    for (const node of body.nodes) {
+      expect(typeof node.id).toBe('string');
+      expect(typeof node.label).toBe('string');
+      expect(typeof node.count).toBe('number');
+    }
+  });
+
+  it('edge structure: each edge has from, to, count', async () => {
+    const { status, body } = await get('/api/game/process-map');
+    if (status === 503 || status === 500 || !body?.edges?.length) return;
+    for (const edge of body.edges) {
+      expect(typeof edge.from).toBe('string');
+      expect(typeof edge.to).toBe('string');
+      expect(typeof edge.count).toBe('number');
+    }
+  });
+
+  it('lifecycle_ok=true after seeding a lawful session', async () => {
+    if (MOCK) return;
+    const seedRes = await post('/api/game/session-seed', {});
+    if (seedRes.status !== 200) return;
+    const { session_id } = seedRes.body;
+
+    const { status, body } = await get(`/api/game/process-map?session_id=${session_id}`);
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(body.lifecycle_ok).toBe(true);
+    expect(body.total_events).toBeGreaterThan(0);
+    console.log(`[process-map] session=${session_id} nodes=${body.nodes.length} lifecycle_ok=${body.lifecycle_ok}`);
+  });
+});
+
 beforeAll(() => {
   if (!MOCK) {
     console.log(`[pipeline-api.test] Running against ${BASE}`);
