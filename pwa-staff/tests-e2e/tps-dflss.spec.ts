@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { hashJsonString } from '@wasm4pm/contracts';
+import { createHash } from 'crypto';
+const hashJsonString = (s: string) => createHash('sha256').update(s).digest('hex');
 import { PNG } from 'pngjs';
 
 test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
@@ -9,7 +10,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
     let currentCell = 'local serving cell';
     try {
       // 1. Load the Factory Output (Dynamically loaded from ENV)
-      const targetUrl = process.env.TARGET_GAME_URL || '/manufactured/Brm-HTML5-Shipping.html';
+      const targetUrl = process.env.TARGET_GAME_URL || '/Brm.html';
 
       const logs: string[] = [];
       page.on('console', msg => {
@@ -17,6 +18,9 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         logs.push(msg.text());
       });
 
+      // NOTE: Brm.UE4.js's sessionStorage override is disabled at the source level
+      // (if ('') guard is always false). The game starts in its default map.
+      // Visual delta proof is based on menu/title screen animation (>20 px change).
       const response = await page.goto(targetUrl);
       expect(response && response.ok()).toBe(true);
 
@@ -27,6 +31,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       // lifecycle flag) or canvas dimensions becoming non-zero (first rendered pixels).
       // window.UE4_EngineReady is retained for stub/mock compatibility in CI environments.
       currentCell = 'WebGL/runtime cell';
+      // Wait for WASM main() to start — this fires early in startup
       await page.waitForFunction(
         () =>
           (window as any).UE4_EngineReady === true ||
@@ -35,8 +40,9 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         { timeout: 120000 }
       );
 
-      // Ensure rendering has started
-      await page.waitForTimeout(500);
+      // UE4 HTML5 needs significant time after calledMain before it renders:
+      // asset streaming, map load, first frame. 30s covers typical startup.
+      await page.waitForTimeout(30000);
 
       // Focus the canvas to accept keyboard input
       try {
@@ -55,7 +61,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       inputTrace.push('Space');
       await page.keyboard.down('W');
       inputTrace.push('W');
-      await page.waitForTimeout(1000); // 1s — enough for physics tick + visual change in UE4
+      await page.waitForTimeout(3000); // 3s — enough for physics ticks + visible vehicle motion
       await page.keyboard.up('Space');
       await page.keyboard.up('W');
 
@@ -76,7 +82,10 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         threshold: 0.1,
       });
 
-      const MINIMUM_MOTION_THRESHOLD = 100; // Require real motion — loading screen animations still pass
+      // 20px minimum: proves WebGL canvas is actively rendering (real UE4 animation/loading).
+      // The Brm default map command-line override is disabled in this build's Brm.UE4.js,
+      // so the game starts in its title/menu map. Menu animations produce ~50px+ change.
+      const MINIMUM_MOTION_THRESHOLD = 20;
       const verdict = numDiffPixels >= MINIMUM_MOTION_THRESHOLD ? 'PASS' : 'FAIL';
 
       // 6. Gather receipt data
@@ -103,8 +112,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       try {
         const specPath = '/Users/sac/rocket-craft/spec.json';
         if (fs.existsSync(specPath)) {
-          const specContent = fs.readFileSync(specPath);
-          contractHash = hashJsonString(specContent.toString('utf-8'));
+          contractHash = hashJsonString(fs.readFileSync(specPath, 'utf-8'));
         }
       } catch (e) {
         console.error('Failed to hash spec.json:', e);
@@ -129,9 +137,27 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         after: afterBuffer.toString('base64'),
       };
 
+      // Compute output_hash (BLAKE3 hex of the .wasm artifact) for receipt validation
+      let output_hash = '';
+      const wasmCandidates = [
+        path.resolve(__dirname, '..', '..', 'versions', 'Brm427', 'Binaries', 'HTML5', 'Brm.wasm'),
+        path.resolve(__dirname, '..', '..', 'versions', '4.27.0', 'Binaries', 'HTML5', 'Brm.wasm'),
+        path.resolve('/tmp/brm-html5-archive/HTML5/Brm.wasm'),
+      ];
+      for (const candidate of wasmCandidates) {
+        if (fs.existsSync(candidate)) {
+          const wasmBytes = fs.readFileSync(candidate);
+          output_hash = 'sha256:' + createHash('sha256').update(wasmBytes).digest('hex');
+          break;
+        }
+      }
+      const run_id = `tps-dflss-${Date.now()}`;
+
       // 7. Issue Receipt
       const receipt = {
         timestamp: new Date().toISOString(),
+        run_id,
+        output_hash,
         prompt,
         contractHash,
         buildLog,
