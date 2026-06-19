@@ -888,25 +888,49 @@ pub struct CookLogEvent {
     pub detail: Option<String>,
 }
 
-/// Pattern table: `(log substring, OCEL activity, detail_extractor)`.
-/// Order matters — first match wins.
+/// Pattern table: `(log substring, OCEL activity)`.
+/// Order matters — first match wins. Each activity is emitted at most once
+/// (first-seen wins; duplicates from UAT retry logic are dropped by `seen_activities`).
 const COOK_PATTERNS: &[(&str, &str)] = &[
-    ("BuildCookRun",            "CookStarted"),
-    ("HTML5Setup",              "HTML5SetupStarted"),
-    ("Success!",                "HTML5SetupComplete"),
-    ("LogCook: Display: Cooking package", "PackageCooking"),
-    ("LogPak: Display: Collecting files", "PakStarted"),
-    ("LogPak: Display: Created pak file", "PakComplete"),
-    ("LogHTML5PlatformEditor",  "WasmBuildStarted"),
-    ("Packaging complete",      "PackageComplete"),
-    ("Total cook time",         "CookComplete"),
-    ("LogStageAndPackage",      "StagingStarted"),
-    ("Archiving",               "ArchiveStarted"),
-    ("Package was created",     "PackageCreated"),
-    ("BuildCookRun: Completed", "CookFinished"),
-    ("Error:",                  "CookError"),
-    ("ERROR:",                  "CookError"),
-    ("FAILED:",                 "CookFailed"),
+    // ── UAT entry / setup ─────────────────────────────────────────────────
+    ("BuildCookRun",                       "CookStarted"),
+    ("HTML5Setup",                         "HTML5SetupStarted"),
+    ("HTML5Setup.sh",                      "HTML5SetupStarted"),   // alternate form
+    ("Success!",                           "HTML5SetupComplete"),
+    // ── Cook phase ────────────────────────────────────────────────────────
+    ("LogCook: Display: Cooking package",  "PackageCooking"),
+    ("LogCook: Display: Cook complete",    "CookComplete"),
+    ("Total cook time",                    "CookComplete"),         // alternate form
+    ("LogCook: Display: Finished cooking", "CookComplete"),
+    // ── Shader compilation ────────────────────────────────────────────────
+    ("LogShaderCompilers:",                "ShaderCompileStarted"),
+    ("ShaderCompileWorker",               "ShaderCompileStarted"),
+    ("Shaders compiled",                   "ShadersCompiled"),
+    // ── Asset save phase ──────────────────────────────────────────────────
+    ("LogSave: Display: Saving package",   "AssetSaveStarted"),
+    ("LogSave: Display: Saving cooked",    "AssetSaveStarted"),
+    // ── WASM / Emscripten compilation ─────────────────────────────────────
+    ("LogHTML5PlatformEditor",             "WasmBuildStarted"),
+    ("emcc",                               "EmscriptenInvoked"),
+    ("wasm-opt",                           "WasmOptimized"),
+    // ── Pak / staging ─────────────────────────────────────────────────────
+    ("LogPak: Display: Collecting files",  "PakStarted"),
+    ("LogPak: Display: Created pak file",  "PakComplete"),
+    ("LogStageAndPackage",                 "StagingStarted"),
+    ("Staging complete",                   "StagingComplete"),
+    ("Archiving",                          "ArchiveStarted"),
+    // ── Package finalisation ──────────────────────────────────────────────
+    ("Packaging complete",                 "PackageComplete"),
+    ("Package was created",                "PackageCreated"),
+    ("BuildCookRun: Completed",            "CookFinished"),
+    // ── Errors (last — only if no success pattern matched first) ──────────
+    ("CookLog: Error:",                    "CookError"),
+    ("Error: Error:",                      "CookError"),
+    ("Error:",                             "CookError"),
+    ("ERROR:",                             "CookError"),
+    ("FAILED:",                            "CookFailed"),
+    ("returned exit code",                 "CookFailed"),
+    ("exception was thrown",               "CookFailed"),
 ];
 
 /// Parse a UAT/UE4 cook log and extract structured OCEL lifecycle events.
@@ -1701,5 +1725,120 @@ mod tests {
     fn parse_cook_log_missing_file_returns_empty() {
         let events = parse_cook_log(std::path::Path::new("/nonexistent/cook.log"), 0);
         assert!(events.is_empty());
+    }
+
+    #[test]
+    fn parse_cook_log_detects_new_patterns() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[
+            "Running BuildCookRun",
+            "LogShaderCompilers: Compiling shaders",
+            "LogPak: Display: Collecting files to pak",
+            "Staging complete, archive ready",
+            "Package was created successfully",
+            "BuildCookRun: Completed successfully",
+        ]);
+        let events = parse_cook_log(&log, 0);
+        let activities: Vec<&str> = events.iter().map(|e| e.activity.as_str()).collect();
+        assert!(activities.contains(&"CookStarted"), "CookStarted missing");
+        assert!(activities.contains(&"ShaderCompileStarted"), "ShaderCompileStarted missing");
+        assert!(activities.contains(&"PakStarted"), "PakStarted missing");
+        assert!(activities.contains(&"StagingComplete"), "StagingComplete missing");
+        assert!(activities.contains(&"PackageCreated"), "PackageCreated missing");
+        assert!(activities.contains(&"CookFinished"), "CookFinished missing");
+    }
+
+    #[test]
+    fn parse_cook_log_failed_pattern() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[
+            "Running BuildCookRun",
+            "ERROR: Exception was thrown during cook",
+        ]);
+        let events = parse_cook_log(&log, 0);
+        let activities: Vec<&str> = events.iter().map(|e| e.activity.as_str()).collect();
+        assert!(activities.contains(&"CookStarted"));
+        // CookError matches "Error:" and "ERROR:" — verify it fires
+        assert!(activities.iter().any(|a| *a == "CookError" || *a == "CookFailed"));
+    }
+
+    // ── output_hash tests ──────────────────────────────────────────────────────
+
+    #[test]
+    fn write_receipt_includes_output_hash_for_real_wasm() {
+        let dir = TempDir::new().unwrap();
+        let wasm = dir.path().join("Brm.wasm");
+        // Write a valid WASM magic header
+        std::fs::write(&wasm, b"\0asm\x01\0\0\0test-payload").unwrap();
+
+        let report = Html5PackageReport {
+            archive_dir: dir.path().to_owned(),
+            wasm_files: vec![WasmFileReport { path: wasm.clone(), verdict: WasmVerdict::Real { size_bytes: 16 } }],
+            companions: CompanionReport { has_js: false, has_html: false, has_data_or_pak: false },
+            is_real_package: true,
+            ui_input_patched: false,
+            cook_session_id: None,
+            cook_log_events: vec![],
+        };
+
+        let path = report.write_receipt().unwrap();
+        let json: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+
+        let hash = json["output_hash"].as_str().expect("output_hash must be present");
+        assert_eq!(hash.len(), 64, "SHA-256 hex must be 64 chars");
+        // Verify it's actually the SHA-256 of the file bytes
+        let expected = {
+            let d = ring::digest::digest(&ring::digest::SHA256, b"\0asm\x01\0\0\0test-payload");
+            d.as_ref().iter().map(|b| format!("{b:02x}")).collect::<String>()
+        };
+        assert_eq!(hash, expected, "output_hash must be SHA-256 of WASM bytes");
+    }
+
+    #[test]
+    fn write_receipt_output_hash_null_for_stub_wasm() {
+        let dir = TempDir::new().unwrap();
+        let wasm = dir.path().join("Stub.wasm");
+        std::fs::write(&wasm, b"stub").unwrap();
+
+        let report = Html5PackageReport {
+            archive_dir: dir.path().to_owned(),
+            wasm_files: vec![WasmFileReport { path: wasm, verdict: WasmVerdict::Stub { size_bytes: 4 } }],
+            companions: CompanionReport { has_js: false, has_html: false, has_data_or_pak: false },
+            is_real_package: false,
+            ui_input_patched: false,
+            cook_session_id: None,
+            cook_log_events: vec![],
+        };
+
+        let path = report.write_receipt().unwrap();
+        let json: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        // Stub WASM → output_hash must be null (no real binary)
+        assert!(json["output_hash"].is_null(), "output_hash must be null for stub WASM");
+    }
+
+    #[test]
+    fn as_supabase_receipt_output_hash_matches_write_receipt() {
+        let dir = TempDir::new().unwrap();
+        let wasm = dir.path().join("Brm.wasm");
+        std::fs::write(&wasm, b"\0asm\x01\0\0\0consistency-check").unwrap();
+
+        let report = Html5PackageReport {
+            archive_dir: dir.path().to_owned(),
+            wasm_files: vec![WasmFileReport { path: wasm, verdict: WasmVerdict::Real { size_bytes: 24 } }],
+            companions: CompanionReport { has_js: true, has_html: true, has_data_or_pak: false },
+            is_real_package: true,
+            ui_input_patched: false,
+            cook_session_id: None,
+            cook_log_events: vec![],
+        };
+
+        let disk_path = report.write_receipt().unwrap();
+        let disk_json: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(&disk_path).unwrap()).unwrap();
+        let supa_receipt = report.as_supabase_receipt();
+
+        let disk_hash = disk_json["output_hash"].as_str().unwrap();
+        let supa_hash = supa_receipt.output_hash.as_deref().unwrap();
+        assert_eq!(disk_hash, supa_hash,
+            "output_hash must be identical in write_receipt() and as_supabase_receipt()");
     }
 }
