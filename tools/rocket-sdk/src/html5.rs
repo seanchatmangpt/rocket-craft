@@ -268,6 +268,50 @@ impl Html5Cook {
         self
     }
 
+    /// Check that all required environment components exist before starting a cook.
+    ///
+    /// Returns a list of human-readable failure reasons. An empty Vec means the
+    /// environment is ready. Call this before `run()` to surface problems early
+    /// without waiting for a long UAT build to fail mid-way.
+    pub fn preflight_check(&self) -> Vec<String> {
+        let mut failures = Vec::new();
+
+        let run_uat = self.engine_root.join("Engine/Build/BatchFiles/RunUAT.sh");
+        if !run_uat.exists() {
+            failures.push(format!("RunUAT.sh not found: {}", run_uat.display()));
+        }
+
+        if !self.project.exists() {
+            failures.push(format!(".uproject not found: {}", self.project.display()));
+        }
+
+        let emsdk = self.engine_root.join("Engine/Platforms/HTML5/Build/emsdk");
+        if !emsdk.exists() {
+            failures.push(format!("HTML5 emsdk not found at {}: run HTML5Setup.sh", emsdk.display()));
+        }
+
+        // Python 3 must be discoverable — HTML5 UAT requires it.
+        let python_ok = discover_emsdk_python(&self.engine_root)
+            .or_else(|| {
+                ["python3", "python"]
+                    .iter()
+                    .find_map(|cmd| {
+                        std::process::Command::new(cmd)
+                            .arg("--version")
+                            .output()
+                            .ok()
+                            .filter(|o| o.status.success())
+                            .map(|_| std::path::PathBuf::from(cmd))
+                    })
+            })
+            .is_some();
+        if !python_ok {
+            failures.push("Python 3 not found in PATH or emsdk; HTML5 UAT requires it".into());
+        }
+
+        failures
+    }
+
     /// Run the cook and verify the output is a real package.
     /// Returns the package report; call `report.is_real_package` to confirm success.
     pub fn run_and_verify(&self) -> Result<Html5PackageReport> {
@@ -779,6 +823,82 @@ mod tests {
         assert!(found.is_some(), "should find python3 in emsdk structure");
         let found = found.unwrap();
         assert!(found.ends_with("bin/python3"), "path should end with bin/python3, got: {}", found.display());
+    }
+
+    // ── Html5Cook::preflight_check ───────────────────────────────────────────
+
+    #[test]
+    fn preflight_check_reports_missing_runuat() {
+        let dir = TempDir::new().unwrap();
+        let uproject = dir.path().join("Game.uproject");
+        std::fs::write(&uproject, "{}").unwrap();
+
+        let cook = Html5Cook::new(dir.path(), &uproject, dir.path().join("archive"));
+        let failures = cook.preflight_check();
+        assert!(
+            failures.iter().any(|f| f.contains("RunUAT.sh")),
+            "missing RunUAT.sh must be reported: {failures:?}"
+        );
+    }
+
+    #[test]
+    fn preflight_check_reports_missing_uproject() {
+        let dir = TempDir::new().unwrap();
+        let cook = Html5Cook::new(dir.path(), dir.path().join("Ghost.uproject"), dir.path().join("archive"));
+        let failures = cook.preflight_check();
+        assert!(
+            failures.iter().any(|f| f.contains("uproject")),
+            "missing .uproject must be reported: {failures:?}"
+        );
+    }
+
+    #[test]
+    fn preflight_check_reports_missing_emsdk() {
+        let dir = TempDir::new().unwrap();
+        // Provide RunUAT.sh and .uproject so those checks pass
+        let batch = dir.path().join("Engine/Build/BatchFiles");
+        std::fs::create_dir_all(&batch).unwrap();
+        std::fs::write(batch.join("RunUAT.sh"), "#!/bin/sh\n").unwrap();
+        let uproject = dir.path().join("Game.uproject");
+        std::fs::write(&uproject, "{}").unwrap();
+
+        let cook = Html5Cook::new(dir.path(), &uproject, dir.path().join("archive"));
+        let failures = cook.preflight_check();
+        assert!(
+            failures.iter().any(|f| f.contains("emsdk") || f.contains("HTML5Setup")),
+            "missing emsdk must be reported: {failures:?}"
+        );
+    }
+
+    #[test]
+    fn preflight_check_passes_when_all_present() {
+        let dir = TempDir::new().unwrap();
+        // Simulate a minimal valid engine layout
+        let batch = dir.path().join("Engine/Build/BatchFiles");
+        std::fs::create_dir_all(&batch).unwrap();
+        std::fs::write(batch.join("RunUAT.sh"), "#!/bin/sh\n").unwrap();
+        let emsdk_dir = dir.path().join("Engine/Platforms/HTML5/Build/emsdk");
+        std::fs::create_dir_all(&emsdk_dir).unwrap();
+        // Put a fake python3 into the emsdk so discover_emsdk_python finds one
+        let fake_python = emsdk_dir.join("python3");
+        std::fs::write(&fake_python, "#!/bin/sh\necho Python 3.11.0\n").unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&fake_python, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
+        let uproject = dir.path().join("Game.uproject");
+        std::fs::write(&uproject, "{}").unwrap();
+
+        let cook = Html5Cook::new(dir.path(), &uproject, dir.path().join("archive"));
+        // Python check depends on PATH; we allow failures here as long as the first two checks pass.
+        let failures = cook.preflight_check();
+        let has_runuat_error = failures.iter().any(|f| f.contains("RunUAT.sh"));
+        let has_uproject_error = failures.iter().any(|f| f.contains("uproject"));
+        let has_emsdk_error = failures.iter().any(|f| f.contains("emsdk"));
+        assert!(!has_runuat_error, "RunUAT.sh should not be reported missing");
+        assert!(!has_uproject_error, ".uproject should not be reported missing");
+        assert!(!has_emsdk_error, "emsdk should not be reported missing");
     }
 
     #[test]

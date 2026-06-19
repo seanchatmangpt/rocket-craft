@@ -96,20 +96,18 @@ fn do_html5_cook(
         .unwrap_or_else(|| std::path::PathBuf::from(format!("/tmp/{}-html5-archive", proj.name.to_lowercase())));
     let engine = ue4_root();
 
-    // Quick pre-cook sanity check — surface blockers before wasting 30 min
-    let uat = engine.join("Engine/Build/BatchFiles/RunUAT.sh");
-    if !uat.exists() {
-        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
-            "RunUAT.sh not found at {} — is UE4_ROOT set correctly? Run 'rocket html5 preflight'",
-            uat.display()
-        )));
-    }
-    let python_ok = std::process::Command::new("python3")
-        .arg("--version").output().map(|o| o.status.success()).unwrap_or(false);
-    if !python_ok {
-        return Err(clap_noun_verb::NounVerbError::execution_error(
-            "python3 not found in PATH — required by RunUAT. Install python3 and retry.".to_string()
-        ));
+    let cook = rocket_sdk::Html5Cook::new(&engine, &uproject, &archive_dir)
+        .with_client_config(config.unwrap_or_else(|| "Development".to_string()));
+
+    // Use Html5Cook::preflight_check() to surface all blockers before wasting 30 min on UAT
+    let blockers = cook.preflight_check();
+    if !blockers.is_empty() {
+        let msg = format!(
+            "Cook preflight failed for '{}' — fix these issues first:\n{}",
+            project,
+            blockers.iter().map(|b| format!("  • {b}")).collect::<Vec<_>>().join("\n")
+        );
+        return Err(clap_noun_verb::NounVerbError::execution_error(msg));
     }
 
     println!(
@@ -118,9 +116,6 @@ fn do_html5_cook(
         archive_dir.display()
     );
     println!("Engine: {}", engine.display());
-
-    let cook = rocket_sdk::Html5Cook::new(&engine, &uproject, &archive_dir)
-        .with_client_config(config.unwrap_or_else(|| "Development".to_string()));
     cook.run()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
 
