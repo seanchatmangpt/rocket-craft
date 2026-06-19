@@ -41,7 +41,7 @@ export interface ConformanceResult {
 const REQUIRED_ACTIVITIES = ['GameSessionStarted', 'FrameRendered'];
 const EXPECTED_ACTIVITIES = new Set(['GameSessionStarted', 'FrameRendered', 'InputAdmitted']);
 
-function conformanceOf(sessions: SessionLifecycleSummary[]): ConformanceResult {
+export function conformanceOf(sessions: SessionLifecycleSummary[]): ConformanceResult {
   if (sessions.length === 0) {
     return { fitness: 0, precision: 0, simplicity: 1, generalization: 0, conformant_sessions: 0, total_sessions: 0, non_conformant: [], all_activities_seen: [] };
   }
