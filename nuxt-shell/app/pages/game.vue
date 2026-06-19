@@ -19,17 +19,16 @@ const lifecycle = computed(() => [...new Set(ocelEvents.value.map(e => e.activit
 // Persist OCEL events to Supabase with hash chaining for pm4py conformance replay
 const { syncedCount, syncError, dbSessionId, lastHash } = useGameSessionPersistence();
 
-// Commit receipt through server route (server validates OCEL lifecycle before writing).
-// Uses exportHashedOcelLog so the receipt hash is the SHA-256 chain tip — not a hash of
-// the serialised JSON blob. This makes the receipt_hash a cryptographic commitment to the
-// exact sequence of events, replayable by verify_event_chain().
+// Minimum lawful OCEL lifecycle for auto-commit (Van der Aalst: process must be provable)
+const PROVEN_LIFECYCLE = ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'] as const;
+
+// Guard: only commit once per session, even if the watcher fires multiple times
+const hasAutoCommitted = ref(false);
+const lastCommitVerdict = ref<string | null>(null);
+
 async function commitReceipt() {
   if (!dbSessionId.value) return;
-  // Use the chain tip already computed by useGameSessionPersistence (canonical formula)
-  // so receipt_hash matches the last stored event_hash in ocel_events.
-  const receiptHash = lastHash.value
-    ? `sha256:${lastHash.value}`
-    : `sha256:empty`;
+  const receiptHash = lastHash.value ? `sha256:${lastHash.value}` : `sha256:empty`;
 
   const result = await $fetch('/api/game/receipt', {
     method: 'POST',
@@ -45,9 +44,27 @@ async function commitReceipt() {
   }).catch(() => null);
 
   if (result) {
-    console.info(`[rocket-craft] Receipt ${result.verdict} — ${result.reason}`);
+    lastCommitVerdict.value = (result as { verdict?: string }).verdict ?? null;
+    console.info(`[rocket-craft] Receipt ${lastCommitVerdict.value} — auto-committed`);
   }
+  return result;
 }
+
+// Auto-commit receipt when OCEL lifecycle reaches the proven minimum.
+// Fires once per session; subsequent events after proven state are ignored.
+// This closes Gap 3: the Playwright receipt-persistence poll now has a real trigger.
+watch(
+  () => lifecycle.value,
+  async (activities) => {
+    if (hasAutoCommitted.value || !dbSessionId.value) return;
+    const actSet = new Set(activities);
+    const proven = PROVEN_LIFECYCLE.every(a => actSet.has(a));
+    if (!proven) return;
+    hasAutoCommitted.value = true;
+    await commitReceipt();
+  },
+  { deep: false },
+);
 
 const engineStatus = computed(() => {
   if (isPlaying.value) return `LIVE — ${ocelEvents.value.length} events`;

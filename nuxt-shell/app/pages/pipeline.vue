@@ -44,8 +44,21 @@ interface ChainVerifyResult {
   breaks: Array<{ session_id: string; message: string; broken_at: number | null }>;
 }
 
+interface DailyStatRow {
+  day: string;
+  sessions: number | null;
+  unique_players: number | null;
+  receipts: number;
+  pass_receipts: number;
+  fail_receipts: number;
+  real_ue4_receipts: number;
+  avg_ocel_events: number;
+  pass_rate_pct: number | null;
+}
+
 const health = ref<PipelineHealth | null>(null);
 const chainStatus = ref<ChainVerifyResult | null>(null);
+const dailyStats = ref<DailyStatRow[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const liveViewers = ref(0);        // Realtime presence: other dashboard viewers
@@ -107,6 +120,14 @@ const healthColor = computed(() => {
 
 // Process conformance (Van der Aalst fitness/precision/generalization/simplicity)
 const { conformance, fitnessLabel, fitnessColor, load: loadConformance } = useProcessConformance();
+
+// ── Daily rollup stats from /api/game/dashboard-stats ─────────────────────
+async function loadDailyStats() {
+  try {
+    const result = await $fetch<{ source: string; rows: DailyStatRow[] }>('/api/game/dashboard-stats');
+    dailyStats.value = result.rows ?? [];
+  } catch { /* non-critical — dashboard still works without rollups */ }
+}
 
 // ── Last receipt lifecycle for ChainVisualization flow diagram ───────────────
 // Fetches the most recent PASS receipt's ocel_lifecycle to show as the process flow
@@ -240,9 +261,10 @@ onMounted(() => {
   loadChainStatus();
   loadConformance();
   loadLastLifecycle();
+  loadDailyStats();
   setupPresence();
   setupSessionCountChannel();
-  timer = setInterval(() => { loadHealth(); loadChainStatus(); loadConformance(); loadLastLifecycle(); }, 30_000);
+  timer = setInterval(() => { loadHealth(); loadChainStatus(); loadConformance(); loadLastLifecycle(); loadDailyStats(); }, 30_000);
 
   // Bust KV cache and reload immediately when a PASS receipt fires
   receiptBus.on((r) => {
@@ -404,6 +426,33 @@ onUnmounted(() => {
         </div>
       </section>
 
+      <!-- Daily rollup stats (from migration 000010 + /api/game/dashboard-stats) -->
+      <section v-if="dailyStats.length" class="daily-stats-section">
+        <h2>Daily Pipeline Rollup <span class="stat-src">(last 7 days)</span></h2>
+        <table class="daily-table">
+          <thead>
+            <tr>
+              <th>Day</th><th>Sessions</th><th>Receipts</th>
+              <th>PASS</th><th>FAIL</th><th>Real UE4</th><th>Avg Events</th><th>Pass%</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in dailyStats" :key="row.day" :class="{ 'row-fail': (row.pass_rate_pct ?? 100) < 80 }">
+              <td class="day-cell">{{ row.day }}</td>
+              <td>{{ row.sessions ?? '—' }}</td>
+              <td>{{ row.receipts }}</td>
+              <td class="pass-cell">{{ row.pass_receipts }}</td>
+              <td class="fail-cell">{{ row.fail_receipts }}</td>
+              <td>{{ row.real_ue4_receipts }}</td>
+              <td>{{ row.avg_ocel_events ? row.avg_ocel_events.toFixed(1) : '—' }}</td>
+              <td :class="{ 'pass-cell': (row.pass_rate_pct ?? 0) >= 90, 'fail-cell': (row.pass_rate_pct ?? 100) < 80 }">
+                {{ row.pass_rate_pct != null ? `${row.pass_rate_pct}%` : '—' }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
       <!-- Health Lie Detector violations panel -->
       <section v-if="lies.length" class="lies-panel">
         <h2>
@@ -500,6 +549,16 @@ onUnmounted(() => {
 .break-dl-list { list-style: none; padding: 0.5rem 0 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .ocel-dl-link { color: #7dd3fc; text-decoration: none; font-size: 0.75rem; border: 1px solid #334155; padding: 0.1rem 0.4rem; border-radius: 2px; white-space: nowrap; }
 .ocel-dl-link:hover { background: #1e293b; }
+.daily-stats-section { margin-bottom: 2rem; }
+.daily-stats-section h2 { font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem; }
+.stat-src { font-size: 0.7rem; color: #475569; font-weight: 400; }
+.daily-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; font-family: 'Courier New', monospace; }
+.daily-table th { color: #64748b; border-bottom: 1px solid #1e293b; padding: 0.25rem 0.5rem; text-align: left; }
+.daily-table td { padding: 0.25rem 0.5rem; border-bottom: 1px solid #0f172a; }
+.day-cell { color: #94a3b8; }
+.pass-cell { color: #22c55e; }
+.fail-cell { color: #ef4444; }
+.row-fail { background: rgba(239,68,68,0.05); }
 .conformance-section { margin-bottom: 2rem; }
 .conformance-section h2 { font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.25rem; }
 .conformance-model { font-size: 0.75rem; color: #475569; margin: 0 0 0.75rem; }
