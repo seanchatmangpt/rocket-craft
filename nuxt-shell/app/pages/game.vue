@@ -11,7 +11,7 @@ useRocketTouchInput(canvasRef);
 const { isEngineReady } = useRocketUe4Bridge();
 
 // OCEL process-mining proof: isPlaying is derived from the event log, not a flag
-const { isPlaying, events: ocelEvents, exportOcelLog } = useGameSessionOcel();
+const { isPlaying, events: ocelEvents, exportOcelLog, exportHashedOcelLog } = useGameSessionOcel();
 
 // Lifecycle is the ordered list of unique activity names — used by the server to verify lawful OCEL process
 const lifecycle = computed(() => [...new Set(ocelEvents.value.map(e => e.activity))]);
@@ -19,13 +19,19 @@ const lifecycle = computed(() => [...new Set(ocelEvents.value.map(e => e.activit
 // Persist OCEL events to Supabase with hash chaining for pm4py conformance replay
 const { syncedCount, syncError, dbSessionId } = useGameSessionPersistence();
 
-// Commit receipt through server route (server validates OCEL lifecycle before writing)
+// Commit receipt through server route (server validates OCEL lifecycle before writing).
+// Uses exportHashedOcelLog so the receipt hash is the SHA-256 chain tip — not a hash of
+// the serialised JSON blob. This makes the receipt_hash a cryptographic commitment to the
+// exact sequence of events, replayable by verify_event_chain().
 async function commitReceipt() {
-  const log = exportOcelLog();
-  const receiptHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(log)))
-    .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
-
   if (!dbSessionId.value) return;
+  const exportedAtMs = Date.now();
+  const hashedLog = await exportHashedOcelLog(exportedAtMs);
+
+  // chain_tip is SHA-256 of the last event in the chain — the receipt hash
+  const receiptHash = hashedLog.chain_tip
+    ? `sha256:${hashedLog.chain_tip}`
+    : `sha256:empty`;
 
   const result = await $fetch('/api/game/receipt', {
     method: 'POST',
@@ -36,7 +42,11 @@ async function commitReceipt() {
       engine_source: isEngineReady.value ? 'real_ue4' : 'unknown',
       receipt_hash: receiptHash,
       milestone: 'GameSessionProof',
-      payload: { exported_log: log },
+      payload: {
+        chain_tip: hashedLog.chain_tip,
+        merkle_root: hashedLog.merkle_root,
+        exported_at_ms: exportedAtMs,
+      },
     },
   }).catch(() => null);
 
@@ -64,7 +74,17 @@ function downloadOcelLog() {
   const blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `game-session-ocel-${Date.now()}.json`;
+  // Embed event count in filename for forensic traceability
+  a.download = `game-session-ocel-${ocelEvents.value.length}evts.json`;
+  a.click();
+}
+
+async function downloadHashedOcelLog() {
+  const hashedLog = await exportHashedOcelLog(Date.now());
+  const blob = new Blob([JSON.stringify(hashedLog, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `game-session-ocel-hashed-${hashedLog.hashed_events.length}evts.json`;
   a.click();
 }
 </script>
@@ -92,10 +112,17 @@ function downloadOcelLog() {
         <button
           v-if="isPlaying"
           class="ocel-export"
-          title="Export OCEL log for pm4py conformance checking"
+          title="Export OCEL log (plain)"
           data-testid="ocel-export-btn"
           @click="downloadOcelLog"
         >↓ OCEL</button>
+        <button
+          v-if="isPlaying"
+          class="ocel-export"
+          title="Export OCEL log with SHA-256 hash chain + Merkle root"
+          data-testid="ocel-export-hashed-btn"
+          @click="downloadHashedOcelLog"
+        >↓ OCEL+SHA256</button>
         <button
           v-if="isPlaying && dbSessionId"
           class="receipt-commit"

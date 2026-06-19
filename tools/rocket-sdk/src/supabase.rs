@@ -162,6 +162,32 @@ impl SupabaseService {
         (checks, health)
     }
 
+    /// Call the `verify_event_chain` Postgres RPC.
+    ///
+    /// Returns an array of `{ ok, message, broken_at, session_id }` rows.
+    /// When `session_id` is `None`, all sessions are checked.
+    pub async fn verify_event_chain(&self, session_id: Option<&str>) -> Result<Vec<serde_json::Value>> {
+        let url = format!("{}/rest/v1/rpc/verify_event_chain", self.url);
+        let body = match session_id {
+            Some(sid) => format!(r#"{{"p_session_id": "{sid}"}}"#),
+            None => "{}".to_string(),
+        };
+        let resp = self.client
+            .post(&url)
+            .headers(self.rest_headers())
+            .body(body)
+            .send()
+            .await
+            .context("POST verify_event_chain failed")?;
+        if resp.status().is_success() {
+            Ok(resp.json::<Vec<serde_json::Value>>().await?)
+        } else {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("verify_event_chain {status}: {msg}");
+        }
+    }
+
     /// Fetch the 10 most recent game receipts ordered by proven_at DESC.
     pub async fn recent_receipts(&self) -> Result<Vec<serde_json::Value>> {
         let resp = self.client

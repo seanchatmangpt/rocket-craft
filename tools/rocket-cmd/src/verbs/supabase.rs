@@ -123,6 +123,39 @@ fn supabase_receipts() -> Result<Value> {
     Ok(serde_json::json!({ "receipts": receipts }))
 }
 
+/// Verify the ocel_events hash chain via the verify_event_chain Postgres RPC.
+///
+/// Checks that each event's prev_hash matches the prior event's event_hash.
+/// A chain break means the event log has been tampered with or is incomplete.
+///
+/// # Arguments
+/// * `session_id` - Verify a specific session UUID (default: all sessions)
+#[verb("chain-verify", "supabase")]
+fn supabase_chain_verify(session_id: Option<String>) -> Result<Value> {
+    let svc = make_service()?;
+    let rt = new_runtime()?;
+    let rows = rt.block_on(svc.verify_event_chain(session_id.as_deref()))
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    if rows.is_empty() {
+        println!("[?] No sessions found or RPC unavailable.");
+        println!("    Run `rocket supabase migrate` to create verify_event_chain.");
+        return Ok(serde_json::json!({ "overall": "UNKNOWN", "rows": [] }));
+    }
+
+    let all_ok = rows.iter().all(|r| r["ok"].as_bool().unwrap_or(false));
+    let overall = if all_ok { "PASS" } else { "FAIL" };
+    println!("=== OCEL Chain Verify ===");
+    for r in &rows {
+        let ok = r["ok"].as_bool().unwrap_or(false);
+        let msg = r["message"].as_str().unwrap_or("?");
+        let sid = r["session_id"].as_str().unwrap_or("?");
+        println!("[{}] session={sid}  {msg}", if ok { "PASS" } else { "FAIL" });
+    }
+    println!("\n[{overall}]");
+    Ok(serde_json::json!({ "overall": overall, "rows": rows }))
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

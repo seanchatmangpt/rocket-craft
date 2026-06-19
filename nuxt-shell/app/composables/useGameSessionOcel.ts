@@ -41,6 +41,21 @@ export interface OcelLog {
   exported_at_ms: number;
 }
 
+/** An OcelEvent enriched with SHA-256 hash chain fields for Supabase insert. */
+export interface HashedOcelEvent extends OcelEvent {
+  event_hash: string;
+  prev_hash: string | null;
+  seq: number;
+}
+
+export interface HashedOcelLog extends OcelLog {
+  hashed_events: HashedOcelEvent[];
+  /** SHA-256 of the final event — the chain tip commitment. */
+  chain_tip: string | null;
+  /** Merkle root across all event hashes for daily anchoring. */
+  merkle_root: string | null;
+}
+
 // Lawful lifecycle: session must start before frames, frames must be recent
 const FRAME_ALIVE_WINDOW_MS = 5_000;
 const MIN_FRAMES_FOR_ALIVE = 1;
@@ -211,6 +226,65 @@ export function useGameSessionOcel() {
     };
   }
 
+  /**
+   * Build a SHA-256 hash-chained export of the current OCEL log.
+   *
+   * Each event becomes a HashedOcelEvent with `event_hash` (SHA-256 of its
+   * canonical form) and `prev_hash` (the prior event's hash, null for genesis).
+   * The Merkle root covers all event hashes for daily anchoring.
+   *
+   * This is the authoritative form for pushing to Supabase `ocel_events` and
+   * for `rocket receipt validate` — van der Aalst conformance checking requires
+   * individual hash-chained event rows, not just an aggregate count.
+   */
+  async function exportHashedOcelLog(exportedAtMs: number): Promise<HashedOcelLog> {
+    const { computeEventHash, computeMerkleRoot } = useHashChain();
+    const rawEvents = events.value.slice();
+    const hashed: HashedOcelEvent[] = [];
+    let prevHash: string | null = null;
+
+    for (let i = 0; i < rawEvents.length; i++) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const ev = rawEvents[i]!;
+      // Map OcelEvent → HashChainEvent canonical shape
+      const chainEvt = {
+        id: ev.id,
+        timestamp: new Date(ev.timestamp_ms).toISOString(),
+        type: ev.activity,
+        data: {
+          object_refs: ev.object_refs as unknown as Record<string, unknown>,
+          attributes: ev.attributes as Record<string, unknown>,
+        },
+        prev_hash: prevHash,
+      };
+      const hash = await computeEventHash(chainEvt);
+      const hashedEv: HashedOcelEvent = {
+        id: ev.id,
+        activity: ev.activity,
+        timestamp_ms: ev.timestamp_ms,
+        object_refs: ev.object_refs,
+        attributes: ev.attributes,
+        event_hash: hash,
+        prev_hash: prevHash,
+        seq: i,
+      };
+      hashed.push(hashedEv);
+      prevHash = hash;
+    }
+
+    const hashes = hashed.map((e) => e.event_hash);
+    const merkleRoot = hashes.length > 0 ? await computeMerkleRoot(hashes) : null;
+
+    return {
+      objects: objects.value.slice(),
+      events: rawEvents,
+      exported_at_ms: exportedAtMs,
+      hashed_events: hashed,
+      chain_tip: prevHash,
+      merkle_root: merkleRoot,
+    };
+  }
+
   return {
     /** True only when OCEL log proves a live session with recent frames */
     isPlaying,
@@ -224,5 +298,7 @@ export function useGameSessionOcel() {
     lastActivityAt,
     /** Export the full OCEL log as a JSON-serialisable object */
     exportOcelLog,
+    /** Export with real SHA-256 hash chain + Merkle root (async, for commit) */
+    exportHashedOcelLog,
   };
 }
