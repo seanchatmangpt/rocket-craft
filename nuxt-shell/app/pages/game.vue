@@ -132,6 +132,7 @@ async function downloadHashedOcelLog() {
         >✓ Commit</button>
         <NuxtLink to="/receipts">Receipts</NuxtLink>
         <NuxtLink to="/leaderboard">Leaderboard</NuxtLink>
+        <NuxtLink to="/pipeline">Pipeline</NuxtLink>
         <NuxtLink to="/profile">Profile</NuxtLink>
         <NuxtLink to="/login">Auth</NuxtLink>
       </nav>
