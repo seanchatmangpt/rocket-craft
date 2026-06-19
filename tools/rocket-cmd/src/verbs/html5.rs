@@ -207,11 +207,30 @@ fn do_html5_cook(
     cook.run()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
 
+    // Parse the UAT cook log to extract rich OCEL lifecycle events.
+    // The log is written to ~/ue4-cook-latest.log by Html5Cook::run().
+    let home = std::env::var("HOME").unwrap_or_default();
+    let cook_log_path = std::path::PathBuf::from(format!("{home}/ue4-cook-latest.log"));
+    let cook_start_ms = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0);
+    let log_events = if cook_log_path.exists() {
+        let evts = rocket_sdk::parse_cook_log(&cook_log_path, cook_start_ms);
+        println!("[cook-log] {} OCEL events from UAT log", evts.len());
+        evts
+    } else {
+        println!("[cook-log] ~/ue4-cook-latest.log not found — using artifact-derived lifecycle");
+        vec![]
+    };
+
     // Auto-verify and write cook receipt after a successful cook
     let archive_html5 = archive_dir.join("HTML5");
     let verify_dir = if archive_html5.exists() { &archive_html5 } else { &archive_dir };
     let (pkg_verdict, receipt_path) = match rocket_sdk::Html5PackageVerifier::new(verify_dir).verify() {
-        Ok(report) => {
+        Ok(mut report) => {
+            // Enrich report with real UAT log events before pushing to Supabase
+            report.cook_log_events = log_events;
             let v = if report.is_real_package { "PASS" } else { "FAIL" };
             println!("[{}] {}", v, report.summary());
             let rp = report.write_receipt().ok().map(|p| p.display().to_string());

@@ -108,6 +108,18 @@ const healthColor = computed(() => {
 // Process conformance (Van der Aalst fitness/precision/generalization/simplicity)
 const { conformance, fitnessLabel, fitnessColor, load: loadConformance } = useProcessConformance();
 
+// ── Network status (offline detection beyond navigator.onLine) ────────────────
+// OfflineBanner pattern from expo-supabase-ai-template: probes real Supabase
+// endpoint so "OS says online" ≠ "Supabase is reachable" distinction is surfaced.
+const { status: networkStatus, isOffline, reconnect } = useNetworkStatus();
+
+// ── Health lie detector (LieDetector pattern from expo-supabase-ai-template) ──
+// Scans pipeline invariants every 30s and surfaces contradictions (lies):
+//   LIE-1: PASS receipt with zero OCEL events
+//   LIE-2: alive session >10 min with no close
+//   LIE-4: synthetic receipt in the DB (bypass of the guard trigger)
+const { lies, lastScan: lieScanAt } = useHealthLieDetector();
+
 // ── Cook log SSE monitor ──────────────────────────────────────────────────────
 // Connects to GET /api/game/cook-log (SSE) and streams real-time OCEL events
 // emitted by the UAT cook process. Activates when "Connect Cook Monitor" is clicked.
@@ -229,6 +241,19 @@ onUnmounted(() => {
 
 <template>
   <main class="pipeline-page">
+    <!-- Offline / Supabase unreachable banner -->
+    <div
+      v-if="isOffline"
+      class="offline-banner"
+      :class="networkStatus === 'reconnecting' ? 'reconnecting' : 'offline'"
+    >
+      <span v-if="networkStatus === 'offline'">
+        ⚠ Supabase unreachable — pipeline metrics may be stale
+        <button class="banner-reconnect" @click="reconnect">Reconnect</button>
+      </span>
+      <span v-else>↻ Reconnecting to Supabase…</span>
+    </div>
+
     <header class="pipeline-header">
       <NuxtLink to="/game">← Mission Control</NuxtLink>
       <h1>Pipeline Health</h1>
@@ -361,6 +386,22 @@ onUnmounted(() => {
         </div>
       </section>
 
+      <!-- Health Lie Detector violations panel -->
+      <section v-if="lies.length" class="lies-panel">
+        <h2>
+          ⚠ Pipeline Invariant Violations
+          <span class="lies-count">{{ lies.length }}</span>
+        </h2>
+        <div v-for="lie in lies" :key="lie.code" class="lie-row">
+          <span class="lie-code">{{ lie.code }}</span>
+          <span class="lie-desc">{{ lie.description }}</span>
+          <span class="lie-time">{{ new Date(lie.detected_at).toLocaleTimeString() }}</span>
+        </div>
+        <p class="lies-hint">
+          Last invariant scan: {{ lieScanAt ? new Date(lieScanAt).toLocaleTimeString() : 'pending' }}
+        </p>
+      </section>
+
       <!-- Cook Log Monitor (SSE real-time stream from ~/ue4-cook-latest.log) -->
       <section class="cook-monitor">
         <h2>
@@ -484,4 +525,36 @@ onUnmounted(() => {
 .cook-activity { font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
 .cook-detail { font-size: 0.7rem; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cook-waiting { font-size: 0.75rem; color: #475569; padding: 0.5rem 0; }
+
+/* Offline banner */
+.offline-banner {
+  padding: 0.5rem 1rem; font-size: 0.8rem; display: flex; align-items: center;
+  gap: 0.75rem; margin-bottom: 1rem; border-radius: 4px;
+}
+.offline-banner.offline { background: #451a03; color: #fed7aa; border: 1px solid #92400e; }
+.offline-banner.reconnecting { background: #0c4a6e; color: #bae6fd; border: 1px solid #0369a1; }
+.banner-reconnect {
+  background: #92400e; border: none; color: #fff; font-size: 0.75rem;
+  padding: 0.15rem 0.5rem; border-radius: 3px; cursor: pointer;
+}
+.banner-reconnect:hover { background: #b45309; }
+
+/* Health lies panel */
+.lies-panel {
+  background: #1c0a0a; border: 1px solid #7f1d1d; border-radius: 6px;
+  padding: 1rem; margin-bottom: 1.5rem;
+}
+.lies-panel h2 { font-size: 0.9rem; color: #f87171; margin: 0 0 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+.lies-count {
+  background: #7f1d1d; color: #fca5a5; font-size: 0.7rem; padding: 0.1rem 0.4rem;
+  border-radius: 999px; font-weight: 700;
+}
+.lie-row {
+  display: flex; align-items: baseline; gap: 0.75rem; font-size: 0.78rem;
+  border-left: 3px solid #ef4444; padding: 0.25rem 0.5rem; margin-bottom: 0.35rem;
+}
+.lie-code { font-weight: 700; color: #ef4444; white-space: nowrap; }
+.lie-desc { flex: 1; color: #fca5a5; }
+.lie-time { font-size: 0.7rem; color: #64748b; white-space: nowrap; }
+.lies-hint { font-size: 0.7rem; color: #475569; margin: 0.5rem 0 0; }
 </style>

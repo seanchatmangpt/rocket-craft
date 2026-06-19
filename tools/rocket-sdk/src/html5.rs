@@ -83,6 +83,10 @@ pub struct Html5PackageReport {
     /// UUID of the `game_sessions` row opened for this cook run, if Supabase is configured.
     /// `None` when running offline. Set by [`Html5PackageVerifier::with_cook_session_id`].
     pub cook_session_id: Option<String>,
+    /// Structured OCEL events parsed from the UAT cook log.
+    /// When non-empty, these replace artifact-derived lifecycle stages in the receipt,
+    /// giving pm4py real evidence of which cook stages executed (not just which files exist).
+    pub cook_log_events: Vec<CookLogEvent>,
 }
 
 impl Html5PackageReport {
@@ -168,16 +172,34 @@ impl Html5PackageReport {
         let digest = ring::digest::digest(&ring::digest::SHA256, hash_input.as_bytes());
         let receipt_hash: String = digest.as_ref().iter().map(|b| format!("{b:02x}")).collect();
 
-        // OCEL lifecycle: ordered activity names emitted by the cook pipeline.
-        let mut lifecycle = vec!["CookStarted".to_string()];
-        if self.wasm_files.iter().any(|f| matches!(f.verdict, WasmVerdict::Real { .. })) {
-            lifecycle.push("WasmPackaged".to_string());
-        }
-        if self.companions.has_js { lifecycle.push("JsEmitted".to_string()); }
-        if self.companions.has_html { lifecycle.push("HtmlEmitted".to_string()); }
-        if self.companions.has_data_or_pak { lifecycle.push("DataPakStaged".to_string()); }
-        if self.ui_input_patched { lifecycle.push("UiInputPatched".to_string()); }
-        if self.is_real_package { lifecycle.push("PackageVerified".to_string()); }
+        // OCEL lifecycle: prefer UAT log-derived events (richer evidence); fall back to
+        // artifact-derived stages when no log events are available (offline verify).
+        let lifecycle: Vec<String> = if !self.cook_log_events.is_empty() {
+            // Log-derived: real cook evidence from UAT log patterns
+            let mut lc: Vec<String> = self.cook_log_events.iter()
+                .map(|e| e.activity.clone())
+                .collect();
+            // Append verify-time stages that the log can't observe (they happen after UAT exits)
+            if self.ui_input_patched && !lc.contains(&"UiInputPatched".to_string()) {
+                lc.push("UiInputPatched".to_string());
+            }
+            if self.is_real_package && !lc.contains(&"PackageVerified".to_string()) {
+                lc.push("PackageVerified".to_string());
+            }
+            lc
+        } else {
+            // Artifact-derived fallback (offline verify / no log available)
+            let mut lc = vec!["CookStarted".to_string()];
+            if self.wasm_files.iter().any(|f| matches!(f.verdict, WasmVerdict::Real { .. })) {
+                lc.push("WasmPackaged".to_string());
+            }
+            if self.companions.has_js { lc.push("JsEmitted".to_string()); }
+            if self.companions.has_html { lc.push("HtmlEmitted".to_string()); }
+            if self.companions.has_data_or_pak { lc.push("DataPakStaged".to_string()); }
+            if self.ui_input_patched { lc.push("UiInputPatched".to_string()); }
+            if self.is_real_package { lc.push("PackageVerified".to_string()); }
+            lc
+        };
 
         let ocel_event_count = lifecycle.len() as u32;
 
@@ -387,6 +409,7 @@ impl Html5PackageVerifier {
             is_real_package,
             ui_input_patched,
             cook_session_id: self.cook_session_id.clone(),
+            cook_log_events: vec![],
         })
     }
 
