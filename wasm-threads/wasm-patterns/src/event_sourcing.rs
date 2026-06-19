@@ -73,3 +73,111 @@ impl<A: Aggregate + Clone> EventSourcedRepo<A> {
     pub fn event_count(&self) -> usize { self.log.len() }
     pub fn has_snapshot(&self) -> bool { self.snapshot.is_some() }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::{Deserialize, Serialize};
+
+    // ── Minimal fixture: counter aggregate ───────────────────────────────────
+
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    enum CounterEvent { Incremented(u64), Decremented(u64) }
+
+    impl DomainEvent for CounterEvent {
+        fn event_type(&self) -> &'static str {
+            match self { CounterEvent::Incremented(_) => "incremented", CounterEvent::Decremented(_) => "decremented" }
+        }
+        fn sequence(&self) -> u64 { 0 }
+    }
+
+    #[derive(Debug, Clone, Default)]
+    struct Counter { value: i64, version: u64 }
+    impl Aggregate for Counter {
+        type Event = CounterEvent;
+        fn apply(&mut self, e: &CounterEvent) {
+            match e {
+                CounterEvent::Incremented(n) => self.value += *n as i64,
+                CounterEvent::Decremented(n) => self.value -= *n as i64,
+            }
+            self.version += 1;
+        }
+        fn version(&self) -> u64 { self.version }
+    }
+
+    // ── EventLog ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_log_is_empty_at_version_zero() {
+        let log: EventLog<CounterEvent> = EventLog::new();
+        assert!(log.is_empty());
+        assert_eq!(log.version(), 0);
+    }
+
+    #[test]
+    fn append_increments_version_and_len() {
+        let mut log: EventLog<CounterEvent> = EventLog::new();
+        log.append(CounterEvent::Incremented(1));
+        log.append(CounterEvent::Incremented(1));
+        assert_eq!(log.len(), 2);
+        assert_eq!(log.version(), 2);
+    }
+
+    #[test]
+    fn events_since_returns_slice_from_index() {
+        let mut log: EventLog<CounterEvent> = EventLog::new();
+        log.append(CounterEvent::Incremented(1));
+        log.append(CounterEvent::Incremented(2));
+        log.append(CounterEvent::Incremented(3));
+        let slice = log.events_since(1);
+        assert_eq!(slice.len(), 2);
+    }
+
+    #[test]
+    fn events_since_past_end_returns_empty() {
+        let mut log: EventLog<CounterEvent> = EventLog::new();
+        log.append(CounterEvent::Incremented(1));
+        assert_eq!(log.events_since(99).len(), 0);
+    }
+
+    // ── EventSourcedRepo ─────────────────────────────────────────────────────
+
+    #[test]
+    fn reconstruct_applies_all_events() {
+        let mut repo: EventSourcedRepo<Counter> = EventSourcedRepo::new(0);
+        repo.append(CounterEvent::Incremented(5));
+        repo.append(CounterEvent::Incremented(3));
+        repo.append(CounterEvent::Decremented(2));
+        let state = repo.reconstruct();
+        assert_eq!(state.value, 6);
+    }
+
+    #[test]
+    fn snapshot_taken_at_interval() {
+        let mut repo: EventSourcedRepo<Counter> = EventSourcedRepo::new(3);
+        assert!(!repo.has_snapshot());
+        repo.append(CounterEvent::Incremented(1));
+        repo.append(CounterEvent::Incremented(1));
+        repo.append(CounterEvent::Incremented(1)); // triggers snapshot at v3
+        assert!(repo.has_snapshot());
+    }
+
+    #[test]
+    fn reconstruct_after_snapshot_is_correct() {
+        let mut repo: EventSourcedRepo<Counter> = EventSourcedRepo::new(2);
+        repo.append(CounterEvent::Incremented(10));
+        repo.append(CounterEvent::Incremented(10)); // snapshot at v2 (value=20)
+        repo.append(CounterEvent::Decremented(5));
+        let state = repo.reconstruct();
+        assert_eq!(state.value, 15);
+    }
+
+    #[test]
+    fn version_and_event_count_match_appends() {
+        let mut repo: EventSourcedRepo<Counter> = EventSourcedRepo::new(0);
+        repo.append(CounterEvent::Incremented(1));
+        repo.append(CounterEvent::Incremented(1));
+        assert_eq!(repo.version(), 2);
+        assert_eq!(repo.event_count(), 2);
+    }
+}
