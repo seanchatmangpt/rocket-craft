@@ -44,7 +44,7 @@ CREATE INDEX IF NOT EXISTS game_sessions_started_at_idx   ON game_sessions(sessi
 CREATE INDEX IF NOT EXISTS game_sessions_is_alive_idx     ON game_sessions(is_alive) WHERE is_alive = true;
 
 -- ── ocel_events ───────────────────────────────────────────────────────────────
--- SHA-256 hash chain: each event commits the previous hash, making the log
+-- BLAKE3 hash chain: each event commits the previous hash, making the log
 -- tamper-evident and replayable by pm4py for process conformance checking.
 
 CREATE TABLE IF NOT EXISTS ocel_events (
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS ocel_events (
   object_refs  TEXT[] NOT NULL DEFAULT '{}',
   -- Arbitrary event attributes (intent type, value, source, etc.)
   attributes   JSONB NOT NULL DEFAULT '{}',
-  -- Hash chain: SHA-256(prev_hash || activity || timestamp_ms || attributes)
+  -- Hash chain: BLAKE3(prev_hash || activity || timestamp_ms || attributes)
   prev_hash    TEXT,
   event_hash   TEXT NOT NULL,
   -- Monotonic sequence within the session for ordering
