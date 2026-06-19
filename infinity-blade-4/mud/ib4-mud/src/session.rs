@@ -1396,4 +1396,59 @@ mod tests {
         assert!(!tier_locked(1, 0));
         assert!(!tier_locked(4, 0));
     }
+
+    // ── GameSession::dispatch ────────────────────────────────────────────────
+
+    fn new_session() -> GameSession {
+        GameSession::new("TestPlayer")
+    }
+
+    #[test]
+    fn dispatch_status_returns_non_empty_output() {
+        let mut session = new_session();
+        let lines = session.dispatch(Command::Status);
+        assert!(!lines.is_empty(), "status command must return at least one line");
+    }
+
+    #[test]
+    fn dispatch_help_returns_non_empty_output() {
+        let mut session = new_session();
+        let lines = session.dispatch(Command::Help);
+        assert!(!lines.is_empty(), "help command must return at least one line");
+    }
+
+    #[test]
+    fn dispatch_look_returns_non_empty_output() {
+        let mut session = new_session();
+        let lines = session.dispatch(Command::Look);
+        assert!(!lines.is_empty(), "look command must return at least one line");
+    }
+
+    #[test]
+    fn dispatch_inventory_returns_non_empty_output() {
+        let mut session = new_session();
+        let lines = session.dispatch(Command::Inventory);
+        assert!(!lines.is_empty(), "inventory command must return at least one line");
+    }
+
+    #[test]
+    fn dispatch_perks_returns_non_empty_output() {
+        let mut session = new_session();
+        let lines = session.dispatch(Command::Perks);
+        assert!(!lines.is_empty(), "perks command must return at least one line");
+    }
+
+    #[test]
+    fn session_json_round_trips() {
+        let session = new_session();
+        let json = session.to_json();
+        let restored = GameSession::from_json(&json).expect("round-trip must succeed");
+        assert_eq!(restored.player.name, session.player.name);
+    }
+
+    #[test]
+    fn new_session_is_not_in_combat() {
+        let session = new_session();
+        assert!(!session.is_in_combat(), "fresh session must not be in combat");
+    }
 }
