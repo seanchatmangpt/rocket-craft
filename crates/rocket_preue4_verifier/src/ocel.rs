@@ -70,3 +70,89 @@ impl OcelLog {
         Ok(OcelLog { events })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const MINIMAL_OCEL: &str = r#"{
+        "events": [
+            {
+                "id": "ev-001",
+                "type": "SOURCE_ADMISSION",
+                "attributes": [
+                    {"name": "audit_receipt", "value": "abc123"},
+                    {"name": "prev_hash", "value": "0000000000000000000000000000000000000000000000000000000000000000"}
+                ]
+            },
+            {
+                "id": "ev-002",
+                "type": "AUTHORITY_GATE",
+                "attributes": [
+                    {"name": "audit_receipt", "value": "def456"},
+                    {"name": "prev_hash", "value": "abc123"}
+                ]
+            }
+        ]
+    }"#;
+
+    #[test]
+    fn parses_minimal_ocel_trace() {
+        let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
+        assert_eq!(log.events.len(), 2);
+    }
+
+    #[test]
+    fn parses_event_ids_and_types() {
+        let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
+        assert_eq!(log.events[0].id, "ev-001");
+        assert_eq!(log.events[0].event_type, "SOURCE_ADMISSION");
+        assert_eq!(log.events[1].event_type, "AUTHORITY_GATE");
+    }
+
+    #[test]
+    fn parses_audit_receipt_attribute() {
+        let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
+        assert_eq!(log.events[0].receipt, "abc123");
+        assert_eq!(log.events[1].receipt, "def456");
+    }
+
+    #[test]
+    fn parses_prev_hash_attribute() {
+        let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
+        assert!(log.events[0].prev_hash.chars().all(|c| c == '0'));
+        assert_eq!(log.events[1].prev_hash, "abc123");
+    }
+
+    #[test]
+    fn sequence_numbers_are_one_based() {
+        let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
+        assert_eq!(log.events[0].sequence, 1);
+        assert_eq!(log.events[1].sequence, 2);
+    }
+
+    #[test]
+    fn event_without_attributes_uses_defaults() {
+        let json = r#"{"events": [{"id": "e1", "type": "BARE"}]}"#;
+        let log = OcelLog::from_powlv2lsp_trace(json).unwrap();
+        assert_eq!(log.events[0].receipt, "");
+        assert!(log.events[0].prev_hash.chars().all(|c| c == '0'));
+    }
+
+    #[test]
+    fn returns_error_on_invalid_json() {
+        assert!(OcelLog::from_powlv2lsp_trace("{invalid json}").is_err());
+    }
+
+    #[test]
+    fn empty_events_list_parses_ok() {
+        let log = OcelLog::from_powlv2lsp_trace(r#"{"events": []}"#).unwrap();
+        assert!(log.events.is_empty());
+    }
+
+    #[test]
+    fn each_event_object_contains_case_id() {
+        let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
+        assert!(log.events[0].objects.contains(&"case-mechbirth-001".into()));
+    }
+}

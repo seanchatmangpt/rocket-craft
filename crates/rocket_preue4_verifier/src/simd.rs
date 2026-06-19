@@ -64,6 +64,14 @@ pub fn verify_simd_scalar_equivalence(
     socket_health: &[u8],
 ) -> Result<(), RefusalReason> {
     let n = heat.len();
+    // Guard mismatched lengths before any indexing — the scalar loop below would
+    // panic rather than return Err without this check.
+    if stress.len() != n || socket_health.len() != n {
+        return Err(RefusalReason::InvalidAuthorityClass {
+            field: "simd_equiv input lengths".into(),
+            class: 0,
+        });
+    }
     let mut scalar_out = vec![0u8; n];
     let mut simd_out = vec![0u8; n];
 

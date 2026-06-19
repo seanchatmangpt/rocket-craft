@@ -106,3 +106,108 @@ impl ReceiptChain {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_chain() -> ReceiptChain {
+        let mut chain = ReceiptChain::default();
+        chain.append(
+            "SOURCE_ADMISSION".into(),
+            vec!["frame-1".into()],
+            AdmissionStatus::Admitted,
+            vec![],
+        );
+        chain.append(
+            "AUTHORITY_GATE".into(),
+            vec!["frame-1".into()],
+            AdmissionStatus::Admitted,
+            vec![],
+        );
+        chain
+    }
+
+    // ── ReceiptEntry::compute_hash ────────────────────────────────────────────
+
+    #[test]
+    fn hash_is_64_hex_chars() {
+        let chain = make_chain();
+        let h = &chain.entries[0].receipt;
+        assert_eq!(h.len(), 64);
+        assert!(h.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn same_content_produces_same_hash() {
+        let chain1 = make_chain();
+        let chain2 = make_chain();
+        assert_eq!(chain1.entries[0].receipt, chain2.entries[0].receipt);
+    }
+
+    #[test]
+    fn different_event_type_produces_different_hash() {
+        let mut c1 = ReceiptChain::default();
+        let mut c2 = ReceiptChain::default();
+        let r1 = c1.append("TYPE_A".into(), vec![], AdmissionStatus::Admitted, vec![]);
+        let r2 = c2.append("TYPE_B".into(), vec![], AdmissionStatus::Admitted, vec![]);
+        assert_ne!(r1, r2);
+    }
+
+    // ── ReceiptChain::append ──────────────────────────────────────────────────
+
+    #[test]
+    fn first_entry_uses_genesis_prev_hash() {
+        let chain = make_chain();
+        assert!(chain.entries[0].prev_hash.chars().all(|c| c == '0'));
+    }
+
+    #[test]
+    fn second_entry_prev_hash_equals_first_receipt() {
+        let chain = make_chain();
+        assert_eq!(chain.entries[1].prev_hash, chain.entries[0].receipt);
+    }
+
+    #[test]
+    fn sequence_numbers_are_monotonic() {
+        let chain = make_chain();
+        assert_eq!(chain.entries[0].sequence, 1);
+        assert_eq!(chain.entries[1].sequence, 2);
+    }
+
+    // ── ReceiptChain::verify ──────────────────────────────────────────────────
+
+    #[test]
+    fn verify_passes_on_intact_chain() {
+        assert!(make_chain().verify().is_ok());
+    }
+
+    #[test]
+    fn verify_passes_on_empty_chain() {
+        assert!(ReceiptChain::default().verify().is_ok());
+    }
+
+    #[test]
+    fn verify_fails_when_prev_hash_tampered() {
+        let mut chain = make_chain();
+        chain.entries[1].prev_hash = "tampered_hash".into();
+        assert!(matches!(
+            chain.verify().unwrap_err(),
+            RefusalReason::ReceiptChainBroken { sequence: 2, .. }
+        ));
+    }
+
+    // ── ReceiptChain::verify_hashes ───────────────────────────────────────────
+
+    #[test]
+    fn verify_hashes_passes_on_intact_chain() {
+        assert!(make_chain().verify_hashes().is_ok());
+    }
+
+    #[test]
+    fn verify_hashes_fails_when_receipt_tampered() {
+        let mut chain = make_chain();
+        chain.entries[0].receipt = "00000000000000000000000000000000000000000000000000000000deadbeef".into();
+        assert!(chain.verify_hashes().is_err());
+    }
+}
