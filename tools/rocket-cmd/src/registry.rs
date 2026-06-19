@@ -3,7 +3,6 @@ use std::fs;
 use std::io::{self, BufRead};
 use walkdir::WalkDir;
 use serde::{Deserialize, Serialize};
-use sha2::{Sha256, Digest as ShaDigest};
 use blake3;
 use colored::*;
 
@@ -15,7 +14,6 @@ pub struct CrateMeta {
     pub version: String,
     pub ontology_count: usize,
     pub query_count: usize,
-    pub sha256_hash: String,
     pub blake3_hash: String,
     pub category: String,
 }
@@ -29,8 +27,7 @@ fn get_home_dir() -> anyhow::Result<PathBuf> {
 
 fn calculate_file_hashes(path: &Path) -> anyhow::Result<(String, String)> {
     let mut file = fs::File::open(path)?;
-    let mut sha_hasher = Sha256::new();
-    let mut blake_hasher = blake3::Hasher::new();
+    let mut hasher = blake3::Hasher::new();
     let mut buffer = [0; 8192];
 
     loop {
@@ -38,13 +35,11 @@ fn calculate_file_hashes(path: &Path) -> anyhow::Result<(String, String)> {
         if count == 0 {
             break;
         }
-        sha_hasher.update(&buffer[..count]);
-        blake_hasher.update(&buffer[..count]);
+        hasher.update(&buffer[..count]);
     }
 
-    let sha_hex = format!("{:x}", sha_hasher.finalize());
-    let blake_hex = blake_hasher.finalize().to_hex().to_string();
-    Ok((sha_hex, blake_hex))
+    let blake_hex = hasher.finalize().to_hex().to_string();
+    Ok((blake_hex.clone(), blake_hex))
 }
 
 pub fn run_copy(manifest_path: &str) -> anyhow::Result<()> {
@@ -201,13 +196,11 @@ pub fn run_index() -> anyhow::Result<()> {
         // Sort paths deterministically to match python behaviour
         all_files.sort();
 
-        let mut crate_sha_hasher = Sha256::new();
         let mut crate_blake_hasher = blake3::Hasher::new();
 
         for f_path in &all_files {
             match calculate_file_hashes(f_path) {
-                Ok((sha_hex, blake_hex)) => {
-                    crate_sha_hasher.update(sha_hex.as_bytes());
+                Ok((blake_hex, _)) => {
                     crate_blake_hasher.update(blake_hex.as_bytes());
                 }
                 Err(e) => {
@@ -216,7 +209,6 @@ pub fn run_index() -> anyhow::Result<()> {
             }
         }
 
-        let sha256_hash_hex = format!("{:x}", crate_sha_hasher.finalize());
         let blake3_hash_hex = crate_blake_hasher.finalize().to_hex().to_string();
 
         let crate_meta = serde_json::json!({
@@ -226,7 +218,6 @@ pub fn run_index() -> anyhow::Result<()> {
             "ontologyCount": ttl_count,
             "queryCount": rq_count,
             "totalBytes": total_bytes,
-            "sha256Hash": sha256_hash_hex,
             "blake3Hash": blake3_hash_hex,
             "category": "ontology-crate"
         });

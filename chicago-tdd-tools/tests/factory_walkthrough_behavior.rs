@@ -298,7 +298,7 @@ fn receipt_command_after_reveal_returns_pass_verdict_and_signature() {
     // Structural checks on the receipt object itself
     let receipt = engine.walkthrough_receipt.as_ref().expect("walkthrough_receipt must be Some after reveal");
     assert_eq!(receipt.final_verdict, "PASS");
-    assert_eq!(receipt.cryptographic_signature.len(), 64, "SHA-256 hex signature must be 64 chars");
+    assert_eq!(receipt.cryptographic_signature.len(), 64, "BLAKE3 hex signature must be 64 chars");
     assert!(receipt.final_assembly_receipt_hash.is_some(), "assembly receipt hash must be present");
 
     // Receipt command must succeed

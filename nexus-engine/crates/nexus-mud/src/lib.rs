@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use sha2::{Sha256, Digest};
+use blake3;
 use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
 use thiserror::Error;
@@ -1209,20 +1209,18 @@ impl MudEngine {
 
         let parts_hashes: HashMap<String, String> = self.parts.iter().map(|(k, v)| {
             let serialized = serde_json::to_string(v).unwrap_or_default();
-            let mut hasher = Sha256::new();
-            hasher.update(serialized.as_bytes());
-            (k.clone(), format!("{:x}", hasher.finalize()))
+            (k.clone(), blake3::hash(serialized.as_bytes()).to_hex().to_string())
         }).collect();
 
         let mut hashes_sorted: Vec<(&String, &String)> = parts_hashes.iter().collect();
         hashes_sorted.sort_by_key(|a| a.0);
 
-        let mut hasher = Sha256::new();
+        let mut hasher = blake3::Hasher::new();
         for (k, v) in hashes_sorted {
             hasher.update(k.as_bytes());
             hasher.update(v.as_bytes());
         }
-        let lineage_hash = format!("{:x}", hasher.finalize());
+        let lineage_hash = hasher.finalize().to_hex().to_string();
 
         let assembly_rec = AssemblyReceipt {
             mech_id: "Gundam-Nexus-Admitted-01".to_string(),
@@ -1245,9 +1243,7 @@ impl MudEngine {
         };
 
         let serialized = serde_json::to_string(&walkthrough_rec).unwrap_or_default();
-        let mut sig_hasher = Sha256::new();
-        sig_hasher.update(serialized.as_bytes());
-        let sig = format!("{:x}", sig_hasher.finalize());
+        let sig = blake3::hash(serialized.as_bytes()).to_hex().to_string();
         walkthrough_rec.cryptographic_signature = sig.clone();
         walkthrough_rec.signature_hash = sig;
 
@@ -1607,10 +1603,7 @@ impl MudEngine {
         };
 
         let serialized = serde_json::to_string(&temp_receipt).unwrap_or_default();
-        let mut hasher = Sha256::new();
-        hasher.update(serialized.as_bytes());
-        let hash_result = hasher.finalize();
-        let cryptographic_signature = format!("{:x}", hash_result);
+        let cryptographic_signature = blake3::hash(serialized.as_bytes()).to_hex().to_string();
 
         temp_receipt.timestamp = actual_timestamp;
         temp_receipt.cryptographic_signature = cryptographic_signature.clone();

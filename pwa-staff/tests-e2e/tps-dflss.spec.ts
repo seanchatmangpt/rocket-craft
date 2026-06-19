@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
+import { hashJsonString } from '@wasm4pm/contracts';
 import { PNG } from 'pngjs';
 
 test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
@@ -104,7 +104,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         const specPath = '/Users/sac/rocket-craft/spec.json';
         if (fs.existsSync(specPath)) {
           const specContent = fs.readFileSync(specPath);
-          contractHash = crypto.createHash('sha256').update(specContent).digest('hex');
+          contractHash = hashJsonString(specContent.toString('utf-8'));
         }
       } catch (e) {
         console.error('Failed to hash spec.json:', e);
@@ -145,7 +145,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       };
 
       const receiptString = JSON.stringify(receipt, null, 2);
-      const receiptSignature = crypto.createHash('sha256').update(receiptString).digest('hex');
+      const receiptSignature = hashJsonString(receiptString);
 
       const finalReceipt = {
         ...receipt,
