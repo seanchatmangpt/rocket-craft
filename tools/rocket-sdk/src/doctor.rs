@@ -40,6 +40,24 @@ impl RocketDoctor {
         Self { project_root }
     }
 
+    /// Resolve UE4 root from `.rocket.json` → `UE4_ROOT` env → `UE_ROOT` env.
+    fn resolve_ue4_root(&self) -> Option<PathBuf> {
+        let rocket_json = self.project_root.join(".rocket.json");
+        if rocket_json.exists() {
+            if let Ok(content) = std::fs::read_to_string(&rocket_json) {
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&content) {
+                    if let Some(root) = v.get("ue4_root").and_then(|r| r.as_str()) {
+                        return Some(PathBuf::from(root));
+                    }
+                }
+            }
+        }
+        std::env::var("UE4_ROOT")
+            .or_else(|_| std::env::var("UE_ROOT"))
+            .ok()
+            .map(PathBuf::from)
+    }
+
     pub fn run_diagnostics(&self) -> DiagnosticReport {
         let checks = vec![
             self.check_git(),
@@ -440,42 +458,13 @@ impl RocketDoctor {
 
     /// Check if the engine's bundled emsdk is present (built by HTML5Setup.sh).
     fn find_ue4_emsdk(&self) -> bool {
-        let rocket_json = self.project_root.join(".rocket.json");
-        let ue4_root = if rocket_json.exists() {
-            std::fs::read_to_string(&rocket_json)
-                .ok()
-                .and_then(|c| serde_json::from_str::<serde_json::Value>(&c).ok())
-                .and_then(|v| v.get("ue4_root")?.as_str().map(PathBuf::from))
-        } else {
-            std::env::var("UE4_ROOT").ok().map(PathBuf::from)
-        };
-
-        ue4_root
+        self.resolve_ue4_root()
             .map(|r| r.join("Engine/Platforms/HTML5/Build/emsdk").exists())
             .unwrap_or(false)
     }
 
     fn check_ue4_plugins(&self) -> CheckResult {
-        let mut ue4_root = None;
-        let rocket_json = self.project_root.join(".rocket.json");
-        if rocket_json.exists() {
-            if let Ok(content) = std::fs::read_to_string(&rocket_json) {
-                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&content) {
-                    if let Some(root) = v.get("ue4_root").and_then(|r| r.as_str()) {
-                        ue4_root = Some(PathBuf::from(root));
-                    }
-                }
-            }
-        }
-        if ue4_root.is_none() {
-            if let Ok(root) = std::env::var("UE4_ROOT") {
-                ue4_root = Some(PathBuf::from(root));
-            } else if let Ok(root) = std::env::var("UE_ROOT") {
-                ue4_root = Some(PathBuf::from(root));
-            }
-        }
-
-        let root_path = match ue4_root {
+        let root_path = match self.resolve_ue4_root() {
             Some(p) => p,
             None => {
                 return CheckResult {
@@ -610,18 +599,7 @@ impl RocketDoctor {
     /// an emsdk is configured. Reports Warn rather than Fail when UE4_ROOT is
     /// not configured at all (the `check_ue4_root` check already covers that).
     fn check_ue4_build_scripts(&self) -> CheckResult {
-        // Resolve the UE4 root from .rocket.json or UE4_ROOT env var.
-        let rocket_json = self.project_root.join(".rocket.json");
-        let ue4_root = if rocket_json.exists() {
-            std::fs::read_to_string(&rocket_json)
-                .ok()
-                .and_then(|c| serde_json::from_str::<serde_json::Value>(&c).ok())
-                .and_then(|v| v.get("ue4_root")?.as_str().map(PathBuf::from))
-        } else {
-            std::env::var("UE4_ROOT").ok().map(PathBuf::from)
-        };
-
-        let root = match ue4_root {
+        let root = match self.resolve_ue4_root() {
             None => {
                 return CheckResult {
                     name: "UE4 Build Scripts".to_string(),
