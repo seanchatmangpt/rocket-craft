@@ -725,3 +725,125 @@ pub fn cmd_dev(subcmd: DevSubcommands) -> Result<Output, CommandError> {
         message: Some(out.message),
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    // ── cmd_receipt ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn cmd_receipt_succeeds_and_returns_key() {
+        let out = cmd_receipt("my-label", "hello world").unwrap();
+        assert!(out.success);
+        assert_eq!(out.data["key"], "my-label");
+    }
+
+    #[test]
+    fn cmd_receipt_hash_is_64_hex_chars() {
+        let out = cmd_receipt("k", "data").unwrap();
+        let hash = out.data["hash"].as_str().unwrap();
+        assert_eq!(hash.len(), 64);
+        assert!(hash.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    // ── cmd_verify ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn cmd_verify_accepts_valid_receipt_json() {
+        // Build a receipt then verify it with its own key as data (per cmd_verify logic).
+        let out = cmd_receipt("test-key", "test-key").unwrap();
+        let receipt_json = serde_json::to_string(&json!({
+            "key": "test-key",
+            "hash": out.data["hash"],
+            "issued_at": out.data["issued_at"]
+        }))
+        .unwrap();
+        let vout = cmd_verify(&receipt_json).unwrap();
+        assert!(vout.data["results"][0]["valid"].as_bool().unwrap());
+    }
+
+    #[test]
+    fn cmd_verify_rejects_invalid_json() {
+        let result = cmd_verify("not-json");
+        assert!(result.is_err());
+    }
+
+    // ── cmd_gate ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn cmd_gate_open_always_admits() {
+        let out = cmd_gate("open", r#"{"any":"thing"}"#).unwrap();
+        assert!(out.success);
+        assert_eq!(out.data["admitted"], true);
+    }
+
+    #[test]
+    fn cmd_gate_field_admits_when_field_present() {
+        let out = cmd_gate("field:name", r#"{"name":"hero"}"#).unwrap();
+        assert!(out.success);
+    }
+
+    #[test]
+    fn cmd_gate_field_denies_when_field_absent() {
+        let out = cmd_gate("field:name", r#"{"age":1}"#).unwrap();
+        assert!(!out.success);
+        assert_eq!(out.data["admitted"], false);
+    }
+
+    #[test]
+    fn cmd_gate_eq_admits_when_value_matches() {
+        let out = cmd_gate("eq:status=active", r#"{"status":"active"}"#).unwrap();
+        assert!(out.success);
+    }
+
+    #[test]
+    fn cmd_gate_eq_denies_when_value_differs() {
+        let out = cmd_gate("eq:status=active", r#"{"status":"inactive"}"#).unwrap();
+        assert!(!out.success);
+    }
+
+    #[test]
+    fn cmd_gate_nonempty_admits_non_empty_object() {
+        let out = cmd_gate("nonempty", r#"{"k":"v"}"#).unwrap();
+        assert!(out.success);
+    }
+
+    #[test]
+    fn cmd_gate_nonempty_denies_empty_object() {
+        let out = cmd_gate("nonempty", r#"{}"#).unwrap();
+        assert!(!out.success);
+    }
+
+    #[test]
+    fn cmd_gate_unknown_law_denies() {
+        let out = cmd_gate("no-such-law", r#"{"k":"v"}"#).unwrap();
+        assert!(!out.success);
+    }
+
+    // ── cmd_dispatch ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn cmd_dispatch_receipt_create_returns_hash() {
+        let input = json!({"label":"lbl","data":"payload"}).to_string();
+        let out = cmd_dispatch(None, "receipt", "create", Some(&input)).unwrap();
+        assert!(out.success);
+        assert_eq!(out.data["key"], "lbl");
+        let hash = out.data["hash"].as_str().unwrap();
+        assert_eq!(hash.len(), 64);
+    }
+
+    #[test]
+    fn cmd_dispatch_version_list_returns_crates() {
+        let out = cmd_dispatch(None, "version", "list", None).unwrap();
+        assert!(out.success);
+        assert!(out.data["crates"].is_array());
+    }
+
+    #[test]
+    fn cmd_dispatch_unknown_returns_error_output() {
+        let out = cmd_dispatch(None, "bogus", "nothing", None).unwrap();
+        assert!(!out.success);
+    }
+}
