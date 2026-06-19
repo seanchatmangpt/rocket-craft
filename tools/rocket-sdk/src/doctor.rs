@@ -54,6 +54,7 @@ impl RocketDoctor {
             self.check_ggen(),
             self.check_anti_llm_cheat_lsp(),
             self.check_html5_package(),
+            self.check_nexus_types(),
         ];
 
         DiagnosticReport {
@@ -510,6 +511,45 @@ impl RocketDoctor {
                     }
                 }
             }
+        }
+    }
+
+    /// Quick compile-check of `nexus-types` — the zero-dependency root of the
+    /// nexus-engine workspace. A failure here means the foundational shared types
+    /// are broken, which would cascade to every other nexus crate.
+    fn check_nexus_types(&self) -> CheckResult {
+        let nexus_root = self.project_root.join("nexus-engine");
+        if !nexus_root.exists() {
+            return CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Warn,
+                message: "nexus-engine directory not found; skipping compile check".to_string(),
+                details: None,
+            };
+        }
+        let output = Command::new("cargo")
+            .args(["check", "-p", "nexus-types", "--quiet"])
+            .current_dir(&nexus_root)
+            .output();
+        match output {
+            Ok(o) if o.status.success() => CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Pass,
+                message: "nexus-types compiles cleanly".to_string(),
+                details: None,
+            },
+            Ok(o) => CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Fail,
+                message: "nexus-types compile check failed".to_string(),
+                details: Some(String::from_utf8_lossy(&o.stderr).chars().take(800).collect()),
+            },
+            Err(e) => CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Fail,
+                message: format!("could not invoke cargo: {e}"),
+                details: None,
+            },
         }
     }
 }
