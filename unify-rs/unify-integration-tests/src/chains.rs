@@ -273,3 +273,70 @@ pub fn run_pm_validation_chain() -> Result<ChainResult, String> {
     result.success = true;
     Ok(result)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn chain_result_new_starts_unsuccessful() {
+        let r = ChainResult::new("test-chain");
+        assert_eq!(r.name, "test-chain");
+        assert_eq!(r.steps_completed, 0);
+        assert!(!r.success);
+        assert!(r.errors.is_empty());
+    }
+
+    #[test]
+    fn chain_result_assert_success_panics_on_failure() {
+        let r = ChainResult {
+            name: "bad".into(),
+            steps_completed: 1,
+            receipt_count: 0,
+            errors: vec!["oops".into()],
+            success: false,
+        };
+        let result = std::panic::catch_unwind(|| r.assert_success());
+        assert!(result.is_err(), "assert_success should panic on failure");
+    }
+
+    #[test]
+    fn chain_result_assert_success_does_not_panic_on_success() {
+        let r = ChainResult {
+            name: "good".into(),
+            steps_completed: 3,
+            receipt_count: 2,
+            errors: vec![],
+            success: true,
+        };
+        r.assert_success(); // must not panic
+    }
+
+    #[test]
+    fn event_to_receipt_chain_completes() {
+        let result = run_event_to_receipt_chain().expect("chain must not error");
+        result.assert_success();
+        assert!(result.steps_completed > 0);
+        assert!(result.receipt_count > 0);
+    }
+
+    #[test]
+    fn rdf_query_chain_completes() {
+        let result = run_rdf_query_chain().expect("RDF chain must not error");
+        result.assert_success();
+        assert!(result.steps_completed > 0);
+    }
+
+    #[test]
+    fn admission_lifecycle_chain_completes() {
+        let result = run_admission_lifecycle_chain().expect("admission chain must not error");
+        result.assert_success();
+        assert!(result.steps_completed > 0);
+    }
+
+    #[test]
+    fn pm_validation_chain_completes() {
+        let result = run_pm_validation_chain().expect("PM chain must not error");
+        result.assert_success();
+    }
+}

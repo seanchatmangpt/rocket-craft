@@ -197,3 +197,107 @@ pub fn scan_for_victory(
 
     obs
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, context: &str) -> Observation {
+        Observation {
+            file_path: "src/lib.rs".into(),
+            start_byte: 0,
+            end_byte: construct.len(),
+            line: 1,
+            column: 0,
+            kind: "victory".into(),
+            construct: construct.into(),
+            context: context.into(),
+            message: String::new(),
+        }
+    }
+
+    fn no_domain() -> Vec<String> { vec![] }
+
+    // ── is_victory ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn is_victory_on_known_term() {
+        assert!(is_victory("victory", "", &no_domain()));
+    }
+
+    #[test]
+    fn is_victory_case_insensitive() {
+        assert!(is_victory("VICTORY", "", &no_domain()));
+        assert!(is_victory("Done", "", &no_domain()));
+    }
+
+    #[test]
+    fn is_victory_context_pattern() {
+        assert!(is_victory("anything", "zero violations found", &no_domain()));
+    }
+
+    #[test]
+    fn domain_term_exempts_construct() {
+        let domain = vec!["fully admitted".to_string()];
+        // "fully admitted" is a victory term normally, but exempted here
+        assert!(!is_victory("fully admitted", "", &domain));
+    }
+
+    #[test]
+    fn is_domain_exempt_case_insensitive() {
+        let domain = vec!["fully admitted".to_string()];
+        assert!(is_domain_exempt("FULLY ADMITTED", &domain));
+    }
+
+    #[test]
+    fn clean_text_is_not_victory() {
+        assert!(!is_victory("cargo test passed 5 out of 5", "", &no_domain()));
+    }
+
+    // ── evaluate ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn evaluate_empty_obs_no_diag() {
+        let diags = evaluate(&[], &no_domain(), false);
+        assert!(diags.is_empty());
+    }
+
+    #[test]
+    fn evaluate_victory_construct_triggers_claim_004() {
+        let diags = evaluate(&[obs("victory", "")], &no_domain(), false);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-CLAIM-004");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn evaluate_domain_exempt_skips_diag() {
+        let domain = vec!["victory".to_string()];
+        let diags = evaluate(&[obs("victory", "")], &domain, false);
+        assert!(diags.is_empty(), "domain-exempt term must not produce a diagnostic");
+    }
+
+    #[test]
+    fn evaluate_context_pattern_triggers_diag() {
+        let diags = evaluate(&[obs("status", "zero violations in module")], &no_domain(), false);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-CLAIM-004");
+    }
+
+    // ── scan_for_victory ─────────────────────────────────────────────────────
+
+    #[test]
+    fn scan_victory_detects_known_term_in_file() {
+        let content = "everything passes\nsome normal text\n";
+        let obs = scan_for_victory("doc.md", content, "markdown", &no_domain());
+        assert!(!obs.is_empty(), "should detect 'everything passes'");
+    }
+
+    #[test]
+    fn scan_victory_clean_file_returns_empty() {
+        let content = "cargo test: 5 passed, 0 failed\n";
+        let obs = scan_for_victory("README.md", content, "markdown", &no_domain());
+        assert!(obs.is_empty());
+    }
+}
