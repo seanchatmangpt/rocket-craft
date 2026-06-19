@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use blake3;
 use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
 use thiserror::Error;
@@ -42,7 +41,7 @@ impl Zone {
         ]
     }
 
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse(s: &str) -> Option<Self> {
         let clean = s.trim().to_lowercase().replace("_", " ").replace("-", " ");
         match clean.as_str() {
             "mission room" | "mission_room" | "mission" => Some(Zone::MissionRoom),
@@ -374,6 +373,12 @@ pub struct MudEngine {
     pub assembly_receipt: Option<AssemblyReceipt>,
 }
 
+impl Default for MudEngine {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MudEngine {
     /// Creates a new MudEngine with healthy/compliant default state.
     pub fn new() -> Self {
@@ -615,13 +620,13 @@ impl MudEngine {
             "left_leg", "right_leg", "backpack", "left_thruster", "right_thruster"
         ];
         
-        let valid_sockets = vec![
+        let valid_sockets = [
             "head_socket", "left_arm_socket", "right_arm_socket",
             "left_leg_socket", "right_leg_socket", "backpack_socket",
             "left_thruster_socket", "right_thruster_socket"
         ];
-        
-        let valid_receipts = vec![
+
+        let valid_receipts = [
             "assembly_receipt", "walkthrough_receipt"
         ];
         
@@ -727,10 +732,8 @@ impl MudEngine {
             MudCommand::Exits => self.cmd_exits(),
         };
 
-        if self.current_zone == Zone::RevealPlatform {
-            if self.gates.motion && self.walkthrough_receipt.is_none() {
-                let _ = self.cmd_verify("reveal");
-            }
+        if self.current_zone == Zone::RevealPlatform && self.gates.motion && self.walkthrough_receipt.is_none() {
+            let _ = self.cmd_verify("reveal");
         }
         result
     }
@@ -822,7 +825,7 @@ impl MudEngine {
     }
 
     fn cmd_go(&mut self, dest: &str) -> Result<String, MudError> {
-        let target_zone = if let Some(z) = Zone::from_str(dest) {
+        let target_zone = if let Some(z) = Zone::parse(dest) {
             z
         } else {
             let clean = dest.trim().to_lowercase();
@@ -906,7 +909,7 @@ impl MudEngine {
             ));
         }
 
-        if let Some(zone) = Zone::from_str(target) {
+        if let Some(zone) = Zone::parse(target) {
             return Ok(format!(
                 "Zone: {}\nElevation: {}\nDescription: {}",
                 zone.name(),

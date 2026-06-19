@@ -832,6 +832,7 @@ impl<P: PlanetCategory + 'static> MechAssemblySpec<Unvalidated, P> {
         }
 
         // Gate 4: Motion profile compatibility check
+        #[allow(clippy::match_like_matches_macro)]
         let is_compatible = match (
             self.frame.mobility_class.to_lowercase().as_str(),
             self.motion_profile,
