@@ -517,6 +517,26 @@ fn preflight_html5(project: Option<String>) -> Result<Value> {
     do_html5_preflight(project)
 }
 
+/// Cross-platform browser open: macOS `open`, Linux `xdg-open`, Windows `start`.
+fn open_in_browser(url: &str) -> std::result::Result<(), String> {
+    let (cmd, args): (&str, Vec<&str>) = if cfg!(target_os = "macos") {
+        ("open", vec![url])
+    } else if cfg!(target_os = "windows") {
+        ("cmd", vec!["/c", "start", url])
+    } else {
+        ("xdg-open", vec![url])
+    };
+    let status = std::process::Command::new(cmd)
+        .args(&args)
+        .status()
+        .map_err(|e| format!("failed to spawn '{cmd}': {e}"))?;
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!("'{cmd}' exited with non-zero status — open {url} manually"))
+    }
+}
+
 /// Open the served HTML5 game in the default browser
 ///
 /// Requires `html5 serve` to already be running. Opens the first `.html`
@@ -551,16 +571,8 @@ fn open_html5(archive: Option<String>, port: Option<u16>, project: Option<String
 
     println!("Opening: {url}");
 
-    let status = std::process::Command::new("open")
-        .arg(&url)
-        .status()
-        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
-
-    if !status.success() {
-        return Err(clap_noun_verb::NounVerbError::execution_error(
-            "Failed to open browser — try opening the URL manually".to_string(),
-        ));
-    }
+    open_in_browser(&url)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(e))?;
 
     Ok(serde_json::json!({ "url": url }))
 }
