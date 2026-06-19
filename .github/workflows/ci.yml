@@ -237,3 +237,85 @@ jobs:
 
       - name: Test
         run: cargo test --workspace
+
+  nuxt-shell:
+    name: Nuxt — pipeline API tests (mock)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nuxt-shell
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: nuxt-shell/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit || true
+
+      - name: Unit + API tests (mock mode)
+        run: MOCK_API=1 npx vitest run
+        env:
+          MOCK_API: "1"
+
+  pm4py-conformance:
+    name: Python — pm4py conformance smoke test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install pm4py
+        run: pip install pm4py
+
+      - name: Generate synthetic OCEL 2.0 fixture
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib
+          # Minimal OCEL 2.0 JSON for smoke-test (no Supabase needed)
+          ocel = {
+            "ocel:global-log": {"ocel:version": "2.0", "ocel:ordering": "timestamp"},
+            "ocel:global-event": {"ocel:activity": "__INVALID__"},
+            "ocel:global-object": {"ocel:type": "session"},
+            "ocel:events": {
+              "e1": {"ocel:activity": "GameSessionStarted", "ocel:timestamp": "2026-06-19T00:00:01Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
+              "e2": {"ocel:activity": "FrameRendered",      "ocel:timestamp": "2026-06-19T00:00:02Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
+              "e3": {"ocel:activity": "InputAdmitted",      "ocel:timestamp": "2026-06-19T00:00:03Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
+            },
+            "ocel:objects": {
+              "s1": {"ocel:type": "session", "ocel:ovmap": {}}
+            },
+            "events": [
+              {"id":"e1","type":"GameSessionStarted","time":"2026-06-19T00:00:01Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
+              {"id":"e2","type":"FrameRendered","time":"2026-06-19T00:00:02Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
+              {"id":"e3","type":"InputAdmitted","time":"2026-06-19T00:00:03Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
+            ],
+            "objectTypes": [{"name":"session","attributes":[]}],
+            "eventTypes": [
+              {"name":"GameSessionStarted","attributes":[]},
+              {"name":"FrameRendered","attributes":[]},
+              {"name":"InputAdmitted","attributes":[]},
+            ],
+          }
+          out = pathlib.Path("/tmp/ci-smoke.ocel.json")
+          out.write_text(json.dumps(ocel))
+          print(f"Wrote {out}")
+          EOF
+
+      - name: Run pm4py conformance (smoke — synthetic session)
+        run: python3 scripts/pm4py_conformance.py /tmp/ci-smoke.ocel.json --session-id ci-smoke --out /tmp/ci-fitness-report.json
+
+      - name: Print fitness report
+        run: cat /tmp/ci-fitness-report.json
