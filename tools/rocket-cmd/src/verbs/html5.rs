@@ -685,6 +685,36 @@ fn stop_html5(port: Option<u16>) -> Result<Value> {
     kill_background_serve(pid, &pid_file, port)
 }
 
+fn build_pipeline_result(
+    project: &str, preflight: Value, cook: Value, verify: Value,
+    preflight_secs: f64, cook_secs: f64, verify_secs: f64, total_secs: f64,
+) -> Value {
+    let ts = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_secs()).unwrap_or(0);
+    serde_json::json!({
+        "project": project,
+        "preflight": preflight,
+        "cook": cook,
+        "verify": verify,
+        "pipeline_verdict": "PASS",
+        "timing_secs": { "preflight": preflight_secs, "cook": cook_secs, "verify": verify_secs, "total": total_secs },
+        "completed_at_unix_secs": ts,
+    })
+}
+
+fn write_pipeline_receipt(project: &str, result: &Value) {
+    let dir = std::path::PathBuf::from(format!("/tmp/{}-html5-archive/HTML5", project.to_lowercase()));
+    if dir.exists() {
+        let path = dir.join("pipeline-receipt.json");
+        if let Ok(s) = serde_json::to_string_pretty(result) {
+            if std::fs::write(&path, s).is_ok() {
+                println!("[receipt] {}", path.display());
+            }
+        }
+    }
+}
+
 fn do_html5_log(lines: Option<u32>, follow: bool) -> Result<Value> {
     // UAT cook logs land in ~/ue4-cook*.log — find the most recent one
     let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
@@ -812,17 +842,10 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
     println!("  → stop the background server:");
     println!("      rocket html5 stop");
 
-    Ok(serde_json::json!({
-        "project": project,
-        "preflight": preflight,
-        "cook": cook_result,
-        "verify": verify,
-        "pipeline_verdict": "PASS",
-        "timing_secs": {
-            "preflight": preflight_secs,
-            "cook": cook_secs,
-            "verify": verify_secs,
-            "total": total_secs,
-        }
-    }))
+    let result = build_pipeline_result(
+        &project, preflight, cook_result, verify,
+        preflight_secs, cook_secs, verify_secs, total_secs,
+    );
+    write_pipeline_receipt(&project, &result);
+    Ok(result)
 }
