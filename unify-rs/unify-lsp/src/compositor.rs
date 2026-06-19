@@ -81,3 +81,71 @@ impl Default for CompositorState {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_server(name: &str) -> ServerEntry {
+        ServerEntry { name: name.into(), language: "rust".into(), weight: 1.0 }
+    }
+
+    #[test]
+    fn new_compositor_has_no_servers() {
+        let c = CompositorState::new();
+        assert_eq!(c.server_count(), 0);
+    }
+
+    #[test]
+    fn add_server_increments_count() {
+        let mut c = CompositorState::new();
+        c.add_server(make_server("rust-analyzer"));
+        c.add_server(make_server("anti-llm"));
+        assert_eq!(c.server_count(), 2);
+    }
+
+    #[test]
+    fn health_initial_gate_open_and_healthy() {
+        let c = CompositorState::new();
+        let h = c.health();
+        assert!(h.gate_open);
+        assert_eq!(h.error_count, 0);
+        assert!(h.healthy);
+    }
+
+    #[test]
+    fn raised_andon_makes_health_unhealthy() {
+        let mut c = CompositorState::new();
+        c.raise_andon("test reason");
+        let h = c.health();
+        assert!(!h.gate_open);
+        assert!(!h.healthy);
+    }
+
+    #[test]
+    fn lower_andon_after_raise_restores_healthy() {
+        let mut c = CompositorState::new();
+        c.raise_andon("r");
+        c.lower_andon();
+        let h = c.health();
+        assert!(h.gate_open);
+        assert!(h.healthy);
+    }
+
+    #[test]
+    fn health_server_count_matches() {
+        let mut c = CompositorState::new();
+        c.add_server(make_server("s1"));
+        c.add_server(make_server("s2"));
+        c.add_server(make_server("s3"));
+        assert_eq!(c.health().server_count, 3);
+    }
+
+    #[test]
+    fn compositor_health_serializes() {
+        let h = CompositorHealth { server_count: 2, error_count: 0, gate_open: true, healthy: true };
+        let json = serde_json::to_string(&h).unwrap();
+        assert!(json.contains("server_count"));
+        assert!(json.contains("healthy"));
+    }
+}
