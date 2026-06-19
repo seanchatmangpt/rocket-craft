@@ -73,9 +73,7 @@ fn validate_receipt_value(val: &Value) -> Vec<String> {
 
     if let Some(delta) = val.get("visualDelta").and_then(|v| v.as_u64()) {
         if delta < 20 {
-            errors.push(format!(
-                "visualDelta={delta} < 20 — canvas appears static"
-            ));
+            errors.push(format!("visualDelta={delta} < 20 — canvas appears static"));
         }
     }
 
@@ -107,7 +105,9 @@ mod tests {
     fn missing_required_fields_caught() {
         let receipt = json!({ "verdict": "PASS" });
         let errs = validate_receipt_value(&receipt);
-        assert!(errs.iter().any(|e| e.contains("missing field 'output_hash'")));
+        assert!(errs
+            .iter()
+            .any(|e| e.contains("missing field 'output_hash'")));
         assert!(errs.iter().any(|e| e.contains("missing field 'run_id'")));
         assert!(errs.iter().any(|e| e.contains("missing field 'timestamp'")));
         assert!(errs.iter().any(|e| e.contains("missing field 'signature'")));

@@ -36,9 +36,8 @@ fn do_wasm_run(file: String) -> Result<Value> {
 fn do_wasm_verify(file: String, min_size: Option<u64>) -> Result<Value> {
     use std::path::Path;
     let path = Path::new(&file);
-    let info = rocket_sdk::wasm::validate_wasm_artifact(path, min_size).map_err(|e| {
-        clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e))
-    })?;
+    let info = rocket_sdk::wasm::validate_wasm_artifact(path, min_size)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
     println!(
         "PASS: {} ({:.1} MB)",
         file,

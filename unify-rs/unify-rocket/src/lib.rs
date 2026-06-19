@@ -580,10 +580,10 @@ pub mod classify {
 
     impl RocketClassify for RocketBuildCommand {
         fn noun(&self) -> &'static str {
-        "project"
+            "project"
         }
         fn verb(&self) -> &'static str {
-        "build"
+            "build"
         }
         fn description(&self) -> &str {
             "Build a project target for a specific platform using RunUAT"
@@ -620,10 +620,10 @@ pub mod classify {
 
     impl RocketClassify for RocketAuditCommand {
         fn noun(&self) -> &'static str {
-        "project"
+            "project"
         }
         fn verb(&self) -> &'static str {
-        "audit"
+            "audit"
         }
         fn description(&self) -> &str {
             "Audit projects for compliance law violations"
@@ -643,10 +643,10 @@ pub mod classify {
 
     impl RocketClassify for RocketDoctorCommand {
         fn noun(&self) -> &'static str {
-        "env"
+            "env"
         }
         fn verb(&self) -> &'static str {
-        "doctor"
+            "doctor"
         }
         fn description(&self) -> &str {
             "Run environment health checks (git, rust, UE4 root, manifest)"
@@ -666,10 +666,10 @@ pub mod classify {
 
     impl RocketClassify for RocketSetupCommand {
         fn noun(&self) -> &'static str {
-        "env"
+            "env"
         }
         fn verb(&self) -> &'static str {
-        "setup"
+            "setup"
         }
         fn description(&self) -> &str {
             "Configure the UE4 root and other environment settings"
@@ -689,10 +689,10 @@ pub mod classify {
 
     impl RocketClassify for RocketInfoCommand {
         fn noun(&self) -> &'static str {
-        "workspace"
+            "workspace"
         }
         fn verb(&self) -> &'static str {
-        "info"
+            "info"
         }
         fn description(&self) -> &str {
             "Print workspace manifest and project information"

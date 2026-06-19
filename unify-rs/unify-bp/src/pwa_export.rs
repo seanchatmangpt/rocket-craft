@@ -194,7 +194,9 @@ impl BlueprintPwaExporter {
             "// Auto-generated JS event bindings for Blueprint: {}",
             self.blueprint_name
         ));
-        lines.push("// Wires game events to HUD instance — vanilla JS, no framework deps".to_string());
+        lines.push(
+            "// Wires game events to HUD instance — vanilla JS, no framework deps".to_string(),
+        );
         lines.push(String::new());
         lines.push(format!("const {} = new {}();", instance_name, class_name));
         lines.push(String::new());

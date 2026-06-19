@@ -228,10 +228,7 @@ mod tests {
     #[test]
     fn project_absolute_path_joins_root() {
         let dir = TempDir::new().unwrap();
-        write_manifest(
-            &dir,
-            &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])],
-        );
+        write_manifest(&dir, &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])]);
         let ctx = RocketContext::load(dir.path()).unwrap();
         let proj = &ctx.projects()[0];
         let abs = proj.absolute_uproject_path();
@@ -259,10 +256,7 @@ mod tests {
     #[test]
     fn build_dispatches_to_executor() {
         let dir = TempDir::new().unwrap();
-        write_manifest(
-            &dir,
-            &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])],
-        );
+        write_manifest(&dir, &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])]);
         let ctx = RocketContext::load(dir.path()).unwrap();
         let proj = &ctx.projects()[0];
         let build = proj.build("Brm".into(), "HTML5".into());
@@ -273,7 +267,10 @@ mod tests {
 
         let calls = mock.recorded();
         assert_eq!(calls.len(), 1);
-        assert!(calls[0].0.contains("Brm.uproject"), "project path must contain Brm.uproject");
+        assert!(
+            calls[0].0.contains("Brm.uproject"),
+            "project path must contain Brm.uproject"
+        );
         assert_eq!(calls[0].1, "Brm", "target must be 'Brm'");
         assert_eq!(calls[0].2, "/fake/ue4-root", "ue4 root must match");
     }
@@ -281,10 +278,7 @@ mod tests {
     #[test]
     fn failing_executor_propagates_error() {
         let dir = TempDir::new().unwrap();
-        write_manifest(
-            &dir,
-            &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])],
-        );
+        write_manifest(&dir, &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])]);
         let ctx = RocketContext::load(dir.path()).unwrap();
         let build = ctx.projects()[0].build("Brm".into(), "HTML5".into());
         let err = build
