@@ -457,6 +457,48 @@ fn do_html5_preflight(project: Option<String>) -> Result<Value> {
         emsdk_python.as_ref().map(|p| format!("{}", p.display()))
             .unwrap_or_else(|| "not found — emsdk may need setup: run 'rocket html5 setup'".into()));
 
+    // 8. UHT symlink — UHT computes CURRENT_FILE_ID from the directory name.
+    //    If the project is in versions/4.27.0/, UHT produces invalid C macros (start with digit).
+    //    Html5Cook auto-creates the symlink, but preflight can verify it already exists.
+    //    Only check when a project is specified.
+    if let Some(proj_name) = &project {
+        let root = std::env::current_dir()
+            .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+        let ctx = rocket_sdk::RocketContext::load(&root).ok();
+        if let Some(uproject_path) = ctx.as_ref()
+            .and_then(|c| c.manifest.projects().iter().find(|p| &p.name == proj_name)
+                .map(|p| root.join(&p.uproject_path)))
+        {
+            // Check if parent dir starts with digit, and if so whether the symlink exists
+            let parent_name = uproject_path.parent()
+                .and_then(|d| d.file_name())
+                .and_then(|n| n.to_str())
+                .unwrap_or("");
+            if parent_name.starts_with(|c: char| c.is_ascii_digit()) {
+                // Look for a sibling symlink that starts with a letter
+                let sibling_dir = uproject_path.parent()
+                    .and_then(|d| d.parent())
+                    .unwrap_or(Path::new("."));
+                let symlink_exists = std::fs::read_dir(sibling_dir)
+                    .ok()
+                    .map(|rd| rd.filter_map(|e| e.ok())
+                        .any(|e| {
+                            let name = e.file_name().to_string_lossy().to_string();
+                            name.starts_with(|c: char| c.is_alphabetic())
+                                && e.path().is_symlink()
+                        }))
+                    .unwrap_or(false);
+                add("UHT symlink", symlink_exists,
+                    if symlink_exists {
+                        format!("letter-starting symlink found in {}", sibling_dir.display())
+                    } else {
+                        format!("WARNING: {} starts with digit — UHT will generate invalid macros. \
+                            'rocket html5 cook' creates the symlink automatically.", parent_name)
+                    });
+            }
+        }
+    }
+
     let verdict = if overall_ok { "READY" } else { "NOT READY" };
     println!("\n[{verdict}] Preflight complete");
 
