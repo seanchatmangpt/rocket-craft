@@ -233,6 +233,40 @@ fn do_html5_cook_dry_run(project: String, archive: Option<String>, config: Optio
     Ok(serde_json::json!({ "dry_run": true, "command": args }))
 }
 
+/// Patch a UE4-generated HTML file to suppress pointer lock so UMG widget
+/// clicks reach UE4's input system on first press (no "focus-capture" eat).
+fn patch_html_for_ui_input(html_dir: &std::path::Path) {
+    let inject = r#"
+<script>
+// rocket-html5: suppress UE4 pointer lock so UMG widget clicks register immediately.
+(function(){
+  var noop=function(){return Promise.resolve();};
+  try{Object.defineProperty(HTMLElement.prototype,'requestPointerLock',{value:noop,writable:false,configurable:false});}catch(e){HTMLElement.prototype.requestPointerLock=noop;}
+  try{Object.defineProperty(Document.prototype,'exitPointerLock',{value:noop,writable:false,configurable:false});}catch(e){document.exitPointerLock=noop;}
+  var _p=setInterval(function(){var c=document.getElementById('canvas');if(c&&c.style.display!=='none'){c.focus();clearInterval(_p);}},500);
+  document.addEventListener('click',function(){var c=document.getElementById('canvas');if(c)c.focus();});
+})();
+</script>
+"#;
+    let html_files: Vec<_> = std::fs::read_dir(html_dir)
+        .ok().into_iter().flatten()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().map(|x| x == "html").unwrap_or(false))
+        .map(|e| e.path())
+        .collect();
+    for path in html_files {
+        if let Ok(src) = std::fs::read_to_string(&path) {
+            if src.contains("rocket-html5: suppress") {
+                continue; // already patched
+            }
+            let patched = src.replace("</body>", &format!("{inject}</body>"));
+            if std::fs::write(&path, patched).is_ok() {
+                println!("[patch] UI input fix applied → {}", path.display());
+            }
+        }
+    }
+}
+
 fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>, project: Option<String>) -> Result<Value> {
     let dir = archive.unwrap_or_else(|| {
         let name = project.as_deref().unwrap_or("brm").to_lowercase();
@@ -241,6 +275,9 @@ fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>, project: Option
     let min_bytes = min_mb
         .map(|mb| (mb * 1_048_576.0) as u64)
         .unwrap_or(10 * 1024 * 1024); // default 10 MB
+
+    // Patch UE4-generated HTML to suppress pointer-lock so UMG widget clicks work.
+    patch_html_for_ui_input(std::path::Path::new(&dir));
 
     let mut verifier = rocket_sdk::Html5PackageVerifier::new(&dir);
     verifier.min_wasm_bytes = min_bytes;
