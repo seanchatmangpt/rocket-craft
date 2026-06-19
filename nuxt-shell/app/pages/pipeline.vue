@@ -108,6 +108,27 @@ const healthColor = computed(() => {
 // Process conformance (Van der Aalst fitness/precision/generalization/simplicity)
 const { conformance, fitnessLabel, fitnessColor, load: loadConformance } = useProcessConformance();
 
+// ── Last receipt lifecycle for ChainVisualization flow diagram ───────────────
+// Fetches the most recent PASS receipt's ocel_lifecycle to show as the process flow
+const lastReceiptLifecycle = ref<string[]>([
+  'CookStarted', 'WasmPackaged', 'JsEmitted', 'DataPakStaged', 'PackageVerified'
+]);
+async function loadLastLifecycle() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data } = await (client as any)
+      .from('game_receipts')
+      .select('ocel_lifecycle')
+      .eq('engine_source', 'rocket_cli')
+      .eq('verdict', 'PASS')
+      .order('proven_at', { ascending: false })
+      .limit(1);
+    if (data?.[0]?.ocel_lifecycle?.length) {
+      lastReceiptLifecycle.value = data[0].ocel_lifecycle;
+    }
+  } catch { /* keep default lifecycle */ }
+}
+
 // ── Network status (offline detection beyond navigator.onLine) ────────────────
 // OfflineBanner pattern from expo-supabase-ai-template: probes real Supabase
 // endpoint so "OS says online" ≠ "Supabase is reachable" distinction is surfaced.
@@ -218,9 +239,10 @@ onMounted(() => {
   loadHealth();
   loadChainStatus();
   loadConformance();
+  loadLastLifecycle();
   setupPresence();
   setupSessionCountChannel();
-  timer = setInterval(() => { loadHealth(); loadChainStatus(); loadConformance(); }, 30_000);
+  timer = setInterval(() => { loadHealth(); loadChainStatus(); loadConformance(); loadLastLifecycle(); }, 30_000);
 
   // Bust KV cache and reload immediately when a PASS receipt fires
   receiptBus.on((r) => {
@@ -315,30 +337,26 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <!-- Chain integrity -->
+      <!-- Chain integrity + OCEL flow diagram (ChainVisualization component) -->
+      <!-- Adapted from dashboard.bak/app/components/evidence/ChainVerifier.vue +
+           dashboard.bak/app/components/ml/ProcessMiningVisualization.vue -->
       <section class="chain-status">
-        <h2>OCEL Chain Integrity</h2>
-        <template v-if="chainStatus">
-          <div :class="['chain-badge', chainStatus.overall.toLowerCase()]">
-            {{ chainStatus.overall }} — {{ chainStatus.sessions_checked }} session(s) checked
-          </div>
-          <ul v-if="chainStatus.breaks.length" class="break-list">
-            <li v-for="b in chainStatus.breaks" :key="b.session_id">
-              <span class="break-session">{{ b.session_id.slice(0, 8) }}…</span>
-              <span class="break-msg"> — {{ b.message }}</span>
-              <span v-if="b.broken_at !== null" class="break-seq"> (seq {{ b.broken_at }})</span>
-              <a
-                class="ocel-dl-link"
-                :href="`/api/game/ocel-export?session_id=${b.session_id}`"
-                :download="`ocel2-${b.session_id.slice(0, 8)}.json`"
-                title="Download OCEL 2.0 JSON for pm4py conformance check"
-              >↓ OCEL 2.0</a>
-            </li>
-          </ul>
-        </template>
-        <div v-else class="chain-badge unknown">
-          Chain verify unavailable — run `rocket supabase migrate`
-        </div>
+        <ChainVisualization
+          :lifecycle="lastReceiptLifecycle"
+          :chain-status="chainStatus"
+          title="OCEL Cook Pipeline Flow"
+        />
+        <!-- Download links for broken sessions -->
+        <ul v-if="chainStatus?.breaks.length" class="break-dl-list">
+          <li v-for="b in chainStatus.breaks" :key="b.session_id">
+            <a
+              class="ocel-dl-link"
+              :href="`/api/game/ocel-export?session_id=${b.session_id}`"
+              :download="`ocel2-${b.session_id.slice(0, 8)}.json`"
+              title="Download OCEL 2.0 JSON for pm4py conformance check"
+            >↓ OCEL 2.0 ({{ b.session_id.slice(0, 8) }}…)</a>
+          </li>
+        </ul>
       </section>
 
       <!-- Process conformance (Van der Aalst four quality dimensions) -->
@@ -479,16 +497,7 @@ onUnmounted(() => {
 .metric-value { display: block; font-size: 1.75rem; font-weight: 700; }
 .metric-label { display: block; font-size: 0.7rem; color: #94a3b8; margin-top: 0.25rem; }
 .chain-status { margin-bottom: 1.5rem; }
-.chain-status h2 { font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.5rem; }
-.chain-badge { display: inline-block; padding: 0.4rem 1rem; border-radius: 4px; font-size: 0.875rem; }
-.chain-badge.pass { background: #14532d; color: #86efac; }
-.chain-badge.fail { background: #450a0a; color: #fca5a5; }
-.chain-badge.unknown { background: #1e293b; color: #94a3b8; }
-.break-list { margin: 0.75rem 0 0 1rem; color: #fca5a5; font-size: 0.8rem; list-style: none; padding: 0; }
-.break-list li { display: flex; align-items: baseline; gap: 0.4rem; padding: 0.2rem 0; }
-.break-session { font-weight: 600; }
-.break-msg { flex: 1; }
-.break-seq { color: #f97316; }
+.break-dl-list { list-style: none; padding: 0.5rem 0 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .ocel-dl-link { color: #7dd3fc; text-decoration: none; font-size: 0.75rem; border: 1px solid #334155; padding: 0.1rem 0.4rem; border-radius: 2px; white-space: nowrap; }
 .ocel-dl-link:hover { background: #1e293b; }
 .conformance-section { margin-bottom: 2rem; }
