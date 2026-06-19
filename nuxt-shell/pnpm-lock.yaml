@@ -29,7 +29,7 @@ importers:
     devDependencies:
       '@nuxt/test-utils':
         specifier: ^3.23.0
-        version: 3.23.0(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0))
+        version: 3.23.0(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(happy-dom@20.10.6)(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0))
       '@playwright/test':
         specifier: ^1.61.0
         version: 1.61.0
@@ -42,9 +42,12 @@ importers:
       '@vueuse/nuxt':
         specifier: ^12.8.2
         version: 12.8.2(magicast@0.5.3)(nuxt@4.4.8(@babel/plugin-syntax-jsx@7.29.7(@babel/core@7.29.7))(@babel/plugin-syntax-typescript@7.29.7(@babel/core@7.29.7))(@parcel/watcher@2.5.6)(@rollup/plugin-babel@6.1.0(@babel/core@7.29.7)(rollup@4.62.0))(@types/node@25.9.3)(@vue/compiler-sfc@3.5.38)(cac@6.7.14)(db0@0.3.4)(ioredis@5.11.1)(lightningcss@1.32.0)(magicast@0.5.3)(rollup-plugin-visualizer@7.0.1(rollup@4.62.0))(rollup@4.62.0)(srvx@0.11.16)(terser@5.48.0)(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))(yaml@2.9.0))(typescript@6.0.3)
+      happy-dom:
+        specifier: ^20.10.6
+        version: 20.10.6
       vitest:
         specifier: ^2.1.9
-        version: 2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0)
+        version: 2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0)
 
 packages:
 
@@ -2530,6 +2533,12 @@ packages:
   '@types/web-bluetooth@0.0.21':
     resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
 
+  '@types/whatwg-mimetype@3.0.2':
+    resolution: {integrity: sha512-c2AKvDT8ToxLIOUlN51gTiHXflsfIFisS4pO7pDPoKouJCESkhZnEy623gwP9laCy5lnLDAw1vAzu2vM2YLOrA==}
+
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
+
   '@unhead/vue@2.1.15':
     resolution: {integrity: sha512-SSByXfEjhzPn8gXdEdgpYqpLMPSkLUH2HVE0GxZfOtNsJ0GgOHQs0g9T67ZZ1z0kTELLKdtOtYrzrbv9+ffF7g==}
     peerDependencies:
@@ -2956,6 +2965,10 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+
+  buffer-image-size@0.6.4:
+    resolution: {integrity: sha512-nEh+kZOPY1w+gcCMobZ6ETUp9WfibndnosbpwB1iJk/8Gt5ZF2bhS6+B6bPYz424KtwsR6Rflc3tCz1/ghX2dQ==}
+    engines: {node: '>=4.0'}
 
   buffer@6.0.3:
     resolution: {integrity: sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==}
@@ -3702,6 +3715,10 @@ packages:
     peerDependenciesMeta:
       crossws:
         optional: true
+
+  happy-dom@20.10.6:
+    resolution: {integrity: sha512-6QD0ilzDDt93tX44y8tbmZdAcdTRYDhUP+Asgi6pC8Pp5IA3cvaZGyoVN/EGtlq9ziT65iPuBBn3ASLr6hCgVw==}
+    engines: {node: '>=20.0.0'}
 
   has-bigints@1.1.0:
     resolution: {integrity: sha512-R3pbpkcIqv2Pm3dUwgjclDRVmWpTJW2DcMzcIhEXEx1oh/CEMObMm3KLmRJOdvhM7o4uQBnwr8pzRK2sJWIqfg==}
@@ -5685,6 +5702,10 @@ packages:
   webpack-virtual-modules@0.6.2:
     resolution: {integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==}
 
+  whatwg-mimetype@3.0.0:
+    resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
+    engines: {node: '>=12'}
+
   whatwg-url@5.0.0:
     resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
 
@@ -7285,7 +7306,7 @@ snapshots:
       rc9: 3.0.1
       std-env: 4.1.0
 
-  '@nuxt/test-utils@3.23.0(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0))':
+  '@nuxt/test-utils@3.23.0(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(happy-dom@20.10.6)(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0))':
     dependencies:
       '@clack/prompts': 1.0.0-alpha.9
       '@nuxt/kit': 3.21.8(magicast@0.5.3)
@@ -7313,12 +7334,13 @@ snapshots:
       tinyexec: 1.2.4
       ufo: 1.6.4
       unplugin: 2.3.11
-      vitest-environment-nuxt: 1.0.1(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0))
+      vitest-environment-nuxt: 1.0.1(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(happy-dom@20.10.6)(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0))
       vue: 3.5.38(typescript@6.0.3)
     optionalDependencies:
       '@playwright/test': 1.61.0
+      happy-dom: 20.10.6
       playwright-core: 1.61.0
-      vitest: 2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0)
+      vitest: 2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0)
     transitivePeerDependencies:
       - crossws
       - magicast
@@ -8325,6 +8347,12 @@ snapshots:
 
   '@types/web-bluetooth@0.0.21': {}
 
+  '@types/whatwg-mimetype@3.0.2': {}
+
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 25.9.3
+
   '@unhead/vue@2.1.15(vue@3.5.38(typescript@6.0.3))':
     dependencies:
       hookable: 6.1.1
@@ -8817,6 +8845,10 @@ snapshots:
   buffer-crc32@1.0.0: {}
 
   buffer-from@1.1.2: {}
+
+  buffer-image-size@0.6.4:
+    dependencies:
+      '@types/node': 25.9.3
 
   buffer@6.0.3:
     dependencies:
@@ -9688,6 +9720,19 @@ snapshots:
       srvx: 0.11.16
     optionalDependencies:
       crossws: 0.4.6(srvx@0.11.16)
+
+  happy-dom@20.10.6:
+    dependencies:
+      '@types/node': 25.9.3
+      '@types/whatwg-mimetype': 3.0.2
+      '@types/ws': 8.18.1
+      buffer-image-size: 0.6.4
+      entities: 7.0.1
+      whatwg-mimetype: 3.0.0
+      ws: 8.21.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   has-bigints@1.1.0: {}
 
@@ -11864,9 +11909,9 @@ snapshots:
       terser: 5.48.0
       yaml: 2.9.0
 
-  vitest-environment-nuxt@1.0.1(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0)):
+  vitest-environment-nuxt@1.0.1(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(happy-dom@20.10.6)(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0)):
     dependencies:
-      '@nuxt/test-utils': 3.23.0(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0))
+      '@nuxt/test-utils': 3.23.0(@playwright/test@1.61.0)(crossws@0.4.6(srvx@0.11.16))(happy-dom@20.10.6)(magicast@0.5.3)(playwright-core@1.61.0)(typescript@6.0.3)(vitest@2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0))
     transitivePeerDependencies:
       - '@cucumber/cucumber'
       - '@jest/globals'
@@ -11882,7 +11927,7 @@ snapshots:
       - typescript
       - vitest
 
-  vitest@2.1.9(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0):
+  vitest@2.1.9(@types/node@25.9.3)(happy-dom@20.10.6)(lightningcss@1.32.0)(terser@5.48.0):
     dependencies:
       '@vitest/expect': 2.1.9
       '@vitest/mocker': 2.1.9(vite@5.4.21(@types/node@25.9.3)(lightningcss@1.32.0)(terser@5.48.0))
@@ -11906,6 +11951,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.9.3
+      happy-dom: 20.10.6
     transitivePeerDependencies:
       - less
       - lightningcss
@@ -11970,6 +12016,8 @@ snapshots:
   webidl-conversions@4.0.2: {}
 
   webpack-virtual-modules@0.6.2: {}
+
+  whatwg-mimetype@3.0.0: {}
 
   whatwg-url@5.0.0:
     dependencies:

@@ -22,19 +22,42 @@ fn do_html5_setup() -> Result<Value> {
 }
 
 // Inline Python server with COOP/COEP headers (required for SharedArrayBuffer/wasm-threads).
+// Automatically redirects / and /index.html to the game HTML file so the user sees
+// the real game, not a directory listing.
 const COEP_SERVER_SCRIPT: &str = r#"
-import http.server, sys
+import http.server, sys, os, glob
+
+# Find the game HTML file (first *.html that isn't a helper script)
+def find_game_html():
+    candidates = [f for f in glob.glob("*.html")
+                  if not f.startswith("Run") and not f.startswith("Utility")]
+    return candidates[0] if candidates else None
+
+GAME_HTML = find_game_html()
 
 class CoepHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        # Redirect bare / and /index.html to the game HTML file
+        if GAME_HTML and self.path in ('/', '/index.html', ''):
+            self.send_response(302)
+            self.send_header("Location", f"/{GAME_HTML}")
+            self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+            self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+            self.end_headers()
+            return
+        super().do_GET()
+
     def end_headers(self):
         self.send_header("Cross-Origin-Opener-Policy", "same-origin")
         self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         super().end_headers()
+
     def log_message(self, fmt, *args):
         pass  # suppress per-request noise
 
 port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
-print(f"Serving on http://0.0.0.0:{port} (COOP/COEP enabled)", flush=True)
+game_url = f"http://localhost:{port}/{GAME_HTML}" if GAME_HTML else f"http://localhost:{port}/"
+print(f"Serving {GAME_HTML or '(no html found)'} on {game_url} (COOP/COEP enabled)", flush=True)
 with http.server.HTTPServer(("0.0.0.0", port), CoepHandler) as httpd:
     httpd.serve_forever()
 "#;
