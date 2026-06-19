@@ -250,4 +250,30 @@ mod tests {
         let result = Manifest::from_toml(toml);
         assert!(result.is_err());
     }
+
+    #[test]
+    fn default_for_sets_generator_out_dir() {
+        let m = Manifest::default_for("my-crate");
+        assert!(!m.generators[0].out_dir.is_empty(), "out_dir must not be empty");
+    }
+
+    #[test]
+    fn default_for_output_is_non_empty() {
+        let m = Manifest::default_for("my-crate");
+        assert!(!m.output.is_empty(), "output dir must not be empty");
+    }
+
+    #[test]
+    fn from_toml_invalid_syntax_returns_error() {
+        let result = Manifest::from_toml("<<< this is not valid toml >>>");
+        assert!(result.is_err(), "invalid TOML must return an error");
+    }
+
+    #[test]
+    fn to_toml_includes_name_and_version() {
+        let m = Manifest::default_for("rocket-rdf");
+        let toml = m.to_toml();
+        assert!(toml.contains("rocket-rdf"), "name must appear in serialized TOML");
+        assert!(toml.contains("0.1.0"), "version must appear in serialized TOML");
+    }
 }
