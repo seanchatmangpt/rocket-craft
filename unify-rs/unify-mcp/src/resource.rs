@@ -80,4 +80,37 @@ mod tests {
         assert!(result.is_ok());
         assert_eq!(result.unwrap()["content"], json!("hello"));
     }
+
+    #[test]
+    fn read_unknown_uri_returns_error() {
+        let registry = ResourceRegistry::new();
+        let result = registry.read("unify://nonexistent");
+        assert!(result.is_err(), "reading unknown URI must fail");
+    }
+
+    #[test]
+    fn list_empty_registry_returns_empty_slice() {
+        let registry = ResourceRegistry::new();
+        assert!(registry.list().is_empty());
+    }
+
+    #[test]
+    fn register_two_resources_both_listed() {
+        let mut registry = ResourceRegistry::new();
+        registry.register(make_desc("unify://a"), |_| Ok(json!({"id": "a"})));
+        registry.register(make_desc("unify://b"), |_| Ok(json!({"id": "b"})));
+        assert_eq!(registry.list().len(), 2);
+        let uris: Vec<&str> = registry.list().iter().map(|r| r.uri.as_str()).collect();
+        assert!(uris.contains(&"unify://a"));
+        assert!(uris.contains(&"unify://b"));
+    }
+
+    #[test]
+    fn handler_error_propagates_to_read_caller() {
+        let mut registry = ResourceRegistry::new();
+        registry.register(make_desc("unify://broken"), |_| Err("broken".into()));
+        let result = registry.read("unify://broken");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("broken"));
+    }
 }
