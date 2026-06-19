@@ -72,6 +72,14 @@ const engineStatus = computed(() => {
   return 'Loading engine…';
 });
 
+// Signal to Playwright that OCEL composables are mounted and listening.
+// game-loop.spec.ts polls `window.__rocketOcelReady` before injecting EngineReady.
+onMounted(() => {
+  if (import.meta.client) {
+    (window as unknown as Record<string, unknown>).__rocketOcelReady = true;
+  }
+});
+
 function onEngineReady() {
   console.log('[rocket-craft] UE4 engine ready');
 }
@@ -110,7 +118,7 @@ async function downloadHashedOcelLog() {
         :class="{ ready: isEngineReady, live: isPlaying }"
         :title="isPlaying ? 'OCEL log proves session is live' : ''"
         :data-ocel-events="ocelEvents.length"
-        :data-is-playing="isPlaying"
+        :data-is-playing="isPlaying ? 'true' : 'false'"
         data-testid="engine-status"
       >{{ engineStatus }}</span>
       <span

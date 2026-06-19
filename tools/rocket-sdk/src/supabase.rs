@@ -38,6 +38,9 @@ pub struct CookReceipt {
     pub engine_source: String,
     /// SHA-256 hex of the serialised receipt payload.
     pub receipt_hash: String,
+    /// SHA-256 hex of the WASM artifact bytes (cook-to-game cross-check, Gap 6).
+    /// None when no WASM file is present (dry-run or cook failure).
+    pub output_hash: Option<String>,
     /// RFC 3339 timestamp.
     pub proven_at: String,
     /// Free-form metadata (wasm_mb, archive_dir, companion files, …).
@@ -477,6 +480,7 @@ mod tests {
             ocel_event_count: 2,
             engine_source: "rocket_cli".into(),
             receipt_hash: "abc123".into(),
+            output_hash: None,
             proven_at: "2026-06-19T00:00:00Z".into(),
             payload: {
                 let mut m = HashMap::new();

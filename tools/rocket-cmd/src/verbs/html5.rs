@@ -1113,8 +1113,8 @@ fn start_nuxt_server_if_needed(nuxt_path: &std::path::Path) -> Result<KillOnDrop
         return Ok(KillOnDrop(None));
     }
     println!("[e2e] Starting Nuxt shell dev server on :3000...");
-    let child = std::process::Command::new("pnpm")
-        .arg("dev").current_dir(nuxt_path)
+    let child = std::process::Command::new("npx")
+        .args(["nuxt", "dev"]).current_dir(nuxt_path)
         .stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null())
         .spawn()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("spawn nuxt: {e}")))?;

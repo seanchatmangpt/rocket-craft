@@ -119,10 +119,19 @@ impl Html5PackageReport {
             };
             json!({ "path": f.path.display().to_string(), "verdict": verdict_str, "size_bytes": size_bytes })
         }).collect();
+        // Compute output_hash: SHA-256 of WASM bytes for Gap 6 cook-to-game cross-check.
+        let output_hash: Option<String> = self.wasm_files.iter()
+            .find(|f| matches!(f.verdict, WasmVerdict::Real { .. }))
+            .and_then(|f| std::fs::read(&f.path).ok())
+            .map(|bytes| {
+                let d = ring::digest::digest(&ring::digest::SHA256, &bytes);
+                d.as_ref().iter().map(|b| format!("{b:02x}")).collect()
+            });
         let receipt = json!({
             "verdict": if self.is_real_package { "PASS" } else { "FAIL" },
             "summary": self.summary(),
             "is_real_package": self.is_real_package,
+            "output_hash": output_hash,
             "wasm_mb": wasm_mb,
             "wasm_files": wasm_files_json,
             "companions": {
@@ -172,6 +181,16 @@ impl Html5PackageReport {
         let digest = ring::digest::digest(&ring::digest::SHA256, hash_input.as_bytes());
         let receipt_hash: String = digest.as_ref().iter().map(|b| format!("{b:02x}")).collect();
 
+        // output_hash: SHA-256 of the actual WASM binary bytes (Gap 6 cook-to-game cross-check).
+        // If the browser loads a different binary than the one cooked, these hashes diverge.
+        let output_hash: Option<String> = self.wasm_files.iter()
+            .find(|f| matches!(f.verdict, WasmVerdict::Real { .. }))
+            .and_then(|f| std::fs::read(&f.path).ok())
+            .map(|bytes| {
+                let d = ring::digest::digest(&ring::digest::SHA256, &bytes);
+                d.as_ref().iter().map(|b| format!("{b:02x}")).collect()
+            });
+
         // OCEL lifecycle: prefer UAT log-derived events (richer evidence); fall back to
         // artifact-derived stages when no log events are available (offline verify).
         let lifecycle: Vec<String> = if !self.cook_log_events.is_empty() {
@@ -216,6 +235,7 @@ impl Html5PackageReport {
             ocel_event_count,
             engine_source: "rocket_cli".into(),
             receipt_hash,
+            output_hash,
             proven_at: format!("{timestamp_secs}"),
             payload,
         }
