@@ -9,7 +9,12 @@
  *
  * Body: { session_id, ocel_lifecycle, ocel_event_count, engine_source, receipt_hash, milestone, payload }
  * Returns: { receipt_id, verdict, milestone }
+ *
+ * OTel span emission uses server/utils/otlp-emitter — failures are logged but
+ * never throw so OTLP unavailability cannot block receipt creation.
  */
+
+import { emitOtelSpan } from '~/server/utils/otlp-emitter';
 
 const LAWFUL_LIFECYCLE_START = 'GameSessionStarted';
 const LAWFUL_LIFECYCLE_FRAME = 'FrameRendered';
@@ -85,6 +90,22 @@ export default defineEventHandler(async (event) => {
   if (error) {
     throw createError({ statusCode: 500, statusMessage: `Receipt persist failed: ${error.message}` });
   }
+
+  // Emit OTel span for the receipt verdict — non-fatal if collector is unreachable.
+  // Fire-and-forget: we do not await the result as the Supabase write already succeeded.
+  emitOtelSpan(body.session_id, 'ReceiptVerdict', {
+    'receipt.verdict': verdict,
+    'receipt.milestone': body.milestone ?? '',
+    'receipt.hash': body.receipt_hash,
+    'receipt.engine_source': body.engine_source ?? '',
+    'receipt.ocel_event_count': body.ocel_event_count ?? 0,
+    'receipt.id': data.id as string,
+  }).catch((err: unknown) => {
+    // Should never reach here since emitOtelSpan itself never throws, but guard
+    // defensively so a future refactor cannot accidentally break receipt creation.
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[receipt.post] emitOtelSpan swallowed unexpected error: ${msg}`);
+  });
 
   return {
     receipt_id: data.id,
