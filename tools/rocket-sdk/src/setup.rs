@@ -210,4 +210,19 @@ mod tests {
         // The fact that validate_ue4_root passes with a well-formed fake confirms
         // the logic path used by find_ue4_root's env-var branch is correct.
     }
+
+    #[test]
+    fn validate_ue4_root_nonexistent_path_fails() {
+        assert!(!validate_ue4_root(Path::new("/nonexistent/totally/fake/path")));
+    }
+
+    #[test]
+    fn validate_ue4_root_with_windows_bat_suffix() {
+        // On non-Windows platforms RunUAT.sh is checked; on Windows RunUAT.bat.
+        // This test validates that the platform-specific check works on the current OS.
+        let dir = TempDir::new().unwrap();
+        let root = make_fake_engine(&dir);
+        // The fake engine was set up correctly for this platform — it must pass.
+        assert!(validate_ue4_root(&root), "fake engine with correct RunUAT must pass");
+    }
 }
