@@ -344,3 +344,108 @@ pub fn eden_grid_health_changed(
         .with_attr("delta", delta as i64)
         .with_attr("civilization_standing", if health_level > 0 { "standing" } else { "fallen" })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── GmfEventKind ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn activity_names_nonempty_for_key_variants() {
+        let kinds = [
+            GmfEventKind::PartGenerated,
+            GmfEventKind::AssemblyReceipted,
+            GmfEventKind::JidokaHaltEmitted,
+            GmfEventKind::ThermalOverload,
+            GmfEventKind::PilotEntered,
+            GmfEventKind::MapeKCycleExecuted,
+        ];
+        for k in &kinds {
+            let name = k.activity_name();
+            assert!(!name.is_empty(), "{:?}.activity_name() is empty", k);
+            assert!(name.contains('.'), "activity name '{name}' should be namespaced");
+        }
+    }
+
+    // ── GmfEvent builder ─────────────────────────────────────────────────────
+
+    #[test]
+    fn gmf_event_new_sets_fields() {
+        let ev = GmfEvent::new("ev-001", GmfEventKind::PartGenerated, 5000);
+        assert_eq!(ev.id, "ev-001");
+        assert_eq!(ev.timestamp_ms, 5000);
+        assert!(ev.object_refs.is_empty());
+        assert!(ev.attributes.is_empty());
+    }
+
+    #[test]
+    fn with_object_accumulates_refs() {
+        let ev = GmfEvent::new("ev-1", GmfEventKind::SocketMatched, 0)
+            .with_object("part-a", "source")
+            .with_object("part-b", "target");
+        assert_eq!(ev.object_refs.len(), 2);
+        assert_eq!(ev.object_refs[0].qualifier, "source");
+        assert_eq!(ev.object_refs[1].qualifier, "target");
+    }
+
+    #[test]
+    fn with_attr_inserts_key_value() {
+        let ev = GmfEvent::new("ev-2", GmfEventKind::ThermalOverload, 0)
+            .with_attr("heat_level", 95_i64);
+        assert!(ev.attributes.contains_key("heat_level"));
+    }
+
+    #[test]
+    fn into_ocel_event_sets_activity_from_kind() {
+        let ev = GmfEvent::new("ev-3", GmfEventKind::ReceiptIssued, 1234)
+            .into_ocel_event();
+        assert_eq!(ev.id, "ev-3");
+        assert_eq!(ev.activity, "receipt.issued");
+        assert_eq!(ev.timestamp_ms, 1234);
+    }
+
+    // ── factory functions ─────────────────────────────────────────────────────
+
+    #[test]
+    fn thermal_overload_event_links_part_and_zone() {
+        let ev = thermal_overload_event("part-1", "zone-head", 90.0, "ev-th-1", 100);
+        assert_eq!(ev.id, "ev-th-1");
+        assert!(ev.attributes.contains_key("thermal_load"));
+        assert_eq!(ev.object_refs.len(), 2);
+    }
+
+    #[test]
+    fn damage_observed_event_sets_part_slot() {
+        let ev = damage_observed_event(PartSlot::ArmL, "part-1", "attacker-1", 30.0, "ev-dmg-1", 200);
+        assert_eq!(ev.id, "ev-dmg-1");
+        assert!(ev.attributes.contains_key("part_slot"));
+        assert!(ev.attributes.contains_key("damage_amount"));
+    }
+
+    #[test]
+    fn pilot_entered_event_links_pilot_cockpit_mech() {
+        let ev = pilot_entered_event("pilot-1", "cockpit-1", "mech-1", "ev-pe-1", 300);
+        assert_eq!(ev.object_refs.len(), 3);
+    }
+
+    #[test]
+    fn battery_inserted_event_links_three_objects() {
+        let ev = battery_inserted_event("bat-1", "mech-1", "agent-1", 0.5, "ev-bi-1", 400);
+        assert_eq!(ev.object_refs.len(), 3);
+        assert!(ev.attributes.contains_key("shield_restore"));
+    }
+
+    #[test]
+    fn eden_grid_health_changed_reflects_standing() {
+        let ev = eden_grid_health_changed("node-1", 5, 1, "ev-eg-1", 500);
+        let standing = ev.attributes.get("civilization_standing")
+            .and_then(|v| v.as_str()).unwrap_or("");
+        assert_eq!(standing, "standing");
+
+        let fallen = eden_grid_health_changed("node-1", 0, -3, "ev-eg-2", 600);
+        let s2 = fallen.attributes.get("civilization_standing")
+            .and_then(|v| v.as_str()).unwrap_or("");
+        assert_eq!(s2, "fallen");
+    }
+}
