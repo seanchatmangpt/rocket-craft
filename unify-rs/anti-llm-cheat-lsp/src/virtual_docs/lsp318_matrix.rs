@@ -23,3 +23,26 @@ pub fn generate_matrix_markdown() -> String {
     }
     out
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn output_starts_with_header() {
+        let out = generate_matrix_markdown();
+        assert!(out.starts_with("# LSP 3.18 Delta Changelog Coverage Matrix"));
+    }
+
+    #[test]
+    fn output_contains_table_header_row() {
+        let out = generate_matrix_markdown();
+        assert!(out.contains("| Feature ID |"));
+    }
+
+    #[test]
+    fn output_is_non_empty() {
+        let out = generate_matrix_markdown();
+        assert!(out.len() > 100, "matrix output unexpectedly short");
+    }
+}
