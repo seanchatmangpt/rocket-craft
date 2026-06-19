@@ -143,12 +143,95 @@ impl Law for AndroidKeystoreLaw {
 
 #[cfg(test)]
 mod tests {
-
+    use super::*;
     use super::plugin::PluginHost;
 
+    struct AlwaysPassLaw;
+    impl Law for AlwaysPassLaw {
+        fn name(&self) -> &str { "AlwaysPass" }
+        fn description(&self) -> &str { "Never fails." }
+        fn validate(&self, _: &Path) -> Result<(), LawError> { Ok(()) }
+    }
+
+    struct AlwaysFailLaw;
+    impl Law for AlwaysFailLaw {
+        fn name(&self) -> &str { "AlwaysFail" }
+        fn description(&self) -> &str { "Always fails." }
+        fn validate(&self, _: &Path) -> Result<(), LawError> {
+            Err(LawError { law_name: "AlwaysFail".into(), message: "intentional".into() })
+        }
+    }
+
     #[test]
-    fn test_plugin_host_new() {
+    fn plugin_host_new_empty() {
         let host = PluginHost::new();
         assert!(host.receipts().is_empty());
+    }
+
+    #[test]
+    fn plugin_host_record_and_retrieve_receipts() {
+        let mut host = PluginHost::new();
+        host.record_receipt(Receipt::new("law1.wasm".into(), "Law1", true, "ok"));
+        host.record_receipt(Receipt::new("law2.wasm".into(), "Law2", false, "fail"));
+        assert_eq!(host.receipts().len(), 2);
+        assert_eq!(host.receipts()[0].law_name, "Law1");
+        assert!(host.receipts()[0].passed);
+        assert_eq!(host.receipts()[1].law_name, "Law2");
+        assert!(!host.receipts()[1].passed);
+    }
+
+    #[test]
+    fn law_error_display_format() {
+        let e = LawError { law_name: "MyLaw".into(), message: "broken".into() };
+        let s = format!("{}", e);
+        assert!(s.contains("MyLaw"));
+        assert!(s.contains("broken"));
+    }
+
+    #[test]
+    fn validator_empty_returns_no_errors() {
+        let v = Validator::new();
+        let errors = v.validate_all(Path::new("/tmp"));
+        assert!(errors.is_empty());
+    }
+
+    #[test]
+    fn validator_passing_law_returns_no_errors() {
+        let mut v = Validator::new();
+        v.add_law(Box::new(AlwaysPassLaw));
+        assert!(v.validate_all(Path::new("/tmp")).is_empty());
+    }
+
+    #[test]
+    fn validator_failing_law_returns_one_error() {
+        let mut v = Validator::new();
+        v.add_law(Box::new(AlwaysFailLaw));
+        let errors = v.validate_all(Path::new("/tmp"));
+        assert_eq!(errors.len(), 1);
+        assert_eq!(errors[0].law_name, "AlwaysFail");
+    }
+
+    #[test]
+    fn validator_collects_all_errors_from_multiple_laws() {
+        let mut v = Validator::new();
+        v.add_law(Box::new(AlwaysPassLaw));
+        v.add_law(Box::new(AlwaysFailLaw));
+        v.add_law(Box::new(AlwaysFailLaw));
+        let errors = v.validate_all(Path::new("/tmp"));
+        assert_eq!(errors.len(), 2);
+    }
+
+    #[test]
+    fn android_keystore_law_name_and_description() {
+        let law = AndroidKeystoreLaw;
+        assert_eq!(law.name(), "AndroidKeystoreLaw");
+        assert!(!law.description().is_empty());
+    }
+
+    #[test]
+    fn android_keystore_law_passes_on_nonexistent_project() {
+        let law = AndroidKeystoreLaw;
+        // A nonexistent path has no Android directory → law passes
+        assert!(law.validate(Path::new("/tmp/no_such_project_xyz")).is_ok());
     }
 }
