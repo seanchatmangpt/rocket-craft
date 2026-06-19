@@ -59,6 +59,19 @@ fn do_html5_serve(dir: Option<String>, port: Option<u16>, project: Option<String
         )));
     }
 
+    // Verify python3 is available before attempting to spawn it — gives a clear error
+    // instead of a cryptic "No such file or directory" from spawn().
+    let python_ok = std::process::Command::new("python3")
+        .arg("--version")
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false);
+    if !python_ok {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            "python3 not found in PATH — required for COOP/COEP serve. Install python3 and retry.".to_string()
+        ));
+    }
+
     println!("Serving {dir} on http://0.0.0.0:{port} (COOP/COEP headers enabled)");
 
     if background {
