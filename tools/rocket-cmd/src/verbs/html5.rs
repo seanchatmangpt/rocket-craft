@@ -21,26 +21,9 @@ fn do_html5_setup() -> Result<Value> {
     Ok(serde_json::json!({"status": "ok", "engine": engine.display().to_string()}))
 }
 
-fn do_html5_serve(dir: Option<String>, port: Option<u16>, project: Option<String>) -> Result<Value> {
-    use std::path::PathBuf;
-    use std::process::Command;
-
-    let dir = dir.unwrap_or_else(|| {
-        let name = project.as_deref().unwrap_or("brm").to_lowercase();
-        format!("/tmp/{name}-html5-archive/HTML5")
-    });
-    let port = port.unwrap_or(8080);
-    let path = PathBuf::from(&dir);
-    if !path.exists() {
-        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
-            "HTML5 package directory not found: {dir}"
-        )));
-    }
-
-    // Inline Python server with COOP/COEP headers — required for SharedArrayBuffer
-    // and wasm-threads. Uses HTTPServer directly (test() API changed in 3.13+).
-    let server_script = r#"
-import http.server, sys, os
+// Inline Python server with COOP/COEP headers (required for SharedArrayBuffer/wasm-threads).
+const COEP_SERVER_SCRIPT: &str = r#"
+import http.server, sys
 
 class CoepHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -56,9 +39,47 @@ with http.server.HTTPServer(("0.0.0.0", port), CoepHandler) as httpd:
     httpd.serve_forever()
 "#;
 
+fn pid_file_for_port(port: u16) -> std::path::PathBuf {
+    std::path::PathBuf::from(format!("/tmp/rocket-html5-serve-{port}.pid"))
+}
+
+fn do_html5_serve(dir: Option<String>, port: Option<u16>, project: Option<String>, background: bool) -> Result<Value> {
+    use std::path::PathBuf;
+    use std::process::Command;
+
+    let dir = dir.unwrap_or_else(|| {
+        let name = project.as_deref().unwrap_or("brm").to_lowercase();
+        format!("/tmp/{name}-html5-archive/HTML5")
+    });
+    let port = port.unwrap_or(8080);
+    let path = PathBuf::from(&dir);
+    if !path.exists() {
+        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "HTML5 package directory not found: {dir}"
+        )));
+    }
+
     println!("Serving {dir} on http://0.0.0.0:{port} (COOP/COEP headers enabled)");
+
+    if background {
+        let child = Command::new("python3")
+            .args(["-c", COEP_SERVER_SCRIPT, &port.to_string()])
+            .current_dir(&path)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+        let pid = child.id();
+        let pid_file = pid_file_for_port(port);
+        std::fs::write(&pid_file, pid.to_string())
+            .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("could not write PID file: {e}")))?;
+        println!("[background] PID {pid} — stop with: rocket html5 stop --port {port}");
+        return Ok(serde_json::json!({ "status": "background", "pid": pid, "pid_file": pid_file.display().to_string() }));
+    }
+
     let status = Command::new("python3")
-        .args(["-c", server_script, &port.to_string()])
+        .args(["-c", COEP_SERVER_SCRIPT, &port.to_string()])
         .current_dir(&path)
         .status()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
@@ -156,9 +177,10 @@ fn setup_html5() -> Result<Value> {
 /// # Arguments
 /// * `dir` - Directory containing the HTML5 package (default: /tmp/brm-html5-archive/HTML5)
 /// * `port` - Port to listen on (default: 8080)
+/// * `background` - Daemonize the server and write a PID file; use `html5 stop` to kill it
 #[verb("serve", "html5")]
-fn serve_html5(dir: Option<String>, port: Option<u16>, project: Option<String>) -> Result<Value> {
-    do_html5_serve(dir, port, project)
+fn serve_html5(dir: Option<String>, port: Option<u16>, project: Option<String>, background: Option<bool>) -> Result<Value> {
+    do_html5_serve(dir, port, project, background.unwrap_or(false))
 }
 
 /// Cook + package a UE4 project for HTML5 via RunUAT BuildCookRun
@@ -575,6 +597,46 @@ fn open_html5(archive: Option<String>, port: Option<u16>, project: Option<String
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(e))?;
 
     Ok(serde_json::json!({ "url": url }))
+}
+
+/// Send SIGTERM to a background process by PID, removing the PID file on success.
+fn kill_background_serve(pid: u32, pid_file: &std::path::Path, port: u16) -> Result<Value> {
+    #[cfg(unix)]
+    {
+        let status = std::process::Command::new("kill")
+            .arg(pid.to_string())
+            .status()
+            .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("kill failed: {e}")))?;
+        if !status.success() {
+            return Err(clap_noun_verb::NounVerbError::execution_error(format!("kill non-zero for PID {pid}")));
+        }
+    }
+    #[cfg(not(unix))]
+    println!("Non-Unix: manually terminate PID {pid}");
+
+    let _ = std::fs::remove_file(pid_file);
+    println!("[stopped] HTML5 serve on port {port} (PID {pid})");
+    Ok(serde_json::json!({ "stopped": true, "pid": pid, "port": port }))
+}
+
+/// Stop a background HTML5 serve process started with `html5 serve --background`
+///
+/// # Arguments
+/// * `port` - Port the background server is running on (default: 8080)
+#[verb("stop", "html5")]
+fn stop_html5(port: Option<u16>) -> Result<Value> {
+    let port = port.unwrap_or(8080);
+    let pid_file = pid_file_for_port(port);
+    if !pid_file.exists() {
+        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "No background serve for port {port} (PID file missing: {})", pid_file.display()
+        )));
+    }
+    let raw = std::fs::read_to_string(&pid_file)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("read PID file: {e}")))?;
+    let pid: u32 = raw.trim().parse()
+        .map_err(|_| clap_noun_verb::NounVerbError::execution_error(format!("invalid PID: {raw}")))?;
+    kill_background_serve(pid, &pid_file, port)
 }
 
 fn do_html5_log(lines: Option<u32>, follow: bool) -> Result<Value> {
