@@ -179,3 +179,160 @@ pub enum LedgerError {
     #[error("insufficient funds: player {player_id} needs {needed} gold")]
     InsufficientFunds { player_id: u64, needed: u32 },
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_entry(
+        ledger: &mut Ledger,
+        debits: Vec<(AccountType, u32)>,
+        credits: Vec<(AccountType, u32)>,
+    ) -> JournalEntry {
+        JournalEntry {
+            id: ledger.next_entry_id(),
+            timestamp: Utc::now(),
+            description: "test".into(),
+            debits,
+            credits,
+            transaction_id: ledger.next_tx_id(),
+        }
+    }
+
+    // ── JournalEntry::is_balanced ─────────────────────────────────────────────
+
+    #[test]
+    fn balanced_entry_passes() {
+        let entry = JournalEntry {
+            id: 0,
+            timestamp: Utc::now(),
+            description: "".into(),
+            transaction_id: 0,
+            debits: vec![(AccountType::PlayerWallet(1), 100)],
+            credits: vec![(AccountType::PlayerWallet(2), 100)],
+        };
+        assert!(entry.is_balanced());
+    }
+
+    #[test]
+    fn unbalanced_entry_fails_is_balanced() {
+        let entry = JournalEntry {
+            id: 0,
+            timestamp: Utc::now(),
+            description: "".into(),
+            transaction_id: 0,
+            debits: vec![(AccountType::PlayerWallet(1), 100)],
+            credits: vec![(AccountType::PlayerWallet(2), 50)],
+        };
+        assert!(!entry.is_balanced());
+    }
+
+    // ── Ledger::record ────────────────────────────────────────────────────────
+
+    #[test]
+    fn unbalanced_entry_rejected_with_error() {
+        let mut ledger = Ledger::new();
+        let entry = make_entry(
+            &mut ledger,
+            vec![(AccountType::PlayerWallet(1), 100)],
+            vec![(AccountType::PlayerWallet(2), 50)], // mismatch
+        );
+        assert!(matches!(
+            ledger.record(entry),
+            Err(LedgerError::UnbalancedEntry { .. })
+        ));
+    }
+
+    #[test]
+    fn total_balance_is_always_zero_after_valid_entries() {
+        let mut ledger = Ledger::new();
+        // Source → player
+        let e1 = make_entry(
+            &mut ledger,
+            vec![(AccountType::SystemSource, 500)],
+            vec![(AccountType::PlayerWallet(1), 500)],
+        );
+        ledger.record(e1).unwrap();
+        assert_eq!(ledger.total_balance(), 0, "double-entry invariant");
+
+        // Player → shop
+        let e2 = make_entry(
+            &mut ledger,
+            vec![(AccountType::PlayerWallet(1), 100)],
+            vec![(AccountType::ShopRevenue, 100)],
+        );
+        ledger.record(e2).unwrap();
+        assert_eq!(
+            ledger.total_balance(),
+            0,
+            "double-entry invariant after shop purchase"
+        );
+    }
+
+    #[test]
+    fn balance_of_reflects_credits_and_debits() {
+        let mut ledger = Ledger::new();
+        let e = make_entry(
+            &mut ledger,
+            vec![(AccountType::SystemSource, 1000)],
+            vec![(AccountType::PlayerWallet(42), 1000)],
+        );
+        ledger.record(e).unwrap();
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(42)), 1000);
+        assert_eq!(ledger.balance_of(AccountType::SystemSource), -1000);
+    }
+
+    // ── Ledger::transfer ──────────────────────────────────────────────────────
+
+    #[test]
+    fn transfer_moves_gold_between_players() {
+        let mut ledger = Ledger::new();
+        // Fund player 1
+        let e = make_entry(
+            &mut ledger,
+            vec![(AccountType::SystemSource, 500)],
+            vec![(AccountType::PlayerWallet(1), 500)],
+        );
+        ledger.record(e).unwrap();
+
+        ledger.transfer(1, 2, 200, "trade").unwrap();
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 300);
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(2)), 200);
+        assert_eq!(ledger.total_balance(), 0);
+    }
+
+    #[test]
+    fn transfer_insufficient_funds_rejected() {
+        let mut ledger = Ledger::new();
+        let err = ledger.transfer(99, 1, 100, "empty wallet").unwrap_err();
+        assert!(matches!(
+            err,
+            LedgerError::InsufficientFunds {
+                player_id: 99,
+                needed: 100
+            }
+        ));
+    }
+
+    // ── Ledger::award_gold ────────────────────────────────────────────────────
+
+    #[test]
+    fn award_gold_credits_player_and_debits_source() {
+        let mut ledger = Ledger::new();
+        ledger.award_gold(7, 250, "login bonus").unwrap();
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(7)), 250);
+        assert_eq!(ledger.balance_of(AccountType::SystemSource), -250);
+        assert_eq!(ledger.total_balance(), 0);
+    }
+
+    #[test]
+    fn history_records_all_entries_in_order() {
+        let mut ledger = Ledger::new();
+        ledger.award_gold(1, 100, "r1").unwrap();
+        ledger.award_gold(2, 200, "r2").unwrap();
+        let hist = ledger.history();
+        assert_eq!(hist.len(), 2);
+        assert_eq!(hist[0].description, "r1");
+        assert_eq!(hist[1].description, "r2");
+    }
+}
