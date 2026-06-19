@@ -262,3 +262,86 @@ fn do_html5_status() -> Result<Value> {
 fn status_html5() -> Result<Value> {
     do_html5_status()
 }
+
+fn do_html5_preflight(project: Option<String>) -> Result<Value> {
+    use std::path::Path;
+
+    let mut checks: Vec<serde_json::Value> = Vec::new();
+    let mut overall_ok = true;
+
+    let mut add = |name: &str, ok: bool, msg: String| {
+        let status = if ok { "PASS" } else { "FAIL" };
+        println!("[{status}] {name}: {msg}");
+        checks.push(serde_json::json!({ "name": name, "status": status, "message": msg }));
+        if !ok { overall_ok = false; }
+    };
+
+    // 1. Engine root
+    let engine = ue4_root();
+    let uat = engine.join("Engine/Build/BatchFiles/RunUAT.sh");
+    add("Engine Root", uat.exists(), format!("{} — RunUAT.sh {}", engine.display(),
+        if uat.exists() { "present" } else { "MISSING" }));
+
+    // 2. emsdk
+    let emsdk = engine.join("Engine/Platforms/HTML5/Build/emsdk");
+    add("emsdk", emsdk.exists(), format!("{}", emsdk.display()));
+
+    // 3. Python 3
+    let python_ok = std::process::Command::new("python3")
+        .arg("--version").output().map(|o| o.status.success()).unwrap_or(false);
+    add("Python 3", python_ok, if python_ok { "python3 in PATH".into() } else { "python3 not found".into() });
+
+    // 4. Disk space (require ≥ 50 GB free in /tmp for archive)
+    let free_gb = {
+        use std::process::Command;
+        Command::new("df").args(["-g", "/tmp"]).output()
+            .ok()
+            .and_then(|o| {
+                let s = String::from_utf8_lossy(&o.stdout).to_string();
+                s.lines().nth(1).and_then(|l| l.split_whitespace().nth(3).and_then(|n| n.parse::<u64>().ok()))
+            })
+            .unwrap_or(0)
+    };
+    add("Disk Space (/tmp)", free_gb >= 50,
+        format!("{free_gb} GB free in /tmp (need ≥ 50 GB)"));
+
+    // 5. Project .uproject file
+    if let Some(proj_name) = &project {
+        let root = std::env::current_dir()
+            .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+        let ctx = rocket_sdk::RocketContext::load(&root).ok();
+        let uproject_ok = ctx.as_ref()
+            .and_then(|c| c.manifest.projects().iter().find(|p| &p.name == proj_name).map(|p| root.join(&p.uproject_path).exists()))
+            .unwrap_or(false);
+        add(&format!("Project '{proj_name}'"), uproject_ok,
+            if uproject_ok { format!("{proj_name}.uproject found") } else { format!("{proj_name} not found in manifest") });
+    }
+
+    // 6. arch -x86_64 (Rosetta required for UE4 HTML5 on Apple Silicon)
+    let arch_ok = std::process::Command::new("arch")
+        .args(["-x86_64", "true"]).status().map(|s| s.success()).unwrap_or(false);
+    add("Rosetta (arch -x86_64)", arch_ok,
+        if arch_ok { "Rosetta present".into() } else { "Rosetta not available — required on Apple Silicon".into() });
+
+    let verdict = if overall_ok { "READY" } else { "NOT READY" };
+    println!("\n[{verdict}] Preflight complete");
+
+    Ok(serde_json::json!({
+        "verdict": verdict,
+        "all_pass": overall_ok,
+        "checks": checks,
+    }))
+}
+
+/// Run preflight checks before starting an HTML5 cook
+///
+/// Verifies: engine root + RunUAT.sh, emsdk, Python 3, disk space (≥50 GB),
+/// project .uproject presence, and Rosetta (arch -x86_64) on Apple Silicon.
+/// Run this before `html5 cook` to catch blockers early.
+///
+/// # Arguments
+/// * `project` - Optional project name to verify .uproject exists
+#[verb("preflight", "html5")]
+fn preflight_html5(project: Option<String>) -> Result<Value> {
+    do_html5_preflight(project)
+}
