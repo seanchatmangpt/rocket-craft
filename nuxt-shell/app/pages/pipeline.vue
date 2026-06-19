@@ -146,16 +146,12 @@ const lastReceiptLifecycle = ref<string[]>([
 ]);
 async function loadLastLifecycle() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (client as any)
-      .from('game_receipts')
-      .select('ocel_lifecycle')
-      .eq('engine_source', 'rocket_cli')
-      .eq('verdict', 'PASS')
-      .order('proven_at', { ascending: false })
-      .limit(1);
-    if (data?.[0]?.ocel_lifecycle?.length) {
-      lastReceiptLifecycle.value = data[0].ocel_lifecycle;
+    // Use the server receipts endpoint — service key stays server-side
+    const data = await $fetch<{ rows: Array<{ ocel_lifecycle: string[] }> }>(
+      '/api/game/receipts?limit=1&engine_source=rocket_cli&verdict=PASS'
+    );
+    if (data.rows[0]?.ocel_lifecycle?.length) {
+      lastReceiptLifecycle.value = data.rows[0].ocel_lifecycle;
     }
   } catch { /* keep default lifecycle */ }
 }

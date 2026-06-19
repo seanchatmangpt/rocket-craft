@@ -1,8 +1,6 @@
 <script setup lang="ts">
 useHead({ title: 'Rocket-Craft — Session Receipts' });
 
-const { client } = useRocketSupabase();
-
 // Live updates when receipts arrive from browser sessions OR the Rust CLI cook pipeline
 const { receiptBus } = useRocketSessionRealtime();
 
@@ -32,18 +30,18 @@ const sigStatus = ref<Record<string, 'verifying' | 'ok' | 'fail' | 'unsigned' | 
 
 async function loadReceipts() {
   loading.value = true;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error: err } = await (client as any)
-    .from('game_receipts')
-    .select('id, session_id, verdict, milestone, ocel_event_count, ocel_lifecycle, engine_source, receipt_hash, output_hash, proven_at, ed25519_sig, payload')
-    .order('proven_at', { ascending: false })
-    .limit(50);
-  loading.value = false;
-  if (err) { error.value = err.message; return; }
-  receipts.value = data ?? [];
-  // Prove chain finality for all PASS receipts (5-at-a-time, backgrounded)
-  const passRows = receipts.value.filter(r => r.verdict === 'PASS');
-  proveAll(passRows.map(r => ({ id: r.id, session_id: r.session_id, receipt_hash: r.receipt_hash })));
+  error.value = null;
+  try {
+    const data = await $fetch<{ rows: ReceiptRow[] }>('/api/game/receipts?limit=50');
+    receipts.value = data.rows;
+    // Prove chain finality for all PASS receipts (5-at-a-time, backgrounded)
+    const passRows = receipts.value.filter(r => r.verdict === 'PASS');
+    proveAll(passRows.map(r => ({ id: r.id, session_id: r.session_id, receipt_hash: r.receipt_hash })));
+  } catch (err: unknown) {
+    error.value = err instanceof Error ? err.message : 'Failed to load receipts';
+  } finally {
+    loading.value = false;
+  }
 }
 
 onMounted(loadReceipts);

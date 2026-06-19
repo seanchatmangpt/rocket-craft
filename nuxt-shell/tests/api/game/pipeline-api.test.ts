@@ -399,6 +399,44 @@ describe('GET /api/game/session-replay', () => {
   });
 });
 
+// ── /api/game/receipts ────────────────────────────────────────────────────────
+describe('GET /api/game/receipts', () => {
+  it('returns rows[], total, offset, limit', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/receipts');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(Array.isArray(body.rows)).toBe(true);
+    expect(typeof body.total).toBe('number');
+    expect(body.limit).toBe(50);
+    expect(body.offset).toBe(0);
+  });
+
+  it('respects ?limit=5 and ?verdict=PASS filters', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/receipts?limit=5&verdict=PASS');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(body.limit).toBe(5);
+    expect(body.rows.length).toBeLessThanOrEqual(5);
+    for (const row of body.rows) {
+      expect(row.verdict).toBe('PASS');
+    }
+  });
+
+  it('contract: receipt row has id, session_id, verdict, receipt_hash', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/receipts?limit=1');
+    if (status === 503 || body.rows.length === 0) return;
+    expect(status).toBe(200);
+    const row = body.rows[0];
+    expect(typeof row.id).toBe('string');
+    expect(typeof row.verdict).toBe('string');
+    expect(typeof row.receipt_hash).toBe('string');
+    expect(['PASS', 'FAIL', 'PENDING', 'PROVEN', 'HASH_MISMATCH']).toContain(row.verdict);
+  });
+});
+
 // ── /api/game/profile ─────────────────────────────────────────────────────────
 describe('GET /api/game/profile', () => {
   it('rejects missing player_id', async () => {
