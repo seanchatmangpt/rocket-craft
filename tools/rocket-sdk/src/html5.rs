@@ -1,10 +1,185 @@
 use anyhow::{bail, Context, Result};
+use serde::Serialize;
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus, Stdio};
 
 use crate::config::discover_python3;
 
 const GIT_WRAPPER_DIR: &str = "/tmp/ubt-git-wrapper";
+
+// ── WASM magic bytes ─────────────────────────────────────────────────────────
+const WASM_MAGIC: [u8; 4] = [0x00, 0x61, 0x73, 0x6d];
+
+// Real UE4 HTML5 packages are ~50–250 MB.  Anything below this threshold is
+// almost certainly a stub or an empty placeholder.
+const MIN_REAL_WASM_BYTES: u64 = 10 * 1024 * 1024; // 10 MB
+
+// ── Package verification ──────────────────────────────────────────────────────
+
+/// Verdict for a single file found in the HTML5 archive directory.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+pub enum WasmVerdict {
+    /// Real WASM file: correct magic bytes and above the minimum size threshold.
+    Real { size_bytes: u64 },
+    /// File has valid WASM magic but is suspiciously small (likely a stub).
+    Stub { size_bytes: u64 },
+    /// The first four bytes are not the WASM magic sequence.
+    NotWasm { first_bytes: Vec<u8> },
+    /// File could not be read.
+    Unreadable { reason: String },
+}
+
+/// Result of verifying one `.wasm` file.
+#[derive(Debug, Clone, Serialize)]
+pub struct WasmFileReport {
+    pub path: PathBuf,
+    pub verdict: WasmVerdict,
+}
+
+/// Companion files expected alongside a real UE4 HTML5 package.
+#[derive(Debug, Clone, Serialize)]
+pub struct CompanionReport {
+    pub has_js: bool,
+    pub has_html: bool,
+    pub has_data_or_pak: bool,
+}
+
+/// Full report produced by [`Html5PackageVerifier`].
+#[derive(Debug, Clone, Serialize)]
+pub struct Html5PackageReport {
+    pub archive_dir: PathBuf,
+    pub wasm_files: Vec<WasmFileReport>,
+    pub companions: CompanionReport,
+    /// True when at least one `.wasm` with `WasmVerdict::Real` was found AND
+    /// all companion files are present.
+    pub is_real_package: bool,
+}
+
+impl Html5PackageReport {
+    /// One-liner summary suitable for CLI output.
+    pub fn summary(&self) -> String {
+        if self.is_real_package {
+            let size = self.wasm_files.iter().find_map(|f| {
+                if let WasmVerdict::Real { size_bytes } = f.verdict {
+                    Some(size_bytes)
+                } else {
+                    None
+                }
+            }).unwrap_or(0);
+            format!(
+                "REAL package — {:.1} MB WASM, js={}, html={}, data={}",
+                size as f64 / 1_048_576.0,
+                self.companions.has_js,
+                self.companions.has_html,
+                self.companions.has_data_or_pak,
+            )
+        } else if self.wasm_files.is_empty() {
+            format!("NO .wasm found in {}", self.archive_dir.display())
+        } else {
+            let stub_count = self.wasm_files.iter().filter(|f| {
+                matches!(f.verdict, WasmVerdict::Stub { .. })
+            }).count();
+            format!(
+                "STUB package — {} wasm file(s), {} stub(s)",
+                self.wasm_files.len(), stub_count
+            )
+        }
+    }
+}
+
+/// Verifies that an HTML5 archive directory contains a real UE4 package.
+///
+/// Checks:
+/// 1. Presence of at least one `.wasm` file with valid magic bytes.
+/// 2. Size exceeds [`MIN_REAL_WASM_BYTES`] (10 MB stub detection threshold).
+/// 3. Companion files: `.js`, `.html`, and `.data`/`.pak`.
+pub struct Html5PackageVerifier {
+    pub archive_dir: PathBuf,
+    /// Override the minimum size threshold (default: 10 MB).
+    pub min_wasm_bytes: u64,
+}
+
+impl Html5PackageVerifier {
+    pub fn new(archive_dir: impl Into<PathBuf>) -> Self {
+        Self {
+            archive_dir: archive_dir.into(),
+            min_wasm_bytes: MIN_REAL_WASM_BYTES,
+        }
+    }
+
+    pub fn with_min_wasm_bytes(mut self, bytes: u64) -> Self {
+        self.min_wasm_bytes = bytes;
+        self
+    }
+
+    /// Walk `archive_dir` recursively and verify all `.wasm` files.
+    pub fn verify(&self) -> Result<Html5PackageReport> {
+        if !self.archive_dir.exists() {
+            bail!(
+                "HTML5 archive directory not found: {}",
+                self.archive_dir.display()
+            );
+        }
+
+        let mut wasm_files = Vec::new();
+        let mut has_js = false;
+        let mut has_html = false;
+        let mut has_data_or_pak = false;
+
+        for entry in walkdir::WalkDir::new(&self.archive_dir)
+            .into_iter()
+            .filter_map(|e| e.ok())
+        {
+            let path = entry.path();
+            if !path.is_file() {
+                continue;
+            }
+            let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
+            match ext {
+                "wasm" => wasm_files.push(self.check_wasm(path)),
+                "js" => has_js = true,
+                "html" | "htm" => has_html = true,
+                "data" | "pak" => has_data_or_pak = true,
+                _ => {}
+            }
+        }
+
+        let has_real_wasm = wasm_files.iter().any(|f| {
+            matches!(f.verdict, WasmVerdict::Real { .. })
+        });
+
+        let companions = CompanionReport { has_js, has_html, has_data_or_pak };
+        let is_real_package = has_real_wasm && has_js && has_html;
+
+        Ok(Html5PackageReport {
+            archive_dir: self.archive_dir.clone(),
+            wasm_files,
+            companions,
+            is_real_package,
+        })
+    }
+
+    fn check_wasm(&self, path: &Path) -> WasmFileReport {
+        let verdict = match std::fs::read(path) {
+            Err(e) => WasmVerdict::Unreadable { reason: e.to_string() },
+            Ok(bytes) => {
+                if bytes.len() < 4 {
+                    WasmVerdict::NotWasm { first_bytes: bytes }
+                } else if bytes[..4] != WASM_MAGIC {
+                    WasmVerdict::NotWasm { first_bytes: bytes[..4].to_vec() }
+                } else {
+                    let size_bytes = bytes.len() as u64;
+                    if size_bytes >= self.min_wasm_bytes {
+                        WasmVerdict::Real { size_bytes }
+                    } else {
+                        WasmVerdict::Stub { size_bytes }
+                    }
+                }
+            }
+        };
+        WasmFileReport { path: path.to_path_buf(), verdict }
+    }
+}
 
 pub struct Html5Cook {
     pub engine_root: PathBuf,
@@ -25,6 +200,14 @@ impl Html5Cook {
             archive_dir: archive_dir.into(),
             client_config: "Development".into(),
         }
+    }
+
+    /// Run the cook and verify the output is a real package.
+    /// Returns the package report; call `report.is_real_package` to confirm success.
+    pub fn run_and_verify(&self) -> Result<Html5PackageReport> {
+        self.run()?;
+        Html5PackageVerifier::new(&self.archive_dir)
+            .verify()
     }
 
     pub fn run(&self) -> Result<()> {
@@ -264,6 +447,130 @@ fn check_exit(status: ExitStatus, label: &str) -> Result<()> {
 mod tests {
     use super::*;
     use tempfile::TempDir;
+
+    // ── Html5PackageVerifier tests ────────────────────────────────────────────
+
+    fn write_file(dir: &Path, name: &str, content: &[u8]) -> PathBuf {
+        let p = dir.join(name);
+        std::fs::write(&p, content).unwrap();
+        p
+    }
+
+    #[test]
+    fn verifier_fails_on_missing_archive_dir() {
+        let result = Html5PackageVerifier::new("/nonexistent/archive").verify();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn verifier_no_files_gives_empty_report() {
+        let dir = TempDir::new().unwrap();
+        let report = Html5PackageVerifier::new(dir.path()).verify().unwrap();
+        assert!(report.wasm_files.is_empty());
+        assert!(!report.is_real_package);
+        assert!(report.summary().contains("NO .wasm"));
+    }
+
+    #[test]
+    fn verifier_detects_stub_wasm_below_threshold() {
+        let dir = TempDir::new().unwrap();
+        // Valid WASM magic, but only 8 bytes total
+        let stub: Vec<u8> = [0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00].to_vec();
+        write_file(dir.path(), "game.wasm", &stub);
+        write_file(dir.path(), "game.js", b"// stub");
+        write_file(dir.path(), "index.html", b"<html/>");
+
+        let report = Html5PackageVerifier::new(dir.path())
+            .with_min_wasm_bytes(1024)  // lower threshold so the test is predictable
+            .verify().unwrap();
+
+        assert!(!report.is_real_package);
+        assert_eq!(report.wasm_files.len(), 1);
+        assert!(matches!(report.wasm_files[0].verdict, WasmVerdict::Stub { .. }));
+        assert!(report.summary().contains("STUB"));
+    }
+
+    #[test]
+    fn verifier_rejects_non_wasm_magic() {
+        let dir = TempDir::new().unwrap();
+        write_file(dir.path(), "fake.wasm", b"not a real wasm file at all");
+        let report = Html5PackageVerifier::new(dir.path()).verify().unwrap();
+        assert!(matches!(
+            report.wasm_files[0].verdict,
+            WasmVerdict::NotWasm { .. }
+        ));
+        assert!(!report.is_real_package);
+    }
+
+    #[test]
+    fn verifier_detects_real_package() {
+        let dir = TempDir::new().unwrap();
+        // Build a fake "real" WASM: magic bytes + enough padding to exceed threshold
+        let threshold = 512_u64; // small threshold for test speed
+        let mut real_wasm = vec![0x00u8, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00];
+        real_wasm.extend(vec![0u8; threshold as usize]);
+        write_file(dir.path(), "game.wasm", &real_wasm);
+        write_file(dir.path(), "game.js", b"(function(){})();");
+        write_file(dir.path(), "index.html", b"<html><body></body></html>");
+        write_file(dir.path(), "game.data", b"some data");
+
+        let report = Html5PackageVerifier::new(dir.path())
+            .with_min_wasm_bytes(threshold)
+            .verify().unwrap();
+
+        assert!(report.is_real_package);
+        assert!(matches!(report.wasm_files[0].verdict, WasmVerdict::Real { .. }));
+        assert!(report.companions.has_js);
+        assert!(report.companions.has_html);
+        assert!(report.companions.has_data_or_pak);
+        assert!(report.summary().contains("REAL"));
+    }
+
+    #[test]
+    fn verifier_real_requires_js_and_html() {
+        let dir = TempDir::new().unwrap();
+        let threshold = 100_u64;
+        let mut wasm = vec![0x00u8, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00];
+        wasm.extend(vec![0u8; threshold as usize]);
+        write_file(dir.path(), "game.wasm", &wasm);
+        // Missing .js and .html
+
+        let report = Html5PackageVerifier::new(dir.path())
+            .with_min_wasm_bytes(threshold)
+            .verify().unwrap();
+
+        // WASM is real-sized but companions are missing → not a complete package
+        assert!(!report.is_real_package);
+    }
+
+    #[test]
+    fn wasm_verdict_real_size_is_correct() {
+        let dir = TempDir::new().unwrap();
+        let threshold = 50_u64;
+        let mut wasm = vec![0x00u8, 0x61, 0x73, 0x6d];
+        wasm.extend(vec![0u8; 100]); // 104 bytes total
+        write_file(dir.path(), "g.wasm", &wasm);
+        write_file(dir.path(), "g.js", b"");
+        write_file(dir.path(), "g.html", b"");
+
+        let report = Html5PackageVerifier::new(dir.path())
+            .with_min_wasm_bytes(threshold)
+            .verify().unwrap();
+
+        if let WasmVerdict::Real { size_bytes } = report.wasm_files[0].verdict {
+            assert_eq!(size_bytes, 104);
+        } else {
+            panic!("expected Real verdict, got {:?}", report.wasm_files[0].verdict);
+        }
+    }
+
+    #[test]
+    fn pak_file_counts_as_data_companion() {
+        let dir = TempDir::new().unwrap();
+        write_file(dir.path(), "game.pak", b"pak data");
+        let report = Html5PackageVerifier::new(dir.path()).verify().unwrap();
+        assert!(report.companions.has_data_or_pak);
+    }
 
     fn make_uproject(base: &Path, dir_name: &str, project_name: &str) -> PathBuf {
         let proj_dir = base.join(dir_name);

@@ -118,3 +118,59 @@ fn serve_html5(dir: Option<String>, port: Option<u16>) -> Result<Value> {
 fn cook_html5(project: String, archive: Option<String>, config: Option<String>) -> Result<Value> {
     do_html5_cook(project, archive, config)
 }
+
+fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>) -> Result<Value> {
+    let dir = archive.unwrap_or_else(|| "/tmp/brm-html5-archive/HTML5".to_string());
+    let min_bytes = min_mb
+        .map(|mb| (mb * 1_048_576.0) as u64)
+        .unwrap_or(10 * 1024 * 1024); // default 10 MB
+
+    let mut verifier = rocket_sdk::Html5PackageVerifier::new(&dir);
+    verifier.min_wasm_bytes = min_bytes;
+
+    let report = verifier.verify()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
+
+    let verdict = if report.is_real_package { "PASS" } else { "FAIL" };
+    println!("[{verdict}] {}", report.summary());
+
+    let wasm_list: Vec<serde_json::Value> = report.wasm_files.iter().map(|f| {
+        let (verdict_str, size) = match &f.verdict {
+            rocket_sdk::WasmVerdict::Real { size_bytes } => ("real", *size_bytes),
+            rocket_sdk::WasmVerdict::Stub { size_bytes } => ("stub", *size_bytes),
+            rocket_sdk::WasmVerdict::NotWasm { .. } => ("not_wasm", 0),
+            rocket_sdk::WasmVerdict::Unreadable { .. } => ("unreadable", 0),
+        };
+        serde_json::json!({
+            "path": f.path.display().to_string(),
+            "verdict": verdict_str,
+            "size_bytes": size,
+        })
+    }).collect();
+
+    Ok(serde_json::json!({
+        "verdict": verdict,
+        "is_real_package": report.is_real_package,
+        "summary": report.summary(),
+        "archive_dir": dir,
+        "wasm_files": wasm_list,
+        "companions": {
+            "has_js": report.companions.has_js,
+            "has_html": report.companions.has_html,
+            "has_data_or_pak": report.companions.has_data_or_pak,
+        },
+    }))
+}
+
+/// Verify an HTML5 package directory contains a real UE4 WASM build
+///
+/// Checks WASM magic bytes, minimum file size (stub detection), and
+/// companion files (.js, .html, .data/.pak).
+///
+/// # Arguments
+/// * `archive` - Directory to verify (default: /tmp/brm-html5-archive/HTML5)
+/// * `min_mb`  - Minimum WASM size in MB to count as real (default: 10.0)
+#[verb("verify", "html5")]
+fn verify_html5(archive: Option<String>, min_mb: Option<f64>) -> Result<Value> {
+    do_html5_verify(archive, min_mb)
+}

@@ -4,6 +4,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 use crate::config::discover_python3;
+use crate::html5::{Html5PackageVerifier, WasmVerdict};
 
 #[derive(Debug, Serialize, Clone, PartialEq)]
 pub enum CheckStatus {
@@ -52,6 +53,7 @@ impl RocketDoctor {
             self.check_html5_toolchain(),
             self.check_ggen(),
             self.check_anti_llm_cheat_lsp(),
+            self.check_html5_package(),
         ];
 
         DiagnosticReport {
@@ -445,6 +447,68 @@ impl RocketDoctor {
                     "Ensure your UE4.24 build includes WebSocketNetworking and VaRest plugins."
                         .to_string(),
                 ),
+            }
+        }
+    }
+    /// Check whether the most recent HTML5 cook produced a real package.
+    ///
+    /// Looks for the default archive directory (`/tmp/brm-html5-archive`) first,
+    /// then falls back to `manufactured/` in the project root.
+    fn check_html5_package(&self) -> CheckResult {
+        let candidates = [
+            PathBuf::from("/tmp/brm-html5-archive/HTML5"),
+            PathBuf::from("/tmp/brm-html5-archive"),
+            self.project_root.join("manufactured"),
+            self.project_root.join("pwa-staff/manufactured"),
+        ];
+
+        let archive_dir = candidates.iter().find(|d| d.exists());
+
+        match archive_dir {
+            None => CheckResult {
+                name: "HTML5 Package".to_string(),
+                status: CheckStatus::Warn,
+                message: "No HTML5 archive directory found".to_string(),
+                details: Some(
+                    "Run 'rocket html5 cook --project Brm' to produce a package.".to_string(),
+                ),
+            },
+            Some(dir) => {
+                match Html5PackageVerifier::new(dir).verify() {
+                    Err(e) => CheckResult {
+                        name: "HTML5 Package".to_string(),
+                        status: CheckStatus::Fail,
+                        message: format!("Verification error: {e}"),
+                        details: None,
+                    },
+                    Ok(report) => {
+                        let summary = report.summary();
+                        if report.is_real_package {
+                            CheckResult {
+                                name: "HTML5 Package".to_string(),
+                                status: CheckStatus::Pass,
+                                message: summary,
+                                details: Some(format!("Archive: {}", dir.display())),
+                            }
+                        } else {
+                            // Distinguish between stub/no-wasm and companion-missing
+                            let has_real_wasm = report.wasm_files.iter().any(|f| {
+                                matches!(f.verdict, WasmVerdict::Real { .. })
+                            });
+                            let status = if has_real_wasm {
+                                CheckStatus::Warn // WASM is real but companions missing
+                            } else {
+                                CheckStatus::Fail // stub or no wasm
+                            };
+                            CheckResult {
+                                name: "HTML5 Package".to_string(),
+                                status,
+                                message: summary,
+                                details: Some(format!("Archive: {}", dir.display())),
+                            }
+                        }
+                    }
+                }
             }
         }
     }

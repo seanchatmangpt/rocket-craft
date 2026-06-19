@@ -8,7 +8,7 @@ pub mod manifest;
 pub mod setup;
 pub mod supabase;
 pub mod wasm;
-pub use html5::{Html5Cook, Html5Setup};
+pub use html5::{Html5Cook, Html5PackageVerifier, Html5PackageReport, Html5Setup, WasmVerdict};
 
 pub use crate::manifest::Manifest;
 use anyhow::Result;
