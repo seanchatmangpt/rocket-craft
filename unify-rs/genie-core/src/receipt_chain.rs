@@ -115,3 +115,103 @@ impl ReceiptChainManager {
         true
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::spec::{HistoryEvent, WorldSpec};
+
+    fn make_spec_with_events(n: usize) -> WorldSpec {
+        let mut spec = WorldSpec::new();
+        for i in 0..n {
+            spec.history.push(HistoryEvent::new(
+                format!("evt-{}", i),
+                (i as u64) * 1000,
+                "test_activity",
+            ));
+        }
+        spec
+    }
+
+    // ── generate_receipt_chain ────────────────────────────────────────────────
+
+    #[test]
+    fn empty_history_generates_no_receipts() {
+        let mut spec = WorldSpec::new();
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"salt").unwrap();
+        assert!(spec.receipts.is_empty());
+    }
+
+    #[test]
+    fn single_event_produces_one_receipt() {
+        let mut spec = make_spec_with_events(1);
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"salt").unwrap();
+        assert_eq!(spec.receipts.len(), 1);
+        assert_eq!(spec.receipts[0].key, "history_receipt_evt-0");
+    }
+
+    #[test]
+    fn receipt_count_matches_event_count() {
+        let mut spec = make_spec_with_events(5);
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"salt").unwrap();
+        assert_eq!(spec.receipts.len(), 5);
+    }
+
+    #[test]
+    fn generate_clears_existing_receipts_on_rebuild() {
+        let mut spec = make_spec_with_events(2);
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"salt").unwrap();
+        let first_hash = spec.receipts[0].hash.clone();
+        // Second generate with same salt — hashes must be identical (deterministic)
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"salt").unwrap();
+        assert_eq!(spec.receipts.len(), 2);
+        assert_eq!(spec.receipts[0].hash, first_hash);
+    }
+
+    #[test]
+    fn different_salts_produce_different_hashes() {
+        let mut spec_a = make_spec_with_events(1);
+        let mut spec_b = spec_a.clone();
+        ReceiptChainManager::generate_receipt_chain(&mut spec_a, b"salt-a").unwrap();
+        ReceiptChainManager::generate_receipt_chain(&mut spec_b, b"salt-b").unwrap();
+        assert_ne!(spec_a.receipts[0].hash, spec_b.receipts[0].hash);
+    }
+
+    // ── verify_receipt_chain ──────────────────────────────────────────────────
+
+    #[test]
+    fn verify_passes_for_empty_history_and_no_receipts() {
+        let spec = WorldSpec::new();
+        assert!(ReceiptChainManager::verify_receipt_chain(&spec, b"salt"));
+    }
+
+    #[test]
+    fn verify_passes_after_generate_with_same_salt() {
+        let mut spec = make_spec_with_events(3);
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"secret").unwrap();
+        assert!(ReceiptChainManager::verify_receipt_chain(&spec, b"secret"));
+    }
+
+    #[test]
+    fn verify_fails_with_wrong_salt() {
+        let mut spec = make_spec_with_events(2);
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"correct-salt").unwrap();
+        assert!(!ReceiptChainManager::verify_receipt_chain(&spec, b"wrong-salt"));
+    }
+
+    #[test]
+    fn verify_fails_when_receipt_count_mismatches_event_count() {
+        let mut spec = make_spec_with_events(3);
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"salt").unwrap();
+        spec.receipts.pop(); // remove one receipt
+        assert!(!ReceiptChainManager::verify_receipt_chain(&spec, b"salt"));
+    }
+
+    #[test]
+    fn verify_fails_when_event_content_is_tampered() {
+        let mut spec = make_spec_with_events(2);
+        ReceiptChainManager::generate_receipt_chain(&mut spec, b"salt").unwrap();
+        spec.history[0].activity = "tampered_activity".into(); // change event content
+        assert!(!ReceiptChainManager::verify_receipt_chain(&spec, b"salt"));
+    }
+}
