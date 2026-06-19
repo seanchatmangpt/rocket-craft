@@ -226,3 +226,135 @@ impl NodePos {
         Self { x, y }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── UeGuid ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn ueguid_new_is_32_uppercase_hex_chars() {
+        let g = UeGuid::new();
+        assert_eq!(g.0.len(), 32);
+        assert!(g.0.chars().all(|c| c.is_ascii_hexdigit() && !c.is_lowercase()));
+    }
+
+    #[test]
+    fn ueguid_two_news_are_distinct() {
+        let a = UeGuid::new();
+        let b = UeGuid::new();
+        assert_ne!(a, b);
+    }
+
+    #[test]
+    fn ueguid_display_returns_inner_string() {
+        let g = UeGuid("ABCDEF1234567890ABCDEF1234567890".into());
+        assert_eq!(g.to_string(), "ABCDEF1234567890ABCDEF1234567890");
+    }
+
+    #[test]
+    fn ueguid_from_str_roundtrip() {
+        use std::str::FromStr;
+        let g: UeGuid = UeGuid::from_str("DEADBEEF").unwrap();
+        assert_eq!(g.0, "DEADBEEF");
+    }
+
+    // ── PinCategory::as_str ───────────────────────────────────────────────────
+
+    #[test]
+    fn pin_category_exec_as_str() {
+        assert_eq!(PinCategory::Exec.as_str(), "exec");
+    }
+
+    #[test]
+    fn pin_category_float_as_str() {
+        assert_eq!(PinCategory::Float.as_str(), "float");
+    }
+
+    #[test]
+    fn pin_category_enum_maps_to_byte() {
+        // UE4 enums are stored as byte pins
+        assert_eq!(PinCategory::Enum.as_str(), "byte");
+    }
+
+    #[test]
+    fn pin_category_wildcard_as_str() {
+        assert_eq!(PinCategory::Wildcard.as_str(), "wildcard");
+    }
+
+    // ── PinType constructors ──────────────────────────────────────────────────
+
+    #[test]
+    fn pin_type_exec_has_exec_category() {
+        let p = PinType::exec();
+        assert_eq!(p.category, PinCategory::Exec);
+    }
+
+    #[test]
+    fn pin_type_bool_category() {
+        assert_eq!(PinType::bool().category, PinCategory::Boolean);
+    }
+
+    #[test]
+    fn pin_type_int_category() {
+        assert_eq!(PinType::int().category, PinCategory::Int);
+    }
+
+    #[test]
+    fn pin_type_float_category() {
+        assert_eq!(PinType::float().category, PinCategory::Float);
+    }
+
+    #[test]
+    fn pin_type_string_category() {
+        assert_eq!(PinType::string().category, PinCategory::String);
+    }
+
+    #[test]
+    fn pin_type_object_stores_class_path() {
+        let p = PinType::object("Engine.Actor");
+        assert_eq!(p.category, PinCategory::Object);
+        assert_eq!(p.sub_category_object.as_deref(), Some("Engine.Actor"));
+    }
+
+    #[test]
+    fn pin_type_as_array_sets_container() {
+        let p = PinType::int().as_array();
+        assert_eq!(p.container, ContainerType::Array);
+    }
+
+    #[test]
+    fn pin_type_as_ref_sets_is_ref() {
+        let p = PinType::bool().as_ref();
+        assert!(p.is_reference);
+    }
+
+    #[test]
+    fn pin_type_as_const_sets_is_const() {
+        let p = PinType::float().as_const();
+        assert!(p.is_const);
+    }
+
+    #[test]
+    fn pin_type_new_defaults_to_none_container() {
+        let p = PinType::new(PinCategory::String);
+        assert_eq!(p.container, ContainerType::None);
+        assert!(!p.is_reference);
+        assert!(!p.is_const);
+    }
+
+    // ── ContainerType / PinDirection ──────────────────────────────────────────
+
+    #[test]
+    fn container_types_are_distinct() {
+        assert_ne!(ContainerType::None, ContainerType::Array);
+        assert_ne!(ContainerType::Array, ContainerType::Set);
+        assert_ne!(ContainerType::Set, ContainerType::Map);
+    }
+
+    #[test]
+    fn pin_directions_are_distinct() {
+        assert_ne!(PinDirection::Input, PinDirection::Output);
+    }
+}

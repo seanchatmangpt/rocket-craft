@@ -299,3 +299,75 @@ pub fn weapon_catalog() -> Vec<Weapon> {
         },
     ]
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Weapon ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn weapon_starter_has_expected_fields() {
+        let w = Weapon::starter();
+        assert_eq!(w.id, "steel_sword");
+        assert_eq!(w.attack_bonus, 12);
+        assert_eq!(w.crit_chance, 0.05);
+        assert!(w.special_move.is_none());
+        assert_eq!(w.gem_slots, 1);
+        assert_eq!(w.mastery_xp, 0);
+        assert_eq!(w.rarity, Rarity::Common);
+    }
+
+    #[test]
+    fn weapon_starter_is_clone() {
+        let w = Weapon::starter();
+        let w2 = w.clone();
+        assert_eq!(w.id, w2.id);
+        assert_eq!(w.attack_bonus, w2.attack_bonus);
+    }
+
+    // ── Shield ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn shield_starter_has_expected_fields() {
+        let s = Shield::starter();
+        assert_eq!(s.id, "iron_shield");
+        assert_eq!(s.defense_bonus, 8);
+        assert_eq!(s.parry_bonus_turns, 0);
+        assert_eq!(s.rarity, Rarity::Common);
+    }
+
+    // ── weapon_catalog ────────────────────────────────────────────────────────
+
+    #[test]
+    fn weapon_catalog_has_at_least_one_entry() {
+        let catalog = weapon_catalog();
+        assert!(!catalog.is_empty());
+    }
+
+    #[test]
+    fn weapon_catalog_first_entry_is_steel_sword() {
+        let catalog = weapon_catalog();
+        assert_eq!(catalog[0].id, "steel_sword");
+    }
+
+    #[test]
+    fn weapon_catalog_contains_only_positive_attack_bonuses() {
+        let catalog = weapon_catalog();
+        for w in &catalog {
+            assert!(w.attack_bonus >= 0, "weapon {} has negative attack", w.id);
+        }
+    }
+
+    #[test]
+    fn weapon_catalog_crit_chances_are_valid_probabilities() {
+        let catalog = weapon_catalog();
+        for w in &catalog {
+            assert!(
+                w.crit_chance >= 0.0 && w.crit_chance <= 1.0,
+                "weapon {} has invalid crit_chance {}",
+                w.id, w.crit_chance
+            );
+        }
+    }
+}
