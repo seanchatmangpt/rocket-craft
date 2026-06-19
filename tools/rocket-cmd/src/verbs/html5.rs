@@ -135,8 +135,11 @@ fn cook_html5(project: String, archive: Option<String>, config: Option<String>) 
     do_html5_cook(project, archive, config)
 }
 
-fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>) -> Result<Value> {
-    let dir = archive.unwrap_or_else(|| "/tmp/brm-html5-archive/HTML5".to_string());
+fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>, project: Option<String>) -> Result<Value> {
+    let dir = archive.unwrap_or_else(|| {
+        let name = project.as_deref().unwrap_or("brm").to_lowercase();
+        format!("/tmp/{name}-html5-archive/HTML5")
+    });
     let min_bytes = min_mb
         .map(|mb| (mb * 1_048_576.0) as u64)
         .unwrap_or(10 * 1024 * 1024); // default 10 MB
@@ -193,8 +196,8 @@ fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>) -> Result<Value
 /// * `archive` - Directory to verify (default: /tmp/brm-html5-archive/HTML5)
 /// * `min_mb`  - Minimum WASM size in MB to count as real (default: 10.0)
 #[verb("verify", "html5")]
-fn verify_html5(archive: Option<String>, min_mb: Option<f64>) -> Result<Value> {
-    do_html5_verify(archive, min_mb)
+fn verify_html5(archive: Option<String>, min_mb: Option<f64>, project: Option<String>) -> Result<Value> {
+    do_html5_verify(archive, min_mb, project)
 }
 
 fn do_html5_status(project: Option<String>) -> Result<Value> {
