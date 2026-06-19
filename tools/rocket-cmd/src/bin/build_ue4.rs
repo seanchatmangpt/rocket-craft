@@ -348,8 +348,7 @@ fn build_target(
         for line in reader.lines().map_while(Result::ok) {
             *last_stdout.lock().unwrap() = Instant::now();
             writeln!(log_clone, "{}", line).ok();
-            print!("{}", line);
-            print!("\n");
+            println!("{}", line);
             for e in parse_ubt_errors(&line) {
                 errors_stdout.lock().unwrap().push(e);
             }

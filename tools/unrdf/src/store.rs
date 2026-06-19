@@ -71,9 +71,9 @@ impl TripleStore {
         self.triples
             .iter()
             .filter(|t| {
-                s.map_or(true, |sv| &t.subject == sv)
-                    && p.map_or(true, |pv| &t.predicate == pv)
-                    && o.map_or(true, |ov| &t.object == ov)
+                s.is_none_or(|sv| &t.subject == sv)
+                    && p.is_none_or(|pv| &t.predicate == pv)
+                    && o.is_none_or(|ov| &t.object == ov)
             })
             .collect()
     }

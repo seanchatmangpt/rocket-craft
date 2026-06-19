@@ -123,7 +123,7 @@ fn scan_workspace(root: &Path) -> HashMap<String, Vec<(String, PathBuf)>> {
         })
         .filter_map(|e| e.ok())
     {
-        if entry.file_type().is_file() && entry.path().extension().map_or(false, |ext| ext == "json") {
+        if entry.file_type().is_file() && entry.path().extension().is_some_and(|ext| ext == "json") {
             if let Some(category) = classify_file(entry.path()) {
                 let rel_path = entry.path().strip_prefix(root).unwrap_or(entry.path()).to_string_lossy().into_owned();
                 if let Some(list) = classified.get_mut(&category) {

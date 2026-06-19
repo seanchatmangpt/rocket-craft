@@ -95,7 +95,7 @@ impl OntologyPipeline {
         let types = self.extract_types();
         let mut files = Vec::new();
         for ty in &types {
-            let type_name = ty.split('/').last().unwrap_or(ty);
+            let type_name = ty.split('/').next_back().unwrap_or(ty);
             let (ext, content) = match self.config.target_language.as_str() {
                 "rust" => (
                     "rs",
