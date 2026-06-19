@@ -540,3 +540,103 @@ fn hash_file(path: &Path) -> Result<String> {
     }
     Ok(hasher.finalize().to_hex().to_string())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── parse_ubt_errors ──────────────────────────────────────────────────────
+
+    #[test]
+    fn ubt_clang_error_line_parsed() {
+        let line =
+            "/home/user/Engine/Source/foo.cpp:42:5: error: use of undeclared identifier 'Bar'";
+        let errs = parse_ubt_errors(line);
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].file, "/home/user/Engine/Source/foo.cpp");
+        assert_eq!(errs[0].line, Some(42));
+        assert!(errs[0].message.contains("undeclared identifier"));
+    }
+
+    #[test]
+    fn ubt_fatal_error_parsed() {
+        let line = "/src/file.h:1:10: fatal error: 'missing.h' file not found";
+        let errs = parse_ubt_errors(line);
+        assert_eq!(errs.len(), 1);
+        assert!(errs[0].message.contains("file not found"));
+    }
+
+    #[test]
+    fn ubt_csharp_error_line_parsed() {
+        let line = "Error: Module 'MyMod' not found";
+        let errs = parse_ubt_errors(line);
+        assert_eq!(errs.len(), 1);
+        assert!(errs[0].message.contains("not found"));
+        assert_eq!(errs[0].file, String::new());
+        assert_eq!(errs[0].line, None);
+    }
+
+    #[test]
+    fn ubt_bracket_error_style_parsed() {
+        let line = "  [1/100]: error UBT_12345: target failed";
+        let errs = parse_ubt_errors(line);
+        assert_eq!(errs.len(), 1);
+    }
+
+    #[test]
+    fn ubt_warning_line_ignored() {
+        let line = "/src/file.cpp:5:3: warning: unused variable 'x'";
+        let errs = parse_ubt_errors(line);
+        assert!(errs.is_empty(), "warnings must not be extracted as errors");
+    }
+
+    #[test]
+    fn ubt_clean_build_line_ignored() {
+        let line = "[42/500] Compiling CppFile.cpp";
+        let errs = parse_ubt_errors(line);
+        assert!(errs.is_empty());
+    }
+
+    // ── parse_clang_errors ───────────────────────────────────────────────────
+
+    #[test]
+    fn clang_error_extracted() {
+        let stderr =
+            "/path/to/HTML5TargetPlatform.cpp:10:9: error: unknown type name 'FPlatformMisc'";
+        let path = std::path::Path::new("/path/to/HTML5TargetPlatform.cpp");
+        let errs = parse_clang_errors(stderr, path);
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].file, "/path/to/HTML5TargetPlatform.cpp");
+        assert_eq!(errs[0].line, Some(10));
+        assert!(errs[0].message.contains("unknown type name"));
+    }
+
+    #[test]
+    fn clang_warning_ignored() {
+        let stderr = "/path/file.cpp:5:1: warning: unused parameter 'ctx'";
+        let path = std::path::Path::new("/path/file.cpp");
+        let errs = parse_clang_errors(stderr, path);
+        assert!(errs.is_empty(), "clang warnings must not be extracted");
+    }
+
+    #[test]
+    fn clang_multiple_errors_extracted() {
+        let stderr = "\
+/src/a.cpp:1:1: error: first error
+/src/b.cpp:2:2: error: second error";
+        let path = std::path::Path::new("/src/a.cpp");
+        let errs = parse_clang_errors(stderr, path);
+        assert_eq!(errs.len(), 2);
+        assert_eq!(errs[0].file, "/src/a.cpp");
+        assert_eq!(errs[1].file, "/src/b.cpp");
+    }
+
+    #[test]
+    fn clang_fatal_error_included() {
+        let stderr = "/path/file.h:1:1: fatal error: 'Core.h' file not found";
+        let path = std::path::Path::new("/path/file.h");
+        let errs = parse_clang_errors(stderr, path);
+        assert_eq!(errs.len(), 1);
+        assert!(errs[0].raw.contains("fatal error"));
+    }
+}
