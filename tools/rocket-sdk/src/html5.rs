@@ -7,6 +7,31 @@ use crate::config::discover_python3;
 
 const GIT_WRAPPER_DIR: &str = "/tmp/ubt-git-wrapper";
 
+// ── emsdk Python discovery ────────────────────────────────────────────────────
+
+/// Find the emsdk-bundled python3 binary inside the engine's HTML5 emsdk directory.
+///
+/// Path pattern: `<engine>/Engine/Platforms/HTML5/Build/emsdk/emsdk-*/python/<ver>/bin/python3`
+/// This is the Python that HTML5Setup.sh activates. UBT reads `PYTHON` env var first,
+/// so pointing it here ensures emcc.py runs under the emsdk interpreter.
+pub fn discover_emsdk_python(engine_root: &Path) -> Option<PathBuf> {
+    let emsdk_root = engine_root.join("Engine/Platforms/HTML5/Build/emsdk");
+    walkdir::WalkDir::new(&emsdk_root)
+        .max_depth(6)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .find(|e| {
+            let name = e.file_name().to_string_lossy();
+            name == "python3"
+                && e.path()
+                    .parent()
+                    .map(|p| p.ends_with("bin"))
+                    .unwrap_or(false)
+                && e.path().is_file()
+        })
+        .map(|e| e.into_path())
+}
+
 // ── WASM magic bytes ─────────────────────────────────────────────────────────
 const WASM_MAGIC: [u8; 4] = [0x00, 0x61, 0x73, 0x6d];
 
@@ -259,12 +284,17 @@ impl Html5Cook {
             bail!("RunUAT.sh not found at {}", run_uat.display());
         }
 
-        // Resolve Python 3 at runtime — never hardcode a path.
-        let python3 = discover_python3().ok_or_else(|| {
-            anyhow::anyhow!(
-                "Python 3 not found. Install python3 or set 'python3_path' in .rocket.json."
-            )
-        })?;
+        // Prefer the emsdk-bundled Python (the same one HTML5Setup.sh activates via
+        // `emsdk activate`). UBT reads the PYTHON env var first — pointing it at the
+        // emsdk Python ensures emcc.py runs under the correct interpreter.
+        // Fall back to system python3 if the emsdk Python is not yet installed.
+        let python3 = discover_emsdk_python(&self.engine_root)
+            .or_else(|| discover_python3())
+            .ok_or_else(|| {
+                anyhow::anyhow!(
+                    "Python 3 not found. Install python3 or run 'rocket html5 setup' to install the emsdk Python."
+                )
+            })?;
 
         // UHT computes CURRENT_FILE_ID relative to the parent of the project directory.
         // If that parent dir starts with a digit (e.g. versions/4.27.0/), all generated
@@ -720,5 +750,34 @@ mod tests {
         let content = std::fs::read_to_string(&receipt_path).unwrap();
         let v: serde_json::Value = serde_json::from_str(&content).unwrap();
         assert_eq!(v["verdict"], "FAIL");
+    }
+
+    #[test]
+    fn discover_emsdk_python_finds_python3_in_nested_structure() {
+        let dir = TempDir::new().unwrap();
+        // Mirror real path: <engine>/Engine/Platforms/HTML5/Build/emsdk/emsdk-5.0.7/python/3.13.3_64bit/bin/python3
+        let bin_dir = dir.path()
+            .join("Engine/Platforms/HTML5/Build/emsdk/emsdk-5.0.7/python/3.13.3_64bit/bin");
+        std::fs::create_dir_all(&bin_dir).unwrap();
+        let python3 = bin_dir.join("python3");
+        std::fs::write(&python3, "#!/bin/sh\nexec python3 \"$@\"").unwrap();
+        // Make it executable so the file exists check passes
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&python3, std::fs::Permissions::from_mode(0o755)).unwrap();
+        }
+
+        let found = discover_emsdk_python(dir.path());
+        assert!(found.is_some(), "should find python3 in emsdk structure");
+        let found = found.unwrap();
+        assert!(found.ends_with("bin/python3"), "path should end with bin/python3, got: {}", found.display());
+    }
+
+    #[test]
+    fn discover_emsdk_python_returns_none_when_emsdk_absent() {
+        let dir = TempDir::new().unwrap();
+        let found = discover_emsdk_python(dir.path());
+        assert!(found.is_none(), "should return None when no emsdk directory exists");
     }
 }
