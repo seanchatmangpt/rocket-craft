@@ -61,7 +61,7 @@ fn part_generated_event_encodes_part_slot_as_attribute() {
     };
     let ev = part_generated_event(&psv, "part_Backpack_001", "zone_runner_wall", "ev_003", 2000);
     let slot_attr = ev.attributes.get("part_slot").expect("must have part_slot attribute");
-    assert!(slot_attr.as_str().unwrap().contains("Backpack"));
+    assert_eq!(slot_attr.as_str(), Some("Backpack"), "part_slot attribute must be the Debug representation of PartSlot::Backpack");
 }
 
 // ── Jidoka halt events ─────────────────────────────────────────────────────
@@ -83,7 +83,7 @@ fn jidoka_mass_exceed_emits_halt_code_attribute() {
     let ev = jidoka_halt_to_event(&halt, "jidoka_002", 6000);
     assert_eq!(ev.attributes["halt_code"].as_str(), Some("mass_exceeds_frame_capacity"));
     let desc = ev.attributes["halt_description"].as_str().unwrap();
-    assert!(desc.contains("120") || desc.contains("100"), "Description must mention mass/capacity");
+    assert_eq!(desc, "Mass exceeds frame capacity: mass 120, capacity 100", "halt_description must be the exact Display string for MassExceedsFrameCapacity {{ mass: 120.0, capacity: 100.0 }}");
 }
 
 #[test]
@@ -134,7 +134,7 @@ fn damage_observed_event_encodes_damage_amount_and_slot() {
     let amount = ev.attributes["damage_amount"].as_f64().unwrap();
     assert!((amount - 30.5).abs() < 0.001);
     let slot = ev.attributes["part_slot"].as_str().unwrap();
-    assert!(slot.contains("ArmR"));
+    assert_eq!(slot, "ArmR", "part_slot attribute must be the Debug representation of PartSlot::ArmR");
 }
 
 // ── Pilot / cockpit (Titanfall bond) ───────────────────────────────────────

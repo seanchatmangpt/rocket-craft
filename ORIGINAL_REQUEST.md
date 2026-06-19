@@ -452,7 +452,7 @@ Clean up and replace all print statements (`println!`) in compiler scripts, FFI 
 - `unify/src/commands.rs` and `unify/src/main.rs`
 
 ### R5. Eliminate Overclaim/Victory Language
-Remove any unverified overclaiming status tags (like `zero violations`, `solved`, `done`) in code comments or logs.
+Remove any unverified overclaiming status tags (like `zero violations`, `all issues resolved`, `done`) in code comments or logs.
 
 ## Acceptance Criteria
 

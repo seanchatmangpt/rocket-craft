@@ -56,8 +56,8 @@ fn test_com_deviation_threshold() {
         let motion_fail = engine.diagnostics.get("motion_fail")
             .expect("Expected 'motion_fail' diagnostic to be set after COM deviation rejection");
         assert!(
-            motion_fail.contains("Center of Mass deviation") || motion_fail.contains("COM deviation"),
-            "motion_fail diagnostic should describe COM deviation, got: {}", motion_fail
+            motion_fail.starts_with("Center of Mass deviation"),
+            "motion_fail diagnostic must start with 'Center of Mass deviation', got: {}", motion_fail
         );
     } else {
         panic!("Expected GateBlocked error");

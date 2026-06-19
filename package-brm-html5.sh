@@ -130,3 +130,14 @@ echo "Magic bytes:  0061736d (valid WebAssembly)"
 echo ""
 echo "STAGE 5 COMPLETE"
 log "STAGE 5 COMPLETE"
+
+# ── Stage 6 hand-off ────────────────────────────────────────────────────────
+# Automatically run Stage 6 (post-build serve + Playwright proof) now that
+# StagedBuilds/HTML5/ has been populated by RunUAT above.
+STAGE6="$SCRIPT_DIR/stage6-serve-and-test.sh"
+if [[ -x "$STAGE6" ]]; then
+    log "Handing off to Stage 6..."
+    exec bash "$STAGE6"
+else
+    log "WARNING: $STAGE6 not found or not executable — skipping Stage 6"
+fi

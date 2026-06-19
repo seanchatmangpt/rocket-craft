@@ -59,13 +59,10 @@ fn should_verify_427_es3_blueprint_semantic_correctness() {
     // Verify FunctionReference property on PrintString points to KismetSystemLibrary
     let func_ref = print_node.properties.get("FunctionReference")
         .expect("PrintString should have FunctionReference property");
-    assert!(
-        func_ref.contains("/Script/Engine.KismetSystemLibrary"),
-        "FunctionReference should reference KismetSystemLibrary; got: {func_ref}"
-    );
-    assert!(
-        func_ref.contains("PrintString"),
-        "FunctionReference should name the PrintString function; got: {func_ref}"
+    assert_eq!(
+        func_ref,
+        "(MemberParent=Class'/Script/Engine.KismetSystemLibrary',MemberName=\"PrintString\")",
+        "FunctionReference must be exact UE4 T3D reference to KismetSystemLibrary::PrintString; got: {func_ref}"
     );
 
     // Verify node positions are present (non-default struct with x/y fields)
@@ -138,13 +135,10 @@ fn should_verify_actor_spawning_logic_for_427() {
     // Verify FunctionReference points to GameplayStatics::BeginSpawningActorFromClass
     let func_ref = spawn.properties.get("FunctionReference")
         .expect("SpawnEnemy should have a FunctionReference property");
-    assert!(
-        func_ref.contains("/Script/Engine.GameplayStatics"),
-        "FunctionReference should reference GameplayStatics; got: {func_ref}"
-    );
-    assert!(
-        func_ref.contains("BeginSpawningActorFromClass"),
-        "FunctionReference should name BeginSpawningActorFromClass; got: {func_ref}"
+    assert_eq!(
+        func_ref,
+        "(MemberParent=Class'/Script/Engine.GameplayStatics',MemberName=\"BeginSpawningActorFromClass\")",
+        "FunctionReference must be exact UE4 T3D reference to GameplayStatics::BeginSpawningActorFromClass; got: {func_ref}"
     );
 
     // Verify ActorClass pin exists

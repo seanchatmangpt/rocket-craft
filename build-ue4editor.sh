@@ -45,7 +45,7 @@ build_target() {
     log "----------------------------------------"
     log "Building: $target Mac Development"
     log "----------------------------------------"
-    if ! arch -x86_64 bash "$BUILD_SH" "$target" Mac Development >> "$LOG" 2>&1; then
+    if ! arch -x86_64 /bin/bash "$BUILD_SH" "$target" Mac Development >> "$LOG" 2>&1; then
         fail "$target Mac Development"
     fi
     log "Finished: $target Mac Development"
@@ -92,3 +92,8 @@ echo "Editor size:   ${SIZE_MB} MB"
 echo ""
 echo "STAGE 4 COMPLETE — ready for rocket build"
 log "STAGE 4 COMPLETE — ready for rocket build"
+# Stage 5 auto-chain: run package after successful build
+if [ "${AUTO_CHAIN:-0}" = "1" ]; then
+    log "Auto-chaining to Stage 5 (package Brm HTML5)..."
+    bash /Users/sac/rocket-craft/package-brm-html5.sh
+fi

@@ -18,11 +18,11 @@ By enforcing this equation, Rocket Craft guarantees that if the underlying ontol
 
 ### Combinatorial Maximalism: Perfect Balance on Day One
 
-Traditional game balance requires thousands of hours of playtesting, spreadsheets, and subjective designer tweaking. Rocket Craft eliminated this via **Combinatorial Maximalism**. 
+Traditional game balance requires thousands of hours of playtesting, spreadsheets, and subjective designer tweaking. Rocket Craft substantially reduced this via **Combinatorial Maximalism**. 
 
 Before `ggen` projected the final binaries, the system's "Aimbot" engine autonomously brute-forced every mathematically possible action, stat, and economy loop inside a local memory simulation. It discovered infinite loops and overpowered metas, automatically tuning the ontology until absolute mathematical equilibrium was achieved. 
 
-The result? A staggering one million games launching with perfectly balanced economies and combat, sealed with unforgeable BLAKE3 cryptographic receipts proving that every single "car drives."
+The result? A staggering one million games launching with verifiably balanced economies and combat, sealed with unforgeable BLAKE3 cryptographic receipts proving that every single "car drives."
 
 ### "We Don't Know The Code, We Know The Truth"
 
@@ -38,7 +38,7 @@ Rocket Craft is an open-source, Process Intelligence-driven ecosystem that fuses
 ## Internal FAQ (Working Backwards)
 
 **Q: Did a team of 500,000 engineers build this?**
-A: No. A core team defined the `ostar.ttl` ontologies. `ggen` functioned as the 500,000 engineers, turning those definitions into millions of lines of perfectly compliant Rust and C++ through the $\mu$ pipeline.
+A: No. A core team defined the `ostar.ttl` ontologies. `ggen` functioned as the 500,000 engineers, turning those definitions into millions of lines of structurally verified Rust and C++ through the $\mu$ pipeline.
 
 **Q: How do you handle updates or expansions?**
 A: We import new O-Crates (Ontology Crates) into our `ggen.toml` registry. `ggen sync` computes the delta, runs the combinatorial balance matrix, and projects the updated world state directly to production.

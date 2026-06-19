@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${GITHUB_TOKEN:?GITHUB_TOKEN must be set — get a token from https://github.com/settings/tokens}"
+
 LOG="$HOME/ue4-build.log"
 UE4_DIR="$HOME/ue-4.27-html5-es3"
 
@@ -24,7 +26,7 @@ if [ -d "$UE4_DIR" ]; then
 else
     log "Cloning UnrealEngine branch 4.27-html5-es3 into $UE4_DIR ..."
     git clone -b 4.27-html5-es3 --single-branch \
-        https://x-access-token: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@github.com/SpeculativeCoder/UnrealEngine.git \
+        https://x-access-token:${GITHUB_TOKEN}@github.com/SpeculativeCoder/UnrealEngine.git \
         "$UE4_DIR" >> "$LOG" 2>&1 || fail "git clone"
     log "Clone complete."
 fi

@@ -129,4 +129,4 @@ playwright-report/
 test-results/
 
 # Agent Framework
-.agents/
+.agents/clone-ue4-html5.sh

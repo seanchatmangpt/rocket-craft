@@ -6,11 +6,11 @@ This report details the architectural vulnerabilities, mocks, outdated dependenc
 
 ## 1. Progress and Verification Status of Monorepo Workspaces
 
-All monorepo workspaces compile successfully and pass their test suites (100% pass rate):
+All monorepo workspaces compile successfully and pass their test suites at last recorded run:
 
 | Workspace | Command | Status | Result / Detail |
 |---|---|---|---|
-| **unify-rs** | `cargo test` | **PASS** | Checked 25 unit/doctests; 100% pass rate. |
+| **unify-rs** | `cargo test` | **PASS** | Checked 25 unit/doctests; all passed at last run. |
 | **wasm-threads** | `cargo check --target wasm32-unknown-unknown` & `cargo test` | **PASS** | Fixed missing `present` implementation in `CanvasRenderer` for the `Renderer` trait. Tested all 70+ behavior, combinatorial, falsification, and lifecycle tests. |
 | **blueprint-rs/blueprint-core** | `cargo test` | **PASS** | Verified 175 tests in AST parsing, T3D serialization, and registry validation. |
 | **chicago-tdd-tools** | `cargo test` | **PASS** | Automated ES3 HTML5 packaging and Playwright E2E visual verification tests for all manufactured games. |

@@ -1,5 +1,10 @@
-## 2026-06-16T01:27:03Z
-You are the Victory Auditor. Your task is to perform an independent victory audit for the Rocket Craft upgrade project. Conduct the three-phase audit (timeline analysis, cheating/integrity check, and independent test verification) based on the files in /Users/sac/rocket-craft and /Users/sac/rocket-craft/.agents/orchestrator/handoff.md. Deliver a clear, structured verdict of VICTORY CONFIRMED or VICTORY REJECTED. Write your report to /Users/sac/rocket-craft/.agents/victory_auditor/handoff.md.
+## 2026-06-19T00:09:22Z
+You are the Victory Auditor for the 'Eden Manufacturing Server Ontology' task.
+Your working directory is `/Users/sac/rocket-craft/.agents/victory_auditor`.
+Please conduct the post-victory audit. Your task is to verify that:
+1. All acceptance criteria and requirements from `/Users/sac/rocket-craft/.agents/ORIGINAL_REQUEST.md` have been met.
+2. The RDF ontologies (`ontology/pack.ttl` and `ontology/deltas.ttl` under `/Users/sac/.ggen/packs/eden_server/`) are syntactically and logically valid.
+3. The SPARQL queries (`queries/substrate.rq`, `queries/extract_authority_deltas.rq`, `queries/extract_receipt_deltas.rq`, and other queries in `/Users/sac/.ggen/packs/eden_server/queries/`) are syntactically valid SPARQL 1.1 queries and functional.
+4. Independent execution of tests/checks (e.g. running the verification scripts like `/Users/sac/.ggen/packs/eden_server/verify.py` or other means) produces success.
 
-## 2026-06-16T01:37:01Z
-You are the Victory Auditor. Your task is to perform an independent victory audit for the Rocket Craft upgrade project (this is retry 1, following fixes applied for the previous rejection). Conduct the three-phase audit (timeline analysis, cheating/integrity check, and independent test verification) based on the files in /Users/sac/rocket-craft and /Users/sac/rocket-craft/.agents/orchestrator/handoff.md. Deliver a clear, structured verdict of VICTORY CONFIRMED or VICTORY REJECTED. Write your report to /Users/sac/rocket-craft/.agents/victory_auditor/handoff.md.
+Provide a clear final verdict: either `VICTORY CONFIRMED` or `VICTORY REJECTED`, with a detailed report of your findings.

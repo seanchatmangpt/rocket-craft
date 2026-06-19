@@ -174,8 +174,11 @@ fn test_ac3_ac4_path_validity_and_invalid_travel_rejected() {
 fn test_ac5_look_returns_zone_description() {
     let engine = MudEngine::new();
     assert_eq!(engine.current_zone, Zone::MissionRoom);
-    // The Mission Room description contains "Strategic blueprint"
-    assert!(engine.current_zone.description().contains("Strategic blueprint"));
+    // The Mission Room description is the exact static string defined in Zone::description()
+    assert_eq!(
+        engine.current_zone.description(),
+        "Zone 0: The Command and Mission briefing room. The Strategic blueprint of the mech's operational journey begins here."
+    );
 }
 
 // Criterion 6: `inspect part` returns structural data for the part.
@@ -362,14 +365,12 @@ fn test_ac14_ac19_gate_failure_with_diagnostic_detail() {
     let fit_fail = overload_engine.execute_command("verify fit");
     assert!(fit_fail.is_err(), "fit gate must fail for overloaded mech");
 
-    // Diagnose must report mass detail via the diagnostics map (structural check)
-    let diag_key = overload_engine.diagnostics.keys()
-        .find(|k| k.contains("fit"))
-        .expect("diagnostics must contain a fit-related key after fit failure");
-    let diag_value = &overload_engine.diagnostics[diag_key];
+    // Diagnose must record fit_fail diagnostic with mass detail (structural check on map key and value prefix)
+    let diag_value = overload_engine.diagnostics.get("fit_fail")
+        .expect("diagnostics must contain 'fit_fail' key after fit gate failure");
     assert!(
-        diag_value.to_lowercase().contains("mass"),
-        "fit diagnostic value must mention mass, got: {}", diag_value
+        diag_value.starts_with("Total mass"),
+        "fit_fail diagnostic must start with 'Total mass', got: {}", diag_value
     );
 }
 
