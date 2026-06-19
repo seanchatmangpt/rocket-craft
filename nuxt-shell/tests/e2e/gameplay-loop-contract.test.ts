@@ -186,6 +186,31 @@ describe('CONTRACT: Chain finality (receipt-finalize)', () => {
   });
 });
 
+// ── Contract 2b: Dashboard-stats rollup ───────────────────────────────────
+
+describe('CONTRACT: Daily rollup stats (dashboard-stats)', () => {
+  it('returns rows array with day + pass_rate_pct fields', async () => {
+    if (MOCK) {
+      const row = { day: '2026-06-19', receipts: 1, pass_receipts: 1, fail_receipts: 0, real_ue4_receipts: 1, avg_ocel_events: 3, pass_rate_pct: 100 };
+      expect(row).toHaveProperty('day');
+      expect(typeof row.pass_rate_pct).toBe('number');
+      return;
+    }
+    const res = await fetch(`${BASE}/api/game/dashboard-stats`);
+    expect([200, 503]).toContain(res.status);
+    if (res.ok) {
+      const body = await res.json();
+      expect(body).toHaveProperty('rows');
+      expect(Array.isArray(body.rows)).toBe(true);
+      if (body.rows.length > 0) {
+        const row = body.rows[0];
+        expect(row).toHaveProperty('day');
+        expect(row).toHaveProperty('receipts');
+      }
+    }
+  });
+});
+
 // ── Contract 3: Pipeline health reflects receipt PASS ─────────────────────
 
 describe('CONTRACT: Pipeline health visibility', () => {

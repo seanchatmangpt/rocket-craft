@@ -255,13 +255,15 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         const receiptHashForLookup = receiptSignature;
         const persisted = await pollForReceiptPersistence(receiptHashForLookup, 15_000);
         if (!persisted) {
-          console.warn(
+          // Hard assertion: game.vue now auto-commits when OCEL lifecycle reaches
+          // PROVEN_LIFECYCLE = [GameSessionStarted, FrameRendered, InputAdmitted].
+          // If Supabase doesn't have the receipt within 15s, the auto-commit failed.
+          console.error(
             `[Gap 3] Receipt not found in Supabase after 15s — ` +
             `hash=${receiptHashForLookup.slice(0, 16)}… ` +
-            `Check that game.vue commitReceipt() fires after session proof.`
+            `Check that game.vue auto-commit watcher fired.`
           );
-          // Soft fail: receipt persistence gap is logged but does not block the PASS verdict.
-          // This becomes a hard assertion once commitReceipt() is wired to fire automatically.
+          expect(persisted, 'Receipt must be persisted to Supabase within 15s of PASS verdict').toBe(true);
         } else {
           console.log(`[Gap 3] Receipt persisted to Supabase ✓ (hash=${receiptHashForLookup.slice(0, 16)}…)`);
         }
