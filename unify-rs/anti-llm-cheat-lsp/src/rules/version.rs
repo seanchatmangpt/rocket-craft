@@ -63,3 +63,63 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, context: &str) -> Observation {
+        Observation {
+            file_path: "Cargo.toml".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "version_smell".into(),
+            construct: construct.into(), context: context.into(), message: String::new(),
+        }
+    }
+
+    #[test]
+    fn empty_obs_returns_no_diags() {
+        assert!(evaluate(&[]).is_empty());
+    }
+
+    #[test]
+    fn version_1_0_0_construct_triggers_version_001() {
+        let diags = evaluate(&[obs("version = \"1.0.0\"", "")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-VERSION-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn v1_0_0_in_context_triggers_version_001() {
+        let diags = evaluate(&[obs("something", "v1.0.0 release notes")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-VERSION-001");
+    }
+
+    #[test]
+    fn path_dep_with_semver_version_triggers_version_002() {
+        let diags = evaluate(&[obs("path_dep_with_semver_version", "")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-VERSION-002");
+        assert!(!diags[0].blocking);
+    }
+
+    #[test]
+    fn workspace_semver_version_triggers_version_003() {
+        let diags = evaluate(&[obs("workspace_semver_version", "")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-VERSION-003");
+        assert!(!diags[0].blocking);
+    }
+
+    #[test]
+    fn calver_version_does_not_trigger() {
+        // CalVer like 26.6.5 should not be flagged
+        let diags = evaluate(&[obs("something", "version = \"26.6.5\"")]);
+        assert!(diags.is_empty());
+    }
+
+    #[test]
+    fn unrelated_construct_produces_no_diag() {
+        let diags = evaluate(&[obs("random_thing", "some context")]);
+        assert!(diags.is_empty());
+    }
+}

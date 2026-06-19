@@ -62,3 +62,76 @@ impl ActorSystem {
     pub fn actor_count(&self) -> u32 { self.next_id }
     pub fn assign_worker(&self, actor_id: u32) -> usize { (actor_id as usize) % self.worker_count }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Debug)]
+    struct Ping;
+    impl ActorMessage for Ping {}
+
+    // ── ActorMailbox ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_mailbox_is_empty() {
+        let mb: ActorMailbox<Ping> = ActorMailbox::new(7, 10);
+        assert_eq!(mb.pending(), 0);
+        assert_eq!(mb.actor_id(), 7);
+        assert!(!mb.is_full());
+    }
+
+    #[test]
+    fn send_enqueues_message() {
+        let mut mb: ActorMailbox<Ping> = ActorMailbox::new(0, 10);
+        mb.send(Ping).unwrap();
+        assert_eq!(mb.pending(), 1);
+    }
+
+    #[test]
+    fn receive_dequeues_fifo() {
+        #[derive(Debug)]
+        struct Msg(u32);
+        impl ActorMessage for Msg {}
+
+        let mut mb: ActorMailbox<Msg> = ActorMailbox::new(0, 10);
+        mb.send(Msg(1)).unwrap();
+        mb.send(Msg(2)).unwrap();
+        assert_eq!(mb.receive().unwrap().0, 1);
+        assert_eq!(mb.receive().unwrap().0, 2);
+        assert!(mb.receive().is_none());
+    }
+
+    #[test]
+    fn send_when_full_returns_err() {
+        let mut mb: ActorMailbox<Ping> = ActorMailbox::new(0, 2);
+        mb.send(Ping).unwrap();
+        mb.send(Ping).unwrap();
+        assert!(mb.is_full());
+        assert!(mb.send(Ping).is_err());
+    }
+
+    // ── ActorSystem ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn spawn_actor_id_is_sequential() {
+        let mut sys = ActorSystem::new(4);
+        assert_eq!(sys.spawn_actor_id(), 0);
+        assert_eq!(sys.spawn_actor_id(), 1);
+        assert_eq!(sys.actor_count(), 2);
+    }
+
+    #[test]
+    fn assign_worker_distributes_round_robin() {
+        let sys = ActorSystem::new(4);
+        assert_eq!(sys.assign_worker(0), 0);
+        assert_eq!(sys.assign_worker(1), 1);
+        assert_eq!(sys.assign_worker(4), 0); // wraps
+    }
+
+    #[test]
+    fn worker_count_matches_config() {
+        let sys = ActorSystem::new(8);
+        assert_eq!(sys.worker_count(), 8);
+    }
+}
