@@ -268,6 +268,19 @@ fn do_html5_status() -> Result<Value> {
         candidates.into_iter().map(|(_, p)| p).next()
     };
 
+    // 7. Cook receipt presence
+    let receipt_path = std::path::Path::new(archive).join("cook-receipt.json");
+    let receipt = if receipt_path.exists() {
+        std::fs::read_to_string(&receipt_path)
+            .ok()
+            .and_then(|s| serde_json::from_str::<serde_json::Value>(&s).ok())
+    } else {
+        None
+    };
+    let receipt_verdict = receipt.as_ref()
+        .and_then(|v| v["verdict"].as_str().map(str::to_string))
+        .unwrap_or_else(|| "NONE".to_string());
+
     let overall = if engine_ok && pkg_verdict == "REAL" { "READY" } else { "NOT READY" };
 
     println!("=== HTML5 Pipeline Status ===");
@@ -275,6 +288,7 @@ fn do_html5_status() -> Result<Value> {
     println!("[{}] emsdk: {}", if emsdk_ok { "PASS" } else { "WARN" }, emsdk.display());
     println!("[{}] Package: {} ({})", pkg_verdict, archive,
         wasm_mb.map(|mb| format!("{mb:.1} MB")).unwrap_or_else(|| "n/a".into()));
+    println!("[{}] Receipt: {}", receipt_verdict, if receipt.is_some() { receipt_path.display().to_string() } else { "not found (run 'rocket html5 verify')".into() });
     println!("[{}] Port 8080: {}", if port_free { "FREE" } else { "IN USE" }, if port_free { "available for serve" } else { "already bound" });
     println!("[INFO] Projects: {present_projects}/{total_projects} present on disk");
     if let Some(ref log) = cook_log {
@@ -293,6 +307,11 @@ fn do_html5_status() -> Result<Value> {
             "archive": archive,
             "verdict": pkg_verdict,
             "wasm_mb": wasm_mb,
+        },
+        "receipt": {
+            "path": receipt_path.display().to_string(),
+            "verdict": receipt_verdict,
+            "present": receipt.is_some(),
         },
         "port_8080_free": port_free,
         "manifest": {
