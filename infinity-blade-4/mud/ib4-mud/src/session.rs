@@ -1299,3 +1299,101 @@ fn tier_locked(tier: u8, bloodline: i32) -> bool {
         _ => false,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── ArenaManager ─────────────────────────────────────────────────────────
+
+    fn make_arena(ids: &[&str]) -> ArenaManager {
+        ArenaManager::new(ids.iter().map(|s| s.to_string()).collect())
+    }
+
+    #[test]
+    fn arena_is_empty_when_empty() {
+        let a = make_arena(&[]);
+        assert!(a.is_empty());
+        assert_eq!(a.len(), 0);
+    }
+
+    #[test]
+    fn arena_len_matches_queue() {
+        let a = make_arena(&["a", "b", "c"]);
+        assert_eq!(a.len(), 3);
+        assert!(!a.is_empty());
+    }
+
+    #[test]
+    fn arena_front_returns_first_without_consuming() {
+        let a = make_arena(&["first", "second"]);
+        assert_eq!(a.front(), Some("first"));
+        // still 2 items
+        assert_eq!(a.len(), 2);
+    }
+
+    #[test]
+    fn arena_next_pops_front() {
+        let mut a = make_arena(&["x", "y"]);
+        assert_eq!(a.next(), Some("x".to_string()));
+        assert_eq!(a.len(), 1);
+        assert_eq!(a.next(), Some("y".to_string()));
+        assert!(a.is_empty());
+    }
+
+    #[test]
+    fn arena_next_on_empty_is_none() {
+        let mut a = make_arena(&[]);
+        assert_eq!(a.next(), None);
+    }
+
+    #[test]
+    fn arena_push_back_appends() {
+        let mut a = make_arena(&["a"]);
+        a.push_back("b".to_string());
+        assert_eq!(a.len(), 2);
+        assert_eq!(a.front(), Some("a")); // order preserved
+    }
+
+    #[test]
+    fn arena_clear_removes_all() {
+        let mut a = make_arena(&["a", "b"]);
+        a.clear();
+        assert!(a.is_empty());
+    }
+
+    #[test]
+    fn arena_reset_replaces_queue() {
+        let mut a = make_arena(&["old"]);
+        a.reset(&["x", "y", "z"]);
+        assert_eq!(a.len(), 3);
+        assert_eq!(a.front(), Some("x"));
+    }
+
+    #[test]
+    fn arena_iter_visits_in_order() {
+        let a = make_arena(&["p", "q", "r"]);
+        let collected: Vec<&str> = a.iter().map(|s| s.as_str()).collect();
+        assert_eq!(collected, vec!["p", "q", "r"]);
+    }
+
+    // ── tier_locked (private helper, tested via pub interface) ──────────────
+
+    #[test]
+    fn tier_locked_tier2_requires_bloodline_5() {
+        assert!(tier_locked(2, 4));
+        assert!(!tier_locked(2, 5));
+    }
+
+    #[test]
+    fn tier_locked_tier3_requires_bloodline_10() {
+        assert!(tier_locked(3, 9));
+        assert!(!tier_locked(3, 10));
+    }
+
+    #[test]
+    fn tier_locked_other_tiers_always_unlocked() {
+        assert!(!tier_locked(1, 0));
+        assert!(!tier_locked(4, 0));
+    }
+}
