@@ -69,3 +69,72 @@ fn run_wasm(file: String) -> Result<Value> {
 fn verify_wasm(file: String, min_size: Option<u64>) -> Result<Value> {
     do_wasm_verify(file, min_size)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    fn write_wasm(dir: &TempDir, name: &str, size: usize) -> String {
+        let path = dir.path().join(name);
+        let mut data = vec![0x00u8, 0x61, 0x73, 0x6d];
+        data.extend(vec![0u8; size]);
+        std::fs::write(&path, &data).unwrap();
+        path.to_string_lossy().into_owned()
+    }
+
+    fn write_stub(dir: &TempDir, name: &str) -> String {
+        let path = dir.path().join(name);
+        std::fs::write(&path, b"\x00asm\x01\x00\x00\x00").unwrap();
+        path.to_string_lossy().into_owned()
+    }
+
+    #[test]
+    fn verify_real_wasm_returns_pass() {
+        let dir = TempDir::new().unwrap();
+        let path = write_wasm(&dir, "game.wasm", 1024 * 1024 + 1);
+        let val = do_wasm_verify(path.clone(), None).unwrap();
+        assert_eq!(val["status"], "pass");
+        assert!(val["size_bytes"].as_u64().unwrap() > 1024 * 1024);
+    }
+
+    #[test]
+    fn verify_stub_fails_with_error() {
+        let dir = TempDir::new().unwrap();
+        let path = write_stub(&dir, "stub.wasm");
+        let err = do_wasm_verify(path, None).unwrap_err();
+        assert!(err.to_string().contains("stub") || err.to_string().contains("bytes"),
+            "error must mention stub size: {err}");
+    }
+
+    #[test]
+    fn verify_missing_file_returns_error() {
+        let err = do_wasm_verify("/nonexistent/path/to/game.wasm".into(), None).unwrap_err();
+        assert!(err.to_string().contains("nonexistent") || err.to_string().contains("cannot stat"),
+            "error must reference path: {err}");
+    }
+
+    #[test]
+    fn verify_returns_size_mb_field() {
+        let dir = TempDir::new().unwrap();
+        let path = write_wasm(&dir, "game.wasm", 1024 * 1024 + 1);
+        let val = do_wasm_verify(path, None).unwrap();
+        let mb = val["size_mb"].as_f64().expect("size_mb must be float");
+        assert!(mb > 1.0, "size_mb must be > 1 for a real wasm: {mb}");
+    }
+
+    #[test]
+    fn verify_custom_min_size_passes_small_wasm() {
+        let dir = TempDir::new().unwrap();
+        let path = write_wasm(&dir, "small.wasm", 500);
+        let val = do_wasm_verify(path, Some(100)).unwrap();
+        assert_eq!(val["status"], "pass");
+    }
+
+    #[test]
+    fn wasm_run_missing_file_returns_error() {
+        let err = do_wasm_run("/no/such/plugin.wasm".into()).unwrap_err();
+        assert!(err.to_string().contains("not found") || err.to_string().contains("WASM file"),
+            "must mention file not found: {err}");
+    }
+}
