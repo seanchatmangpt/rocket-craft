@@ -290,6 +290,106 @@ fn supabase_chain_verify(session_id: Option<String>) -> Result<Value> {
     Ok(serde_json::json!({ "overall": overall, "rows": rows }))
 }
 
+/// Compute process conformance metrics against the declared pipeline model.
+///
+/// Declared model: GameSessionStarted → FrameRendered → InputAdmitted*
+///
+/// Computes Van der Aalst's four quality dimensions from session_lifecycle_summary:
+///   fitness       — fraction of sessions containing all required activities
+///   precision     — fraction of sessions with no unexpected activity types
+///   generalization — fraction of required activities seen across all sessions
+///   simplicity    — 1.0 (single-trace declared model)
+///
+/// # Arguments
+/// * `out`   - Output file path (default: conformance-<date>.json)
+/// * `limit` - Max sessions to analyse (default: 200)
+#[verb("conformance", "supabase")]
+fn supabase_conformance(out: Option<String>, limit: Option<u32>) -> Result<Value> {
+    let svc = make_service()?;
+    let rt = new_runtime()?;
+    let n = limit.unwrap_or(200);
+    let sessions = rt.block_on(svc.fetch_session_lifecycle_summary(n))
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    if sessions.is_empty() {
+        println!("[conformance] No sessions found.");
+        return Ok(serde_json::json!({ "status": "no-data", "sessions": 0 }));
+    }
+
+    let report = compute_conformance(&sessions);
+    let path = out.unwrap_or_else(|| {
+        let date = chrono::Utc::now().format("%Y%m%d-%H%M%S");
+        format!("conformance-{date}.json")
+    });
+    let json = serde_json::to_string_pretty(&report)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+    std::fs::write(&path, &json)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    let fitness = report["fitness"].as_f64().unwrap_or(0.0);
+    let label = if fitness >= 0.95 { "CONFORMANT" } else if fitness >= 0.75 { "DEGRADED" } else { "NON-CONFORMANT" };
+    println!("=== Process Conformance ===");
+    println!("Model:   GameSessionStarted → FrameRendered → InputAdmitted*");
+    println!("Status:  {label}");
+    println!("Fitness:        {:.1}%", fitness * 100.0);
+    println!("Precision:      {:.1}%", report["precision"].as_f64().unwrap_or(0.0) * 100.0);
+    println!("Generalization: {:.1}%", report["generalization"].as_f64().unwrap_or(0.0) * 100.0);
+    println!("Simplicity:     100.0%");
+    println!("Sessions:       {}/{}", report["conformant_sessions"].as_u64().unwrap_or(0), report["total_sessions"].as_u64().unwrap_or(0));
+    println!("\n[{label}] Report: {path}");
+    Ok(report)
+}
+
+const REQUIRED: &[&str] = &["GameSessionStarted", "FrameRendered"];
+const EXPECTED: &[&str] = &["GameSessionStarted", "FrameRendered", "InputAdmitted"];
+
+fn compute_conformance(sessions: &[serde_json::Value]) -> serde_json::Value {
+    let mut all_activities: std::collections::HashSet<String> = std::collections::HashSet::new();
+    let mut conformant = 0usize;
+    let mut non_conformant: Vec<serde_json::Value> = Vec::new();
+
+    for s in sessions {
+        let sid = s["session_id"].as_str().unwrap_or("?");
+        let activities: std::collections::HashSet<String> = s["distinct_activities"]
+            .as_array()
+            .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+            .unwrap_or_default();
+        for a in &activities { all_activities.insert(a.clone()); }
+
+        let missing: Vec<&str> = REQUIRED.iter().copied().filter(|r| !activities.contains(*r)).collect();
+        let extra: Vec<String> = activities.iter().filter(|a| !EXPECTED.contains(&a.as_str())).cloned().collect();
+
+        if missing.is_empty() && extra.is_empty() {
+            conformant += 1;
+        } else {
+            non_conformant.push(serde_json::json!({ "session_id": sid, "missing": missing, "extra": extra }));
+        }
+    }
+
+    let n = sessions.len() as f64;
+    let precision_count = sessions.iter().filter(|s| {
+        let acts: std::collections::HashSet<String> = s["distinct_activities"].as_array()
+            .map(|arr| arr.iter().filter_map(|v| v.as_str().map(String::from)).collect())
+            .unwrap_or_default();
+        acts.iter().all(|a| EXPECTED.contains(&a.as_str()))
+    }).count();
+
+    let generalization = REQUIRED.iter().filter(|r| all_activities.contains(**r)).count() as f64
+        / REQUIRED.len() as f64;
+
+    serde_json::json!({
+        "model": "GameSessionStarted → FrameRendered → InputAdmitted*",
+        "fitness": conformant as f64 / n,
+        "precision": precision_count as f64 / n,
+        "generalization": generalization,
+        "simplicity": 1.0,
+        "conformant_sessions": conformant,
+        "total_sessions": sessions.len(),
+        "non_conformant": non_conformant,
+        "all_activities_seen": all_activities.into_iter().collect::<Vec<_>>(),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

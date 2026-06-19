@@ -181,6 +181,31 @@ impl SupabaseService {
         (checks, health)
     }
 
+    /// Fetch session_lifecycle_summary view (distinct activities per session).
+    /// Used by `rocket supabase conformance` to compute Van der Aalst metrics.
+    pub async fn fetch_session_lifecycle_summary(&self, limit: u32) -> Result<Vec<serde_json::Value>> {
+        let url = format!(
+            "{}/rest/v1/session_lifecycle_summary\
+             ?select=session_id,event_count,distinct_activities,duration_ms,latest_verdict\
+             &order=session_id.desc\
+             &limit={limit}",
+            self.url
+        );
+        let resp = self.client
+            .get(&url)
+            .headers(self.rest_headers())
+            .send()
+            .await
+            .context("GET session_lifecycle_summary failed")?;
+        if resp.status().is_success() {
+            Ok(resp.json::<Vec<serde_json::Value>>().await?)
+        } else {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("session_lifecycle_summary fetch {status}: {msg}");
+        }
+    }
+
     /// Fetch all ocel_events for a session ordered by seq ASC.
     pub async fn fetch_ocel_events(&self, session_id: &str) -> Result<Vec<serde_json::Value>> {
         let url = format!(
