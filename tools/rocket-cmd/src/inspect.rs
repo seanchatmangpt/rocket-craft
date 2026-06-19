@@ -863,3 +863,142 @@ fn inspect_file(filepath: &Path, rel_path: &str) -> Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    // ── format_value ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn format_value_string_returns_raw_string() {
+        let v = json!("hello world");
+        assert_eq!(format_value(&v), "hello world");
+    }
+
+    #[test]
+    fn format_value_number_returns_digit_string() {
+        let v = json!(42);
+        assert_eq!(format_value(&v), "42");
+    }
+
+    #[test]
+    fn format_value_bool_returns_word() {
+        assert_eq!(format_value(&json!(true)), "true");
+        assert_eq!(format_value(&json!(false)), "false");
+    }
+
+    #[test]
+    fn format_value_object_returns_pretty_json() {
+        let v = json!({"a": 1});
+        let s = format_value(&v);
+        assert!(s.contains("\"a\""));
+        assert!(s.contains("1"));
+    }
+
+    #[test]
+    fn format_value_array_returns_pretty_json() {
+        let v = json!([1, 2, 3]);
+        let s = format_value(&v);
+        assert!(s.contains("1"));
+        assert!(s.contains("3"));
+    }
+
+    // ── query_json ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn query_json_top_level_key() {
+        let v = json!({"name": "rocket"});
+        let result = query_json(&v, "name").unwrap();
+        assert_eq!(result, json!("rocket"));
+    }
+
+    #[test]
+    fn query_json_nested_key() {
+        let v = json!({"player": {"hp": 100}});
+        let result = query_json(&v, "player.hp").unwrap();
+        assert_eq!(result, json!(100));
+    }
+
+    #[test]
+    fn query_json_array_index() {
+        let v = json!([10, 20, 30]);
+        let result = query_json(&v, "1").unwrap();
+        assert_eq!(result, json!(20));
+    }
+
+    #[test]
+    fn query_json_missing_key_returns_none() {
+        let v = json!({"a": 1});
+        assert!(query_json(&v, "b").is_none());
+    }
+
+    #[test]
+    fn query_json_nested_missing_returns_none() {
+        let v = json!({"a": {"b": 1}});
+        assert!(query_json(&v, "a.c").is_none());
+    }
+
+    // ── classify_file ─────────────────────────────────────────────────────────
+
+    fn write_json_tempfile(json: &str) -> NamedTempFile {
+        let mut f = NamedTempFile::new().unwrap();
+        write!(f, "{}", json).unwrap();
+        f
+    }
+
+    #[test]
+    fn classify_mud_state() {
+        let f = write_json_tempfile(r#"{"player": {}, "bloodline": "IB4"}"#);
+        assert_eq!(classify_file(f.path()), Some(MUD_STATE.to_string()));
+    }
+
+    #[test]
+    fn classify_verification_receipt() {
+        let f = write_json_tempfile(r#"{"visualDelta": 0.5, "screenshots": []}"#);
+        assert_eq!(classify_file(f.path()), Some(VERIFICATION_RECEIPT.to_string()));
+    }
+
+    #[test]
+    fn classify_audit_receipt() {
+        let f = write_json_tempfile(r#"{"events": [], "chain_hash": "abc"}"#);
+        assert_eq!(classify_file(f.path()), Some(AUDIT_RECEIPT.to_string()));
+    }
+
+    #[test]
+    fn classify_sync_receipt() {
+        let f = write_json_tempfile(
+            r#"{"operation_id": "x", "input_hashes": [], "signature": "sig"}"#,
+        );
+        assert_eq!(classify_file(f.path()), Some(SYNC_RECEIPT.to_string()));
+    }
+
+    #[test]
+    fn classify_compliance_receipt() {
+        let f = write_json_tempfile(
+            r#"{"checkpoint": "c", "digest": "d", "digest_algorithm": "blake3"}"#,
+        );
+        assert_eq!(classify_file(f.path()), Some(COMPLIANCE_RECEIPT.to_string()));
+    }
+
+    #[test]
+    fn classify_ocel_event_log() {
+        let f = write_json_tempfile(r#"{"event_types": [], "events": []}"#);
+        assert_eq!(classify_file(f.path()), Some(OCEL_EVENT_LOG.to_string()));
+    }
+
+    #[test]
+    fn classify_returns_none_for_unknown_json() {
+        let f = write_json_tempfile(r#"{"foo": "bar"}"#);
+        assert_eq!(classify_file(f.path()), None);
+    }
+
+    #[test]
+    fn classify_returns_none_for_non_object_json() {
+        let f = write_json_tempfile(r#"[1, 2, 3]"#);
+        assert_eq!(classify_file(f.path()), None);
+    }
+}
