@@ -120,3 +120,80 @@ impl AuthorityState {
         errs
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_state_has_correct_count() {
+        let s = AuthorityState::new(5);
+        assert_eq!(s.len(), 5);
+        assert!(!s.is_empty());
+    }
+
+    #[test]
+    fn new_state_is_empty_for_zero_parts() {
+        let s = AuthorityState::new(0);
+        assert!(s.is_empty());
+    }
+
+    #[test]
+    fn new_state_default_grip_is_7() {
+        let s = AuthorityState::new(3);
+        assert!(s.grip.iter().all(|&g| g == 7));
+    }
+
+    #[test]
+    fn new_state_default_socket_health_is_max_class() {
+        let s = AuthorityState::new(4);
+        assert!(s.socket_health.iter().all(|&h| h == MAX_CLASS));
+    }
+
+    #[test]
+    fn new_state_default_damage_heat_stress_are_zero() {
+        let s = AuthorityState::new(3);
+        assert!(s.damage.iter().all(|&v| v == 0));
+        assert!(s.heat.iter().all(|&v| v == 0));
+        assert!(s.stress.iter().all(|&v| v == 0));
+    }
+
+    #[test]
+    fn validate_lengths_passes_for_consistent_state() {
+        let s = AuthorityState::new(4);
+        assert!(s.validate_lengths().is_ok());
+    }
+
+    #[test]
+    fn validate_lengths_fails_when_buffers_mismatched() {
+        let mut s = AuthorityState::new(4);
+        s.heat.push(0); // now heat.len() == 5, others == 4
+        assert!(s.validate_lengths().is_err());
+    }
+
+    #[test]
+    fn validate_classes_is_empty_for_default_state() {
+        let s = AuthorityState::new(5);
+        assert!(s.validate_classes().is_empty());
+    }
+
+    #[test]
+    fn validate_classes_catches_out_of_range_damage() {
+        let mut s = AuthorityState::new(3);
+        s.damage[1] = 16; // > MAX_CLASS=15
+        let errs = s.validate_classes();
+        assert_eq!(errs.len(), 1);
+        assert!(matches!(&errs[0],
+            RefusalReason::InvalidAuthorityClass { field, .. } if field.contains("damage[1]")
+        ));
+    }
+
+    #[test]
+    fn validate_classes_catches_multiple_violations() {
+        let mut s = AuthorityState::new(3);
+        s.heat[0] = 255;
+        s.stress[2] = 100;
+        let errs = s.validate_classes();
+        assert_eq!(errs.len(), 2);
+    }
+}
