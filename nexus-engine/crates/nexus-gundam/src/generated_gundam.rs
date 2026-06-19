@@ -1022,3 +1022,67 @@ impl OntologyName for ZakuFrame {
 }
 
 impl FrameTypeCategory for ZakuFrame {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── AABB ──────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn aabb_default_is_degenerate_zero_size() {
+        let b = AABB::default();
+        assert_eq!(b.min, [0.0, 0.0, 0.0]);
+        assert_eq!(b.max, [0.0, 0.0, 0.0]);
+    }
+
+    #[test]
+    fn aabb_intersects_overlapping() {
+        let a = AABB::new([-1.0, -1.0, -1.0], [1.0, 1.0, 1.0]);
+        let b = AABB::new([0.0, 0.0, 0.0], [2.0, 2.0, 2.0]);
+        assert!(a.intersects(&b));
+        assert!(b.intersects(&a)); // symmetric
+    }
+
+    #[test]
+    fn aabb_no_intersect_separated() {
+        let a = AABB::new([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]);
+        let b = AABB::new([2.0, 0.0, 0.0], [3.0, 1.0, 1.0]); // gap on x
+        assert!(!a.intersects(&b));
+    }
+
+    #[test]
+    fn aabb_touching_faces_intersects() {
+        let a = AABB::new([0.0, 0.0, 0.0], [1.0, 1.0, 1.0]);
+        let b = AABB::new([1.0, 0.0, 0.0], [2.0, 1.0, 1.0]); // share x=1 face
+        assert!(a.intersects(&b));
+    }
+
+    // ── RotationLimits ────────────────────────────────────────────────────────
+
+    #[test]
+    fn rotation_limits_default_full_range() {
+        let r = RotationLimits::default();
+        assert_eq!(r.min_yaw, -180.0);
+        assert_eq!(r.max_yaw, 180.0);
+        assert_eq!(r.min_pitch, -90.0);
+        assert_eq!(r.max_pitch, 90.0);
+    }
+
+    // ── Frame ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn frame_default_mass_and_slots() {
+        let f = Frame::default();
+        assert_eq!(f.mass, 50.0);
+        assert_eq!(f.slot_count, 5);
+        assert_eq!(f.id, "Standard Frame");
+    }
+
+    #[test]
+    fn frame_default_occupancy_is_unit_cube() {
+        let f = Frame::default();
+        // clearance is slightly larger than occupancy
+        assert!(f.clearance.max[0] > f.occupancy.max[0]);
+    }
+}
