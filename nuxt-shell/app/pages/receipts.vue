@@ -141,9 +141,9 @@ const sigColor: Record<string, string> = {
             </button>
             <span
               v-else
-              :style="{ color: sigColor[sigStatus[r.id]] }"
+              :style="{ color: sigColor[sigStatus[r.id] ?? 'unsigned'] }"
               class="sig-result"
-            >{{ sigLabel[sigStatus[r.id]] }}</span>
+            >{{ sigLabel[sigStatus[r.id] ?? 'unsigned'] }}</span>
           </td>
           <td class="dimmed small">{{ new Date(r.proven_at).toLocaleString() }}</td>
           <td class="proof-links">

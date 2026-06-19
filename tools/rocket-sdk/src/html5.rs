@@ -830,6 +830,101 @@ fn check_exit(status: ExitStatus, label: &str) -> Result<()> {
     }
 }
 
+// ── CookLogParser ─────────────────────────────────────────────────────────────
+
+/// A structured event extracted from a UE4/UAT cook log line.
+#[derive(Debug, Clone, Serialize)]
+pub struct CookLogEvent {
+    /// OCEL 2.0 activity name (e.g. "CookPackageStarted", "PakComplete").
+    pub activity: String,
+    /// The raw log line that triggered this event.
+    pub raw_line: String,
+    /// Approximate epoch milliseconds (line offset from cook start × 1000).
+    pub timestamp_ms: u64,
+    /// Optional structured detail extracted from the log line.
+    pub detail: Option<String>,
+}
+
+/// Pattern table: `(log substring, OCEL activity, detail_extractor)`.
+/// Order matters — first match wins.
+const COOK_PATTERNS: &[(&str, &str)] = &[
+    ("BuildCookRun",            "CookStarted"),
+    ("HTML5Setup",              "HTML5SetupStarted"),
+    ("Success!",                "HTML5SetupComplete"),
+    ("LogCook: Display: Cooking package", "PackageCooking"),
+    ("LogPak: Display: Collecting files", "PakStarted"),
+    ("LogPak: Display: Created pak file", "PakComplete"),
+    ("LogHTML5PlatformEditor",  "WasmBuildStarted"),
+    ("Packaging complete",      "PackageComplete"),
+    ("Total cook time",         "CookComplete"),
+    ("LogStageAndPackage",      "StagingStarted"),
+    ("Archiving",               "ArchiveStarted"),
+    ("Package was created",     "PackageCreated"),
+    ("BuildCookRun: Completed", "CookFinished"),
+    ("Error:",                  "CookError"),
+    ("ERROR:",                  "CookError"),
+    ("FAILED:",                 "CookFailed"),
+];
+
+/// Parse a UAT/UE4 cook log and extract structured OCEL lifecycle events.
+///
+/// Scans the log file sequentially. Each line is matched against `COOK_PATTERNS`
+/// and when a match is found a `CookLogEvent` is emitted. Duplicate activities are
+/// deduplicated so the caller gets a clean ordered lifecycle list (first-seen wins).
+///
+/// Timestamps are synthetic: `cook_start_ms + line_number * 100ms` — real timestamps
+/// require log-line timestamp parsing which UAT does not always emit.
+pub fn parse_cook_log(log_path: &Path, cook_start_ms: u64) -> Vec<CookLogEvent> {
+    use std::io::{BufRead, BufReader};
+    use std::collections::HashSet;
+    let Ok(file) = std::fs::File::open(log_path) else { return vec![]; };
+    let reader = BufReader::new(file);
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut events: Vec<CookLogEvent> = Vec::new();
+    let mut line_no: u64 = 0;
+
+    for line in reader.lines().filter_map(|l| l.ok()) {
+        line_no += 1;
+        for (pattern, activity) in COOK_PATTERNS {
+            if line.contains(pattern) && seen.insert((*activity).to_string()) {
+                let detail = extract_cook_detail(&line, activity);
+                events.push(CookLogEvent {
+                    activity: activity.to_string(),
+                    raw_line: line.clone(),
+                    timestamp_ms: cook_start_ms + line_no * 100,
+                    detail,
+                });
+                break;
+            }
+        }
+    }
+    events
+}
+
+/// Extract a meaningful detail string from certain log line types.
+fn extract_cook_detail(line: &str, activity: &str) -> Option<String> {
+    match activity {
+        "PackageCooking" => {
+            // "LogCook: Display: Cooking package: /Game/Maps/TestMap"
+            line.split("Cooking package:").nth(1)
+                .map(|s| s.trim().to_string())
+        }
+        "CookComplete" | "CookFinished" => {
+            // "Total cook time was 1847.3s"
+            line.split("Total cook time").nth(1)
+                .map(|s| format!("Total cook time{}", s.trim()))
+        }
+        "PakComplete" => {
+            line.split("Created pak file").nth(1)
+                .map(|s| s.trim().to_string())
+        }
+        "CookError" | "CookFailed" => {
+            Some(line.trim().to_string())
+        }
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1471,5 +1566,97 @@ mod tests {
         let events = ocel_events_from_lifecycle(&receipt.ocel_lifecycle, 0, dir.path());
         assert_eq!(events.len(), receipt.ocel_lifecycle.len());
         assert_eq!(events.len(), receipt.ocel_event_count as usize);
+    }
+
+    // ── CookLogParser tests ───────────────────────────────────────────────────
+
+    fn write_cook_log(dir: &Path, lines: &[&str]) -> PathBuf {
+        let path = dir.join("ue4-cook-latest.log");
+        std::fs::write(&path, lines.join("\n")).unwrap();
+        path
+    }
+
+    #[test]
+    fn parse_cook_log_empty_file_returns_empty() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[]);
+        let events = parse_cook_log(&log, 0);
+        assert!(events.is_empty());
+    }
+
+    #[test]
+    fn parse_cook_log_detects_cook_started() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &["Running BuildCookRun for Brm project..."]);
+        let events = parse_cook_log(&log, 0);
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].activity, "CookStarted");
+    }
+
+    #[test]
+    fn parse_cook_log_detects_pak_complete_with_detail() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[
+            "LogPak: Display: Created pak file /tmp/brm-html5-archive/HTML5/Brm-HTML5.pak",
+        ]);
+        let events = parse_cook_log(&log, 0);
+        assert_eq!(events.len(), 1);
+        assert_eq!(events[0].activity, "PakComplete");
+        assert!(events[0].detail.as_deref().unwrap_or("").contains("Brm-HTML5.pak"));
+    }
+
+    #[test]
+    fn parse_cook_log_deduplicates_same_activity() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[
+            "Running BuildCookRun",
+            "Running BuildCookRun again (should be deduped)",
+        ]);
+        let events = parse_cook_log(&log, 0);
+        assert_eq!(events.len(), 1, "CookStarted must appear only once");
+    }
+
+    #[test]
+    fn parse_cook_log_timestamps_increase_monotonically() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[
+            "Running BuildCookRun",
+            "LogCook: Display: Cooking package: /Game/Maps/TestMap",
+            "LogPak: Display: Created pak file /out/game.pak",
+            "Total cook time was 42s",
+        ]);
+        let events = parse_cook_log(&log, 1_000_000);
+        assert!(events.len() >= 2);
+        for w in events.windows(2) {
+            assert!(w[1].timestamp_ms > w[0].timestamp_ms, "timestamps must increase");
+        }
+    }
+
+    #[test]
+    fn parse_cook_log_detects_cook_error() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[
+            "Error: Failed to cook package /Game/Meshes/Foo",
+        ]);
+        let events = parse_cook_log(&log, 0);
+        assert_eq!(events[0].activity, "CookError");
+        assert!(events[0].detail.as_deref().unwrap_or("").contains("Failed to cook"));
+    }
+
+    #[test]
+    fn parse_cook_log_extracts_package_cooking_detail() {
+        let dir = TempDir::new().unwrap();
+        let log = write_cook_log(dir.path(), &[
+            "LogCook: Display: Cooking package: /Game/Maps/MainLevel",
+        ]);
+        let events = parse_cook_log(&log, 0);
+        assert_eq!(events[0].activity, "PackageCooking");
+        assert_eq!(events[0].detail.as_deref(), Some("/Game/Maps/MainLevel"));
+    }
+
+    #[test]
+    fn parse_cook_log_missing_file_returns_empty() {
+        let events = parse_cook_log(std::path::Path::new("/nonexistent/cook.log"), 0);
+        assert!(events.is_empty());
     }
 }

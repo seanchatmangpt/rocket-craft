@@ -922,6 +922,42 @@ fn log_html5(lines: Option<u32>, follow: Option<bool>) -> Result<Value> {
     do_html5_log(lines, follow.unwrap_or(false))
 }
 
+fn do_html5_parse_log(log: Option<String>) -> Result<Value> {
+    let home = std::env::var("HOME").unwrap_or_default();
+    let log_path = log.as_deref()
+        .map(std::path::Path::new)
+        .map(std::path::Path::to_path_buf)
+        .unwrap_or_else(|| std::path::PathBuf::from(format!("{home}/ue4-cook-latest.log")));
+    if !log_path.exists() {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            format!("Log not found: {} — run rocket html5 cook first", log_path.display())));
+    }
+    let cook_start_ms = log_path.metadata()
+        .and_then(|m| m.created())
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).map_err(|_| std::io::Error::new(std::io::ErrorKind::Other, "")))
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0);
+    let events = rocket_sdk::parse_cook_log(&log_path, cook_start_ms);
+    let activities: Vec<&str> = events.iter().map(|e| e.activity.as_str()).collect();
+    println!("[parse-log] {} → {} OCEL events", log_path.display(), events.len());
+    for evt in &events {
+        println!("  {:>25}  {}", evt.activity, evt.detail.as_deref().unwrap_or(""));
+    }
+    Ok(serde_json::json!({ "log": log_path.display().to_string(), "event_count": events.len(), "activities": activities, "events": events }))
+}
+
+/// Parse the most recent UE4 cook log into structured OCEL lifecycle events.
+///
+/// Scans ~/ue4-cook-latest.log (or a custom --log path) for UAT log patterns
+/// and emits a structured list of OCEL activities: CookStarted, PackageCooking,
+/// PakComplete, CookFinished, CookError, etc.
+///
+/// Useful for post-cook analysis or to populate OCEL event rows for conformance.
+#[verb("parse-log", "html5")]
+fn html5_parse_log(log: Option<String>) -> Result<Value> {
+    do_html5_parse_log(log)
+}
+
 /// Run the full HTML5 pipeline: preflight → cook → verify in sequence.
 /// Exits immediately on any failure. Equivalent to running each step manually.
 ///

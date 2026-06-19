@@ -108,6 +108,52 @@ const healthColor = computed(() => {
 // Process conformance (Van der Aalst fitness/precision/generalization/simplicity)
 const { conformance, fitnessLabel, fitnessColor, load: loadConformance } = useProcessConformance();
 
+// ── Cook log SSE monitor ──────────────────────────────────────────────────────
+// Connects to GET /api/game/cook-log (SSE) and streams real-time OCEL events
+// emitted by the UAT cook process. Activates when "Connect Cook Monitor" is clicked.
+interface CookLogEvt {
+  activity: string;
+  raw_line: string;
+  timestamp_ms: number;
+  detail?: string;
+  line_no: number;
+}
+const cookEvents = ref<CookLogEvt[]>([]);
+const cookMonitorActive = ref(false);
+let cookEventSource: EventSource | null = null;
+
+function startCookMonitor() {
+  if (cookEventSource) return;
+  cookMonitorActive.value = true;
+  cookEvents.value = [];
+  cookEventSource = new EventSource('/api/game/cook-log');
+  cookEventSource.onmessage = (e) => {
+    try {
+      const evt = JSON.parse(e.data) as CookLogEvt;
+      if (evt.activity !== 'StreamOpened') cookEvents.value.unshift(evt);
+      if (cookEvents.value.length > 100) cookEvents.value.splice(100);
+    } catch { /* ignore parse errors */ }
+  };
+  cookEventSource.onerror = () => {
+    cookMonitorActive.value = false;
+    cookEventSource?.close();
+    cookEventSource = null;
+  };
+}
+
+function stopCookMonitor() {
+  cookEventSource?.close();
+  cookEventSource = null;
+  cookMonitorActive.value = false;
+}
+
+const cookActivityColor = (activity: string) => {
+  if (activity.includes('Error') || activity.includes('Failed')) return '#ef4444';
+  if (activity === 'CookFinished' || activity === 'PackageComplete') return '#22c55e';
+  if (activity === 'CookStarted') return '#7dd3fc';
+  return '#94a3b8';
+};
+
 // Realtime receipt bus — bust KV cache when a new PASS receipt lands so
 // the next poll shows fresh numbers (pattern from nuxt-supabase-book chapter-4)
 const { receiptBus } = useRocketSessionRealtime();
@@ -122,7 +168,7 @@ function setupPresence() {
   presenceChannel = (client as any).channel('pipeline-dashboard', {
     config: { presence: { key: `viewer-${Math.random().toString(36).slice(2, 8)}` } },
   });
-  presenceChannel
+  presenceChannel!
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .on('presence', { event: 'sync' }, () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -177,6 +223,7 @@ onUnmounted(() => {
   if (timer) clearInterval(timer);
   presenceChannel?.unsubscribe();
   sessionCountChannel?.unsubscribe();
+  stopCookMonitor();
 });
 </script>
 
@@ -314,6 +361,40 @@ onUnmounted(() => {
         </div>
       </section>
 
+      <!-- Cook Log Monitor (SSE real-time stream from ~/ue4-cook-latest.log) -->
+      <section class="cook-monitor">
+        <h2>
+          Cook Log Monitor
+          <button v-if="!cookMonitorActive" class="cook-connect-btn" @click="startCookMonitor">
+            ▶ Connect
+          </button>
+          <button v-else class="cook-stop-btn" @click="stopCookMonitor">
+            ■ Disconnect
+          </button>
+          <span v-if="cookMonitorActive" class="cook-live-badge">● LIVE</span>
+        </h2>
+        <p class="cook-monitor-hint">
+          Streams <code>~/ue4-cook-latest.log</code> → OCEL activities in real time.
+          Run <code>rocket html5 cook --project Brm</code> to populate.
+        </p>
+        <div v-if="cookEvents.length" class="cook-event-list">
+          <div
+            v-for="evt in cookEvents"
+            :key="evt.line_no"
+            class="cook-evt"
+            :style="{ borderLeftColor: cookActivityColor(evt.activity) }"
+          >
+            <span class="cook-activity" :style="{ color: cookActivityColor(evt.activity) }">
+              {{ evt.activity }}
+            </span>
+            <span v-if="evt.detail" class="cook-detail">{{ evt.detail }}</span>
+          </div>
+        </div>
+        <div v-else-if="cookMonitorActive" class="cook-waiting">
+          Waiting for cook activity… (log is empty or no matching events yet)
+        </div>
+      </section>
+
       <!-- Last receipt -->
       <section v-if="health?.last_receipt_at" class="last-receipt">
         <span>Last receipt: {{ new Date(health.last_receipt_at).toLocaleString() }}</span>
@@ -389,4 +470,18 @@ onUnmounted(() => {
 .last-receipt { font-size: 0.8rem; color: #94a3b8; margin-bottom: 1.5rem; }
 .pipeline-nav { display: flex; gap: 1.5rem; }
 .pipeline-nav a { color: #7dd3fc; text-decoration: none; font-size: 0.875rem; }
+
+/* Cook monitor */
+.cook-monitor { background: #0f172a; border: 1px solid #1e293b; border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem; }
+.cook-monitor h2 { font-size: 0.9rem; color: #94a3b8; margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.75rem; }
+.cook-connect-btn, .cook-stop-btn { background: #1e293b; border: 1px solid #334155; color: #7dd3fc; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 3px; cursor: pointer; }
+.cook-stop-btn { color: #f87171; border-color: #7f1d1d; }
+.cook-live-badge { font-size: 0.7rem; color: #22c55e; animation: pulse 2s infinite; }
+.cook-monitor-hint { font-size: 0.72rem; color: #475569; margin: 0 0 0.75rem; }
+.cook-monitor-hint code { color: #7dd3fc; }
+.cook-event-list { max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.cook-evt { padding: 0.25rem 0.5rem; border-left: 3px solid #334155; display: flex; align-items: baseline; gap: 0.75rem; }
+.cook-activity { font-size: 0.78rem; font-weight: 700; white-space: nowrap; }
+.cook-detail { font-size: 0.7rem; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cook-waiting { font-size: 0.75rem; color: #475569; padding: 0.5rem 0; }
 </style>
