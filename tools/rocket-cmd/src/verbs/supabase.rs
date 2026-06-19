@@ -123,6 +123,121 @@ fn supabase_receipts() -> Result<Value> {
     Ok(serde_json::json!({ "receipts": receipts }))
 }
 
+/// Export ocel_events for a session as OCEL 2.0 JSON for pm4py conformance checking.
+///
+/// Usage:
+///   rocket supabase ocel-export --session-id <uuid> [--out ocel2.json]
+///
+/// Drop the output into pm4py:
+///   import pm4py
+///   log = pm4py.read_ocel2_json('ocel2.json')
+///   process_tree = pm4py.discover_process_tree_inductive(log)
+///
+/// # Arguments
+/// * `session_id` - Session UUID to export (required)
+/// * `out`        - Output file path (default: ocel2-<session_id_prefix>.json)
+#[verb("ocel-export", "supabase")]
+fn supabase_ocel_export(session_id: String, out: Option<String>) -> Result<Value> {
+    let svc = make_service()?;
+    let rt = new_runtime()?;
+    let rows = rt.block_on(svc.fetch_ocel_events(&session_id))
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    if rows.is_empty() {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            format!("No events found for session {session_id}")));
+    }
+
+    let ocel2 = build_ocel2(&session_id, &rows);
+    let json = serde_json::to_string_pretty(&ocel2)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    let prefix = &session_id[..8.min(session_id.len())];
+    let path = out.unwrap_or_else(|| format!("ocel2-{prefix}.json"));
+    std::fs::write(&path, &json)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    println!("[ocel-export] {path}");
+    println!("  events:  {}", rows.len());
+    println!("  pm4py:   log = pm4py.read_ocel2_json('{path}')");
+    Ok(serde_json::json!({ "path": path, "events": rows.len(), "session_id": session_id }))
+}
+
+fn infer_object_type(id: &str) -> &'static str {
+    if id.starts_with("session") { "GameSession" }
+    else if id.starts_with("intent") { "Intent" }
+    else { "GameSession" }
+}
+
+fn build_ocel2(session_id: &str, rows: &[serde_json::Value]) -> serde_json::Value {
+    let mut objects: std::collections::HashMap<String, &str> = std::collections::HashMap::new();
+    objects.insert(session_id.to_string(), "GameSession");
+
+    for row in rows {
+        if let Some(refs) = row["object_refs"].as_array() {
+            for r in refs {
+                if let Some(s) = r.as_str() {
+                    objects.entry(s.to_string()).or_insert_with(|| infer_object_type(s));
+                }
+            }
+        }
+    }
+
+    let activity_set: std::collections::HashSet<&str> = rows.iter()
+        .filter_map(|r| r["activity"].as_str()).collect();
+
+    let ocel_events: Vec<serde_json::Value> = rows.iter().enumerate().map(|(i, row)| {
+        let ts_ms = row["timestamp_ms"].as_i64().unwrap_or(0);
+        let ts = chrono::DateTime::from_timestamp_millis(ts_ms)
+            .map(|d| d.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string())
+            .unwrap_or_else(|| ts_ms.to_string());
+
+        let mut rels = vec![serde_json::json!({ "objectId": session_id, "qualifier": "session" })];
+        if let Some(refs) = row["object_refs"].as_array() {
+            for r in refs {
+                if let Some(s) = r.as_str() {
+                    if s != session_id {
+                        rels.push(serde_json::json!({ "objectId": s, "qualifier": "rel" }));
+                    }
+                }
+            }
+        }
+
+        let mut attrs = vec![
+            serde_json::json!({ "name": "seq", "value": row["seq"] }),
+            serde_json::json!({ "name": "event_hash", "value": row["event_hash"] }),
+        ];
+        if !row["prev_hash"].is_null() {
+            attrs.push(serde_json::json!({ "name": "prev_hash", "value": row["prev_hash"] }));
+        }
+        if let Some(obj) = row["attributes"].as_object() {
+            for (k, v) in obj { attrs.push(serde_json::json!({ "name": k, "value": v })); }
+        }
+
+        serde_json::json!({
+            "id": format!("ev-{i}"),
+            "type": row["activity"],
+            "time": ts,
+            "attributes": attrs,
+            "relationships": rels,
+        })
+    }).collect();
+
+    let ocel_objects: Vec<serde_json::Value> = objects.iter()
+        .map(|(id, t)| serde_json::json!({ "id": id, "type": t, "attributes": [] }))
+        .collect();
+
+    serde_json::json!({
+        "objectTypes": objects.values().collect::<std::collections::HashSet<_>>().iter()
+            .map(|t| serde_json::json!({ "name": t, "attributes": [] })).collect::<Vec<_>>(),
+        "eventTypes": activity_set.iter()
+            .map(|a| serde_json::json!({ "name": a, "attributes": [{"name":"seq","type":"integer"}] }))
+            .collect::<Vec<_>>(),
+        "objects": ocel_objects,
+        "events": ocel_events,
+    })
+}
+
 /// Verify the ocel_events hash chain via the verify_event_chain Postgres RPC.
 ///
 /// Checks that each event's prev_hash matches the prior event's event_hash.

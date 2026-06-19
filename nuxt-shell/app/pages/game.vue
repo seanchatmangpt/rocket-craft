@@ -17,7 +17,7 @@ const { isPlaying, events: ocelEvents, exportOcelLog, exportHashedOcelLog } = us
 const lifecycle = computed(() => [...new Set(ocelEvents.value.map(e => e.activity))]);
 
 // Persist OCEL events to Supabase with hash chaining for pm4py conformance replay
-const { syncedCount, syncError, dbSessionId } = useGameSessionPersistence();
+const { syncedCount, syncError, dbSessionId, lastHash } = useGameSessionPersistence();
 
 // Commit receipt through server route (server validates OCEL lifecycle before writing).
 // Uses exportHashedOcelLog so the receipt hash is the SHA-256 chain tip — not a hash of
@@ -25,12 +25,10 @@ const { syncedCount, syncError, dbSessionId } = useGameSessionPersistence();
 // exact sequence of events, replayable by verify_event_chain().
 async function commitReceipt() {
   if (!dbSessionId.value) return;
-  const exportedAtMs = Date.now();
-  const hashedLog = await exportHashedOcelLog(exportedAtMs);
-
-  // chain_tip is SHA-256 of the last event in the chain — the receipt hash
-  const receiptHash = hashedLog.chain_tip
-    ? `sha256:${hashedLog.chain_tip}`
+  // Use the chain tip already computed by useGameSessionPersistence (canonical formula)
+  // so receipt_hash matches the last stored event_hash in ocel_events.
+  const receiptHash = lastHash.value
+    ? `sha256:${lastHash.value}`
     : `sha256:empty`;
 
   const result = await $fetch('/api/game/receipt', {
@@ -42,11 +40,7 @@ async function commitReceipt() {
       engine_source: isEngineReady.value ? 'real_ue4' : 'unknown',
       receipt_hash: receiptHash,
       milestone: 'GameSessionProof',
-      payload: {
-        chain_tip: hashedLog.chain_tip,
-        merkle_root: hashedLog.merkle_root,
-        exported_at_ms: exportedAtMs,
-      },
+      payload: { chain_tip: lastHash.value },
     },
   }).catch(() => null);
 

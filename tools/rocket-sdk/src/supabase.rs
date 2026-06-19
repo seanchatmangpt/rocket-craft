@@ -162,6 +162,30 @@ impl SupabaseService {
         (checks, health)
     }
 
+    /// Fetch all ocel_events for a session ordered by seq ASC.
+    pub async fn fetch_ocel_events(&self, session_id: &str) -> Result<Vec<serde_json::Value>> {
+        let url = format!(
+            "{}/rest/v1/ocel_events\
+             ?select=id,session_id,activity,timestamp_ms,object_refs,attributes,prev_hash,event_hash,seq\
+             &session_id=eq.{session_id}\
+             &order=seq.asc",
+            self.url
+        );
+        let resp = self.client
+            .get(&url)
+            .headers(self.rest_headers())
+            .send()
+            .await
+            .context("GET ocel_events failed")?;
+        if resp.status().is_success() {
+            Ok(resp.json::<Vec<serde_json::Value>>().await?)
+        } else {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("ocel_events fetch {status}: {msg}");
+        }
+    }
+
     /// Call the `verify_event_chain` Postgres RPC.
     ///
     /// Returns an array of `{ ok, message, broken_at, session_id }` rows.

@@ -1,24 +1,21 @@
 /**
  * useGameSessionPersistence — persists OCEL events to Supabase with hash chaining.
  *
- * Pattern: ~/dashboard.bak/supabase/migrations/002_events_raw.sql (tamper-evident hash chain)
- * Each event's hash = SHA-256(prev_hash || activity || timestamp_ms || JSON(attributes))
- * This makes the event log immutable and verifiable by pm4py conformance checking.
+ * Hash formula: uses useHashChain.computeEventHash (SHA-256 of canonical JSON object
+ * {id, timestamp, type, data, prev_hash}) — same formula as exportHashedOcelLog, so
+ * the chain_tip from the exported log matches the last stored event_hash.
+ *
+ * seq is 0-indexed: first event is seq=0, matching exportHashedOcelLog's enumeration.
  *
  * The composable watches useGameSessionOcel's event array and syncs new events to
  * the game_sessions + ocel_events Supabase tables in real time.
  */
 
-
-async function sha256Hex(data: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
 export function useGameSessionPersistence() {
   const { client } = useRocketSupabase();
   const { events, sessionId, isPlaying } = useGameSessionOcel();
 
+  const { computeEventHash } = useHashChain();
   const dbSessionId = ref<string | null>(null);
   const lastHash = ref<string | null>(null);
   const syncedCount = ref(0);
@@ -62,9 +59,19 @@ export function useGameSessionPersistence() {
     isSyncing.value = true;
     try {
       for (const evt of unsync) {
-        const seq = syncedCount.value + 1;
-        const raw = `${lastHash.value ?? ''}|${evt.activity}|${evt.timestamp_ms}|${JSON.stringify(evt.attributes)}`;
-        const hash = await sha256Hex(raw);
+        // seq is 0-indexed — matches exportHashedOcelLog enumeration
+        const seq = syncedCount.value;
+        // Canonical hash matches exportHashedOcelLog so chain_tip == last stored event_hash
+        const hash = await computeEventHash({
+          id: evt.id,
+          timestamp: new Date(evt.timestamp_ms).toISOString(),
+          type: evt.activity,
+          data: {
+            object_refs: evt.object_refs as unknown as Record<string, unknown>,
+            attributes: evt.attributes as Record<string, unknown>,
+          },
+          prev_hash: lastHash.value,
+        });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error } = await (client as any).from('ocel_events').insert({
@@ -82,7 +89,7 @@ export function useGameSessionPersistence() {
           break;
         }
         lastHash.value = hash;
-        syncedCount.value = seq;
+        syncedCount.value = seq + 1;
       }
 
       // Update session alive status and count
