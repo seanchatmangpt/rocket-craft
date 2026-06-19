@@ -570,7 +570,7 @@ fn open_html5(archive: Option<String>, port: Option<u16>, project: Option<String
     Ok(serde_json::json!({ "url": url }))
 }
 
-fn do_html5_log(lines: Option<u32>) -> Result<Value> {
+fn do_html5_log(lines: Option<u32>, follow: bool) -> Result<Value> {
     // UAT cook logs land in ~/ue4-cook*.log — find the most recent one
     let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
     let log_dir = std::path::Path::new(&home);
@@ -606,13 +606,19 @@ fn do_html5_log(lines: Option<u32>) -> Result<Value> {
     let n = lines.unwrap_or(50);
     println!("[log] {}", log_path.display());
 
-    let status = std::process::Command::new("tail")
-        .args(["-n", &n.to_string()])
-        .arg(&log_path)
+    let mut cmd = std::process::Command::new("tail");
+    cmd.args(["-n", &n.to_string()]);
+    if follow {
+        cmd.arg("-f");
+        println!("[following — Ctrl-C to stop]");
+    }
+    cmd.arg(&log_path);
+
+    let status = cmd
         .status()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
 
-    if !status.success() {
+    if !status.success() && !follow {
         return Err(clap_noun_verb::NounVerbError::execution_error(
             "tail exited non-zero".to_string(),
         ));
@@ -621,6 +627,7 @@ fn do_html5_log(lines: Option<u32>) -> Result<Value> {
     Ok(serde_json::json!({
         "log": log_path.display().to_string(),
         "lines": n,
+        "follow": follow,
     }))
 }
 
@@ -628,11 +635,12 @@ fn do_html5_log(lines: Option<u32>) -> Result<Value> {
 ///
 /// Finds the latest ue4-cook*.log in $HOME and prints the last N lines.
 /// Use this to check cook progress or diagnose a failure without hunting
-/// for the log file path.
+/// for the log file path. Pass --follow to stream new lines as they arrive.
 ///
 /// # Arguments
 /// * `lines` - Number of tail lines to show (default: 50)
+/// * `follow` - If true, stream new lines (like tail -f)
 #[verb("log", "html5")]
-fn log_html5(lines: Option<u32>) -> Result<Value> {
-    do_html5_log(lines)
+fn log_html5(lines: Option<u32>, follow: Option<bool>) -> Result<Value> {
+    do_html5_log(lines, follow.unwrap_or(false))
 }
