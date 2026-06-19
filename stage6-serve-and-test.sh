@@ -48,41 +48,50 @@ log "STAGE 6 — Post-build serve + Playwright proof"
 log "========================================"
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-STAGED_BUILDS="$SCRIPT_DIR/versions/4.27.0/Saved/StagedBuilds/HTML5"
+# RunUAT with -archivedirectory=pwa-staff/manufactured writes to a nested path:
+#   pwa-staff/manufactured/HTML5/Brm-HTML5-Shipping/  (or similar)
+# We search recursively under pwa-staff/manufactured/ for game files, then
+# flatten them into pwa-staff/manufactured/ for the server.
 MANUFACTURED="$SCRIPT_DIR/pwa-staff/manufactured"
 PWA_DIR="$SCRIPT_DIR/pwa-staff"
 RECEIPT_DIR="$PWA_DIR/test-results"
 RECEIPT_PATH="$RECEIPT_DIR/tps-dflss-receipt.json"
 GENIE_SERVER="$SCRIPT_DIR/genie_server.js"
 
-# ── Step 1: Copy real package into pwa-staff/manufactured/ ──────────────────
-log "[1/6] Copying HTML5 package from StagedBuilds into manufactured/..."
+# ── Step 1: Find and flatten HTML5 package into pwa-staff/manufactured/ ─────
+log "[1/6] Locating HTML5 package output from RunUAT..."
 
-if [[ ! -d "$STAGED_BUILDS" ]]; then
-    echo "BLOCKED: Stage 5 output directory not found: $STAGED_BUILDS"
+# Search recursively — RunUAT nests output under HTML5/<ProjectName>/
+STAGE5_WASM=$(find "$MANUFACTURED" -name "*.wasm" -type f 2>/dev/null | \
+    awk 'length > 100' | head -1 || \
+    find "$MANUFACTURED" -name "*.wasm" -type f 2>/dev/null | head -1)
+
+# If not in manufactured/, check default RunUAT staging path as fallback
+if [[ -z "$STAGE5_WASM" ]]; then
+    FALLBACK="$SCRIPT_DIR/versions/4.27.0/Saved/StagedBuilds/HTML5"
+    STAGE5_WASM=$(find "$FALLBACK" -name "*.wasm" -type f 2>/dev/null | head -1 || true)
+fi
+
+if [[ -z "$STAGE5_WASM" ]]; then
+    echo "BLOCKED: No .wasm found under $MANUFACTURED or fallback StagedBuilds path"
     echo "Run package-brm-html5.sh first (Stage 5)."
     exit 1
 fi
 
-# Count qualifying files
-STAGE5_FILES=$(find "$STAGED_BUILDS" -maxdepth 1 \
-    \( -name "*.html" -o -name "*.js" -o -name "*.wasm" -o -name "*.data" \) \
-    -type f 2>/dev/null | wc -l | tr -d ' ')
-
-if [[ "$STAGE5_FILES" -eq 0 ]]; then
-    echo "BLOCKED: No HTML5 package files found in $STAGED_BUILDS"
-    echo "Expected *.html *.js *.wasm *.data — run Stage 5 first."
-    exit 1
-fi
+STAGE5_DIR="$(dirname "$STAGE5_WASM")"
+log "Found package at: $STAGE5_DIR"
 
 mkdir -p "$MANUFACTURED"
-# Copy only the HTML5 game files (not subdirectories, not receipt.json etc.)
-find "$STAGED_BUILDS" -maxdepth 1 \
+# Flatten all game files up to pwa-staff/manufactured/ (handles nested RunUAT layout)
+find "$STAGE5_DIR" -maxdepth 1 \
     \( -name "*.html" -o -name "*.js" -o -name "*.wasm" -o -name "*.data" \) \
     -type f \
     -exec cp -v {} "$MANUFACTURED/" \;
 
-log "Copied $STAGE5_FILES file(s) into $MANUFACTURED"
+STAGE5_FILES=$(find "$MANUFACTURED" -maxdepth 1 \
+    \( -name "*.html" -o -name "*.js" -o -name "*.wasm" -o -name "*.data" \) \
+    -type f 2>/dev/null | wc -l | tr -d ' ')
+log "Flattened $STAGE5_FILES file(s) into $MANUFACTURED"
 
 # ── Step 2: Verify .wasm (size > 10 MB, magic bytes 0061736d) ───────────────
 log "[2/6] Verifying WASM integrity..."
@@ -100,7 +109,7 @@ MIN_WASM=$((10 * 1024 * 1024))  # 10 MB
 if [[ "$WASM_SIZE" -le "$MIN_WASM" ]]; then
     WASM_MB=$(( WASM_SIZE / 1024 / 1024 ))
     echo "BLOCKED: WASM file too small: $WASM_FILE (${WASM_MB} MB — expected >10 MB)"
-    echo "The file at $STAGED_BUILDS may be a stub. Re-run Stage 5 with a real UE4 build."
+    echo "Stub file detected. Re-run Stage 5 with a real UE4 build."
     exit 1
 fi
 

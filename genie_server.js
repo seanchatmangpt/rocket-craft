@@ -207,7 +207,12 @@ function serveStatic(req, res) {
                 res.end(`Server Error: ${err.code}`);
             }
         } else {
-            res.writeHead(200, { 'Content-Type': contentType });
+            // COOP/COEP headers required for UE4 HTML5 WASM SharedArrayBuffer in Chromium
+            res.writeHead(200, {
+                'Content-Type': contentType,
+                'Cross-Origin-Opener-Policy': 'same-origin',
+                'Cross-Origin-Embedder-Policy': 'require-corp',
+            });
             res.end(content);
         }
     });

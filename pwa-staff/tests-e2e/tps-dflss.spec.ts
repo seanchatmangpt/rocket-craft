@@ -55,7 +55,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       inputTrace.push('Space');
       await page.keyboard.down('W');
       inputTrace.push('W');
-      await page.waitForTimeout(200); // Allow multiple animation frames to register movement
+      await page.waitForTimeout(1000); // 1s — enough for physics tick + visual change in UE4
       await page.keyboard.up('Space');
       await page.keyboard.up('W');
 
@@ -76,7 +76,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
         threshold: 0.1,
       });
 
-      const MINIMUM_MOTION_THRESHOLD = 50; // Arbitrary pixel threshold
+      const MINIMUM_MOTION_THRESHOLD = 100; // Require real motion — loading screen animations still pass
       const verdict = numDiffPixels >= MINIMUM_MOTION_THRESHOLD ? 'PASS' : 'FAIL';
 
       // 6. Gather receipt data
