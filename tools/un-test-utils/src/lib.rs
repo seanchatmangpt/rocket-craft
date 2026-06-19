@@ -153,3 +153,83 @@ impl UnrealEnvMock {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── UnrealEnvMock::new ────────────────────────────────────────────────────
+
+    #[test]
+    fn new_creates_engine_and_project_directories() {
+        let env = UnrealEnvMock::new().unwrap();
+        assert!(env.engine_path.exists(), "engine dir must exist");
+        assert!(env.project_path.exists(), "project dir must exist");
+    }
+
+    #[test]
+    fn new_creates_ubt_executable() {
+        let env = UnrealEnvMock::new().unwrap();
+        assert!(env.ubt_path().exists(), "UBT mock must exist at known path");
+    }
+
+    #[test]
+    fn new_creates_uat_executable() {
+        let env = UnrealEnvMock::new().unwrap();
+        assert!(env.uat_path().exists(), "UAT mock must exist at known path");
+    }
+
+    #[test]
+    fn new_creates_uproject_file() {
+        let env = UnrealEnvMock::new().unwrap();
+        let uproject = env.project_path.join("MyProject.uproject");
+        assert!(uproject.exists());
+        let content = std::fs::read_to_string(&uproject).unwrap();
+        assert_eq!(content, "{}");
+    }
+
+    // ── create_plugin ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn create_plugin_creates_uplugin_file() {
+        let env = UnrealEnvMock::new().unwrap();
+        let plugin_path = env.create_plugin("VaRest").unwrap();
+        assert!(plugin_path.join("VaRest.uplugin").exists());
+    }
+
+    #[test]
+    fn create_plugin_creates_source_directory() {
+        let env = UnrealEnvMock::new().unwrap();
+        let plugin_path = env.create_plugin("WS").unwrap();
+        assert!(plugin_path.join("Source").is_dir());
+    }
+
+    // ── write_uproject ────────────────────────────────────────────────────────
+
+    #[test]
+    fn write_uproject_overwrites_content() {
+        let env = UnrealEnvMock::new().unwrap();
+        env.write_uproject(r#"{"EngineAssociation":"4.27"}"#).unwrap();
+        let uproject = env.project_path.join("MyProject.uproject");
+        let content = std::fs::read_to_string(&uproject).unwrap();
+        assert!(content.contains("4.27"));
+    }
+
+    // ── ubt_path / uat_path ───────────────────────────────────────────────────
+
+    #[test]
+    fn ubt_path_under_engine_binaries_dotnet() {
+        let env = UnrealEnvMock::new().unwrap();
+        let p = env.ubt_path();
+        assert!(p.to_str().unwrap().contains("DotNET"));
+        assert!(p.to_str().unwrap().contains("UnrealBuildTool"));
+    }
+
+    #[test]
+    fn uat_path_under_engine_binaries_dotnet() {
+        let env = UnrealEnvMock::new().unwrap();
+        let p = env.uat_path();
+        assert!(p.to_str().unwrap().contains("DotNET"));
+        assert!(p.to_str().unwrap().contains("AutomationTool"));
+    }
+}
