@@ -44,7 +44,7 @@ impl DeploymentManager {
         let t3d_path = project_root.join("map.t3d");
         let project_uproject = project_root
             .join("versions")
-            .join("4.27.0")
+            .join("v4_27_0")
             .join("Brm.uproject");
         let destination_dir = project_root.join("pwa-staff").join("manufactured");
 
