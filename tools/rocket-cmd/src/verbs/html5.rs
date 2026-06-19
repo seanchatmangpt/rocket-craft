@@ -644,3 +644,52 @@ fn do_html5_log(lines: Option<u32>, follow: bool) -> Result<Value> {
 fn log_html5(lines: Option<u32>, follow: Option<bool>) -> Result<Value> {
     do_html5_log(lines, follow.unwrap_or(false))
 }
+
+/// Run the full HTML5 pipeline: preflight → cook → verify in sequence.
+/// Exits immediately on any failure. Equivalent to running each step manually.
+///
+/// # Arguments
+/// * `project` - UE4 project name (e.g. Brm)
+/// * `config` - Build configuration (default: Shipping)
+/// * `archive` - Override the archive directory
+#[verb("pipeline", "html5")]
+fn pipeline_html5(project: String, config: Option<String>, archive: Option<String>) -> Result<Value> {
+    // Step 1: preflight
+    println!("[1/3] Running preflight checks for {}...", project);
+    let preflight = do_html5_preflight(Some(project.clone()))?;
+    let all_pass = preflight["all_pass"].as_bool().unwrap_or(false);
+    if !all_pass {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            format!("Preflight failed for {}. Fix the above issues before cooking.", project)
+        ));
+    }
+    println!("[1/3] Preflight PASS\n");
+
+    // Step 2: cook
+    println!("[2/3] Cooking {}...", project);
+    let cook_result = do_html5_cook(project.clone(), archive.clone(), config)?;
+    println!("[2/3] Cook complete\n");
+
+    // Step 3: verify (do_html5_cook already auto-verifies, but run explicitly for clean output)
+    println!("[3/3] Verifying package...");
+    let verify = do_html5_verify(archive, None, Some(project.clone()))?;
+    let verdict = verify["verdict"].as_str().unwrap_or("UNKNOWN");
+    if verdict != "PASS" {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            format!("Package verification failed: verdict={verdict}")
+        ));
+    }
+    println!("[3/3] Verification PASS\n");
+
+    println!("[DONE] HTML5 pipeline complete for {project}");
+    println!("  → Run 'rocket html5 serve --project {project}' to serve");
+    println!("  → Run 'rocket html5 open --project {project}' to open in browser");
+
+    Ok(serde_json::json!({
+        "project": project,
+        "preflight": preflight,
+        "cook": cook_result,
+        "verify": verify,
+        "pipeline_verdict": "PASS",
+    }))
+}

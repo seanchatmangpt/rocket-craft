@@ -32,6 +32,7 @@ Rocket Craft is a multi-game Unreal Engine 4.24 monorepo containing six UE4 game
 ./rocket html5 open --project Brm        # Open served game in browser (finds .html automatically)
 ./rocket html5 log --lines 50            # Tail latest ue4-cook*.log (monitor running cook)
 ./rocket html5 status --project Brm      # Pipeline summary: engine, emsdk, package, receipt, port, manifest, cook log
+./rocket html5 pipeline --project Brm   # One-shot: preflight → cook → verify in sequence (exits on first failure)
 ./verify_html5_pipeline.sh               # Full Stage 6 proof: cook → serve → Playwright → receipt PASS
 # Playwright config: pwa-staff/playwright.html5.config.ts (headless:false, Metal GPU WebGL2, timeout:240s)
 # Receipt: pwa-staff/test-results/tps-dflss-receipt.json (verdict=PASS, 362762 non-black pixels proven)
