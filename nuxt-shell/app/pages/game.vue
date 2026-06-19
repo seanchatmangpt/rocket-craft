@@ -5,9 +5,15 @@ useHead({ title: 'Rocket-Craft — Mission Control' });
 useRocketKeyboard();
 
 const { isEngineReady } = useRocketUe4Bridge();
-const engineStatus = computed(() =>
-  isEngineReady.value ? 'Engine ready' : 'Loading engine…'
-);
+
+// OCEL process-mining proof: isPlaying is derived from the event log, not a flag
+const { isPlaying, events: ocelEvents, exportOcelLog } = useGameSessionOcel();
+
+const engineStatus = computed(() => {
+  if (isPlaying.value) return `LIVE — ${ocelEvents.value.length} events`;
+  if (isEngineReady.value) return 'Engine ready — waiting for frames';
+  return 'Loading engine…';
+});
 
 function onEngineReady() {
   console.log('[rocket-craft] UE4 engine ready');
@@ -16,6 +22,15 @@ function onEngineReady() {
 function onEngineError(msg: string) {
   console.error('[rocket-craft] UE4 engine error:', msg);
 }
+
+function downloadOcelLog() {
+  const log = exportOcelLog();
+  const blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `game-session-ocel-${Date.now()}.json`;
+  a.click();
+}
 </script>
 
 <template>
@@ -23,8 +38,20 @@ function onEngineError(msg: string) {
     <!-- DOM HUD — lives in Nuxt, not UE4 -->
     <header class="shell-header" role="banner" aria-label="Mission control header">
       <span class="brand">ROCKET-CRAFT</span>
-      <span class="engine-status" :class="{ ready: isEngineReady }">{{ engineStatus }}</span>
+      <span
+        class="engine-status"
+        :class="{ ready: isEngineReady, live: isPlaying }"
+        :title="isPlaying ? 'OCEL log proves session is live' : ''"
+        data-testid="engine-status"
+      >{{ engineStatus }}</span>
       <nav class="shell-nav" aria-label="Shell navigation">
+        <button
+          v-if="isPlaying"
+          class="ocel-export"
+          title="Export OCEL log for pm4py conformance checking"
+          data-testid="ocel-export-btn"
+          @click="downloadOcelLog"
+        >↓ OCEL</button>
         <NuxtLink to="/receipt">Receipts</NuxtLink>
         <NuxtLink to="/profile">Profile</NuxtLink>
         <NuxtLink to="/login">Auth</NuxtLink>
@@ -81,6 +108,11 @@ function onEngineError(msg: string) {
 .brand { font-weight: bold; color: #00f0ff; letter-spacing: 2px; }
 .engine-status { font-size: 0.75rem; color: #666; }
 .engine-status.ready { color: #00c853; }
+.engine-status.live { color: #00f0ff; font-weight: bold; }
+.ocel-export {
+  background: none; border: 1px solid #00f0ff; color: #00f0ff;
+  font-size: 0.75rem; padding: 0.15rem 0.5rem; cursor: pointer; border-radius: 2px;
+}
 .shell-nav { margin-left: auto; display: flex; gap: 1rem; }
 .shell-nav a { color: #00f0ff; text-decoration: none; font-size: 0.85rem; }
 .canvas-loading {
