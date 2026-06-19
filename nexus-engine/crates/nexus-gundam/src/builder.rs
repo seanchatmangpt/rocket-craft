@@ -608,3 +608,152 @@ impl Civilization<Venus> {
             .with_class("Explorer")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::generated_gundam::{Flight, Frame, Power, Walking, Weapon, AABB};
+
+    fn non_overlapping_aabb(offset: f32) -> AABB {
+        AABB::new([offset, offset, offset], [offset + 0.1, offset + 0.1, offset + 0.1])
+    }
+
+    fn basic_walking_mech() -> Mech<Walking> {
+        use crate::generated_gundam::{Armor, Frame, Mobility, Power};
+        // Each component occupies a distinct non-overlapping 0.1³ region
+        MechBuilder::new()
+            .with_frame(Frame {
+                id: "frame".into(), mass: 10.0,
+                occupancy: non_overlapping_aabb(0.0),
+                clearance: non_overlapping_aabb(0.0),
+                slot_count: 5,
+            })
+            .with_mobility(Walking {
+                physical: Mobility {
+                    id: "mobility".into(), mass: 5.0,
+                    occupancy: non_overlapping_aabb(1.0),
+                    clearance: non_overlapping_aabb(1.0),
+                    load_capacity: 500.0, max_speed: 10.0,
+                },
+                leg_count: 2,
+            })
+            .with_power(Power {
+                id: "power".into(), mass: 5.0,
+                occupancy: non_overlapping_aabb(2.0),
+                clearance: non_overlapping_aabb(2.0),
+                energy_capacity: 1000.0, output: 100.0,
+            })
+            .with_armor(Armor {
+                id: "armor".into(), mass: 5.0,
+                occupancy: non_overlapping_aabb(3.0),
+                clearance: non_overlapping_aabb(3.0),
+                defense_rating: 50.0, material: "Titanium".into(),
+            })
+            .with_class("Warrior")
+            .build()
+    }
+    
+    fn heavy_mech_with_frame() -> Mech<Walking> {
+        // Explicitly sets all components; used where we need a fully populated mech
+        MechBuilder::new()
+            .with_mobility(Walking {
+                physical: crate::generated_gundam::Mobility {
+                    load_capacity: 500.0,
+                    ..Default::default()
+                },
+                ..Default::default()
+            })
+            .with_frame(Frame::default())
+            .with_class("Heavy")
+            .build()
+    }
+
+    // ── MechBuilder typestate ─────────────────────────────────────────────────
+
+    #[test]
+    fn build_walking_mech_with_defaults() {
+        let mech = basic_walking_mech();
+        assert_eq!(mech.class, "Warrior");
+        assert!(mech.weapons.is_empty());
+    }
+
+    #[test]
+    fn build_flight_mech_with_class() {
+        let mech = MechBuilder::new()
+            .with_mobility(Flight::default())
+            .with_class("Angel Wing")
+            .build();
+        assert_eq!(mech.class, "Angel Wing");
+        assert_eq!(mech.mobility.wing_span, 12.0);
+    }
+
+    #[test]
+    fn mech_class_defaults_to_warrior_when_omitted() {
+        let mech = MechBuilder::new()
+            .with_mobility(Walking::default())
+            .build();
+        assert_eq!(mech.class, "Warrior");
+    }
+
+    #[test]
+    fn add_weapon_accumulates_weapons() {
+        let mech = MechBuilder::new()
+            .with_mobility(Walking::default())
+            .add_weapon(Weapon { id: "BeamSaber".into(), mass: 1.0, occupancy: AABB::default(), clearance: AABB::default(), damage: 80.0, range: 3.0 })
+            .add_weapon(Weapon { id: "BeamRifle".into(), mass: 2.0, occupancy: AABB::default(), clearance: AABB::default(), damage: 60.0, range: 50.0 })
+            .build();
+        assert_eq!(mech.weapons.len(), 2);
+    }
+
+    #[test]
+    fn with_frame_sets_frame() {
+        let mech = heavy_mech_with_frame();
+        assert_eq!(mech.frame.slot_count, 5);
+    }
+
+    // ── Mech::validate ────────────────────────────────────────────────────────
+
+    #[test]
+    fn mech_with_defaults_passes_validation() {
+        let mech = basic_walking_mech();
+        let result = mech.validate();
+        assert!(result.is_ok(), "default mech must be valid: {:?}", result.err());
+    }
+
+    #[test]
+    fn mech_with_joint_missing_limits_fails_validation() {
+        use crate::generated_gundam::Joint;
+        let mech = MechBuilder::new()
+            .with_mobility(Walking::default())
+            .add_joint(Joint {
+                name: "knee".into(),
+                parent_component_id: "torso".into(),
+                child_component_id: "leg".into(),
+                location: [0.0, -0.5, 0.0],
+                limits: None, // missing limits → validation error
+                mass: 2.0,
+            })
+            .build();
+        assert!(matches!(mech.validate(), Err(ValidationError::MissingJointLimits { .. })));
+    }
+
+    // ── generate_receipt ──────────────────────────────────────────────────────
+
+    #[test]
+    fn generate_receipt_succeeds_for_valid_mech() {
+        let mech = basic_walking_mech();
+        let receipt = mech.generate_receipt();
+        assert!(receipt.is_ok(), "valid mech must produce a receipt");
+    }
+
+    #[test]
+    fn receipt_contains_mobility_type_name() {
+        let mech = basic_walking_mech();
+        let receipt = mech.generate_receipt().unwrap();
+        assert!(
+            receipt.mobility_type.contains("Walking"),
+            "receipt must name mobility type, got: {}",
+            receipt.mobility_type
+        );
+    }
+}
