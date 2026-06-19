@@ -91,6 +91,7 @@ ci:
     just clippy
     just test
     just typecheck
+    just validate-receipt
 
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
