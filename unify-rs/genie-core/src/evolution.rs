@@ -215,3 +215,106 @@ impl WorldEvolver {
         Ok(new_spec)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::spec::{Actor, Bounds3D, Object, Place, Vector3, WorldSpec};
+
+    fn make_place(id: &str) -> Place {
+        Place::new(id, id, Bounds3D::new(Vector3::default(), Vector3::new(5.0, 5.0, 5.0)))
+    }
+
+    fn base_spec() -> WorldSpec {
+        let mut spec = WorldSpec::new();
+        spec.places.push(make_place("room-1"));
+        spec.actors.push(Actor::new("hero", "Hero", "Player", "room-1"));
+        spec.objects.push(Object::new("box-1", "Crate", "Box", "room-1"));
+        spec
+    }
+
+    // ── delete commands ───────────────────────────────────────────────────────
+
+    #[test]
+    fn delete_actor_by_type_and_id_removes_it() {
+        let spec = base_spec();
+        let result = WorldEvolver::evolve(&spec, "delete actor hero").unwrap();
+        assert!(result.actors.is_empty());
+        assert_eq!(result.places.len(), 1); // places untouched
+    }
+
+    #[test]
+    fn delete_generic_removes_from_any_collection() {
+        let spec = base_spec();
+        let result = WorldEvolver::evolve(&spec, "delete box-1").unwrap();
+        assert!(result.objects.is_empty());
+    }
+
+    #[test]
+    fn delete_unknown_entity_type_returns_err() {
+        let spec = base_spec();
+        let err = WorldEvolver::evolve(&spec, "delete widget xyz").unwrap_err();
+        assert!(err.to_string().contains("unknown entity type"));
+    }
+
+    // ── update position / rotation ────────────────────────────────────────────
+
+    #[test]
+    fn update_actor_position_sets_new_coords() {
+        let spec = base_spec();
+        let result = WorldEvolver::evolve(&spec, "update actor hero position(1.0, 2.0, 3.0)").unwrap();
+        let hero = result.actors.iter().find(|a| a.id == "hero").unwrap();
+        assert!((hero.placement.position.x - 1.0).abs() < 1e-5);
+        assert!((hero.placement.position.y - 2.0).abs() < 1e-5);
+        assert!((hero.placement.position.z - 3.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn update_actor_position_for_unknown_actor_returns_err() {
+        let spec = base_spec();
+        let err = WorldEvolver::evolve(&spec, "update actor nobody position(0.0, 0.0, 0.0)").unwrap_err();
+        assert!(err.to_string().contains("Actor not found"));
+    }
+
+    #[test]
+    fn update_object_position_sets_new_coords() {
+        let spec = base_spec();
+        let result = WorldEvolver::evolve(&spec, "update object box-1 position(7.0, 8.0, 9.0)").unwrap();
+        let obj = result.objects.iter().find(|o| o.id == "box-1").unwrap();
+        assert!((obj.placement.position.z - 9.0).abs() < 1e-5);
+    }
+
+    #[test]
+    fn update_object_for_unknown_id_returns_err() {
+        let spec = base_spec();
+        let err = WorldEvolver::evolve(&spec, "update object ghost position(0.0, 0.0, 0.0)").unwrap_err();
+        assert!(err.to_string().contains("Object not found"));
+    }
+
+    // ── blank lines / comments / multi-line ──────────────────────────────────
+
+    #[test]
+    fn blank_lines_and_hash_comments_are_skipped() {
+        let spec = base_spec();
+        let intent = "# comment\n\ndelete actor hero";
+        let result = WorldEvolver::evolve(&spec, intent).unwrap();
+        assert!(result.actors.is_empty());
+    }
+
+    #[test]
+    fn unrecognized_command_returns_err() {
+        let spec = base_spec();
+        let err = WorldEvolver::evolve(&spec, "teleport hero to mars").unwrap_err();
+        assert!(err.to_string().contains("not recognized"));
+    }
+
+    // ── history events added after each evolution ─────────────────────────────
+
+    #[test]
+    fn evolve_appends_history_event() {
+        let spec = base_spec();
+        let before = spec.history.len();
+        let result = WorldEvolver::evolve(&spec, "delete actor hero").unwrap();
+        assert!(result.history.len() > before);
+    }
+}
