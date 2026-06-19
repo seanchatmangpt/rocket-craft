@@ -2914,6 +2914,7 @@ dependencies = [
  "indicatif",
  "inquire",
  "knhk",
+ "libc",
  "mockall",
  "openssl",
  "p12-keystore",

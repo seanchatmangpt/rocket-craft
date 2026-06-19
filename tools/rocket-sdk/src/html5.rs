@@ -78,6 +78,8 @@ pub struct Html5PackageReport {
     /// True when at least one `.wasm` with `WasmVerdict::Real` was found AND
     /// all companion files are present.
     pub is_real_package: bool,
+    /// True when the UI-input pointer-lock patch has been applied to the HTML files.
+    pub ui_input_patched: bool,
 }
 
 impl Html5PackageReport {
@@ -123,6 +125,7 @@ impl Html5PackageReport {
             },
             "archive_dir": self.archive_dir.display().to_string(),
             "verified_at_unix_secs": timestamp_secs,
+            "ui_input_patched": self.ui_input_patched,
         });
         let json_str = serde_json::to_string_pretty(&receipt)
             .context("failed to serialise cook receipt")?;
@@ -225,12 +228,14 @@ impl Html5PackageVerifier {
 
         let companions = CompanionReport { has_js, has_html, has_data_or_pak };
         let is_real_package = has_real_wasm && has_js && has_html;
+        let ui_input_patched = check_html_ui_patch_applied(&self.archive_dir);
 
         Ok(Html5PackageReport {
             archive_dir: self.archive_dir.clone(),
             wasm_files,
             companions,
             is_real_package,
+            ui_input_patched,
         })
     }
 
@@ -261,6 +266,8 @@ pub struct Html5Cook {
     pub project: PathBuf,
     pub archive_dir: PathBuf,
     pub client_config: String,
+    /// Minimum free disk space in GB required before a cook is started (default 50 GB).
+    pub min_disk_gb: f64,
 }
 
 impl Html5Cook {
@@ -274,6 +281,7 @@ impl Html5Cook {
             project: project.into(),
             archive_dir: archive_dir.into(),
             client_config: "Development".into(),
+            min_disk_gb: 50.0,
         }
     }
 
@@ -281,6 +289,12 @@ impl Html5Cook {
     /// Use `"Shipping"` for release packages.
     pub fn with_client_config(mut self, config: impl Into<String>) -> Self {
         self.client_config = config.into();
+        self
+    }
+
+    /// Override the minimum required free disk space (defaults to 50 GB).
+    pub fn with_min_disk_gb(mut self, gb: f64) -> Self {
+        self.min_disk_gb = gb;
         self
     }
 
@@ -323,6 +337,29 @@ impl Html5Cook {
             .is_some();
         if !python_ok {
             failures.push("Python 3 not found in PATH or emsdk; HTML5 UAT requires it".into());
+        }
+
+        // Disk space: UE4 HTML5 cook + intermediate files need ~50 GB free.
+        let check_path = if self.engine_root.exists() {
+            self.engine_root.as_path()
+        } else {
+            Path::new("/")
+        };
+        if let Some(free_gb) = available_disk_gb(check_path) {
+            if free_gb < self.min_disk_gb {
+                let oclnr_hint = if std::path::Path::new(&format!(
+                    "{}/osx-clnr/target/release/oclnr",
+                    std::env::var("HOME").unwrap_or_default()
+                )).exists() {
+                    " — run ~/osx-clnr/target/release/oclnr to free space"
+                } else {
+                    ""
+                };
+                failures.push(format!(
+                    "insufficient disk space: {:.1} GB free, need ≥{:.0} GB (UE4 HTML5 cook requires ~50 GB){oclnr_hint}",
+                    free_gb, self.min_disk_gb
+                ));
+            }
         }
 
         failures
@@ -582,6 +619,37 @@ fn ensure_letter_start_symlink(project: &Path) -> Result<PathBuf> {
         .file_name()
         .ok_or_else(|| anyhow::anyhow!("project has no file name"))?;
     Ok(link_path.join(uproject_name))
+}
+
+/// Check whether the UI-input pointer-lock patch has been applied to any HTML file
+/// in the given archive directory (looks for the sentinel comment).
+pub fn check_html_ui_patch_applied(archive_dir: &Path) -> bool {
+    let Ok(entries) = std::fs::read_dir(archive_dir) else { return false; };
+    entries
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().map(|x| x == "html").unwrap_or(false))
+        .any(|e| {
+            std::fs::read_to_string(e.path())
+                .map(|s| s.contains("rocket-html5: suppress"))
+                .unwrap_or(false)
+        })
+}
+
+/// Check available disk space on the volume containing `path`.
+/// Returns `None` if the check is not supported on this platform or path doesn't exist.
+pub fn available_disk_gb(path: &Path) -> Option<f64> {
+    #[cfg(unix)]
+    {
+        use std::ffi::CString;
+        let c_path = CString::new(path.to_str()?).ok()?;
+        let mut stat: libc::statvfs = unsafe { std::mem::zeroed() };
+        let ret = unsafe { libc::statvfs(c_path.as_ptr(), &mut stat) };
+        if ret != 0 { return None; }
+        let available = stat.f_bavail as u64 * stat.f_frsize as u64;
+        Some(available as f64 / 1_073_741_824.0) // bytes → GB
+    }
+    #[cfg(not(unix))]
+    { let _ = path; None }
 }
 
 fn ensure_git_wrapper() -> Result<()> {
@@ -1029,5 +1097,79 @@ mod tests {
         );
         // The symlink target directory must exist
         assert!(result.parent().unwrap().exists(), "symlink must exist on disk");
+    }
+
+    // ── check_html_ui_patch_applied ───────────────────────────────────────────
+
+    #[test]
+    fn ui_patch_detected_when_sentinel_present() {
+        let dir = TempDir::new().unwrap();
+        std::fs::write(
+            dir.path().join("Game.html"),
+            "<html><body><!-- rocket-html5: suppress pointer lock --></body></html>",
+        ).unwrap();
+        assert!(check_html_ui_patch_applied(dir.path()), "sentinel must be detected");
+    }
+
+    #[test]
+    fn ui_patch_not_detected_on_unpatched_html() {
+        let dir = TempDir::new().unwrap();
+        std::fs::write(dir.path().join("Game.html"), "<html><body></body></html>").unwrap();
+        assert!(!check_html_ui_patch_applied(dir.path()), "unpached html must return false");
+    }
+
+    #[test]
+    fn ui_patch_not_detected_on_empty_dir() {
+        let dir = TempDir::new().unwrap();
+        assert!(!check_html_ui_patch_applied(dir.path()));
+    }
+
+    #[test]
+    fn verifier_report_includes_ui_input_patched_field() {
+        let dir = TempDir::new().unwrap();
+        // patched html
+        std::fs::write(
+            dir.path().join("Game.html"),
+            "<html><!-- rocket-html5: suppress --></html>",
+        ).unwrap();
+        let report = Html5PackageVerifier::new(dir.path()).verify().unwrap();
+        assert!(report.ui_input_patched, "report must reflect patched html");
+    }
+
+    // ── available_disk_gb ─────────────────────────────────────────────────────
+
+    #[test]
+    #[cfg(unix)]
+    fn available_disk_gb_returns_positive_for_root() {
+        let gb = available_disk_gb(Path::new("/"));
+        assert!(gb.is_some(), "should return Some on unix for /");
+        assert!(gb.unwrap() > 0.0, "free space must be positive");
+    }
+
+    #[test]
+    fn available_disk_gb_returns_none_for_missing_path() {
+        let gb = available_disk_gb(Path::new("/nonexistent/path/that/does/not/exist"));
+        // On unix, statvfs fails for nonexistent paths
+        #[cfg(unix)]
+        assert!(gb.is_none(), "nonexistent path must return None on unix");
+    }
+
+    #[test]
+    fn preflight_check_reports_disk_shortage_when_threshold_is_enormous() {
+        let dir = TempDir::new().unwrap();
+        // Set min_disk_gb to an absurdly large number to guarantee the check fires
+        let cook = Html5Cook::new(dir.path(), dir.path().join("G.uproject"), dir.path().join("a"))
+            .with_min_disk_gb(999_999.0);
+        let failures = cook.preflight_check();
+        assert!(
+            failures.iter().any(|f| f.contains("disk") || f.contains("GB")),
+            "disk check must fire with absurd threshold: {failures:?}"
+        );
+    }
+
+    #[test]
+    fn with_min_disk_gb_builder_sets_field() {
+        let cook = Html5Cook::new("/e", "/p.uproject", "/a").with_min_disk_gb(100.0);
+        assert_eq!(cook.min_disk_gb, 100.0);
     }
 }
