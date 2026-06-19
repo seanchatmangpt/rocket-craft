@@ -72,4 +72,32 @@ mod tests {
         assert!(Ndc::new(0.0, 1.1).is_err());
         assert!(Ndc::new(0.0, -1.1).is_err());
     }
+
+    #[test]
+    fn pixel_coord_stores_x_and_y() {
+        let p = PixelCoord { x: 1920, y: 1080 };
+        assert_eq!(p.x, 1920);
+        assert_eq!(p.y, 1080);
+    }
+
+    #[test]
+    fn pixel_coord_zero_is_valid() {
+        let p = PixelCoord { x: 0, y: 0 };
+        assert_eq!(p.x, 0);
+        assert_eq!(p.y, 0);
+    }
+
+    #[test]
+    fn vec3_zero_is_additive_identity() {
+        let v = Vec3::zeros();
+        let u = Vec3::new(1.0, 2.0, 3.0);
+        assert_eq!(v + u, u);
+    }
+
+    #[test]
+    fn mat4_identity_preserves_vec4() {
+        let m = Mat4::identity();
+        let v = Vec4::new(1.0, 2.0, 3.0, 1.0);
+        assert_eq!(m * v, v);
+    }
 }
