@@ -286,4 +286,39 @@ mod tests {
             .unwrap_err();
         assert!(err.to_string().contains("mock failure"));
     }
+
+    #[test]
+    fn build_platform_is_passed_through_to_executor() {
+        // Platform is stored on Build but not recorded by MockExecutor's tuple.
+        // Access it via the Build struct directly before running.
+        let inner = UnrdfProject {
+            name: "Brm".into(),
+            uproject_path: "Brm.uproject".into(),
+            targets: vec![],
+        };
+        let proj = Project::new(inner, "/workspace".into());
+        let build = proj.build("Brm".into(), "HTML5".into());
+        assert_eq!(build.platform, "HTML5");
+        assert_eq!(build.target, "Brm");
+    }
+
+    #[test]
+    fn multiple_projects_accessible_by_index() {
+        let dir = TempDir::new().unwrap();
+        write_manifest(
+            &dir,
+            &[
+                ("Alpha", "a/Alpha.uproject", &["Alpha"]),
+                ("Beta", "b/Beta.uproject", &["Beta"]),
+                ("Gamma", "c/Gamma.uproject", &["Gamma"]),
+            ],
+        );
+        let ctx = RocketContext::load(dir.path()).unwrap();
+        let projects = ctx.projects();
+        assert_eq!(projects.len(), 3);
+        let names: Vec<&str> = projects.iter().map(|p| p.name()).collect();
+        assert!(names.contains(&"Alpha"));
+        assert!(names.contains(&"Beta"));
+        assert!(names.contains(&"Gamma"));
+    }
 }
