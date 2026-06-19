@@ -394,3 +394,143 @@ pub fn tick_stunned(turns_remaining: u32) -> Option<u32> {
         Some(turns_remaining - 1)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use nexus_types::AttackDir;
+
+    // ── builder validation ────────────────────────────────────────────────────
+
+    #[test]
+    fn builder_rejects_negative_hp() {
+        let result = CombatMachineBuilder::new().hp(-1.0).max_hp(100.0).build();
+        assert!(matches!(result, Err(CombatBuildError::InvalidHealth(_))));
+    }
+
+    #[test]
+    fn builder_rejects_max_hp_below_hp() {
+        let result = CombatMachineBuilder::new().hp(100.0).max_hp(50.0).build();
+        assert!(matches!(result, Err(CombatBuildError::InvalidMaxHealth { .. })));
+    }
+
+    #[test]
+    fn builder_defaults_max_hp_to_hp_when_omitted() {
+        let machine = CombatMachineBuilder::new().hp(200.0).build().unwrap();
+        assert_eq!(machine.max_hp, 200.0);
+    }
+
+    #[test]
+    fn builder_succeeds_with_valid_hp() {
+        let m = CombatMachineBuilder::new().hp(100.0).max_hp(100.0).build().unwrap();
+        assert_eq!(m.hp, 100.0);
+        assert_eq!(m.combo_depth, 0);
+    }
+
+    // ── Idle → Attacking → resolve_hit ───────────────────────────────────────
+
+    #[test]
+    fn attack_and_hit_deals_damage_to_target() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let mut target_hp = 200.0_f32;
+        let (attacking, _dir) = machine.begin_attack(AttackDir::Overhead);
+        let idle = attacking.resolve_hit(30.0, &mut target_hp);
+        assert_eq!(target_hp, 170.0);
+        assert_eq!(idle.hp, 100.0, "attacker HP must be unchanged");
+    }
+
+    #[test]
+    fn resolve_hit_increments_combo_depth() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let mut target_hp = 500.0;
+        let (attacking, _) = machine.begin_attack(AttackDir::Left);
+        let idle = attacking.resolve_hit(10.0, &mut target_hp);
+        assert_eq!(idle.combo_depth, 1);
+    }
+
+    #[test]
+    fn combo_depth_caps_at_5() {
+        let machine = CombatMachineBuilder::new().hp(100.0).combo_depth(5).build().unwrap();
+        let mut target_hp = 500.0;
+        let (attacking, _) = machine.begin_attack(AttackDir::Right);
+        let idle = attacking.resolve_hit(10.0, &mut target_hp);
+        assert_eq!(idle.combo_depth, 5, "combo depth must not exceed 5");
+    }
+
+    // ── Idle → Attacking → resolve_blocked ───────────────────────────────────
+
+    #[test]
+    fn blocked_attack_resets_combo_depth() {
+        let machine = CombatMachineBuilder::new().hp(100.0).combo_depth(3).build().unwrap();
+        let (attacking, _) = machine.begin_attack(AttackDir::Overhead);
+        let idle = attacking.resolve_blocked();
+        assert_eq!(idle.combo_depth, 0);
+    }
+
+    // ── Idle → Parrying → resolve ────────────────────────────────────────────
+
+    #[test]
+    fn perfect_parry_takes_no_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let parrying = machine.begin_parry();
+        let (idle, outcome) = parrying.resolve(ParryOutcome::Perfect, 50.0);
+        assert_eq!(idle.hp, 100.0);
+        assert_eq!(outcome, ParryOutcome::Perfect);
+    }
+
+    #[test]
+    fn normal_parry_takes_10pct_chip_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let parrying = machine.begin_parry();
+        let (idle, _) = parrying.resolve(ParryOutcome::Normal, 50.0);
+        // 10% of 50 = 5 chip damage
+        assert!((idle.hp - 95.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn missed_parry_takes_full_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let parrying = machine.begin_parry();
+        let (idle, _) = parrying.resolve(ParryOutcome::Miss, 40.0);
+        assert!((idle.hp - 60.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn parry_hp_clamps_at_zero_on_lethal_miss() {
+        let machine = CombatMachine::<Idle>::new(10.0);
+        let parrying = machine.begin_parry();
+        let (idle, _) = parrying.resolve(ParryOutcome::Miss, 9999.0);
+        assert_eq!(idle.hp, 0.0);
+    }
+
+    // ── Idle → PerfectParrying → resolve ─────────────────────────────────────
+
+    #[test]
+    fn matching_direction_perfect_parry_takes_no_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let (pp, dir) = machine.begin_perfect_parry(AttackDir::Overhead);
+        let (idle, outcome) = pp.resolve(dir, AttackDir::Overhead, 50.0);
+        assert_eq!(outcome, ParryOutcome::Perfect);
+        assert_eq!(idle.hp, 100.0);
+    }
+
+    #[test]
+    fn wrong_direction_perfect_parry_degrades_to_normal() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let (pp, _announced) = machine.begin_perfect_parry(AttackDir::Left);
+        let (idle, outcome) = pp.resolve(AttackDir::Left, AttackDir::Right, 50.0);
+        assert_eq!(outcome, ParryOutcome::Normal);
+        assert!((idle.hp - 95.0).abs() < 0.01, "normal = 10% chip of 50 = 5");
+    }
+
+    // ── Idle → Dodging → resolve ──────────────────────────────────────────────
+
+    #[test]
+    fn dodge_returns_idle() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let dodging = machine.begin_dodge();
+        // CombatMachine<Dodging> must have a resolve method → back to Idle
+        let idle = dodging.resolve();
+        assert_eq!(idle.hp, 100.0);
+    }
+}
