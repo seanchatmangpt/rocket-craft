@@ -104,3 +104,105 @@ impl Default for DiagnosticSet {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn diag(severity: DiagnosticSeverity, msg: &str) -> Diagnostic {
+        Diagnostic {
+            range: Range {
+                start: Position { line: 0, character: 0 },
+                end:   Position { line: 0, character: 1 },
+            },
+            severity,
+            message: msg.into(),
+            code: None,
+            source: None,
+        }
+    }
+
+    // ── DiagnosticSet basics ──────────────────────────────────────────────────
+
+    #[test]
+    fn new_is_empty() {
+        let set = DiagnosticSet::new();
+        assert_eq!(set.uri_count(), 0);
+        assert_eq!(set.error_count(), 0);
+    }
+
+    #[test]
+    fn add_then_get_returns_diagnostics_for_uri() {
+        let mut set = DiagnosticSet::new();
+        set.add("file:///a.rs".into(), diag(DiagnosticSeverity::Error, "oops"));
+        let diags = set.get("file:///a.rs");
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].message, "oops");
+    }
+
+    #[test]
+    fn get_unknown_uri_returns_empty_slice() {
+        let set = DiagnosticSet::new();
+        assert!(set.get("file:///nope.rs").is_empty());
+    }
+
+    #[test]
+    fn add_multiple_to_same_uri_appends() {
+        let mut set = DiagnosticSet::new();
+        set.add("f".into(), diag(DiagnosticSeverity::Error, "e1"));
+        set.add("f".into(), diag(DiagnosticSeverity::Warning, "w1"));
+        assert_eq!(set.get("f").len(), 2);
+    }
+
+    #[test]
+    fn clear_removes_all_for_uri() {
+        let mut set = DiagnosticSet::new();
+        set.add("f".into(), diag(DiagnosticSeverity::Error, "e"));
+        set.clear("f");
+        assert!(set.get("f").is_empty());
+        assert_eq!(set.uri_count(), 0);
+    }
+
+    // ── error_count / all_errors ──────────────────────────────────────────────
+
+    #[test]
+    fn error_count_counts_only_errors() {
+        let mut set = DiagnosticSet::new();
+        set.add("a".into(), diag(DiagnosticSeverity::Error, "e"));
+        set.add("a".into(), diag(DiagnosticSeverity::Warning, "w"));
+        set.add("b".into(), diag(DiagnosticSeverity::Error, "e2"));
+        assert_eq!(set.error_count(), 2);
+    }
+
+    #[test]
+    fn all_errors_returns_only_error_severity() {
+        let mut set = DiagnosticSet::new();
+        set.add("a".into(), diag(DiagnosticSeverity::Error, "E"));
+        set.add("a".into(), diag(DiagnosticSeverity::Information, "I"));
+        let errors = set.all_errors();
+        assert_eq!(errors.len(), 1);
+        assert_eq!(errors[0].1.message, "E");
+    }
+
+    // ── merge ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn merge_appends_diagnostics_from_other() {
+        let mut a = DiagnosticSet::new();
+        a.add("f".into(), diag(DiagnosticSeverity::Error, "a"));
+        let mut b = DiagnosticSet::new();
+        b.add("f".into(), diag(DiagnosticSeverity::Warning, "b"));
+        a.merge(b);
+        assert_eq!(a.get("f").len(), 2);
+    }
+
+    #[test]
+    fn merge_adds_new_uris_from_other() {
+        let mut a = DiagnosticSet::new();
+        a.add("f1".into(), diag(DiagnosticSeverity::Error, "e"));
+        let mut b = DiagnosticSet::new();
+        b.add("f2".into(), diag(DiagnosticSeverity::Warning, "w"));
+        a.merge(b);
+        assert_eq!(a.uri_count(), 2);
+    }
+}
