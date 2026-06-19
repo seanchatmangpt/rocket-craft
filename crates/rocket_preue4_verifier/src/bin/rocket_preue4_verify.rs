@@ -1,4 +1,4 @@
-// GC-MECHBIRTH-002: rocket-preue4-verify CLI
+// GC-MECHBIRTH-002 / GC-GUNDAM-FACTORY-001: rocket-preue4-verify CLI
 // Runs the pre-UE4 authority/SIMD/prediction verifier pipeline.
 // Accepts POWL trace, OCEL trace, and optional report output path.
 
@@ -6,7 +6,7 @@ use clap::Parser;
 use rocket_preue4_verifier::{
     authority::AuthorityState,
     receipt::{AdmissionStatus, ReceiptChain},
-    report::{VerifierReport, mechbirth_002_residuals},
+    report::{VerifierReport, mechbirth_002_residuals, gundam_factory_001_residuals},
     verifier::run_pipeline,
 };
 
@@ -14,7 +14,7 @@ use rocket_preue4_verifier::{
 #[command(
     name = "rocket-preue4-verify",
     version,
-    about = "GC-MECHBIRTH-002 Pre-UE4 Verifier — Authority/SIMD/Prediction layers"
+    about = "Pre-UE4 Verifier — Authority/SIMD/Prediction layers"
 )]
 struct Cli {
     /// Path to POWL trace file.
@@ -36,10 +36,17 @@ struct Cli {
     /// Number of cells for stress-mode authority check (0 = default 1000).
     #[arg(long, default_value = "1000")]
     cells: usize,
+
+    /// Milestone to target (e.g. GC-MECHBIRTH-002, GC-GUNDAM-FACTORY-001).
+    #[arg(long)]
+    milestone: Option<String>,
 }
 
 fn main() {
     let cli = Cli::parse();
+
+    let milestone = cli.milestone.clone().unwrap_or_else(|| "GC-MECHBIRTH-002".into());
+    let is_gundam = milestone == "GC-GUNDAM-FACTORY-001";
 
     let n = if cli.cells == 0 { 1000 } else { cli.cells };
     let mut state = AuthorityState::new(n);
@@ -50,22 +57,40 @@ fn main() {
         state.socket_health[i] = (15_usize.saturating_sub(i % 16)) as u8;
     }
 
-    // Build a minimal receipt chain representing the GC-MECHBIRTH-001 admission trace
+    // Build a minimal receipt chain representing the admission trace
     let mut chain = ReceiptChain::default();
-    let steps = [
-        "SelectFrame",
-        "GenerateSocketTopology",
-        "GenerateArmorPanels",
-        "GenerateRig",
-        "GenerateMotionFamily",
-        "GenerateSkinLayers",
-        "PackageProjectionArtifacts",
-        "EmitReceipt",
-    ];
+    let steps = if is_gundam {
+        vec![
+            "Spawn",
+            "FactoryEntrance",
+            "FrameAssembly",
+            "SocketTopology",
+            "ArmorSkinStation",
+            "RigMotionStation",
+            "VerificationGate",
+            "ReceiptTerminal",
+            "ExitOrLoop",
+        ]
+    } else {
+        vec![
+            "SelectFrame",
+            "GenerateSocketTopology",
+            "GenerateArmorPanels",
+            "GenerateRig",
+            "GenerateMotionFamily",
+            "GenerateSkinLayers",
+            "PackageProjectionArtifacts",
+            "EmitReceipt",
+        ]
+    };
     for step in &steps {
         chain.append(
             step.to_string(),
-            vec!["Mech-001".into()],
+            if is_gundam {
+                vec!["case-gundam-factory-001".into()]
+            } else {
+                vec!["Mech-001".into()]
+            },
             AdmissionStatus::Admitted,
             vec![],
         );
@@ -75,33 +100,67 @@ fn main() {
 
     let inputs = vec![
         cli.powl
-            .unwrap_or_else(|| "/Users/sac/powlv2lsp/samples/MechBirth.powl".into()),
+            .clone()
+            .unwrap_or_else(|| if is_gundam {
+                "/Users/sac/powlv2lsp/samples/GundamFactory.powl".into()
+            } else {
+                "/Users/sac/powlv2lsp/samples/MechBirth.powl".into()
+            }),
         cli.trace
-            .unwrap_or_else(|| "/Users/sac/powlv2lsp/out.json".into()),
+            .clone()
+            .unwrap_or_else(|| if is_gundam {
+                "/Users/sac/powlv2lsp/gundam_factory_trace.json".into()
+            } else {
+                "/Users/sac/powlv2lsp/out.json".into()
+            }),
     ];
 
-    let artifacts = vec![
-        "MechBirthSteps.h".into(),
-        "MechBirthSteps.rs".into(),
-        "MechBirthProjectionRows.csv".into(),
-        "MechBirthSocketTopology.csv".into(),
-        "MechBirthSkinLayers.csv".into(),
-        "MechBirthMotionFamilies.csv".into(),
-        "MechBirthLODClasses.csv".into(),
-        "MechBirthAuthorityClasses.csv".into(),
-        "MechBirthTransitionTable.csv".into(),
-        "MechBirthPredictionRules.csv".into(),
-        "MechBirthReceiptManifest.json".into(),
-        "MechBirthProjectionManifest.json".into(),
-        "MechBirthOCELSeed.json".into(),
-    ];
+    let artifacts = if is_gundam {
+        vec![
+            "generated/gundam_factory/GundamFactorySteps.h".into(),
+            "generated/gundam_factory/GundamFactorySteps.rs".into(),
+            "generated/gundam_factory/GundamFactoryProjectionRows.csv".into(),
+            "generated/gundam_factory/GundamFactorySocketTopology.csv".into(),
+            "generated/gundam_factory/GundamFactorySkinLayers.csv".into(),
+            "generated/gundam_factory/GundamFactoryMotionFamilies.csv".into(),
+            "generated/gundam_factory/GundamFactoryLODClasses.csv".into(),
+            "generated/gundam_factory/GundamFactoryAuthorityClasses.csv".into(),
+            "generated/gundam_factory/GundamFactoryTransitionTable.csv".into(),
+            "generated/gundam_factory/GundamFactoryPredictionRules.csv".into(),
+            "generated/gundam_factory/GundamFactoryReceiptManifest.json".into(),
+            "generated/gundam_factory/GundamFactoryProjectionManifest.json".into(),
+            "generated/gundam_factory/GundamFactoryOCELSeed.json".into(),
+        ]
+    } else {
+        vec![
+            "MechBirthSteps.h".into(),
+            "MechBirthSteps.rs".into(),
+            "MechBirthProjectionRows.csv".into(),
+            "MechBirthSocketTopology.csv".into(),
+            "MechBirthSkinLayers.csv".into(),
+            "MechBirthMotionFamilies.csv".into(),
+            "MechBirthLODClasses.csv".into(),
+            "MechBirthAuthorityClasses.csv".into(),
+            "MechBirthTransitionTable.csv".into(),
+            "MechBirthPredictionRules.csv".into(),
+            "MechBirthReceiptManifest.json".into(),
+            "MechBirthProjectionManifest.json".into(),
+            "MechBirthOCELSeed.json".into(),
+        ]
+    };
+
+    let residuals = if is_gundam {
+        gundam_factory_001_residuals()
+    } else {
+        mechbirth_002_residuals()
+    };
 
     let report = VerifierReport::from_pipeline(
-        "GC-MECHBIRTH-002".into(),
+        milestone.clone(),
         &result,
         inputs,
         artifacts,
-        mechbirth_002_residuals(),
+        residuals,
     );
 
     let json = report.to_json();
@@ -115,7 +174,8 @@ fn main() {
     }
 
     eprintln!(
-        "[rocket-preue4-verify] Milestone: GC-MECHBIRTH-002 | Status: {} | Scoped: {}",
+        "[rocket-preue4-verify] Milestone: {} | Status: {} | Scoped: {}",
+        milestone,
         result.final_status,
         result.scoped_status()
     );

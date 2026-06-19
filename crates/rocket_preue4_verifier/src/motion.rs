@@ -57,14 +57,38 @@ impl MotionTrace {
     }
 
     fn validate_fire_weapon(&self) -> Result<(i8, i8), RefusalReason> {
-        let has_plant = self.phases.contains(&MotionPhase::PlantFeet);
-        let has_fire = self.phases.contains(&MotionPhase::Fire);
-
-        // PlantFeet must precede Fire.
-        if has_fire && !has_plant {
+        // CF-4 guard: class values must be in [0, 15].
+        let max_class: u8 = 15;
+        if self.heat_class > max_class || self.stress_class > max_class || self.leg_damage_class > max_class {
             return Err(RefusalReason::MotionClearanceViolation {
-                detail: "Fire phase requires PlantFeet".into(),
+                detail: format!(
+                    "class value out of range: heat={} stress={} leg_damage={}",
+                    self.heat_class, self.stress_class, self.leg_damage_class
+                ),
             });
+        }
+
+        let fire_idx = self.phases.iter().position(|p| p == &MotionPhase::Fire);
+        let plant_idx = self.phases.iter().position(|p| p == &MotionPhase::PlantFeet);
+        let has_fire = fire_idx.is_some();
+
+        // CF-1: PlantFeet must positionally precede Fire — not merely be present.
+        if has_fire {
+            match (plant_idx, fire_idx) {
+                (None, _) => {
+                    return Err(RefusalReason::MotionClearanceViolation {
+                        detail: "Fire phase requires PlantFeet".into(),
+                    });
+                }
+                (Some(pi), Some(fi)) if pi >= fi => {
+                    return Err(RefusalReason::MotionClearanceViolation {
+                        detail: format!(
+                            "PlantFeet (idx {pi}) must precede Fire (idx {fi}) in phase sequence"
+                        ),
+                    });
+                }
+                _ => {}
+            }
         }
         // Socket required for WeaponMount actuation.
         if has_fire && !self.socket_available {
@@ -72,26 +96,46 @@ impl MotionTrace {
                 dependent: "FireWeapon".into(),
             });
         }
-        // High heat forces VentHeat or refuses the trace.
-        if has_fire && self.heat_class >= 12 && !self.phases.contains(&MotionPhase::VentHeat) {
-            return Err(RefusalReason::MotionClearanceViolation {
-                detail: format!(
-                    "heat_class {} requires VentHeat before Fire",
-                    self.heat_class
-                ),
-            });
+        // CF-2: High heat — VentHeat must positionally precede Fire.
+        if has_fire && self.heat_class >= 12 {
+            let vent_idx = self.phases.iter().position(|p| p == &MotionPhase::VentHeat);
+            match (vent_idx, fire_idx) {
+                (None, _) => {
+                    return Err(RefusalReason::MotionClearanceViolation {
+                        detail: format!(
+                            "heat_class {} requires VentHeat before Fire",
+                            self.heat_class
+                        ),
+                    });
+                }
+                (Some(vi), Some(fi)) if vi >= fi => {
+                    return Err(RefusalReason::MotionClearanceViolation {
+                        detail: format!(
+                            "VentHeat (idx {vi}) must precede Fire (idx {fi}); heat_class={}",
+                            self.heat_class
+                        ),
+                    });
+                }
+                _ => {}
+            }
         }
         // Effects: Fire increases heat; AbsorbRecoil increases stress.
         let delta_heat: i8 = if has_fire { 2 } else { 0 };
-        let delta_stress: i8 = if self.phases.contains(&MotionPhase::AbsorbRecoil) {
-            1
-        } else {
-            0
-        };
+        let delta_stress: i8 = if self.phases.contains(&MotionPhase::AbsorbRecoil) { 1 } else { 0 };
         Ok((delta_heat, delta_stress))
     }
 
     fn validate_walk_run(&self) -> Result<(i8, i8), RefusalReason> {
+        // CF-4 guard: class values must be in [0, 15].
+        let max_class: u8 = 15;
+        if self.heat_class > max_class || self.stress_class > max_class || self.leg_damage_class > max_class {
+            return Err(RefusalReason::MotionClearanceViolation {
+                detail: format!(
+                    "class value out of range: heat={} stress={} leg_damage={}",
+                    self.heat_class, self.stress_class, self.leg_damage_class
+                ),
+            });
+        }
         // Run is refused when leg damage is too severe.
         if self.family == MotionFamily::Run && self.leg_damage_class >= 12 {
             return Err(RefusalReason::MotionClearanceViolation {

@@ -16,21 +16,21 @@ gn:MechAssembly a owl:Class ;
 gn:MechPrimitive a owl:Class ;
     rdfs:label "Mech Primitive" .
 
-gn:Frame a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
-gn:Mobility a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
-gn:Power a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
-gn:Armor a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
-gn:Weapon a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
-gn:Sensor a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
-gn:UtilitySystem a owl:Class ; rdfs:subClassOf gn:MechPrimitive .
+gn:Frame a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Frame" .
+gn:Mobility a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Mobility" .
+gn:Power a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Power" .
+gn:Armor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Armor" .
+gn:Weapon a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Weapon" .
+gn:Sensor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Sensor" .
+gn:UtilitySystem a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Utility System" .
 
 gn:MechClass a owl:Class ;
     rdfs:label "Mech Class" .
-gn:Worker a owl:Class ; rdfs:subClassOf gn:MechClass .
-gn:Explorer a owl:Class ; rdfs:subClassOf gn:MechClass .
-gn:Warrior a owl:Class ; rdfs:subClassOf gn:MechClass .
-gn:Guardian a owl:Class ; rdfs:subClassOf gn:MechClass .
-gn:Ark a owl:Class ; rdfs:subClassOf gn:MechClass .
+gn:Worker a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Worker" .
+gn:Explorer a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Explorer" .
+gn:Warrior a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Warrior" .
+gn:Guardian a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Guardian" .
+gn:Ark a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Ark" .
 
 # --- RESOURCES ---
 

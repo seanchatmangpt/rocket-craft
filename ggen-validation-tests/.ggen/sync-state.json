@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "created_at": "2026-06-19T18:19:59.944844+00:00",
+  "ontology": {
+    "hash": "8cc6ef64df949e6fb48d40a33fade523ae1c7af0095e600a5a1acc4f7ddaa0be",
+    "timestamp": "2026-06-19T18:19:59.944842+00:00",
+    "size_bytes": 12539
+  },
+  "manifest": {
+    "hash": "a5127df93ac3d06cb114c76169c2e6ce30dcf36a77704612b4e5f76b4de88bdb",
+    "timestamp": "2026-06-19T18:19:59.944842+00:00",
+    "size_bytes": 62805
+  },
+  "inference_rules": {
+    "infer-is-level-of": "63fd658002966b6cc6d25229a11e9b9281b2276d75f2a594672cc4c5e0299d3f",
+    "infer-is-component-of": "2532cc8bda5bb4521a64a65f81ed419784ed1c98737cdc9e308e72e0a3e98ba6"
+  },
+  "imports": {
+    "/Users/sac/rocket-craft/ggen-validation-tests/../ontology/gundam_nexus.ttl": {
+      "hash": "a560dcd1d4ac8a191a33007bd710b9559690aa9efb8822c7d28bc020c81a1b9d",
+      "timestamp": "2026-06-19T18:19:59.944842+00:00",
+      "size_bytes": 2562
+    },
+    "/Users/sac/rocket-craft/ggen-validation-tests/typestates.ttl": {
+      "hash": "001f9b87cb966f3ee9ae907622816f41d04c960497c6f1dfc48442c18750551d",
+      "timestamp": "2026-06-19T18:19:59.944842+00:00",
+      "size_bytes": 26665
+    },
+    "/Users/sac/rocket-craft/ggen-validation-tests/blueprints.ttl": {
+      "hash": "bed9eab7012d0a0d8607d973bac5b9b404fdb4598dcefb6cdde004cd0028d793",
+      "timestamp": "2026-06-19T18:19:59.944842+00:00",
+      "size_bytes": 13118
+    },
+    "/Users/sac/rocket-craft/ggen-validation-tests/reflection.ttl": {
+      "hash": "2e512c4efa44e9f234ccebcdb6983c0195f741e422d242d7c3aed96ea99cad59",
+      "timestamp": "2026-06-19T18:19:59.944842+00:00",
+      "size_bytes": 15226
+    },
+    "/Users/sac/rocket-craft/ggen-validation-tests/subsystems.ttl": {
+      "hash": "717fff176662c4132a63814ffa75d66d1644a0b5362a13f35889cafd06d98985",
+      "timestamp": "2026-06-19T18:19:59.944842+00:00",
+      "size_bytes": 30371
+    },
+    "/Users/sac/rocket-craft/ggen-validation-tests/gundam_character.ttl": {
+      "hash": "eccd44d39d4d827c644b970ba92190de24687364ecf89b1e8719359c57cbe44d",
+      "timestamp": "2026-06-19T18:19:59.944842+00:00",
+      "size_bytes": 6764
+    }
+  },
+  "files_synced": 14,
+  "sync_duration_ms": 40
+}

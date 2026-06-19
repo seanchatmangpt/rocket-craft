@@ -3,7 +3,6 @@
 //! Produces a structured `VerifierReport` that can be serialized to JSON.
 //! The report captures all gate results, jidoka events, residuals, and final status.
 
-use crate::error::JidokaEvent;
 use crate::verifier::{GateResult, PipelineResult};
 use serde::{Deserialize, Serialize};
 
@@ -109,6 +108,16 @@ pub fn mechbirth_002_residuals() -> Vec<String> {
         "simdE_ffi: C SIMDe FFI kernel deferred to GC-MECHBIRTH-003".into(),
         "stress_1M: 1M cell stress test deferred pending dev machine capacity check".into(),
         "wasm4pm_playground: @wasm4pm/testing build blocked by nuxt postinstall".into(),
+    ]
+}
+
+/// Produce a default GC-GUNDAM-FACTORY-001 report with known static residuals.
+pub fn gundam_factory_001_residuals() -> Vec<String> {
+    vec![
+        "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline".into(),
+        "visual_delta: no Playwright browser session in pre-UE4 scope".into(),
+        "signing_layer: tamper-evident, not cryptographically signed".into(),
+        "stress_1M: 1M cell stress test deferred pending dev machine capacity check".into(),
     ]
 }
 

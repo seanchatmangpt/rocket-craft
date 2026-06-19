@@ -1102,3 +1102,1067 @@ Generate a comprehensive markdown report detailing the fakes found, including th
 - [ ] The report catalogues every identified fake artifact with its absolute or relative path.
 - [ ] The report categorizes each finding (e.g., Simulated Toolchain, Mock Projection, Stub Output) and explains why it violates the CM doctrine.
 - [ ] No files are modified or deleted during the scan.
+
+## 2026-06-19T17:59:45Z
+
+<USER_REQUEST>
+# Teamwork Project Prompt — GC-GUNDAM-FACTORY-001
+
+## Status
+
+Ready for launch after user approval.
+
+## Working Directory
+
+```text
+~/rocket-craft
+```
+
+## Integrity Mode
+
+```text
+benchmark
+```
+
+## Mission
+
+Build the automated **Gundam Factory Walkthrough Projection**.
+
+The system must procedurally manufacture the semantic authority for a Gundam/mech factory walkthrough using the `ggen` pipeline, verify all game-law concepts in a headless Rust pre-UE4 environment, and only then project the result through UE4 HTML5/WASM.
+
+The final artifact must be a locally served WASM package that Playwright can load, observe, actuate, screenshot, and verify by visual delta.
+
+This project must preserve the doctrine:
+
+```text
+POWL coordinates the birth of the mech.
+ggen manufactures the authority artifacts.
+Rust proves the game law before pixels.
+UE4 projects the body.
+Playwright proves physical actuation.
+Receipts prove the trace.
+```
+
+Do not treat UE4 rendering as proof of correctness.
+
+Do not treat generated files as proof of standing.
+
+Do not treat Playwright screenshot success as proof of semantic validity.
+
+The system earns standing only through:
+
+```text
+Observation
+→ Admission
+→ Manufacturing
+→ Rust Verification
+→ UE4 Projection
+→ Playwright Actuation
+→ Receipt
+→ Replay
+```
+
+---
+
+# Milestone
+
+```text
+GC-GUNDAM-FACTORY-001
+```
+
+## Target Status
+
+```text
+PARTIAL_ALIVE_CANDIDATE
+```
+
+## Scoped Status Goal
+
+Only claim the following if every required gate passes:
+
+```text
+GUNDAM_FACTORY_WALKTHROUGH_ALIVE_UNDER_SCOPE
+```
+
+Otherwise report:
+
+```text
+PARTIAL_ALIVE_CANDIDATE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with exact residuals.
+
+---
+
+# Project Objective
+
+Produce a verified procedural pipeline for a **Gundam Factory walkthrough**:
+
+```text
+Public / project ontology
+→ POWL / process law
+→ ggen semantic manufacturing
+→ Rust pre-UE4 verification
+→ generated C++ headers / DataTables / manifests
+→ UE4 HTML5/WASM build
+→ local server
+→ Playwright visual actuation test
+→ BLAKE3 receipt chain
+→ verifier report
+```
+
+The walkthrough must include a minimal but complete factory route:
+
+```text
+Spawn
+→ Enter Factory
+→ View Frame Assembly
+→ View Socket Topology
+→ View Armor / Skin Station
+→ View Motion / Rig Station
+→ View Verification Gate
+→ View Receipt Terminal
+```
+
+The environment does not need full production art.
+
+It must prove that generated semantic authority can drive projection.
+
+---
+
+# Repository Boundary Law
+
+Expected repositories / surfaces:
+
+```text
+~/rocket-craft
+~/ggen
+~/wasm4pm
+~/wasm4pm-compat
+~/powlv2lsp
+```
+
+Respect existing repository conventions.
+
+Do not create shadow crates for `wasm4pm`, `wasm4pm-compat`, or `ggen`.
+
+Boundary rules:
+
+```text
+powlv2lsp:
+  Owns POWL authoring, grammar, traversal, diagnostics, and trace emission.
+
+wasm4pm-compat:
+  Owns canonical structural Rust representations only.
+  It must not run replay, conformance, or game simulation.
+
+wasm4pm:
+  Owns replay, conformance, OCEL/process verification, and process evidence.
+
+ggen:
+  Owns deterministic manufacturing from admitted semantic/process rows into artifacts.
+
+rocket-craft:
+  Owns Rocket-Craft fixtures, game-law verifier, generated artifacts, UE4 projection harness, Playwright tests, and final verifier reports.
+```
+
+---
+
+# Required Gates
+
+The project has four gates.
+
+No later gate may bless an earlier failed gate.
+
+## Gate 1 — Headless Rust Pre-UE4 Verification
+
+Before UE4 builds, Rust must prove the game law.
+
+Required:
+
+```text
+cargo test passes for the pre-UE4 verifier
+authority byte fields validate
+branchless typestates validate
+SIMD/scalar equivalence validates where implemented
+Semantic LOD validates
+walkthrough topology validates
+geometry surrogate validates
+motion surrogate validates
+skin/material surrogate validates
+projection manifest validates
+receipt replay validates
+chaos tests refuse invalid cases
+benchmark report emits
+```
+
+Gate 1 output:
+
+```text
+RUST_PREUE4_VERIFIED_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+## Gate 2 — ggen Manufacturing
+
+`ggen` must emit deterministic UE4-facing artifacts from admitted semantic/process inputs.
+
+Required artifacts:
+
+```text
+Generated/GundamFactory/GundamFactorySteps.h
+Generated/GundamFactory/GundamFactoryAuthority.h
+Generated/GundamFactory/GundamFactoryTypestates.h
+Generated/GundamFactory/GundamFactoryProjectionManifest.json
+Generated/GundamFactory/GundamFactoryReceiptManifest.json
+Generated/GundamFactory/GundamFactoryWalkthrough.csv
+Generated/GundamFactory/GundamFactoryDataTables/
+Generated/GundamFactory/GundamFactorySemanticLOD.csv
+Generated/GundamFactory/GundamFactorySocketTopology.csv
+Generated/GundamFactory/GundamFactorySkinLayers.csv
+Generated/GundamFactory/GundamFactoryMotionFamilies.csv
+```
+
+Exact filenames may follow project convention, but the verifier report must document the mapping.
+
+Required property:
+
+```text
+same inputs → same generated hashes
+```
+
+Gate 2 output:
+
+```text
+GGEN_MANUFACTURING_VERIFIED_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+## Gate 3 — UE4 HTML5/WASM Projection
+
+UE4 must consume the generated artifacts.
+
+Required:
+
+```text
+generated C++ headers included
+generated DataTables consumed
+walkthrough coordinates loaded
+Semantic LOD classes loaded
+projection manifest consumed or mirrored
+minimal Gundam factory environment packaged to HTML5/WASM
+local server launches package
+```
+
+No manual Blueprint logic may become semantic authority.
+
+Blueprints may project or trigger generated state, but must not own the law.
+
+Gate 3 output:
+
+```text
+UE4_WASM_PROJECTION_READY_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+## Gate 4 — Playwright Visual Actuation
+
+Playwright must prove that the package loads and visibly responds to actuation.
+
+Required:
+
+```text
+serve WASM build locally
+open package in browser
+detect engine readiness
+capture baseline screenshot
+inject movement / walkthrough input
+capture post-input screenshot
+compute visual delta
+emit screenshot hashes
+emit BLAKE3 receipt
+write Playwright report
+```
+
+Minimum visual delta:
+
+```text
+observable screenshot change after input
+```
+
+The delta must not be caused only by loading spinner, clock, random noise, or unrelated browser UI.
+
+Gate 4 output:
+
+```text
+PLAYWRIGHT_ACTUATION_VERIFIED_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+---
+
+# Required Rust Pre-UE4 Concepts
+
+The Rust verifier must test everything that does not require pixels.
+
+## Authority Classes
+
+Represent authority as dense byte classes.
+
+Required classes:
+
+```text
+damage_class: u8
+heat_class: u8
+stress_class: u8
+grip_class: u8
+socket_health_class: u8
+lod_class: u8
+walkthrough_state_class: u8
+projection_state_class: u8
+receipt_state_class: u8
+```
+
+Required invariants:
+
+```text
+classes remain within admitted ranges
+invalid values are refused
+state buffers have consistent lengths
+transition outputs are deterministic
+receipt state cannot be forged by file existence
+```
+
+## Branchless Typestates
+
+Implement or verify table-driven branchless typestates for:
+
+```text
+heat + stress + socket_health → failure risk
+damage + mission relevance → Semantic LOD promotion
+walkthrough_state + input_event → next walkthrough_state
+projection_state + semantic_lod → projection command class
+```
+
+Required equivalence:
+
+```text
+scalar_reference == generated_table == SIMD_path
+```
+
+where SIMD path exists.
+
+## SIMDe / SIMD
+
+If SIMDe integration is in scope for this pass, implement the smallest kernel proving vector equivalence.
+
+Minimum kernel:
+
+```text
+heat[i], stress[i], socket_health[i] → failure_risk[i]
+```
+
+Tests:
+
+```text
+fixed vectors
+random vectors
+length not divisible by lane count
+empty vectors
+max values
+invalid values refused
+scalar/SIMD divergence triggers Jidoka
+```
+
+Do not overclaim performance.
+
+Report planning-class benchmark numbers only.
+
+## Semantic LOD
+
+Classes:
+
+```text
+CROWN
+PRIMARY
+SECONDARY
+TERTIARY
+BACKGROUND
+REFUSED
+```
+
+Required laws:
+
+```text
+near does not automatically mean important
+far does not automatically mean irrelevant
+process relevance can promote
+prediction relevance can pre-warm but not admit
+CROWN requires authority reason
+walkthrough focus can promote projection
+```
+
+Test cases:
+
+```text
+factory entrance far but mission-critical → PRIMARY
+receipt terminal during audit → CROWN
+background bolt near camera → TERTIARY/BACKGROUND
+socket during assembly validation → CROWN
+skin layer hiding thermal vent → REFUSED
+```
+
+## Geometry Surrogate
+
+No UE4 required.
+
+Represent geometry as metadata:
+
+```text
+part_id
+part_family
+bounds
+socket mounts
+clearance zones
+required semantic features
+LOD preservation requirements
+```
+
+Required checks:
+
+```text
+weapon mount requires socket
+armor panel cannot block required clearance
+thermal vent must remain readable
+CROWN feature must survive low LOD
+walkthrough route must not intersect blocked geometry
+```
+
+## Motion Surrogate
+
+No animation clips required.
+
+Represent motion as process phases:
+
+```text
+Walk
+Turn
+Inspect
+Brace
+Assemble
+FireWeapon
+Repair
+Recover
+```
+
+Required checks:
+
+```text
+PlantFeet before FireWeapon
+Inspect before Certify
+Repair before Revalidate
+Motion cannot require missing socket
+damaged leg changes gait class
+motion surrogate maps to projection manifest row
+```
+
+## Skin / Material Surrogate
+
+Skins are semantic projection.
+
+Required layers:
+
+```text
+BaseMaterial
+FactionPalette
+SponsorLivery
+ThermalZones
+DamageMasks
+WearMasks
+RepairResidue
+SemanticHighlights
+LODTextureSet
+```
+
+Required checks:
+
+```text
+damage mask binds to damage authority
+thermal zone binds to heat authority
+sponsor livery cannot hide thermal vent
+repair residue binds to repair receipt
+LOD texture preserves CROWN/PRIMARY features
+```
+
+## Walkthrough Topology
+
+Represent the automated walkthrough as generated route law.
+
+Required route nodes:
+
+```text
+Spawn
+FactoryEntrance
+FrameAssembly
+SocketTopology
+ArmorSkinStation
+RigMotionStation
+VerificationGate
+ReceiptTerminal
+ExitOrLoop
+```
+
+Required checks:
+
+```text
+route is connected
+all required stations reachable
+coordinates deterministic
+walkthrough node has Semantic LOD focus class
+walkthrough node has projection command
+Playwright input can advance route
+```
+
+---
+
+# Required ggen Outputs
+
+`ggen` must manufacture artifacts, not merely copy templates.
+
+Every generated artifact must answer:
+
+```text
+which POWL/process step created it?
+which semantic authority input produced it?
+which verifier admitted it?
+which receipt proves it?
+which runtime surface consumes it?
+```
+
+Required generated package directory:
+
+```text
+~/rocket-craft/generated/gundam_factory/
+```
+
+Minimum generated artifacts:
+
+```text
+GundamFactorySteps.h
+GundamFactorySteps.rs
+GundamFactoryAuthority.h
+GundamFactoryTypestates.h
+GundamFactoryWalkthrough.csv
+GundamFactoryProjectionManifest.json
+GundamFactoryReceiptManifest.json
+GundamFactorySemanticLOD.csv
+GundamFactorySocketTopology.csv
+GundamFactorySkinLayers.csv
+GundamFactoryMotionFamilies.csv
+GundamFactoryDataTableManifest.json
+GundamFactoryVerifierInput.json
+```
+
+Every generated artifact must have a hash in:
+
+```text
+GundamFactoryReceiptManifest.json
+```
+
+No orphan artifacts.
+
+No artifact without source step.
+
+---
+
+# Required UE4/WASM Projection
+
+Build the smallest complete HTML5/WASM package.
+
+Required behavior:
+
+```text
+world loads
+factory shell visible
+walkthrough route exists
+player/camera can move or automated movement can actuate
+generated DataTables or manifest are consumed
+receipt/debug overlay or log proves generated source
+```
+
+Minimum visual elements:
+
+```text
+factory entrance
+frame assembly marker
+socket topology marker
+armor/skin station marker
+rig/motion station marker
+verification gate marker
+receipt terminal marker
+```
+
+These may be simple placeholder meshes.
+
+The point is not art quality.
+
+The point is projection from generated semantic authority.
+
+---
+
+# Required Playwright Test
+
+Create or update Playwright tests under project convention.
+
+Minimum test name:
+
+```text
+gundam_factory_walkthrough_projection.spec.ts
+```
+
+Required test sequence:
+
+```text
+1. launch local server for WASM package
+2. open browser page
+3. wait for engine readiness signal
+4. capture baseline screenshot
+5. inject movement input or trigger walkthrough start
+6. wait for movement/projection tick
+7. capture post-input screenshot
+8. compute visual delta
+9. assert delta exceeds threshold
+10. write screenshot hashes
+11. emit BLAKE3 execution receipt
+```
+
+Readiness signal may be one of:
+
+```text
+DOM marker
+console marker
+canvas present and stable
+UE4 boot log marker
+custom generated receipt marker
+```
+
+Document which is used.
+
+Visual delta must be bounded:
+
+```text
+must not count loading spinner
+must not count nondeterministic browser chrome
+must not count timestamp changes
+must not count unrelated canvas noise
+```
+
+---
+
+# Required Receipt Chain
+
+Generate tamper-evident receipts for:
+
+```text
+POWL/process input
+ggen manufacturing
+Rust pre-UE4 verification
+UE4 artifact package
+local server launch
+Playwright baseline screenshot
+Playwright post-input screenshot
+visual delta result
+final verifier report
+```
+
+Receipt fields:
+
+```json
+{
+  "sequence": 1,
+  "event_type": "...",
+  "surface": "...",
+  "input_hash": "...",
+  "output_hash": "...",
+  "prev_hash": "...",
+  "receipt": "...",
+  "status": "ADMITTED|REFUSED|RESIDUAL",
+  "residuals": []
+}
+```
+
+Use BLAKE3.
+
+Do not say unforgeable.
+
+Correct phrase:
+
+```text
+tamper-evident receipt chain
+```
+
+---
+
+# Agent Jidoka Requirements
+
+Agent Jidoka must stop the line when:
+
+```text
+POWL graph has unreachable required node
+ggen emits orphan artifact
+generated header and CSV disagree
+Rust verifier fails
+SIMD diverges from scalar
+prediction overwrites admitted state
+Semantic LOD demotes CROWN feature without authority reason
+geometry surrogate blocks walkthrough
+skin hides required feature
+motion requires missing geometry
+UE4 build ignores generated artifacts
+Playwright delta is caused by non-game pixels
+receipt chain breaks
+benchmark mode is skipped
+```
+
+Every Jidoka event must publish:
+
+```text
+defect_class
+surface
+expected_law
+observed_failure
+residual
+repair_candidate
+repair_applied
+receipt
+```
+
+---
+
+# Testing Ladder
+
+Follow:
+
+```text
+unit
+→ integration
+→ e2e
+→ chaos
+→ stress
+→ benchmark
+→ verifier report
+```
+
+## Unit
+
+Required:
+
+```text
+authority validation
+typestate transition
+SIMD equivalence
+Semantic LOD
+geometry surrogate
+motion surrogate
+skin surrogate
+walkthrough topology
+receipt chain
+```
+
+## Integration
+
+Required:
+
+```text
+POWL/process trace → ggen rows
+ggen rows → generated artifacts
+generated artifacts → Rust verifier
+Rust verifier → projection manifest
+projection manifest → UE4 package inputs
+```
+
+## E2E
+
+Required:
+
+```text
+ggen manufacture
+→ Rust verify
+→ UE4 package
+→ local serve
+→ Playwright actuation
+→ receipts
+```
+
+## Chaos
+
+Required mutations:
+
+```text
+remove walkthrough coordinate
+break receipt hash
+remove generated DataTable
+change header enum without CSV update
+drop CROWN LOD feature
+hide thermal vent with skin
+make Playwright input no-op
+force screenshot delta from spinner only
+remove source receipt from projection row
+```
+
+Each must fail for the expected reason.
+
+## Stress / Benchmark
+
+Benchmark at least:
+
+```text
+authority update
+Semantic LOD classification
+walkthrough topology validation
+projection manifest validation
+receipt replay
+Playwright screenshot delta computation
+```
+
+Report:
+
+```text
+machine
+target
+command
+sample size
+timings
+outliers
+residuals
+```
+
+---
+
+# Acceptance Criteria
+
+## A. Headless Verification
+
+```text
+cargo test passes for pre-UE4 verifier crate
+chaos tests refuse invalid cases
+benchmark report emitted
+receipt replay validates
+```
+
+## B. ggen Manufacturing
+
+```text
+generated Gundam factory package exists
+generated artifacts deterministic
+all artifacts have source step and receipt
+no orphan artifacts
+headers/DataTables/manifests mutually consistent
+```
+
+## C. UE4/WASM Projection
+
+```text
+UE4 HTML5/WASM package builds
+generated artifacts are consumed
+factory walkthrough surface loads locally
+route/projection markers visible
+```
+
+## D. Playwright Admittance
+
+```text
+WASM world loads in browser
+engine readiness detected
+baseline screenshot captured
+movement/walkthrough input injected
+post-input screenshot captured
+visual delta observed
+screenshot hashes emitted
+BLAKE3 receipt generated
+```
+
+## E. Final Report
+
+Generate:
+
+```text
+~/rocket-craft/VERIFIER_REPORT_GC_GUNDAM_FACTORY_001.md
+~/rocket-craft/VERIFIER_REPORT_GC_GUNDAM_FACTORY_001.json
+```
+
+Required report sections:
+
+```text
+Milestone
+Scope
+Repository Boundaries
+Inputs
+Generated Artifacts
+Headless Rust Verification
+ggen Manufacturing
+UE4/WASM Projection
+Playwright Visual Actuation
+Receipt Chain
+Agent Jidoka Events
+Testing Ladder
+Benchmark Results
+Residuals
+Next Falsifier
+Final Status
+```
+
+---
+
+# Exclusions
+
+Do not:
+
+```text
+claim global ALIVE
+claim production ready
+claim mathematical closure beyond declared scope
+claim unforgeable receipts
+hand-author semantic authority in Blueprint
+skip Rust verification because UE4 renders
+skip Playwright because UE4 packaged
+hide failed tests
+delete residuals
+move replay into wasm4pm-compat
+create shadow authority crates
+treat visual delta alone as game standing
+```
+
+---
+
+# Final Status Logic
+
+Set:
+
+```text
+GUNDAM_FACTORY_WALKTHROUGH_ALIVE_UNDER_SCOPE
+```
+
+only if all gates pass:
+
+```text
+Rust pre-UE4 verifier passes
+ggen manufacturing passes
+UE4/WASM package builds and consumes generated artifacts
+Playwright detects readiness
+Playwright captures baseline screenshot
+Playwright injects input
+Playwright captures post-input screenshot
+visual delta passes threshold
+BLAKE3 receipt chain validates
+residuals are published
+```
+
+Otherwise set:
+
+```text
+PARTIAL_ALIVE_CANDIDATE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with exact residuals.
+
+---
+
+# Next Falsifier
+
+After this milestone, the next falsifier is:
+
+```text
+GC-GUNDAM-FACTORY-002:
+SEMANTIC_LOD_MECH_ASSEMBLY_AND_RUNTIME_STATE
+```
+
+That next milestone must prove:
+
+```text
+multiple generated mech variants
+runtime authority class transitions
+Semantic LOD promotion/demotion during walkthrough
+SIMD/scalar equivalence under larger cell counts
+Playwright validates multiple projected states
+```
+
+Do not start that milestone until this one emits receipts and residuals.
+
+---
+
+# Final Response Required From Teamwork
+
+Respond only with the following structure:
+
+```text
+Milestone:
+Status:
+Scoped status:
+Commands run:
+Files changed:
+Generated artifacts:
+Tests passed:
+Tests failed:
+Benchmarks:
+Playwright evidence:
+Receipt files:
+Agent Jidoka events:
+Residuals:
+Next falsifier:
+```
+
+Forbidden words unless proven under scope:
+
+```text
+done
+complete
+production ready
+fully alive
+unforgeable
+```
+
+Use bounded status language.
+
+The milestone is secured only by tests, receipts, replay, visual actuation, and published residuals.
+</USER_REQUEST>

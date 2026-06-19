@@ -38,6 +38,26 @@ pub struct LodOutput {
 /// - Prediction relevance can pre-warm but NOT grant authority.
 /// - CROWN requires explicit authority reason (damage, threat, mission, process).
 pub fn classify_lod(inputs: &LodInputs) -> Result<LodOutput, RefusalReason> {
+    // CF-4 guard: all class fields must be in [0, 15]. Values > 15 are rejected
+    // rather than silently promoted to Crown through unclamped arithmetic.
+    const MAX_CLASS: u8 = 15;
+    let fields = [
+        ("distance_class",          inputs.distance_class),
+        ("mission_relevance",       inputs.mission_relevance),
+        ("damage_class",            inputs.damage_class),
+        ("threat_class",            inputs.threat_class),
+        ("interaction_probability", inputs.interaction_probability),
+        ("process_step_relevance",  inputs.process_step_relevance),
+        ("prediction_relevance",    inputs.prediction_relevance),
+    ];
+    for (name, val) in fields {
+        if val > MAX_CLASS {
+            return Err(RefusalReason::LodRefused {
+                detail: format!("input field '{name}' value {val} exceeds MAX_CLASS {MAX_CLASS}"),
+            });
+        }
+    }
+
     // Compute authority score (ignores prediction_relevance)
     let authority_score = (inputs.mission_relevance as u16)
         .max(inputs.damage_class as u16)

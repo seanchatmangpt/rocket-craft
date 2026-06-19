@@ -152,7 +152,7 @@ gundam:MoveForwardPinIn a ue4:UEdGraphPin ;
     rdfs:comment "Input execution pin to execute function." ;
     ue4:pinOf gundam:MoveForwardCallNode ;
     ue4:pinDirection ue4:Input ;
-    ue4:pinCategory "float" ;
+    ue4:pinCategory "exec" ;
     ue4:connectedTo gundam:W_KeyPressedPinOut .
 
 gundam:MoveForwardDirPin a ue4:UEdGraphPin ;

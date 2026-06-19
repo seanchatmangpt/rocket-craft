@@ -1,0 +1,56 @@
+{#-
+  error.rs.tera
+  GC-MECHBIRTH-002 Manufacturing Template
+  Stamps out: src/error.rs
+
+  Input binding:
+    results — rows from extract_refusal_reasons.sparql
+              columns: variant, fields, errorTemplate
+
+  Law: every RefusalReason variant in error.rs must correspond to exactly one
+  mb:RefusalReason individual in mechbirth.ttl (A = μ(O*)).
+  Adding a variant without adding an ontology triple is a JIDOKA HALT.
+-#}
+//! RefusalReason taxonomy and JidokaEvent.
+//! ⚠️ GENERATED FILE — do NOT edit by hand.
+//! Source of truth: ontology/mechbirth.ttl
+//! Generator:       ggen/templates/error.rs.tera
+//! SPARQL:          ggen/sparql/extract_refusal_reasons.sparql
+//!
+//! GC-MECHBIRTH-002: Every variant below was extracted from mb:RefusalReason
+//! individuals. Mutation requires ontology edit first.
+
+use thiserror::Error;
+
+/// Bounded taxonomy of all possible refusal reasons.
+/// Generated from ontology — {{ results | length }} variants admitted.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum RefusalReason {
+{% for row in results %}
+    /// Ontology source: mb:{{ row.variant }}
+    #[error("{{ row.errorTemplate }}")]
+    {{ row.variant }}
+    {%- if row.fields and row.fields | length > 0 %} {
+        {% set field_list = row.fields | split(pat=", ") %}
+        {%- for f in field_list %}
+        {{ f }},
+        {%- endfor %}
+    }
+    {%- else %},
+    {%- endif %}
+{% endfor %}
+}
+
+/// A Jidoka event record produced whenever a defect is detected and surfaced.
+/// Carries structured audit data for the Repair Routing Law.
+#[derive(Debug, Clone)]
+pub struct JidokaEvent {
+    pub defect_class: String,
+    pub surface: String,
+    pub expected_law: String,
+    pub observed_failure: String,
+    pub residual: String,
+    pub repair_candidate: Option<String>,
+    pub repair_applied: bool,
+    pub receipt: Option<String>,
+}

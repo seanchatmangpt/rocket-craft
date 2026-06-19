@@ -387,3 +387,119 @@ fn fire_weapon_no_fire_phase_gives_zero_effects() {
     let result = trace.validate_and_compute_effects();
     assert_eq!(result, Ok((0, 0)));
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// COUNTERFACTUAL REGRESSION TESTS
+// CF-1: Phase ordering — PlantFeet listed AFTER Fire must be refused.
+// CF-2: VentHeat listed AFTER Fire (with heat≥12) must be refused.
+// CF-4: Out-of-range class inputs must be refused.
+// Old code used .contains() — these would have silently PASSED.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// CF-1: [Fire, PlantFeet] — Fire appears first in Vec → must be refused.
+#[test]
+fn cf1_fire_before_plant_feet_in_sequence_is_refused() {
+    let trace = MotionTrace {
+        phases: vec![
+            MotionPhase::Fire,      // Fire at index 0
+            MotionPhase::PlantFeet, // PlantFeet at index 1 — too late
+            MotionPhase::AbsorbRecoil,
+        ],
+        ..nominal_fire_trace()
+    };
+    let result = trace.validate_and_compute_effects();
+    assert!(
+        matches!(result, Err(RefusalReason::MotionClearanceViolation { .. })),
+        "CF-1: Fire before PlantFeet in Vec must be refused, got {:?}",
+        result
+    );
+}
+
+// CF-1: [PlantFeet, Fire] — PlantFeet is before Fire → must be admitted.
+#[test]
+fn cf1_plant_feet_before_fire_in_sequence_is_admitted() {
+    let trace = MotionTrace {
+        phases: vec![
+            MotionPhase::PlantFeet, // index 0
+            MotionPhase::Fire,      // index 1
+            MotionPhase::AbsorbRecoil,
+        ],
+        ..nominal_fire_trace()
+    };
+    assert_eq!(trace.validate_and_compute_effects(), Ok((2, 1)));
+}
+
+// CF-2: [Fire, VentHeat] with heat=12 — VentHeat appears after Fire → must be refused.
+#[test]
+fn cf2_vent_heat_after_fire_is_refused() {
+    let trace = MotionTrace {
+        heat_class: 12,
+        phases: vec![
+            MotionPhase::PlantFeet,
+            MotionPhase::Fire,      // index 1
+            MotionPhase::VentHeat,  // index 2 — too late
+            MotionPhase::AbsorbRecoil,
+        ],
+        ..nominal_fire_trace()
+    };
+    let result = trace.validate_and_compute_effects();
+    assert!(
+        matches!(result, Err(RefusalReason::MotionClearanceViolation { .. })),
+        "CF-2: VentHeat after Fire (heat=12) must be refused, got {:?}",
+        result
+    );
+}
+
+// CF-2: [VentHeat, Fire] with heat=12 — correct ordering → must be admitted.
+#[test]
+fn cf2_vent_heat_before_fire_is_admitted() {
+    let trace = MotionTrace {
+        heat_class: 12,
+        phases: vec![
+            MotionPhase::PlantFeet,
+            MotionPhase::VentHeat, // index 1 — before Fire
+            MotionPhase::Fire,     // index 2
+            MotionPhase::AbsorbRecoil,
+        ],
+        ..nominal_fire_trace()
+    };
+    assert_eq!(trace.validate_and_compute_effects(), Ok((2, 1)));
+}
+
+// CF-4: Out-of-range heat_class on FireWeapon → refused.
+#[test]
+fn cf4_out_of_range_heat_class_in_fire_weapon_is_refused() {
+    let trace = MotionTrace {
+        heat_class: 16, // > 15 → out of range
+        phases: vec![
+            MotionPhase::PlantFeet,
+            MotionPhase::Fire,
+        ],
+        ..nominal_fire_trace()
+    };
+    let result = trace.validate_and_compute_effects();
+    assert!(
+        matches!(result, Err(RefusalReason::MotionClearanceViolation { .. })),
+        "CF-4: heat_class=16 must be refused, got {:?}",
+        result
+    );
+}
+
+// CF-4: Out-of-range leg_damage_class on Walk → refused (not silently degraded).
+#[test]
+fn cf4_out_of_range_leg_damage_in_walk_is_refused() {
+    let trace = MotionTrace {
+        family: MotionFamily::Walk,
+        phases: vec![MotionPhase::Stride],
+        socket_available: true,
+        heat_class: 0,
+        stress_class: 0,
+        leg_damage_class: 200, // > 15 → out of range
+    };
+    let result = trace.validate_and_compute_effects();
+    assert!(
+        matches!(result, Err(RefusalReason::MotionClearanceViolation { .. })),
+        "CF-4: leg_damage_class=200 must be refused, got {:?}",
+        result
+    );
+}

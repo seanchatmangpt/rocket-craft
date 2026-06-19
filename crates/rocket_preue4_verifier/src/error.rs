@@ -41,6 +41,9 @@ pub enum RefusalReason {
 
     #[error("geometry validation failed: {detail}")]
     GeometryValidationFailed { detail: String },
+
+    #[error("LOD input refused: {detail}")]
+    LodRefused { detail: String },
 }
 
 /// An Jidoka event record produced whenever a defect is detected and surfaced.

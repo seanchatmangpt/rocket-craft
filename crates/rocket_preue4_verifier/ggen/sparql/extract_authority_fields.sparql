@@ -1,0 +1,34 @@
+# extract_authority_fields.sparql
+# GC-MECHBIRTH-002: Anti-Cartesian Exhaustion SELECT
+#
+# Extracts all admitted AuthorityByteField individuals from the mechbirth ontology.
+# Results drive: authority_state.rs.tera → AuthorityState SoA struct
+#
+# Anti-Cartesian guarantee: FILTER on rdf:type + ORDER BY soaIndex produces
+# exactly |AuthorityByteFields| rows — no cross-product inflation.
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+SELECT
+    ?fieldName
+    ?defaultValue
+    ?nominalValue
+    ?semantics
+    ?soaIndex
+    ?derivedFrom
+WHERE {
+    ?field a mb:AuthorityByteField ;
+           mb:fieldName     ?fieldName ;
+           mb:defaultValue  ?defaultValue ;
+           mb:soaIndex      ?soaIndex .
+    OPTIONAL { ?field mb:semantics   ?semantics . }
+    OPTIONAL { ?field mb:derivedFrom ?derivedFrom . }
+    OPTIONAL { ?field mb:nominalValue ?nominalValue . }
+
+    # Bound: only fields with soaIndex < 64 (exhaustion guard)
+    FILTER (xsd:integer(?soaIndex) < 64)
+}
+ORDER BY ?soaIndex

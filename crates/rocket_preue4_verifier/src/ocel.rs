@@ -34,11 +34,20 @@ impl OcelLog {
             event_type: String,
             #[serde(default)]
             attributes: Vec<RawAttr>,
+            #[serde(default)]
+            relationships: Vec<RawRel>,
+            #[serde(default)]
+            objects: Vec<String>,
         }
         #[derive(Deserialize)]
         struct RawAttr {
             name: String,
             value: String,
+        }
+        #[derive(Deserialize)]
+        struct RawRel {
+            #[serde(rename = "objectId")]
+            object_id: String,
         }
 
         let raw: RawLog = serde_json::from_str(json)?;
@@ -58,10 +67,19 @@ impl OcelLog {
                 .unwrap_or_else(|| {
                     "0000000000000000000000000000000000000000000000000000000000000000".into()
                 });
+            let mut event_objects = e.objects.clone();
+            for rel in &e.relationships {
+                if !event_objects.contains(&rel.object_id) {
+                    event_objects.push(rel.object_id.clone());
+                }
+            }
+            if event_objects.is_empty() {
+                event_objects.push("case-gundam-factory-001".into());
+            }
             events.push(OcelEvent {
                 id: e.id.clone(),
                 event_type: e.event_type.clone(),
-                objects: vec!["case-mechbirth-001".into()],
+                objects: event_objects,
                 receipt,
                 prev_hash,
                 sequence: i as u64 + 1,
@@ -153,6 +171,6 @@ mod tests {
     #[test]
     fn each_event_object_contains_case_id() {
         let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
-        assert!(log.events[0].objects.contains(&"case-mechbirth-001".into()));
+        assert!(log.events[0].objects.contains(&"case-gundam-factory-001".into()));
     }
 }

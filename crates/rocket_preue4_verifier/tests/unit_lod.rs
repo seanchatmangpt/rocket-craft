@@ -223,3 +223,74 @@ fn secondary_class_threshold() {
     assert_eq!(out.projection_priority, 128);
     assert!(!out.authority_required);
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CF-4 COUNTERFACTUAL REGRESSION TESTS
+// Old code: values > 15 were cast to u16 and silently promoted to Crown.
+// Fixed code: LodRefused with detail.
+// ══════════════════════════════════════════════════════════════════════════════
+
+#[test]
+fn cf4_out_of_range_mission_relevance_is_refused() {
+    let inputs = LodInputs {
+        distance_class: 0,
+        mission_relevance: 255, // would silently have scored 255 → Crown
+        damage_class: 0,
+        threat_class: 0,
+        interaction_probability: 0,
+        process_step_relevance: 0,
+        prediction_relevance: 0,
+    };
+    let result = classify_lod(&inputs);
+    assert!(
+        matches!(result, Err(RefusalReason::LodRefused { .. })),
+        "CF-4: out-of-range mission_relevance must return LodRefused, got {:?}",
+        result
+    );
+}
+
+#[test]
+fn cf4_out_of_range_damage_class_is_refused() {
+    let inputs = LodInputs {
+        distance_class: 0,
+        mission_relevance: 0,
+        damage_class: 200, // out of range
+        threat_class: 0,
+        interaction_probability: 0,
+        process_step_relevance: 0,
+        prediction_relevance: 0,
+    };
+    assert!(matches!(classify_lod(&inputs), Err(RefusalReason::LodRefused { .. })));
+}
+
+#[test]
+fn cf4_out_of_range_prediction_relevance_refused() {
+    let inputs = LodInputs {
+        distance_class: 0,
+        mission_relevance: 0,
+        damage_class: 0,
+        threat_class: 0,
+        interaction_probability: 0,
+        process_step_relevance: 0,
+        prediction_relevance: 16, // just over limit
+    };
+    assert!(matches!(classify_lod(&inputs), Err(RefusalReason::LodRefused { .. })));
+}
+
+#[test]
+fn all_fields_at_ceiling_15_are_admitted() {
+    // 15 is the ceiling — must NOT be refused.
+    // All authority fields = 15 ≥ 13 → has_authority_reason = true → Crown admitted.
+    let inputs = LodInputs {
+        distance_class: 15,
+        mission_relevance: 15,
+        damage_class: 15,
+        threat_class: 15,
+        interaction_probability: 15,
+        process_step_relevance: 15,
+        prediction_relevance: 15,
+    };
+    let result = classify_lod(&inputs);
+    assert!(result.is_ok(), "All-15 inputs must be admitted: {:?}", result);
+    assert_eq!(result.unwrap().lod_class, LodClass::Crown);
+}

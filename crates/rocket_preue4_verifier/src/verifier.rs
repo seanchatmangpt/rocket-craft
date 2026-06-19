@@ -4,8 +4,8 @@
 //! Each gate runs in sequence; failures halt the pipeline and emit a JidokaEvent.
 
 use crate::authority::AuthorityState;
-use crate::error::{JidokaEvent, RefusalReason};
-use crate::receipt::{AdmissionStatus, ReceiptChain};
+use crate::error::JidokaEvent;
+use crate::receipt::ReceiptChain;
 use crate::transitions::TransitionTable;
 
 /// Overall gate result for a single pipeline run.
@@ -25,12 +25,26 @@ pub struct PipelineResult {
 }
 
 impl PipelineResult {
+    /// True only when every gate is Pass (no Fails, no Residuals).
     pub fn is_all_pass(&self) -> bool {
         self.gates.iter().all(|(_, r)| *r == GateResult::Pass)
     }
 
+    /// True when every *in-scope* gate (non-RESIDUAL) passes.
+    /// RESIDUAL gates represent deferred UE4/WASM scope and do NOT count against
+    /// ALIVE_UNDER_SCOPE — they are tracked separately.
+    pub fn is_in_scope_pass(&self) -> bool {
+        self.gates
+            .iter()
+            .filter(|(_, r)| !matches!(r, GateResult::Residual(_)))
+            .all(|(_, r)| *r == GateResult::Pass)
+    }
+
+    /// Returns the bounded status vocabulary for Rust-scoped gates only.
+    /// ALIVE_UNDER_SCOPE: all in-scope gates pass (RESIDUAL gates excluded).
+    /// PARTIAL_ALIVE_CANDIDATE: at least one in-scope gate failed.
     pub fn scoped_status(&self) -> &'static str {
-        if self.is_all_pass() {
+        if self.is_in_scope_pass() {
             "ALIVE_UNDER_SCOPE"
         } else {
             "PARTIAL_ALIVE_CANDIDATE"
@@ -120,21 +134,34 @@ pub fn run_pipeline(state: &mut AuthorityState, chain: &ReceiptChain) -> Pipelin
         GateResult::Residual("visual_delta: no Playwright browser session in pre-UE4 scope".into()),
     ));
 
-    // GATE 7 — Receipt: produced by this pipeline
-    result
-        .gates
-        .push(("GATE_7_RECEIPT".into(), GateResult::Pass));
+    // GATE 7 — Receipt: verify hash integrity of the full chain
+    let gate7 = match chain.verify_hashes() {
+        Ok(_) => GateResult::Pass,
+        Err(e) => {
+            let ev = JidokaEvent {
+                defect_class: "RECEIPT_HASH_INTEGRITY".into(),
+                surface: "receipt_chain".into(),
+                expected_law: "every entry.receipt == blake3(content)".into(),
+                observed_failure: e.to_string(),
+                residual: String::new(),
+                repair_candidate: Some("recompute receipts from source events".into()),
+                repair_applied: false,
+                receipt: None,
+            };
+            result.jidoka_events.push(ev);
+            GateResult::Fail(e.to_string())
+        }
+    };
+    result.gates.push(("GATE_7_RECEIPT".into(), gate7));
 
     // Apply table-driven damage update
     crate::transitions::batch_update_damage_table(state, &table);
 
-    let rust_gates_pass = result
-        .gates
-        .iter()
-        .filter(|(name, _)| !name.contains("UE4") && !name.contains("MOTION"))
-        .all(|(_, r)| *r == GateResult::Pass);
-    result.final_status = if rust_gates_pass {
-        "PARTIAL_ALIVE_CANDIDATE".into()
+    // final_status uses in-scope gate result (excludes RESIDUAL UE4/WASM gates).
+    // ALIVE_UNDER_SCOPE: all in-scope gates pass.
+    // BLOCKED: at least one in-scope gate failed (hard failure).
+    result.final_status = if result.is_in_scope_pass() {
+        "ALIVE_UNDER_SCOPE".into()
     } else {
         "BLOCKED".into()
     };
@@ -249,18 +276,62 @@ mod tests {
     }
 
     #[test]
-    fn healthy_pipeline_is_partial_alive_candidate() {
+    fn healthy_pipeline_is_alive_under_scope() {
         let mut state = healthy_state(2);
         let result = run_pipeline(&mut state, &valid_chain());
-        assert_eq!(result.final_status, "PARTIAL_ALIVE_CANDIDATE");
+        // In-scope gates (0-4, 7) all pass. GATE_5 and GATE_6 are RESIDUAL (excluded).
+        assert_eq!(result.final_status, "ALIVE_UNDER_SCOPE");
+        assert_eq!(result.scoped_status(), "ALIVE_UNDER_SCOPE");
     }
 
     #[test]
     fn broken_pipeline_is_blocked() {
         let mut state = healthy_state(2);
-        state.heat.push(99); // triggers length mismatch → GATE_1 fails
+        state.heat.push(99); // triggers length mismatch → GATE_1 fails → BLOCKED
         let result = run_pipeline(&mut state, &valid_chain());
         assert_eq!(result.final_status, "BLOCKED");
+    }
+
+    #[test]
+    fn is_in_scope_pass_excludes_residual_gates() {
+        // A pipeline with only PASS and RESIDUAL gates must report is_in_scope_pass = true.
+        let result = PipelineResult {
+            gates: vec![
+                ("G0".into(), GateResult::Pass),
+                ("G1".into(), GateResult::Pass),
+                ("G2".into(), GateResult::Residual("deferred".into())),
+            ],
+            jidoka_events: vec![],
+            final_status: String::new(),
+        };
+        assert!(result.is_in_scope_pass());
+        assert_eq!(result.scoped_status(), "ALIVE_UNDER_SCOPE");
+    }
+
+    #[test]
+    fn is_in_scope_pass_fails_when_scoped_gate_fails() {
+        let result = PipelineResult {
+            gates: vec![
+                ("G0".into(), GateResult::Pass),
+                ("G1".into(), GateResult::Fail("bad".into())),
+                ("G2".into(), GateResult::Residual("deferred".into())),
+            ],
+            jidoka_events: vec![],
+            final_status: String::new(),
+        };
+        assert!(!result.is_in_scope_pass());
+        assert_eq!(result.scoped_status(), "PARTIAL_ALIVE_CANDIDATE");
+    }
+
+    #[test]
+    fn gate_7_fails_on_tampered_receipt_hash() {
+        let mut state = healthy_state(2);
+        let mut chain = valid_chain();
+        // Tamper the stored receipt field after it was computed
+        chain.entries[0].receipt = "badhashbadhash00000000000000000000000000000000000000000000000000".into();
+        let result = run_pipeline(&mut state, &chain);
+        let (_, gate7) = result.gates.iter().find(|(n, _)| n.contains("GATE_7")).unwrap();
+        assert!(matches!(gate7, GateResult::Fail(_)), "GATE_7 must fail on tampered receipt hash");
     }
 
     #[test]
