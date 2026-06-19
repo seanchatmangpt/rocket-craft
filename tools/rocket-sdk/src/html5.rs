@@ -304,6 +304,12 @@ impl Html5Cook {
 
         let path_with_wrapper = prepend_to_path(GIT_WRAPPER_DIR);
 
+        // Write cook log to a predictable path so 'rocket html5 log' always finds it.
+        // UE4's BuildCookRun also writes ~/ue4-cook<N>.log; the -log flag adds a copy
+        // at a known location without disabling the default log.
+        let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".into());
+        let cook_log = format!("{home}/ue4-cook-latest.log");
+
         let status = Command::new("arch")
             .args(["-x86_64", "/bin/bash"])
             .arg(&run_uat)
@@ -321,6 +327,7 @@ impl Html5Cook {
                 "-archive",
                 "-IgnoreCookErrors",
                 &format!("-archivedirectory={}", self.archive_dir.display()),
+                &format!("-log={}", cook_log),
             ])
             .env("PYTHON", python3.to_str().unwrap_or("python3"))
             .env("PATH", &path_with_wrapper)

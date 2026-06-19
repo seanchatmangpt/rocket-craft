@@ -665,9 +665,10 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
     }
     println!("[1/3] Preflight PASS\n");
 
-    // Step 2: cook
-    println!("[2/3] Cooking {}...", project);
-    let cook_result = do_html5_cook(project.clone(), archive.clone(), config)?;
+    // Step 2: cook — default to Shipping for pipeline (production quality)
+    let effective_config = config.unwrap_or_else(|| "Shipping".to_string());
+    println!("[2/3] Cooking {} ({})...", project, effective_config);
+    let cook_result = do_html5_cook(project.clone(), archive.clone(), Some(effective_config))?;
     println!("[2/3] Cook complete\n");
 
     // Step 3: verify (do_html5_cook already auto-verifies, but run explicitly for clean output)
