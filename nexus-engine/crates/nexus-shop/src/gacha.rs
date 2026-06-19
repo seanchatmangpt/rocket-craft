@@ -108,6 +108,7 @@ impl PullSession {
         if self.pulls_since_last_ssr < 70 {
             base
         } else if self.pulls_since_last_ssr < 90 {
+            // soft pity: +5% per pull over 70. At pull 70 extra=0; rate first exceeds base at pull 71.
             let extra = (self.pulls_since_last_ssr - 70) as f64 * 0.05;
             (base + extra).min(1.0)
         } else {
@@ -280,4 +281,182 @@ pub enum GachaError {
     NoItemsInPool { banner_id: String, rarity: String },
     #[error("insufficient credits: need {need}, have {have}")]
     InsufficientCredits { need: u32, have: u32 },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ssr_item(id: &str, rate_up: bool) -> GachaItem {
+        GachaItem {
+            id: id.into(),
+            name: id.into(),
+            rarity: GachaRarity::SSR,
+            banner_id: "b".into(),
+            is_rate_up: rate_up,
+        }
+    }
+    fn sr_item(id: &str) -> GachaItem {
+        GachaItem {
+            id: id.into(),
+            name: id.into(),
+            rarity: GachaRarity::SR,
+            banner_id: "b".into(),
+            is_rate_up: false,
+        }
+    }
+    fn r_item(id: &str) -> GachaItem {
+        GachaItem {
+            id: id.into(),
+            name: id.into(),
+            rarity: GachaRarity::R,
+            banner_id: "b".into(),
+            is_rate_up: false,
+        }
+    }
+
+    fn banner_with(ssr: Vec<GachaItem>, sr: Vec<GachaItem>, r: Vec<GachaItem>) -> Banner {
+        let mut items = ssr;
+        items.extend(sr);
+        items.extend(r);
+        Banner::standard("b", "Test Banner", items)
+    }
+
+    fn session() -> PullSession {
+        PullSession::new(1, "b".into())
+    }
+
+    // ── GachaRarity ordering ──────────────────────────────────────────────────
+
+    #[test]
+    fn rarity_ordering_r_lt_sr_lt_ssr() {
+        assert!(GachaRarity::R < GachaRarity::SR);
+        assert!(GachaRarity::SR < GachaRarity::SSR);
+        assert!(GachaRarity::R < GachaRarity::SSR);
+    }
+
+    // ── PullSession::current_ssr_rate ─────────────────────────────────────────
+
+    #[test]
+    fn base_rate_before_soft_pity() {
+        let mut s = session();
+        s.pulls_since_last_ssr = 0;
+        assert!((s.current_ssr_rate() - 0.03).abs() < 1e-9);
+        s.pulls_since_last_ssr = 69;
+        assert!((s.current_ssr_rate() - 0.03).abs() < 1e-9);
+    }
+
+    #[test]
+    fn soft_pity_increases_rate_linearly_from_pull_70() {
+        // pull 70: extra = (70-70)*0.05 = 0 → still base rate
+        // pull 71: extra = 1*0.05 = 0.05 → first actual increase
+        let mut s = session();
+        s.pulls_since_last_ssr = 71;
+        let r71 = s.current_ssr_rate();
+        assert!(r71 > 0.03, "rate must exceed base at pull 71");
+        s.pulls_since_last_ssr = 72;
+        let r72 = s.current_ssr_rate();
+        assert!(r72 > r71, "rate must keep increasing in soft pity window");
+    }
+
+    #[test]
+    fn hard_pity_at_90_gives_guaranteed_ssr_rate() {
+        let mut s = session();
+        s.pulls_since_last_ssr = 90;
+        assert_eq!(s.current_ssr_rate(), 1.0);
+    }
+
+    #[test]
+    fn rate_caps_at_1_during_soft_pity() {
+        let mut s = session();
+        s.pulls_since_last_ssr = 88; // soft pity, well above floor
+        assert!(s.current_ssr_rate() <= 1.0);
+    }
+
+    // ── GachaEngine::single_pull ──────────────────────────────────────────────
+
+    #[test]
+    fn pull_from_empty_banner_returns_error() {
+        let banner = Banner::standard("b", "empty", vec![]);
+        let mut engine = GachaEngine::new(42);
+        let mut s = session();
+        assert!(matches!(
+            engine.single_pull(&banner, &mut s),
+            Err(GachaError::EmptyBanner(_))
+        ));
+    }
+
+    #[test]
+    fn pull_advances_total_pulls_counter() {
+        let banner = banner_with(vec![ssr_item("Wing", false)], vec![], vec![r_item("gm")]);
+        let mut engine = GachaEngine::new(42);
+        let mut s = session();
+        engine.single_pull(&banner, &mut s).unwrap();
+        assert_eq!(s.total_pulls, 1);
+        engine.single_pull(&banner, &mut s).unwrap();
+        assert_eq!(s.total_pulls, 2);
+    }
+
+    #[test]
+    fn ssr_pull_resets_pity_counter() {
+        // Force an SSR by setting pity to 90 before the pull.
+        let banner = banner_with(vec![ssr_item("RX-78", false)], vec![], vec![r_item("gm")]);
+        let mut engine = GachaEngine::new(0);
+        let mut s = session();
+        s.pulls_since_last_ssr = 89; // next pull = 90 → guaranteed SSR
+        let result = engine.single_pull(&banner, &mut s).unwrap();
+        assert_eq!(result.item.rarity, GachaRarity::SSR);
+        assert!(result.pity_pull);
+        assert_eq!(
+            s.pulls_since_last_ssr, 0,
+            "pity counter must reset after SSR"
+        );
+    }
+
+    #[test]
+    fn ssr_increments_ssr_count() {
+        let banner = banner_with(vec![ssr_item("RX-78", false)], vec![], vec![r_item("gm")]);
+        let mut engine = GachaEngine::new(0);
+        let mut s = session();
+        s.pulls_since_last_ssr = 89; // force SSR
+        engine.single_pull(&banner, &mut s).unwrap();
+        assert_eq!(s.ssr_count, 1);
+    }
+
+    // ── GachaEngine::ten_pull ─────────────────────────────────────────────────
+
+    #[test]
+    fn ten_pull_always_returns_exactly_10_results() {
+        let banner = banner_with(
+            vec![ssr_item("RX-78", false)],
+            vec![sr_item("Zaku II")],
+            vec![r_item("gm"), r_item("ball")],
+        );
+        let mut engine = GachaEngine::new(999);
+        let mut s = session();
+        let results = engine.ten_pull(&banner, &mut s).unwrap();
+        assert_eq!(results.len(), 10);
+    }
+
+    #[test]
+    fn ten_pull_advances_total_pulls_by_10() {
+        let banner = banner_with(
+            vec![ssr_item("Wing", false)],
+            vec![sr_item("Zaku II")],
+            vec![r_item("gm")],
+        );
+        let mut engine = GachaEngine::new(777);
+        let mut s = session();
+        engine.ten_pull(&banner, &mut s).unwrap();
+        assert_eq!(s.total_pulls, 10);
+    }
+
+    // ── GachaRarity ordering edge cases ───────────────────────────────────────
+
+    #[test]
+    fn same_rarity_is_equal() {
+        assert_eq!(GachaRarity::SSR, GachaRarity::SSR);
+        assert_eq!(GachaRarity::SR, GachaRarity::SR);
+        assert_eq!(GachaRarity::R, GachaRarity::R);
+    }
 }
