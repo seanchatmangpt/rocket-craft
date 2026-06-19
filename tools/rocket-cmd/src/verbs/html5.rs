@@ -489,8 +489,11 @@ fn preflight_html5(project: Option<String>) -> Result<Value> {
 /// * `archive` - Package directory (default: /tmp/brm-html5-archive/HTML5)
 /// * `port` - Port the server is listening on (default: 8080)
 #[verb("open", "html5")]
-fn open_html5(archive: Option<String>, port: Option<u16>) -> Result<Value> {
-    let dir = archive.unwrap_or_else(|| "/tmp/brm-html5-archive/HTML5".to_string());
+fn open_html5(archive: Option<String>, port: Option<u16>, project: Option<String>) -> Result<Value> {
+    let dir = archive.unwrap_or_else(|| {
+        let name = project.as_deref().unwrap_or("brm").to_lowercase();
+        format!("/tmp/{name}-html5-archive/HTML5")
+    });
     let port = port.unwrap_or(8080);
 
     // Find the first .html file in the archive dir
