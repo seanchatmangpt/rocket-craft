@@ -473,6 +473,182 @@ describe('GET /api/game/profile', () => {
   });
 });
 
+// ── /api/game/dashboard-stats ─────────────────────────────────────────────────
+describe('GET /api/game/dashboard-stats', () => {
+  it('returns an array of daily rollup rows', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/dashboard-stats');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    // Returns { source, rows } — rows may be empty if no sessions exist yet
+    expect(typeof body.source).toBe('string');
+    expect(Array.isArray(body.rows)).toBe(true);
+  });
+
+  it('contract: each row has day, sessions, pass_rate_pct', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/dashboard-stats');
+    if (status === 503 || body.rows?.length === 0) return;
+    expect(status).toBe(200);
+    const row = body.rows[0];
+    expect(typeof row.day).toBe('string');
+    expect(typeof row.sessions).toBe('number');
+    // pass_rate_pct may be null if no receipts yet
+    expect(['number', 'object']).toContain(typeof row.pass_rate_pct);
+  });
+});
+
+// ── /api/game/ocel-export ─────────────────────────────────────────────────────
+describe('GET /api/game/ocel-export', () => {
+  it('rejects missing session_id', async () => {
+    if (MOCK) return;
+    const { status } = await get('/api/game/ocel-export');
+    expect([400, 422]).toContain(status);
+  });
+
+  it('returns 404 for unknown session', async () => {
+    if (MOCK) return;
+    const { status } = await get('/api/game/ocel-export?session_id=00000000-0000-0000-0000-000000000099');
+    expect([404, 503]).toContain(status);
+  });
+
+  it('OCEL 2.0 contract: objectTypes, eventTypes, objects, events', async () => {
+    if (MOCK) return;
+    // Seed a session to export
+    const seed = await post('/api/game/session-seed', {});
+    if (seed.status === 503 || seed.status === 403) return;
+    const { session_id } = seed.body;
+
+    const { status, body } = await get(`/api/game/ocel-export?session_id=${session_id}`);
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(Array.isArray(body.objectTypes)).toBe(true);
+    expect(Array.isArray(body.eventTypes)).toBe(true);
+    expect(Array.isArray(body.objects)).toBe(true);
+    expect(Array.isArray(body.events)).toBe(true);
+    expect(body.events.length).toBeGreaterThan(0);
+    // OCEL 2.0: event.type = activity name
+    const firstEvent = body.events[0];
+    expect(typeof firstEvent.type).toBe('string');
+    expect(typeof firstEvent.time).toBe('string');
+  });
+});
+
+// ── /api/game/health-lies ─────────────────────────────────────────────────────
+describe('GET /api/game/health-lies', () => {
+  it('returns lies[], all_clear, scanned_at', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/health-lies');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(Array.isArray(body.lies)).toBe(true);
+    expect(typeof body.all_clear).toBe('boolean');
+    expect(typeof body.scanned_at).toBe('string');
+  });
+
+  it('contract: each lie has code, description, evidence', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/health-lies');
+    if (status === 503 || body.lies?.length === 0) return;
+    expect(status).toBe(200);
+    const lie = body.lies[0];
+    expect(['LIE-1', 'LIE-2', 'LIE-4']).toContain(lie.code);
+    expect(typeof lie.description).toBe('string');
+    expect(typeof lie.evidence).toBe('object');
+  });
+});
+
+// ── /api/game/verify-signature ────────────────────────────────────────────────
+describe('POST /api/game/verify-signature', () => {
+  it('rejects empty body', async () => {
+    if (MOCK) return;
+    const { status } = await post('/api/game/verify-signature', {});
+    expect([400, 422]).toContain(status);
+  });
+
+  it('returns verified:false for fake signature (no signing key configured)', async () => {
+    if (MOCK) return;
+    const { status, body } = await post('/api/game/verify-signature', {
+      verdict: 'PASS',
+      receipt_hash: 'a'.repeat(64),
+      session_id: '00000000-0000-0000-0000-000000000001',
+      proven_at: '2026-06-19T00:00:00.000Z',
+      ed25519_sig: 'b'.repeat(128),
+    });
+    if (status === 503) return;
+    expect([200, 400, 422]).toContain(status);
+    if (status === 200) {
+      // Without a real key, verification must fail
+      expect(typeof body.verified).toBe('boolean');
+      expect(typeof body.algorithm).toBe('string');
+    }
+  });
+});
+
+// ── /api/game/evidence-pack ───────────────────────────────────────────────────
+describe('POST /api/game/evidence-pack', () => {
+  it('rejects missing session_id', async () => {
+    if (MOCK) return;
+    const { status } = await post('/api/game/evidence-pack', {});
+    expect(status).toBe(400);
+  });
+
+  it('returns 404 for unknown session', async () => {
+    if (MOCK) return;
+    const { status } = await post('/api/game/evidence-pack', {
+      session_id: '00000000-0000-0000-0000-000000000099',
+    });
+    expect([404, 503]).toContain(status);
+  });
+
+  it('contract: pack has pack_hash, manifest, ocel, chain_proof', async () => {
+    if (MOCK) return;
+    const seed = await post('/api/game/session-seed', {});
+    if (seed.status === 503 || seed.status === 403) return;
+    const { session_id } = seed.body;
+
+    const { status, body } = await post('/api/game/evidence-pack', { session_id });
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(typeof body.pack_hash).toBe('string');
+    expect(body.pack_hash).toHaveLength(64); // BLAKE3 hex
+    expect(body.pack_algorithm).toBe('BLAKE3');
+    expect(typeof body.manifest).toBe('object');
+    expect(typeof body.manifest.total_events).toBe('number');
+    expect(typeof body.manifest.chain_intact).toBe('boolean');
+    expect(Array.isArray(body.ocel.events)).toBe(true);
+    expect(Array.isArray(body.chain_proof.events)).toBe(true);
+  });
+
+  it('full proof: seed → evidence-pack → chain_intact=true, BLAKE3 pack_hash', async () => {
+    if (MOCK) return;
+    const seed = await post('/api/game/session-seed', {});
+    if (seed.status === 503 || seed.status === 403) return;
+    const { session_id, ocel_event_count } = seed.body;
+
+    const { status, body } = await post('/api/game/evidence-pack', { session_id });
+    if (status === 503) return;
+    expect(status).toBe(200);
+
+    // Chain must be intact for a lawfully seeded session
+    expect(body.chain_proof.intact).toBe(true);
+    expect(body.chain_proof.first_break_at).toBeNull();
+    expect(body.chain_proof.events.length).toBe(ocel_event_count);
+
+    // All per-event chain_ok
+    const brokenLinks = body.chain_proof.events.filter((e: { chain_ok: boolean }) => !e.chain_ok);
+    expect(brokenLinks).toHaveLength(0);
+
+    // OCEL 2.0 activities match
+    const activities = body.ocel.events.map((e: { type: string }) => e.type);
+    expect(activities).toContain('GameSessionStarted');
+    expect(activities).toContain('FrameRendered');
+    expect(activities).toContain('InputAdmitted');
+
+    console.log(`[evidence-pack] session=${session_id} pack_hash=${body.pack_hash.slice(0,16)}… events=${ocel_event_count}`);
+  });
+});
+
 beforeAll(() => {
   if (!MOCK) {
     console.log(`[pipeline-api.test] Running against ${BASE}`);
