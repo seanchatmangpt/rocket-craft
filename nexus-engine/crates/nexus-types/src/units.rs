@@ -246,3 +246,144 @@ impl TimeDilation {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Hp ────────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn hp_new_checked_accepts_zero() {
+        assert!(Hp::new_checked(0.0).is_ok());
+    }
+
+    #[test]
+    fn hp_new_checked_accepts_positive() {
+        let hp = Hp::new_checked(250.0).unwrap();
+        assert_eq!(hp.value(), 250.0);
+    }
+
+    #[test]
+    fn hp_new_checked_rejects_negative() {
+        assert!(Hp::new_checked(-1.0).is_err());
+    }
+
+    #[test]
+    fn hp_is_dead_at_zero() {
+        assert!(Hp::ZERO.is_dead());
+    }
+
+    #[test]
+    fn hp_is_not_dead_when_positive() {
+        assert!(!Hp::new(1.0).is_dead());
+    }
+
+    #[test]
+    fn hp_addition_sums_values() {
+        let a = Hp::new(100.0);
+        let b = Hp::new(50.0);
+        assert_eq!((a + b).value(), 150.0);
+    }
+
+    #[test]
+    fn hp_subtraction_yields_difference() {
+        let a = Hp::new(100.0);
+        let b = Hp::new(30.0);
+        assert_eq!((a - b).value(), 70.0);
+    }
+
+    #[test]
+    fn hp_scale_by_f32() {
+        let hp = Hp::new(100.0);
+        assert_eq!((hp * 0.5).value(), 50.0);
+    }
+
+    // ── Gold ──────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn gold_zero_constant_is_zero() {
+        assert_eq!(Gold::ZERO.value(), 0);
+    }
+
+    #[test]
+    fn gold_checked_add_succeeds_on_normal_values() {
+        let result = Gold::new(100).checked_add(Gold::new(50)).unwrap();
+        assert_eq!(result.value(), 150);
+    }
+
+    #[test]
+    fn gold_checked_add_errors_on_overflow() {
+        let result = Gold::new(u32::MAX).checked_add(Gold::new(1));
+        assert!(matches!(result, Err(TypeError::GoldOverflow { .. })));
+    }
+
+    #[test]
+    fn gold_addition_operator() {
+        let total = Gold::new(200) + Gold::new(300);
+        assert_eq!(total.value(), 500);
+    }
+
+    // ── Damage ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn damage_value_round_trips() {
+        let dmg = Damage::new(42.5);
+        assert_eq!(dmg.value(), 42.5);
+    }
+
+    #[test]
+    fn damage_adds() {
+        let d = Damage::new(10.0) + Damage::new(5.0);
+        assert_eq!(d.value(), 15.0);
+    }
+
+    // ── TimeDilation ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn time_dilation_normal_constant_is_1() {
+        assert_eq!(TimeDilation::NORMAL.value(), 1.0);
+    }
+
+    #[test]
+    fn time_dilation_slow_constant_is_0_5() {
+        assert_eq!(TimeDilation::SLOW.value(), 0.5);
+    }
+
+    #[test]
+    fn time_dilation_fast_constant_is_1_3() {
+        assert_eq!(TimeDilation::FAST.value(), 1.3);
+    }
+
+    #[test]
+    fn time_dilation_new_checked_accepts_valid_range() {
+        assert!(TimeDilation::new_checked(1.0).is_ok());
+        assert!(TimeDilation::new_checked(0.1).is_ok());
+        assert!(TimeDilation::new_checked(3.0).is_ok());
+    }
+
+    #[test]
+    fn time_dilation_new_checked_rejects_below_min() {
+        assert!(TimeDilation::new_checked(0.0).is_err());
+        assert!(TimeDilation::new_checked(-1.0).is_err());
+    }
+
+    #[test]
+    fn time_dilation_new_checked_rejects_above_max() {
+        assert!(TimeDilation::new_checked(3.1).is_err());
+    }
+
+    // ── Xp ───────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn xp_addition_accumulates() {
+        let total = Xp::new(1000) + Xp::new(500);
+        assert_eq!(total.value(), 1500);
+    }
+
+    #[test]
+    fn xp_subtraction() {
+        let remaining = Xp::new(1000) - Xp::new(400);
+        assert_eq!(remaining.value(), 600);
+    }
+}
