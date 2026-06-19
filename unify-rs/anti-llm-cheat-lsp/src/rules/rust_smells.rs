@@ -152,3 +152,58 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, message: &str) -> Observation {
+        Observation {
+            file_path: "src/lib.rs".into(),
+            start_byte: 0,
+            end_byte: construct.len(),
+            line: 1,
+            column: 0,
+            kind: "pattern".into(),
+            construct: construct.into(),
+            context: String::new(),
+            message: message.into(),
+        }
+    }
+
+    #[test]
+    fn clean_obs_produces_no_diag() {
+        let diags = evaluate(&[obs("normal_function", "")]);
+        assert!(diags.is_empty());
+    }
+
+    #[test]
+    fn clap_debug_triggers_strange_001() {
+        let diags = evaluate(&[obs("CLAP-DEBUG", "")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-STRANGE-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn clap_debug_path_triggers_strange_001() {
+        let diags = evaluate(&[obs("CLAP-DEBUG-PATH", "")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-STRANGE-001");
+    }
+
+    #[test]
+    fn content_was_triggers_strange_002() {
+        let diags = evaluate(&[obs("Content was:", "")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-STRANGE-002");
+    }
+
+    #[test]
+    fn path_was_triggers_strange_003() {
+        let diags = evaluate(&[obs("Path was:", "")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-STRANGE-003");
+    }
+}

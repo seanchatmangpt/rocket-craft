@@ -276,3 +276,64 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(file: &str, construct: &str, context: &str) -> Observation {
+        Observation {
+            file_path: file.into(),
+            start_byte: 0,
+            end_byte: construct.len(),
+            line: 1,
+            column: 0,
+            kind: "raw_text".into(),
+            construct: construct.into(),
+            context: context.into(),
+            message: String::new(),
+        }
+    }
+
+    const LAUNDERING: &str =
+        "ChangelogCoverage(15 rows) => SpecCoverage(LSP 3.18)";
+
+    #[test]
+    fn clean_observation_produces_no_diag() {
+        let diags = evaluate(&[obs("src/server.rs", "fn handle()", "")]);
+        assert!(diags.is_empty());
+    }
+
+    #[test]
+    fn laundering_in_construct_triggers_diag() {
+        let diags = evaluate(&[obs("src/server.rs", LAUNDERING, "")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-LSP318-COMB-001");
+    }
+
+    #[test]
+    fn laundering_in_context_triggers_diag() {
+        let diags = evaluate(&[obs("src/server.rs", "other", LAUNDERING)]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-LSP318-COMB-001");
+    }
+
+    #[test]
+    fn self_file_lsp318_rs_is_skipped() {
+        let diags = evaluate(&[obs("rules/lsp318.rs", LAUNDERING, LAUNDERING)]);
+        assert!(diags.is_empty(), "lsp318.rs must not self-trigger");
+    }
+
+    #[test]
+    fn engine_rs_is_skipped() {
+        let diags = evaluate(&[obs("src/engine.rs", LAUNDERING, LAUNDERING)]);
+        assert!(diags.is_empty(), "engine.rs must not trigger lsp318 rule");
+    }
+
+    #[test]
+    fn diag_is_blocking() {
+        let diags = evaluate(&[obs("src/foo.rs", LAUNDERING, "")]);
+        assert!(diags[0].blocking, "LSP318 violation must be blocking");
+    }
+}

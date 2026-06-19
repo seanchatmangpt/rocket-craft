@@ -137,3 +137,86 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(file: &str, construct: &str) -> Observation {
+        Observation {
+            file_path: file.into(),
+            start_byte: 0,
+            end_byte: construct.len(),
+            line: 1,
+            column: 0,
+            kind: "pattern".into(),
+            construct: construct.into(),
+            context: construct.into(),
+            message: String::new(),
+        }
+    }
+
+    #[test]
+    fn clean_observation_produces_no_diag() {
+        let diags = evaluate(&[obs("src/lib.rs", "normal_function")]);
+        assert!(diags.is_empty());
+    }
+
+    #[test]
+    fn oracle_001_fires_on_lazy_static_env_init() {
+        let diags = evaluate(&[obs("src/breed.rs", "lazy_static_env_init")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-ORACLE-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn oracle_001_skipped_in_tests() {
+        let diags = evaluate(&[obs("tests/breed_test.rs", "lazy_static_env_init")]);
+        assert!(diags.is_empty(), "oracle-001 must not fire in test paths");
+    }
+
+    #[test]
+    fn oracle_002_fires_on_transmute_cast() {
+        let diags = evaluate(&[obs("src/compute.rs", "transmute_cast")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-ORACLE-002");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn oracle_002_skipped_in_test_path() {
+        let diags = evaluate(&[obs("tests/foo.rs", "transmute_cast")]);
+        assert!(diags.is_empty());
+    }
+
+    #[test]
+    fn oracle_003_fires_in_breeds_dir() {
+        let diags = evaluate(&[obs("src/breeds/algo.rs", "global_hashmap_literal")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-ORACLE-003");
+    }
+
+    #[test]
+    fn oracle_003_skipped_outside_breeds() {
+        // Global hashmap literals are only suspicious inside breed src dirs.
+        let diags = evaluate(&[obs("src/util.rs", "global_hashmap_literal")]);
+        assert!(diags.is_empty());
+    }
+
+    #[test]
+    fn is_breed_src_recognizes_breeds_dir() {
+        assert!(is_breed_src("src/breeds/my_breed.rs"));
+        assert!(is_breed_src("src/breeds/nested/algo.rs"));
+        assert!(!is_breed_src("src/lib.rs"));
+    }
+
+    #[test]
+    fn is_test_path_recognizes_test_dirs() {
+        assert!(is_test_path("tests/integration.rs"));
+        assert!(is_test_path("src/algo_test.rs"));
+        assert!(is_test_path("fixtures/sample.rs"));
+        assert!(!is_test_path("src/lib.rs"));
+    }
+}
