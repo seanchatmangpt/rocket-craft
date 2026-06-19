@@ -12,14 +12,18 @@ impl UeGuid {
         UeGuid(s)
     }
 
-    pub fn from_str(s: &str) -> Self {
-        UeGuid(s.to_string())
-    }
 }
 
 impl Default for UeGuid {
     fn default() -> Self {
         UeGuid::new()
+    }
+}
+
+impl std::str::FromStr for UeGuid {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(UeGuid(s.to_string()))
     }
 }
 

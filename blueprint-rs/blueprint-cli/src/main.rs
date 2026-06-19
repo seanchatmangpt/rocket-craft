@@ -435,7 +435,7 @@ fn cmd_decompile(
 }
 
 fn cmd_watch(
-    dir: &PathBuf,
+    dir: &std::path::Path,
     output_dir: &Option<PathBuf>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     use notify::{EventKind, RecursiveMode, Watcher};

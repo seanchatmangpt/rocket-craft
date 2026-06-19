@@ -397,7 +397,7 @@ mod tests {
         // Link to PrintString but with a fake pin GUID
         source.pins[1].linked_to.push(PinRef {
             node_name: "PrintString".to_string(),
-            pin_id: UeGuid::from_str("DEADBEEFDEADBEEFDEADBEEFDEADBEEF"),
+            pin_id: "DEADBEEFDEADBEEFDEADBEEFDEADBEEF".parse().unwrap(),
         });
 
         let graph = make_graph("EventGraph", vec![source, target]);

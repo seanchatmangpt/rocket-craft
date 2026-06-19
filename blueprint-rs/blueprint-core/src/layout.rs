@@ -198,8 +198,8 @@ fn assign_layers(
     let mut queue: VecDeque<usize> = VecDeque::new();
 
     // Seed the queue with all source nodes (no predecessors).
-    for i in 0..n {
-        if in_degree[i] == 0 {
+    for (i, &deg) in in_degree.iter().enumerate().take(n) {
+        if deg == 0 {
             queue.push_back(i);
         }
     }
