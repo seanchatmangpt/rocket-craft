@@ -542,3 +542,202 @@ pub fn sample_rdf_store() -> TripleStore {
 
     store
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use unify_receipts::receipt::Receipt;
+
+    // ── ReceiptChain ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn receipt_chain_new_is_empty() {
+        let c = ReceiptChain::new();
+        assert!(c.is_empty());
+        assert_eq!(c.len(), 0);
+        assert!(c.head().is_none());
+    }
+
+    #[test]
+    fn receipt_chain_append_and_head() {
+        let mut c = ReceiptChain::new();
+        c.append(Receipt::new("k1", b"d1"));
+        c.append(Receipt::new("k2", b"d2"));
+        assert_eq!(c.len(), 2);
+        assert_eq!(c.head().unwrap().key, "k2");
+    }
+
+    #[test]
+    fn receipt_chain_receipts_returns_all_in_order() {
+        let mut c = ReceiptChain::new();
+        c.append(Receipt::new("a", b"x"));
+        c.append(Receipt::new("b", b"y"));
+        let keys: Vec<_> = c.receipts().iter().map(|r| r.key.as_str()).collect();
+        assert_eq!(keys, ["a", "b"]);
+    }
+
+    #[test]
+    fn sample_receipt_chain_has_three_receipts() {
+        let c = sample_receipt_chain();
+        assert_eq!(c.len(), 3);
+        assert!(!c.receipts()[0].hash.is_empty());
+    }
+
+    // ── OCEL ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn validate_ocel_passes_on_good_log() {
+        let log = sample_ocel_log();
+        assert!(validate_ocel(&log).is_empty());
+    }
+
+    #[test]
+    fn validate_ocel_fails_on_dangling_reference() {
+        let log = OcelLog {
+            objects: vec![OcelObject { id: "obj-a".into(), object_type: "T".into() }],
+            events: vec![OcelEvent {
+                id: "e1".into(),
+                event_type: "act".into(),
+                related_object_ids: vec!["UNKNOWN-ID".into()],
+                timestamp: 1,
+            }],
+        };
+        let violations = validate_ocel(&log);
+        assert!(!violations.is_empty());
+    }
+
+    // ── event_log_to_ocel ─────────────────────────────────────────────────────
+
+    #[test]
+    fn event_log_to_ocel_creates_one_object_per_trace() {
+        let log = sample_event_log();
+        let ocel = event_log_to_ocel(&log);
+        assert_eq!(ocel.objects.len(), 2);
+        assert!(ocel.objects.iter().any(|o| o.id == "case-001"));
+        assert!(ocel.objects.iter().any(|o| o.id == "case-002"));
+    }
+
+    #[test]
+    fn event_log_to_ocel_creates_correct_event_count() {
+        let log = sample_event_log();
+        let ocel = event_log_to_ocel(&log);
+        // case-001 has 3 events, case-002 has 2 → total 5
+        assert_eq!(ocel.events.len(), 5);
+    }
+
+    // ── AdmissionGate ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn admission_gate_starts_open() {
+        let g = AdmissionGate::open("gate-1");
+        assert!(g.check());
+        assert_eq!(g.name, "gate-1");
+    }
+
+    #[test]
+    fn admission_gate_raise_closes_and_lower_reopens() {
+        let mut g = AdmissionGate::open("g");
+        g.raise();
+        assert!(!g.check());
+        g.lower();
+        assert!(g.check());
+    }
+
+    // ── ReceiptBuilder ────────────────────────────────────────────────────────
+
+    #[test]
+    fn receipt_builder_with_data_is_hashed() {
+        let r = ReceiptBuilder::new("my-key").with_data(b"payload").build();
+        assert_eq!(r.key, "my-key");
+        assert!(!r.hash.is_empty());
+    }
+
+    #[test]
+    fn receipt_envelope_map_service_changes_tag() {
+        let r = Receipt::new("k", b"d");
+        let env = ReceiptEnvelope::wrap(r, "svc-a");
+        let env2 = env.map_service("svc-b");
+        assert_eq!(env2.service_tag, "svc-b");
+        assert_eq!(env2.receipt.key, "k");
+    }
+
+    // ── LifecycleTracker ──────────────────────────────────────────────────────
+
+    #[test]
+    fn lifecycle_starts_at_raw() {
+        let t = LifecycleTracker::new();
+        assert_eq!(t.state(), LifecycleState::Raw);
+        assert_eq!(t.history().len(), 1);
+    }
+
+    #[test]
+    fn lifecycle_valid_forward_transitions() {
+        let mut t = LifecycleTracker::new();
+        assert!(t.transition(LifecycleState::Parsed).is_ok());
+        assert!(t.transition(LifecycleState::Admitted).is_ok());
+        assert!(t.transition(LifecycleState::Exported).is_ok());
+        assert_eq!(t.history().len(), 4);
+        assert_eq!(t.state(), LifecycleState::Exported);
+    }
+
+    #[test]
+    fn lifecycle_invalid_skip_transition_fails() {
+        let mut t = LifecycleTracker::new();
+        let err = t.transition(LifecycleState::Admitted);
+        assert!(err.is_err());
+        // State unchanged
+        assert_eq!(t.state(), LifecycleState::Raw);
+    }
+
+    // ── PetriNet ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn petri_net_workflow_net_requires_source_and_sink() {
+        let mut net = PetriNet::new();
+        let p1 = net.add_place("start");
+        let p2 = net.add_place("end");
+        assert!(!net.is_workflow_net());
+        net.mark_source(p1);
+        assert!(!net.is_workflow_net());
+        net.mark_sink(p2);
+        assert!(net.is_workflow_net());
+    }
+
+    #[test]
+    fn petri_net_arc_connects_place_to_transition() {
+        let mut net = PetriNet::new();
+        let p = net.add_place("p");
+        let t = net.add_transition("t");
+        net.connect_place_to_transition(p, t);
+        net.connect_transition_to_place(t, p);
+        // No panic = success; structural state is internal
+    }
+
+    // ── ConformanceScore ──────────────────────────────────────────────────────
+
+    #[test]
+    fn conformance_perfect_f_measure_is_one() {
+        let s = ConformanceScore::perfect();
+        assert!((s.f_measure() - 1.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn conformance_zero_f_measure_is_zero() {
+        assert_eq!(ConformanceScore::zero().f_measure(), 0.0);
+    }
+
+    #[test]
+    fn conformance_f_measure_harmonic_mean() {
+        let s = ConformanceScore::new(0.8, 0.6);
+        let expected = 2.0 * 0.8 * 0.6 / (0.8 + 0.6);
+        assert!((s.f_measure() - expected).abs() < 1e-9);
+    }
+
+    // ── LifecycleState Display ────────────────────────────────────────────────
+
+    #[test]
+    fn lifecycle_state_display() {
+        assert_eq!(format!("{}", LifecycleState::Raw), "Raw");
+        assert_eq!(format!("{}", LifecycleState::Exported), "Exported");
+    }
+}
