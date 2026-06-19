@@ -25,6 +25,8 @@ interface ReceiptBody {
   payload: Record<string, unknown>;
 }
 
+const SYNTHETIC_ENGINE_SOURCES = ['synthetic', 'sim', 'fake', 'stub', 'mock'];
+
 function verifyLifecycle(lifecycle: string[], eventCount: number): { verdict: 'PASS' | 'FAIL'; reason: string } {
   if (!lifecycle.includes(LAWFUL_LIFECYCLE_START)) {
     return { verdict: 'FAIL', reason: 'Missing GameSessionStarted' };
@@ -43,6 +45,14 @@ export default defineEventHandler(async (event) => {
 
   if (!body?.session_id || !body.ocel_lifecycle || !body.receipt_hash) {
     throw createError({ statusCode: 400, statusMessage: 'session_id, ocel_lifecycle, receipt_hash required' });
+  }
+
+  // Hard reject synthetic engine sources — only real UE4 proof accepted
+  if (SYNTHETIC_ENGINE_SOURCES.includes((body.engine_source ?? '').toLowerCase())) {
+    throw createError({
+      statusCode: 422,
+      statusMessage: `engine_source '${body.engine_source}' is not real UE4 — synthetic receipts are rejected`,
+    });
   }
 
   const { verdict, reason } = verifyLifecycle(body.ocel_lifecycle, body.ocel_event_count ?? 0);

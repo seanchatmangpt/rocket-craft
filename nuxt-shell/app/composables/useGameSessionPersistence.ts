@@ -100,6 +100,9 @@ export function useGameSessionPersistence() {
         .eq('id', dbSessionId.value);
 
       // Fire-and-forget: emit OTel spans via server route (non-fatal if collector down)
+      // seq: syncedCount.value is already past the last processed event; rewind by unsync.length
+      // so seq[0] = (syncedCount - unsync.length), matching the 0-indexed seq stored in ocel_events
+      const batchStartSeq = syncedCount.value - unsync.length;
       const batch = unsync.map((evt, i) => ({
         session_id: dbSessionId.value!,
         activity: evt.activity,
@@ -107,7 +110,7 @@ export function useGameSessionPersistence() {
         object_refs: evt.object_refs.map(o => o.object_id),
         attributes: evt.attributes as Record<string, unknown>,
         event_hash: lastHash.value ?? '',
-        seq: syncedCount.value - unsync.length + i + 1,
+        seq: batchStartSeq + i,
       }));
       $fetch('/api/game/ocel-ingest', { method: 'POST', body: { session_id: dbSessionId.value, events: batch } })
         .catch(() => { /* collector down — Supabase is source of truth */ });

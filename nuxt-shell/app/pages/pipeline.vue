@@ -174,8 +174,15 @@ onUnmounted(() => {
           </div>
           <ul v-if="chainStatus.breaks.length" class="break-list">
             <li v-for="b in chainStatus.breaks" :key="b.session_id">
-              Session {{ b.session_id.slice(0, 8) }}… — {{ b.message }}
-              <span v-if="b.broken_at !== null"> (seq {{ b.broken_at }})</span>
+              <span class="break-session">{{ b.session_id.slice(0, 8) }}…</span>
+              <span class="break-msg"> — {{ b.message }}</span>
+              <span v-if="b.broken_at !== null" class="break-seq"> (seq {{ b.broken_at }})</span>
+              <a
+                class="ocel-dl-link"
+                :href="`/api/game/ocel-export?session_id=${b.session_id}`"
+                :download="`ocel2-${b.session_id.slice(0, 8)}.json`"
+                title="Download OCEL 2.0 JSON for pm4py conformance check"
+              >↓ OCEL 2.0</a>
             </li>
           </ul>
         </template>
@@ -227,7 +234,13 @@ onUnmounted(() => {
 .chain-badge.pass { background: #14532d; color: #86efac; }
 .chain-badge.fail { background: #450a0a; color: #fca5a5; }
 .chain-badge.unknown { background: #1e293b; color: #94a3b8; }
-.break-list { margin: 0.75rem 0 0 1rem; color: #fca5a5; font-size: 0.8rem; }
+.break-list { margin: 0.75rem 0 0 1rem; color: #fca5a5; font-size: 0.8rem; list-style: none; padding: 0; }
+.break-list li { display: flex; align-items: baseline; gap: 0.4rem; padding: 0.2rem 0; }
+.break-session { font-weight: 600; }
+.break-msg { flex: 1; }
+.break-seq { color: #f97316; }
+.ocel-dl-link { color: #7dd3fc; text-decoration: none; font-size: 0.75rem; border: 1px solid #334155; padding: 0.1rem 0.4rem; border-radius: 2px; white-space: nowrap; }
+.ocel-dl-link:hover { background: #1e293b; }
 .last-receipt { font-size: 0.8rem; color: #94a3b8; margin-bottom: 1.5rem; }
 .pipeline-nav { display: flex; gap: 1.5rem; }
 .pipeline-nav a { color: #7dd3fc; text-decoration: none; font-size: 0.875rem; }
