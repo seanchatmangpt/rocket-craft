@@ -330,3 +330,89 @@ pub fn run_index() -> anyhow::Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::NamedTempFile;
+    use std::io::Write;
+
+    // ── CrateMeta serde ───────────────────────────────────────────────────────
+
+    #[test]
+    fn crate_meta_serializes_to_camel_case_json() {
+        let meta = CrateMeta {
+            id: "my-crate-1.0.0".into(),
+            name: "my-crate".into(),
+            version: "1.0.0".into(),
+            ontology_count: 3,
+            query_count: 7,
+            blake3_hash: "abc123".into(),
+            category: "rdf".into(),
+        };
+        let json = serde_json::to_string(&meta).unwrap();
+        assert!(json.contains("\"ontologyCount\""));
+        assert!(json.contains("\"queryCount\""));
+        assert!(json.contains("\"blake3Hash\""));
+        assert!(!json.contains("ontology_count")); // snake_case must not appear
+    }
+
+    #[test]
+    fn crate_meta_deserializes_from_camel_case_json() {
+        let json = r#"{"id":"x","name":"x","version":"0.1.0","ontologyCount":2,"queryCount":5,"blake3Hash":"ff","category":"gen"}"#;
+        let meta: CrateMeta = serde_json::from_str(json).unwrap();
+        assert_eq!(meta.ontology_count, 2);
+        assert_eq!(meta.query_count, 5);
+        assert_eq!(meta.blake3_hash, "ff");
+    }
+
+    #[test]
+    fn crate_meta_clone_is_independent() {
+        let a = CrateMeta {
+            id: "a".into(), name: "a".into(), version: "1".into(),
+            ontology_count: 0, query_count: 0, blake3_hash: "h".into(), category: "c".into(),
+        };
+        let mut b = a.clone();
+        b.name = "b".into();
+        assert_eq!(a.name, "a");
+    }
+
+    // ── calculate_file_hashes ─────────────────────────────────────────────────
+
+    #[test]
+    fn calculate_file_hashes_returns_64_hex_chars() {
+        let mut tmp = NamedTempFile::new().unwrap();
+        tmp.write_all(b"hello rocket").unwrap();
+        let (h1, h2) = calculate_file_hashes(tmp.path()).unwrap();
+        assert_eq!(h1.len(), 64);
+        assert_eq!(h1, h2); // both outputs are the same hash
+        assert!(h1.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn calculate_file_hashes_same_content_same_hash() {
+        let mut a = NamedTempFile::new().unwrap();
+        let mut b = NamedTempFile::new().unwrap();
+        a.write_all(b"data").unwrap();
+        b.write_all(b"data").unwrap();
+        let (ha, _) = calculate_file_hashes(a.path()).unwrap();
+        let (hb, _) = calculate_file_hashes(b.path()).unwrap();
+        assert_eq!(ha, hb);
+    }
+
+    #[test]
+    fn calculate_file_hashes_different_content_different_hash() {
+        let mut a = NamedTempFile::new().unwrap();
+        let mut b = NamedTempFile::new().unwrap();
+        a.write_all(b"foo").unwrap();
+        b.write_all(b"bar").unwrap();
+        let (ha, _) = calculate_file_hashes(a.path()).unwrap();
+        let (hb, _) = calculate_file_hashes(b.path()).unwrap();
+        assert_ne!(ha, hb);
+    }
+
+    #[test]
+    fn calculate_file_hashes_missing_file_returns_err() {
+        assert!(calculate_file_hashes(std::path::Path::new("/nonexistent/file.ttl")).is_err());
+    }
+}
