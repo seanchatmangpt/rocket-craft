@@ -1,14 +1,10 @@
 {
-  "operation_id": "57653910-f323-446e-b319-839968d7170c",
-  "timestamp": "2026-06-19T18:31:29.261511Z",
+  "operation_id": "f306c97a-e6ac-4d24-b0df-d0377f65d4e2",
+  "timestamp": "2026-06-19T18:49:04.505565Z",
   "input_hashes": [
     "actuator:ggen-sync@26.6.11"
   ],
-  "output_hashes": [
-    "ontology/ggen-packs/mechbirth/./crates/rocket_preue4_verifier/src/semantic_lod.rs:c57ff133fa31b700ad8a85e0ffc9d7bd49cf8189a05f8f3931fec2a5d765d686",
-    "ontology/ggen-packs/mechbirth/./crates/rocket_preue4_verifier/src/motion.rs:4eb298932a7c74fdf2ca616a4e473fdc470ee61d246ade4baac2c598a3995b85",
-    "ontology/ggen-packs/mechbirth/./crates/rocket_preue4_verifier/src/geometry.rs:8061e7d1d8317751e0e4a2fca4eca900c8c1c7a592bbae77fe336bb6321d3305"
-  ],
-  "signature": "c0f029e1fb65eb67caa9380ef7169056f25545b7d537bb905ceb153b082f4a12fc7afed9b41304f63a2bbd45524c0c239a2ef216f93c528df2acba0a3a3cbd09",
-  "previous_receipt_hash": "8be3331e4a93fd88a5684795f4e40ce2eec498a287dcd223a30c8dc1fbf163ed"
+  "output_hashes": [],
+  "signature": "e06a53a23d562fa6a356e0a3349b8703b7578efc9b5f2f5ce33abcf1b35e6c49a2d53e355eb6d756fd8bb31abbf3ca20e49d3c196ec3da18bbbef4ede1551f0f",
+  "previous_receipt_hash": "162311c87f124d65fb2d5b01fde62683cc77754b064f0acf04531d883394e69c"
 }

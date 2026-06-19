@@ -1,13 +1,7 @@
-#[derive(Debug, Clone, Default)]
-pub struct OcelEvent {
-    pub id: String,
-}
+use serde::{Deserialize, Serialize};
 
-impl OcelEvent {
-    pub fn new(id: impl Into<String>) -> Self {
-        Self { id: id.into() }
-    }
-    pub fn is_valid(&self) -> bool {
-        !self.id.is_empty()
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OcelData {
+    pub objects: Vec<String>,
+    pub events: Vec<String>,
 }

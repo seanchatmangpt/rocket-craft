@@ -1,13 +1,16 @@
-#[derive(Debug, Clone, Default)]
-pub struct ProjectionCommand {
-    pub id: String,
-}
+use serde::{Deserialize, Serialize};
 
-impl ProjectionCommand {
-    pub fn new(id: impl Into<String>) -> Self {
-        Self { id: id.into() }
-    }
-    pub fn is_valid(&self) -> bool {
-        !self.id.is_empty()
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProjectionRow {
+    pub projection_id: String,
+    pub object_id: String,
+    pub station_id: String,
+    pub route_node_id: String,
+    pub source_process_step: String,
+    pub source_receipt: String,
+    pub authority_inputs: String,
+    pub lod_class: u8,
+    pub projection_type: String,
+    pub ue4_target_surface: String,
+    pub admission_status: String,
 }
