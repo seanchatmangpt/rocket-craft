@@ -212,3 +212,153 @@ impl Frustum {
         true
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn default_cam() -> Camera {
+        Camera::new(90.0, 16.0 / 9.0, 0.1, 1000.0).unwrap()
+    }
+
+    // ── Camera::new ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn valid_camera_construction() {
+        let c = default_cam();
+        assert!((c.fov_y_degrees() - 90.0).abs() < 0.01);
+        assert_eq!(c.near, 0.1);
+        assert_eq!(c.far, 1000.0);
+    }
+
+    #[test]
+    fn zero_fov_rejected() {
+        assert!(Camera::new(0.0, 1.0, 0.1, 100.0).is_err());
+    }
+
+    #[test]
+    fn fov_180_rejected() {
+        assert!(Camera::new(180.0, 1.0, 0.1, 100.0).is_err());
+    }
+
+    #[test]
+    fn far_equal_to_near_rejected() {
+        assert!(Camera::new(90.0, 1.0, 1.0, 1.0).is_err());
+    }
+
+    #[test]
+    fn far_less_than_near_rejected() {
+        assert!(Camera::new(90.0, 1.0, 10.0, 1.0).is_err());
+    }
+
+    #[test]
+    fn near_zero_rejected() {
+        assert!(Camera::new(90.0, 1.0, 0.0, 100.0).is_err());
+    }
+
+    // ── Camera matrices ───────────────────────────────────────────────────────
+
+    #[test]
+    fn identity_camera_view_matrix_is_identity() {
+        // At world-origin with no rotation, view = I
+        let c = default_cam();
+        let v = c.view_matrix();
+        for i in 0..4 {
+            for j in 0..4 {
+                let expected = if i == j { 1.0_f32 } else { 0.0 };
+                assert!((v[(i, j)] - expected).abs() < 1e-5,
+                    "v[{i},{j}] = {} expected {expected}", v[(i,j)]);
+            }
+        }
+    }
+
+    #[test]
+    fn projection_matrix_is_non_identity() {
+        let c = default_cam();
+        let p = c.projection_matrix();
+        // The [2,2] element encodes near/far — definitely not 1.0
+        assert!((p[(2, 2)] - 1.0).abs() > 0.01, "projection must differ from identity");
+    }
+
+    // ── Aabb ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn aabb_valid_construction() {
+        let a = Aabb::new(Vec3::new(-1.0, -1.0, -1.0), Vec3::new(1.0, 1.0, 1.0)).unwrap();
+        let c = a.center();
+        assert!(c.norm() < 1e-5, "unit cube center should be origin");
+    }
+
+    #[test]
+    fn aabb_invalid_min_gt_max_rejected() {
+        assert!(Aabb::new(Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 1.0)).is_err());
+    }
+
+    #[test]
+    fn aabb_contains_point_inside() {
+        let a = Aabb::new(Vec3::zeros(), Vec3::new(2.0, 2.0, 2.0)).unwrap();
+        assert!(a.contains_point(Vec3::new(1.0, 1.0, 1.0)));
+    }
+
+    #[test]
+    fn aabb_excludes_point_outside() {
+        let a = Aabb::new(Vec3::zeros(), Vec3::new(1.0, 1.0, 1.0)).unwrap();
+        assert!(!a.contains_point(Vec3::new(2.0, 0.5, 0.5)));
+    }
+
+    #[test]
+    fn aabb_contains_min_corner() {
+        let a = Aabb::new(Vec3::zeros(), Vec3::new(1.0, 1.0, 1.0)).unwrap();
+        assert!(a.contains_point(Vec3::zeros()));
+    }
+
+    #[test]
+    fn aabb_half_extents_correct() {
+        let a = Aabb::new(Vec3::zeros(), Vec3::new(4.0, 6.0, 8.0)).unwrap();
+        let h = a.half_extents();
+        assert!((h.x - 2.0).abs() < 1e-5);
+        assert!((h.y - 3.0).abs() < 1e-5);
+        assert!((h.z - 4.0).abs() < 1e-5);
+    }
+
+    // ── Frustum::intersects_aabb ──────────────────────────────────────────────
+
+    #[test]
+    fn origin_unit_cube_visible_from_default_camera() {
+        let c = Camera::new(90.0, 1.0, 0.1, 1000.0).unwrap();
+        let vp = c.view_projection();
+        let frustum = Frustum::from_view_projection(&vp);
+        // Camera at origin looking down -Z: a box at -5 on Z should be in frustum
+        let aabb = Aabb::new(
+            Vec3::new(-0.5, -0.5, -6.0),
+            Vec3::new(0.5, 0.5, -4.0),
+        ).unwrap();
+        assert!(frustum.intersects_aabb(&aabb), "cube directly in front should be visible");
+    }
+
+    #[test]
+    fn aabb_behind_camera_not_visible() {
+        let c = Camera::new(90.0, 1.0, 0.1, 1000.0).unwrap();
+        let vp = c.view_projection();
+        let frustum = Frustum::from_view_projection(&vp);
+        // Box at +Z = behind camera (looking down -Z)
+        let aabb = Aabb::new(
+            Vec3::new(-0.5, -0.5, 2.0),
+            Vec3::new(0.5, 0.5, 5.0),
+        ).unwrap();
+        assert!(!frustum.intersects_aabb(&aabb), "cube behind camera should not be visible");
+    }
+
+    #[test]
+    fn aabb_beyond_far_plane_not_visible() {
+        let c = Camera::new(90.0, 1.0, 0.1, 10.0).unwrap(); // far = 10
+        let vp = c.view_projection();
+        let frustum = Frustum::from_view_projection(&vp);
+        // Box well past the far plane
+        let aabb = Aabb::new(
+            Vec3::new(-0.5, -0.5, -100.0),
+            Vec3::new(0.5, 0.5, -50.0),
+        ).unwrap();
+        assert!(!frustum.intersects_aabb(&aabb), "cube past far plane should be culled");
+    }
+}

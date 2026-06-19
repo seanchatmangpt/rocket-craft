@@ -44,3 +44,32 @@ impl Ndc {
 }
 
 pub use nexus_types::Transform;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Ndc::new ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn ndc_valid_origin() {
+        let n = Ndc::new(0.0, 0.0).unwrap();
+        assert_eq!(n.x(), 0.0);
+        assert_eq!(n.y(), 0.0);
+    }
+
+    #[test]
+    fn ndc_boundary_values_accepted() {
+        Ndc::new(-1.0, -1.0).unwrap();
+        Ndc::new(1.0, 1.0).unwrap();
+        Ndc::new(-1.0, 1.0).unwrap();
+    }
+
+    #[test]
+    fn ndc_out_of_range_rejected() {
+        assert!(Ndc::new(1.1, 0.0).is_err());
+        assert!(Ndc::new(-1.1, 0.0).is_err());
+        assert!(Ndc::new(0.0, 1.1).is_err());
+        assert!(Ndc::new(0.0, -1.1).is_err());
+    }
+}

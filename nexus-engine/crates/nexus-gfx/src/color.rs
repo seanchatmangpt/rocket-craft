@@ -81,3 +81,101 @@ pub enum GfxError {
     #[error("color channel out of [0, 1] range: r={r}, g={g}, b={b}")]
     ColorOutOfRange { r: f32, g: f32, b: f32 },
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── LinearRgb::new ────────────────────────────────────────────────────────
+
+    #[test]
+    fn valid_color_is_accepted() {
+        let c = LinearRgb::new(0.5, 0.25, 1.0).unwrap();
+        assert!((c.r() - 0.5).abs() < 1e-6);
+        assert!((c.g() - 0.25).abs() < 1e-6);
+        assert!((c.b() - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn zero_color_is_valid() {
+        LinearRgb::new(0.0, 0.0, 0.0).unwrap();
+    }
+
+    #[test]
+    fn full_white_is_valid() {
+        LinearRgb::new(1.0, 1.0, 1.0).unwrap();
+    }
+
+    #[test]
+    fn channel_above_one_is_rejected() {
+        assert!(LinearRgb::new(1.1, 0.5, 0.5).is_err());
+        assert!(LinearRgb::new(0.5, 1.1, 0.5).is_err());
+        assert!(LinearRgb::new(0.5, 0.5, 1.1).is_err());
+    }
+
+    #[test]
+    fn negative_channel_is_rejected() {
+        assert!(LinearRgb::new(-0.1, 0.5, 0.5).is_err());
+    }
+
+    // ── LinearRgb::to_array ───────────────────────────────────────────────────
+
+    #[test]
+    fn to_array_round_trips_values() {
+        let c = LinearRgb::new(0.1, 0.2, 0.3).unwrap();
+        let arr = c.to_array();
+        assert!((arr[0] - 0.1).abs() < 1e-6);
+        assert!((arr[1] - 0.2).abs() < 1e-6);
+        assert!((arr[2] - 0.3).abs() < 1e-6);
+    }
+
+    // ── LinearRgb::to_srgb ────────────────────────────────────────────────────
+
+    #[test]
+    fn linear_black_maps_to_srgb_black() {
+        let srgb = LinearRgb::new(0.0, 0.0, 0.0).unwrap().to_srgb();
+        assert_eq!(srgb, [0, 0, 0]);
+    }
+
+    #[test]
+    fn linear_white_maps_to_srgb_255() {
+        let srgb = LinearRgb::new(1.0, 1.0, 1.0).unwrap().to_srgb();
+        assert_eq!(srgb, [255, 255, 255]);
+    }
+
+    #[test]
+    fn srgb_conversion_is_nonlinear() {
+        // 50% linear is NOT 127 in sRGB — it's brighter (~188)
+        let srgb = LinearRgb::new(0.5, 0.5, 0.5).unwrap().to_srgb();
+        let mid = srgb[0];
+        assert!(mid > 127 + 10, "linear 0.5 should map to sRGB > 137, got {mid}");
+        assert!(mid < 200, "linear 0.5 should map to sRGB < 200, got {mid}");
+    }
+
+    #[test]
+    fn srgb_conversion_below_threshold_uses_linear_segment() {
+        // For linear values <= 0.0031308, sRGB = linear * 12.92
+        let tiny = 0.001_f32;
+        let expected = (tiny * 12.92 * 255.0).round() as u8;
+        let srgb = LinearRgb::new(tiny, 0.0, 0.0).unwrap().to_srgb();
+        assert_eq!(srgb[0], expected, "below-threshold channel should use linear segment");
+    }
+
+    // ── named constants ───────────────────────────────────────────────────────
+
+    #[test]
+    fn beam_saber_constants_are_valid_linear_colors() {
+        let consts = [
+            LinearRgb::NU_GUNDAM_GREEN,
+            LinearRgb::WING_ZERO_GOLD,
+            LinearRgb::UNICORN_NT_D_RED,
+            LinearRgb::FREEDOM_BLUE,
+            LinearRgb::AERIAL_GREEN,
+        ];
+        for c in consts {
+            assert!((0.0..=1.0).contains(&c.r()), "r out of range: {}", c.r());
+            assert!((0.0..=1.0).contains(&c.g()), "g out of range: {}", c.g());
+            assert!((0.0..=1.0).contains(&c.b()), "b out of range: {}", c.b());
+        }
+    }
+}
