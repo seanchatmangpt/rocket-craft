@@ -180,7 +180,7 @@ const chainLabel: Record<string, string> = {
           <td class="lifecycle">{{ r.ocel_lifecycle?.join(' → ') ?? '—' }}</td>
           <td class="mono dimmed">{{ shortId(r.session_id) }}</td>
           <td class="mono dimmed" :title="r.receipt_hash">{{ shortHash(r.receipt_hash) }}</td>
-          <!-- output_hash: SHA-256 of the WASM binary (cook-to-game cross-check) -->
+          <!-- output_hash: BLAKE3 of the WASM binary (cook-to-game cross-check) -->
           <td class="mono dimmed" :title="r.output_hash ?? 'No WASM hash — browser receipt'">
             <span v-if="r.output_hash" class="wasm-hash">{{ shortHash(r.output_hash) }}</span>
             <span v-else class="dimmed">—</span>

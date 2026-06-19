@@ -34,24 +34,48 @@ interface CookLogEvent {
   line_no: number;
 }
 
-// Pattern table: order matters, first match wins.
+// Pattern table: mirrors Rust CookLogParser COOK_PATTERNS (tools/rocket-sdk/src/html5.rs).
+// Order matters — first match wins. Keep in sync with the Rust table.
 const PATTERNS: Array<{ match: string; activity: string }> = [
-  { match: 'BuildCookRun',                  activity: 'CookStarted' },
-  { match: 'HTML5Setup',                    activity: 'HTML5SetupStarted' },
-  { match: 'Success!',                      activity: 'HTML5SetupComplete' },
-  { match: 'LogCook: Display: Cooking package', activity: 'PackageCooking' },
-  { match: 'LogPak: Display: Collecting files', activity: 'PakStarted' },
-  { match: 'LogPak: Display: Created pak file', activity: 'PakComplete' },
-  { match: 'LogHTML5PlatformEditor',        activity: 'WasmBuildStarted' },
-  { match: 'Packaging complete',            activity: 'PackageComplete' },
-  { match: 'Total cook time',               activity: 'CookComplete' },
-  { match: 'LogStageAndPackage',            activity: 'StagingStarted' },
-  { match: 'Archiving',                     activity: 'ArchiveStarted' },
-  { match: 'Package was created',           activity: 'PackageCreated' },
-  { match: 'BuildCookRun: Completed',       activity: 'CookFinished' },
-  { match: 'Error:',                        activity: 'CookError' },
-  { match: 'ERROR:',                        activity: 'CookError' },
-  { match: 'FAILED:',                       activity: 'CookFailed' },
+  // ── UAT entry / setup ────────────────────────────────────────────────────
+  { match: 'BuildCookRun',                       activity: 'CookStarted' },
+  { match: 'HTML5Setup.sh',                      activity: 'HTML5SetupStarted' },
+  { match: 'HTML5Setup',                         activity: 'HTML5SetupStarted' },
+  { match: 'Success!',                           activity: 'HTML5SetupComplete' },
+  // ── Cook phase ───────────────────────────────────────────────────────────
+  { match: 'LogCook: Display: Cooking package',  activity: 'PackageCooking' },
+  { match: 'LogCook: Display: Cook complete',    activity: 'CookComplete' },
+  { match: 'Total cook time',                    activity: 'CookComplete' },
+  { match: 'LogCook: Display: Finished cooking', activity: 'CookComplete' },
+  // ── Shader compilation ───────────────────────────────────────────────────
+  { match: 'LogShaderCompilers:',                activity: 'ShaderCompileStarted' },
+  { match: 'ShaderCompileWorker',                activity: 'ShaderCompileStarted' },
+  { match: 'Shaders compiled',                   activity: 'ShadersCompiled' },
+  // ── Asset save phase ─────────────────────────────────────────────────────
+  { match: 'LogSave: Display: Saving package',   activity: 'AssetSaveStarted' },
+  { match: 'LogSave: Display: Saving cooked',    activity: 'AssetSaveStarted' },
+  // ── WASM / Emscripten compilation ────────────────────────────────────────
+  { match: 'LogHTML5PlatformEditor',             activity: 'WasmBuildStarted' },
+  { match: 'emcc',                               activity: 'EmscriptenInvoked' },
+  { match: 'wasm-opt',                           activity: 'WasmOptimized' },
+  // ── Pak / staging ────────────────────────────────────────────────────────
+  { match: 'LogPak: Display: Collecting files',  activity: 'PakStarted' },
+  { match: 'LogPak: Display: Created pak file',  activity: 'PakComplete' },
+  { match: 'LogStageAndPackage',                 activity: 'StagingStarted' },
+  { match: 'Staging complete',                   activity: 'StagingComplete' },
+  { match: 'Archiving',                          activity: 'ArchiveStarted' },
+  // ── Package finalisation ─────────────────────────────────────────────────
+  { match: 'Packaging complete',                 activity: 'PackageComplete' },
+  { match: 'Package was created',                activity: 'PackageCreated' },
+  { match: 'BuildCookRun: Completed',            activity: 'CookFinished' },
+  // ── Errors (last — only if no success pattern matched first) ─────────────
+  { match: 'CookLog: Error:',                    activity: 'CookError' },
+  { match: 'Error: Error:',                      activity: 'CookError' },
+  { match: 'Error:',                             activity: 'CookError' },
+  { match: 'ERROR:',                             activity: 'CookError' },
+  { match: 'FAILED:',                            activity: 'CookFailed' },
+  { match: 'returned exit code',                 activity: 'CookFailed' },
+  { match: 'exception was thrown',               activity: 'CookFailed' },
 ];
 
 function classifyLine(line: string): Pick<CookLogEvent, 'activity' | 'detail'> | null {

@@ -1,7 +1,7 @@
 /**
  * useGameSessionPersistence — persists OCEL events to Supabase with hash chaining.
  *
- * Hash formula: uses useHashChain.computeEventHash (SHA-256 of canonical JSON object
+ * Hash formula: uses useHashChain.computeEventHash (BLAKE3 of canonical JSON object
  * {id, timestamp, type, data, prev_hash}) — same formula as exportHashedOcelLog, so
  * the chain_tip from the exported log matches the last stored event_hash.
  *

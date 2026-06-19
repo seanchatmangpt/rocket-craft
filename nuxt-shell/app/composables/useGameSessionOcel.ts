@@ -41,7 +41,7 @@ export interface OcelLog {
   exported_at_ms: number;
 }
 
-/** An OcelEvent enriched with SHA-256 hash chain fields for Supabase insert. */
+/** An OcelEvent enriched with BLAKE3 hash chain fields for Supabase insert. */
 export interface HashedOcelEvent extends OcelEvent {
   event_hash: string;
   prev_hash: string | null;
@@ -50,7 +50,7 @@ export interface HashedOcelEvent extends OcelEvent {
 
 export interface HashedOcelLog extends OcelLog {
   hashed_events: HashedOcelEvent[];
-  /** SHA-256 of the final event — the chain tip commitment. */
+  /** BLAKE3 of the final event — the chain tip commitment. */
   chain_tip: string | null;
   /** Merkle root across all event hashes for daily anchoring. */
   merkle_root: string | null;
@@ -227,9 +227,9 @@ export function useGameSessionOcel() {
   }
 
   /**
-   * Build a SHA-256 hash-chained export of the current OCEL log.
+   * Build a BLAKE3 hash-chained export of the current OCEL log.
    *
-   * Each event becomes a HashedOcelEvent with `event_hash` (SHA-256 of its
+   * Each event becomes a HashedOcelEvent with `event_hash` (BLAKE3 of its
    * canonical form) and `prev_hash` (the prior event's hash, null for genesis).
    * The Merkle root covers all event hashes for daily anchoring.
    *
@@ -298,7 +298,7 @@ export function useGameSessionOcel() {
     lastActivityAt,
     /** Export the full OCEL log as a JSON-serialisable object */
     exportOcelLog,
-    /** Export with real SHA-256 hash chain + Merkle root (async, for commit) */
+    /** Export with real BLAKE3 hash chain + Merkle root (async, for commit) */
     exportHashedOcelLog,
   };
 }

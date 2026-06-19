@@ -39,6 +39,7 @@ async function get(path: string) {
 // ── /api/game/receipt ────────────────────────────────────────────────────────
 describe('POST /api/game/receipt', () => {
   it('rejects missing session_id', async () => {
+    if (MOCK) return; // validation tests require a live Nitro server
     const { status, body } = await post('/api/game/receipt', {
       ocel_lifecycle: ['GameSessionStarted'],
       receipt_hash: 'abc',
@@ -48,6 +49,7 @@ describe('POST /api/game/receipt', () => {
   });
 
   it('rejects synthetic engine_source', async () => {
+    if (MOCK) return;
     const { status, body } = await post('/api/game/receipt', {
       session_id: '00000000-0000-0000-0000-000000000000',
       ocel_lifecycle: ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
@@ -62,6 +64,7 @@ describe('POST /api/game/receipt', () => {
   });
 
   it('rejects lifecycle missing GameSessionStarted', async () => {
+    if (MOCK) return;
     const { status, body } = await post('/api/game/receipt', {
       session_id: '00000000-0000-0000-0000-000000000001',
       ocel_lifecycle: ['FrameRendered', 'InputAdmitted'],
@@ -124,11 +127,13 @@ describe('GET /api/game/chain-verify', () => {
 // ── /api/game/receipt-finalize ───────────────────────────────────────────────
 describe('POST /api/game/receipt-finalize', () => {
   it('rejects missing session_id', async () => {
+    if (MOCK) return;
     const { status } = await post('/api/game/receipt-finalize', { receipt_hash: 'abc' });
     expect(status).toBe(400);
   });
 
   it('rejects missing receipt_hash', async () => {
+    if (MOCK) return;
     const { status } = await post('/api/game/receipt-finalize', {
       session_id: '00000000-0000-0000-0000-000000000000',
     });
@@ -175,6 +180,7 @@ describe('GET /api/game/pipeline-health', () => {
 // ── /api/game/ocel-ingest ────────────────────────────────────────────────────
 describe('POST /api/game/ocel-ingest', () => {
   it('rejects empty body', async () => {
+    if (MOCK) return;
     const { status } = await post('/api/game/ocel-ingest', {});
     expect([400, 422]).toContain(status);
   });
@@ -200,6 +206,54 @@ describe('POST /api/game/ocel-ingest', () => {
     expect([200, 500]).toContain(status);
     if (status === 200) {
       expect(body).toHaveProperty('persisted');
+    }
+  });
+});
+
+// ── /api/game/wasm-crosscheck ────────────────────────────────────────────────
+describe('GET /api/game/wasm-crosscheck', () => {
+  const VALID_HASH = 'a'.repeat(64);   // 64 hex chars — valid BLAKE3 shape
+
+  it('rejects missing output_hash', async () => {
+    if (MOCK) return;
+    const { status } = await get('/api/game/wasm-crosscheck');
+    expect(status).toBe(400);
+  });
+
+  it('rejects output_hash that is not 64 hex chars', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/wasm-crosscheck?output_hash=tooshort');
+    expect(status).toBe(400);
+    expect(body?.statusMessage ?? body?.message ?? '').toMatch(/64/i);
+  });
+
+  it('accepts a valid 64-char BLAKE3 hash and returns cross_check structure', async () => {
+    if (MOCK) return;
+    const { status, body } = await get(`/api/game/wasm-crosscheck?output_hash=${VALID_HASH}`);
+    // 200 = Supabase reachable (even if no rows with this hash)
+    // 503 = Supabase not configured (local dev without env)
+    expect([200, 503]).toContain(status);
+    if (status === 200) {
+      expect(body).toHaveProperty('output_hash', VALID_HASH);
+      expect(body).toHaveProperty('receipts');
+      expect(Array.isArray(body.receipts)).toBe(true);
+      expect(body).toHaveProperty('cross_check');
+      expect(['MATCH', 'MISMATCH', 'COOK_ONLY', 'GAME_ONLY', 'NO_DATA']).toContain(body.cross_check.verdict);
+      expect(typeof body.cross_check.cook_receipts).toBe('number');
+      expect(typeof body.cross_check.game_receipts).toBe('number');
+      expect(typeof body.cross_check.total).toBe('number');
+    }
+  });
+
+  it('NO_DATA verdict for a hash that cannot exist in DB', async () => {
+    if (MOCK) return;
+    // All-zeros hash is a valid BLAKE3 hex — but will never be in the DB
+    const zeroHash = '0'.repeat(64);
+    const { status, body } = await get(`/api/game/wasm-crosscheck?output_hash=${zeroHash}`);
+    expect([200, 503]).toContain(status);
+    if (status === 200) {
+      expect(body.cross_check.verdict).toBe('NO_DATA');
+      expect(body.receipts).toHaveLength(0);
     }
   });
 });

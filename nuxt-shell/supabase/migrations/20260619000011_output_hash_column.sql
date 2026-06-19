@@ -1,5 +1,5 @@
 -- Migration: add output_hash to game_receipts
--- output_hash = SHA-256 hex of the cooked WASM artifact bytes.
+-- output_hash = BLAKE3 hex of the cooked WASM artifact bytes.
 -- Written by the Rust CLI (rocket html5 verify → as_supabase_receipt).
 -- Used by verify_html5_pipeline.sh [6/5] cook-to-game cross-check.
 -- Browser receipts will have NULL (no WASM artifact on the client side).
@@ -14,4 +14,4 @@ CREATE INDEX IF NOT EXISTS idx_game_receipts_output_hash
 
 -- Comment for schema introspection
 COMMENT ON COLUMN game_receipts.output_hash IS
-  'SHA-256 hex of the cooked WASM artifact (64 chars). NULL for browser-only receipts.';
+  'BLAKE3 hex of the cooked WASM artifact (64 chars). NULL for browser-only receipts.';

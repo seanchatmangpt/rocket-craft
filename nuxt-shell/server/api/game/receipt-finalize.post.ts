@@ -12,7 +12,7 @@
  * Returns: {
  *   session_id,
  *   chain_verified: boolean,       // verify_event_chain RPC returned ok=true
- *   chain_tip_matches_hash: boolean, // chain tip SHA-256 == receipt_hash
+ *   chain_tip_matches_hash: boolean, // chain tip BLAKE3 == receipt_hash
  *   broken_at: number | null,      // event seq where chain broke (if any)
  *   verdict: 'PROVEN' | 'CHAIN_BROKEN' | 'HASH_MISMATCH' | 'NO_EVENTS',
  * }
