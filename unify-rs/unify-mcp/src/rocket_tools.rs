@@ -353,7 +353,7 @@ pub fn register_rocket_resources(registry: &mut ResourceRegistry) {
 
 /// Attach all rocket/* tools and resources to a McpServer via the builder pattern.
 pub fn attach_rocket_tools(server: McpServer) -> McpServer {
-    let server = server
+    server
         .with_tool(
             ToolDescriptor {
                 name: "rocket/manifest/list".into(),
@@ -444,9 +444,7 @@ pub fn attach_rocket_tools(server: McpServer) -> McpServer {
                 description: "Contents of capabilities/CapabilityManifest.md.".into(),
             },
             handle_resource_capabilities,
-        );
-
-    server
+        )
 }
 
 // ─────────────────────────────────────────────

@@ -402,9 +402,7 @@ fn detect_hardcoded_objects(filepath: &str, content: &str, obs: &mut Vec<Observa
             match ch {
                 '{' => depth += 1,
                 '}' => {
-                    if depth > 0 {
-                        depth -= 1;
-                    }
+                    depth = depth.saturating_sub(1);
                 }
                 _ => { /* handled */ }
             }

@@ -22,10 +22,8 @@ impl StatAllocation {
         }
 
         // Prevent stats from being completely ignored if there are enough points
-        if total_points >= 4 {
-            if self.health == 0 || self.attack == 0 {
-                return true;
-            }
+        if total_points >= 4 && (self.health == 0 || self.attack == 0) {
+            return true;
         }
 
         // Prevent all-in-one allocations as they are mathematically degenerate

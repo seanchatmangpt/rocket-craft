@@ -137,12 +137,11 @@ impl IntentParser {
 /// Helper function to strip surrounding double or single quotes from a parsed string value.
 fn strip_quotes(s: &str) -> String {
     let trimmed = s.trim();
-    if (trimmed.starts_with('"') && trimmed.ends_with('"'))
-        || (trimmed.starts_with('\'') && trimmed.ends_with('\''))
+    if ((trimmed.starts_with('"') && trimmed.ends_with('"'))
+        || (trimmed.starts_with('\'') && trimmed.ends_with('\'')))
+        && trimmed.len() >= 2
     {
-        if trimmed.len() >= 2 {
-            return trimmed[1..trimmed.len() - 1].to_string();
-        }
+        return trimmed[1..trimmed.len() - 1].to_string();
     }
     trimmed.to_string()
 }

@@ -44,20 +44,21 @@ pub fn parse_cargo_toml(filepath: &str, content: &str) -> Vec<Observation> {
         }
 
         // Detect plain tower-lsp dependency
-        if trimmed.contains("tower-lsp") && !trimmed.starts_with('#') {
-            if !trimmed.contains("tower-lsp-boilerplate") {
-                obs.push(Observation {
-                    file_path: filepath.to_string(),
-                    start_byte: 0,
-                    end_byte: 0,
-                    line: line_num,
-                    column: 1,
-                    kind: "cargo_toml".to_string(),
-                    construct: "tower-lsp dependency".to_string(),
-                    context: trimmed.to_string(),
-                    message: "Plain tower-lsp dependency found in Cargo.toml".to_string(),
-                });
-            }
+        if trimmed.contains("tower-lsp")
+            && !trimmed.starts_with('#')
+            && !trimmed.contains("tower-lsp-boilerplate")
+        {
+            obs.push(Observation {
+                file_path: filepath.to_string(),
+                start_byte: 0,
+                end_byte: 0,
+                line: line_num,
+                column: 1,
+                kind: "cargo_toml".to_string(),
+                construct: "tower-lsp dependency".to_string(),
+                context: trimmed.to_string(),
+                message: "Plain tower-lsp dependency found in Cargo.toml".to_string(),
+            });
         }
 
         // Detect default template version "1.0.0"

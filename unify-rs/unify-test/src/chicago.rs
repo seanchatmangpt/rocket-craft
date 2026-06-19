@@ -139,13 +139,13 @@ impl EnvironmentGate {
     /// environment allows `Unit` and `Integration` tests; an `E2e` environment
     /// allows all tiers.
     pub fn allows(&self) -> bool {
-        match (self.current, self.required) {
-            (TestEnvironment::Unit, TestEnvironment::Unit) => true,
-            (TestEnvironment::Integration, TestEnvironment::Unit)
-            | (TestEnvironment::Integration, TestEnvironment::Integration) => true,
-            (TestEnvironment::E2e, _) => true,
-            _ => false,
-        }
+        matches!(
+            (self.current, self.required),
+            (TestEnvironment::Unit, TestEnvironment::Unit)
+                | (TestEnvironment::Integration, TestEnvironment::Unit)
+                | (TestEnvironment::Integration, TestEnvironment::Integration)
+                | (TestEnvironment::E2e, _)
+        )
     }
 
     /// Panic with a descriptive skip message when the environment is

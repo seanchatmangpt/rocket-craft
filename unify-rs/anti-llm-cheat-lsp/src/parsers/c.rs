@@ -283,9 +283,7 @@ fn detect_hardcoded_lookup_tables(filepath: &str, content: &str, obs: &mut Vec<O
                     match ch {
                         '{' => array_depth += 1,
                         '}' => {
-                            if array_depth > 0 {
-                                array_depth -= 1;
-                            }
+                            array_depth = array_depth.saturating_sub(1);
                         }
                         _ => { /* handled */ }
                     }
@@ -311,9 +309,7 @@ fn detect_hardcoded_lookup_tables(filepath: &str, content: &str, obs: &mut Vec<O
                 match ch {
                     '{' => array_depth += 1,
                     '}' => {
-                        if array_depth > 0 {
-                            array_depth -= 1;
-                        }
+                        array_depth = array_depth.saturating_sub(1);
                     }
                     _ => { /* handled */ }
                 }
@@ -369,9 +365,7 @@ fn detect_stub_functions(filepath: &str, content: &str, obs: &mut Vec<Observatio
                     match ch {
                         '{' => depth += 1,
                         '}' => {
-                            if depth > 0 {
-                                depth -= 1;
-                            }
+                            depth = depth.saturating_sub(1);
                         }
                         _ => { /* handled */ }
                     }

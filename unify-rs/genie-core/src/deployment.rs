@@ -12,7 +12,6 @@ impl DeploymentManager {
     pub fn deploy(spec: &WorldSpec, log_path: &Path) -> Result<(), GenieError> {
         let mut file = OpenOptions::new()
             .create(true)
-            .write(true)
             .append(true)
             .open(log_path)
             .map_err(|e| GenieError::Deployment(format!("Failed to open log file: {}", e)))?;

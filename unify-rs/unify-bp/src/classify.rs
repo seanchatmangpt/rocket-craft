@@ -23,16 +23,13 @@ pub struct BlueprintGenerateCmd;
 
 impl Classify for BlueprintGenerateCmd {
     fn noun(&self) -> &str {
-        let n = "blueprint";
-        n
+        "blueprint"
     }
     fn verb(&self) -> &str {
-        let v = "generate";
-        v
+        "generate"
     }
     fn description(&self) -> &str {
-        let desc = "Generate a Blueprint from a JSON spec";
-        desc
+        "Generate a Blueprint from a JSON spec"
     }
 
     fn execute(
@@ -54,16 +51,13 @@ pub struct BlueprintValidateCmd;
 
 impl Classify for BlueprintValidateCmd {
     fn noun(&self) -> &str {
-        let n = "blueprint";
-        n
+        "blueprint"
     }
     fn verb(&self) -> &str {
-        let v = "validate";
-        v
+        "validate"
     }
     fn description(&self) -> &str {
-        let desc = "Validate a Blueprint spec against admission rules";
-        desc
+        "Validate a Blueprint spec against admission rules"
     }
 
     fn execute(

@@ -194,9 +194,7 @@ impl BlueprintPwaExporter {
             "// Auto-generated JS event bindings for Blueprint: {}",
             self.blueprint_name
         ));
-        lines.push(format!(
-            "// Wires game events to HUD instance — vanilla JS, no framework deps"
-        ));
+        lines.push("// Wires game events to HUD instance — vanilla JS, no framework deps".to_string());
         lines.push(String::new());
         lines.push(format!("const {} = new {}();", instance_name, class_name));
         lines.push(String::new());
@@ -262,13 +260,13 @@ impl BlueprintPwaExporter {
         let mut exec_entry_points: Vec<String> = Vec::new();
 
         for &name in node_names {
-            let is_known_lifecycle = lifecycle_keywords.iter().any(|&kw| kw == name);
+            let is_known_lifecycle = lifecycle_keywords.contains(&name);
             let is_event_prefix = name.starts_with("On") || name.starts_with("on");
             if is_known_lifecycle || is_event_prefix {
                 event_names.push(name.to_string());
             }
             // Only canonical exec-chain entry points (BeginPlay) go into exec_entry_points.
-            if exec_entry_keywords.iter().any(|&kw| kw == name) {
+            if exec_entry_keywords.contains(&name) {
                 exec_entry_points.push(name.to_string());
             }
         }
@@ -436,7 +434,7 @@ fn epoch_to_parts(secs: u64) -> (u64, u64, u64, u64, u64, u64) {
 }
 
 fn is_leap(year: u64) -> bool {
-    (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
+    (year.is_multiple_of(4) && !year.is_multiple_of(100)) || year.is_multiple_of(400)
 }
 
 // ---------------------------------------------------------------------------

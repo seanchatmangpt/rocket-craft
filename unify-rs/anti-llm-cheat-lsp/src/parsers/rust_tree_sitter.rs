@@ -227,21 +227,20 @@ fn detect_risky_patterns(filepath: &str, content: &str, obs: &mut Vec<Observatio
             });
         }
 
-        if trimmed.contains("lazy_static!") || trimmed.contains("once_cell") {
-            if trimmed.contains("env::var") || trimmed.contains("std::env") {
-                obs.push(Observation {
-                    file_path: filepath.to_string(),
-                    start_byte: 0,
-                    end_byte: 0,
-                    line: line_num,
-                    column: 1,
-                    kind: "risky_pattern".to_string(),
-                    construct: "lazy_static_env".to_string(),
-                    context: trimmed.to_string(),
-                    message: "lazy_static/once_cell initialization from env var detected"
-                        .to_string(),
-                });
-            }
+        if (trimmed.contains("lazy_static!") || trimmed.contains("once_cell"))
+            && (trimmed.contains("env::var") || trimmed.contains("std::env"))
+        {
+            obs.push(Observation {
+                file_path: filepath.to_string(),
+                start_byte: 0,
+                end_byte: 0,
+                line: line_num,
+                column: 1,
+                kind: "risky_pattern".to_string(),
+                construct: "lazy_static_env".to_string(),
+                context: trimmed.to_string(),
+                message: "lazy_static/once_cell initialization from env var detected".to_string(),
+            });
         }
 
         if trimmed.starts_with("unsafe ") || trimmed.contains("unsafe {") {
