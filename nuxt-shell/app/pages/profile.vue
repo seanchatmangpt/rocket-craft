@@ -30,8 +30,12 @@ async function loadProfile() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sb = client as any;
 
+  // Upsert player profile row on first login (idempotent via ON CONFLICT)
+  await sb.rpc('upsert_player_profile', { p_username: null }).catch(() => null);
+
   const [playerRes, sessionsRes, rankRes] = await Promise.all([
-    sb.from('players').select('id, username, high_score, created_at').eq('id', user.value.id).single(),
+    // players.auth_user_id FK = Supabase auth user UUID; not players.id PK
+    sb.from('players').select('id, username, high_score, created_at').eq('auth_user_id', user.value.id).single(),
     sb.from('game_sessions')
       .select('id, is_alive, ocel_event_count, engine_source, session_started_at, session_ended_at')
       .eq('player_id', user.value.id)
