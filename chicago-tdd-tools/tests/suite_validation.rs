@@ -29,6 +29,7 @@ fn find_project_root() -> PathBuf {
 }
 
 #[test]
+#[ignore = "requires real UE4 HTML5 packages in pwa-staff/ — run after Stage 5 packaging completes"]
 fn validate_entire_game_suite_on_es3_pipeline() {
     let project_root = find_project_root();
     let pwa_dir = project_root.join("pwa-staff");
