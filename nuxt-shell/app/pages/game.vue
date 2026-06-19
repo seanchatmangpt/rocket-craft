@@ -42,6 +42,8 @@ function downloadOcelLog() {
         class="engine-status"
         :class="{ ready: isEngineReady, live: isPlaying }"
         :title="isPlaying ? 'OCEL log proves session is live' : ''"
+        :data-ocel-events="ocelEvents.length"
+        :data-is-playing="isPlaying"
         data-testid="engine-status"
       >{{ engineStatus }}</span>
       <nav class="shell-nav" aria-label="Shell navigation">

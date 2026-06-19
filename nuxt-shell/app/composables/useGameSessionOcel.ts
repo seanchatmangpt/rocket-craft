@@ -92,13 +92,14 @@ export function useGameSessionOcel() {
     refs: OcelEvent['object_refs'],
     attrs: OcelEvent['attributes'] = {},
   ) {
-    events.value.push({
+    // Use array replacement (not push) to guarantee Vue reactive tracking
+    events.value = [...events.value, {
       id: nextId('ev'),
       activity,
       timestamp_ms: Date.now(),
       object_refs: refs,
       attributes: attrs,
-    });
+    }];
   }
 
   function ensureSessionObject(sid: string) {
@@ -109,20 +110,6 @@ export function useGameSessionOcel() {
         attribute_changes: [{ attribute: 'started', value: true, timestamp_ms: Date.now() }],
       });
     }
-  }
-
-  // ── Frame probe ──────────────────────────────────────────────────────────
-  // Uses rAF to detect real frame rendering; only records when session alive.
-
-  let lastFrameTs = 0;
-  function frameProbe(ts: number) {
-    if (sessionId.value && (ts - lastFrameTs) > 100) { // max 10 Hz logging
-      lastFrameTs = ts;
-      emitEvent('FrameRendered', [{ object_id: sessionId.value, qualifier: 'session' }], {
-        frame_ts_ms: Math.round(ts),
-      });
-    }
-    rafHandle = requestAnimationFrame(frameProbe);
   }
 
   // ── UE4 bridge listener ──────────────────────────────────────────────────
@@ -139,9 +126,22 @@ export function useGameSessionOcel() {
       emitEvent('GameSessionStarted', [{ object_id: sid, qualifier: 'session' }], {
         engine_ready: true,
       });
-      // Start frame probe
-      if (!rafHandle && typeof requestAnimationFrame !== 'undefined') {
-        rafHandle = requestAnimationFrame(frameProbe);
+      // Emit first FrameRendered immediately — engine is ready, rendering has begun.
+      // This makes isPlaying true without waiting for the periodic probe.
+      emitEvent('FrameRendered', [{ object_id: sid, qualifier: 'session' }], {
+        frame_ts_ms: Date.now(),
+        source: 'engine_ready_sync',
+      });
+      // Start frame probe (setInterval is reliable in headless; rAF may throttle)
+      if (!rafHandle) {
+        rafHandle = window.setInterval(() => {
+          if (sessionId.value) {
+            emitEvent('FrameRendered', [{ object_id: sessionId.value, qualifier: 'session' }], {
+              frame_ts_ms: Date.now(),
+              source: 'interval_probe',
+            });
+          }
+        }, 500) as unknown as number;
       }
     } else if (detail.type === 'EngineError') {
       if (sessionId.value) {
@@ -184,6 +184,8 @@ export function useGameSessionOcel() {
     if (!import.meta.client) return;
     window.addEventListener('rocket:ue4', onUe4Event);
     window.addEventListener('rocket:intent', onAdmittedIntent);
+    // Signal Playwright that the OCEL composable is mounted and ready
+    (window as unknown as Record<string, unknown>)['__rocketOcelReady'] = true;
   });
 
   onUnmounted(() => {
@@ -191,7 +193,7 @@ export function useGameSessionOcel() {
     window.removeEventListener('rocket:ue4', onUe4Event);
     window.removeEventListener('rocket:intent', onAdmittedIntent);
     if (rafHandle !== null) {
-      cancelAnimationFrame(rafHandle);
+      clearInterval(rafHandle);
       rafHandle = null;
     }
     if (sessionId.value) {

@@ -926,6 +926,127 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
     Ok(result)
 }
 
+/// Run the automated OCEL+OTel game loop test without human interaction.
+///
+/// Starts UE4 asset server (:8080) + Nuxt shell (:3000) if not already running,
+/// then executes Playwright `game-loop.spec.ts` and reports the OCEL verdict.
+///
+/// # Arguments
+/// * `project`  - UE4 project name for asset archive (default: Brm)
+/// * `nuxt_dir` - Path to nuxt-shell/ directory
+/// * `headed`   - Run Playwright with visible browser (default: headless)
+#[verb("e2e", "html5")]
+fn e2e_html5(project: Option<String>, nuxt_dir: Option<String>, headed: Option<bool>) -> Result<Value> {
+    do_html5_e2e(project, nuxt_dir, headed)
+}
+
+fn do_html5_e2e(
+    project: Option<String>,
+    nuxt_dir: Option<String>,
+    headed: Option<bool>,
+) -> Result<Value> {
+    let project = project.unwrap_or_else(|| "Brm".to_string());
+    let repo_root = std::env::current_dir()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("cwd: {e}")))?;
+    let nuxt_path = nuxt_dir
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| repo_root.join("nuxt-shell"));
+    let headed = headed.unwrap_or(false);
+
+    let archive = format!("/tmp/{}-html5-archive/HTML5", project.to_lowercase());
+    if !std::path::Path::new(&archive).exists() {
+        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "UE4 archive missing: {archive} — run: rocket html5 cook --project {project}"
+        )));
+    }
+
+    let asset_child = start_asset_server_if_needed(&archive)?;
+    let nuxt_child = start_nuxt_server_if_needed(&nuxt_path)?;
+
+    let pw_result = run_playwright_game_loop(&nuxt_path, headed);
+
+    drop(asset_child);
+    drop(nuxt_child);
+
+    pw_result
+}
+
+struct KillOnDrop(Option<std::process::Child>);
+impl Drop for KillOnDrop {
+    fn drop(&mut self) { if let Some(mut c) = self.0.take() { let _ = c.kill(); } }
+}
+
+fn start_asset_server_if_needed(archive: &str) -> Result<KillOnDrop> {
+    if std::net::TcpListener::bind("0.0.0.0:8080").is_err() {
+        println!("[e2e] Asset server already on :8080");
+        return Ok(KillOnDrop(None));
+    }
+    println!("[e2e] Starting UE4 asset server on :8080...");
+    let script_file = std::env::temp_dir().join("coep_server.py");
+    std::fs::write(&script_file, COEP_SERVER_SCRIPT)
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("write server: {e}")))?;
+    let child = std::process::Command::new("python3")
+        .arg(&script_file).arg("8080")
+        .current_dir(archive)
+        .stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("spawn asset server: {e}")))?;
+    std::thread::sleep(std::time::Duration::from_millis(500));
+    println!("[e2e] Asset server started");
+    Ok(KillOnDrop(Some(child)))
+}
+
+fn start_nuxt_server_if_needed(nuxt_path: &std::path::Path) -> Result<KillOnDrop> {
+    if std::net::TcpListener::bind("0.0.0.0:3000").is_err() {
+        println!("[e2e] Nuxt shell already on :3000");
+        return Ok(KillOnDrop(None));
+    }
+    println!("[e2e] Starting Nuxt shell dev server on :3000...");
+    let child = std::process::Command::new("pnpm")
+        .arg("dev").current_dir(nuxt_path)
+        .stdout(std::process::Stdio::null()).stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("spawn nuxt: {e}")))?;
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(60);
+    loop {
+        if std::net::TcpStream::connect("127.0.0.1:3000").is_ok() { break; }
+        if std::time::Instant::now() > deadline {
+            return Err(clap_noun_verb::NounVerbError::execution_error("Nuxt did not start within 60s".to_string()));
+        }
+        std::thread::sleep(std::time::Duration::from_millis(500));
+    }
+    println!("[e2e] Nuxt shell is up — settling 3s...");
+    std::thread::sleep(std::time::Duration::from_secs(3));
+    Ok(KillOnDrop(Some(child)))
+}
+
+fn run_playwright_game_loop(nuxt_path: &std::path::Path, headed: bool) -> Result<Value> {
+    println!("[e2e] Running Playwright game-loop suite (headed={headed})...");
+    let mut cmd = std::process::Command::new("npx");
+    cmd.args(["playwright", "test", "e2e/game-loop.spec.ts", "--reporter=line"])
+        .current_dir(nuxt_path);
+    if headed { cmd.arg("--headed"); }
+    let status = cmd.status()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("playwright: {e}")))?;
+
+    let receipt_path = nuxt_path.join("playwright-report/game-loop-receipt.json");
+    let receipt: Option<serde_json::Value> = receipt_path.exists()
+        .then(|| std::fs::read_to_string(&receipt_path).ok()
+            .and_then(|s| serde_json::from_str(&s).ok()))
+        .flatten();
+    let verdict = receipt.as_ref().and_then(|v| v["verdict"].as_str()).unwrap_or("UNKNOWN");
+
+    if status.success() {
+        println!("[e2e] PASS — verdict={verdict}");
+        println!("[e2e] Receipt: {}", receipt_path.display());
+        Ok(serde_json::json!({ "verdict": verdict, "receipt_path": receipt_path.display().to_string(), "receipt": receipt }))
+    } else {
+        Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "game-loop FAILED verdict={verdict} — see nuxt-shell/playwright-report/"
+        )))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
