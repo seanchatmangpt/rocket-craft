@@ -76,3 +76,101 @@ impl KnownBadCorpus {
         ]
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── DeterministicFuzzer ───────────────────────────────────────────────────
+
+    #[test]
+    fn same_seed_produces_same_sequence() {
+        let mut f1 = DeterministicFuzzer::new(42);
+        let mut f2 = DeterministicFuzzer::new(42);
+        for _ in 0..20 {
+            assert_eq!(f1.next_u32(), f2.next_u32());
+        }
+    }
+
+    #[test]
+    fn different_seeds_produce_different_sequences() {
+        let mut f1 = DeterministicFuzzer::new(1);
+        let mut f2 = DeterministicFuzzer::new(2);
+        let vals1: Vec<u32> = (0..10).map(|_| f1.next_u32()).collect();
+        let vals2: Vec<u32> = (0..10).map(|_| f2.next_u32()).collect();
+        assert_ne!(vals1, vals2);
+    }
+
+    #[test]
+    fn next_f32_is_between_zero_and_one() {
+        let mut f = DeterministicFuzzer::new(99);
+        for _ in 0..100 {
+            let v = f.next_f32();
+            assert!(v >= 0.0 && v <= 1.0, "f32 out of [0,1]: {}", v);
+        }
+    }
+
+    #[test]
+    fn combat_sequence_has_correct_length() {
+        let mut f = DeterministicFuzzer::new(7);
+        let seq = f.combat_sequence(15);
+        assert_eq!(seq.len(), 15);
+    }
+
+    #[test]
+    fn combat_sequence_action_type_is_0_to_3() {
+        let mut f = DeterministicFuzzer::new(7);
+        for (action, _dir) in f.combat_sequence(200) {
+            assert!(action < 4, "action out of range: {}", action);
+        }
+    }
+
+    #[test]
+    fn combat_sequence_dir_is_0_to_2() {
+        let mut f = DeterministicFuzzer::new(7);
+        for (_action, dir) in f.combat_sequence(200) {
+            assert!(dir < 3, "dir out of range: {}", dir);
+        }
+    }
+
+    #[test]
+    fn transfer_sequence_has_correct_length() {
+        let mut f = DeterministicFuzzer::new(5);
+        let seq = f.transfer_sequence(4, 20);
+        assert_eq!(seq.len(), 20);
+    }
+
+    #[test]
+    fn transfer_sequence_never_self_transfers() {
+        let mut f = DeterministicFuzzer::new(5);
+        for (from, to, _amount) in f.transfer_sequence(4, 500) {
+            assert_ne!(from, to, "self-transfer: player {}", from);
+        }
+    }
+
+    // ── KnownBadCorpus ────────────────────────────────────────────────────────
+
+    #[test]
+    fn combat_edge_cases_non_empty() {
+        assert!(!KnownBadCorpus::combat_edge_cases().is_empty());
+    }
+
+    #[test]
+    fn gold_edge_cases_includes_zero_and_max() {
+        let cases = KnownBadCorpus::gold_edge_cases();
+        assert!(cases.iter().any(|&(a, b)| a == 0 && b == 0));
+        assert!(cases.iter().any(|&(a, _)| a == u32::MAX));
+    }
+
+    #[test]
+    fn combat_edge_cases_includes_zero_damage() {
+        let cases = KnownBadCorpus::combat_edge_cases();
+        assert!(cases.iter().any(|&(dmg, _, _, _)| dmg == 0.0));
+    }
+
+    #[test]
+    fn combat_edge_cases_includes_max_damage() {
+        let cases = KnownBadCorpus::combat_edge_cases();
+        assert!(cases.iter().any(|&(dmg, _, _, _)| dmg >= 10_000.0));
+    }
+}
