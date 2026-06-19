@@ -58,6 +58,26 @@ interface DailyStatRow {
 
 const chainStatus = ref<ChainVerifyResult | null>(null);
 const dailyStats = ref<DailyStatRow[]>([]);
+
+interface ProcessMapNode { id: string; label: string; count: number }
+interface ProcessMapEdge { from: string; to: string; count: number }
+interface ProcessMap {
+  nodes: ProcessMapNode[];
+  edges: ProcessMapEdge[];
+  lifecycle_ok: boolean;
+  declared_lifecycle: string[];
+  total_events: number;
+  sessions_scanned: number;
+}
+const processMap = ref<ProcessMap | null>(null);
+
+async function loadProcessMap() {
+  try {
+    const data = await $fetch<ProcessMap>('/api/game/process-map?limit=500');
+    processMap.value = data;
+  } catch { /* non-fatal */ }
+}
+
 const loading = ref(true);
 const error = ref<string | null>(null);
 const liveViewers = ref(0);        // Realtime presence: other dashboard viewers
@@ -268,6 +288,7 @@ onMounted(() => {
   loadConformance();
   loadLastLifecycle();
   loadDailyStats();
+  loadProcessMap();
   setupPresence();
   setupSessionCountChannel();
   timer = setInterval(() => { loadHealth(); loadChainStatus(); loadConformance(); loadLastLifecycle(); loadDailyStats(); }, 30_000);
@@ -509,6 +530,41 @@ onUnmounted(() => {
         </div>
       </section>
 
+      <!-- Process Map (DFG) -->
+      <section v-if="processMap" class="process-map-section">
+        <h2>Process Map
+          <span class="lifecycle-badge" :class="processMap.lifecycle_ok ? 'ok' : 'fail'">
+            {{ processMap.lifecycle_ok ? 'LIFECYCLE OK' : 'LIFECYCLE MISSING' }}
+          </span>
+        </h2>
+        <p class="process-map-meta">
+          {{ processMap.total_events }} events · {{ processMap.sessions_scanned }} sessions
+        </p>
+        <div class="dfg-grid">
+          <div class="dfg-nodes">
+            <h3>Activities</h3>
+            <ul>
+              <li v-for="node in processMap.nodes.slice(0, 10)" :key="node.id">
+                <span class="dfg-act">{{ node.label }}</span>
+                <span class="dfg-count">×{{ node.count }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="dfg-edges">
+            <h3>Follows</h3>
+            <ul>
+              <li v-for="edge in processMap.edges.slice(0, 10)" :key="`${edge.from}→${edge.to}`">
+                <span class="dfg-edge-label">{{ edge.from }} → {{ edge.to }}</span>
+                <span class="dfg-count">×{{ edge.count }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <p class="declared-lifecycle">
+          Declared: {{ processMap.declared_lifecycle.join(' → ') }}
+        </p>
+      </section>
+
       <!-- Last receipt -->
       <section v-if="health?.last_receipt_at" class="last-receipt">
         <span>Last receipt: {{ new Date(health.last_receipt_at).toLocaleString() }}</span>
@@ -523,6 +579,20 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.process-map-section { margin-top: 2rem; padding: 1rem; background: #0f172a; border-radius: 8px; border: 1px solid #1e293b; }
+.process-map-section h2 { font-size: 1rem; margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.75rem; }
+.lifecycle-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+.lifecycle-badge.ok { background: #166534; color: #86efac; }
+.lifecycle-badge.fail { background: #7f1d1d; color: #fca5a5; }
+.process-map-meta { font-size: 0.75rem; color: #64748b; margin: 0 0 0.75rem; }
+.dfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.dfg-nodes h3, .dfg-edges h3 { font-size: 0.8rem; color: #94a3b8; margin: 0 0 0.4rem; }
+.dfg-nodes ul, .dfg-edges ul { list-style: none; padding: 0; margin: 0; }
+.dfg-nodes li, .dfg-edges li { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 2px 0; border-bottom: 1px solid #1e293b; }
+.dfg-act { color: #7dd3fc; }
+.dfg-edge-label { color: #c4b5fd; font-size: 0.7rem; }
+.dfg-count { color: #64748b; }
+.declared-lifecycle { font-size: 0.72rem; color: #475569; margin: 0.75rem 0 0; }
 .pipeline-page { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; font-family: monospace; }
 .pipeline-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
 .pipeline-header h1 { font-size: 1.5rem; margin: 0; }
