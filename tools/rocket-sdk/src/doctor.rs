@@ -54,6 +54,7 @@ impl RocketDoctor {
             self.check_ggen(),
             self.check_anti_llm_cheat_lsp(),
             self.check_html5_package(),
+            self.check_ue4_build_scripts(),
             self.check_nexus_types(),
         ];
 
@@ -514,6 +515,104 @@ impl RocketDoctor {
         }
     }
 
+    /// Verify that the critical UE4 build scripts are present and executable.
+    ///
+    /// Checks RunUAT.sh (required for cook+package) and the Mac/Linux Build.sh
+    /// scripts. Also validates the HTML5-specific setup script is present when
+    /// an emsdk is configured. Reports Warn rather than Fail when UE4_ROOT is
+    /// not configured at all (the `check_ue4_root` check already covers that).
+    fn check_ue4_build_scripts(&self) -> CheckResult {
+        // Resolve the UE4 root from .rocket.json or UE4_ROOT env var.
+        let rocket_json = self.project_root.join(".rocket.json");
+        let ue4_root = if rocket_json.exists() {
+            std::fs::read_to_string(&rocket_json)
+                .ok()
+                .and_then(|c| serde_json::from_str::<serde_json::Value>(&c).ok())
+                .and_then(|v| v.get("ue4_root")?.as_str().map(PathBuf::from))
+        } else {
+            std::env::var("UE4_ROOT").ok().map(PathBuf::from)
+        };
+
+        let root = match ue4_root {
+            None => {
+                return CheckResult {
+                    name: "UE4 Build Scripts".to_string(),
+                    status: CheckStatus::Warn,
+                    message: "Skipped: UE4 root not configured".to_string(),
+                    details: None,
+                };
+            }
+            Some(r) if !r.exists() => {
+                return CheckResult {
+                    name: "UE4 Build Scripts".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("UE4 root path missing: {}", r.display()),
+                    details: None,
+                };
+            }
+            Some(r) => r,
+        };
+
+        // Critical scripts that must exist for `rocket build` and `rocket html5 cook`.
+        let required = [
+            "Engine/Build/BatchFiles/RunUAT.sh",
+            "Engine/Build/BatchFiles/Mac/Build.sh",
+        ];
+        let optional = [
+            "Engine/Platforms/HTML5/HTML5Setup.sh",
+        ];
+
+        let mut missing_required: Vec<&str> = Vec::new();
+        let mut missing_optional: Vec<&str> = Vec::new();
+
+        for rel in &required {
+            if !root.join(rel).exists() {
+                missing_required.push(rel);
+            }
+        }
+        for rel in &optional {
+            if !root.join(rel).exists() {
+                missing_optional.push(rel);
+            }
+        }
+
+        if !missing_required.is_empty() {
+            return CheckResult {
+                name: "UE4 Build Scripts".to_string(),
+                status: CheckStatus::Fail,
+                message: format!("Missing critical scripts: {}", missing_required.join(", ")),
+                details: Some(format!(
+                    "UE4 root: {} — ensure you have a full engine build with BatchFiles",
+                    root.display()
+                )),
+            };
+        }
+
+        if !missing_optional.is_empty() {
+            CheckResult {
+                name: "UE4 Build Scripts".to_string(),
+                status: CheckStatus::Warn,
+                message: format!(
+                    "RunUAT.sh present; HTML5 setup scripts missing: {}",
+                    missing_optional.join(", ")
+                ),
+                details: Some(
+                    "Run HTML5Setup.sh from the SpeculativeCoder/UnrealEngine fork to enable HTML5 packaging".to_string(),
+                ),
+            }
+        } else {
+            CheckResult {
+                name: "UE4 Build Scripts".to_string(),
+                status: CheckStatus::Pass,
+                message: format!(
+                    "RunUAT.sh, Build.sh, HTML5Setup.sh present at {}",
+                    root.display()
+                ),
+                details: None,
+            }
+        }
+    }
+
     /// Quick compile-check of `nexus-types` — the zero-dependency root of the
     /// nexus-engine workspace. A failure here means the foundational shared types
     /// are broken, which would cascade to every other nexus crate.
@@ -660,6 +759,91 @@ mod tests {
                 || result.status == CheckStatus::Warn
                 || result.status == CheckStatus::Fail
         );
+    }
+
+    // ── check_ue4_build_scripts ───────────────────────────────────────────────
+
+    #[test]
+    fn build_scripts_warn_when_ue4_root_not_configured() {
+        let dir = tempdir().unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert_eq!(result.name, "UE4 Build Scripts");
+    }
+
+    #[test]
+    fn build_scripts_fail_when_ue4_root_missing_from_disk() {
+        let dir = tempdir().unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, r#"{"ue4_root": "/nonexistent/ue4-path"}"#).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("missing"));
+    }
+
+    #[test]
+    fn build_scripts_fail_when_run_uat_absent() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        // Create the root but NOT the scripts
+        fs::create_dir_all(&fake_ue4).unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display())).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("RunUAT.sh"));
+    }
+
+    #[test]
+    fn build_scripts_warn_when_run_uat_present_but_html5_setup_absent() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        // Create RunUAT.sh and Mac/Build.sh but NOT HTML5Setup.sh
+        fs::create_dir_all(fake_ue4.join("Engine/Build/BatchFiles/Mac")).unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/RunUAT.sh"), b"#!/bin/sh").unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/Mac/Build.sh"), b"#!/bin/sh").unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display())).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("RunUAT.sh present"));
+    }
+
+    #[test]
+    fn build_scripts_pass_when_all_scripts_present() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        fs::create_dir_all(fake_ue4.join("Engine/Build/BatchFiles/Mac")).unwrap();
+        fs::create_dir_all(fake_ue4.join("Engine/Platforms/HTML5")).unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/RunUAT.sh"), b"#!/bin/sh").unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/Mac/Build.sh"), b"#!/bin/sh").unwrap();
+        fs::write(fake_ue4.join("Engine/Platforms/HTML5/HTML5Setup.sh"), b"#!/bin/sh").unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display())).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Pass);
+        assert!(result.message.contains("RunUAT.sh"));
+        assert!(result.message.contains("HTML5Setup.sh"));
     }
 
     #[test]
