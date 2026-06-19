@@ -75,3 +75,72 @@ impl Classify for BlueprintValidateCmd {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn valid_spec_json() -> serde_json::Value {
+        json!({
+            "name": "Hero",
+            "parent_class": "Actor",
+            "events": ["begin_play"],
+            "variables": [],
+            "print_on_begin": null
+        })
+    }
+
+    // ── BlueprintGenerateCmd ──────────────────────────────────────────────────
+
+    #[test]
+    fn generate_noun_and_verb() {
+        let cmd = BlueprintGenerateCmd;
+        assert_eq!(cmd.noun(), "blueprint");
+        assert_eq!(cmd.verb(), "generate");
+    }
+
+    #[test]
+    fn generate_execute_returns_t3d_key() {
+        let cmd = BlueprintGenerateCmd;
+        let result = cmd.execute(valid_spec_json()).unwrap();
+        assert!(result["t3d"].is_string());
+    }
+
+    #[test]
+    fn generate_execute_errors_on_invalid_input() {
+        let cmd = BlueprintGenerateCmd;
+        assert!(cmd.execute(json!({"bad": "data"})).is_err());
+    }
+
+    // ── BlueprintValidateCmd ──────────────────────────────────────────────────
+
+    #[test]
+    fn validate_noun_and_verb() {
+        let cmd = BlueprintValidateCmd;
+        assert_eq!(cmd.noun(), "blueprint");
+        assert_eq!(cmd.verb(), "validate");
+    }
+
+    #[test]
+    fn validate_execute_passes_on_valid_spec() {
+        let cmd = BlueprintValidateCmd;
+        let result = cmd.execute(valid_spec_json()).unwrap();
+        assert_eq!(result["valid"], true);
+    }
+
+    #[test]
+    fn validate_execute_fails_on_empty_name() {
+        let cmd = BlueprintValidateCmd;
+        let input = json!({
+            "name": "",
+            "parent_class": "Actor",
+            "events": [],
+            "variables": [],
+            "print_on_begin": null
+        });
+        let result = cmd.execute(input).unwrap();
+        assert_eq!(result["valid"], false);
+        assert!(result["violations"].as_array().unwrap().len() > 0);
+    }
+}

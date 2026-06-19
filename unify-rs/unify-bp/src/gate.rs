@@ -93,3 +93,67 @@ impl BlueprintAdmissionGate {
         gate.admit(bp).map(|_| bp)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use blueprint_core::Blueprint;
+
+    fn valid_bp() -> Blueprint {
+        Blueprint::new("MyActor", "Actor")
+    }
+
+    fn empty_name_bp() -> Blueprint {
+        Blueprint::new("", "Actor")
+    }
+
+    // ── BlueprintAdmissionGate::admit ─────────────────────────────────────────
+
+    #[test]
+    fn admit_passes_valid_blueprint() {
+        let mut gate = BlueprintAdmissionGate::new();
+        assert!(gate.admit(&valid_bp()).is_ok());
+    }
+
+    #[test]
+    fn admit_fails_on_empty_name() {
+        let mut gate = BlueprintAdmissionGate::new();
+        let err = gate.admit(&empty_name_bp()).unwrap_err();
+        assert!(err.iter().any(|v| v.contains("empty")));
+    }
+
+    #[test]
+    fn admit_updates_state_to_closed_on_failure() {
+        let mut gate = BlueprintAdmissionGate::new();
+        let _ = gate.admit(&empty_name_bp());
+        assert!(!gate.is_open());
+    }
+
+    #[test]
+    fn admit_updates_state_to_open_on_success() {
+        let mut gate = BlueprintAdmissionGate::new();
+        let _ = gate.admit(&empty_name_bp()); // close it first
+        let _ = gate.admit(&valid_bp());       // re-open
+        assert!(gate.is_open());
+    }
+
+    // ── BlueprintAdmissionGate::validate ─────────────────────────────────────
+
+    #[test]
+    fn validate_returns_ok_for_valid_blueprint() {
+        assert!(BlueprintAdmissionGate::validate(&valid_bp()).is_ok());
+    }
+
+    #[test]
+    fn validate_returns_err_for_empty_name() {
+        assert!(BlueprintAdmissionGate::validate(&empty_name_bp()).is_err());
+    }
+
+    // ── GateState / is_open ───────────────────────────────────────────────────
+
+    #[test]
+    fn new_gate_is_open() {
+        let gate = BlueprintAdmissionGate::new();
+        assert!(gate.is_open());
+    }
+}
