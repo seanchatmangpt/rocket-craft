@@ -223,6 +223,29 @@ fn do_html5_status() -> Result<Value> {
         Err(_) => (0, 0),
     };
 
+    // 6. Most recent cook log
+    let home = std::env::var("HOME").unwrap_or_else(|_| ".".into());
+    let cook_log = {
+        let log_dir = std::path::Path::new(&home);
+        let mut candidates: Vec<(std::time::SystemTime, std::path::PathBuf)> = std::fs::read_dir(log_dir)
+            .ok()
+            .into_iter()
+            .flatten()
+            .filter_map(|e| {
+                let e = e.ok()?;
+                let name = e.file_name().to_string_lossy().to_string();
+                if name.starts_with("ue4-cook") && name.ends_with(".log") {
+                    let mtime = e.metadata().ok()?.modified().ok()?;
+                    Some((mtime, e.path()))
+                } else {
+                    None
+                }
+            })
+            .collect();
+        candidates.sort_by(|a, b| b.0.cmp(&a.0));
+        candidates.into_iter().map(|(_, p)| p).next()
+    };
+
     let overall = if engine_ok && pkg_verdict == "REAL" { "READY" } else { "NOT READY" };
 
     println!("=== HTML5 Pipeline Status ===");
@@ -232,6 +255,9 @@ fn do_html5_status() -> Result<Value> {
         wasm_mb.map(|mb| format!("{mb:.1} MB")).unwrap_or_else(|| "n/a".into()));
     println!("[{}] Port 8080: {}", if port_free { "FREE" } else { "IN USE" }, if port_free { "available for serve" } else { "already bound" });
     println!("[INFO] Projects: {present_projects}/{total_projects} present on disk");
+    if let Some(ref log) = cook_log {
+        println!("[INFO] Last cook log: {}  (run 'rocket html5 log' to tail)", log.display());
+    }
     println!("\n[{overall}] Pipeline is {}", overall.to_lowercase());
 
     Ok(serde_json::json!({
@@ -251,6 +277,7 @@ fn do_html5_status() -> Result<Value> {
             "total_projects": total_projects,
             "present_projects": present_projects,
         },
+        "cook_log": cook_log.as_ref().map(|p| p.display().to_string()),
     }))
 }
 
