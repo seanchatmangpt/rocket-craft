@@ -649,6 +649,44 @@ describe('POST /api/game/evidence-pack', () => {
   });
 });
 
+describe('POST /api/game/rotate-key', () => {
+  it('rejects missing new_public_key_b64', async () => {
+    const { status } = await post('/api/game/rotate-key', {});
+    // 400=bad body, 422=validation, 503=no service key, 500=upstream error in mock
+    expect([400, 422, 500, 503]).toContain(status);
+  });
+
+  it('rejects too-short key (not a real Ed25519 base64)', async () => {
+    const { status } = await post('/api/game/rotate-key', { new_public_key_b64: 'abc' });
+    expect([400, 422, 500, 503]).toContain(status);
+  });
+
+  it('returns non-200 when SUPABASE_SERVICE_ROLE_KEY not configured', async () => {
+    if (!MOCK) return; // live: only fails if key absent
+    const fakeKey = 'MCowBQYDK2VwAyEABrZJQe9gWJlBnk9L0u1rXD4A2h7vJsOo1GqWaRjM0xc=';
+    const { status } = await post('/api/game/rotate-key', { new_public_key_b64: fakeKey });
+    // mock env has no service role key → expect error status
+    expect(status).toBeGreaterThanOrEqual(400);
+  });
+
+  it('contract: successful rotation returns new_key_id and prior_key_demoted', async () => {
+    if (MOCK) return; // requires live Supabase with signing_keys table
+    const fakeKey = 'MCowBQYDK2VwAyEABrZJQe9gWJlBnk9L0u1rXD4A2h7vJsOo1GqWaRjM0xc=';
+    const { status, body } = await post('/api/game/rotate-key', {
+      new_public_key_b64: fakeKey,
+      notes: 'test rotation from pipeline-api.test',
+    });
+    if (status === 503) return; // service role key not configured — skip
+    expect(status).toBe(200);
+    expect(body.rotated).toBe(true);
+    expect(typeof body.new_key_id).toBe('string');
+    expect(body.new_key_id.length).toBeGreaterThan(10);
+    // prior_key_demoted is true if there was a prior key, false if first key
+    expect(typeof body.prior_key_demoted).toBe('boolean');
+    console.log(`[rotate-key] new_key_id=${body.new_key_id} prior_demoted=${body.prior_key_demoted}`);
+  });
+});
+
 beforeAll(() => {
   if (!MOCK) {
     console.log(`[pipeline-api.test] Running against ${BASE}`);
