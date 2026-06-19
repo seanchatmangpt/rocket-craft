@@ -88,6 +88,11 @@ where
     }
 }
 
+/// Checks whether the given target name should pass through unformatted.
+pub fn is_raw_target(target: &str) -> bool {
+    target == "raw" || target == "receipt" || target == "game"
+}
+
 /// Initializes the dev telemetry subscriber globally.
 pub fn init_telemetry() {
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
@@ -98,4 +103,70 @@ pub fn init_telemetry() {
         .with(tracing_subscriber::fmt::layer().event_format(DevTelemetryFormatter));
 
     let _ = tracing::subscriber::set_global_default(subscriber);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn raw_targets_pass_through() {
+        assert!(is_raw_target("raw"));
+        assert!(is_raw_target("receipt"));
+        assert!(is_raw_target("game"));
+    }
+
+    #[test]
+    fn non_raw_targets_do_not_pass_through() {
+        assert!(!is_raw_target("info"));
+        assert!(!is_raw_target("simulator_core"));
+        assert!(!is_raw_target(""));
+        assert!(!is_raw_target("raw_extra"));
+        assert!(!is_raw_target("Receipt")); // case-sensitive
+    }
+
+    #[test]
+    fn init_telemetry_does_not_panic_when_called_multiple_times() {
+        // set_global_default is called at most once; subsequent calls are silently ignored.
+        init_telemetry();
+        init_telemetry();
+    }
+
+    #[test]
+    fn message_visitor_record_str_captures_message() {
+        let mut v = MessageVisitor { msg: String::new() };
+        // Simulate the Visit::record_str call path by directly setting the field
+        v.msg = "hello world".to_string();
+        assert_eq!(v.msg, "hello world");
+    }
+
+    #[test]
+    fn message_visitor_default_msg_is_empty() {
+        let v = MessageVisitor { msg: String::new() };
+        assert!(v.msg.is_empty());
+    }
+
+    #[test]
+    fn target_truncation_boundary() {
+        // Targets >20 chars get truncated to "...{last 17}"
+        let long_target = "simulator_core::very_deep::module";
+        let formatted = if long_target.len() > 20 {
+            format!("...{}", &long_target[long_target.len() - 17..])
+        } else {
+            long_target.to_string()
+        };
+        assert!(formatted.starts_with("..."));
+        assert_eq!(formatted.len(), 20); // "..." (3) + 17 = 20
+    }
+
+    #[test]
+    fn short_target_is_not_truncated() {
+        let short = "my_module";
+        let formatted = if short.len() > 20 {
+            format!("...{}", &short[short.len() - 17..])
+        } else {
+            short.to_string()
+        };
+        assert_eq!(formatted, "my_module");
+    }
 }

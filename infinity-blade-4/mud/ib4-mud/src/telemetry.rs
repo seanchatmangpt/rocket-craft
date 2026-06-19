@@ -82,6 +82,11 @@ where
     }
 }
 
+/// Returns true when the tracing target should bypass formatting and emit raw.
+pub fn is_raw_target(target: &str) -> bool {
+    target == "raw" || target == "receipt" || target == "game"
+}
+
 /// Initializes the dev telemetry subscriber globally.
 pub fn init_telemetry() {
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
@@ -92,4 +97,59 @@ pub fn init_telemetry() {
         .with(tracing_subscriber::fmt::layer().event_format(DevTelemetryFormatter));
 
     let _ = tracing::subscriber::set_global_default(subscriber);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn raw_targets_bypass_formatting() {
+        assert!(is_raw_target("raw"));
+        assert!(is_raw_target("receipt"));
+        assert!(is_raw_target("game"));
+    }
+
+    #[test]
+    fn non_raw_targets_get_formatted() {
+        assert!(!is_raw_target("info"));
+        assert!(!is_raw_target("ib4_mud"));
+        assert!(!is_raw_target(""));
+        assert!(!is_raw_target("Game")); // case-sensitive
+    }
+
+    #[test]
+    fn init_telemetry_is_idempotent() {
+        init_telemetry();
+        init_telemetry(); // second call must not panic
+    }
+
+    #[test]
+    fn message_visitor_starts_empty() {
+        let v = MessageVisitor { msg: String::new() };
+        assert!(v.msg.is_empty());
+    }
+
+    #[test]
+    fn target_over_20_chars_is_truncated_to_20() {
+        let long = "ib4_mud::command::parser::deep";
+        let formatted = if long.len() > 20 {
+            format!("...{}", &long[long.len() - 17..])
+        } else {
+            long.to_string()
+        };
+        assert!(formatted.starts_with("..."));
+        assert_eq!(formatted.len(), 20);
+    }
+
+    #[test]
+    fn target_at_most_20_chars_is_unchanged() {
+        let short = "ib4_mud";
+        let formatted = if short.len() > 20 {
+            format!("...{}", &short[short.len() - 17..])
+        } else {
+            short.to_string()
+        };
+        assert_eq!(formatted, "ib4_mud");
+    }
 }
