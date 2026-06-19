@@ -475,7 +475,8 @@ mod tests {
     struct TempFile(PathBuf);
     impl TempFile {
         fn write(path: &str, content: &str) -> Self {
-            let temp_path = std::env::temp_dir().join(format!("project-manifest-test-{}.json", path));
+            let temp_path =
+                std::env::temp_dir().join(format!("project-manifest-test-{}.json", path));
             fs::write(&temp_path, content).expect("write temp file");
             std::env::set_var("ROCKET_MANIFEST_PATH", &temp_path);
             TempFile(temp_path)

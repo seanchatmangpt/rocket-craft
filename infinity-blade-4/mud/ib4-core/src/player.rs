@@ -1,13 +1,13 @@
-use serde::{Serialize, Deserialize};
+use crate::equipment::{Shield, Weapon};
 use crate::types::{CombatState, MagicType};
-use crate::equipment::{Weapon, Shield};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerState {
     pub name: String,
-    pub level: u32,       // 1–45
+    pub level: u32, // 1–45
     pub xp: u64,
-    pub bloodline: i32,   // 0 normal, >0 rebirth count, <0 negative
+    pub bloodline: i32, // 0 normal, >0 rebirth count, <0 negative
     pub health: f32,
     pub max_health: f32,
     pub mana: f32,

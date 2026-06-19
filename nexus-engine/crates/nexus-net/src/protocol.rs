@@ -13,22 +13,38 @@ use serde::{Deserialize, Serialize};
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ClientMessage {
     // -- Authentication --
-    Authenticate { player_id: u64, token: String },
+    Authenticate {
+        player_id: u64,
+        token: String,
+    },
 
     // -- Lobby --
     JoinLobby,
     LeaveLobby,
-    ChallengeDuel { target_player_id: u64, suit_id: String },
-    AcceptDuel { challenge_id: u64 },
-    DeclineDuel { challenge_id: u64 },
+    ChallengeDuel {
+        target_player_id: u64,
+        suit_id: String,
+    },
+    AcceptDuel {
+        challenge_id: u64,
+    },
+    DeclineDuel {
+        challenge_id: u64,
+    },
 
     // -- In-Match (Duel Arena) --
-    CombatAction { action: CombatAction },
-    EmotePing { emote_id: u8 },
+    CombatAction {
+        action: CombatAction,
+    },
+    EmotePing {
+        emote_id: u8,
+    },
     SurrenderMatch,
 
     // -- Heartbeat --
-    Ping { seq: u32 },
+    Ping {
+        seq: u32,
+    },
 }
 
 // ── Server → Client ──────────────────────────────────────────────────────────
@@ -38,11 +54,17 @@ pub enum ClientMessage {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ServerMessage {
     // -- Auth response --
-    AuthSuccess { session_id: u64 },
-    AuthFailure { reason: String },
+    AuthSuccess {
+        session_id: u64,
+    },
+    AuthFailure {
+        reason: String,
+    },
 
     // -- Lobby --
-    LobbyJoined { online_count: u32 },
+    LobbyJoined {
+        online_count: u32,
+    },
     DuelChallenge {
         challenge_id: u64,
         challenger_id: u64,
@@ -56,14 +78,30 @@ pub enum ServerMessage {
     },
 
     // -- Match state sync --
-    MatchState { state: MatchStateSnapshot },
-    CombatResult { action: CombatAction, outcome: CombatOutcome },
-    MatchEnded { winner_id: u64, reason: MatchEndReason },
+    MatchState {
+        state: MatchStateSnapshot,
+    },
+    CombatResult {
+        action: CombatAction,
+        outcome: CombatOutcome,
+    },
+    MatchEnded {
+        winner_id: u64,
+        reason: MatchEndReason,
+    },
 
     // -- Server housekeeping --
-    Pong { seq: u32, server_time_ms: u64 },
-    Error { code: u16, message: String },
-    Disconnect { reason: String },
+    Pong {
+        seq: u32,
+        server_time_ms: u64,
+    },
+    Error {
+        code: u16,
+        message: String,
+    },
+    Disconnect {
+        reason: String,
+    },
 }
 
 // ── Shared payload types ──────────────────────────────────────────────────────
@@ -95,11 +133,19 @@ pub enum CombatAction {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum CombatOutcome {
-    Hit { damage: f32, new_hp: f32, combo_depth: u32 },
+    Hit {
+        damage: f32,
+        new_hp: f32,
+        combo_depth: u32,
+    },
     Blocked,
-    PerfectParry { counter_damage: f32 },
+    PerfectParry {
+        counter_damage: f32,
+    },
     Dodged,
-    PlayerDied { player_id: u64 },
+    PlayerDied {
+        player_id: u64,
+    },
 }
 
 pub use nexus_types::AttackDir;

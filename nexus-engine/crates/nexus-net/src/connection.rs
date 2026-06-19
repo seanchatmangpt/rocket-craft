@@ -314,7 +314,8 @@ impl Connection<InLobby> {
 impl Connection<InMatch> {
     /// Retrieve the current match id (always `Some` in this state).
     pub fn current_match_id(&self) -> u64 {
-        self.match_id.expect("InMatch connection must have a match_id")
+        self.match_id
+            .expect("InMatch connection must have a match_id")
     }
 
     /// Match ended; return to the lobby so the player can queue again.

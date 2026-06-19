@@ -1,8 +1,8 @@
 use crate::generated_gundam::{
-    PlanetCategory, MobilityTypeCategory, Earth, Mars, Venus,
-    Frame, Power, Armor, Weapon, Sensor, UtilitySystem, Joint, AABB
+    Armor, Earth, Frame, Joint, Mars, MobilityTypeCategory, PlanetCategory, Power, Sensor,
+    UtilitySystem, Venus, Weapon, AABB,
 };
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pub struct Unset;
 pub struct Set<T>(pub T);
@@ -181,7 +181,9 @@ pub enum ValidationError {
     #[error("Clearance violation: component '{component}' occupancy overlaps with clearance zone of '{other}'")]
     ClearanceViolation { component: String, other: String },
 
-    #[error("Total mech mass ({total_mass} kg) exceeds mobility load capacity ({load_capacity} kg)")]
+    #[error(
+        "Total mech mass ({total_mass} kg) exceeds mobility load capacity ({load_capacity} kg)"
+    )]
     LoadCapacityExceeded { total_mass: f32, load_capacity: f32 },
 
     #[error("Planetary incompatibility: {message}")]
@@ -267,17 +269,28 @@ impl<Mob: MobilityTypeCategory> Mech<Mob> {
     pub fn validate(&self) -> Result<(), ValidationError> {
         // 1. Joint limits check
         for j in &self.joints {
-            let limits = j.limits.ok_or_else(|| ValidationError::MissingJointLimits {
-                name: j.name.clone(),
-            })?;
+            let limits = j
+                .limits
+                .ok_or_else(|| ValidationError::MissingJointLimits {
+                    name: j.name.clone(),
+                })?;
             if limits.min_yaw > limits.max_yaw {
-                return Err(ValidationError::InvalidJointLimits { name: j.name.clone(), axis: "yaw".to_string() });
+                return Err(ValidationError::InvalidJointLimits {
+                    name: j.name.clone(),
+                    axis: "yaw".to_string(),
+                });
             }
             if limits.min_pitch > limits.max_pitch {
-                return Err(ValidationError::InvalidJointLimits { name: j.name.clone(), axis: "pitch".to_string() });
+                return Err(ValidationError::InvalidJointLimits {
+                    name: j.name.clone(),
+                    axis: "pitch".to_string(),
+                });
             }
             if limits.min_roll > limits.max_roll {
-                return Err(ValidationError::InvalidJointLimits { name: j.name.clone(), axis: "roll".to_string() });
+                return Err(ValidationError::InvalidJointLimits {
+                    name: j.name.clone(),
+                    axis: "roll".to_string(),
+                });
             }
         }
 
@@ -311,9 +324,9 @@ impl<Mob: MobilityTypeCategory> Mech<Mob> {
         }
 
         // 3. Load capacity check
-        let total_mass: f32 = comps.iter().map(|c| c.mass).sum::<f32>() 
+        let total_mass: f32 = comps.iter().map(|c| c.mass).sum::<f32>()
             + self.joints.iter().map(|j| j.mass).sum::<f32>();
-        
+
         let load_capacity = self.mobility.physical().load_capacity;
         if total_mass > load_capacity {
             return Err(ValidationError::LoadCapacityExceeded {
@@ -327,16 +340,20 @@ impl<Mob: MobilityTypeCategory> Mech<Mob> {
 
     pub fn generate_receipt(&self) -> Result<AssemblyReceipt, ValidationError> {
         self.validate()?;
-        
+
         let serialized = serde_json::to_vec(self)
             .map_err(|e| ValidationError::SerializationError(e.to_string()))?;
-        
+
         use sha2::Digest;
         let mut hasher = sha2::Sha256::new();
         hasher.update(&serialized);
         let lineage_hash = format!("{:x}", hasher.finalize());
 
-        let total_mass: f32 = self.get_all_components().iter().map(|c| c.mass).sum::<f32>() 
+        let total_mass: f32 = self
+            .get_all_components()
+            .iter()
+            .map(|c| c.mass)
+            .sum::<f32>()
             + self.joints.iter().map(|j| j.mass).sum::<f32>();
 
         Ok(AssemblyReceipt {
@@ -353,20 +370,35 @@ impl<Mob: MobilityTypeCategory> Mech<Mob> {
 // --- Planetary Compatibility Trait & SPECIALIZATIONS ---
 
 pub trait PlanetMechCompatibility {
-    fn validate_compatibility(&self, class: &str, mobility_name: &str) -> Result<(), ValidationError>;
+    fn validate_compatibility(
+        &self,
+        class: &str,
+        mobility_name: &str,
+    ) -> Result<(), ValidationError>;
 }
 
 impl PlanetMechCompatibility for Earth {
-    fn validate_compatibility(&self, _class: &str, _mobility_name: &str) -> Result<(), ValidationError> {
+    fn validate_compatibility(
+        &self,
+        _class: &str,
+        _mobility_name: &str,
+    ) -> Result<(), ValidationError> {
         Ok(())
     }
 }
 
 impl PlanetMechCompatibility for Mars {
-    fn validate_compatibility(&self, class: &str, _mobility_name: &str) -> Result<(), ValidationError> {
+    fn validate_compatibility(
+        &self,
+        class: &str,
+        _mobility_name: &str,
+    ) -> Result<(), ValidationError> {
         if class != "Guardian" && class != "Miner" {
             return Err(ValidationError::PlanetaryIncompatibility {
-                message: format!("Mars mechs must be of class Guardian or Miner, found '{}'", class),
+                message: format!(
+                    "Mars mechs must be of class Guardian or Miner, found '{}'",
+                    class
+                ),
             });
         }
         Ok(())
@@ -374,10 +406,17 @@ impl PlanetMechCompatibility for Mars {
 }
 
 impl PlanetMechCompatibility for Venus {
-    fn validate_compatibility(&self, _class: &str, mobility_name: &str) -> Result<(), ValidationError> {
+    fn validate_compatibility(
+        &self,
+        _class: &str,
+        mobility_name: &str,
+    ) -> Result<(), ValidationError> {
         if mobility_name != "Flight" && mobility_name != "Hover" {
             return Err(ValidationError::PlanetaryIncompatibility {
-                message: format!("Venus mechs must use Flight or Hover mobility, found '{}'", mobility_name),
+                message: format!(
+                    "Venus mechs must use Flight or Hover mobility, found '{}'",
+                    mobility_name
+                ),
             });
         }
         Ok(())
@@ -488,7 +527,9 @@ impl<Plan: PlanetCategory> CivilizationBuilder<Set<Plan>> {
             name: self.name.unwrap_or_else(|| "New Horizon".to_string()),
             history: self.history,
             values: self.values,
-            environment: self.environment.unwrap_or_else(|| "Terraformed".to_string()),
+            environment: self
+                .environment
+                .unwrap_or_else(|| "Terraformed".to_string()),
             resources: self.resources,
         }
     }

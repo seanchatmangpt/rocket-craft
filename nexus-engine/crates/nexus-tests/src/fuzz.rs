@@ -25,18 +25,12 @@ impl DeterministicFuzzer {
     /// action_type: 0=Attack, 1=Parry, 2=PerfectParry, 3=Dodge
     pub fn combat_sequence(&mut self, length: usize) -> Vec<(u8, u8)> {
         (0..length)
-            .map(|_| {
-                (self.next_u32() as u8 % 4, self.next_u32() as u8 % 3)
-            })
+            .map(|_| (self.next_u32() as u8 % 4, self.next_u32() as u8 % 3))
             .collect()
     }
 
     /// Generate a random economic sequence: list of (from_player, to_player, amount) transfers
-    pub fn transfer_sequence(
-        &mut self,
-        num_players: u64,
-        length: usize,
-    ) -> Vec<(u64, u64, u32)> {
+    pub fn transfer_sequence(&mut self, num_players: u64, length: usize) -> Vec<(u64, u64, u32)> {
         (0..length)
             .map(|_| {
                 let from = self.next_u64() % num_players;
@@ -64,11 +58,11 @@ impl KnownBadCorpus {
     pub fn combat_edge_cases() -> Vec<(f32, f32, f32, f32)> {
         vec![
             // (base_damage, combo_mult, equipment_bonus, armor)
-            (0.0, 1.0, 0.0, 0.0),                        // zero damage
-            (f32::MIN_POSITIVE, 3.0, 100.0, 9999.0),     // tiny damage vs massive armor
-            (10_000.0, 3.0, 100.0, 0.0),                 // maximum damage
-            (1.0, 0.0, 0.0, 0.0),                        // zero multiplier edge
-            (100.0, 3.0, 0.0, 99.0),                     // damage barely above floor after armor
+            (0.0, 1.0, 0.0, 0.0),                    // zero damage
+            (f32::MIN_POSITIVE, 3.0, 100.0, 9999.0), // tiny damage vs massive armor
+            (10_000.0, 3.0, 100.0, 0.0),             // maximum damage
+            (1.0, 0.0, 0.0, 0.0),                    // zero multiplier edge
+            (100.0, 3.0, 0.0, 99.0),                 // damage barely above floor after armor
         ]
     }
 

@@ -1,21 +1,55 @@
-use nexus_mud::{MudEngine, Zone, MudError, AABB, MudEvent};
 use chrono::Utc;
+use nexus_mud::{MudEngine, MudError, MudEvent, Zone, AABB};
 
 #[test]
 fn test_aabb_intersection_boundaries() {
     // Test overlapping boxes
-    let a = AABB { min_x: 0.0, max_x: 2.0, min_y: 0.0, max_y: 2.0, min_z: 0.0, max_z: 2.0 };
-    let b = AABB { min_x: 1.0, max_x: 3.0, min_y: 1.0, max_y: 3.0, min_z: 1.0, max_z: 3.0 };
+    let a = AABB {
+        min_x: 0.0,
+        max_x: 2.0,
+        min_y: 0.0,
+        max_y: 2.0,
+        min_z: 0.0,
+        max_z: 2.0,
+    };
+    let b = AABB {
+        min_x: 1.0,
+        max_x: 3.0,
+        min_y: 1.0,
+        max_y: 3.0,
+        min_z: 1.0,
+        max_z: 3.0,
+    };
     assert!(a.intersects(&b), "Should overlap on all axes");
     assert!(b.intersects(&a), "Symmetry check");
 
     // Test edge-touching (non-overlapping) - min_x == max_x boundary
-    let c = AABB { min_x: 2.0, max_x: 4.0, min_y: 0.0, max_y: 2.0, min_z: 0.0, max_z: 2.0 };
-    assert!(!a.intersects(&c), "Touching on face should not be considered an intersection (strict less-than comparison)");
-    
+    let c = AABB {
+        min_x: 2.0,
+        max_x: 4.0,
+        min_y: 0.0,
+        max_y: 2.0,
+        min_z: 0.0,
+        max_z: 2.0,
+    };
+    assert!(
+        !a.intersects(&c),
+        "Touching on face should not be considered an intersection (strict less-than comparison)"
+    );
+
     // Test completely separate boxes
-    let d = AABB { min_x: 10.0, max_x: 12.0, min_y: 10.0, max_y: 12.0, min_z: 10.0, max_z: 12.0 };
-    assert!(!a.intersects(&d), "Completely separated boxes must not intersect");
+    let d = AABB {
+        min_x: 10.0,
+        max_x: 12.0,
+        min_y: 10.0,
+        max_y: 12.0,
+        min_z: 10.0,
+        max_z: 12.0,
+    };
+    assert!(
+        !a.intersects(&d),
+        "Completely separated boxes must not intersect"
+    );
 }
 
 #[test]
@@ -38,7 +72,7 @@ fn test_com_deviation_threshold() {
     if let Some(right) = engine.parts.get_mut("right_arm") {
         right.mass = 29.9;
     }
-    
+
     // Should verify motion successfully
     let res = engine.execute_command("verify motion");
     assert!(res.is_ok(), "COM deviation of 9.9 should pass");
@@ -48,16 +82,22 @@ fn test_com_deviation_threshold() {
         right.mass = 31.0; // deviation = 11.0
     }
     engine.gates.motion = false; // Reset gate
-    
+
     let res_fail = engine.execute_command("verify motion");
-    assert!(res_fail.is_err(), "COM deviation of 11.0 should be rejected");
+    assert!(
+        res_fail.is_err(),
+        "COM deviation of 11.0 should be rejected"
+    );
     if let Err(MudError::GateBlocked(_)) = res_fail {
         // Structural check: diagnostics map must record a motion_fail entry referencing COM deviation
-        let motion_fail = engine.diagnostics.get("motion_fail")
+        let motion_fail = engine
+            .diagnostics
+            .get("motion_fail")
             .expect("Expected 'motion_fail' diagnostic to be set after COM deviation rejection");
         assert!(
             motion_fail.starts_with("Center of Mass deviation"),
-            "motion_fail diagnostic must start with 'Center of Mass deviation', got: {}", motion_fail
+            "motion_fail diagnostic must start with 'Center of Mass deviation', got: {}",
+            motion_fail
         );
     } else {
         panic!("Expected GateBlocked error");
@@ -82,13 +122,16 @@ fn test_unbounded_joint_limits() {
     }
 
     let res = engine.execute_command("verify motion");
-    assert!(res.is_err(), "Unbounded joint rotation limits must fail verification");
+    assert!(
+        res.is_err(),
+        "Unbounded joint rotation limits must fail verification"
+    );
 }
 
 #[test]
 fn test_event_log_monotonic_timestamps() {
     let mut engine = MudEngine::new();
-    
+
     // Fire many events in rapid succession
     for i in 0..100 {
         engine.emit_event("test.event", "head", &format!("Event number {}", i));
@@ -100,7 +143,9 @@ fn test_event_log_monotonic_timestamps() {
         assert!(
             log[i].timestamp > log[i - 1].timestamp,
             "Event log timestamp is not strictly monotonic at index {}: {:?} vs {:?}",
-            i, log[i].timestamp, log[i - 1].timestamp
+            i,
+            log[i].timestamp,
+            log[i - 1].timestamp
         );
     }
 }
@@ -113,16 +158,30 @@ fn test_referential_integrity_failures() {
     assert!(engine.verify_referential_integrity().is_ok());
 
     // Inject an invalid object_id event
-    engine.emit_event("illegal.action", "unregistered_object_xyz", "This object is not in the whitelist");
-    
+    engine.emit_event(
+        "illegal.action",
+        "unregistered_object_xyz",
+        "This object is not in the whitelist",
+    );
+
     let result = engine.verify_referential_integrity();
-    assert!(result.is_err(), "Referential integrity check should fail with an invalid object_id");
+    assert!(
+        result.is_err(),
+        "Referential integrity check should fail with an invalid object_id"
+    );
     // Structural check: find the offending event directly in the event log rather than string-matching the error
-    let offending_event = engine.event_log.iter()
+    let offending_event = engine
+        .event_log
+        .iter()
         .find(|e| e.object_id == "unregistered_object_xyz")
-        .expect("Event log must contain the injected event with object_id 'unregistered_object_xyz'");
-    assert_eq!(offending_event.event_type, "illegal.action",
-        "Injected event must have event_type 'illegal.action', got: {}", offending_event.event_type);
+        .expect(
+            "Event log must contain the injected event with object_id 'unregistered_object_xyz'",
+        );
+    assert_eq!(
+        offending_event.event_type, "illegal.action",
+        "Injected event must have event_type 'illegal.action', got: {}",
+        offending_event.event_type
+    );
 }
 
 #[test]

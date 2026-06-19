@@ -2,10 +2,7 @@
 // Generates 100+ distinct mech assemblies from different state vectors,
 // verifies determinism, and confirms Ark-class manufacturing.
 
-use nexus_tps::{
-    generate_part, assemble_mech, PartStateVector, PartSlot, JidokaHalt,
-};
-
+use nexus_tps::{assemble_mech, generate_part, JidokaHalt, PartSlot, PartStateVector};
 
 fn main() {
     // Initialize standard dev telemetry
@@ -25,14 +22,86 @@ fn main() {
         let profile = (i as f32) / 99.0;
 
         let vectors: [PartStateVector; 8] = [
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.5, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::Head },
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.8, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::Torso },
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.3, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::Waist },
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.4, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::ArmL },
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.4, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::ArmR },
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.5, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::LegL },
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.5, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::LegR },
-            PartStateVector { civilization_id: civ_id, frame_id, armor_profile: profile, joint_profile: profile, mass_profile: profile * 0.2, weapon_profile: profile, motion_profile: profile, part_slot: PartSlot::Backpack },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.5,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::Head,
+            },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.8,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::Torso,
+            },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.3,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::Waist,
+            },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.4,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::ArmL,
+            },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.4,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::ArmR,
+            },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.5,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::LegL,
+            },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.5,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::LegR,
+            },
+            PartStateVector {
+                civilization_id: civ_id,
+                frame_id,
+                armor_profile: profile,
+                joint_profile: profile,
+                mass_profile: profile * 0.2,
+                weapon_profile: profile,
+                motion_profile: profile,
+                part_slot: PartSlot::Backpack,
+            },
         ];
 
         match assemble_mech(&vectors) {
@@ -61,7 +130,11 @@ fn main() {
     tracing::info!("  Jidoka rejections: {}", rejected_count);
     tracing::info!("  Silent failures:   {}", silent_failures);
     assert_eq!(silent_failures, 0, "DEFECT: Silent failures detected!");
-    assert_eq!(valid_count + rejected_count, 100, "DEFECT: Not all 100 vectors produced an outcome!");
+    assert_eq!(
+        valid_count + rejected_count,
+        100,
+        "DEFECT: Not all 100 vectors produced an outcome!"
+    );
     tracing::info!("  STATUS: PASS — zero silent failures, all 100 vectors accounted for\n");
 
     // --- TEST 2: Determinism ---
@@ -83,9 +156,18 @@ fn main() {
     match (result_a, result_b) {
         (Ok(a), Ok(b)) => {
             // Compare key fields
-            assert_eq!(a.mass_balance, b.mass_balance, "DEFECT: mass_balance non-deterministic!");
-            assert_eq!(a.socket_fit, b.socket_fit, "DEFECT: socket_fit non-deterministic!");
-            assert_eq!(a.geometry, b.geometry, "DEFECT: geometry non-deterministic!");
+            assert_eq!(
+                a.mass_balance, b.mass_balance,
+                "DEFECT: mass_balance non-deterministic!"
+            );
+            assert_eq!(
+                a.socket_fit, b.socket_fit,
+                "DEFECT: socket_fit non-deterministic!"
+            );
+            assert_eq!(
+                a.geometry, b.geometry,
+                "DEFECT: geometry non-deterministic!"
+            );
             tracing::info!("  STATUS: PASS — byte-identical output for identical state vector\n");
         }
         _ => panic!("DEFECT: Determinism test failed — parts could not be generated"),

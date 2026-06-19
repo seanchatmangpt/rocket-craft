@@ -1,5 +1,5 @@
+use nexus_gfx::{camera::*, color::*, math::*, pipeline::*, vertex::*};
 use proptest::prelude::*;
-use nexus_gfx::{math::*, camera::*, color::*, vertex::*, pipeline::*};
 
 #[test]
 fn transform_identity_is_neutral_for_composition() {
@@ -10,7 +10,10 @@ fn transform_identity_is_neutral_for_composition() {
         scale: Vec3::new(2.0, 2.0, 2.0),
     };
     let composed = id.mul_transform(&t);
-    assert!((composed.translation - t.translation).norm() < 1e-5, "identity * t should equal t");
+    assert!(
+        (composed.translation - t.translation).norm() < 1e-5,
+        "identity * t should equal t"
+    );
     assert!((composed.scale - t.scale).norm() < 1e-5);
 }
 
@@ -30,10 +33,13 @@ fn transform_lerp_endpoints() {
 
 #[test]
 fn camera_view_projection_has_correct_aspect() {
-    let cam = Camera::new(60.0, 16.0/9.0, 0.1, 1000.0).unwrap();
+    let cam = Camera::new(60.0, 16.0 / 9.0, 0.1, 1000.0).unwrap();
     let vp = cam.view_projection();
     // VP matrix must be non-degenerate (det != 0)
-    assert!(vp.determinant().abs() > 1e-6, "VP matrix must be non-degenerate");
+    assert!(
+        vp.determinant().abs() > 1e-6,
+        "VP matrix must be non-degenerate"
+    );
 }
 
 #[test]
@@ -43,7 +49,10 @@ fn aabb_frustum_culling_visible_object_not_culled() {
     let frustum = Frustum::from_view_projection(&vp);
     // Small box right in front of camera (at z=-5, which is within near/far)
     let aabb = Aabb::new(Vec3::new(-0.5, -0.5, -6.0), Vec3::new(0.5, 0.5, -4.0)).unwrap();
-    assert!(frustum.intersects_aabb(&aabb), "box in front of camera should be visible");
+    assert!(
+        frustum.intersects_aabb(&aabb),
+        "box in front of camera should be visible"
+    );
 }
 
 #[test]
@@ -63,7 +72,9 @@ fn invalid_ndc_rejected() {
 #[test]
 fn skinned_vertex_weights_normalized() {
     let v = SkinnedVertex {
-        position: [0.0; 3], normal: [0.0; 3], uv: [0.0; 2],
+        position: [0.0; 3],
+        normal: [0.0; 3],
+        uv: [0.0; 2],
         joint_indices: [0; 4],
         joint_weights: [0.5, 0.3, 0.2, 0.0],
     };

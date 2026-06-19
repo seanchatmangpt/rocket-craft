@@ -1,10 +1,15 @@
-pub use nexus_types::{Gold, Hp, Xp, AttackDir, ParryOutcome};
-use serde::{Serialize, Deserialize};
-use rand::{SeedableRng, RngExt};
+pub use nexus_types::{AttackDir, Gold, Hp, ParryOutcome, Xp};
 use rand::rngs::SmallRng;
+use rand::{RngExt, SeedableRng};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum StatType { Attack, Defense, Magic, Health }
+pub enum StatType {
+    Attack,
+    Defense,
+    Magic,
+    Health,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum GameCommand {
@@ -73,15 +78,30 @@ pub struct PlayerState {
 impl PlayerState {
     pub fn new(id: u64, name: impl Into<String>) -> Self {
         PlayerState {
-            id, name: name.into(), level: 1, xp: Xp::new(0), bloodline: 0,
-            gold: Gold::new(500), hp: Hp::new(100.0), max_hp: Hp::new(100.0),
-            attack: 20, defense: 10, magic: 0, stat_points: 0, perk_points: 0,
-            selected_perks: vec![], combo_depth: 0, qip_scar_stacks: 0,
-            trans_am_gauge: 0.0, suit_id: "RX-78-2".to_string(),
+            id,
+            name: name.into(),
+            level: 1,
+            xp: Xp::new(0),
+            bloodline: 0,
+            gold: Gold::new(500),
+            hp: Hp::new(100.0),
+            max_hp: Hp::new(100.0),
+            attack: 20,
+            defense: 10,
+            magic: 0,
+            stat_points: 0,
+            perk_points: 0,
+            selected_perks: vec![],
+            combo_depth: 0,
+            qip_scar_stacks: 0,
+            trans_am_gauge: 0.0,
+            suit_id: "RX-78-2".to_string(),
         }
     }
 
-    pub fn is_alive(&self) -> bool { !self.hp.is_dead() }
+    pub fn is_alive(&self) -> bool {
+        !self.hp.is_dead()
+    }
 
     pub fn take_damage(&mut self, dmg: f32) {
         self.hp = Hp::new((self.hp.value() - dmg.max(0.0)).max(0.0));
@@ -92,7 +112,12 @@ impl PlayerState {
     }
 
     pub fn combo_multiplier(&self) -> f32 {
-        match self.combo_depth { 0 | 1 => 1.0, 2 => 1.5, 3 => 2.0, _ => 3.0 }
+        match self.combo_depth {
+            0 | 1 => 1.0,
+            2 => 1.5,
+            3 => 2.0,
+            _ => 3.0,
+        }
     }
 
     pub fn gain_xp(&mut self, xp: u64) -> bool {
@@ -102,14 +127,18 @@ impl PlayerState {
             self.level += 1;
             self.stat_points += 3;
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     pub fn spend_gold(&mut self, amount: u32) -> bool {
         if self.gold.value() >= amount {
             self.gold = self.gold - Gold::new(amount);
             true
-        } else { false }
+        } else {
+            false
+        }
     }
 
     pub fn rebirth(&mut self) {
@@ -122,7 +151,9 @@ impl PlayerState {
         self.level = saved_level;
         self.bloodline = saved_bloodline + 1;
         self.selected_perks = saved_perks;
-        if self.bloodline <= 20 { self.perk_points += 1; }
+        if self.bloodline <= 20 {
+            self.perk_points += 1;
+        }
     }
 }
 
@@ -149,22 +180,47 @@ impl EnemyState {
         let id = id.into();
         let is_godking = id == "CorruptedGalath";
         EnemyState {
-            id, name: name.into(), hp, max_hp: hp, attack, phase: 1,
-            announced_dir: None, shield_active: is_godking,
-            shield_parries_received: 0, is_godking,
+            id,
+            name: name.into(),
+            hp,
+            max_hp: hp,
+            attack,
+            phase: 1,
+            announced_dir: None,
+            shield_active: is_godking,
+            shield_parries_received: 0,
+            is_godking,
         }
     }
 
-    pub fn is_alive(&self) -> bool { self.hp > 0.0 }
-    pub fn hp_pct(&self) -> f32 { if self.max_hp > 0.0 { self.hp / self.max_hp } else { 0.0 } }
+    pub fn is_alive(&self) -> bool {
+        self.hp > 0.0
+    }
+    pub fn hp_pct(&self) -> f32 {
+        if self.max_hp > 0.0 {
+            self.hp / self.max_hp
+        } else {
+            0.0
+        }
+    }
 
     /// Apply damage; returns true if phase changed.
     pub fn take_damage(&mut self, dmg: f32) -> bool {
-        if self.shield_active { return false; }
+        if self.shield_active {
+            return false;
+        }
         let prev = self.phase;
         self.hp = (self.hp - dmg.max(0.0)).max(0.0);
-        let new_phase = if self.hp_pct() > 0.6 { 1 } else if self.hp_pct() > 0.3 { 2 } else { 3 };
-        if new_phase > self.phase { self.phase = new_phase; }
+        let new_phase = if self.hp_pct() > 0.6 {
+            1
+        } else if self.hp_pct() > 0.3 {
+            2
+        } else {
+            3
+        };
+        if new_phase > self.phase {
+            self.phase = new_phase;
+        }
         self.phase > prev
     }
 
@@ -195,10 +251,30 @@ pub struct ShopItem {
 
 pub fn default_shop() -> Vec<ShopItem> {
     vec![
-        ShopItem { name: "Beam Saber".into(),  cost: 100, attack_bonus: 15, defense_bonus: 0 },
-        ShopItem { name: "Shield Frame".into(), cost: 80,  attack_bonus: 0,  defense_bonus: 10 },
-        ShopItem { name: "Pilot Helm".into(),   cost: 120, attack_bonus: 5,  defense_bonus: 5 },
-        ShopItem { name: "Bazooka".into(),      cost: 200, attack_bonus: 25, defense_bonus: 0 },
+        ShopItem {
+            name: "Beam Saber".into(),
+            cost: 100,
+            attack_bonus: 15,
+            defense_bonus: 0,
+        },
+        ShopItem {
+            name: "Shield Frame".into(),
+            cost: 80,
+            attack_bonus: 0,
+            defense_bonus: 10,
+        },
+        ShopItem {
+            name: "Pilot Helm".into(),
+            cost: 120,
+            attack_bonus: 5,
+            defense_bonus: 5,
+        },
+        ShopItem {
+            name: "Bazooka".into(),
+            cost: 200,
+            attack_bonus: 25,
+            defense_bonus: 0,
+        },
     ]
 }
 
@@ -273,31 +349,51 @@ impl GameSession {
                         let dmg = ((self.player.attack as f32 * mult) - 2.0).max(1.0);
                         self.player.combo_depth = (self.player.combo_depth + 1).min(5);
                         if self.player.combo_depth >= 4 {
-                            self.player.trans_am_gauge = (self.player.trans_am_gauge + 0.25).min(1.0);
+                            self.player.trans_am_gauge =
+                                (self.player.trans_am_gauge + 0.25).min(1.0);
                         }
                         let phase_changed = enemy.take_damage(dmg);
                         let new_hp = enemy.hp;
                         let new_phase = enemy.phase;
                         let _ = enemy;
-                        out.push(self.ev(EventKind::CombatHit { damage: dmg, new_enemy_hp: new_hp }));
+                        out.push(self.ev(EventKind::CombatHit {
+                            damage: dmg,
+                            new_enemy_hp: new_hp,
+                        }));
                         if phase_changed {
-                            out.push(self.ev(EventKind::SpecialActivated { ability: format!("Phase {}", new_phase) }));
+                            out.push(self.ev(EventKind::SpecialActivated {
+                                ability: format!("Phase {}", new_phase),
+                            }));
                         }
                     }
                 }
 
                 // Check enemy defeated
-                if self.current_enemy.as_ref().map(|e| !e.is_alive()).unwrap_or(false) {
-                    let xp = self.current_enemy.as_ref().map(|e| 50 + e.max_hp as u64 / 10).unwrap_or(50);
+                if self
+                    .current_enemy
+                    .as_ref()
+                    .map(|e| !e.is_alive())
+                    .unwrap_or(false)
+                {
+                    let xp = self
+                        .current_enemy
+                        .as_ref()
+                        .map(|e| 50 + e.max_hp as u64 / 10)
+                        .unwrap_or(50);
                     let gold = 25 + self.rng.random_range(0..50u32);
                     let leveled = self.player.gain_xp(xp);
                     self.player.gold = self.player.gold + Gold::new(gold);
                     self.player.combo_depth = 0;
                     self.current_enemy = None;
                     self.is_in_combat = false;
-                    out.push(self.ev(EventKind::EnemyDefeated { xp_gained: xp, gold_gained: gold }));
+                    out.push(self.ev(EventKind::EnemyDefeated {
+                        xp_gained: xp,
+                        gold_gained: gold,
+                    }));
                     if leveled {
-                        out.push(self.ev(EventKind::LevelUp { new_level: self.player.level }));
+                        out.push(self.ev(EventKind::LevelUp {
+                            new_level: self.player.level,
+                        }));
                     }
                 } else if self.is_in_combat {
                     // Enemy counter-attack
@@ -319,14 +415,16 @@ impl GameSession {
 
                     let shield_broken = if outcome == ParryOutcome::Perfect {
                         enemy.receive_perfect_parry()
-                    } else { false };
+                    } else {
+                        false
+                    };
 
                     // Extract what we need before dropping the borrow
                     let qip_eligible = enemy.is_godking && enemy.phase == 2 && !enemy.shield_active;
                     let dmg = match outcome {
                         ParryOutcome::Perfect => 0.0,
-                        ParryOutcome::Normal  => enemy.attack * 0.1,
-                        ParryOutcome::Miss    => enemy.attack,
+                        ParryOutcome::Normal => enemy.attack * 0.1,
+                        ParryOutcome::Miss => enemy.attack,
                     };
                     let _ = enemy;
 
@@ -339,7 +437,9 @@ impl GameSession {
                             out.push(self.ev(EventKind::Rebirth { new_bloodline: bl }));
                         }
                     }
-                    if dmg > 0.0 { self.player.take_damage(dmg); }
+                    if dmg > 0.0 {
+                        self.player.take_damage(dmg);
+                    }
 
                     out.push(self.ev(EventKind::CombatParry(outcome)));
                     if shield_broken {
@@ -349,7 +449,9 @@ impl GameSession {
 
                 if !self.player.is_alive() {
                     self.player.rebirth();
-                    out.push(self.ev(EventKind::Rebirth { new_bloodline: self.player.bloodline }));
+                    out.push(self.ev(EventKind::Rebirth {
+                        new_bloodline: self.player.bloodline,
+                    }));
                 }
             }
 
@@ -362,14 +464,19 @@ impl GameSession {
                 if self.player.trans_am_gauge >= 1.0 {
                     self.player.trans_am_gauge = 0.0;
                     self.player.attack = (self.player.attack as f32 * 3.0) as u32;
-                    out.push(self.ev(EventKind::SpecialActivated { ability: "Trans-Am".into() }));
+                    out.push(self.ev(EventKind::SpecialActivated {
+                        ability: "Trans-Am".into(),
+                    }));
                 } else {
                     out.push(self.ev(EventKind::CombatMiss));
                 }
             }
 
             GameCommand::OpenShop => {
-                out.push(self.ev(EventKind::Info(format!("Shop open. Gold: {}", self.player.gold.value()))));
+                out.push(self.ev(EventKind::Info(format!(
+                    "Shop open. Gold: {}",
+                    self.player.gold.value()
+                ))));
             }
 
             GameCommand::BuyItem { item_index } => {
@@ -378,7 +485,10 @@ impl GameSession {
                     if self.player.spend_gold(item.cost) {
                         self.player.attack += item.attack_bonus;
                         self.player.defense += item.defense_bonus;
-                        out.push(self.ev(EventKind::ItemPurchased { name: item.name, cost: item.cost }));
+                        out.push(self.ev(EventKind::ItemPurchased {
+                            name: item.name,
+                            cost: item.cost,
+                        }));
                     }
                 }
             }
@@ -387,12 +497,14 @@ impl GameSession {
                 if self.player.stat_points > 0 {
                     self.player.stat_points -= 1;
                     match stat {
-                        StatType::Attack  => self.player.attack += 5,
+                        StatType::Attack => self.player.attack += 5,
                         StatType::Defense => self.player.defense += 5,
-                        StatType::Magic   => self.player.magic += 5,
-                        StatType::Health  => {
+                        StatType::Magic => self.player.magic += 5,
+                        StatType::Health => {
                             self.player.max_hp = self.player.max_hp + Hp::new(10.0);
-                            self.player.hp = Hp::new((self.player.hp.value() + 10.0).min(self.player.max_hp.value()));
+                            self.player.hp = Hp::new(
+                                (self.player.hp.value() + 10.0).min(self.player.max_hp.value()),
+                            );
                         }
                     }
                     out.push(self.ev(EventKind::StatAllocated(stat)));
@@ -423,15 +535,19 @@ impl GameSession {
 
     fn ev(&self, kind: EventKind) -> GameEvent {
         let message = format!("{:?}", kind);
-        GameEvent { turn: self.turn, kind, message }
+        GameEvent {
+            turn: self.turn,
+            kind,
+            message,
+        }
     }
 
     fn spawn_random_enemy(&mut self) -> EnemyState {
         const ROSTER: &[(&str, f32, f32)] = &[
-            ("StoneTitan",    150.0, 20.0),
-            ("WarlordTitan",  200.0, 25.0),
-            ("GoldTitan",     300.0, 35.0),
-            ("QuantumTitan",  400.0, 45.0),
+            ("StoneTitan", 150.0, 20.0),
+            ("WarlordTitan", 200.0, 25.0),
+            ("GoldTitan", 300.0, 35.0),
+            ("QuantumTitan", 400.0, 45.0),
         ];
         let (name, hp, atk) = ROSTER[self.rng.random_range(0..ROSTER.len())];
         let mut e = EnemyState::new(name, name, hp, atk);
@@ -454,8 +570,13 @@ impl GameSession {
 
         if !self.player.is_alive() {
             self.player.rebirth();
-            return Some(self.ev(EventKind::Rebirth { new_bloodline: self.player.bloodline }));
+            return Some(self.ev(EventKind::Rebirth {
+                new_bloodline: self.player.bloodline,
+            }));
         }
-        Some(self.ev(EventKind::PlayerTookDamage { damage: atk, new_player_hp: new_hp }))
+        Some(self.ev(EventKind::PlayerTookDamage {
+            damage: atk,
+            new_player_hp: new_hp,
+        }))
     }
 }

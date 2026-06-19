@@ -1,5 +1,5 @@
-use hecs::{World, Entity};
 use crate::components::*;
+use hecs::{Entity, World};
 
 pub fn system_tick_ai(world: &mut World) {
     for (_entity, ai) in world.query_mut::<(Entity, &mut AiState)>() {

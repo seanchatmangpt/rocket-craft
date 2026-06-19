@@ -14,8 +14,8 @@
 //! The combat engine sits between `ib4-core` (supplying entity stats) and `ib4-ai` (providing opponent decisions),
 //! packaging results into standard `CombatEvent` structures consumed by `ib4-mud` for narrative output.
 
-pub mod parry;
 pub mod combo;
 pub mod damage;
 pub mod magic;
+pub mod parry;
 pub mod turn;

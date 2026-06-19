@@ -38,7 +38,10 @@ impl Command {
 
         match parts[0].to_lowercase().as_str() {
             "attack" | "a" => {
-                let dir = parts.get(1).map(|s| parse_dir(s)).transpose()?
+                let dir = parts
+                    .get(1)
+                    .map(|s| parse_dir(s))
+                    .transpose()?
                     .unwrap_or(AttackDir::Right);
                 Ok(Command::Attack(dir))
             }
@@ -66,7 +69,10 @@ impl Command {
             }
             "dodge" | "d" => Ok(Command::Dodge),
             "magic" | "cast" | "m" => {
-                let magic = parts.get(1).map(|s| parse_magic(s)).transpose()?
+                let magic = parts
+                    .get(1)
+                    .map(|s| parse_magic(s))
+                    .transpose()?
                     .ok_or_else(|| "Usage: magic <fire|lightning|ice|dark|light>".to_string())?;
                 Ok(Command::Magic(magic))
             }

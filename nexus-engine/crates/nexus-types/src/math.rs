@@ -69,11 +69,15 @@ impl Transform {
 
     /// Apply a child transform in this transform's local space (parent * child).
     pub fn mul_transform(&self, child: &Transform) -> Transform {
-        let translation = self.translation
-            + self.rotation * child.translation.component_mul(&self.scale);
+        let translation =
+            self.translation + self.rotation * child.translation.component_mul(&self.scale);
         let rotation = self.rotation * child.rotation;
         let scale = self.scale.component_mul(&child.scale);
-        Transform { translation, rotation, scale }
+        Transform {
+            translation,
+            rotation,
+            scale,
+        }
     }
 }
 
@@ -86,7 +90,7 @@ impl Transform {
 /// Use these types for beam-saber hit detection and any loop that processes
 /// hundreds of transforms per frame.
 pub mod simd {
-    pub use glam::{Vec3A, Vec4, Mat4 as GlamMat4, Quat as GlamQuat};
+    pub use glam::{Mat4 as GlamMat4, Quat as GlamQuat, Vec3A, Vec4};
 
     /// Convert a nalgebra `Vector3<f32>` to a glam `Vec3A` (16-byte aligned).
     #[inline]

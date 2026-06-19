@@ -28,13 +28,26 @@ pub struct RenderPipeline<S> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CullMode { None, Front, Back }
+pub enum CullMode {
+    None,
+    Front,
+    Back,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BlendMode { Opaque, AlphaBlend, Additive }
+pub enum BlendMode {
+    Opaque,
+    AlphaBlend,
+    Additive,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DepthCompare { Less, LessEqual, Greater, Always }
+pub enum DepthCompare {
+    Less,
+    LessEqual,
+    Greater,
+    Always,
+}
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -56,9 +69,9 @@ pub enum PipelineError {
 impl From<CullMode> for Option<wgpu::Face> {
     fn from(m: CullMode) -> Self {
         match m {
-            CullMode::None  => None,
+            CullMode::None => None,
             CullMode::Front => Some(wgpu::Face::Front),
-            CullMode::Back  => Some(wgpu::Face::Back),
+            CullMode::Back => Some(wgpu::Face::Back),
         }
     }
 }
@@ -67,9 +80,9 @@ impl From<CullMode> for Option<wgpu::Face> {
 impl From<BlendMode> for Option<wgpu::BlendState> {
     fn from(m: BlendMode) -> Self {
         match m {
-            BlendMode::Opaque     => None,
+            BlendMode::Opaque => None,
             BlendMode::AlphaBlend => Some(wgpu::BlendState::ALPHA_BLENDING),
-            BlendMode::Additive   => Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),
+            BlendMode::Additive => Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),
         }
     }
 }
@@ -78,10 +91,10 @@ impl From<BlendMode> for Option<wgpu::BlendState> {
 impl From<DepthCompare> for wgpu::CompareFunction {
     fn from(d: DepthCompare) -> Self {
         match d {
-            DepthCompare::Less      => wgpu::CompareFunction::Less,
+            DepthCompare::Less => wgpu::CompareFunction::Less,
             DepthCompare::LessEqual => wgpu::CompareFunction::LessEqual,
-            DepthCompare::Greater   => wgpu::CompareFunction::Greater,
-            DepthCompare::Always    => wgpu::CompareFunction::Always,
+            DepthCompare::Greater => wgpu::CompareFunction::Greater,
+            DepthCompare::Always => wgpu::CompareFunction::Always,
         }
     }
 }
@@ -106,8 +119,14 @@ impl RenderPipeline<Uninitialized> {
         }
     }
 
-    pub fn with_blend(mut self, mode: BlendMode) -> Self { self.blend_mode = mode; self }
-    pub fn with_cull(mut self, mode: CullMode) -> Self { self.cull_mode = mode; self }
+    pub fn with_blend(mut self, mode: BlendMode) -> Self {
+        self.blend_mode = mode;
+        self
+    }
+    pub fn with_cull(mut self, mode: CullMode) -> Self {
+        self.cull_mode = mode;
+        self
+    }
 
     /// Compile without a GPU device (type-state transition only).
     ///
@@ -221,7 +240,9 @@ impl RenderPipeline<Uninitialized> {
 // ---------------------------------------------------------------------------
 
 impl RenderPipeline<Compiled> {
-    pub fn label(&self) -> &str { &self.label }
+    pub fn label(&self) -> &str {
+        &self.label
+    }
 
     /// Returns a reference to the wgpu pipeline, if one was compiled via
     /// `compile_with_device`.
@@ -248,17 +269,22 @@ impl PipelineSet {
     pub fn build() -> Self {
         PipelineSet {
             opaque: RenderPipeline::new("opaque", "suit.vert", "suit.frag")
-                .with_cull(CullMode::Back).compile(),
+                .with_cull(CullMode::Back)
+                .compile(),
             transparent: RenderPipeline::new("transparent", "suit.vert", "suit_transparent.frag")
-                .with_blend(BlendMode::AlphaBlend).compile(),
+                .with_blend(BlendMode::AlphaBlend)
+                .compile(),
             beam_effects: RenderPipeline::new("beam", "particle.vert", "beam.frag")
                 .with_blend(BlendMode::Additive)
-                .with_cull(CullMode::None).compile(),
+                .with_cull(CullMode::None)
+                .compile(),
             ui: RenderPipeline::new("ui", "ui.vert", "ui.frag")
                 .with_blend(BlendMode::AlphaBlend)
-                .with_cull(CullMode::None).compile(),
+                .with_cull(CullMode::None)
+                .compile(),
             shadow: RenderPipeline::new("shadow", "shadow.vert", "shadow.frag")
-                .with_cull(CullMode::Front).compile(),
+                .with_cull(CullMode::Front)
+                .compile(),
         }
     }
 }

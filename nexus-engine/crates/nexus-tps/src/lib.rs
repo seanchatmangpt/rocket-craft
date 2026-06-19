@@ -1,9 +1,8 @@
-use serde::{Serialize, Deserialize};
-use sha2::{Sha256, Digest};
 use nexus_types::tps::Part;
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 pub mod telemetry;
-
 
 // ============================================================================
 // R1: PartSlot and PartStateVector
@@ -75,7 +74,10 @@ pub enum Axis {
 #[derive(Debug, Clone, PartialEq, thiserror::Error, Serialize, Deserialize)]
 pub enum JidokaHalt {
     #[error("Socket mismatch: expected {expected:?}, got {got:?}")]
-    SocketMismatch { expected: SocketType, got: SocketType },
+    SocketMismatch {
+        expected: SocketType,
+        got: SocketType,
+    },
 
     #[error("Collision volume intersects: part_a {part_a:?}, part_b {part_b:?}")]
     CollisionVolumeIntersects { part_a: PartSlot, part_b: PartSlot },
@@ -101,10 +103,34 @@ struct CivParams {
 }
 
 const CIV_PARAMS: [CivParams; 4] = [
-    CivParams { mass_mult: 1.0, armor_mult: 1.0, motion_mult: 1.0, _weapon_mult: 1.0, _joint_mult: 1.0 },
-    CivParams { mass_mult: 0.8, armor_mult: 1.2, motion_mult: 0.9, _weapon_mult: 1.1, _joint_mult: 1.05 },
-    CivParams { mass_mult: 1.25, armor_mult: 0.85, motion_mult: 1.3, _weapon_mult: 0.75, _joint_mult: 1.2 },
-    CivParams { mass_mult: 1.5, armor_mult: 1.5, motion_mult: 0.5, _weapon_mult: 1.5, _joint_mult: 0.7 },
+    CivParams {
+        mass_mult: 1.0,
+        armor_mult: 1.0,
+        motion_mult: 1.0,
+        _weapon_mult: 1.0,
+        _joint_mult: 1.0,
+    },
+    CivParams {
+        mass_mult: 0.8,
+        armor_mult: 1.2,
+        motion_mult: 0.9,
+        _weapon_mult: 1.1,
+        _joint_mult: 1.05,
+    },
+    CivParams {
+        mass_mult: 1.25,
+        armor_mult: 0.85,
+        motion_mult: 1.3,
+        _weapon_mult: 0.75,
+        _joint_mult: 1.2,
+    },
+    CivParams {
+        mass_mult: 1.5,
+        armor_mult: 1.5,
+        motion_mult: 0.5,
+        _weapon_mult: 1.5,
+        _joint_mult: 0.7,
+    },
 ];
 
 #[derive(Clone, Copy)]
@@ -126,21 +152,133 @@ struct SlotParams {
 
 const SLOT_PARAMS: [SlotParams; 8] = [
     // Head = 0
-    SlotParams { base_mass: 5.0, mass_range: 2.0, base_dim_x: 0.4, dim_x_range: 0.2, base_dim_y: 0.4, dim_y_range: 0.2, base_dim_z: 0.4, dim_z_range: 0.2, base_clearance: 0.1, clearance_range: 0.05, base_volume: 0.064, volume_range: 0.05, _socket_gender: 2 },
+    SlotParams {
+        base_mass: 5.0,
+        mass_range: 2.0,
+        base_dim_x: 0.4,
+        dim_x_range: 0.2,
+        base_dim_y: 0.4,
+        dim_y_range: 0.2,
+        base_dim_z: 0.4,
+        dim_z_range: 0.2,
+        base_clearance: 0.1,
+        clearance_range: 0.05,
+        base_volume: 0.064,
+        volume_range: 0.05,
+        _socket_gender: 2,
+    },
     // Torso = 1
-    SlotParams { base_mass: 40.0, mass_range: 20.0, base_dim_x: 1.8, dim_x_range: 0.6, base_dim_y: 1.2, dim_y_range: 0.4, base_dim_z: 1.6, dim_z_range: 0.6, base_clearance: 0.2, clearance_range: 0.1, base_volume: 3.456, volume_range: 2.5, _socket_gender: 1 },
+    SlotParams {
+        base_mass: 40.0,
+        mass_range: 20.0,
+        base_dim_x: 1.8,
+        dim_x_range: 0.6,
+        base_dim_y: 1.2,
+        dim_y_range: 0.4,
+        base_dim_z: 1.6,
+        dim_z_range: 0.6,
+        base_clearance: 0.2,
+        clearance_range: 0.1,
+        base_volume: 3.456,
+        volume_range: 2.5,
+        _socket_gender: 1,
+    },
     // Waist = 2
-    SlotParams { base_mass: 20.0, mass_range: 10.0, base_dim_x: 1.4, dim_x_range: 0.4, base_dim_y: 1.0, dim_y_range: 0.3, base_dim_z: 0.8, dim_z_range: 0.3, base_clearance: 0.15, clearance_range: 0.05, base_volume: 1.12, volume_range: 0.8, _socket_gender: 2 },
+    SlotParams {
+        base_mass: 20.0,
+        mass_range: 10.0,
+        base_dim_x: 1.4,
+        dim_x_range: 0.4,
+        base_dim_y: 1.0,
+        dim_y_range: 0.3,
+        base_dim_z: 0.8,
+        dim_z_range: 0.3,
+        base_clearance: 0.15,
+        clearance_range: 0.05,
+        base_volume: 1.12,
+        volume_range: 0.8,
+        _socket_gender: 2,
+    },
     // ArmL = 3
-    SlotParams { base_mass: 12.0, mass_range: 6.0, base_dim_x: 0.6, dim_x_range: 0.3, base_dim_y: 0.6, dim_y_range: 0.3, base_dim_z: 1.8, dim_z_range: 0.6, base_clearance: 0.15, clearance_range: 0.05, base_volume: 0.648, volume_range: 0.4, _socket_gender: 2 },
+    SlotParams {
+        base_mass: 12.0,
+        mass_range: 6.0,
+        base_dim_x: 0.6,
+        dim_x_range: 0.3,
+        base_dim_y: 0.6,
+        dim_y_range: 0.3,
+        base_dim_z: 1.8,
+        dim_z_range: 0.6,
+        base_clearance: 0.15,
+        clearance_range: 0.05,
+        base_volume: 0.648,
+        volume_range: 0.4,
+        _socket_gender: 2,
+    },
     // ArmR = 4
-    SlotParams { base_mass: 12.0, mass_range: 6.0, base_dim_x: 0.6, dim_x_range: 0.3, base_dim_y: 0.6, dim_y_range: 0.3, base_dim_z: 1.8, dim_z_range: 0.6, base_clearance: 0.15, clearance_range: 0.05, base_volume: 0.648, volume_range: 0.4, _socket_gender: 2 },
+    SlotParams {
+        base_mass: 12.0,
+        mass_range: 6.0,
+        base_dim_x: 0.6,
+        dim_x_range: 0.3,
+        base_dim_y: 0.6,
+        dim_y_range: 0.3,
+        base_dim_z: 1.8,
+        dim_z_range: 0.6,
+        base_clearance: 0.15,
+        clearance_range: 0.05,
+        base_volume: 0.648,
+        volume_range: 0.4,
+        _socket_gender: 2,
+    },
     // LegL = 5
-    SlotParams { base_mass: 25.0, mass_range: 12.0, base_dim_x: 0.8, dim_x_range: 0.4, base_dim_y: 0.8, dim_y_range: 0.4, base_dim_z: 2.4, dim_z_range: 0.8, base_clearance: 0.25, clearance_range: 0.1, base_volume: 1.536, volume_range: 1.2, _socket_gender: 2 },
+    SlotParams {
+        base_mass: 25.0,
+        mass_range: 12.0,
+        base_dim_x: 0.8,
+        dim_x_range: 0.4,
+        base_dim_y: 0.8,
+        dim_y_range: 0.4,
+        base_dim_z: 2.4,
+        dim_z_range: 0.8,
+        base_clearance: 0.25,
+        clearance_range: 0.1,
+        base_volume: 1.536,
+        volume_range: 1.2,
+        _socket_gender: 2,
+    },
     // LegR = 6
-    SlotParams { base_mass: 25.0, mass_range: 12.0, base_dim_x: 0.8, dim_x_range: 0.4, base_dim_y: 0.8, dim_y_range: 0.4, base_dim_z: 2.4, dim_z_range: 0.8, base_clearance: 0.25, clearance_range: 0.1, base_volume: 1.536, volume_range: 1.2, _socket_gender: 2 },
+    SlotParams {
+        base_mass: 25.0,
+        mass_range: 12.0,
+        base_dim_x: 0.8,
+        dim_x_range: 0.4,
+        base_dim_y: 0.8,
+        dim_y_range: 0.4,
+        base_dim_z: 2.4,
+        dim_z_range: 0.8,
+        base_clearance: 0.25,
+        clearance_range: 0.1,
+        base_volume: 1.536,
+        volume_range: 1.2,
+        _socket_gender: 2,
+    },
     // Backpack = 7
-    SlotParams { base_mass: 15.0, mass_range: 10.0, base_dim_x: 1.2, dim_x_range: 0.4, base_dim_y: 0.8, dim_y_range: 0.4, base_dim_z: 1.2, dim_z_range: 0.4, base_clearance: 0.3, clearance_range: 0.15, base_volume: 1.152, volume_range: 0.9, _socket_gender: 2 },
+    SlotParams {
+        base_mass: 15.0,
+        mass_range: 10.0,
+        base_dim_x: 1.2,
+        dim_x_range: 0.4,
+        base_dim_y: 0.8,
+        dim_y_range: 0.4,
+        base_dim_z: 1.2,
+        dim_z_range: 0.4,
+        base_clearance: 0.3,
+        clearance_range: 0.15,
+        base_volume: 1.152,
+        volume_range: 0.9,
+        _socket_gender: 2,
+    },
 ];
 
 /// Pure branchless clamp of a float to the [0.0, 1.0] range
@@ -166,7 +304,11 @@ pub fn branchless_lerp(a: f32, b: f32, t: f32) -> f32 {
 fn validate_profile(val: f32, limit_max: f32, axis: Axis) -> Result<(), JidokaHalt> {
     if !val.is_finite() || val < 0.0 || val > limit_max {
         let limit = if val < 0.0 { 0.0 } else { limit_max };
-        Err(JidokaHalt::MotionBoundsViolated { axis, limit, actual: val })
+        Err(JidokaHalt::MotionBoundsViolated {
+            axis,
+            limit,
+            actual: val,
+        })
     } else {
         Ok(())
     }
@@ -207,28 +349,43 @@ pub fn generate_part(state: &PartStateVector) -> Result<Part, JidokaHalt> {
     let base_part = nexus_types::tps::μ(internal_state);
 
     // Derive geometry, dimensions, socket fit, motion clearance, collision volume, and mass balance branchlessly
-    let dim_x = branchless_lerp(slot.base_dim_x, slot.base_dim_x + slot.dim_x_range, u_armor) * civ.armor_mult;
-    let dim_y = branchless_lerp(slot.base_dim_y, slot.base_dim_y + slot.dim_y_range, u_armor) * civ.armor_mult;
-    let dim_z = branchless_lerp(slot.base_dim_z, slot.base_dim_z + slot.dim_z_range, u_mass) * civ.mass_mult;
+    let dim_x = branchless_lerp(slot.base_dim_x, slot.base_dim_x + slot.dim_x_range, u_armor)
+        * civ.armor_mult;
+    let dim_y = branchless_lerp(slot.base_dim_y, slot.base_dim_y + slot.dim_y_range, u_armor)
+        * civ.armor_mult;
+    let dim_z = branchless_lerp(slot.base_dim_z, slot.base_dim_z + slot.dim_z_range, u_mass)
+        * civ.mass_mult;
 
     let geom_x_quant = ((dim_x * 100.0) as u64) & 0xFFFF;
     let geom_y_quant = ((dim_y * 100.0) as u64) & 0xFFFF;
     let geom_z_quant = ((dim_z * 100.0) as u64) & 0xFFFF;
-    let geometry = geom_x_quant | (geom_y_quant << 16) | (geom_z_quant << 32) | (base_part.geometry & 1);
+    let geometry =
+        geom_x_quant | (geom_y_quant << 16) | (geom_z_quant << 32) | (base_part.geometry & 1);
 
     // Sockets mating layout: base_fit derived from frame_id & joint_profile to keep them matching
     let base_fit = (state.frame_id as u64).wrapping_add((u_joint * 255.0) as u64) & 0xFF;
     let socket_fit = base_fit | (base_part.socket_fit & 1);
 
     // Scale clearance and volume down to avoid collisions during standard assembly spacing
-    let raw_clearance = branchless_lerp(slot.base_clearance, slot.base_clearance + slot.clearance_range, u_motion);
-    let motion_clearance = (((raw_clearance * civ.motion_mult * 10.0) as u64) & 0xFF) | (base_part.motion_clearance & 1);
+    let raw_clearance = branchless_lerp(
+        slot.base_clearance,
+        slot.base_clearance + slot.clearance_range,
+        u_motion,
+    );
+    let motion_clearance = (((raw_clearance * civ.motion_mult * 10.0) as u64) & 0xFF)
+        | (base_part.motion_clearance & 1);
 
-    let raw_volume = branchless_lerp(slot.base_volume, slot.base_volume + slot.volume_range, u_mass);
-    let collision_volume = (((raw_volume * civ.mass_mult * 10.0) as u64) & 0xFF) | (base_part.collision_volume & 1);
+    let raw_volume = branchless_lerp(
+        slot.base_volume,
+        slot.base_volume + slot.volume_range,
+        u_mass,
+    );
+    let collision_volume =
+        (((raw_volume * civ.mass_mult * 10.0) as u64) & 0xFF) | (base_part.collision_volume & 1);
 
     let raw_mass = branchless_lerp(slot.base_mass, slot.base_mass + slot.mass_range, u_mass);
-    let mass_balance = (((raw_mass * civ.mass_mult * 10.0) as u64) & 0xFFFF) | (base_part.mass_balance & 1);
+    let mass_balance =
+        (((raw_mass * civ.mass_mult * 10.0) as u64) & 0xFFFF) | (base_part.mass_balance & 1);
 
     let physics_role = (slot_idx as u64 * 10) + ((u_weapon * 3.0) as u64) + 1;
     let assembly_compatibility = (1 << slot_idx) as u64;
@@ -274,8 +431,12 @@ impl TpsReceipt {
         let z_size = ((geom >> 32) & 0xFFFF) as f32 / 100.0;
 
         let collider_aabb = [
-            -x_size / 2.0, -y_size / 2.0, -z_size / 2.0,
-            x_size / 2.0, y_size / 2.0, z_size / 2.0,
+            -x_size / 2.0,
+            -y_size / 2.0,
+            -z_size / 2.0,
+            x_size / 2.0,
+            y_size / 2.0,
+            z_size / 2.0,
         ];
 
         let motion_bounds = [0.0, 100.0];
@@ -359,12 +520,12 @@ impl MechTpsReceipt {
         s.push_str("\x1b[1;33m├──────────┼──────────────────────┼────────────┼──────────┼─────────────┼──────────┤\x1b[0m\n");
 
         let slots = [
-            "Head", "Torso", "Waist", "ArmL", "ArmR", "LegL", "LegR", "Backpack"
+            "Head", "Torso", "Waist", "ArmL", "ArmR", "LegL", "LegR", "Backpack",
         ];
 
         for (i, part) in self.parts.iter().enumerate() {
             let slot_name = slots.get(i).unwrap_or(&"Unknown");
-            
+
             let geom = part.geometry;
             let dim_x = ((geom) & 0xFFFF) as f32 / 100.0;
             let dim_y = ((geom >> 16) & 0xFFFF) as f32 / 100.0;
@@ -374,7 +535,7 @@ impl MechTpsReceipt {
             let mass = part.mass_balance as f32 / 10.0;
             let socket = format!("0x{:02X}", part.socket_fit);
             let clearance = (part.motion_clearance & 0xFF) as f32 / 10.0;
-            
+
             s.push_str(&format!(
                 "│ \x1b[1;36m{:<8}\x1b[0m │ {:<20} │ {:<10.2} │ {:<8} │ {:<11.2} │ \x1b[1;32m{:<8}\x1b[0m │\n",
                 slot_name, dims_str, mass, socket, clearance, "PASS"
@@ -382,21 +543,29 @@ impl MechTpsReceipt {
         }
 
         s.push_str("\x1b[1;33m├──────────┴──────────────────────┴────────────┴──────────┴─────────────┴──────────┤\x1b[0m\n");
-        
+
         let total_mass_kg = self.total_mass as f32 / 10.0;
         let capacity_kg = self.load_capacity as f32 / 10.0;
-        
+
         s.push_str(&format!(
             "│  \x1b[1mTotal Mass\x1b[0m:  {:<10.2} kg /  \x1b[1mLoad Capacity\x1b[0m:  {:<10.2} kg    \x1b[1;32m[{}]\x1b[0m       │\n",
             total_mass_kg, capacity_kg, self.final_decision
         ));
         s.push_str(&format!(
             "│  \x1b[1mLineage Hash\x1b[0m:  {:<59} │\n",
-            if self.lineage_hash.len() > 55 { format!("{}...", &self.lineage_hash[..55]) } else { self.lineage_hash.clone() }
+            if self.lineage_hash.len() > 55 {
+                format!("{}...", &self.lineage_hash[..55])
+            } else {
+                self.lineage_hash.clone()
+            }
         ));
         s.push_str(&format!(
             "│  \x1b[1mReceipt Hash\x1b[0m:  {:<59} │\n",
-            if self.receipt_hash.len() > 55 { format!("{}...", &self.receipt_hash[..55]) } else { self.receipt_hash.clone() }
+            if self.receipt_hash.len() > 55 {
+                format!("{}...", &self.receipt_hash[..55])
+            } else {
+                self.receipt_hash.clone()
+            }
         ));
         s.push_str("\x1b[1;33m└──────────────────────────────────────────────────────────────────────────────────┘\x1b[0m\n");
         s
@@ -412,11 +581,17 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
     for v in vectors.iter() {
         let idx = v.part_slot as usize;
         if idx >= 8 {
-            tracing::error!("Assembly structure defect: slot index {:?} out of bounds", v.part_slot);
+            tracing::error!(
+                "Assembly structure defect: slot index {:?} out of bounds",
+                v.part_slot
+            );
             panic!("Assembly structure defect: slot index out of bounds");
         }
         if parts_map[idx].is_some() {
-            tracing::error!("Assembly structure defect: duplicate slot configuration for {:?}", v.part_slot);
+            tracing::error!(
+                "Assembly structure defect: duplicate slot configuration for {:?}",
+                v.part_slot
+            );
             panic!("Assembly structure defect: duplicate slot");
         }
         let part = generate_part(v)?;
@@ -426,7 +601,10 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
 
     for (idx, p) in parts_map.iter().enumerate() {
         if p.is_none() {
-            tracing::error!("Assembly structure defect: missing slot configuration at index {}", idx);
+            tracing::error!(
+                "Assembly structure defect: missing slot configuration at index {}",
+                idx
+            );
             panic!("Assembly structure defect: missing slot");
         }
     }
@@ -444,37 +622,58 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
     // 2. Socket Mating Gate
     tracing::info!("Gate 2: Socket Mating Verification. Verifying part connector interfaces...");
     if (head.socket_fit & 0x0F) != (torso.socket_fit & 0x0F) {
-        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Head };
+        let err = JidokaHalt::SocketMismatch {
+            expected: SocketType::Torso,
+            got: SocketType::Head,
+        };
         tracing::error!("Jidoka Halt at Socket Gate: {}", err);
         return Err(err);
     }
     if (waist.socket_fit & 0x0F) != (torso.socket_fit & 0x0F) {
-        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Waist };
+        let err = JidokaHalt::SocketMismatch {
+            expected: SocketType::Torso,
+            got: SocketType::Waist,
+        };
         tracing::error!("Jidoka Halt at Socket Gate: {}", err);
         return Err(err);
     }
     if (arm_l.socket_fit & 0xF0) != (torso.socket_fit & 0xF0) {
-        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::ArmL };
+        let err = JidokaHalt::SocketMismatch {
+            expected: SocketType::Torso,
+            got: SocketType::ArmL,
+        };
         tracing::error!("Jidoka Halt at Socket Gate: {}", err);
         return Err(err);
     }
     if (arm_r.socket_fit & 0xF0) != (torso.socket_fit & 0xF0) {
-        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::ArmR };
+        let err = JidokaHalt::SocketMismatch {
+            expected: SocketType::Torso,
+            got: SocketType::ArmR,
+        };
         tracing::error!("Jidoka Halt at Socket Gate: {}", err);
         return Err(err);
     }
     if (leg_l.socket_fit & 0x0F) != (waist.socket_fit & 0x0F) {
-        let err = JidokaHalt::SocketMismatch { expected: SocketType::Waist, got: SocketType::LegL };
+        let err = JidokaHalt::SocketMismatch {
+            expected: SocketType::Waist,
+            got: SocketType::LegL,
+        };
         tracing::error!("Jidoka Halt at Socket Gate: {}", err);
         return Err(err);
     }
     if (leg_r.socket_fit & 0x0F) != (waist.socket_fit & 0x0F) {
-        let err = JidokaHalt::SocketMismatch { expected: SocketType::Waist, got: SocketType::LegR };
+        let err = JidokaHalt::SocketMismatch {
+            expected: SocketType::Waist,
+            got: SocketType::LegR,
+        };
         tracing::error!("Jidoka Halt at Socket Gate: {}", err);
         return Err(err);
     }
     if (backpack.socket_fit & 0xF0) != (torso.socket_fit & 0xF0) {
-        let err = JidokaHalt::SocketMismatch { expected: SocketType::Torso, got: SocketType::Backpack };
+        let err = JidokaHalt::SocketMismatch {
+            expected: SocketType::Torso,
+            got: SocketType::Backpack,
+        };
         tracing::error!("Jidoka Halt at Socket Gate: {}", err);
         return Err(err);
     }
@@ -483,7 +682,8 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
     // 3. Collision and Clearance Gate
     tracing::info!("Gate 3: Collision and Clearance Verification. Check volume clearance...");
     let get_radius = |part: &Part| -> f32 {
-        ((part.collision_volume & 0xFF) as f32) / 100.0 + ((part.motion_clearance & 0xFF) as f32) / 200.0
+        ((part.collision_volume & 0xFF) as f32) / 100.0
+            + ((part.motion_clearance & 0xFF) as f32) / 200.0
     };
 
     let slots_positions: [(PartSlot, (f32, f32, f32)); 8] = [
@@ -507,11 +707,14 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
             let dx = pos_a.0 - pos_b.0;
             let dy = pos_a.1 - pos_b.1;
             let dz = pos_a.2 - pos_b.2;
-            let distance = (dx*dx + dy*dy + dz*dz).sqrt();
+            let distance = (dx * dx + dy * dy + dz * dz).sqrt();
 
             let combined_radius = get_radius(&part_a) + get_radius(&part_b);
             if combined_radius > distance {
-                let err = JidokaHalt::CollisionVolumeIntersects { part_a: slot_a, part_b: slot_b };
+                let err = JidokaHalt::CollisionVolumeIntersects {
+                    part_a: slot_a,
+                    part_b: slot_b,
+                };
                 tracing::error!("Jidoka Halt at Collision Gate: {}", err);
                 return Err(err);
             }
@@ -522,13 +725,13 @@ pub fn assemble_mech(vectors: &[PartStateVector; 8]) -> Result<MechTpsReceipt, J
     // 4. Mass and Frame Capacity Gate
     tracing::info!("Gate 4: Mass and Frame Capacity Verification. Checking payload thresholds...");
     let total_mass: u64 = parts_map.iter().map(|p| p.unwrap().1.mass_balance).sum();
-    
+
     // Extract leg dimensions for capacity calculation
     let leg_l_z = (leg_l.geometry >> 32) & 0xFFFF;
     let leg_r_z = (leg_r.geometry >> 32) & 0xFFFF;
     let leg_l_val = if leg_l_z > 0 { leg_l_z } else { leg_l.geometry };
     let leg_r_val = if leg_r_z > 0 { leg_r_z } else { leg_r.geometry };
-    
+
     let load_capacity = (leg_l_val.wrapping_add(leg_r_val)).wrapping_mul(7) / 2;
     if total_mass > load_capacity {
         let err = JidokaHalt::MassExceedsFrameCapacity {

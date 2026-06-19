@@ -12,7 +12,12 @@ fn full_combat_loop_kills_enemy_and_grants_rewards() {
     assert!(s.is_in_combat);
 
     let mut rounds = 0;
-    while s.current_enemy.as_ref().map(|e| e.is_alive()).unwrap_or(false) {
+    while s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.is_alive())
+        .unwrap_or(false)
+    {
         s.dispatch(GameCommand::Attack(AttackDir::Overhead));
         rounds += 1;
         assert!(rounds < 200, "combat should resolve within 200 rounds");
@@ -28,11 +33,24 @@ fn full_combat_loop_kills_enemy_and_grants_rewards() {
 fn combo_depth_builds_with_attacks() {
     let mut s = GameSession::new(1, "Kamille", 1);
     s.dispatch(GameCommand::Attack(AttackDir::Overhead)); // spawns + first hit
-    if s.is_in_combat && s.current_enemy.as_ref().map(|e| e.is_alive()).unwrap_or(false) {
+    if s.is_in_combat
+        && s.current_enemy
+            .as_ref()
+            .map(|e| e.is_alive())
+            .unwrap_or(false)
+    {
         assert_eq!(s.player.combo_depth, 1);
-        if s.current_enemy.as_ref().map(|e| e.is_alive()).unwrap_or(false) {
+        if s.current_enemy
+            .as_ref()
+            .map(|e| e.is_alive())
+            .unwrap_or(false)
+        {
             s.dispatch(GameCommand::Attack(AttackDir::Left));
-            if s.current_enemy.as_ref().map(|e| e.is_alive()).unwrap_or(false) {
+            if s.current_enemy
+                .as_ref()
+                .map(|e| e.is_alive())
+                .unwrap_or(false)
+            {
                 assert_eq!(s.player.combo_depth, 2);
             }
         }
@@ -72,7 +90,11 @@ fn godking_shield_breaks_after_3_perfect_parries() {
         s.dispatch(GameCommand::Parry(Some(AttackDir::Overhead)));
     }
 
-    let shield_on = s.current_enemy.as_ref().map(|e| e.shield_active).unwrap_or(true);
+    let shield_on = s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.shield_active)
+        .unwrap_or(true);
     assert!(!shield_on, "shield must break after 3 perfect parries");
 }
 
@@ -83,20 +105,28 @@ fn godking_phase2_qip_scars_force_rebirth_at_3() {
 
     // Break shield first (3 perfect parries)
     for _ in 0..3 {
-        if let Some(e) = s.current_enemy.as_mut() { e.announced_dir = Some(AttackDir::Left); }
+        if let Some(e) = s.current_enemy.as_mut() {
+            e.announced_dir = Some(AttackDir::Left);
+        }
         s.dispatch(GameCommand::Parry(Some(AttackDir::Left)));
     }
 
     // Now in Phase 2 (no shield). Stack 3 QIP scars via wrong-dir parries.
     // Wrong dir = normal parry = applies QIP scar in Phase 2 GodKing.
-    if let Some(e) = s.current_enemy.as_mut() { e.announced_dir = Some(AttackDir::Right); }
+    if let Some(e) = s.current_enemy.as_mut() {
+        e.announced_dir = Some(AttackDir::Right);
+    }
     // Phase 2 may not be active yet (shield just broke = phase 2 activates now)
     // Force phase 2
-    if let Some(e) = s.current_enemy.as_mut() { e.phase = 2; }
+    if let Some(e) = s.current_enemy.as_mut() {
+        e.phase = 2;
+    }
 
     let initial_bloodline = s.player.bloodline;
     for _ in 0..3 {
-        if let Some(e) = s.current_enemy.as_mut() { e.announced_dir = Some(AttackDir::Overhead); }
+        if let Some(e) = s.current_enemy.as_mut() {
+            e.announced_dir = Some(AttackDir::Overhead);
+        }
         s.dispatch(GameCommand::Parry(Some(AttackDir::Right))); // wrong dir = QIP scar
     }
 
@@ -189,8 +219,14 @@ fn trans_am_activates_only_with_full_gauge() {
 
     s.player.trans_am_gauge = 1.0;
     s.dispatch(GameCommand::UseSpecial);
-    assert!(s.player.attack > initial_atk, "full gauge = Trans-Am activates");
-    assert_eq!(s.player.trans_am_gauge, 0.0, "gauge resets after activation");
+    assert!(
+        s.player.attack > initial_atk,
+        "full gauge = Trans-Am activates"
+    );
+    assert_eq!(
+        s.player.trans_am_gauge, 0.0,
+        "gauge resets after activation"
+    );
 }
 
 // ── Surrender ────────────────────────────────────────────────────────────────

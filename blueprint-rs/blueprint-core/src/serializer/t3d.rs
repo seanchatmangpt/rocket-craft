@@ -4,7 +4,7 @@
 //! (Ctrl+V) and the nodes will appear with their connections intact.
 
 use crate::ast::{Blueprint, BpGraph, BpNode, Pin};
-use crate::types::{PinDirection, PinCategory};
+use crate::types::{PinCategory, PinDirection};
 
 pub struct T3dSerializer;
 
@@ -103,7 +103,10 @@ fn serialize_pin(pin: &Pin, _index: usize) -> String {
     parts.push(format!("Direction=\"{}\"", dir_str));
 
     // PinType — PinCategory
-    parts.push(format!("PinType.PinCategory=\"{}\"", pin.pin_type.category.as_str()));
+    parts.push(format!(
+        "PinType.PinCategory=\"{}\"",
+        pin.pin_type.category.as_str()
+    ));
 
     if let Some(sub) = &pin.pin_type.sub_category {
         parts.push(format!("PinType.PinSubCategory=\"{}\"", sub));
@@ -115,10 +118,7 @@ fn serialize_pin(pin: &Pin, _index: usize) -> String {
 
     // LinkedTo list
     for link in &pin.linked_to {
-        parts.push(format!(
-            "LinkedTo=({}({}))",
-            link.node_name, link.pin_id
-        ));
+        parts.push(format!("LinkedTo=({}({}))", link.node_name, link.pin_id));
     }
 
     // Default value (skip for exec pins)
@@ -141,47 +141,41 @@ fn serialize_pin(pin: &Pin, _index: usize) -> String {
         parts.push("bOrphanedPin=True".to_string());
     }
 
-    format!(
-        "   CustomProperties Pin ({})\n",
-        parts.join(",")
-    )
+    format!("   CustomProperties Pin ({})\n", parts.join(","))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::ast::BpNode;
-    use crate::types::{PinDirection, PinType, PinCategory, ContainerType};
+    use crate::types::{ContainerType, PinCategory, PinDirection, PinType};
 
     fn make_event_node() -> BpNode {
-        BpNode::new(
-            "/Script/BlueprintGraph.K2Node_Event",
-            "K2Node_Event_0",
-        )
-        .at(64, -16)
-        .with_property(
-            "EventReference",
-            "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"ReceiveBeginPlay\")",
-        )
-        .with_property("bOverrideFunction", "True")
-        .with_pin({
-            let mut p = Pin::new(
-                "OutputDelegate",
-                PinDirection::Output,
-                PinType {
-                    category: PinCategory::Delegate,
-                    sub_category: None,
-                    sub_category_object: None,
-                    container: ContainerType::None,
-                    is_reference: false,
-                    is_const: false,
-                },
-            );
-            p.is_hidden = true;
-            p.is_not_connectable = true;
-            p
-        })
-        .with_pin(Pin::exec_output("then"))
+        BpNode::new("/Script/BlueprintGraph.K2Node_Event", "K2Node_Event_0")
+            .at(64, -16)
+            .with_property(
+                "EventReference",
+                "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"ReceiveBeginPlay\")",
+            )
+            .with_property("bOverrideFunction", "True")
+            .with_pin({
+                let mut p = Pin::new(
+                    "OutputDelegate",
+                    PinDirection::Output,
+                    PinType {
+                        category: PinCategory::Delegate,
+                        sub_category: None,
+                        sub_category_object: None,
+                        container: ContainerType::None,
+                        is_reference: false,
+                        is_const: false,
+                    },
+                );
+                p.is_hidden = true;
+                p.is_not_connectable = true;
+                p
+            })
+            .with_pin(Pin::exec_output("then"))
     }
 
     #[test]
@@ -189,8 +183,16 @@ mod tests {
         let node = make_event_node();
         let t3d = serialize_node(&node);
 
-        assert!(t3d.contains("Begin Object"), "missing Begin Object:\n{}", t3d);
-        assert!(t3d.contains("K2Node_Event_0"), "missing node name:\n{}", t3d);
+        assert!(
+            t3d.contains("Begin Object"),
+            "missing Begin Object:\n{}",
+            t3d
+        );
+        assert!(
+            t3d.contains("K2Node_Event_0"),
+            "missing node name:\n{}",
+            t3d
+        );
         assert!(t3d.contains("NodeGuid="), "missing NodeGuid:\n{}", t3d);
         assert!(t3d.contains("End Object"), "missing End Object:\n{}", t3d);
         assert!(
@@ -218,12 +220,9 @@ mod tests {
         // Build a graph with two nodes connected by exec pins
         let mut graph = BpGraph::new("TestGraph");
 
-        let event_node = BpNode::new(
-            "/Script/BlueprintGraph.K2Node_Event",
-            "K2Node_Event_0",
-        )
-        .at(64, -16)
-        .with_pin(Pin::exec_output("then"));
+        let event_node = BpNode::new("/Script/BlueprintGraph.K2Node_Event", "K2Node_Event_0")
+            .at(64, -16)
+            .with_pin(Pin::exec_output("then"));
 
         let call_node = BpNode::new(
             "/Script/BlueprintGraph.K2Node_CallFunction",

@@ -9,20 +9,20 @@
 //! 2. **High-level builder** ([`BlueprintBuilder`]) — ergonomic API consumed by
 //!    the `blueprint_macros` proc-macro crate.
 
-pub mod types;
 pub mod ast;
-pub mod nodes;
 pub mod builder;
-pub mod serializer;
-pub mod render;
-pub mod layout;
 pub mod diff;
-pub mod validator;
+pub mod layout;
+pub mod nodes;
 pub mod parser;
 pub mod registry;
+pub mod render;
+pub mod serializer;
+pub mod types;
+pub mod validator;
 
-pub use types::*;
 pub use ast::*;
-pub use builder::{BlueprintBuilder, NodeHandle, VarType, EventBodyBuilder, Statement};
-pub use serializer::{T3dSerializer, JsonSerializer};
+pub use builder::{BlueprintBuilder, EventBodyBuilder, NodeHandle, Statement, VarType};
 pub use layout::auto_layout_blueprint;
+pub use serializer::{JsonSerializer, T3dSerializer};
+pub use types::*;

@@ -20,7 +20,9 @@ pub mod ledger;
 pub mod marketplace;
 pub mod shop;
 
-pub use auction::{Auction, AuctionBuilder, AuctionBuildError, AuctionState, AuctionTransitionError};
-pub use ledger::{Ledger, JournalEntry, AccountType};
+pub use auction::{
+    Auction, AuctionBuildError, AuctionBuilder, AuctionState, AuctionTransitionError,
+};
+pub use ledger::{AccountType, JournalEntry, Ledger};
 pub use marketplace::Marketplace;
-pub use shop::{Shop, ShopItem, ShopError};
+pub use shop::{Shop, ShopError, ShopItem};

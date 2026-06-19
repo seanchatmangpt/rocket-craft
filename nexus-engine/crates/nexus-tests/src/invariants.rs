@@ -1,6 +1,8 @@
 /// Combat invariant: damage floor — computed damage is always >= 1.0
 pub fn damage_floor_holds(base: f32, combo_mult: f32, equipment_bonus: f32, armor: f32) -> bool {
-    if base <= 0.0 { return true; }
+    if base <= 0.0 {
+        return true;
+    }
     let raw = base * combo_mult * (1.0 + equipment_bonus / 100.0);
     let mitigated = (raw - armor).max(1.0);
     mitigated >= 1.0
@@ -15,7 +17,7 @@ pub fn qip_scar_rebirth_at_3(stacks_before: u32) -> bool {
     let mut tracker = QipScarTracker::new();
     tracker.stacks = stacks_before;
     let triggered = tracker.apply_scar();
-    
+
     if triggered {
         tracker.stacks >= 3
     } else {
@@ -31,7 +33,10 @@ pub fn inventory_add_remove_preserves_size(initial_size: usize) -> bool {
     }
     let mut inv = Inventory::<50>::new();
     for i in 0..initial_size {
-        let item = Item { id: i as u64, ..Default::default() };
+        let item = Item {
+            id: i as u64,
+            ..Default::default()
+        };
         if inv.add(item).is_err() {
             return false;
         }
@@ -40,8 +45,11 @@ pub fn inventory_add_remove_preserves_size(initial_size: usize) -> bool {
     if before_add != initial_size {
         return false;
     }
-    
-    let new_item = Item { id: 999, ..Default::default() };
+
+    let new_item = Item {
+        id: 999,
+        ..Default::default()
+    };
     let idx = match inv.add(new_item) {
         Ok(idx) => idx,
         Err(_) => return false,
@@ -49,11 +57,10 @@ pub fn inventory_add_remove_preserves_size(initial_size: usize) -> bool {
     if inv.len() != before_add + 1 {
         return false;
     }
-    
+
     if inv.remove(idx).is_err() {
         return false;
     }
-    
+
     inv.len() == before_add
 }
-

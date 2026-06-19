@@ -1,16 +1,24 @@
-use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use thiserror::Error;
 
-use nexus_tps::{PartStateVector, PartSlot};
+use nexus_tps::{PartSlot, PartStateVector};
 // These enums mirror wasm4pm::self_healing but are defined locally to respect
 // the wasm4pm-compat boundary. nexus-mud must not cross into full wasm4pm authority.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum CircuitState { Closed, HalfOpen, Open }
+enum CircuitState {
+    Closed,
+    HalfOpen,
+    Open,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum HealthStatus { Healthy, Degraded, Unhealthy }
+enum HealthStatus {
+    Healthy,
+    Degraded,
+    Unhealthy,
+}
 
 /// Nine factory zones representing the GMF physical spaces.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -46,9 +54,13 @@ impl Zone {
         match clean.as_str() {
             "mission room" | "mission_room" | "mission" => Some(Zone::MissionRoom),
             "materials lab" | "materials_lab" | "materials" => Some(Zone::MaterialsLab),
-            "primitive foundry" | "primitive_foundry" | "primitive" | "foundry" => Some(Zone::PrimitiveFoundry),
+            "primitive foundry" | "primitive_foundry" | "primitive" | "foundry" => {
+                Some(Zone::PrimitiveFoundry)
+            }
             "runner wall" | "runner_wall" | "runner" => Some(Zone::RunnerWall),
-            "assembly gantry" | "assembly_gantry" | "assembly" | "gantry" => Some(Zone::AssemblyGantry),
+            "assembly gantry" | "assembly_gantry" | "assembly" | "gantry" => {
+                Some(Zone::AssemblyGantry)
+            }
             "fit bay" | "fit_bay" | "fit" => Some(Zone::FitBay),
             "collision bay" | "collision_bay" | "collision" => Some(Zone::CollisionBay),
             "proving ground" | "proving_ground" | "proving" => Some(Zone::ProvingGround),
@@ -117,9 +129,12 @@ pub struct AABB {
 
 impl AABB {
     pub fn intersects(&self, other: &AABB) -> bool {
-        self.min_x < other.max_x && self.max_x > other.min_x &&
-        self.min_y < other.max_y && self.max_y > other.min_y &&
-        self.min_z < other.max_z && self.max_z > other.min_z
+        self.min_x < other.max_x
+            && self.max_x > other.min_x
+            && self.min_y < other.max_y
+            && self.max_y > other.min_y
+            && self.min_z < other.max_z
+            && self.max_z > other.min_z
     }
 }
 
@@ -247,10 +262,16 @@ pub enum MudError {
     KineticsRequired,
 
     #[error("Invalid room transition: cannot move {direction} from {current_zone}")]
-    InvalidTransition { direction: String, current_zone: String },
+    InvalidTransition {
+        direction: String,
+        current_zone: String,
+    },
 
     #[error("Invalid direct travel: cannot go to {destination} from {current_zone}")]
-    InvalidDirectTravel { destination: String, current_zone: String },
+    InvalidDirectTravel {
+        destination: String,
+        current_zone: String,
+    },
 
     #[error("Gate blocked: {0}")]
     GateBlocked(String),
@@ -383,82 +404,321 @@ impl MudEngine {
     /// Creates a new MudEngine with healthy/compliant default state.
     pub fn new() -> Self {
         let state_vectors = [
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::Head },
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::Torso },
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::Waist },
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::ArmL },
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::ArmR },
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::LegL },
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::LegR },
-            PartStateVector { civilization_id: 0, frame_id: 1, armor_profile: 0.5, joint_profile: 0.5, mass_profile: 0.5, weapon_profile: 0.5, motion_profile: 50.0, part_slot: PartSlot::Backpack },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::Head,
+            },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::Torso,
+            },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::Waist,
+            },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::ArmL,
+            },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::ArmR,
+            },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::LegL,
+            },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::LegR,
+            },
+            PartStateVector {
+                civilization_id: 0,
+                frame_id: 1,
+                armor_profile: 0.5,
+                joint_profile: 0.5,
+                mass_profile: 0.5,
+                weapon_profile: 0.5,
+                motion_profile: 50.0,
+                part_slot: PartSlot::Backpack,
+            },
         ];
 
         let mut twin_parts = HashMap::new();
-        let part_names = vec!["Head", "Torso", "Waist", "ArmL", "ArmR", "LegL", "LegR", "Backpack"];
+        let part_names = vec![
+            "Head", "Torso", "Waist", "ArmL", "ArmR", "LegL", "LegR", "Backpack",
+        ];
         for name in part_names {
-            twin_parts.insert(name.to_string(), TwinPart {
-                name: name.to_string(),
-                geometry: 500,
-                socket_fit: 0xFF,
-                motion_clearance: 1,
-                collision_volume: 1,
-                mass_balance: 100,
-                physics_role: 1,
-                assembly_compatibility: 0xFFFF,
-                health_score: 1.0,
-                wear_rate: 0.0,
-                thermal_load: 35.0,
-                fault_status: "None".to_string(),
-            });
+            twin_parts.insert(
+                name.to_string(),
+                TwinPart {
+                    name: name.to_string(),
+                    geometry: 500,
+                    socket_fit: 0xFF,
+                    motion_clearance: 1,
+                    collision_volume: 1,
+                    mass_balance: 100,
+                    physics_role: 1,
+                    assembly_compatibility: 0xFFFF,
+                    health_score: 1.0,
+                    wear_rate: 0.0,
+                    thermal_load: 35.0,
+                    fault_status: "None".to_string(),
+                },
+            );
         }
 
         let mut twin_sockets = HashMap::new();
         let socket_names = vec!["head", "torso", "left_arm", "right_arm", "legs"];
         for name in socket_names {
-            twin_sockets.insert(name.to_string(), TwinSocket {
-                name: name.to_string(),
-                mated: false,
-                stress_level: 0.05,
-                mated_to: None,
-                mating_rule: format!("{} socket bitwise check", name),
-            });
+            twin_sockets.insert(
+                name.to_string(),
+                TwinSocket {
+                    name: name.to_string(),
+                    mated: false,
+                    stress_level: 0.05,
+                    mated_to: None,
+                    mating_rule: format!("{} socket bitwise check", name),
+                },
+            );
         }
 
         let mut twin_joints = HashMap::new();
-        let joint_names = vec!["Neck", "ShoulderL", "ShoulderR", "HipL", "HipR", "AnkleL", "AnkleR"];
+        let joint_names = vec![
+            "Neck",
+            "ShoulderL",
+            "ShoulderR",
+            "HipL",
+            "HipR",
+            "AnkleL",
+            "AnkleR",
+        ];
         for name in joint_names {
-            twin_joints.insert(name.to_string(), TwinJoint {
-                name: name.to_string(),
-                wear_level: 0.0,
-                motion_failures: 0,
-                status: "Operational".to_string(),
-            });
+            twin_joints.insert(
+                name.to_string(),
+                TwinJoint {
+                    name: name.to_string(),
+                    wear_level: 0.0,
+                    motion_failures: 0,
+                    status: "Operational".to_string(),
+                },
+            );
         }
 
         let mut parts = HashMap::new();
         let default_parts = vec![
-            ("torso_frame", "frame", 100.0, AABB { min_x: -0.9, max_x: 0.9, min_y: -0.9, max_y: 0.9, min_z: -0.9, max_z: 0.9 }, vec![], vec!["head", "left_arm", "right_arm", "left_leg", "right_leg", "backpack"]),
-            ("head", "head", 10.0, AABB { min_x: -0.3, max_x: 0.3, min_y: -0.3, max_y: 0.3, min_z: 1.0, max_z: 1.6 }, vec!["head"], vec![]),
-            ("left_arm", "arm", 20.0, AABB { min_x: -2.0, max_x: -1.0, min_y: -0.4, max_y: 0.4, min_z: -0.5, max_z: 0.5 }, vec!["left_arm"], vec![]),
-            ("right_arm", "arm", 20.0, AABB { min_x: 1.0, max_x: 2.0, min_y: -0.4, max_y: 0.4, min_z: -0.5, max_z: 0.5 }, vec!["right_arm"], vec![]),
-            ("left_leg", "leg", 30.0, AABB { min_x: -0.8, max_x: -0.2, min_y: -0.5, max_y: 0.5, min_z: -2.5, max_z: -1.0 }, vec!["left_leg"], vec![]),
-            ("right_leg", "leg", 30.0, AABB { min_x: 0.2, max_x: 0.8, min_y: -0.5, max_y: 0.5, min_z: -2.5, max_z: -1.0 }, vec!["right_leg"], vec![]),
-            ("backpack", "backpack", 15.0, AABB { min_x: -0.5, max_x: 0.5, min_y: -2.0, max_y: -1.0, min_z: -0.5, max_z: 0.5 }, vec!["backpack"], vec!["left_thruster", "right_thruster"]),
-            ("left_thruster", "thruster", 8.0, AABB { min_x: -0.8, max_x: -0.4, min_y: -3.5, max_y: -2.5, min_z: -0.8, max_z: 0.4 }, vec!["left_thruster"], vec![]),
-            ("right_thruster", "thruster", 8.0, AABB { min_x: 0.4, max_x: 0.8, min_y: -3.5, max_y: -2.5, min_z: -0.8, max_z: 0.4 }, vec!["right_thruster"], vec![]),
+            (
+                "torso_frame",
+                "frame",
+                100.0,
+                AABB {
+                    min_x: -0.9,
+                    max_x: 0.9,
+                    min_y: -0.9,
+                    max_y: 0.9,
+                    min_z: -0.9,
+                    max_z: 0.9,
+                },
+                vec![],
+                vec![
+                    "head",
+                    "left_arm",
+                    "right_arm",
+                    "left_leg",
+                    "right_leg",
+                    "backpack",
+                ],
+            ),
+            (
+                "head",
+                "head",
+                10.0,
+                AABB {
+                    min_x: -0.3,
+                    max_x: 0.3,
+                    min_y: -0.3,
+                    max_y: 0.3,
+                    min_z: 1.0,
+                    max_z: 1.6,
+                },
+                vec!["head"],
+                vec![],
+            ),
+            (
+                "left_arm",
+                "arm",
+                20.0,
+                AABB {
+                    min_x: -2.0,
+                    max_x: -1.0,
+                    min_y: -0.4,
+                    max_y: 0.4,
+                    min_z: -0.5,
+                    max_z: 0.5,
+                },
+                vec!["left_arm"],
+                vec![],
+            ),
+            (
+                "right_arm",
+                "arm",
+                20.0,
+                AABB {
+                    min_x: 1.0,
+                    max_x: 2.0,
+                    min_y: -0.4,
+                    max_y: 0.4,
+                    min_z: -0.5,
+                    max_z: 0.5,
+                },
+                vec!["right_arm"],
+                vec![],
+            ),
+            (
+                "left_leg",
+                "leg",
+                30.0,
+                AABB {
+                    min_x: -0.8,
+                    max_x: -0.2,
+                    min_y: -0.5,
+                    max_y: 0.5,
+                    min_z: -2.5,
+                    max_z: -1.0,
+                },
+                vec!["left_leg"],
+                vec![],
+            ),
+            (
+                "right_leg",
+                "leg",
+                30.0,
+                AABB {
+                    min_x: 0.2,
+                    max_x: 0.8,
+                    min_y: -0.5,
+                    max_y: 0.5,
+                    min_z: -2.5,
+                    max_z: -1.0,
+                },
+                vec!["right_leg"],
+                vec![],
+            ),
+            (
+                "backpack",
+                "backpack",
+                15.0,
+                AABB {
+                    min_x: -0.5,
+                    max_x: 0.5,
+                    min_y: -2.0,
+                    max_y: -1.0,
+                    min_z: -0.5,
+                    max_z: 0.5,
+                },
+                vec!["backpack"],
+                vec!["left_thruster", "right_thruster"],
+            ),
+            (
+                "left_thruster",
+                "thruster",
+                8.0,
+                AABB {
+                    min_x: -0.8,
+                    max_x: -0.4,
+                    min_y: -3.5,
+                    max_y: -2.5,
+                    min_z: -0.8,
+                    max_z: 0.4,
+                },
+                vec!["left_thruster"],
+                vec![],
+            ),
+            (
+                "right_thruster",
+                "thruster",
+                8.0,
+                AABB {
+                    min_x: 0.4,
+                    max_x: 0.8,
+                    min_y: -3.5,
+                    max_y: -2.5,
+                    min_z: -0.8,
+                    max_z: 0.4,
+                },
+                vec!["right_thruster"],
+                vec![],
+            ),
         ];
 
         for (id, kind, mass, bounds, req, prov) in default_parts {
-            parts.insert(id.to_string(), MechPart {
-                part_id: id.to_string(),
-                part_kind: kind.to_string(),
-                mass,
-                bounds,
-                sockets_required: req.into_iter().map(|s| SocketConnection { name: s.to_string(), kind: s.to_string() }).collect(),
-                sockets_provided: prov.into_iter().map(|s| SocketConnection { name: s.to_string(), kind: s.to_string() }).collect(),
-                health_status: 1.0,
-                admission_status: "pending".to_string(),
-            });
+            parts.insert(
+                id.to_string(),
+                MechPart {
+                    part_id: id.to_string(),
+                    part_kind: kind.to_string(),
+                    mass,
+                    bounds,
+                    sockets_required: req
+                        .into_iter()
+                        .map(|s| SocketConnection {
+                            name: s.to_string(),
+                            kind: s.to_string(),
+                        })
+                        .collect(),
+                    sockets_provided: prov
+                        .into_iter()
+                        .map(|s| SocketConnection {
+                            name: s.to_string(),
+                            kind: s.to_string(),
+                        })
+                        .collect(),
+                    health_status: 1.0,
+                    admission_status: "pending".to_string(),
+                },
+            );
         }
 
         let mut joints = HashMap::new();
@@ -469,17 +729,30 @@ impl MudEngine {
             ("HipL", "torso_frame", "left_leg", Some([-60.0, 60.0])),
             ("HipR", "torso_frame", "right_leg", Some([-60.0, 60.0])),
             ("BackpackMount", "torso_frame", "backpack", Some([0.0, 0.0])),
-            ("ThrusterL", "backpack", "left_thruster", Some([-30.0, 30.0])),
-            ("ThrusterR", "backpack", "right_thruster", Some([-30.0, 30.0])),
+            (
+                "ThrusterL",
+                "backpack",
+                "left_thruster",
+                Some([-30.0, 30.0]),
+            ),
+            (
+                "ThrusterR",
+                "backpack",
+                "right_thruster",
+                Some([-30.0, 30.0]),
+            ),
         ];
 
         for (name, parent, child, lims) in default_joints {
-            joints.insert(name.to_string(), Joint {
-                name: name.to_string(),
-                parent_part: parent.to_string(),
-                child_part: child.to_string(),
-                rotation_limits: lims,
-            });
+            joints.insert(
+                name.to_string(),
+                Joint {
+                    name: name.to_string(),
+                    parent_part: parent.to_string(),
+                    child_part: child.to_string(),
+                    rotation_limits: lims,
+                },
+            );
         }
 
         let mut engine = MudEngine {
@@ -512,19 +785,28 @@ impl MudEngine {
             assembly_receipt: None,
         };
 
-        engine.emit_event("factory.entered", "mission_room", "Agent entered the Gundam Manufacturing Facility MUD strategic space.");
+        engine.emit_event(
+            "factory.entered",
+            "mission_room",
+            "Agent entered the Gundam Manufacturing Facility MUD strategic space.",
+        );
         engine
     }
 
     /// Creates a MudEngine with a specific injected fault.
     pub fn new_with_fault(fault_type: &str) -> Self {
         let mut engine = Self::new();
-        engine.diagnostics.insert("fault_type".to_string(), fault_type.to_string());
+        engine
+            .diagnostics
+            .insert("fault_type".to_string(), fault_type.to_string());
 
         if fault_type == "socket" {
             // Mismatched socket: head and torso socket mismatch
             if let Some(head) = engine.parts.get_mut("head") {
-                head.sockets_required = vec![SocketConnection { name: "head_mismatched".to_string(), kind: "head_mismatched".to_string() }];
+                head.sockets_required = vec![SocketConnection {
+                    name: "head_mismatched".to_string(),
+                    kind: "head_mismatched".to_string(),
+                }];
                 head.health_status = 0.4;
             }
             if let Some(head) = engine.twin_parts.get_mut("Head") {
@@ -611,34 +893,83 @@ impl MudEngine {
     /// Performs referential integrity check on the event log.
     pub fn verify_referential_integrity(&self) -> Result<(), String> {
         let valid_zones = vec![
-            "mission_room", "materials_lab", "primitive_foundry", "runner_wall",
-            "assembly_gantry", "fit_bay", "collision_bay", "proving_ground", "reveal_platform"
-        ];
-        
-        let valid_parts = vec![
-            "torso_frame", "head", "left_arm", "right_arm",
-            "left_leg", "right_leg", "backpack", "left_thruster", "right_thruster"
-        ];
-        
-        let valid_sockets = [
-            "head_socket", "left_arm_socket", "right_arm_socket",
-            "left_leg_socket", "right_leg_socket", "backpack_socket",
-            "left_thruster_socket", "right_thruster_socket"
+            "mission_room",
+            "materials_lab",
+            "primitive_foundry",
+            "runner_wall",
+            "assembly_gantry",
+            "fit_bay",
+            "collision_bay",
+            "proving_ground",
+            "reveal_platform",
         ];
 
-        let valid_receipts = [
-            "assembly_receipt", "walkthrough_receipt"
+        let valid_parts = vec![
+            "torso_frame",
+            "head",
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "backpack",
+            "left_thruster",
+            "right_thruster",
         ];
-        
+
+        let valid_sockets = [
+            "head_socket",
+            "left_arm_socket",
+            "right_arm_socket",
+            "left_leg_socket",
+            "right_leg_socket",
+            "backpack_socket",
+            "left_thruster_socket",
+            "right_thruster_socket",
+        ];
+
+        let valid_receipts = ["assembly_receipt", "walkthrough_receipt"];
+
         let allowed_meta = vec![
-            "inventory", "exits", "preview", "all", "mech", "assembly", "overall", "mission_room",
-            "materials_lab", "primitive_foundry", "runner_wall", "assembly_gantry", "fit_bay",
-            "collision_bay", "proving_ground", "reveal_platform", "socket", "head", "torso", "left_arm",
-            "right_arm", "left_leg", "right_leg", "backpack", "left_thruster", "right_thruster",
-            "mission", "materials", "primitive", "runner", "fit", "collision", "motion", "kinetics",
-            "reveal", "standard", "walkthrough", "command"
+            "inventory",
+            "exits",
+            "preview",
+            "all",
+            "mech",
+            "assembly",
+            "overall",
+            "mission_room",
+            "materials_lab",
+            "primitive_foundry",
+            "runner_wall",
+            "assembly_gantry",
+            "fit_bay",
+            "collision_bay",
+            "proving_ground",
+            "reveal_platform",
+            "socket",
+            "head",
+            "torso",
+            "left_arm",
+            "right_arm",
+            "left_leg",
+            "right_leg",
+            "backpack",
+            "left_thruster",
+            "right_thruster",
+            "mission",
+            "materials",
+            "primitive",
+            "runner",
+            "fit",
+            "collision",
+            "motion",
+            "kinetics",
+            "reveal",
+            "standard",
+            "walkthrough",
+            "command",
         ];
-        
+
         for event in &self.event_log {
             let id = event.object_id.to_lowercase();
             let matches_zone = valid_zones.contains(&id.as_str());
@@ -646,8 +977,13 @@ impl MudEngine {
             let matches_socket = valid_sockets.contains(&id.as_str());
             let matches_receipt = valid_receipts.contains(&id.as_str());
             let matches_meta = allowed_meta.contains(&id.as_str());
-            
-            if !matches_zone && !matches_part && !matches_socket && !matches_receipt && !matches_meta {
+
+            if !matches_zone
+                && !matches_part
+                && !matches_socket
+                && !matches_receipt
+                && !matches_meta
+            {
                 return Err(format!(
                     "Referential integrity failure: event ID {} refers to invalid object_id '{}'",
                     event.event_id, event.object_id
@@ -673,26 +1009,35 @@ impl MudEngine {
         } else if lower.starts_with("go ") {
             let dest = trimmed[3..].trim().to_string();
             if dest.is_empty() {
-                Err(MudError::InvalidCommand("Go command requires a direction or zone name".into()))
+                Err(MudError::InvalidCommand(
+                    "Go command requires a direction or zone name".into(),
+                ))
             } else {
                 Ok(Command::Go(dest))
             }
         } else if lower.starts_with("inspect ") {
             let target = trimmed[8..].trim().to_string();
             if target.is_empty() {
-                Err(MudError::InvalidCommand("Inspect command requires a target".into()))
+                Err(MudError::InvalidCommand(
+                    "Inspect command requires a target".into(),
+                ))
             } else {
                 Ok(Command::Inspect(target))
             }
         } else if lower.starts_with("stress part ") {
             let part_name = trimmed[12..].trim().to_string();
             if part_name.is_empty() {
-                Err(MudError::InvalidCommand("Stress part command requires a component name".into()))
+                Err(MudError::InvalidCommand(
+                    "Stress part command requires a component name".into(),
+                ))
             } else {
                 Ok(Command::StressPart(part_name))
             }
         } else {
-            Err(MudError::InvalidCommand(format!("Unknown command: '{}'", trimmed)))
+            Err(MudError::InvalidCommand(format!(
+                "Unknown command: '{}'",
+                trimmed
+            )))
         }
     }
 
@@ -700,7 +1045,7 @@ impl MudEngine {
     pub fn execute_command(&mut self, input: &str) -> Result<String, MudError> {
         self.run_mape_k_loop();
         let cmd_parsed = parse_command(input)?;
-        
+
         self.command_history.push(input.trim().to_string());
 
         let object_id = match &cmd_parsed {
@@ -708,7 +1053,13 @@ impl MudEngine {
             MudCommand::Go(dest) => dest.as_str(),
             MudCommand::Inspect(target) => target.as_str(),
             MudCommand::Health(target) => target.as_str(),
-            MudCommand::Diagnose(target) => if target.is_empty() { "all" } else { target.as_str() },
+            MudCommand::Diagnose(target) => {
+                if target.is_empty() {
+                    "all"
+                } else {
+                    target.as_str()
+                }
+            }
             MudCommand::Verify(gate) => gate.as_str(),
             MudCommand::Assemble(spec) => spec.as_str(),
             MudCommand::Preview(op) => op.as_str(),
@@ -716,8 +1067,12 @@ impl MudEngine {
             MudCommand::Inventory => "inventory",
             MudCommand::Exits => "exits",
         };
-        self.emit_event("object.inspected", object_id, &format!("Executed command: {}", input));
-        
+        self.emit_event(
+            "object.inspected",
+            object_id,
+            &format!("Executed command: {}", input),
+        );
+
         let result = match cmd_parsed {
             MudCommand::Look => self.cmd_look(),
             MudCommand::Go(dest) => self.cmd_go(&dest),
@@ -732,7 +1087,10 @@ impl MudEngine {
             MudCommand::Exits => self.cmd_exits(),
         };
 
-        if self.current_zone == Zone::RevealPlatform && self.gates.motion && self.walkthrough_receipt.is_none() {
+        if self.current_zone == Zone::RevealPlatform
+            && self.gates.motion
+            && self.walkthrough_receipt.is_none()
+        {
             let _ = self.cmd_verify("reveal");
         }
         result
@@ -760,7 +1118,11 @@ impl MudEngine {
             Command::VerifyKinetics => "motion",
             Command::StressPart(p) => p.as_str(),
         };
-        self.emit_event("object.inspected", object_id, &format!("Executed legacy command: {}", cmd_str));
+        self.emit_event(
+            "object.inspected",
+            object_id,
+            &format!("Executed legacy command: {}", cmd_str),
+        );
 
         match cmd {
             Command::Look => self.cmd_look(),
@@ -847,7 +1209,10 @@ impl MudEngine {
                 (Zone::ProvingGround, "east") => Zone::RevealPlatform,
                 (Zone::RevealPlatform, "west") => Zone::ProvingGround,
                 _ => {
-                    return Err(MudError::InvalidTransition { direction: dest.to_string(), current_zone: self.current_zone.name().to_string() });
+                    return Err(MudError::InvalidTransition {
+                        direction: dest.to_string(),
+                        current_zone: self.current_zone.name().to_string(),
+                    });
                 }
             }
         };
@@ -857,7 +1222,10 @@ impl MudEngine {
 
         let diff = (to.elevation() - from.elevation()).abs();
         if diff > 1 {
-            return Err(MudError::InvalidDirectTravel { destination: to.name().to_string(), current_zone: from.name().to_string() });
+            return Err(MudError::InvalidDirectTravel {
+                destination: to.name().to_string(),
+                current_zone: from.name().to_string(),
+            });
         }
 
         if to.elevation() > from.elevation() {
@@ -884,7 +1252,11 @@ impl MudEngine {
         self.room_history.push(to);
         self.current_zone = to;
 
-        self.emit_event("zone.entered", to.to_str(), &format!("Player walked into {}", to.name()));
+        self.emit_event(
+            "zone.entered",
+            to.to_str(),
+            &format!("Player walked into {}", to.name()),
+        );
 
         Ok(format!("Moved to room: {}", to.name()))
     }
@@ -946,7 +1318,17 @@ impl MudEngine {
                 "=== CURRENT CONSTRUCTED ASSEMBLY ===".to_string(),
                 "Attached Components:".to_string(),
             ];
-            let parts_order = vec!["torso_frame", "head", "left_arm", "right_arm", "left_leg", "right_leg", "backpack", "left_thruster", "right_thruster"];
+            let parts_order = vec![
+                "torso_frame",
+                "head",
+                "left_arm",
+                "right_arm",
+                "left_leg",
+                "right_leg",
+                "backpack",
+                "left_thruster",
+                "right_thruster",
+            ];
             for p in parts_order {
                 if let Some(part) = self.parts.get(p) {
                     report.push(format!("  - {} (Health: {:.2})", p, part.health_status));
@@ -958,42 +1340,80 @@ impl MudEngine {
         if clean == "motion-domain" || clean == "motion_domain" {
             let mut report = vec![
                 "=== MOTION KINEMATICS DOMAIN REPORT ===".to_string(),
-                format!("Overall Joint Status: {}", if self.overall_degradation_state == "FailSafe" { "Locked/Kneeling" } else { "Active" }),
+                format!(
+                    "Overall Joint Status: {}",
+                    if self.overall_degradation_state == "FailSafe" {
+                        "Locked/Kneeling"
+                    } else {
+                        "Active"
+                    }
+                ),
                 "Joint Wear levels:".to_string(),
             ];
             for (name, joint) in &self.twin_joints {
-                report.push(format!("  - Joint {}: Wear: {:.2}, Failures: {}, Status: {}", name, joint.wear_level, joint.motion_failures, joint.status));
+                report.push(format!(
+                    "  - Joint {}: Wear: {:.2}, Failures: {}, Status: {}",
+                    name, joint.wear_level, joint.motion_failures, joint.status
+                ));
             }
-            report.push(format!("Active Degradation Profile: {}", self.overall_degradation_state));
+            report.push(format!(
+                "Active Degradation Profile: {}",
+                self.overall_degradation_state
+            ));
             if self.overall_degradation_state == "FailSafe" {
-                report.push("  -> FAIL-SAFE MODE: Joints locked, weapons deactivated, kneeling down.".into());
+                report.push(
+                    "  -> FAIL-SAFE MODE: Joints locked, weapons deactivated, kneeling down."
+                        .into(),
+                );
             } else if self.overall_degradation_state == "FailDegraded" {
-                report.push("  -> FAIL-DEGRADED MODE: Walking speed limited, thrusters reduced to 50%.".into());
+                report.push(
+                    "  -> FAIL-DEGRADED MODE: Walking speed limited, thrusters reduced to 50%."
+                        .into(),
+                );
             } else {
-                report.push("  -> FAIL-OPERATIONAL MODE: Auxiliary pathways routing, 100% mission cap.".into());
+                report.push(
+                    "  -> FAIL-OPERATIONAL MODE: Auxiliary pathways routing, 100% mission cap."
+                        .into(),
+                );
             }
             return Ok(report.join("\n"));
         }
 
-        Err(MudError::InvalidInspectTarget(format!("Cannot inspect '{}'. Target not found.", target)))
+        Err(MudError::InvalidInspectTarget(format!(
+            "Cannot inspect '{}'. Target not found.",
+            target
+        )))
     }
 
     fn cmd_health(&mut self, target: &str) -> Result<String, MudError> {
         let clean = target.trim().to_lowercase();
-        self.emit_event("object.inspected", target, &format!("Checked health for {}", target));
+        self.emit_event(
+            "object.inspected",
+            target,
+            &format!("Checked health for {}", target),
+        );
         if clean == "mech" || clean == "assembly" || clean == "overall" {
             let phm = self.get_phm_metrics();
             return Ok(format!("Overall health status: {:.2}", phm.overall_health));
         }
         if let Some(part) = self.parts.get(&clean) {
-            return Ok(format!("Part: {}, Health Score: {:.2}", part.part_id, part.health_status));
+            return Ok(format!(
+                "Part: {}, Health Score: {:.2}",
+                part.part_id, part.health_status
+            ));
         }
         for (name, part) in &self.twin_parts {
             if name.to_lowercase() == clean {
-                return Ok(format!("Part: {}, Health Score: {:.2}", name, part.health_score));
+                return Ok(format!(
+                    "Part: {}, Health Score: {:.2}",
+                    name, part.health_score
+                ));
             }
         }
-        Err(MudError::InvalidInspectTarget(format!("Unknown health target '{}'", target)))
+        Err(MudError::InvalidInspectTarget(format!(
+            "Unknown health target '{}'",
+            target
+        )))
     }
 
     fn cmd_diagnose(&mut self, target: &str) -> Result<String, MudError> {
@@ -1009,7 +1429,10 @@ impl MudEngine {
             if let Some(v) = self.diagnostics.get(&clean) {
                 reports.push(format!("{}: {}", clean, v));
             } else if let Some(part) = self.parts.get(&clean) {
-                reports.push(format!("Part {} is healthy with score {:.2}.", part.part_id, part.health_status));
+                reports.push(format!(
+                    "Part {} is healthy with score {:.2}.",
+                    part.part_id, part.health_status
+                ));
             } else {
                 for (name, part) in &self.twin_parts {
                     if name.to_lowercase() == clean {
@@ -1032,7 +1455,9 @@ impl MudEngine {
         match clean.as_str() {
             "mission" => {
                 if self.current_zone != Zone::MissionRoom {
-                    return Err(MudError::OperationError("Mission gate can only be verified in Mission Room".into()));
+                    return Err(MudError::OperationError(
+                        "Mission gate can only be verified in Mission Room".into(),
+                    ));
                 }
                 self.gates.mission = true;
                 self.emit_event("fit.checked", "mission_room", "Mission gate verified.");
@@ -1040,7 +1465,9 @@ impl MudEngine {
             }
             "materials" => {
                 if self.current_zone != Zone::MaterialsLab {
-                    return Err(MudError::OperationError("Materials gate can only be verified in Materials Lab".into()));
+                    return Err(MudError::OperationError(
+                        "Materials gate can only be verified in Materials Lab".into(),
+                    ));
                 }
                 self.gates.materials = true;
                 self.emit_event("fit.checked", "materials_lab", "Materials gate verified.");
@@ -1048,15 +1475,23 @@ impl MudEngine {
             }
             "primitive" => {
                 if self.current_zone != Zone::PrimitiveFoundry {
-                    return Err(MudError::OperationError("Primitive gate can only be verified in Primitive Foundry".into()));
+                    return Err(MudError::OperationError(
+                        "Primitive gate can only be verified in Primitive Foundry".into(),
+                    ));
                 }
                 self.gates.primitive = true;
-                self.emit_event("fit.checked", "primitive_foundry", "Primitive gate verified.");
+                self.emit_event(
+                    "fit.checked",
+                    "primitive_foundry",
+                    "Primitive gate verified.",
+                );
                 Ok("Primitive gate compliance check passed.".to_string())
             }
             "runner_wall" | "runner" => {
                 if self.current_zone != Zone::RunnerWall {
-                    return Err(MudError::OperationError("Runner Wall gate can only be verified in Runner Wall".into()));
+                    return Err(MudError::OperationError(
+                        "Runner Wall gate can only be verified in Runner Wall".into(),
+                    ));
                 }
                 self.gates.runner_wall = true;
                 self.emit_event("fit.checked", "runner_wall", "Runner Wall gate verified.");
@@ -1064,10 +1499,14 @@ impl MudEngine {
             }
             "assembly" => {
                 if self.current_zone != Zone::AssemblyGantry {
-                    return Err(MudError::OperationError("Assembly gate can only be verified in Assembly Gantry".into()));
+                    return Err(MudError::OperationError(
+                        "Assembly gate can only be verified in Assembly Gantry".into(),
+                    ));
                 }
                 if !self.assembly_complete {
-                    return Err(MudError::OperationError("You must assemble the mech first using 'assemble standard'".into()));
+                    return Err(MudError::OperationError(
+                        "You must assemble the mech first using 'assemble standard'".into(),
+                    ));
                 }
                 self.gates.assembly = true;
                 self.emit_event("fit.checked", "assembly_gantry", "Assembly gate verified.");
@@ -1077,17 +1516,24 @@ impl MudEngine {
             "collision" => self.cmd_verify_collision(),
             "motion" | "kinetics" => self.cmd_verify_kinetics(),
             "reveal" => self.cmd_verify_reveal(),
-            _ => Err(MudError::InvalidCommand(format!("Unknown gate: {}", gate_name))),
+            _ => Err(MudError::InvalidCommand(format!(
+                "Unknown gate: {}",
+                gate_name
+            ))),
         }
     }
 
     /// Verify socket mating and mass capacity in the Fit Bay.
     fn cmd_verify_fit(&mut self) -> Result<String, MudError> {
         if self.current_zone != Zone::FitBay {
-            return Err(MudError::OperationError("Fit gate can only be verified in Fit Bay".into()));
+            return Err(MudError::OperationError(
+                "Fit gate can only be verified in Fit Bay".into(),
+            ));
         }
         if !self.assembly_complete {
-            return Err(MudError::OperationError("No active assembly found. Complete assembly first.".into()));
+            return Err(MudError::OperationError(
+                "No active assembly found. Complete assembly first.".into(),
+            ));
         }
 
         let mut mismatch = false;
@@ -1106,16 +1552,35 @@ impl MudEngine {
         }
 
         if mismatch {
-            self.emit_event("socket.mismatched", "head", "Socket mating failure at Neck.");
-            self.diagnostics.insert("fit_fail".to_string(), "Neck socket mating mismatch: torso expected 'head', got 'head_mismatched'".to_string());
-            return Err(MudError::GateBlocked("Fit check failed: head and torso socket mating mismatch.".into()));
+            self.emit_event(
+                "socket.mismatched",
+                "head",
+                "Socket mating failure at Neck.",
+            );
+            self.diagnostics.insert(
+                "fit_fail".to_string(),
+                "Neck socket mating mismatch: torso expected 'head', got 'head_mismatched'"
+                    .to_string(),
+            );
+            return Err(MudError::GateBlocked(
+                "Fit check failed: head and torso socket mating mismatch.".into(),
+            ));
         }
 
         let total_mass: f32 = self.parts.values().map(|p| p.mass).sum();
         let leg_capacity = 250.0;
         if total_mass > leg_capacity {
-            self.diagnostics.insert("fit_fail".to_string(), format!("Total mass {} exceeds leg capacity {}", total_mass, leg_capacity));
-            return Err(MudError::GateBlocked(format!("Fit check failed: total mass {} exceeds leg capacity {}.", total_mass, leg_capacity)));
+            self.diagnostics.insert(
+                "fit_fail".to_string(),
+                format!(
+                    "Total mass {} exceeds leg capacity {}",
+                    total_mass, leg_capacity
+                ),
+            );
+            return Err(MudError::GateBlocked(format!(
+                "Fit check failed: total mass {} exceeds leg capacity {}.",
+                total_mass, leg_capacity
+            )));
         }
 
         self.gates.fit = true;
@@ -1126,10 +1591,14 @@ impl MudEngine {
     /// Sweep all part pairs for AABB intersection and re-verify mass in the Collision Bay.
     fn cmd_verify_collision(&mut self) -> Result<String, MudError> {
         if self.current_zone != Zone::CollisionBay {
-            return Err(MudError::OperationError("Collision gate can only be verified in Collision Bay".into()));
+            return Err(MudError::OperationError(
+                "Collision gate can only be verified in Collision Bay".into(),
+            ));
         }
         if !self.gates.fit {
-            return Err(MudError::GateBlocked("Fit gate must be verified before Collision gate".into()));
+            return Err(MudError::GateBlocked(
+                "Fit gate must be verified before Collision gate".into(),
+            ));
         }
 
         let mut intersection_detected = false;
@@ -1137,7 +1606,7 @@ impl MudEngine {
 
         let part_keys: Vec<String> = self.parts.keys().cloned().collect();
         'outer: for i in 0..part_keys.len() {
-            for j in (i+1)..part_keys.len() {
+            for j in (i + 1)..part_keys.len() {
                 let part_a = self.parts.get(&part_keys[i]).unwrap();
                 let part_b = self.parts.get(&part_keys[j]).unwrap();
                 if part_a.bounds.intersects(&part_b.bounds) {
@@ -1149,39 +1618,85 @@ impl MudEngine {
         }
 
         if intersection_detected {
-            self.emit_event("collision.checked", &intersecting_parts.0, &format!("Collision sweep detected intersection between {} and {}", intersecting_parts.0, intersecting_parts.1));
-            self.diagnostics.insert("collision_fail".to_string(), format!("Collision sweep defect: {} and {} bounds overlap.", intersecting_parts.0, intersecting_parts.1));
-            return Err(MudError::GateBlocked(format!("Collision check failed: {} intersects with {}.", intersecting_parts.0, intersecting_parts.1)));
+            self.emit_event(
+                "collision.checked",
+                &intersecting_parts.0,
+                &format!(
+                    "Collision sweep detected intersection between {} and {}",
+                    intersecting_parts.0, intersecting_parts.1
+                ),
+            );
+            self.diagnostics.insert(
+                "collision_fail".to_string(),
+                format!(
+                    "Collision sweep defect: {} and {} bounds overlap.",
+                    intersecting_parts.0, intersecting_parts.1
+                ),
+            );
+            return Err(MudError::GateBlocked(format!(
+                "Collision check failed: {} intersects with {}.",
+                intersecting_parts.0, intersecting_parts.1
+            )));
         }
 
         let total_mass: f32 = self.parts.values().map(|p| p.mass).sum();
         let leg_capacity = 250.0;
         if total_mass > leg_capacity {
-            self.diagnostics.insert("collision_fail".to_string(), format!("Total mass {} exceeds leg capacity {}", total_mass, leg_capacity));
-            return Err(MudError::GateBlocked(format!("Collision check failed: total mass {} exceeds leg capacity {}.", total_mass, leg_capacity)));
+            self.diagnostics.insert(
+                "collision_fail".to_string(),
+                format!(
+                    "Total mass {} exceeds leg capacity {}",
+                    total_mass, leg_capacity
+                ),
+            );
+            return Err(MudError::GateBlocked(format!(
+                "Collision check failed: total mass {} exceeds leg capacity {}.",
+                total_mass, leg_capacity
+            )));
         }
 
         self.gates.collision = true;
         self.clearance_verified = true;
-        self.emit_event("collision.checked", "collision_bay", "Collision sweep passed cleanly.");
+        self.emit_event(
+            "collision.checked",
+            "collision_bay",
+            "Collision sweep passed cleanly.",
+        );
         Ok("Collision gate compliance check passed.".to_string())
     }
 
     /// Verify joint rotation limits and center-of-mass balance in the Proving Ground.
     fn cmd_verify_kinetics(&mut self) -> Result<String, MudError> {
         if self.current_zone != Zone::ProvingGround {
-            return Err(MudError::OperationError("Motion gate can only be verified in Proving Ground".into()));
+            return Err(MudError::OperationError(
+                "Motion gate can only be verified in Proving Ground".into(),
+            ));
         }
         if !self.gates.collision {
-            return Err(MudError::GateBlocked("Collision gate must be verified before Motion gate".into()));
+            return Err(MudError::GateBlocked(
+                "Collision gate must be verified before Motion gate".into(),
+            ));
         }
 
-        self.emit_event("motion.sweep_started", "proving_ground", "Kinetic motion sweep started for 4 poses: stand, step, turn, kneel.");
+        self.emit_event(
+            "motion.sweep_started",
+            "proving_ground",
+            "Kinetic motion sweep started for 4 poses: stand, step, turn, kneel.",
+        );
 
         for joint in self.joints.values() {
             if joint.rotation_limits.is_none() {
-                self.diagnostics.insert("motion_fail".to_string(), format!("Joint '{}' rotation limits are unbounded (None).", joint.name));
-                return Err(MudError::GateBlocked(format!("Motion sweep check failed: Joint '{}' limits are unbounded.", joint.name)));
+                self.diagnostics.insert(
+                    "motion_fail".to_string(),
+                    format!(
+                        "Joint '{}' rotation limits are unbounded (None).",
+                        joint.name
+                    ),
+                );
+                return Err(MudError::GateBlocked(format!(
+                    "Motion sweep check failed: Joint '{}' limits are unbounded.",
+                    joint.name
+                )));
             }
         }
 
@@ -1189,31 +1704,55 @@ impl MudEngine {
         let right_arm = self.parts.get("right_arm").unwrap();
         let com_dev = (left_arm.mass - right_arm.mass).abs();
         if com_dev > 10.0 {
-            self.diagnostics.insert("motion_fail".to_string(), format!("Center of Mass deviation ({:.1}) exceeds threshold (10.0)", com_dev));
-            return Err(MudError::GateBlocked(format!("Motion sweep check failed: COM deviation ({:.1}) too high.", com_dev)));
+            self.diagnostics.insert(
+                "motion_fail".to_string(),
+                format!(
+                    "Center of Mass deviation ({:.1}) exceeds threshold (10.0)",
+                    com_dev
+                ),
+            );
+            return Err(MudError::GateBlocked(format!(
+                "Motion sweep check failed: COM deviation ({:.1}) too high.",
+                com_dev
+            )));
         }
 
         self.gates.motion = true;
         self.kinetics_verified = true;
-        self.emit_event("motion.sweep_passed", "proving_ground", "Kinetic motion sweep passed for all 4 poses.");
+        self.emit_event(
+            "motion.sweep_passed",
+            "proving_ground",
+            "Kinetic motion sweep passed for all 4 poses.",
+        );
         Ok("Motion gate compliance check passed.".to_string())
     }
 
     /// Generate assembly receipt and walkthrough receipt on the Reveal Platform.
     fn cmd_verify_reveal(&mut self) -> Result<String, MudError> {
         if self.current_zone != Zone::RevealPlatform {
-            return Err(MudError::OperationError("Reveal gate can only be verified in Reveal Platform".into()));
+            return Err(MudError::OperationError(
+                "Reveal gate can only be verified in Reveal Platform".into(),
+            ));
         }
         if !self.gates.motion {
-            return Err(MudError::GateBlocked("Motion gate must be verified before Reveal gate".into()));
+            return Err(MudError::GateBlocked(
+                "Motion gate must be verified before Reveal gate".into(),
+            ));
         }
 
         self.gates.reveal = true;
 
-        let parts_hashes: HashMap<String, String> = self.parts.iter().map(|(k, v)| {
-            let serialized = serde_json::to_string(v).unwrap_or_default();
-            (k.clone(), blake3::hash(serialized.as_bytes()).to_hex().to_string())
-        }).collect();
+        let parts_hashes: HashMap<String, String> = self
+            .parts
+            .iter()
+            .map(|(k, v)| {
+                let serialized = serde_json::to_string(v).unwrap_or_default();
+                (
+                    k.clone(),
+                    blake3::hash(serialized.as_bytes()).to_hex().to_string(),
+                )
+            })
+            .collect();
 
         let mut hashes_sorted: Vec<(&String, &String)> = parts_hashes.iter().collect();
         hashes_sorted.sort_by_key(|a| a.0);
@@ -1251,23 +1790,47 @@ impl MudEngine {
         walkthrough_rec.signature_hash = sig;
 
         self.walkthrough_receipt = Some(walkthrough_rec);
-        self.emit_event("assembly.admitted", "assembly_receipt", "Mech assembly admitted and registered.");
-        self.emit_event("receipt.issued", "walkthrough_receipt", "Cryptographic walkthrough receipt issued.");
+        self.emit_event(
+            "assembly.admitted",
+            "assembly_receipt",
+            "Mech assembly admitted and registered.",
+        );
+        self.emit_event(
+            "receipt.issued",
+            "walkthrough_receipt",
+            "Cryptographic walkthrough receipt issued.",
+        );
 
         Ok("Reveal gate compliance check passed. Assembly receipt generated.".to_string())
     }
 
     fn cmd_assemble(&mut self, _spec: &str) -> Result<String, MudError> {
         if self.current_zone != Zone::AssemblyGantry {
-            return Err(MudError::OperationError("Assembly must be performed in Assembly Gantry".into()));
+            return Err(MudError::OperationError(
+                "Assembly must be performed in Assembly Gantry".into(),
+            ));
         }
 
-        if !self.gates.mission || !self.gates.materials || !self.gates.primitive || !self.gates.runner_wall {
-            self.emit_event("assembly.refused", "assembly_gantry", "Assembly refused due to missing prior gates.");
-            return Err(MudError::GateBlocked("Prior gates must be verified before assembly.".into()));
+        if !self.gates.mission
+            || !self.gates.materials
+            || !self.gates.primitive
+            || !self.gates.runner_wall
+        {
+            self.emit_event(
+                "assembly.refused",
+                "assembly_gantry",
+                "Assembly refused due to missing prior gates.",
+            );
+            return Err(MudError::GateBlocked(
+                "Prior gates must be verified before assembly.".into(),
+            ));
         }
 
-        self.emit_event("assembly.started", "assembly_gantry", "Starting mechanical assembly...");
+        self.emit_event(
+            "assembly.started",
+            "assembly_gantry",
+            "Starting mechanical assembly...",
+        );
 
         let mating_steps = vec![
             ("torso_frame", "central frame"),
@@ -1284,8 +1847,14 @@ impl MudEngine {
         let mut outputs = vec!["=== Gantry Assembly started ===".to_string()];
         for (id, desc) in mating_steps {
             if !self.parts.contains_key(id) {
-                self.emit_event("assembly.refused", id, "Missing required part for assembly.");
-                return Err(MudError::AssemblyFailure { reason: format!("Missing part {}", id) });
+                self.emit_event(
+                    "assembly.refused",
+                    id,
+                    "Missing required part for assembly.",
+                );
+                return Err(MudError::AssemblyFailure {
+                    reason: format!("Missing part {}", id),
+                });
             }
 
             if id == "head" {
@@ -1293,16 +1862,30 @@ impl MudEngine {
                 let head_req = head.sockets_required.first().map(|s| &s.kind);
                 if let Some(req) = head_req {
                     if req != "head" {
-                        self.emit_event("socket.mismatched", "head", "Socket mismatch: torso expected 'head', got mismatch.");
+                        self.emit_event(
+                            "socket.mismatched",
+                            "head",
+                            "Socket mismatch: torso expected 'head', got mismatch.",
+                        );
                         self.emit_event("assembly.refused", "head", "Socket mismatch at head.");
-                        return Err(MudError::AssemblyFailure { reason: "Socket mating mismatch at Neck socket.".into() });
+                        return Err(MudError::AssemblyFailure {
+                            reason: "Socket mating mismatch at Neck socket.".into(),
+                        });
                     }
                 }
             }
 
-            self.emit_event("socket.matched", id, &format!("Mating socket for {} to {}", id, desc));
+            self.emit_event(
+                "socket.matched",
+                id,
+                &format!("Mating socket for {} to {}", id, desc),
+            );
             self.emit_event("part.placed", id, &format!("Placed part {}", id));
-            self.emit_event("assembly.step_completed", id, &format!("Step completed: {}", desc));
+            self.emit_event(
+                "assembly.step_completed",
+                id,
+                &format!("Step completed: {}", desc),
+            );
             outputs.push(format!("  [MATE] Placed and secured {} to {}", id, desc));
         }
 
@@ -1327,7 +1910,11 @@ impl MudEngine {
 
     fn cmd_preview(&mut self, op: &str) -> Result<String, MudError> {
         let clean = op.trim().to_lowercase();
-        self.emit_event("object.inspected", "preview", &format!("Previewing operation: {}", op));
+        self.emit_event(
+            "object.inspected",
+            "preview",
+            &format!("Previewing operation: {}", op),
+        );
         match clean.as_str() {
             "assembly" => {
                 Ok("Previewing assembly steps: torso_frame -> head -> left_arm -> right_arm -> left_leg -> right_leg -> backpack -> left_thruster -> right_thruster.".to_string())
@@ -1343,30 +1930,44 @@ impl MudEngine {
 
     fn cmd_receipt(&mut self, target: &str) -> Result<String, MudError> {
         let clean = target.trim().to_lowercase();
-        self.emit_event("object.inspected", target, &format!("Requested receipt for {}", target));
+        self.emit_event(
+            "object.inspected",
+            target,
+            &format!("Requested receipt for {}", target),
+        );
         if clean == "walkthrough" || clean == "assembly" || clean == "mech" {
             if let Some(rec) = &self.walkthrough_receipt {
                 return Ok(format!(
                     "Walkthrough Receipt:\nVerdict: {}\nSignature: {}\nTimestamp: {}",
-                    rec.final_verdict,
-                    rec.cryptographic_signature,
-                    rec.timestamp
+                    rec.final_verdict, rec.cryptographic_signature, rec.timestamp
                 ));
             } else {
-                return Err(MudError::OperationError("No receipt has been generated yet. Complete the reveal gate first.".into()));
+                return Err(MudError::OperationError(
+                    "No receipt has been generated yet. Complete the reveal gate first.".into(),
+                ));
             }
         }
-        Err(MudError::InvalidInspectTarget(format!("Unknown receipt target '{}'", target)))
+        Err(MudError::InvalidInspectTarget(format!(
+            "Unknown receipt target '{}'",
+            target
+        )))
     }
 
     fn cmd_inventory(&mut self) -> Result<String, MudError> {
-        self.emit_event("object.inspected", "inventory", "Checked inventory at runner wall.");
+        self.emit_event(
+            "object.inspected",
+            "inventory",
+            "Checked inventory at runner wall.",
+        );
         let mut parts_list = vec!["=== Parts inventory at Runner Wall ===".to_string()];
         let mut keys: Vec<&String> = self.parts.keys().collect();
         keys.sort();
         for k in keys {
             let part = self.parts.get(k).unwrap();
-            parts_list.push(format!("  - {} (kind: {}, mass: {}, health: {:.2})", part.part_id, part.part_kind, part.mass, part.health_status));
+            parts_list.push(format!(
+                "  - {} (kind: {}, mass: {}, health: {:.2})",
+                part.part_id, part.part_kind, part.mass, part.health_status
+            ));
         }
         Ok(parts_list.join("\n"))
     }
@@ -1415,7 +2016,11 @@ impl MudEngine {
 
     fn cmd_stress_part(&mut self, part_name: &str) -> Result<String, MudError> {
         let name_lower = part_name.to_lowercase();
-        self.emit_event("object.inspected", part_name, &format!("Stressed part {}", part_name));
+        self.emit_event(
+            "object.inspected",
+            part_name,
+            &format!("Stressed part {}", part_name),
+        );
 
         if let Some(part) = self.parts.get_mut(&name_lower) {
             part.health_status -= 0.4;
@@ -1459,11 +2064,12 @@ impl MudEngine {
     /// Retrieve the overall PHM metrics for tests
     pub fn query_mech_phm(&self) -> MechPhmReport {
         let phm = self.get_phm_metrics();
-        let fault_state = if !phm.active_faults.is_empty() || phm.degradation_state == "FailDegraded" {
-            "KineticsFailure".to_string()
-        } else {
-            "Nominal".to_string()
-        };
+        let fault_state =
+            if !phm.active_faults.is_empty() || phm.degradation_state == "FailDegraded" {
+                "KineticsFailure".to_string()
+            } else {
+                "Nominal".to_string()
+            };
 
         MechPhmReport {
             degradation_state: phm.degradation_state.clone(),
@@ -1556,7 +2162,7 @@ impl MudEngine {
 
     pub fn run_mape_k_loop(&mut self) {
         let phm = self.get_phm_metrics();
-        
+
         let _health_status = if phm.overall_health >= 0.85 {
             HealthStatus::Healthy
         } else if phm.overall_health >= 0.5 {
@@ -1577,7 +2183,10 @@ impl MudEngine {
         }
     }
 
-    pub fn generate_walkthrough_receipt(&self, prompt: &str) -> Result<WalkthroughReceipt, MudError> {
+    pub fn generate_walkthrough_receipt(
+        &self,
+        prompt: &str,
+    ) -> Result<WalkthroughReceipt, MudError> {
         if self.current_zone != Zone::RevealPlatform {
             return Err(MudError::OperationError(
                 "Replay receipts can only be generated on the Reveal Platform upon playthrough completion.".into()
@@ -1590,7 +2199,10 @@ impl MudEngine {
             "FAIL".to_string()
         };
 
-        let final_assembly_receipt_hash = self.assembly_receipt.as_ref().map(|r| r.lineage_hash.clone());
+        let final_assembly_receipt_hash = self
+            .assembly_receipt
+            .as_ref()
+            .map(|r| r.lineage_hash.clone());
 
         let actual_timestamp = Utc::now();
         let mut temp_receipt = WalkthroughReceipt {
@@ -1649,7 +2261,11 @@ fn compute_weibull_rul(overall_health: f32, part_healths: &[f32]) -> f32 {
     }
     let mean = part_healths.iter().map(|&x| x as f64).sum::<f64>() / n;
     let variance = if n > 1.0 {
-        part_healths.iter().map(|&x| (x as f64 - mean).powi(2)).sum::<f64>() / (n - 1.0)
+        part_healths
+            .iter()
+            .map(|&x| (x as f64 - mean).powi(2))
+            .sum::<f64>()
+            / (n - 1.0)
     } else {
         0.0
     };
@@ -1679,21 +2295,27 @@ pub fn parse_command(input: &str) -> Result<MudCommand, MudError> {
     } else if lower.starts_with("go ") {
         let dest = trimmed[3..].trim().to_string();
         if dest.is_empty() {
-            Err(MudError::InvalidCommand("Go command requires a direction or zone name".into()))
+            Err(MudError::InvalidCommand(
+                "Go command requires a direction or zone name".into(),
+            ))
         } else {
             Ok(MudCommand::Go(dest))
         }
     } else if lower.starts_with("inspect ") {
         let target = trimmed[8..].trim().to_string();
         if target.is_empty() {
-            Err(MudError::InvalidCommand("Inspect command requires a target".into()))
+            Err(MudError::InvalidCommand(
+                "Inspect command requires a target".into(),
+            ))
         } else {
             Ok(MudCommand::Inspect(target))
         }
     } else if lower.starts_with("health ") {
         let target = trimmed[7..].trim().to_string();
         if target.is_empty() {
-            Err(MudError::InvalidCommand("Health command requires a target".into()))
+            Err(MudError::InvalidCommand(
+                "Health command requires a target".into(),
+            ))
         } else {
             Ok(MudCommand::Health(target))
         }
@@ -1705,28 +2327,36 @@ pub fn parse_command(input: &str) -> Result<MudCommand, MudError> {
     } else if lower.starts_with("verify ") {
         let gate = trimmed[7..].trim().to_string();
         if gate.is_empty() {
-            Err(MudError::InvalidCommand("Verify command requires a gate name".into()))
+            Err(MudError::InvalidCommand(
+                "Verify command requires a gate name".into(),
+            ))
         } else {
             Ok(MudCommand::Verify(gate))
         }
     } else if lower.starts_with("assemble ") {
         let spec = trimmed[9..].trim().to_string();
         if spec.is_empty() {
-            Err(MudError::InvalidCommand("Assemble command requires a spec".into()))
+            Err(MudError::InvalidCommand(
+                "Assemble command requires a spec".into(),
+            ))
         } else {
             Ok(MudCommand::Assemble(spec))
         }
     } else if lower.starts_with("preview ") {
         let op = trimmed[8..].trim().to_string();
         if op.is_empty() {
-            Err(MudError::InvalidCommand("Preview command requires an operation".into()))
+            Err(MudError::InvalidCommand(
+                "Preview command requires an operation".into(),
+            ))
         } else {
             Ok(MudCommand::Preview(op))
         }
     } else if lower.starts_with("receipt ") {
         let target = trimmed[8..].trim().to_string();
         if target.is_empty() {
-            Err(MudError::InvalidCommand("Receipt command requires a target".into()))
+            Err(MudError::InvalidCommand(
+                "Receipt command requires a target".into(),
+            ))
         } else {
             Ok(MudCommand::Receipt(target))
         }
@@ -1741,7 +2371,10 @@ fn parse_alias_command(lower: &str, original: &str) -> Result<MudCommand, MudErr
         "watch assembly" => Ok(MudCommand::Assemble("standard".to_string())),
         "verify clearance" => Ok(MudCommand::Verify("collision".to_string())),
         "verify kinetics" => Ok(MudCommand::Verify("motion".to_string())),
-        _ => Err(MudError::InvalidCommand(format!("Unknown command: '{}'", original))),
+        _ => Err(MudError::InvalidCommand(format!(
+            "Unknown command: '{}'",
+            original
+        ))),
     }
 }
 

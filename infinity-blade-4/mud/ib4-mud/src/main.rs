@@ -41,12 +41,9 @@ fn main() -> anyhow::Result<()> {
     ib4_mud::telemetry::init_telemetry();
     let cli = Cli::parse();
 
-
-    let mut session = match cli
-        .command
-        .unwrap_or(CliCommand::New {
-            name: "Siris".to_string(),
-        }) {
+    let mut session = match cli.command.unwrap_or(CliCommand::New {
+        name: "Siris".to_string(),
+    }) {
         CliCommand::New { name } => {
             tracing::info!("Creating new game for {}...", name);
             GameSession::new(&name)

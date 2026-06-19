@@ -147,7 +147,10 @@ fn qip_scar_resets_cleanly() {
     tracker.apply_scar();
     tracker.reset();
     assert_eq!(tracker.stacks, 0);
-    assert!(!tracker.apply_scar(), "1st scar after reset should not force rebirth");
+    assert!(
+        !tracker.apply_scar(),
+        "1st scar after reset should not force rebirth"
+    );
 }
 
 /// Typestate machine: verify the basic happy path compiles and produces
@@ -175,7 +178,10 @@ fn combat_machine_happy_path() {
     let (idle2, outcome) = parrying.resolve(ParryOutcome::Normal, 30.0);
     assert_eq!(outcome, ParryOutcome::Normal);
     // 10 % chip of 30 = 3 damage
-    assert!((idle2.hp - 97.0).abs() < 1e-6, "hp should be 97 after Normal parry chip");
+    assert!(
+        (idle2.hp - 97.0).abs() < 1e-6,
+        "hp should be 97 after Normal parry chip"
+    );
 
     // begin_dodge → resolve
     let dodging = idle2.begin_dodge();
@@ -199,9 +205,15 @@ fn trans_am_zone_activates_at_depth_4() {
     let mut chain = StandardCombo::new(100);
     for i in 0..5 {
         if i < 3 {
-            assert!(!chain.is_trans_am_zone(), "should not be in Trans-Am zone at depth {i}");
+            assert!(
+                !chain.is_trans_am_zone(),
+                "should not be in Trans-Am zone at depth {i}"
+            );
         }
         chain.on_hit();
     }
-    assert!(chain.is_trans_am_zone(), "should be in Trans-Am zone at depth >= 4");
+    assert!(
+        chain.is_trans_am_zone(),
+        "should be in Trans-Am zone at depth >= 4"
+    );
 }

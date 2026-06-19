@@ -1,5 +1,5 @@
-use std::io::{self, BufRead, Write};
 use crate::{command::Command, session::GameSession};
+use std::io::{self, BufRead, Write};
 
 pub fn run_repl(session: &mut GameSession) -> anyhow::Result<()> {
     // Premium gold/yellow for the welcome banner
@@ -8,7 +8,7 @@ pub fn run_repl(session: &mut GameSession) -> anyhow::Result<()> {
     tracing::info!(target: "game", "\x1b[1;33m\u{2551}  'help' for commands | 'explore' to begin     \u{2551}\x1b[0m");
     tracing::info!(target: "game", "\x1b[1;33m\u{255a}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{2550}\u{255d}\x1b[0m");
     tracing::info!(target: "game", "");
-    
+
     // Bold cyan and green for status
     tracing::info!(
         target: "game",

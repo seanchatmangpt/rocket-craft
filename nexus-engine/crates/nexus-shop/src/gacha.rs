@@ -1,10 +1,14 @@
-use rand::{SeedableRng, RngExt};
-use rand_chacha::ChaCha8Rng;
-use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
+use rand::{RngExt, SeedableRng};
+use rand_chacha::ChaCha8Rng;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum GachaRarity { R, SR, SSR }
+pub enum GachaRarity {
+    R,
+    SR,
+    SSR,
+}
 
 impl PartialOrd for GachaRarity {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -126,20 +130,28 @@ pub struct GachaEngine {
 
 impl GachaEngine {
     pub fn new(seed: u64) -> Self {
-        GachaEngine { rng: ChaCha8Rng::seed_from_u64(seed) }
+        GachaEngine {
+            rng: ChaCha8Rng::seed_from_u64(seed),
+        }
     }
 
     pub fn from_server_entropy(player_id: u64, nonce: u64) -> Self {
-        use sha2::{Sha256, Digest};
+        use sha2::{Digest, Sha256};
         let mut hasher = Sha256::new();
         hasher.update(player_id.to_le_bytes());
         hasher.update(nonce.to_le_bytes());
         let result = hasher.finalize();
         let seed = u64::from_le_bytes(result[..8].try_into().unwrap());
-        GachaEngine { rng: ChaCha8Rng::seed_from_u64(seed) }
+        GachaEngine {
+            rng: ChaCha8Rng::seed_from_u64(seed),
+        }
     }
 
-    pub fn single_pull(&mut self, banner: &Banner, session: &mut PullSession) -> Result<PullResult, GachaError> {
+    pub fn single_pull(
+        &mut self,
+        banner: &Banner,
+        session: &mut PullSession,
+    ) -> Result<PullResult, GachaError> {
         if !banner.is_active() {
             return Err(GachaError::BannerExpired(banner.id.clone()));
         }
@@ -168,14 +180,28 @@ impl GachaEngine {
             let new_count = session.pulls_since_last_ssr;
             session.pulls_since_last_ssr = 0;
             session.ssr_count += 1;
-            Ok(PullResult { item, pity_pull, pulls_used: 1, new_pity_count: new_count })
+            Ok(PullResult {
+                item,
+                pity_pull,
+                pulls_used: 1,
+                new_pity_count: new_count,
+            })
         } else {
             let count = session.pulls_since_last_ssr;
-            Ok(PullResult { item, pity_pull: false, pulls_used: 1, new_pity_count: count })
+            Ok(PullResult {
+                item,
+                pity_pull: false,
+                pulls_used: 1,
+                new_pity_count: count,
+            })
         }
     }
 
-    pub fn ten_pull(&mut self, banner: &Banner, session: &mut PullSession) -> Result<Vec<PullResult>, GachaError> {
+    pub fn ten_pull(
+        &mut self,
+        banner: &Banner,
+        session: &mut PullSession,
+    ) -> Result<Vec<PullResult>, GachaError> {
         let mut results = Vec::with_capacity(10);
         let mut has_sr_or_above = false;
 
@@ -189,7 +215,11 @@ impl GachaEngine {
 
         if !has_sr_or_above {
             if let Some(last) = results.last_mut() {
-                let sr_items: Vec<_> = banner.items.iter().filter(|i| i.rarity == GachaRarity::SR).collect();
+                let sr_items: Vec<_> = banner
+                    .items
+                    .iter()
+                    .filter(|i| i.rarity == GachaRarity::SR)
+                    .collect();
                 if !sr_items.is_empty() {
                     let idx = self.rng.random_range(0..sr_items.len());
                     last.item = sr_items[idx].clone();
@@ -200,10 +230,19 @@ impl GachaEngine {
         Ok(results)
     }
 
-    fn select_item(&mut self, banner: &Banner, rarity: GachaRarity, session: &PullSession) -> Result<GachaItem, GachaError> {
+    fn select_item(
+        &mut self,
+        banner: &Banner,
+        rarity: GachaRarity,
+        session: &PullSession,
+    ) -> Result<GachaItem, GachaError> {
         let pool: Vec<_> = banner.items.iter().filter(|i| i.rarity == rarity).collect();
         if pool.is_empty() {
-            let lower = if rarity == GachaRarity::SSR { GachaRarity::SR } else { GachaRarity::R };
+            let lower = if rarity == GachaRarity::SSR {
+                GachaRarity::SR
+            } else {
+                GachaRarity::R
+            };
             let lower_pool: Vec<_> = banner.items.iter().filter(|i| i.rarity == lower).collect();
             if lower_pool.is_empty() {
                 return Err(GachaError::NoItemsInPool {

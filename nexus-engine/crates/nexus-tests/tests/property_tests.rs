@@ -45,14 +45,14 @@ proptest! {
         let mut p = PlayerProfile::new(1, "test".to_string());
         p.level = level;
         p.xp = 0;
-        
+
         let req_next = oracle_xp_for_level(level + 1);
-        
+
         // If we gain 1 less than next level requirement, we should NOT level up
         let gained_less = p.apply_xp_gain(req_next - 1);
         prop_assert!(!gained_less);
         prop_assert_eq!(p.level, level);
-        
+
         // If we gain the remaining 1 XP, we should level up
         let gained_enough = p.apply_xp_gain(1);
         prop_assert!(gained_enough);
@@ -262,7 +262,11 @@ fn known_bad_combat_cases_all_pass_floor() {
             assert!(
                 dmg >= 1.0,
                 "damage floor failed: base={}, mult={}, eq={}, armor={}, got={}",
-                base, combo_mult, equipment_bonus, armor, dmg
+                base,
+                combo_mult,
+                equipment_bonus,
+                armor,
+                dmg
             );
         }
     }

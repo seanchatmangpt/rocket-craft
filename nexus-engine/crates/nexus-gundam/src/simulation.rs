@@ -1,7 +1,7 @@
-use anyhow::{anyhow, Result};
 use crate::generated_gundam::{
-    BecomeMythology, Build, CreateHistory, Discover, Expand, Explore, Preserve
+    BecomeMythology, Build, CreateHistory, Discover, Expand, Explore, Preserve,
 };
+use anyhow::{anyhow, Result};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum ExperiencePhase {
@@ -47,7 +47,8 @@ impl ExperiencePhaseTrait for Explore {
         Box::new(Discover)
     }
     fn run(&self, sim: &mut GundamNexusSimulation) -> Result<()> {
-        sim.history_log.push("Exploring surrounding solar systems and charting planets.".to_string());
+        sim.history_log
+            .push("Exploring surrounding solar systems and charting planets.".to_string());
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -60,7 +61,8 @@ impl ExperiencePhaseTrait for Discover {
         Box::new(Build)
     }
     fn run(&self, sim: &mut GundamNexusSimulation) -> Result<()> {
-        sim.history_log.push("Discovered ancient ruins of a long-lost mech civilization.".to_string());
+        sim.history_log
+            .push("Discovered ancient ruins of a long-lost mech civilization.".to_string());
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -73,7 +75,8 @@ impl ExperiencePhaseTrait for Build {
         Box::new(Preserve)
     }
     fn run(&self, sim: &mut GundamNexusSimulation) -> Result<()> {
-        sim.history_log.push("Constructing new orbital platforms and manufacturing frames.".to_string());
+        sim.history_log
+            .push("Constructing new orbital platforms and manufacturing frames.".to_string());
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -87,7 +90,10 @@ impl ExperiencePhaseTrait for Preserve {
     }
     fn run(&self, sim: &mut GundamNexusSimulation) -> Result<()> {
         sim.preserved_count += 1;
-        sim.history_log.push(format!("Preserved historical game engine state. Total: {}.", sim.preserved_count));
+        sim.history_log.push(format!(
+            "Preserved historical game engine state. Total: {}.",
+            sim.preserved_count
+        ));
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -100,7 +106,9 @@ impl ExperiencePhaseTrait for Expand {
         Box::new(CreateHistory)
     }
     fn run(&self, sim: &mut GundamNexusSimulation) -> Result<()> {
-        sim.history_log.push("Civilizations expanding across boundaries, establishing new colonies.".to_string());
+        sim.history_log.push(
+            "Civilizations expanding across boundaries, establishing new colonies.".to_string(),
+        );
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -113,7 +121,8 @@ impl ExperiencePhaseTrait for CreateHistory {
         Box::new(BecomeMythology)
     }
     fn run(&self, sim: &mut GundamNexusSimulation) -> Result<()> {
-        sim.history_log.push("A legendary pilot has established a new record in battle.".to_string());
+        sim.history_log
+            .push("A legendary pilot has established a new record in battle.".to_string());
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -126,7 +135,8 @@ impl ExperiencePhaseTrait for BecomeMythology {
         Box::new(Explore)
     }
     fn run(&self, sim: &mut GundamNexusSimulation) -> Result<()> {
-        sim.history_log.push("Historic battles are recorded as mythology for future cycles.".to_string());
+        sim.history_log
+            .push("Historic battles are recorded as mythology for future cycles.".to_string());
         Ok(())
     }
     fn name(&self) -> &'static str {
@@ -178,7 +188,8 @@ impl SimulationInterface for GundamNexusSimulation {
             "BecomeMythology" => ExperiencePhase::BecomeMythology,
             _ => ExperiencePhase::Explore,
         };
-        self.history_log.push(format!("Simulation phase shifted to {:?}", phase));
+        self.history_log
+            .push(format!("Simulation phase shifted to {:?}", phase));
         Ok(phase)
     }
 
@@ -195,12 +206,15 @@ impl SimulationInterface for GundamNexusSimulation {
         if name.trim().is_empty() {
             return Err(anyhow!("Mech name cannot be empty"));
         }
-        let valid_classes = ["Worker", "Explorer", "Builder", "Miner", "Trader", "Guardian", "Warrior", "Ark"];
+        let valid_classes = [
+            "Worker", "Explorer", "Builder", "Miner", "Trader", "Guardian", "Warrior", "Ark",
+        ];
         if !valid_classes.contains(&class) {
             return Err(anyhow!("Invalid Mech class: {}", class));
         }
         self.mechs.push(name.to_string());
-        self.history_log.push(format!("Spawned new Mech of class {}: {}", class, name));
+        self.history_log
+            .push(format!("Spawned new Mech of class {}: {}", class, name));
         Ok(())
     }
 
@@ -212,8 +226,12 @@ impl SimulationInterface for GundamNexusSimulation {
         if !valid_planets.contains(&planet) {
             return Err(anyhow!("Unknown planet: {}", planet));
         }
-        self.civilizations.push((name.to_string(), planet.to_string()));
-        self.history_log.push(format!("Civilization '{}' formed on sentient planet '{}'", name, planet));
+        self.civilizations
+            .push((name.to_string(), planet.to_string()));
+        self.history_log.push(format!(
+            "Civilization '{}' formed on sentient planet '{}'",
+            name, planet
+        ));
         Ok(())
     }
 

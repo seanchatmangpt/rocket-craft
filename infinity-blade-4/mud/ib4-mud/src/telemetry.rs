@@ -1,13 +1,9 @@
 use chrono::Local;
 use std::fmt;
-use tracing::{Event, Level, Subscriber};
-use tracing::field::Visit;
-use tracing_subscriber::{
-    fmt as sub_fmt,
-    prelude::*,
-    Registry,
-};
 use sub_fmt::format::{FormatEvent, FormatFields, Writer};
+use tracing::field::Visit;
+use tracing::{Event, Level, Subscriber};
+use tracing_subscriber::{fmt as sub_fmt, prelude::*, Registry};
 
 /// A visitor that extracts the main message text from a tracing event.
 struct MessageVisitor {

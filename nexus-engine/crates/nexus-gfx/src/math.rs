@@ -15,11 +15,17 @@ pub type Vec2 = na::Vector2<f32>;
 
 /// Screen-space pixel coordinate
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PixelCoord { pub x: u32, pub y: u32 }
+pub struct PixelCoord {
+    pub x: u32,
+    pub y: u32,
+}
 
 /// Normalized device coordinate: both axes in [-1, 1]
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Ndc { x: f32, y: f32 }
+pub struct Ndc {
+    x: f32,
+    y: f32,
+}
 
 impl Ndc {
     pub fn new(x: f32, y: f32) -> Result<Self, GfxError> {
@@ -29,8 +35,12 @@ impl Ndc {
             Ok(Ndc { x, y })
         }
     }
-    pub fn x(&self) -> f32 { self.x }
-    pub fn y(&self) -> f32 { self.y }
+    pub fn x(&self) -> f32 {
+        self.x
+    }
+    pub fn y(&self) -> f32 {
+        self.y
+    }
 }
 
 pub use nexus_types::Transform;

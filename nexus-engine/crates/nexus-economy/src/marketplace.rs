@@ -108,11 +108,7 @@ impl Marketplace {
     }
 
     /// Cancel a listing (seller only).
-    pub fn cancel(
-        &mut self,
-        listing_id: u64,
-        seller_id: u64,
-    ) -> Result<(), MarketplaceError> {
+    pub fn cancel(&mut self, listing_id: u64, seller_id: u64) -> Result<(), MarketplaceError> {
         let listing = self
             .listings
             .iter_mut()

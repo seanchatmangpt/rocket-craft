@@ -11,7 +11,6 @@ impl UeGuid {
         let s = id.as_simple().to_string().to_uppercase();
         UeGuid(s)
     }
-
 }
 
 impl Default for UeGuid {

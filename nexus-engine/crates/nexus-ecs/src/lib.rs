@@ -14,7 +14,6 @@
 //! and `nexus-integration` (for the game loop) query and mutate components managed within this crate.
 
 pub mod components;
-pub mod world;
-pub mod systems;
 pub mod scheduler;
-
+pub mod systems;
+pub mod world;

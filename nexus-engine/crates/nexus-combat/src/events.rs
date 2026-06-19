@@ -53,8 +53,5 @@ pub enum CombatEvent {
     TransAmActivated,
 
     /// A QIP Scar was applied.
-    QipScarApplied {
-        stack: u32,
-        forced_rebirth: bool,
-    },
+    QipScarApplied { stack: u32, forced_rebirth: bool },
 }

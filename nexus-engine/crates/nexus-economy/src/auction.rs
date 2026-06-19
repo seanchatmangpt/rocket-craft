@@ -164,7 +164,9 @@ impl AuctionBuilder {
         if item_name.trim().is_empty() {
             return Err(AuctionBuildError::EmptyItemName);
         }
-        let starting_price = self.starting_price.ok_or(AuctionBuildError::ZeroStartingPrice)?;
+        let starting_price = self
+            .starting_price
+            .ok_or(AuctionBuildError::ZeroStartingPrice)?;
         if starting_price == 0 {
             return Err(AuctionBuildError::ZeroStartingPrice);
         }
@@ -311,13 +313,8 @@ impl Auction<OpenForBids> {
 
         // Refund the previous bidder from escrow.
         if let Some(prev) = &self.current_bid {
-            release_from_escrow(
-                ledger,
-                prev.bidder_id,
-                prev.amount,
-                "auction outbid refund",
-            )
-            .map_err(|e| AuctionError::LedgerError(e.to_string()))?;
+            release_from_escrow(ledger, prev.bidder_id, prev.amount, "auction outbid refund")
+                .map_err(|e| AuctionError::LedgerError(e.to_string()))?;
         }
 
         // Lock new bid in escrow.
@@ -346,10 +343,7 @@ impl Auction<OpenForBids> {
     /// * If there were no bids, the auction closes with no fund movements.
     pub fn close(self, ledger: &mut Ledger) -> Result<Auction<AuctionClosed>, AuctionError> {
         if let Some(ref bid) = self.current_bid {
-            let reserve_met = self
-                .reserve_price
-                .map(|r| bid.amount >= r)
-                .unwrap_or(true);
+            let reserve_met = self.reserve_price.map(|r| bid.amount >= r).unwrap_or(true);
 
             if reserve_met {
                 let fee = bid.amount / 20;
@@ -401,8 +395,13 @@ impl Auction<OpenForBids> {
     /// Cancel the auction.  If there is a current bid, the bidder is refunded.
     pub fn cancel(self, ledger: &mut Ledger) -> Result<Auction<AuctionCancelled>, AuctionError> {
         if let Some(ref bid) = self.current_bid {
-            release_from_escrow(ledger, bid.bidder_id, bid.amount, "auction cancelled refund")
-                .map_err(|e| AuctionError::LedgerError(e.to_string()))?;
+            release_from_escrow(
+                ledger,
+                bid.bidder_id,
+                bid.amount,
+                "auction cancelled refund",
+            )
+            .map_err(|e| AuctionError::LedgerError(e.to_string()))?;
         }
 
         Ok(Auction {

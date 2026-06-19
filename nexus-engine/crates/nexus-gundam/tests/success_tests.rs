@@ -1,9 +1,12 @@
-use nexus_gundam::builder::{MechBuilder, CivilizationBuilder, ValidationError};
+use nexus_gundam::builder::{CivilizationBuilder, MechBuilder, ValidationError};
 use nexus_gundam::generated_gundam::{
-    Walking, Earth, Mars, Venus, Frame, Power, Armor, Weapon, Sensor, UtilitySystem, Joint, Mobility, AABB, RotationLimits
+    Armor, Earth, Frame, Joint, Mars, Mobility, Power, RotationLimits, Sensor, UtilitySystem,
+    Venus, Walking, Weapon, AABB,
 };
-use nexus_gundam::preservation::{PreservationArtifact, PreservationLayer, GundamPreservationManager};
-use nexus_gundam::simulation::{SimulationInterface, GundamNexusSimulation, ExperiencePhase};
+use nexus_gundam::preservation::{
+    GundamPreservationManager, PreservationArtifact, PreservationLayer,
+};
+use nexus_gundam::simulation::{ExperiencePhase, GundamNexusSimulation, SimulationInterface};
 use std::collections::HashMap;
 
 fn get_valid_mobility() -> Walking {
@@ -136,7 +139,10 @@ fn test_missing_joint_limits() {
 
     let res = mech.validate();
     assert!(res.is_err());
-    assert!(matches!(res.unwrap_err(), ValidationError::MissingJointLimits { .. }));
+    assert!(matches!(
+        res.unwrap_err(),
+        ValidationError::MissingJointLimits { .. }
+    ));
 }
 
 #[test]
@@ -166,7 +172,10 @@ fn test_invalid_joint_limits() {
 
     let res = mech.validate();
     assert!(res.is_err());
-    assert!(matches!(res.unwrap_err(), ValidationError::InvalidJointLimits { .. }));
+    assert!(matches!(
+        res.unwrap_err(),
+        ValidationError::InvalidJointLimits { .. }
+    ));
 }
 
 #[test]
@@ -187,7 +196,10 @@ fn test_collision_detected() {
 
     let res = mech.validate();
     assert!(res.is_err());
-    assert!(matches!(res.unwrap_err(), ValidationError::CollisionDetected { .. }));
+    assert!(matches!(
+        res.unwrap_err(),
+        ValidationError::CollisionDetected { .. }
+    ));
 }
 
 #[test]
@@ -208,7 +220,10 @@ fn test_clearance_violation() {
 
     let res = mech.validate();
     assert!(res.is_err());
-    assert!(matches!(res.unwrap_err(), ValidationError::ClearanceViolation { .. }));
+    assert!(matches!(
+        res.unwrap_err(),
+        ValidationError::ClearanceViolation { .. }
+    ));
 }
 
 #[test]
@@ -233,7 +248,10 @@ fn test_load_capacity_exceeded() {
 
     let res = mech.validate();
     assert!(res.is_err());
-    assert!(matches!(res.unwrap_err(), ValidationError::LoadCapacityExceeded { .. }));
+    assert!(matches!(
+        res.unwrap_err(),
+        ValidationError::LoadCapacityExceeded { .. }
+    ));
 }
 
 #[test]
@@ -256,30 +274,27 @@ fn test_planetary_incompatibility() {
 
 #[test]
 fn test_civilization_spawns() {
-    let earth_civ = CivilizationBuilder::new()
-        .with_planet(Earth)
-        .build();
+    let earth_civ = CivilizationBuilder::new().with_planet(Earth).build();
     let earth_builder = earth_civ.spawn_mech_builder();
     assert_eq!(earth_builder.class.unwrap(), "Warrior");
     assert_eq!(earth_builder.frame.unwrap().id, "Earth_Balanced_Frame");
     assert_eq!(earth_builder.armor.unwrap().id, "Luna_Titanium_Armor");
 
-    let mars_civ = CivilizationBuilder::new()
-        .with_planet(Mars)
-        .build();
+    let mars_civ = CivilizationBuilder::new().with_planet(Mars).build();
     let mars_builder = mars_civ.spawn_mech_builder();
     assert_eq!(mars_builder.class.unwrap(), "Guardian");
     assert_eq!(mars_builder.frame.unwrap().id, "Mars_Heavy_Frame");
     assert_eq!(mars_builder.armor.unwrap().id, "Mars_Heavy_Chobham_Armor");
 
-    let venus_civ = CivilizationBuilder::new()
-        .with_planet(Venus)
-        .build();
+    let venus_civ = CivilizationBuilder::new().with_planet(Venus).build();
     let venus_builder = venus_civ.spawn_mech_builder();
     assert_eq!(venus_builder.class.unwrap(), "Explorer");
     assert_eq!(venus_builder.frame.unwrap().id, "Venus_Lightweight_Frame");
     assert_eq!(venus_builder.power.unwrap().id, "Venus_High_Output_Reactor");
-    assert_eq!(venus_builder.armor.unwrap().id, "Venus_Aerodynamic_Composite_Armor");
+    assert_eq!(
+        venus_builder.armor.unwrap().id,
+        "Venus_Aerodynamic_Composite_Armor"
+    );
 }
 
 #[test]

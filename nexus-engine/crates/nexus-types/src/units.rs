@@ -1,7 +1,7 @@
+use serde::{Deserialize, Serialize};
 /// Phantom-typed numeric units that make illegal cross-unit arithmetic a compile error.
 use std::marker::PhantomData;
-use std::ops::{Add, Sub, Mul};
-use serde::{Serialize, Deserialize};
+use std::ops::{Add, Mul, Sub};
 
 use crate::errors::TypeError;
 
@@ -222,7 +222,10 @@ impl Gold {
         self.0
             .checked_add(rhs.0)
             .map(Gold::new)
-            .ok_or(TypeError::GoldOverflow { current: self.0, added: rhs.0 })
+            .ok_or(TypeError::GoldOverflow {
+                current: self.0,
+                added: rhs.0,
+            })
     }
 }
 

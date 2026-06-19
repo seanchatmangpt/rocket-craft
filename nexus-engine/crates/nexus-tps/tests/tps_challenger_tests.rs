@@ -1,6 +1,5 @@
 use nexus_tps::{
-    generate_part, assemble_mech, PartStateVector, PartSlot, JidokaHalt, Axis,
-    branchless_clamp01
+    assemble_mech, branchless_clamp01, generate_part, Axis, JidokaHalt, PartSlot, PartStateVector,
 };
 
 fn create_base_vector(slot: PartSlot) -> PartStateVector {
@@ -90,17 +89,26 @@ fn test_generate_part_rejects_nan_inf() {
         setter(&mut state, f32::NAN);
         let res = generate_part(&state);
         assert!(res.is_err());
-        assert!(matches!(res.err().unwrap(), JidokaHalt::MotionBoundsViolated { .. }));
+        assert!(matches!(
+            res.err().unwrap(),
+            JidokaHalt::MotionBoundsViolated { .. }
+        ));
 
         setter(&mut state, f32::INFINITY);
         let res = generate_part(&state);
         assert!(res.is_err());
-        assert!(matches!(res.err().unwrap(), JidokaHalt::MotionBoundsViolated { .. }));
+        assert!(matches!(
+            res.err().unwrap(),
+            JidokaHalt::MotionBoundsViolated { .. }
+        ));
 
         setter(&mut state, f32::NEG_INFINITY);
         let res = generate_part(&state);
         assert!(res.is_err());
-        assert!(matches!(res.err().unwrap(), JidokaHalt::MotionBoundsViolated { .. }));
+        assert!(matches!(
+            res.err().unwrap(),
+            JidokaHalt::MotionBoundsViolated { .. }
+        ));
 
         // Restore to valid value
         setter(&mut state, 0.5);
@@ -110,17 +118,26 @@ fn test_generate_part_rejects_nan_inf() {
     state.motion_profile = f32::NAN;
     let res = generate_part(&state);
     assert!(res.is_err());
-    assert!(matches!(res.err().unwrap(), JidokaHalt::MotionBoundsViolated { axis: Axis::Z, .. }));
+    assert!(matches!(
+        res.err().unwrap(),
+        JidokaHalt::MotionBoundsViolated { axis: Axis::Z, .. }
+    ));
 
     state.motion_profile = f32::INFINITY;
     let res = generate_part(&state);
     assert!(res.is_err());
-    assert!(matches!(res.err().unwrap(), JidokaHalt::MotionBoundsViolated { axis: Axis::Z, .. }));
+    assert!(matches!(
+        res.err().unwrap(),
+        JidokaHalt::MotionBoundsViolated { axis: Axis::Z, .. }
+    ));
 
     state.motion_profile = f32::NEG_INFINITY;
     let res = generate_part(&state);
     assert!(res.is_err());
-    assert!(matches!(res.err().unwrap(), JidokaHalt::MotionBoundsViolated { axis: Axis::Z, .. }));
+    assert!(matches!(
+        res.err().unwrap(),
+        JidokaHalt::MotionBoundsViolated { axis: Axis::Z, .. }
+    ));
 }
 
 // ============================================================================
@@ -183,12 +200,13 @@ fn test_collision_gate_exact_math() {
     let res = assemble_mech(&vectors);
     assert!(res.is_err());
     let err = res.err().unwrap();
-    
+
     // With these values, Torso and Waist will intersect first due to a distance of 1.0.
     // Let's assert that we do indeed halt on collision.
     assert!(
         matches!(err, JidokaHalt::CollisionVolumeIntersects { .. }),
-        "Expected CollisionVolumeIntersects, got: {:?}", err
+        "Expected CollisionVolumeIntersects, got: {:?}",
+        err
     );
 }
 
@@ -242,6 +260,7 @@ fn test_load_capacity_exact_math() {
     let err = res.err().unwrap();
     assert!(
         matches!(err, JidokaHalt::MassExceedsFrameCapacity { mass, capacity } if mass == 1384.0 && capacity == 1344.0),
-        "Expected MassExceedsFrameCapacity with mass=1384, capacity=1344, got: {:?}", err
+        "Expected MassExceedsFrameCapacity with mass=1384, capacity=1344, got: {:?}",
+        err
     );
 }

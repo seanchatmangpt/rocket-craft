@@ -61,7 +61,10 @@ impl MessageCodec {
     /// oversized payloads.
     pub fn check_size(bytes: &[u8], max_bytes: usize) -> Result<(), CodecError> {
         if bytes.len() > max_bytes {
-            Err(CodecError::MessageTooLarge { size: bytes.len(), max: max_bytes })
+            Err(CodecError::MessageTooLarge {
+                size: bytes.len(),
+                max: max_bytes,
+            })
         } else {
             Ok(())
         }

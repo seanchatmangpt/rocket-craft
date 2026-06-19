@@ -1,4 +1,4 @@
-use ib4_core::{player::PlayerState, enemy::EnemyInstance};
+use ib4_core::{enemy::EnemyInstance, player::PlayerState};
 
 /// Returns (damage_dealt, is_crit)
 pub fn calc_player_damage(
@@ -11,7 +11,12 @@ pub fn calc_player_damage(
 ) -> (f32, bool) {
     let weapon_bonus = player.weapon.as_ref().map(|w| w.attack_bonus).unwrap_or(0) as f32;
     let base = weapon_bonus + player.stat_attack as f32;
-    let crit_chance = player.weapon.as_ref().map(|w| w.crit_chance).unwrap_or(0.05) + extra_crit_chance;
+    let crit_chance = player
+        .weapon
+        .as_ref()
+        .map(|w| w.crit_chance)
+        .unwrap_or(0.05)
+        + extra_crit_chance;
     let is_crit = rng_crit < crit_chance;
     let crit_mult = if is_crit { 1.5 } else { 1.0 };
 
@@ -28,11 +33,7 @@ pub fn calc_player_damage(
 }
 
 /// Returns damage the enemy deals to the player.
-pub fn calc_enemy_damage(
-    enemy: &EnemyInstance,
-    player: &PlayerState,
-    defense_mult: f32,
-) -> f32 {
+pub fn calc_enemy_damage(enemy: &EnemyInstance, player: &PlayerState, defense_mult: f32) -> f32 {
     let shield_bonus = player.shield.as_ref().map(|s| s.defense_bonus).unwrap_or(0) as f32;
     let defense = player.stat_defense as f32 + shield_bonus;
     let reduction = (defense / (defense + 50.0)) * defense_mult;

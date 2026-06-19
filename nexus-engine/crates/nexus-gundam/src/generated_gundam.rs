@@ -1,6 +1,6 @@
 #![allow(unused_imports, dead_code)]
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pub trait OntologyName {
     fn ontology_name() -> &'static str;
@@ -43,9 +43,12 @@ impl AABB {
     }
 
     pub fn intersects(&self, other: &Self) -> bool {
-        self.min[0] <= other.max[0] && self.max[0] >= other.min[0] &&
-        self.min[1] <= other.max[1] && self.max[1] >= other.min[1] &&
-        self.min[2] <= other.max[2] && self.max[2] >= other.min[2]
+        self.min[0] <= other.max[0]
+            && self.max[0] >= other.min[0]
+            && self.min[1] <= other.max[1]
+            && self.max[1] >= other.min[1]
+            && self.min[2] <= other.max[2]
+            && self.max[2] >= other.min[2]
     }
 }
 
@@ -347,8 +350,6 @@ impl OntologyName for Aquatic {
     }
 }
 
-
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Ambition;
 
@@ -358,13 +359,7 @@ impl OntologyName for Ambition {
     }
 }
 
-
 impl PlanetDimensionCategory for Ambition {}
-
-
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Arcades;
@@ -375,11 +370,7 @@ impl OntologyName for Arcades {
     }
 }
 
-
 impl PreservationDomainCategory for Arcades {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Ark;
@@ -390,11 +381,7 @@ impl OntologyName for Ark {
     }
 }
 
-
 impl MechClassCategory for Ark {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct BeamRifle;
@@ -405,11 +392,7 @@ impl OntologyName for BeamRifle {
     }
 }
 
-
 impl WeaponTypeCategory for BeamRifle {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct BeamSaber;
@@ -420,11 +403,7 @@ impl OntologyName for BeamSaber {
     }
 }
 
-
 impl WeaponTypeCategory for BeamSaber {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Beauty;
@@ -435,11 +414,7 @@ impl OntologyName for Beauty {
     }
 }
 
-
 impl PlanetDimensionCategory for Beauty {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct BecomeMythology;
@@ -450,11 +425,7 @@ impl OntologyName for BecomeMythology {
     }
 }
 
-
 impl ExperiencePhaseCategory for BecomeMythology {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct BrowserMMOs;
@@ -465,11 +436,7 @@ impl OntologyName for BrowserMMOs {
     }
 }
 
-
 impl PreservationDomainCategory for BrowserMMOs {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Build;
@@ -480,11 +447,7 @@ impl OntologyName for Build {
     }
 }
 
-
 impl ExperiencePhaseCategory for Build {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Builder;
@@ -495,11 +458,7 @@ impl OntologyName for Builder {
     }
 }
 
-
 impl MechClassCategory for Builder {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct BuilderArchetype;
@@ -510,11 +469,7 @@ impl OntologyName for BuilderArchetype {
     }
 }
 
-
 impl MythologyArchetypeCategory for BuilderArchetype {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct CityArk;
@@ -525,11 +480,7 @@ impl OntologyName for CityArk {
     }
 }
 
-
 impl ArkFormCategory for CityArk {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct ColonyArk;
@@ -540,11 +491,7 @@ impl OntologyName for ColonyArk {
     }
 }
 
-
 impl ArkFormCategory for ColonyArk {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Community;
@@ -555,11 +502,7 @@ impl OntologyName for Community {
     }
 }
 
-
 impl PlanetDimensionCategory for Community {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct CreateHistory;
@@ -570,11 +513,7 @@ impl OntologyName for CreateHistory {
     }
 }
 
-
 impl ExperiencePhaseCategory for CreateHistory {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Destroyer;
@@ -585,11 +524,7 @@ impl OntologyName for Destroyer {
     }
 }
 
-
 impl MythologyArchetypeCategory for Destroyer {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Discover;
@@ -600,11 +535,7 @@ impl OntologyName for Discover {
     }
 }
 
-
 impl ExperiencePhaseCategory for Discover {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct DualSensor;
@@ -615,11 +546,7 @@ impl OntologyName for DualSensor {
     }
 }
 
-
 impl SensorTypeCategory for DualSensor {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Earth;
@@ -630,11 +557,7 @@ impl OntologyName for Earth {
     }
 }
 
-
 impl PlanetCategory for Earth {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Expand;
@@ -645,11 +568,7 @@ impl OntologyName for Expand {
     }
 }
 
-
 impl ExperiencePhaseCategory for Expand {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Expansion;
@@ -660,11 +579,7 @@ impl OntologyName for Expansion {
     }
 }
 
-
 impl PlanetDimensionCategory for Expansion {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct ExpansionCycle;
@@ -675,11 +590,7 @@ impl OntologyName for ExpansionCycle {
     }
 }
 
-
 impl CosmicCycleCategory for ExpansionCycle {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Explore;
@@ -690,11 +601,7 @@ impl OntologyName for Explore {
     }
 }
 
-
 impl ExperiencePhaseCategory for Explore {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Explorer;
@@ -705,11 +612,7 @@ impl OntologyName for Explorer {
     }
 }
 
-
 impl MechClassCategory for Explorer {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Faith;
@@ -720,11 +623,7 @@ impl OntologyName for Faith {
     }
 }
 
-
 impl PlanetDimensionCategory for Faith {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct FlashGames;
@@ -735,13 +634,7 @@ impl OntologyName for FlashGames {
     }
 }
 
-
 impl PreservationDomainCategory for FlashGames {}
-
-
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct FusionReactor;
@@ -752,11 +645,7 @@ impl OntologyName for FusionReactor {
     }
 }
 
-
 impl PowerSourceCategory for FusionReactor {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct GMFrame;
@@ -767,11 +656,7 @@ impl OntologyName for GMFrame {
     }
 }
 
-
 impl FrameTypeCategory for GMFrame {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Growth;
@@ -782,11 +667,7 @@ impl OntologyName for Growth {
     }
 }
 
-
 impl CosmicCycleCategory for Growth {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Guardian;
@@ -797,11 +678,7 @@ impl OntologyName for Guardian {
     }
 }
 
-
 impl MechClassCategory for Guardian {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct GundamFrame;
@@ -812,11 +689,7 @@ impl OntologyName for GundamFrame {
     }
 }
 
-
 impl FrameTypeCategory for GundamFrame {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Gundanium;
@@ -827,12 +700,8 @@ impl OntologyName for Gundanium {
     }
 }
 
-
 impl ResourceCategory for Gundanium {}
 impl ArmorTypeCategory for Gundanium {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct HeatHawk;
@@ -843,11 +712,7 @@ impl OntologyName for HeatHawk {
     }
 }
 
-
 impl WeaponTypeCategory for HeatHawk {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Hero;
@@ -858,13 +723,7 @@ impl OntologyName for Hero {
     }
 }
 
-
 impl MythologyArchetypeCategory for Hero {}
-
-
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Judgment;
@@ -875,11 +734,7 @@ impl OntologyName for Judgment {
     }
 }
 
-
 impl CosmicCycleCategory for Judgment {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Knowledge;
@@ -890,11 +745,7 @@ impl OntologyName for Knowledge {
     }
 }
 
-
 impl PlanetDimensionCategory for Knowledge {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct KnowledgePreservation;
@@ -905,11 +756,7 @@ impl OntologyName for KnowledgePreservation {
     }
 }
 
-
 impl ArkPurposeCategory for KnowledgePreservation {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct LunaTitanium;
@@ -920,12 +767,8 @@ impl OntologyName for LunaTitanium {
     }
 }
 
-
 impl ResourceCategory for LunaTitanium {}
 impl ArmorTypeCategory for LunaTitanium {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Mars;
@@ -936,11 +779,7 @@ impl OntologyName for Mars {
     }
 }
 
-
 impl PlanetCategory for Mars {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Miner;
@@ -951,11 +790,7 @@ impl OntologyName for Miner {
     }
 }
 
-
 impl MechClassCategory for Miner {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct MinovskyParticles;
@@ -966,11 +801,7 @@ impl OntologyName for MinovskyParticles {
     }
 }
 
-
 impl ResourceCategory for MinovskyParticles {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct MinovskyUltracompact;
@@ -981,11 +812,7 @@ impl OntologyName for MinovskyUltracompact {
     }
 }
 
-
 impl PowerSourceCategory for MinovskyUltracompact {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Monoeye;
@@ -996,11 +823,7 @@ impl OntologyName for Monoeye {
     }
 }
 
-
 impl SensorTypeCategory for Monoeye {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct NanoComposite;
@@ -1011,11 +834,7 @@ impl OntologyName for NanoComposite {
     }
 }
 
-
 impl ArmorTypeCategory for NanoComposite {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Order;
@@ -1026,11 +845,7 @@ impl OntologyName for Order {
     }
 }
 
-
 impl PlanetDimensionCategory for Order {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct PreservationCycle;
@@ -1041,11 +856,7 @@ impl OntologyName for PreservationCycle {
     }
 }
 
-
 impl CosmicCycleCategory for PreservationCycle {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Preserve;
@@ -1056,11 +867,7 @@ impl OntologyName for Preserve {
     }
 }
 
-
 impl ExperiencePhaseCategory for Preserve {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Preserver;
@@ -1071,11 +878,7 @@ impl OntologyName for Preserver {
     }
 }
 
-
 impl MythologyArchetypeCategory for Preserver {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Prophet;
@@ -1086,11 +889,7 @@ impl OntologyName for Prophet {
     }
 }
 
-
 impl MythologyArchetypeCategory for Prophet {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Renewal;
@@ -1101,11 +900,7 @@ impl OntologyName for Renewal {
     }
 }
 
-
 impl CosmicCycleCategory for Renewal {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Risk;
@@ -1116,11 +911,7 @@ impl OntologyName for Risk {
     }
 }
 
-
 impl PlanetDimensionCategory for Risk {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Saint;
@@ -1131,11 +922,7 @@ impl OntologyName for Saint {
     }
 }
 
-
 impl MythologyArchetypeCategory for Saint {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Sentinel;
@@ -1146,11 +933,7 @@ impl OntologyName for Sentinel {
     }
 }
 
-
 impl PlanetCategory for Sentinel {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct SocialGames;
@@ -1161,13 +944,7 @@ impl OntologyName for SocialGames {
     }
 }
 
-
 impl PreservationDomainCategory for SocialGames {}
-
-
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Trader;
@@ -1178,11 +955,7 @@ impl OntologyName for Trader {
     }
 }
 
-
 impl MechClassCategory for Trader {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Venus;
@@ -1193,11 +966,7 @@ impl OntologyName for Venus {
     }
 }
 
-
 impl PlanetCategory for Venus {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Villain;
@@ -1208,11 +977,7 @@ impl OntologyName for Villain {
     }
 }
 
-
 impl MythologyArchetypeCategory for Villain {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct VirtualWorlds;
@@ -1223,13 +988,7 @@ impl OntologyName for VirtualWorlds {
     }
 }
 
-
 impl PreservationDomainCategory for VirtualWorlds {}
-
-
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Warrior;
@@ -1240,11 +999,7 @@ impl OntologyName for Warrior {
     }
 }
 
-
 impl MechClassCategory for Warrior {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct Worker;
@@ -1255,11 +1010,7 @@ impl OntologyName for Worker {
     }
 }
 
-
 impl MechClassCategory for Worker {}
-
-
-
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct ZakuFrame;
@@ -1270,7 +1021,4 @@ impl OntologyName for ZakuFrame {
     }
 }
 
-
 impl FrameTypeCategory for ZakuFrame {}
-
-

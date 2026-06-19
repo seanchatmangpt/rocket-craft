@@ -95,7 +95,11 @@ pub struct StatParseError(pub String);
 
 impl std::fmt::Display for StatParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "unknown stat '{}': expected health, attack, defense, or magic", self.0)
+        write!(
+            f,
+            "unknown stat '{}': expected health, attack, defense, or magic",
+            self.0
+        )
     }
 }
 

@@ -7,7 +7,7 @@ pub struct Vertex {
     pub position: [f32; 3],
     pub normal: [f32; 3],
     pub uv: [f32; 2],
-    pub tangent: [f32; 4],  // xyz = tangent, w = handedness
+    pub tangent: [f32; 4], // xyz = tangent, w = handedness
 }
 
 /// Skinned mesh vertex with joint indices and weights for animation
@@ -17,8 +17,8 @@ pub struct SkinnedVertex {
     pub position: [f32; 3],
     pub normal: [f32; 3],
     pub uv: [f32; 2],
-    pub joint_indices: [u32; 4],  // up to 4 bone influences
-    pub joint_weights: [f32; 4],  // must sum to 1.0
+    pub joint_indices: [u32; 4], // up to 4 bone influences
+    pub joint_weights: [f32; 4], // must sum to 1.0
 }
 
 impl SkinnedVertex {
@@ -33,7 +33,7 @@ impl SkinnedVertex {
 #[derive(Debug, Clone, Copy, PartialEq, Pod, Zeroable)]
 pub struct ParticleVertex {
     pub position: [f32; 3],
-    pub color: [f32; 4],    // RGBA
+    pub color: [f32; 4], // RGBA
     pub size: f32,
     pub rotation: f32,
 }

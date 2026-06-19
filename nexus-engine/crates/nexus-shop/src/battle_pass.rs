@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BattlePassSeason {
@@ -71,9 +71,16 @@ impl PlayerPassState {
         (prev_tier + 1..=self.current_tier).collect()
     }
 
-    pub fn claim_reward(&mut self, tier: u32, season: &BattlePassSeason) -> Result<PassReward, BattlePassError> {
+    pub fn claim_reward(
+        &mut self,
+        tier: u32,
+        season: &BattlePassSeason,
+    ) -> Result<PassReward, BattlePassError> {
         if tier > self.current_tier {
-            return Err(BattlePassError::TierNotReached { tier, current: self.current_tier });
+            return Err(BattlePassError::TierNotReached {
+                tier,
+                current: self.current_tier,
+            });
         }
         if self.claimed_tiers.contains(&tier) {
             return Err(BattlePassError::AlreadyClaimed(tier));
@@ -85,7 +92,8 @@ impl PlayerPassState {
             &season.free_rewards
         };
 
-        let reward = rewards.iter()
+        let reward = rewards
+            .iter()
             .find(|r| r.tier == tier)
             .ok_or(BattlePassError::RewardNotFound(tier))?
             .clone();
@@ -96,7 +104,10 @@ impl PlayerPassState {
 
     pub fn unclaimed_count(&self, _season: &BattlePassSeason) -> usize {
         let available: Vec<u32> = (1..=self.current_tier).collect();
-        available.iter().filter(|t| !self.claimed_tiers.contains(t)).count()
+        available
+            .iter()
+            .filter(|t| !self.claimed_tiers.contains(t))
+            .count()
     }
 }
 

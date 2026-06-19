@@ -156,9 +156,15 @@ impl GameRoom {
                 };
 
                 if new_hp.is_dead() {
-                    CombatOutcome::PlayerDied { player_id: defender_id }
+                    CombatOutcome::PlayerDied {
+                        player_id: defender_id,
+                    }
                 } else {
-                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth }
+                    CombatOutcome::Hit {
+                        damage: dmg.value(),
+                        new_hp: new_hp.value(),
+                        combo_depth,
+                    }
                 }
             }
             CombatAction::Parry { .. } => {
@@ -184,8 +190,7 @@ impl GameRoom {
                     self.player2.attack
                 };
 
-                let dmg =
-                    Damage::new(attacker_attack.value() * 2.0 + ability_id as f32 * 5.0);
+                let dmg = Damage::new(attacker_attack.value() * 2.0 + ability_id as f32 * 5.0);
 
                 let (new_hp, defender_id) = if is_p1_acting {
                     self.player2.hp = Hp::new((self.player2.hp.value() - dmg.value()).max(0.0));
@@ -198,9 +203,15 @@ impl GameRoom {
                 };
 
                 if new_hp.is_dead() {
-                    CombatOutcome::PlayerDied { player_id: defender_id }
+                    CombatOutcome::PlayerDied {
+                        player_id: defender_id,
+                    }
                 } else {
-                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth: 0 }
+                    CombatOutcome::Hit {
+                        damage: dmg.value(),
+                        new_hp: new_hp.value(),
+                        combo_depth: 0,
+                    }
                 }
             }
             CombatAction::CastMagic { magic_type } => {
@@ -224,9 +235,15 @@ impl GameRoom {
                 };
 
                 if new_hp.is_dead() {
-                    CombatOutcome::PlayerDied { player_id: defender_id }
+                    CombatOutcome::PlayerDied {
+                        player_id: defender_id,
+                    }
                 } else {
-                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth: 0 }
+                    CombatOutcome::Hit {
+                        damage: dmg.value(),
+                        new_hp: new_hp.value(),
+                        combo_depth: 0,
+                    }
                 }
             }
         };

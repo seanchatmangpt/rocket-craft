@@ -20,16 +20,20 @@ impl StatAllocation {
         if total_points == 0 {
             return false;
         }
-        
+
         // Prevent stats from being completely ignored if there are enough points
         if total_points >= 4 {
             if self.health == 0 || self.attack == 0 {
                 return true;
             }
         }
-        
+
         // Prevent all-in-one allocations as they are mathematically degenerate
-        let max_stat = self.health.max(self.attack).max(self.defense).max(self.magic);
+        let max_stat = self
+            .health
+            .max(self.attack)
+            .max(self.defense)
+            .max(self.magic);
         if max_stat == total_points && total_points > 1 {
             return true;
         }
@@ -82,8 +86,7 @@ pub fn simulate_battles(alloc: &StatAllocation, num_blank_battles: usize) -> Sim
                     legal_moves[0].clone()
                 }
             } else {
-                if let Some(atk_move) =
-                    legal_moves.iter().find(|m| matches!(m, Command::Attack(_)))
+                if let Some(atk_move) = legal_moves.iter().find(|m| matches!(m, Command::Attack(_)))
                 {
                     atk_move.clone()
                 } else {
@@ -149,5 +152,6 @@ pub fn optimize_balance(
         }
     }
 
-    best_result.context("Failed to find any valid allocation result after pruning imbalanced coordinates")
+    best_result
+        .context("Failed to find any valid allocation result after pruning imbalanced coordinates")
 }

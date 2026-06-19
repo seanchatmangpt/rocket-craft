@@ -53,6 +53,42 @@ build-rocket:
 build-ue4:
     cd tools && cargo run --bin build_ue4 --release
 
+# ── Lint & Format ────────────────────────────────────────────────────────────
+
+# Check Rust formatting across all workspaces (no changes, exit non-zero if drift)
+fmt-check:
+    cd tools && cargo fmt -- --check
+    cd nexus-engine && cargo fmt -- --check
+    cd blueprint-rs && cargo fmt -- --check
+    cd chicago-tdd-tools && cargo fmt -- --check
+    cd unify-rs && cargo fmt -- --check
+    cd infinity-blade-4/mud && cargo fmt -- --check
+
+# Apply Rust formatting across all workspaces
+fmt:
+    cd tools && cargo fmt
+    cd nexus-engine && cargo fmt
+    cd blueprint-rs && cargo fmt
+    cd chicago-tdd-tools && cargo fmt
+    cd unify-rs && cargo fmt
+    cd infinity-blade-4/mud && cargo fmt
+
+# Run clippy across all Rust workspaces
+clippy:
+    cd tools && cargo clippy --all 2>&1 | grep -v "^error\[E" | grep "^warning\|^error" | grep -v "wasm4pm\|unknown lint" || true
+    cd nexus-engine && cargo clippy --all 2>&1 | grep "^warning\|^error" | grep -v "wasm4pm\|unknown lint" || true
+    cd blueprint-rs && cargo clippy --all 2>&1 | grep "^warning\|^error" || true
+    cd chicago-tdd-tools && cargo clippy --all-features 2>&1 | grep "^warning\|^error" | grep -v "unknown lint" || true
+    cd unify-rs && cargo clippy --all 2>&1 | grep "^warning\|^error" | grep -v "unknown lint\|wasm4pm" || true
+    cd infinity-blade-4/mud && cargo clippy --all 2>&1 | grep "^warning\|^error" || true
+
+# Full CI gate: fmt-check + clippy + test + typecheck
+ci:
+    just fmt-check
+    just clippy
+    just test
+    just typecheck
+
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
 # Run all Rust workspace tests

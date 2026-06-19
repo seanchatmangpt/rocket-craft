@@ -3,10 +3,10 @@ use crate::types::PinType;
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 
-const CALL_FN:  &str = "/Script/BlueprintGraph.K2Node_CallFunction";
+const CALL_FN: &str = "/Script/BlueprintGraph.K2Node_CallFunction";
 const COMM_BIN: &str = "/Script/BlueprintGraph.K2Node_CommutativeAssociativeBinaryOperator";
 const MATH_LIB: &str = "/Script/Engine.KismetMathLibrary";
-const SYS_LIB:  &str = "/Script/Engine.KismetSystemLibrary";
+const SYS_LIB: &str = "/Script/Engine.KismetSystemLibrary";
 
 /// Build the FunctionReference property string for a `K2Node_CallFunction`.
 fn fn_ref(library: &str, func_name: &str) -> String {
@@ -19,14 +19,12 @@ fn fn_ref(library: &str, func_name: &str) -> String {
 
 /// Create a `K2Node_CallFunction` wired to `KismetMathLibrary`.
 fn math_call(name: impl Into<String>, func_name: &str) -> BpNode {
-    BpNode::new(CALL_FN, name)
-        .with_property("FunctionReference", fn_ref(MATH_LIB, func_name))
+    BpNode::new(CALL_FN, name).with_property("FunctionReference", fn_ref(MATH_LIB, func_name))
 }
 
 /// Create a `K2Node_CommutativeAssociativeBinaryOperator` wired to `KismetMathLibrary`.
 fn comm_bin(name: impl Into<String>, func_name: &str) -> BpNode {
-    BpNode::new(COMM_BIN, name)
-        .with_property("FunctionReference", fn_ref(MATH_LIB, func_name))
+    BpNode::new(COMM_BIN, name).with_property("FunctionReference", fn_ref(MATH_LIB, func_name))
 }
 
 // ─── Integer math ─────────────────────────────────────────────────────────────
@@ -82,8 +80,8 @@ pub fn abs_int(name: impl Into<String>) -> BpNode {
 pub fn clamp_int(name: impl Into<String>, min: i32, max: i32) -> BpNode {
     math_call(name, "Clamp_Int")
         .with_pin(Pin::data_input("Value", PinType::int()).with_default("0"))
-        .with_pin(Pin::data_input("Min", PinType::int()).with_default(&min.to_string()))
-        .with_pin(Pin::data_input("Max", PinType::int()).with_default(&max.to_string()))
+        .with_pin(Pin::data_input("Min", PinType::int()).with_default(min.to_string()))
+        .with_pin(Pin::data_input("Max", PinType::int()).with_default(max.to_string()))
         .with_pin(Pin::data_output("ReturnValue", PinType::int()))
 }
 
@@ -106,8 +104,8 @@ pub fn max_int(name: impl Into<String>) -> BpNode {
 /// Random integer in [`min`, `max`] (inclusive).
 pub fn random_int_in_range(name: impl Into<String>, min: i32, max: i32) -> BpNode {
     math_call(name, "RandomIntegerInRange")
-        .with_pin(Pin::data_input("Min", PinType::int()).with_default(&min.to_string()))
-        .with_pin(Pin::data_input("Max", PinType::int()).with_default(&max.to_string()))
+        .with_pin(Pin::data_input("Min", PinType::int()).with_default(min.to_string()))
+        .with_pin(Pin::data_input("Max", PinType::int()).with_default(max.to_string()))
         .with_pin(Pin::data_output("ReturnValue", PinType::int()))
 }
 
@@ -204,8 +202,8 @@ pub fn abs_float(name: impl Into<String>) -> BpNode {
 pub fn clamp_float(name: impl Into<String>, min: f32, max: f32) -> BpNode {
     math_call(name, "FClamp")
         .with_pin(Pin::data_input("Value", PinType::float()).with_default("0.0"))
-        .with_pin(Pin::data_input("Min", PinType::float()).with_default(&format!("{:.6}", min)))
-        .with_pin(Pin::data_input("Max", PinType::float()).with_default(&format!("{:.6}", max)))
+        .with_pin(Pin::data_input("Min", PinType::float()).with_default(format!("{:.6}", min)))
+        .with_pin(Pin::data_input("Max", PinType::float()).with_default(format!("{:.6}", max)))
         .with_pin(Pin::data_output("ReturnValue", PinType::float()))
 }
 
@@ -286,15 +284,14 @@ pub fn round(name: impl Into<String>) -> BpNode {
 
 /// Random float in [0, 1).
 pub fn random_float(name: impl Into<String>) -> BpNode {
-    math_call(name, "RandomFloat")
-        .with_pin(Pin::data_output("ReturnValue", PinType::float()))
+    math_call(name, "RandomFloat").with_pin(Pin::data_output("ReturnValue", PinType::float()))
 }
 
 /// Random float in [`min`, `max`].
 pub fn random_float_in_range(name: impl Into<String>, min: f32, max: f32) -> BpNode {
     math_call(name, "RandomFloatInRange")
-        .with_pin(Pin::data_input("Min", PinType::float()).with_default(&format!("{:.6}", min)))
-        .with_pin(Pin::data_input("Max", PinType::float()).with_default(&format!("{:.6}", max)))
+        .with_pin(Pin::data_input("Min", PinType::float()).with_default(format!("{:.6}", min)))
+        .with_pin(Pin::data_input("Max", PinType::float()).with_default(format!("{:.6}", max)))
         .with_pin(Pin::data_output("ReturnValue", PinType::float()))
 }
 
@@ -417,10 +414,13 @@ pub fn print_string(name: impl Into<String>, message: impl Into<String>) -> BpNo
         .with_property("FunctionReference", fn_ref(SYS_LIB, "PrintString"))
         .with_pin(Pin::exec_input("execute"))
         .with_pin(Pin::exec_output("then"))
-        .with_pin(Pin::data_input("InString", PinType::string()).with_default(&message.into()))
+        .with_pin(Pin::data_input("InString", PinType::string()).with_default(message.into()))
         .with_pin(Pin::data_input("bPrintToScreen", PinType::bool()).with_default("true"))
         .with_pin(Pin::data_input("bPrintToLog", PinType::bool()).with_default("true"))
-        .with_pin(Pin::data_input("TextColor", PinType::struct_type("/Script/CoreUObject.LinearColor")))
+        .with_pin(Pin::data_input(
+            "TextColor",
+            PinType::struct_type("/Script/CoreUObject.LinearColor"),
+        ))
         .with_pin(Pin::data_input("Duration", PinType::float()).with_default("2.000000"))
 }
 
@@ -431,8 +431,7 @@ pub fn delay(name: impl Into<String>, duration: f32) -> BpNode {
         .with_pin(Pin::exec_input("execute"))
         .with_pin(Pin::exec_output("then"))
         .with_pin(
-            Pin::data_input("Duration", PinType::float())
-                .with_default(&format!("{:.6}", duration))
+            Pin::data_input("Duration", PinType::float()).with_default(format!("{:.6}", duration)),
         )
 }
 
@@ -440,7 +439,10 @@ pub fn delay(name: impl Into<String>, duration: f32) -> BpNode {
 pub fn is_valid(name: impl Into<String>) -> BpNode {
     BpNode::new(CALL_FN, name)
         .with_property("FunctionReference", fn_ref(SYS_LIB, "IsValid"))
-        .with_pin(Pin::data_input("Object", PinType::object("/Script/CoreUObject.Object")))
+        .with_pin(Pin::data_input(
+            "Object",
+            PinType::object("/Script/CoreUObject.Object"),
+        ))
         .with_pin(Pin::data_output("ReturnValue", PinType::bool()))
 }
 
@@ -462,8 +464,7 @@ pub fn call_function(
         mp = member_parent.into(),
         mn = member_name.into(),
     );
-    BpNode::new(CALL_FN, name)
-        .with_property("FunctionReference", func_ref)
+    BpNode::new(CALL_FN, name).with_property("FunctionReference", func_ref)
 }
 
 // ─── Pin builder extension ────────────────────────────────────────────────────
@@ -483,7 +484,6 @@ impl PinExt for Pin {
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -493,7 +493,10 @@ mod tests {
     fn add_int_has_correct_class_and_pins() {
         let node = add_int("MyAdd");
 
-        assert_eq!(node.class, COMM_BIN, "class should be CommutativeAssociativeBinaryOperator");
+        assert_eq!(
+            node.class, COMM_BIN,
+            "class should be CommutativeAssociativeBinaryOperator"
+        );
 
         let a_pin = node.find_pin("A").expect("should have pin A");
         assert!(matches!(a_pin.direction, PinDirection::Input));
@@ -501,14 +504,24 @@ mod tests {
         let b_pin = node.find_pin("B").expect("should have pin B");
         assert!(matches!(b_pin.direction, PinDirection::Input));
 
-        let ret_pin = node.find_pin("ReturnValue").expect("should have pin ReturnValue");
+        let ret_pin = node
+            .find_pin("ReturnValue")
+            .expect("should have pin ReturnValue");
         assert!(matches!(ret_pin.direction, PinDirection::Output));
 
         // FunctionReference must reference KismetMathLibrary / Add_IntInt
-        let fn_ref_val = node.properties.get("FunctionReference")
+        let fn_ref_val = node
+            .properties
+            .get("FunctionReference")
             .expect("must have FunctionReference property");
-        assert!(fn_ref_val.contains("KismetMathLibrary"), "must reference KismetMathLibrary");
-        assert!(fn_ref_val.contains("Add_IntInt"), "must reference Add_IntInt");
+        assert!(
+            fn_ref_val.contains("KismetMathLibrary"),
+            "must reference KismetMathLibrary"
+        );
+        assert!(
+            fn_ref_val.contains("Add_IntInt"),
+            "must reference Add_IntInt"
+        );
     }
 
     #[test]
@@ -524,10 +537,18 @@ mod tests {
         assert!(matches!(in_str.direction, PinDirection::Input));
         assert_eq!(in_str.default_value.as_deref(), Some("Hello World"));
 
-        let fn_ref_val = node.properties.get("FunctionReference")
+        let fn_ref_val = node
+            .properties
+            .get("FunctionReference")
             .expect("must have FunctionReference");
-        assert!(fn_ref_val.contains("KismetSystemLibrary"), "must reference KismetSystemLibrary");
-        assert!(fn_ref_val.contains("PrintString"), "must reference PrintString");
+        assert!(
+            fn_ref_val.contains("KismetSystemLibrary"),
+            "must reference KismetSystemLibrary"
+        );
+        assert!(
+            fn_ref_val.contains("PrintString"),
+            "must reference PrintString"
+        );
     }
 
     #[test]
@@ -545,22 +566,26 @@ mod tests {
         let z = node.find_pin("Z").expect("should have pin Z");
         assert!(matches!(z.direction, PinDirection::Input));
 
-        let ret = node.find_pin("ReturnValue").expect("should have ReturnValue");
+        let ret = node
+            .find_pin("ReturnValue")
+            .expect("should have ReturnValue");
         assert!(matches!(ret.direction, PinDirection::Output));
 
         // ReturnValue should be a struct (FVector)
-        let sub_obj = ret.pin_type.sub_category_object.as_deref()
+        let sub_obj = ret
+            .pin_type
+            .sub_category_object
+            .as_deref()
             .expect("ReturnValue must have sub_category_object");
-        assert!(sub_obj.contains("Vector"), "ReturnValue must be a Vector struct");
+        assert!(
+            sub_obj.contains("Vector"),
+            "ReturnValue must be a Vector struct"
+        );
     }
 
     #[test]
     fn call_function_generic_creates_correct_property() {
-        let node = call_function(
-            "MyFunc",
-            "/Script/Engine.KismetMathLibrary",
-            "Sqrt",
-        );
+        let node = call_function("MyFunc", "/Script/Engine.KismetMathLibrary", "Sqrt");
 
         assert_eq!(node.class, CALL_FN);
         let fn_ref_val = node.properties.get("FunctionReference").unwrap();

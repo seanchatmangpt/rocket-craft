@@ -1,8 +1,8 @@
 use ib4_core::{player::PlayerState, types::MagicType};
 use ib4_progression::{
-    xp::{XPSystem, xp_for_level, xp_threshold, MAX_LEVEL},
     bloodline::BloodlineSystem,
     perks::PerkTree,
+    xp::{xp_for_level, xp_threshold, XPSystem, MAX_LEVEL},
 };
 
 #[test]

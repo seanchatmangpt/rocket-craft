@@ -12,6 +12,6 @@
 //! Progression data structures are attached to the `Player` profile inside `ib4-core` and are manipulated
 //! by both the game loop state and the combat rewards step when Titans are defeated.
 
-pub mod xp;
 pub mod bloodline;
 pub mod perks;
+pub mod xp;

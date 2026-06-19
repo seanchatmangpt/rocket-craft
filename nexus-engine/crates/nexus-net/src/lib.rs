@@ -10,6 +10,6 @@ pub mod protocol;
 pub mod room;
 
 pub use connection::{
-    Connection, ConnectionBuilder, ConnectionState, ConnectionTransitionError,
-    Disconnected, Handshaking, Connected, Authenticated, InLobby, InMatch,
+    Authenticated, Connected, Connection, ConnectionBuilder, ConnectionState,
+    ConnectionTransitionError, Disconnected, Handshaking, InLobby, InMatch,
 };

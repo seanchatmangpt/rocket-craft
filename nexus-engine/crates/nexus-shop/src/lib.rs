@@ -12,6 +12,6 @@
 //! This crate integrates with the currency systems in `nexus-economy` (validating balances before pulls or unlocks)
 //! and records receipt logs into `nexus-integration` for visual compliance audits.
 
-pub mod gacha;
-pub mod battle_pass;
 pub mod ar_bridge;
+pub mod battle_pass;
+pub mod gacha;

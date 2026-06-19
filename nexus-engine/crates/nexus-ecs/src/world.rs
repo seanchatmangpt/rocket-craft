@@ -1,12 +1,16 @@
-use hecs::{World as HecsWorld, Entity};
 use crate::components::*;
+use hecs::{Entity, World as HecsWorld};
 
 pub struct GameWorld {
     pub inner: HecsWorld,
 }
 
 impl GameWorld {
-    pub fn new() -> Self { GameWorld { inner: HecsWorld::new() } }
+    pub fn new() -> Self {
+        GameWorld {
+            inner: HecsWorld::new(),
+        }
+    }
 
     /// Spawn a player entity with all required components
     pub fn spawn_player(&mut self, player_id: u64, name: &str, hp: f32, gold: u32) -> Entity {
@@ -15,10 +19,23 @@ impl GameWorld {
             PlayerId(player_id),
             Name(name.to_string()),
             Health::new(hp),
-            Mana { current: 100.0, max: 100.0 },
-            AttackPower { base: 30.0, bonus: 0.0 },
-            Defense { base: 10.0, bonus: 0.0 },
-            ComboState { depth: 0, idle_turns: 0, max_depth: 5 },
+            Mana {
+                current: 100.0,
+                max: 100.0,
+            },
+            AttackPower {
+                base: 30.0,
+                bonus: 0.0,
+            },
+            Defense {
+                base: 10.0,
+                bonus: 0.0,
+            },
+            ComboState {
+                depth: 0,
+                idle_turns: 0,
+                max_depth: 5,
+            },
             QipScars { stacks: 0 },
             Gold(gold),
             Level(1),
@@ -28,18 +45,33 @@ impl GameWorld {
             Position::default(),
             Rotation::identity(),
         ));
-        self.inner.insert(entity, (Scale::default(), Visible(true))).ok();
+        self.inner
+            .insert(entity, (Scale::default(), Visible(true)))
+            .ok();
         entity
     }
 
     /// Spawn an enemy titan entity
-    pub fn spawn_enemy(&mut self, enemy_id: u64, name: &str, hp: f32, attack: f32, phase: u8) -> Entity {
+    pub fn spawn_enemy(
+        &mut self,
+        enemy_id: u64,
+        name: &str,
+        hp: f32,
+        attack: f32,
+        phase: u8,
+    ) -> Entity {
         self.inner.spawn((
             EnemyId(enemy_id),
             Name(name.to_string()),
             Health::new(hp),
-            AttackPower { base: attack, bonus: 0.0 },
-            Defense { base: 5.0, bonus: 0.0 },
+            AttackPower {
+                base: attack,
+                bonus: 0.0,
+            },
+            Defense {
+                base: 5.0,
+                bonus: 0.0,
+            },
             AiControlled,
             AiState {
                 current_behavior: AiBehavior::Idle,

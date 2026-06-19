@@ -19,7 +19,9 @@ pub mod npc;
 pub mod player;
 pub mod session;
 
-pub use inventory::{Inventory, PlayerInventory, NpcInventory, ShopInventory};
-pub use npc::{Npc, NpcState, NpcDialogueTree};
-pub use player::{PlayerProfile, NewtypeRank, GundamSeries};
-pub use session::{PlayerSession, PlayerSessionBuilder, SessionBuildError, SessionState, SessionTransitionError};
+pub use inventory::{Inventory, NpcInventory, PlayerInventory, ShopInventory};
+pub use npc::{Npc, NpcDialogueTree, NpcState};
+pub use player::{GundamSeries, NewtypeRank, PlayerProfile};
+pub use session::{
+    PlayerSession, PlayerSessionBuilder, SessionBuildError, SessionState, SessionTransitionError,
+};

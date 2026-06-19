@@ -1,6 +1,6 @@
 //! TPS Branchless Mech Parts Generator for Gundam Nexus
 
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 
 /// StateVector representing the ontology state coordinates O*
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -118,7 +118,10 @@ pub struct MechAssembly {
 #[derive(Debug, Clone, PartialEq, thiserror::Error)]
 pub enum TpsValidationError {
     #[error("Socket mating failure: {slot_a} and {slot_b} sockets are incompatible")]
-    SocketMatingFailure { slot_a: &'static str, slot_b: &'static str },
+    SocketMatingFailure {
+        slot_a: &'static str,
+        slot_b: &'static str,
+    },
 
     #[error("Collision intersection between {slot_a} and {slot_b}: distance is {distance:.4}, but combined radius is {combined_radius:.4}")]
     CollisionIntersection {
@@ -140,21 +143,34 @@ impl MechAssembly {
     pub fn validate(&self) -> Result<(), TpsValidationError> {
         // 1. Socket mating checks (bitwise matching pattern check)
         if (self.head.socket_fit & 0x0F) != (self.torso.socket_fit & 0x0F) {
-            return Err(TpsValidationError::SocketMatingFailure { slot_a: "head", slot_b: "torso" });
+            return Err(TpsValidationError::SocketMatingFailure {
+                slot_a: "head",
+                slot_b: "torso",
+            });
         }
         if (self.left_arm.socket_fit & 0xF0) != (self.torso.socket_fit & 0xF0) {
-            return Err(TpsValidationError::SocketMatingFailure { slot_a: "left_arm", slot_b: "torso" });
+            return Err(TpsValidationError::SocketMatingFailure {
+                slot_a: "left_arm",
+                slot_b: "torso",
+            });
         }
         if (self.right_arm.socket_fit & 0xF0) != (self.torso.socket_fit & 0xF0) {
-            return Err(TpsValidationError::SocketMatingFailure { slot_a: "right_arm", slot_b: "torso" });
+            return Err(TpsValidationError::SocketMatingFailure {
+                slot_a: "right_arm",
+                slot_b: "torso",
+            });
         }
         if (self.legs.socket_fit & 0x0F) != (self.torso.socket_fit & 0x0F) {
-            return Err(TpsValidationError::SocketMatingFailure { slot_a: "legs", slot_b: "torso" });
+            return Err(TpsValidationError::SocketMatingFailure {
+                slot_a: "legs",
+                slot_b: "torso",
+            });
         }
 
         // Helper to get part radius based on collision volume and motion clearance.
         let get_radius = |part: &Part| -> f32 {
-            ((part.collision_volume & 0xFF) as f32) / 100.0 + ((part.motion_clearance & 0xFF) as f32) / 200.0
+            ((part.collision_volume & 0xFF) as f32) / 100.0
+                + ((part.motion_clearance & 0xFF) as f32) / 200.0
         };
 
         // 2. Collision intersections check (relative coordinates layout)
@@ -190,7 +206,9 @@ impl MechAssembly {
 
         // 3. Load capacity check: legs capacity is legs.geometry * 10
         let capacity = self.legs.geometry.wrapping_mul(10);
-        let total_mass = self.head.mass_balance
+        let total_mass = self
+            .head
+            .mass_balance
             .wrapping_add(self.torso.mass_balance)
             .wrapping_add(self.left_arm.mass_balance)
             .wrapping_add(self.right_arm.mass_balance)
@@ -211,10 +229,7 @@ impl MechAssembly {
             let deviation = com_x.abs();
             let limit = 0.5f32;
             if deviation > limit {
-                return Err(TpsValidationError::CenterOfMassDeviation {
-                    deviation,
-                    limit,
-                });
+                return Err(TpsValidationError::CenterOfMassDeviation { deviation, limit });
             }
         }
 
@@ -240,7 +255,11 @@ pub struct TpsAssemblyReceipt {
 
 impl TpsAssemblyReceipt {
     /// Generate a cryptographic receipt proving manufacturing compliance.
-    pub fn generate(assembly: &MechAssembly, passed_gates: Vec<String>, final_decision: String) -> Self {
+    pub fn generate(
+        assembly: &MechAssembly,
+        passed_gates: Vec<String>,
+        final_decision: String,
+    ) -> Self {
         let serialized = serde_json::to_string(assembly).unwrap_or_default();
         let mut hasher = Sha256::new();
         hasher.update(serialized.as_bytes());
@@ -392,7 +411,13 @@ mod tests {
         };
 
         let result = assembly.validate();
-        assert!(matches!(result, Err(TpsValidationError::SocketMatingFailure { slot_a: "head", slot_b: "torso" })));
+        assert!(matches!(
+            result,
+            Err(TpsValidationError::SocketMatingFailure {
+                slot_a: "head",
+                slot_b: "torso"
+            })
+        ));
     }
 
     #[test]
@@ -424,7 +449,10 @@ mod tests {
         };
 
         let result = assembly.validate();
-        assert!(matches!(result, Err(TpsValidationError::CollisionIntersection { .. })));
+        assert!(matches!(
+            result,
+            Err(TpsValidationError::CollisionIntersection { .. })
+        ));
     }
 
     #[test]
@@ -448,7 +476,10 @@ mod tests {
         };
 
         let result = assembly.validate();
-        assert!(matches!(result, Err(TpsValidationError::LoadCapacityExceeded { .. })));
+        assert!(matches!(
+            result,
+            Err(TpsValidationError::LoadCapacityExceeded { .. })
+        ));
     }
 
     #[test]
@@ -478,7 +509,10 @@ mod tests {
         };
 
         let result = assembly.validate();
-        assert!(matches!(result, Err(TpsValidationError::CenterOfMassDeviation { .. })));
+        assert!(matches!(
+            result,
+            Err(TpsValidationError::CenterOfMassDeviation { .. })
+        ));
     }
 
     #[test]

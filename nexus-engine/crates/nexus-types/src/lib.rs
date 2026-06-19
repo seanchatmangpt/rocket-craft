@@ -18,24 +18,21 @@ pub mod errors;
 pub mod ids;
 pub mod math;
 pub mod states;
-pub mod units;
 pub mod tps;
+pub mod units;
 
 pub use tps::{
-    StateVector, Part, μ, const_validate_part, MechAssembly, TpsValidationError, TpsAssemblyReceipt,
+    const_validate_part, μ, MechAssembly, Part, StateVector, TpsAssemblyReceipt, TpsValidationError,
 };
-
 
 // Convenience re-exports so downstream crates can write `nexus_types::Hp` etc.
 pub use errors::{GameError, TypeError};
 pub use ids::{AuctionId, EnemyId, ItemId, PlayerId, SessionId, TransactionId, TypedId};
 pub use math::{Aabb, Mat4, Quat, Transform, Vec2, Vec3};
 pub use states::{
-    AttackDir, AuctionClosed, Authenticated, BidAccepted, BidRejected, Connecting, CombatStateMarker,
-    Dead, Disconnected, Dodging, EconomyStateMarker, GachaRarity, Idle, InLobby, InMatch,
-    MagicType, ParryOutcome, PendingBid, Rarity, Series, GundamSeries, SessionStateMarker, Spectating, Stunned,
-    TitanType, Attacking, Parrying,
+    AttackDir, Attacking, AuctionClosed, Authenticated, BidAccepted, BidRejected,
+    CombatStateMarker, Connecting, Dead, Disconnected, Dodging, EconomyStateMarker, GachaRarity,
+    GundamSeries, Idle, InLobby, InMatch, MagicType, ParryOutcome, Parrying, PendingBid, Rarity,
+    Series, SessionStateMarker, Spectating, Stunned, TitanType,
 };
-pub use units::{
-    Armor, ComboMultiplier, Damage, Gold, Hp, Mana, TimeDilation, Typed, Xp,
-};
+pub use units::{Armor, ComboMultiplier, Damage, Gold, Hp, Mana, TimeDilation, Typed, Xp};

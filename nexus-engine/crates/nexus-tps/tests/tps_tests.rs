@@ -1,5 +1,6 @@
 use nexus_tps::{
-    generate_part, assemble_mech, PartStateVector, PartSlot, JidokaHalt, TpsReceipt, Axis, SocketType
+    assemble_mech, generate_part, Axis, JidokaHalt, PartSlot, PartStateVector, SocketType,
+    TpsReceipt,
 };
 
 fn create_valid_vector(slot: PartSlot) -> PartStateVector {
@@ -36,7 +37,9 @@ fn test_generate_part_motion_violation() {
     let mut state = create_valid_vector(PartSlot::Torso);
     state.motion_profile = 150.0;
     let part_res = generate_part(&state);
-    assert!(matches!(part_res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Z, limit: 100.0, actual }) if actual == 150.0));
+    assert!(
+        matches!(part_res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Z, limit: 100.0, actual }) if actual == 150.0)
+    );
 }
 
 #[test]
@@ -167,13 +170,17 @@ fn test_assembly_collision_failure() {
     let res = assemble_mech(&vectors);
     assert!(res.is_err());
     let err = res.err().unwrap();
-    assert!(matches!(
-        err,
-        JidokaHalt::CollisionVolumeIntersects {
-            part_a: PartSlot::Torso,
-            part_b: PartSlot::Waist
-        }
-    ), "Expected CollisionVolumeIntersects, got {:?}", err);
+    assert!(
+        matches!(
+            err,
+            JidokaHalt::CollisionVolumeIntersects {
+                part_a: PartSlot::Torso,
+                part_b: PartSlot::Waist
+            }
+        ),
+        "Expected CollisionVolumeIntersects, got {:?}",
+        err
+    );
 }
 
 #[test]
@@ -227,10 +234,14 @@ fn test_assembly_mass_overload() {
     let res = assemble_mech(&vectors);
     assert!(res.is_err());
     let err = res.err().unwrap();
-    assert!(matches!(
-        err,
-        JidokaHalt::MassExceedsFrameCapacity { mass, capacity } if mass > capacity
-    ), "Expected MassExceedsFrameCapacity, got {:?}", err);
+    assert!(
+        matches!(
+            err,
+            JidokaHalt::MassExceedsFrameCapacity { mass, capacity } if mass > capacity
+        ),
+        "Expected MassExceedsFrameCapacity, got {:?}",
+        err
+    );
 }
 
 #[test]
@@ -289,19 +300,27 @@ fn test_generate_part_hardened_validation_armor() {
     let mut state = create_valid_vector(PartSlot::Head);
     state.armor_profile = -0.5;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 0.0, actual }) if actual == -0.5));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 0.0, actual }) if actual == -0.5)
+    );
 
     state.armor_profile = 1.5;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 1.0, actual }) if actual == 1.5));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 1.0, actual }) if actual == 1.5)
+    );
 
     state.armor_profile = f32::NAN;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 1.0, actual }) if actual.is_nan()));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 1.0, actual }) if actual.is_nan())
+    );
 
     state.armor_profile = f32::INFINITY;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 1.0, actual }) if actual == f32::INFINITY));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 1.0, actual }) if actual == f32::INFINITY)
+    );
 }
 
 #[test]
@@ -309,7 +328,9 @@ fn test_generate_part_hardened_validation_joint() {
     let mut state = create_valid_vector(PartSlot::Head);
     state.joint_profile = -0.1;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Y, limit: 0.0, actual }) if actual == -0.1));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Y, limit: 0.0, actual }) if actual == -0.1)
+    );
 }
 
 #[test]
@@ -317,7 +338,9 @@ fn test_generate_part_hardened_validation_mass() {
     let mut state = create_valid_vector(PartSlot::Head);
     state.mass_profile = 1.01;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Z, limit: 1.0, actual }) if actual == 1.01));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Z, limit: 1.0, actual }) if actual == 1.01)
+    );
 }
 
 #[test]
@@ -325,7 +348,9 @@ fn test_generate_part_hardened_validation_weapon() {
     let mut state = create_valid_vector(PartSlot::Head);
     state.weapon_profile = -0.001;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 0.0, actual }) if actual == -0.001));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::X, limit: 0.0, actual }) if actual == -0.001)
+    );
 }
 
 #[test]
@@ -333,7 +358,7 @@ fn test_generate_part_hardened_validation_motion() {
     let mut state = create_valid_vector(PartSlot::Head);
     state.motion_profile = 100.1;
     let res = generate_part(&state);
-    assert!(matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Z, limit: 100.0, actual }) if actual == 100.1));
+    assert!(
+        matches!(res, Err(JidokaHalt::MotionBoundsViolated { axis: Axis::Z, limit: 100.0, actual }) if actual == 100.1)
+    );
 }
-
-

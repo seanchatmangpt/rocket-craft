@@ -1,5 +1,5 @@
-use nexus_mud::{MudEngine, Zone, MudError};
-use nexus_tps::{PartStateVector, PartSlot};
+use nexus_mud::{MudEngine, MudError, Zone};
+use nexus_tps::{PartSlot, PartStateVector};
 
 fn assert_eq_sorted_lines(a: &str, b: &str) {
     let mut a_lines: Vec<&str> = a.lines().collect();
@@ -39,7 +39,8 @@ fn test_edge_cases_state_vectors() {
         let res = nexus_tps::generate_part(&state);
         assert!(
             res.is_err(),
-            "Expected part generation to fail for edge value: {:?}", val
+            "Expected part generation to fail for edge value: {:?}",
+            val
         );
     }
 
@@ -114,14 +115,21 @@ fn test_cyclic_navigation_determinism() {
     assert_eq!(mud1.room_transitions, mud2.room_transitions);
     assert_eq!(mud1.command_history, mud2.command_history);
 
-    let rec1 = mud1.generate_walkthrough_receipt("Deterministic Walkthrough").unwrap();
-    let rec2 = mud2.generate_walkthrough_receipt("Deterministic Walkthrough").unwrap();
+    let rec1 = mud1
+        .generate_walkthrough_receipt("Deterministic Walkthrough")
+        .unwrap();
+    let rec2 = mud2
+        .generate_walkthrough_receipt("Deterministic Walkthrough")
+        .unwrap();
 
     assert_eq!(rec1.prompt, rec2.prompt);
     assert_eq!(rec1.room_transitions, rec2.room_transitions);
     assert_eq!(rec1.command_history, rec2.command_history);
     assert_eq!(rec1.final_verdict, rec2.final_verdict);
-    assert_eq!(rec1.final_assembly_receipt_hash, rec2.final_assembly_receipt_hash);
+    assert_eq!(
+        rec1.final_assembly_receipt_hash,
+        rec2.final_assembly_receipt_hash
+    );
     assert_eq!(rec1.cryptographic_signature, rec2.cryptographic_signature);
     assert_eq!(rec1.signature_hash, rec2.signature_hash);
 
@@ -161,12 +169,18 @@ fn test_ac3_ac4_path_validity_and_invalid_travel_rejected() {
     // Direct travel skipping zones is rejected
     let skip_fail = engine.execute_command("go reveal_platform");
     assert!(skip_fail.is_err());
-    assert!(matches!(skip_fail.unwrap_err(), MudError::InvalidDirectTravel { .. }));
+    assert!(matches!(
+        skip_fail.unwrap_err(),
+        MudError::InvalidDirectTravel { .. }
+    ));
 
     // Moving forward without gate verification is blocked
     let move_fail_before_gate = engine.execute_command("go materials_lab");
     assert!(move_fail_before_gate.is_err());
-    assert!(matches!(move_fail_before_gate.unwrap_err(), MudError::GateBlocked(_)));
+    assert!(matches!(
+        move_fail_before_gate.unwrap_err(),
+        MudError::GateBlocked(_)
+    ));
 }
 
 // Criterion 5: `look` returns the correct zone description.
@@ -196,7 +210,10 @@ fn test_ac6_inspect_part_returns_structural_data() {
     // Verify head part fields directly via the parts map
     let head = engine.parts.get("head").expect("head part must exist");
     assert_eq!(head.mass, 10.0, "head mass must be 10 kg");
-    assert!(!head.sockets_required.is_empty(), "head must have required sockets");
+    assert!(
+        !head.sockets_required.is_empty(),
+        "head must have required sockets"
+    );
     assert!(head.health_status > 0.0, "head health must be positive");
 }
 
@@ -213,16 +230,28 @@ fn test_ac7_inventory_lists_all_parts() {
 
     // Check structural parts map directly — no string parsing
     let expected_parts = [
-        "torso_frame", "head", "left_arm", "right_arm",
-        "left_leg", "right_leg", "backpack", "left_thruster", "right_thruster",
+        "torso_frame",
+        "head",
+        "left_arm",
+        "right_arm",
+        "left_leg",
+        "right_leg",
+        "backpack",
+        "left_thruster",
+        "right_thruster",
     ];
     for part_id in &expected_parts {
         assert!(
             engine.parts.contains_key(*part_id),
-            "parts map must contain '{}'", part_id
+            "parts map must contain '{}'",
+            part_id
         );
     }
-    assert_eq!(engine.parts.len(), expected_parts.len(), "must have exactly 9 parts");
+    assert_eq!(
+        engine.parts.len(),
+        expected_parts.len(),
+        "must have exactly 9 parts"
+    );
 }
 
 // Criterion 8: Assembly Gantry can assemble the minimal 9-part mech.
@@ -240,7 +269,10 @@ fn test_ac8_assembly_gantry_assembles_mech() {
 
     let assemble_res = engine.execute_command("assemble standard");
     assert!(assemble_res.is_ok(), "assemble standard must succeed");
-    assert!(engine.assembly_complete, "assembly_complete flag must be set");
+    assert!(
+        engine.assembly_complete,
+        "assembly_complete flag must be set"
+    );
 }
 
 // Criterion 9: Mismatched socket kinds refuse assembly.
@@ -250,7 +282,9 @@ fn test_ac9_socket_mismatch_refuses_assembly() {
     fault_engine.execute_command("verify mission").unwrap();
     fault_engine.execute_command("go materials_lab").unwrap();
     fault_engine.execute_command("verify materials").unwrap();
-    fault_engine.execute_command("go primitive_foundry").unwrap();
+    fault_engine
+        .execute_command("go primitive_foundry")
+        .unwrap();
     fault_engine.execute_command("verify primitive").unwrap();
     fault_engine.execute_command("go runner_wall").unwrap();
     fault_engine.execute_command("verify runner_wall").unwrap();
@@ -258,7 +292,10 @@ fn test_ac9_socket_mismatch_refuses_assembly() {
 
     let assemble_refused = fault_engine.execute_command("assemble standard");
     assert!(assemble_refused.is_err());
-    assert!(matches!(assemble_refused.unwrap_err(), MudError::AssemblyFailure { .. }));
+    assert!(matches!(
+        assemble_refused.unwrap_err(),
+        MudError::AssemblyFailure { .. }
+    ));
 }
 
 // Criterion 10: fit_bay validation admits valid structural fit.
@@ -278,7 +315,10 @@ fn test_ac10_fit_bay_passes_valid_assembly() {
     engine.execute_command("go fit_bay").unwrap();
 
     engine.execute_command("verify fit").unwrap();
-    assert!(engine.gates.fit, "fit gate must be set after passing fit bay");
+    assert!(
+        engine.gates.fit,
+        "fit gate must be set after passing fit bay"
+    );
 }
 
 // Criterion 11: collision_bay detects and refuses overlapping bounds.
@@ -296,7 +336,10 @@ fn test_ac11_collision_bay_detects_overlapping_bounds() {
 
     let verify_collision_failed = coll_fault_engine.execute_command("verify collision");
     assert!(verify_collision_failed.is_err());
-    assert!(matches!(verify_collision_failed.unwrap_err(), MudError::GateBlocked(_)));
+    assert!(matches!(
+        verify_collision_failed.unwrap_err(),
+        MudError::GateBlocked(_)
+    ));
 }
 
 // Criterion 12: proving_ground validates 4-pose motion sweep.
@@ -320,7 +363,10 @@ fn test_ac12_proving_ground_validates_motion_sweep() {
     engine.execute_command("go proving_ground").unwrap();
 
     engine.execute_command("verify motion").unwrap();
-    assert!(engine.gates.motion, "motion gate must be set after passing proving ground");
+    assert!(
+        engine.gates.motion,
+        "motion gate must be set after passing proving ground"
+    );
 }
 
 // Criterion 13: Cryptographic AssemblyReceipt is generated upon final admission.
@@ -346,8 +392,14 @@ fn test_ac13_assembly_receipt_generated_at_reveal() {
     engine.execute_command("go reveal_platform").unwrap();
     engine.execute_command("verify reveal").unwrap();
 
-    assert!(engine.assembly_receipt.is_some(), "assembly_receipt must be Some after reveal");
-    assert!(engine.walkthrough_receipt.is_some(), "walkthrough_receipt must be Some after reveal");
+    assert!(
+        engine.assembly_receipt.is_some(),
+        "assembly_receipt must be Some after reveal"
+    );
+    assert!(
+        engine.walkthrough_receipt.is_some(),
+        "walkthrough_receipt must be Some after reveal"
+    );
 }
 
 // Criteria 14 & 19: Mechs failing gate are refused; diagnose reports failure detail.
@@ -366,11 +418,14 @@ fn test_ac14_ac19_gate_failure_with_diagnostic_detail() {
     assert!(fit_fail.is_err(), "fit gate must fail for overloaded mech");
 
     // Diagnose must record fit_fail diagnostic with mass detail (structural check on map key and value prefix)
-    let diag_value = overload_engine.diagnostics.get("fit_fail")
+    let diag_value = overload_engine
+        .diagnostics
+        .get("fit_fail")
         .expect("diagnostics must contain 'fit_fail' key after fit gate failure");
     assert!(
         diag_value.starts_with("Total mass"),
-        "fit_fail diagnostic must start with 'Total mass', got: {}", diag_value
+        "fit_fail diagnostic must start with 'Total mass', got: {}",
+        diag_value
     );
 }
 
@@ -400,7 +455,10 @@ fn test_ac15_commands_emit_events() {
     let count_before = engine.event_log.len();
     engine.execute_command("look").unwrap();
     let count_after = engine.event_log.len();
-    assert!(count_after > count_before, "look must emit at least one event");
+    assert!(
+        count_after > count_before,
+        "look must emit at least one event"
+    );
 }
 
 // Criterion 16: Event logs pass referential integrity.
@@ -454,8 +512,9 @@ fn test_ac17_event_log_timestamps_monotonic() {
 
     for i in 1..engine.event_log.len() {
         assert!(
-            engine.event_log[i].timestamp > engine.event_log[i-1].timestamp,
-            "event log timestamps must be strictly monotonic at index {}", i
+            engine.event_log[i].timestamp > engine.event_log[i - 1].timestamp,
+            "event log timestamps must be strictly monotonic at index {}",
+            i
         );
     }
 }
@@ -485,7 +544,10 @@ fn test_ac18_health_command_returns_part_health() {
 
     // Structural check: head part health must be positive and accessible
     let head = engine.parts.get("head").expect("head part must exist");
-    assert!(head.health_status >= 0.0, "head health_status must be non-negative");
+    assert!(
+        head.health_status >= 0.0,
+        "head health_status must be non-negative"
+    );
 }
 
 // Criterion 20: Happy-path end-to-end walkthrough completes cleanly.

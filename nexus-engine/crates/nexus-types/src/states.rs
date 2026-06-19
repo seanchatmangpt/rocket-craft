@@ -217,11 +217,11 @@ impl std::error::Error for MagicTypeParseError {}
 impl From<MagicType> for f32 {
     fn from(m: MagicType) -> f32 {
         match m {
-            MagicType::Fire      => 20.0,
+            MagicType::Fire => 20.0,
             MagicType::Lightning => 30.0,
-            MagicType::Ice       => 15.0,
-            MagicType::Dark      => 35.0,
-            MagicType::Light     => 25.0,
+            MagicType::Ice => 15.0,
+            MagicType::Dark => 35.0,
+            MagicType::Light => 25.0,
             MagicType::BeamSaber => 40.0,
         }
     }

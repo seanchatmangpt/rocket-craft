@@ -8,7 +8,7 @@ pub struct PerkDef {
     pub prerequisite: Option<&'static str>,
     pub description: &'static str,
     // Aggregate effect fields
-    pub attack_bonus: f32,          // additive percentage (0.10 = +10%)
+    pub attack_bonus: f32, // additive percentage (0.10 = +10%)
     pub defense_bonus: f32,
     pub magic_bonus: f32,
     pub health_bonus: f32,
@@ -16,21 +16,21 @@ pub struct PerkDef {
     pub gold_find: f32,
     pub crit_chance: f32,
     pub magic_cost_reduction: f32,
-    pub combo_window_bonus: u32,    // extra turns before combo reset
-    pub grants_parry_bonus: bool,   // QIPResonance
+    pub combo_window_bonus: u32,  // extra turns before combo reset
+    pub grants_parry_bonus: bool, // QIPResonance
 }
 
 /// Computed aggregate from all selected perks.
 #[derive(Debug, Clone, Default)]
 pub struct PerkAggregate {
-    pub attack_mult: f32,       // 1.0 + sum of attack_bonus
+    pub attack_mult: f32, // 1.0 + sum of attack_bonus
     pub defense_mult: f32,
     pub magic_mult: f32,
     pub health_mult: f32,
     pub xp_mult: f32,
     pub gold_mult: f32,
     pub crit_bonus: f32,
-    pub magic_cost_mult: f32,   // 1.0 - sum of magic_cost_reduction
+    pub magic_cost_mult: f32, // 1.0 - sum of magic_cost_reduction
     pub combo_extra_turns: u32,
     pub has_parry_bonus: bool,
 }

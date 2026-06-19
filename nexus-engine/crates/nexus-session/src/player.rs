@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 pub use nexus_types::{GundamSeries, MagicType};
+use serde::{Deserialize, Serialize};
 
 use crate::session::SessionError;
 

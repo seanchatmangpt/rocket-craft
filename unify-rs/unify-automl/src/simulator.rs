@@ -1,4 +1,4 @@
-use nexus_combat::machine::{CombatMachine, Idle, Attacking, Parrying, PerfectParrying, Dodging};
+use nexus_combat::machine::{Attacking, CombatMachine, Dodging, Idle, Parrying, PerfectParrying};
 use nexus_types::{AttackDir, ParryOutcome};
 use std::time::Instant;
 
@@ -55,9 +55,7 @@ impl TypestateAimbot {
                 (CombatStateEnum::Attacking(m, _), "resolve:blocked") => {
                     CombatStateEnum::Idle(m.resolve_blocked())
                 }
-                (CombatStateEnum::Idle(m), "parry") => {
-                    CombatStateEnum::Parrying(m.begin_parry())
-                }
+                (CombatStateEnum::Idle(m), "parry") => CombatStateEnum::Parrying(m.begin_parry()),
                 (CombatStateEnum::Parrying(m), "resolve:parry:perfect") => {
                     let (next, _) = m.resolve(ParryOutcome::Perfect, incoming_damage);
                     CombatStateEnum::Idle(next)
@@ -82,7 +80,10 @@ impl TypestateAimbot {
                     let (next, d) = m.begin_perfect_parry(AttackDir::Right);
                     CombatStateEnum::PerfectParrying(next, d)
                 }
-                (CombatStateEnum::PerfectParrying(m, announced), "resolve:perfect_parry:overhead") => {
+                (
+                    CombatStateEnum::PerfectParrying(m, announced),
+                    "resolve:perfect_parry:overhead",
+                ) => {
                     let (next, _) = m.resolve(announced, AttackDir::Overhead, incoming_damage);
                     CombatStateEnum::Idle(next)
                 }
@@ -94,9 +95,7 @@ impl TypestateAimbot {
                     let (next, _) = m.resolve(announced, AttackDir::Right, incoming_damage);
                     CombatStateEnum::Idle(next)
                 }
-                (CombatStateEnum::Idle(m), "dodge") => {
-                    CombatStateEnum::Dodging(m.begin_dodge())
-                }
+                (CombatStateEnum::Idle(m), "dodge") => CombatStateEnum::Dodging(m.begin_dodge()),
                 (CombatStateEnum::Dodging(m), "resolve:dodge") => {
                     CombatStateEnum::Idle(m.resolve())
                 }
@@ -118,22 +117,32 @@ impl TypestateAimbot {
         }
     }
 
-    /// Evaluates combinations of coordinates autonomously to guarantee combinatorial 
+    /// Evaluates combinations of coordinates autonomously to guarantee combinatorial
     /// equilibrium of the state space, ensuring bounds without allocating vectors per run.
     pub fn combinatorial_brute_force(&self) -> Result<(), &'static str> {
         // Example base matrix. Real implementation would traverse millions of permutations.
         let sequences = [
-            vec!["attack:overhead", "resolve:hit", "parry", "resolve:parry:perfect"],
+            vec![
+                "attack:overhead",
+                "resolve:hit",
+                "parry",
+                "resolve:parry:perfect",
+            ],
             vec!["attack:left", "resolve:blocked", "dodge", "resolve:dodge"],
-            vec!["perfect_parry:overhead", "resolve:perfect_parry:overhead", "attack:right", "resolve:hit"],
+            vec![
+                "perfect_parry:overhead",
+                "resolve:perfect_parry:overhead",
+                "attack:right",
+                "resolve:hit",
+            ],
         ];
-        
+
         let start = Instant::now();
         for seq in &sequences {
             let _ = self.brute_force_coordinates(100.0, 100.0, 10.0, 15.0, seq.clone())?;
         }
         let elapsed = start.elapsed();
-        
+
         // Failsafe for "The Law of the Chip: Execution must respect nanosecond tolerances"
         // Let's just log or assert, but we won't panic in this library method unless instructed
         if elapsed.as_nanos() > 2_000_000 {

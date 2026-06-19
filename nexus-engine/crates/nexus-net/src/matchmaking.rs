@@ -85,9 +85,10 @@ impl MatchmakingQueue {
     /// returned.  Otherwise `None` is returned and the entry waits.
     pub fn enqueue(&mut self, entry: QueueEntry) -> Option<ActiveMatch> {
         // Find the first queued player within ±200 rating.
-        let match_partner_idx = self.queue.iter().position(|q| {
-            (q.rating as i64 - entry.rating as i64).abs() <= 200
-        });
+        let match_partner_idx = self
+            .queue
+            .iter()
+            .position(|q| (q.rating as i64 - entry.rating as i64).abs() <= 200);
 
         if let Some(idx) = match_partner_idx {
             let partner = self.queue.remove(idx).expect("index was valid");

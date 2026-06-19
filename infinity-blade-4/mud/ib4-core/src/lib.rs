@@ -2,7 +2,7 @@
 //!
 //! Provides the core game domain types, player modeling, equipment, and enemy templates.
 
-pub mod types;
-pub mod player;
-pub mod equipment;
 pub mod enemy;
+pub mod equipment;
+pub mod player;
+pub mod types;

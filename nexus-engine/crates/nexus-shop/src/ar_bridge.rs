@@ -1,5 +1,5 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct KitBarcode {
@@ -70,12 +70,32 @@ impl ArBridgeRegistry {
         };
         registry.register_kit("HG-AERIAL-001", "XVX-016_Gundam-Aerial", KitTier::Hg, "WFM");
         registry.register_kit("RG-NU-001", "RX-93_Nu-Gundam", KitTier::Rg, "UC");
-        registry.register_kit("MG-WING-ZERO-001", "XXXG-00W0_Wing-Zero", KitTier::Mg, "WING");
+        registry.register_kit(
+            "MG-WING-ZERO-001",
+            "XXXG-00W0_Wing-Zero",
+            KitTier::Mg,
+            "WING",
+        );
         registry.register_kit("PG-UNICORN-001", "RX-0_Unicorn-Gundam", KitTier::Pg, "UC");
-        registry.register_kit("MG-FREEDOM-001", "ZGMF-X10A_Freedom-Gundam", KitTier::Mg, "SEED");
-        registry.register_kit("PG-FREEDOM-001", "ZGMF-X10A_Freedom-Gundam", KitTier::Pg, "SEED");
+        registry.register_kit(
+            "MG-FREEDOM-001",
+            "ZGMF-X10A_Freedom-Gundam",
+            KitTier::Mg,
+            "SEED",
+        );
+        registry.register_kit(
+            "PG-FREEDOM-001",
+            "ZGMF-X10A_Freedom-Gundam",
+            KitTier::Pg,
+            "SEED",
+        );
         registry.register_kit("RG-ZETA-001", "MSZ-006_Zeta-Gundam", KitTier::Rg, "UC");
-        registry.register_kit("MG-BARBATOS-001", "ASW-G-08_Barbatos-Lupus-Rex", KitTier::Mg, "IBO");
+        registry.register_kit(
+            "MG-BARBATOS-001",
+            "ASW-G-08_Barbatos-Lupus-Rex",
+            KitTier::Mg,
+            "IBO",
+        );
         registry
     }
 
@@ -92,7 +112,9 @@ impl ArBridgeRegistry {
         let nonce = self.generate_nonce(raw_barcode, player_id);
 
         if self.redeemed_nonces.contains(&nonce) {
-            return Err(ArError::AlreadyRedeemed { barcode: raw_barcode.to_string() });
+            return Err(ArError::AlreadyRedeemed {
+                barcode: raw_barcode.to_string(),
+            });
         }
 
         // Format: "GN-{tier}-{kit_id}"  e.g. "GN-HG-HG-AERIAL-001"
@@ -112,7 +134,9 @@ impl ArBridgeRegistry {
             _ => return Err(ArError::UnknownTier(tier_code.to_string())),
         };
 
-        let entry = self.kit_database.iter()
+        let entry = self
+            .kit_database
+            .iter()
             .find(|e| e.kit_id == kit_id && e.tier == tier)
             .ok_or_else(|| ArError::KitNotFound(kit_id.clone()))?;
 

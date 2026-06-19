@@ -1,5 +1,5 @@
-use rand::RngExt;
 use ib4_core::{enemy::EnemyInstance, types::AttackDir};
+use rand::RngExt;
 
 #[derive(Debug, Clone)]
 pub struct AiDecision {
@@ -23,7 +23,9 @@ pub struct TitanAI {
 
 impl TitanAI {
     pub fn new() -> Self {
-        Self { weapon_throw_cooldown: 0 }
+        Self {
+            weapon_throw_cooldown: 0,
+        }
     }
 
     pub fn decide(&mut self, enemy: &EnemyInstance, rng: &mut impl RngExt) -> AiDecision {
@@ -52,8 +54,14 @@ impl TitanAI {
 
         let text = match phase {
             1 => format!("The {} telegraphs a {} strike!", enemy.name, announced),
-            2 => format!("The ENRAGED {} lunges {} with terrifying speed!", enemy.name, announced),
-            3 => format!("The {} attacks {} — but something feels wrong...", enemy.name, announced),
+            2 => format!(
+                "The ENRAGED {} lunges {} with terrifying speed!",
+                enemy.name, announced
+            ),
+            3 => format!(
+                "The {} attacks {} — but something feels wrong...",
+                enemy.name, announced
+            ),
             _ => format!("The {} attacks {}!", enemy.name, announced),
         };
 

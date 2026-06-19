@@ -1,5 +1,5 @@
-use serde::{Serialize, Deserialize};
 use crate::types::{AttackDir, TitanType};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnemyInstance {
@@ -9,7 +9,7 @@ pub struct EnemyInstance {
     pub base_hp: f32,
     pub current_hp: f32,
     pub base_attack_damage: f32,
-    pub attack_damage: f32,   // modified by phase scaling
+    pub attack_damage: f32, // modified by phase scaling
     pub phase: u8,
     pub bloodline_required: i32,
     pub reward_xp: u64,

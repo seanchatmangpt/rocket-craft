@@ -11,7 +11,7 @@
 //! * **Consuming (`self`)** — used by the `blueprint_macros` proc-macro crate,
 //!   where the DSL expands to a method-chain that ends with `.to_t3d()`.
 
-use crate::ast::{BpNode, Blueprint, Pin};
+use crate::ast::{Blueprint, BpNode, Pin};
 use crate::nodes;
 use crate::serializer::{JsonSerializer, T3dSerializer};
 use crate::types::{NodePos, PinType};
@@ -259,7 +259,12 @@ impl BlueprintBuilder {
     // ------------------------------------------------------------------
 
     /// Add a Blueprint variable (mutable style).
-    pub fn add_variable_mut(&mut self, name: impl Into<std::string::String>, ty: VarType, default: Option<std::string::String>) -> &mut Self {
+    pub fn add_variable_mut(
+        &mut self,
+        name: impl Into<std::string::String>,
+        ty: VarType,
+        default: Option<std::string::String>,
+    ) -> &mut Self {
         use crate::ast::BpVariable;
         let mut var = BpVariable::new(name.into(), ty.to_pin_type());
         if let Some(d) = default {
@@ -376,69 +381,56 @@ impl BlueprintBuilder {
                 }
                 Statement::CallFunction { func, args } => {
                     let name = format!("CallFunction_{idx}");
-                    let mut node = BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_CallFunction",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property(
-                        "FunctionReference",
-                        &format!("(MemberName=\"{func}\")"),
-                    )
-                    .with_pin(Pin::exec_input("execute"))
-                    .with_pin(Pin::exec_output("then"));
+                    let mut node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("FunctionReference", format!("(MemberName=\"{func}\")"))
+                        .with_pin(Pin::exec_input("execute"))
+                        .with_pin(Pin::exec_output("then"));
                     for (i, arg) in args.iter().enumerate() {
-                        let mut p = Pin::data_input(&format!("Param{i}"), PinType::wildcard());
+                        let mut p = Pin::data_input(format!("Param{i}"), PinType::wildcard());
                         p.default_value = Some(arg.clone());
                         node = node.with_pin(p);
                     }
                     node
                 }
-                Statement::SetVar { name: var_name, value } => {
+                Statement::SetVar {
+                    name: var_name,
+                    value,
+                } => {
                     let name = format!("VariableSet_{idx}");
                     let mut val_pin = Pin::data_input("NewValue", PinType::wildcard());
                     val_pin.default_value = Some(value);
-                    BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_VariableSet",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property("VariableName", &format!("\"{var_name}\""))
-                    .with_pin(Pin::exec_input("execute"))
-                    .with_pin(Pin::exec_output("then"))
-                    .with_pin(val_pin)
+                    BpNode::new("/Script/BlueprintGraph.K2Node_VariableSet", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("VariableName", format!("\"{var_name}\""))
+                        .with_pin(Pin::exec_input("execute"))
+                        .with_pin(Pin::exec_output("then"))
+                        .with_pin(val_pin)
                 }
                 Statement::GetVar { name: var_name } => {
                     let name = format!("VariableGet_{idx}");
-                    BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_VariableGet",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property("VariableName", &format!("\"{var_name}\""))
-                    .with_pin(Pin::data_output("Value", PinType::wildcard()))
+                    BpNode::new("/Script/BlueprintGraph.K2Node_VariableGet", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("VariableName", format!("\"{var_name}\""))
+                        .with_pin(Pin::data_output("Value", PinType::wildcard()))
                 }
                 Statement::Branch { condition } => {
                     let name = format!("Branch_{idx}");
                     let mut cond_pin = Pin::data_input("Condition", PinType::bool());
                     cond_pin.default_value = Some(condition);
-                    nodes::branch_node(&name)
-                        .at(pos.x, pos.y)
+                    nodes::branch_node(&name).at(pos.x, pos.y)
                 }
                 Statement::ForLoop { var, start, end } => {
                     let name = format!("ForLoop_{idx}");
-                    BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_MacroInstance",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property("MacroGraphReference", "(MacroName=\"ForLoop\")")
-                    .with_property("LoopVar", &format!("\"{var}\""))
-                    .with_property("StartIndex", &start.to_string())
-                    .with_property("LastIndex", &(end - 1).to_string())
-                    .with_pin(Pin::exec_input("execute"))
-                    .with_pin(Pin::exec_output("LoopBody"))
-                    .with_pin(Pin::exec_output("Completed"))
+                    BpNode::new("/Script/BlueprintGraph.K2Node_MacroInstance", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("MacroGraphReference", "(MacroName=\"ForLoop\")")
+                        .with_property("LoopVar", format!("\"{var}\""))
+                        .with_property("StartIndex", start.to_string())
+                        .with_property("LastIndex", (end - 1).to_string())
+                        .with_pin(Pin::exec_input("execute"))
+                        .with_pin(Pin::exec_output("LoopBody"))
+                        .with_pin(Pin::exec_output("Completed"))
                 }
             };
             self.blueprint.event_graph().nodes.push(node);
@@ -701,14 +693,23 @@ impl BlueprintBuilder {
             )
             .with_pin(Pin::exec_input("execute"))
             .with_pin(Pin::exec_output("then"))
-            .with_pin(Pin::data_input("DamagedActor", PinType::object("/Script/Engine.Actor")))
+            .with_pin(Pin::data_input(
+                "DamagedActor",
+                PinType::object("/Script/Engine.Actor"),
+            ))
             .with_pin(Pin::data_input("BaseDamage", PinType::float()))
             .with_pin(Pin::data_input(
                 "EventInstigator",
                 PinType::object("/Script/Engine.Controller"),
             ))
-            .with_pin(Pin::data_input("DamageCauser", PinType::object("/Script/Engine.Actor")))
-            .with_pin(Pin::data_input("DamageTypeClass", PinType::class("/Script/Engine.DamageType")))
+            .with_pin(Pin::data_input(
+                "DamageCauser",
+                PinType::object("/Script/Engine.Actor"),
+            ))
+            .with_pin(Pin::data_input(
+                "DamageTypeClass",
+                PinType::class("/Script/Engine.DamageType"),
+            ))
             .with_pin(Pin::data_output("ReturnValue", PinType::float()));
         self.push_node(node)
     }
@@ -736,13 +737,19 @@ impl BlueprintBuilder {
     }
 
     /// Add a MacroInstance (generic macro call) node — mutable style.
-    pub fn macro_instance_node(&mut self, macro_name: impl Into<std::string::String>) -> NodeHandle {
+    pub fn macro_instance_node(
+        &mut self,
+        macro_name: impl Into<std::string::String>,
+    ) -> NodeHandle {
         let macro_name = macro_name.into();
         let name = self.unique_name(&format!("MacroInstance_{macro_name}"));
         let pos = self.next_pos();
         let node = BpNode::new("/Script/BlueprintGraph.K2Node_MacroInstance", &name)
             .at(pos.x, pos.y)
-            .with_property("MacroGraphReference", &format!("(MacroName=\"{macro_name}\")"))
+            .with_property(
+                "MacroGraphReference",
+                format!("(MacroName=\"{macro_name}\")"),
+            )
             .with_pin(Pin::exec_input("execute"))
             .with_pin(Pin::exec_output("then"));
         self.push_node(node)
@@ -792,7 +799,7 @@ impl BlueprintBuilder {
             .with_pin(Pin::exec_output("then"))
             .with_pin(
                 Pin::data_input("Time", PinType::float())
-                    .with_default(&rate.to_string()),
+                    .with_default(rate.to_string()),
             )
             .with_pin(
                 Pin::data_input("bLooping", PinType::bool())
@@ -818,7 +825,7 @@ impl BlueprintBuilder {
                     "NewLocation",
                     PinType::struct_type("/Script/CoreUObject.Vector"),
                 )
-                .with_default(&format!("(X={x},Y={y},Z={z})")),
+                .with_default(format!("(X={x},Y={y},Z={z})")),
             );
         self.push_node(node)
     }
@@ -839,12 +846,8 @@ impl BlueprintBuilder {
                 "WorldDirection",
                 PinType::struct_type("/Script/CoreUObject.Vector"),
             ))
-            .with_pin(
-                Pin::data_input("ScaleValue", PinType::float()).with_default("1.0"),
-            )
-            .with_pin(
-                Pin::data_input("bForce", PinType::bool()).with_default("false"),
-            );
+            .with_pin(Pin::data_input("ScaleValue", PinType::float()).with_default("1.0"))
+            .with_pin(Pin::data_input("bForce", PinType::bool()).with_default("false"));
         self.push_node(node)
     }
 
@@ -878,13 +881,7 @@ impl BlueprintBuilder {
     }
 
     /// Connect an arbitrary pin on `from` to an arbitrary pin on `to`.
-    pub fn connect(
-        &mut self,
-        from: &NodeHandle,
-        from_pin: &str,
-        to: &NodeHandle,
-        to_pin: &str,
-    ) {
+    pub fn connect(&mut self, from: &NodeHandle, from_pin: &str, to: &NodeHandle, to_pin: &str) {
         self.blueprint
             .event_graph()
             .connect(&from.name, from_pin, &to.name, to_pin);

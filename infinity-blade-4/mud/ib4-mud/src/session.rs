@@ -1,31 +1,23 @@
-use std::collections::VecDeque;
-use std::marker::PhantomData;
-use rand::{SeedableRng, RngExt};
-use rand::rngs::SmallRng;
-use serde::{Serialize, Deserialize};
-use ib4_core::{
-    player::PlayerState,
-    enemy::EnemyInstance,
-    types::{AttackDir, MagicType, Rarity, Stat},
-    equipment::weapon_catalog,
-};
-use ib4_combat::{
-    damage::calc_player_damage,
-    parry::{ParryResolver, ParryIntent, ParryOutcome},
-    magic::resolve_magic,
-};
-use ib4_ai::{
-    roster::spawn_enemy,
-    titan::TitanAI,
-    godking::GodKingAI,
-};
-use ib4_progression::{
-    xp::XPSystem,
-    bloodline::BloodlineSystem,
-    perks::PerkTree,
-};
 use crate::command::Command;
 use crate::narrative;
+use ib4_ai::{godking::GodKingAI, roster::spawn_enemy, titan::TitanAI};
+use ib4_combat::{
+    damage::calc_player_damage,
+    magic::resolve_magic,
+    parry::{ParryIntent, ParryOutcome, ParryResolver},
+};
+use ib4_core::{
+    enemy::EnemyInstance,
+    equipment::weapon_catalog,
+    player::PlayerState,
+    types::{AttackDir, MagicType, Rarity, Stat},
+};
+use ib4_progression::{bloodline::BloodlineSystem, perks::PerkTree, xp::XPSystem};
+use rand::rngs::SmallRng;
+use rand::{RngExt, SeedableRng};
+use serde::{Deserialize, Serialize};
+use std::collections::VecDeque;
+use std::marker::PhantomData;
 
 // ── Arena manager ─────────────────────────────────────────────────────────────
 
@@ -37,17 +29,33 @@ pub struct ArenaManager {
 }
 
 impl ArenaManager {
-    fn new(queue: VecDeque<String>) -> Self { ArenaManager { queue } }
-    fn next(&mut self) -> Option<String> { self.queue.pop_front() }
-    fn front(&self) -> Option<&str> { self.queue.front().map(|s| s.as_str()) }
-    pub fn is_empty(&self) -> bool { self.queue.is_empty() }
-    fn iter(&self) -> impl Iterator<Item = &String> { self.queue.iter() }
+    fn new(queue: VecDeque<String>) -> Self {
+        ArenaManager { queue }
+    }
+    fn next(&mut self) -> Option<String> {
+        self.queue.pop_front()
+    }
+    fn front(&self) -> Option<&str> {
+        self.queue.front().map(|s| s.as_str())
+    }
+    pub fn is_empty(&self) -> bool {
+        self.queue.is_empty()
+    }
+    fn iter(&self) -> impl Iterator<Item = &String> {
+        self.queue.iter()
+    }
     fn reset(&mut self, ids: &[&str]) {
         self.queue = ids.iter().map(|s| s.to_string()).collect();
     }
-    pub fn clear(&mut self) { self.queue.clear(); }
-    pub fn push_back(&mut self, item: String) { self.queue.push_back(item); }
-    pub fn len(&self) -> usize { self.queue.len() }
+    pub fn clear(&mut self) {
+        self.queue.clear();
+    }
+    pub fn push_back(&mut self, item: String) {
+        self.queue.push_back(item);
+    }
+    pub fn len(&self) -> usize {
+        self.queue.len()
+    }
 }
 
 // ── Typestate phase markers ────────────────────────────────────────────────────
@@ -66,12 +74,18 @@ pub struct TypedSession<Phase> {
 
 impl TypedSession<NotInCombat> {
     pub fn new(name: &str) -> Self {
-        TypedSession { inner: GameSession::new(name), _phase: PhantomData }
+        TypedSession {
+            inner: GameSession::new(name),
+            _phase: PhantomData,
+        }
     }
 
     pub fn enter_combat(mut self) -> TypedSession<InCombat> {
         let _ = self.inner.spawn_next_enemy();
-        TypedSession { inner: self.inner, _phase: PhantomData }
+        TypedSession {
+            inner: self.inner,
+            _phase: PhantomData,
+        }
     }
 }
 
@@ -83,7 +97,10 @@ impl TypedSession<InCombat> {
     pub fn flee(mut self) -> TypedSession<NotInCombat> {
         self.inner.in_combat = false;
         self.inner.current_enemy = None;
-        TypedSession { inner: self.inner, _phase: PhantomData }
+        TypedSession {
+            inner: self.inner,
+            _phase: PhantomData,
+        }
     }
 }
 
@@ -144,7 +161,9 @@ impl GameSession {
     }
 
     /// Returns `true` when an active combat encounter is in progress.
-    pub fn is_in_combat(&self) -> bool { self.in_combat }
+    pub fn is_in_combat(&self) -> bool {
+        self.in_combat
+    }
 
     pub fn from_json(json: &str) -> Result<Self, serde_json::Error> {
         let save: SaveData = serde_json::from_str(json)?;
@@ -198,7 +217,11 @@ impl GameSession {
     fn cmd_look(&mut self) -> Vec<String> {
         let mut lines = Vec::new();
         if let Some(enemy) = &self.current_enemy {
-            lines.push(format!("You face: {} [{}]", enemy.name, enemy.phase_label()));
+            lines.push(format!(
+                "You face: {} [{}]",
+                enemy.name,
+                enemy.phase_label()
+            ));
             lines.push(narrative::fmt_enemy_hp(
                 &enemy.name,
                 enemy.current_hp,
@@ -234,9 +257,7 @@ impl GameSession {
     fn spawn_next_enemy(&mut self) -> Vec<String> {
         let id = match self.arena.next() {
             Some(id) => id,
-            None => {
-                return vec!["No more enemies. You have conquered this bloodline!".to_string()]
-            }
+            None => return vec!["No more enemies. You have conquered this bloodline!".to_string()],
         };
 
         let enemy = match spawn_enemy(&id, self.player.bloodline) {
@@ -267,7 +288,11 @@ impl GameSession {
         // Enemy announces first attack
         let dir = self.random_dir();
         if let Some(e) = self.current_enemy.as_ref() {
-            lines.push(narrative::fmt_attack_announce(&e.name.clone(), &dir, e.phase));
+            lines.push(narrative::fmt_attack_announce(
+                &e.name.clone(),
+                &dir,
+                e.phase,
+            ));
         }
         self.announced_attack = Some(dir);
         lines
@@ -328,7 +353,10 @@ impl GameSession {
             .map(|e| e.shield_active)
             .unwrap_or(false);
         if shield_blocked {
-            lines.push("  \u{1f6e1}  Your blade sparks off Galath's hard-light shield. No damage!".to_string());
+            lines.push(
+                "  \u{1f6e1}  Your blade sparks off Galath's hard-light shield. No damage!"
+                    .to_string(),
+            );
             self.combo_depth = 0;
             self.combo_idle_turns = 0;
             let next_dir = self.random_dir();
@@ -493,8 +521,7 @@ impl GameSession {
         }
         self.announced_attack = None;
         self.combo_depth = 0;
-        let mut lines =
-            vec!["  You roll clear \u{2014} dodge successful! Combo lost.".to_string()];
+        let mut lines = vec!["  You roll clear \u{2014} dodge successful! Combo lost.".to_string()];
         self.announce_next_attack(&mut lines);
         lines
     }
@@ -540,11 +567,13 @@ impl GameSession {
                 self.player.health, self.player.max_health
             ));
         } else {
-            let shield_active = self.current_enemy.as_ref().map(|e| e.shield_active).unwrap_or(false);
+            let shield_active = self
+                .current_enemy
+                .as_ref()
+                .map(|e| e.shield_active)
+                .unwrap_or(false);
             if shield_active {
-                lines.push(
-                    "  \u{26a1} Magic sparks off the hard-light shield!".to_string(),
-                );
+                lines.push("  \u{26a1} Magic sparks off the hard-light shield!".to_string());
             } else if let Some(e) = self.current_enemy.as_mut() {
                 e.take_damage(damage);
                 lines.push(format!("  {} is {}!", e.name, effect_text));
@@ -556,7 +585,12 @@ impl GameSession {
                 ));
             }
             // check if dead — separate borrow
-            if self.current_enemy.as_ref().map(|e| !e.is_alive()).unwrap_or(false) {
+            if self
+                .current_enemy
+                .as_ref()
+                .map(|e| !e.is_alive())
+                .unwrap_or(false)
+            {
                 self.combo_depth = 0;
                 return self.handle_enemy_defeat(lines);
             }
@@ -667,16 +701,18 @@ impl GameSession {
         }
         let parsed: Stat = match stat.parse() {
             Ok(s) => s,
-            Err(_) => return vec![format!(
-                "Unknown stat '{}'. Use: health, attack, defense, magic",
-                stat
-            )],
+            Err(_) => {
+                return vec![format!(
+                    "Unknown stat '{}'. Use: health, attack, defense, magic",
+                    stat
+                )]
+            }
         };
         match parsed {
-            Stat::Health  => self.player.stat_health += 1,
-            Stat::Attack  => self.player.stat_attack += 1,
+            Stat::Health => self.player.stat_health += 1,
+            Stat::Attack => self.player.stat_attack += 1,
             Stat::Defense => self.player.stat_defense += 1,
-            Stat::Magic   => self.player.stat_magic += 1,
+            Stat::Magic => self.player.stat_magic += 1,
         }
         self.player.stat_points -= 1;
         self.player.recalculate_stats();
@@ -694,19 +730,9 @@ impl GameSession {
             ("SwiftStrikes", 1, None, "+1 combo turn"),
             ("MagicSensitivity", 1, None, "+15% MAG"),
             ("Scavenger", 1, None, "+20% Gold"),
-            (
-                "DeadlyPrecision",
-                2,
-                Some("BloodyResolve"),
-                "+5% Crit",
-            ),
+            ("DeadlyPrecision", 2, Some("BloodyResolve"), "+5% Crit"),
             ("FortressStance", 2, Some("IronHide"), "+15% MaxHP"),
-            (
-                "ComboMaster",
-                2,
-                Some("SwiftStrikes"),
-                "+1 combo + 5% ATK",
-            ),
+            ("ComboMaster", 2, Some("SwiftStrikes"), "+1 combo + 5% ATK"),
             (
                 "ArcaneChanneling",
                 2,
@@ -761,9 +787,7 @@ impl GameSession {
             } else {
                 "\u{25cb}"
             };
-            let prereq_str = prereq
-                .map(|p| format!(" [req: {}]", p))
-                .unwrap_or_default();
+            let prereq_str = prereq.map(|p| format!(" [req: {}]", p)).unwrap_or_default();
             lines.push(format!(
                 "  {} T{} {} \u{2014} {}{}",
                 status, tier, id, effect, prereq_str
@@ -774,9 +798,7 @@ impl GameSession {
 
     fn cmd_select_perk(&mut self, perk_id: &str) -> Vec<String> {
         if self.player.perk_points == 0 {
-            return vec![
-                "No perk points available. Die and rebirth to earn more.".to_string(),
-            ];
+            return vec!["No perk points available. Die and rebirth to earn more.".to_string()];
         }
         if self.player.selected_perks.contains(&perk_id.to_string()) {
             return vec![format!("{} already selected.", perk_id)];
@@ -929,12 +951,15 @@ impl GameSession {
         // XP with perk mult via ib4-progression::xp::XPSystem::add_xp
         let level_events = XPSystem::add_xp(&mut self.player, xp, agg.xp_mult);
         let xp_gained = (xp as f32 * agg.xp_mult).round() as u64;
-        let levelled: Vec<String> = level_events.iter().map(|e| {
-            format!(
-                "  \u{2b06}  LEVEL UP! Now Level {}. +{} stat points.",
-                e.new_level, e.stat_points_gained
-            )
-        }).collect();
+        let levelled: Vec<String> = level_events
+            .iter()
+            .map(|e| {
+                format!(
+                    "  \u{2b06}  LEVEL UP! Now Level {}. +{} stat points.",
+                    e.new_level, e.stat_points_gained
+                )
+            })
+            .collect();
 
         lines.push(format!("  \u{2694}  {} defeated!", name));
         lines.push(format!("  +{} XP | +{} gp", xp_gained, gold_gained));
@@ -956,9 +981,7 @@ impl GameSession {
         }
 
         if self.arena.is_empty() {
-            lines.push(
-                "  You have conquered this arena. The bloodline endures.".to_string(),
-            );
+            lines.push("  You have conquered this arena. The bloodline endures.".to_string());
         } else {
             lines.push(format!(
                 "  Next: {}. Type 'explore' to continue.",
@@ -989,7 +1012,8 @@ impl GameSession {
         self.titan_ai = TitanAI::new();
 
         // Rebuild arena queue for new bloodline
-        self.arena.reset(&["LightTitan", "HeavyTitan", "DarkKnight", "CorruptedGalath"]);
+        self.arena
+            .reset(&["LightTitan", "HeavyTitan", "DarkKnight", "CorruptedGalath"]);
 
         let hp_scale = BloodlineSystem::enemy_hp_scale(self.player.bloodline);
         let mut lines = vec![
@@ -1002,16 +1026,10 @@ impl GameSession {
             } else {
                 "  Three QIP Scars consumed your soul. Reborn.".to_string()
             },
-            format!(
-                "  Enemies grow stronger ({:.2}\u{d7} HP).",
-                hp_scale
-            ),
+            format!("  Enemies grow stronger ({:.2}\u{d7} HP).", hp_scale),
         ];
         if rebirth.perk_point_gained {
-            lines.push(format!(
-                "  +1 Perk Point! ({})",
-                self.player.perk_points
-            ));
+            lines.push(format!("  +1 Perk Point! ({})", self.player.perk_points));
         }
         for magic in &rebirth.newly_unlocked_magic {
             lines.push(format!("  \u{2728} New magic unlocked: {}", magic));
@@ -1036,7 +1054,11 @@ impl GameSession {
         }
         // Use ib4-ai::titan::TitanAI::decide for smarter AI decisions
         let decision = self.titan_ai.decide(&enemy, &mut self.rng);
-        lines.push(narrative::fmt_attack_announce(&enemy.name, &decision.announced_dir, enemy.phase));
+        lines.push(narrative::fmt_attack_announce(
+            &enemy.name,
+            &decision.announced_dir,
+            enemy.phase,
+        ));
         self.announced_attack = Some(decision.announced_dir);
     }
 
@@ -1261,10 +1283,12 @@ fn xp_to_next(player: &PlayerState) -> u64 {
 fn check_level_up(player: &mut PlayerState) -> Vec<String> {
     XPSystem::add_xp(player, 0, 1.0)
         .into_iter()
-        .map(|e| format!(
-            "  \u{2b06}  LEVEL UP! Now Level {}. +{} stat points.",
-            e.new_level, e.stat_points_gained
-        ))
+        .map(|e| {
+            format!(
+                "  \u{2b06}  LEVEL UP! Now Level {}. +{} stat points.",
+                e.new_level, e.stat_points_gained
+            )
+        })
         .collect()
 }
 

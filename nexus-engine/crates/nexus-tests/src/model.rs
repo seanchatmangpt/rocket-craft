@@ -25,7 +25,10 @@ pub fn oracle_xp_for_level(level: u32) -> u64 {
 /// Oracle: perk unlock bloodline requirement
 pub fn oracle_perk_available(perk_tier: u8, bloodline: u32) -> bool {
     match perk_tier {
-        1 => { let _ = bloodline; true }
+        1 => {
+            let _ = bloodline;
+            true
+        }
         2 => bloodline >= 5,
         3 => bloodline >= 10,
         _ => false,

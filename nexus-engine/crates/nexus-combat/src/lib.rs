@@ -25,5 +25,7 @@ pub mod parry;
 pub use combo::{ComboChain, StandardCombo, TransAmCombo};
 pub use damage::{calculate_damage, QipScarTracker};
 pub use events::CombatEvent;
-pub use machine::{CombatMachine, CombatMachineBuilder, CombatBuildError, CombatState, CombatTransitionError};
+pub use machine::{
+    CombatBuildError, CombatMachine, CombatMachineBuilder, CombatState, CombatTransitionError,
+};
 pub use parry::ParryResolver;

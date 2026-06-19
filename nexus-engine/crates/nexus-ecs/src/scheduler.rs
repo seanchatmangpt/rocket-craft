@@ -1,5 +1,5 @@
-use hecs::World;
 use crate::systems::*;
+use hecs::World;
 
 pub struct SystemScheduler {
     pub dt: f32,

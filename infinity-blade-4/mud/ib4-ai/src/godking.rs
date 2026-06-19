@@ -1,6 +1,6 @@
-use rand::{Rng, RngExt};
+use crate::titan::{random_dir, AiDecision, TitanAI};
 use ib4_core::{enemy::EnemyInstance, player::PlayerState};
-use crate::titan::{AiDecision, TitanAI, random_dir};
+use rand::{Rng, RngExt};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TimeDilationState {
@@ -80,7 +80,10 @@ impl GodKingAI {
             }
             if !self.reinforcements_spawned && self.turn_counter >= 6 {
                 self.reinforcements_spawned = true;
-                events.push(GodKingEvent::ReinforceSpawned(vec!["LightTitan", "ShadowTitan"]));
+                events.push(GodKingEvent::ReinforceSpawned(vec![
+                    "LightTitan",
+                    "ShadowTitan",
+                ]));
             }
         }
 
@@ -93,9 +96,15 @@ impl GodKingAI {
         };
 
         let galath_text = match enemy.phase {
-            1 => format!("Galath's hard-light shield blazes as he strikes {}!{}", dir, dilation_text),
+            1 => format!(
+                "Galath's hard-light shield blazes as he strikes {}!{}",
+                dir, dilation_text
+            ),
             2 => format!("Galath lunges with twin blades — {}!{}", dir, dilation_text),
-            3 => format!("GALATH FRACTURES REALITY — {} strike!{}", dir, dilation_text),
+            3 => format!(
+                "GALATH FRACTURES REALITY — {} strike!{}",
+                dir, dilation_text
+            ),
             _ => format!("Galath attacks {}!", dir),
         };
 

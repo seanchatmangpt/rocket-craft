@@ -1,8 +1,8 @@
 #![allow(unused_imports)]
 use ib4_combat::{
     combo::ComboTracker,
-    parry::{ParryResolver, ParryIntent, ParryOutcome},
-    damage::{calc_player_damage, calc_enemy_damage},
+    damage::{calc_enemy_damage, calc_player_damage},
+    parry::{ParryIntent, ParryOutcome, ParryResolver},
 };
 use ib4_core::types::AttackDir;
 

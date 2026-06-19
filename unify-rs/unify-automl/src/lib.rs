@@ -377,7 +377,6 @@ pub mod cli {
     }
 }
 
-
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. UNIT TESTS
 // ─────────────────────────────────────────────────────────────────────────────
@@ -385,9 +384,9 @@ pub mod cli {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use optimizer::{optimize_balance, simulate_battles, StatAllocation};
     use cli::dispatch_command;
     use discovery::extract_name_from_tag;
+    use optimizer::{optimize_balance, simulate_battles, StatAllocation};
 
     #[test]
     fn test_extract_name_from_tag() {

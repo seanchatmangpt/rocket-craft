@@ -13,6 +13,6 @@
 //! The AI subsystem receives state from the player and enemy instances defined in `ib4-core` and is driven
 //! by the turn resolution step inside `ib4-combat` to update action telemetries.
 
+pub mod godking;
 pub mod roster;
 pub mod titan;
-pub mod godking;

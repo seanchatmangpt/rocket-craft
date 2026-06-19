@@ -32,7 +32,6 @@ pub fn extract_unwitnessed_seeds(filepath: &str, content: &str) -> Vec<Observati
     obs
 }
 
-
 pub fn parse_refgraph_json(_fp: &str, _c: &str) -> Vec<Observation> {
     vec![]
 }

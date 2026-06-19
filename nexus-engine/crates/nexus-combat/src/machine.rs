@@ -171,7 +171,9 @@ pub enum CombatState {
 
 /// Errors returned when a state transition is invalid.
 #[derive(Debug, Clone, PartialEq, thiserror::Error)]
-#[error("Illegal combat transition: cannot transition from {current:?} to {target:?}. Reason: {reason}")]
+#[error(
+    "Illegal combat transition: cannot transition from {current:?} to {target:?}. Reason: {reason}"
+)]
 pub struct CombatTransitionError {
     pub current: CombatState,
     pub target: CombatState,
@@ -219,7 +221,10 @@ impl CombatMachine<Idle> {
 
     /// `Idle → PerfectParrying` — enters the directional parry window, announcing
     /// the expected incoming direction.
-    pub fn begin_perfect_parry(self, dir: AttackDir) -> (CombatMachine<PerfectParrying>, AttackDir) {
+    pub fn begin_perfect_parry(
+        self,
+        dir: AttackDir,
+    ) -> (CombatMachine<PerfectParrying>, AttackDir) {
         (
             CombatMachine {
                 hp: self.hp,
@@ -288,7 +293,11 @@ impl CombatMachine<Parrying> {
     /// - `Miss`:    full damage.
     ///
     /// HP is clamped to 0 (never negative).
-    pub fn resolve(self, outcome: ParryOutcome, incoming_damage: f32) -> (CombatMachine<Idle>, ParryOutcome) {
+    pub fn resolve(
+        self,
+        outcome: ParryOutcome,
+        incoming_damage: f32,
+    ) -> (CombatMachine<Idle>, ParryOutcome) {
         let new_hp = match outcome {
             ParryOutcome::Perfect => self.hp,
             ParryOutcome::Normal => self.hp - incoming_damage * 0.1,

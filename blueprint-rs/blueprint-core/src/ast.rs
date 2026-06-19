@@ -1,6 +1,6 @@
-use std::collections::HashMap;
+use crate::types::{NodePos, PinDirection, PinType, UeGuid};
 use serde::{Deserialize, Serialize};
-use crate::types::{UeGuid, PinType, PinDirection, NodePos};
+use std::collections::HashMap;
 
 pub type NodeProperties = HashMap<String, String>;
 
@@ -144,15 +144,27 @@ pub enum GraphType {
 
 impl BpGraph {
     pub fn event_graph() -> Self {
-        Self { name: "EventGraph".to_string(), graph_type: GraphType::EventGraph, nodes: Vec::new() }
+        Self {
+            name: "EventGraph".to_string(),
+            graph_type: GraphType::EventGraph,
+            nodes: Vec::new(),
+        }
     }
 
     pub fn function(name: impl Into<String>) -> Self {
-        Self { name: name.into(), graph_type: GraphType::Function, nodes: Vec::new() }
+        Self {
+            name: name.into(),
+            graph_type: GraphType::Function,
+            nodes: Vec::new(),
+        }
     }
 
     pub fn new(name: impl Into<String>) -> Self {
-        Self { name: name.into(), graph_type: GraphType::EventGraph, nodes: Vec::new() }
+        Self {
+            name: name.into(),
+            graph_type: GraphType::EventGraph,
+            nodes: Vec::new(),
+        }
     }
 
     pub fn add_node(&mut self, node: BpNode) -> usize {
@@ -163,12 +175,16 @@ impl BpGraph {
     /// Connect from_pin (output) on from_node to to_pin (input) on to_node
     pub fn connect(&mut self, from_node: &str, from_pin: &str, to_node: &str, to_pin: &str) {
         // Collect pin IDs first to avoid borrow issues
-        let to_pin_id = self.nodes.iter()
+        let to_pin_id = self
+            .nodes
+            .iter()
             .find(|n| n.name == to_node)
             .and_then(|n| n.find_pin(to_pin))
             .map(|p| p.id.clone());
 
-        let from_pin_id = self.nodes.iter()
+        let from_pin_id = self
+            .nodes
+            .iter()
             .find(|n| n.name == from_node)
             .and_then(|n| n.find_pin(from_pin))
             .map(|p| p.id.clone());
@@ -177,13 +193,19 @@ impl BpGraph {
             // Link from output pin → to node
             if let Some(n) = self.nodes.iter_mut().find(|n| n.name == from_node) {
                 if let Some(p) = n.find_pin_mut(from_pin) {
-                    p.linked_to.push(PinRef { node_name: to_node.to_string(), pin_id: tid });
+                    p.linked_to.push(PinRef {
+                        node_name: to_node.to_string(),
+                        pin_id: tid,
+                    });
                 }
             }
             // Link from input pin → from node (bidirectional)
             if let Some(n) = self.nodes.iter_mut().find(|n| n.name == to_node) {
                 if let Some(p) = n.find_pin_mut(to_pin) {
-                    p.linked_to.push(PinRef { node_name: from_node.to_string(), pin_id: fid });
+                    p.linked_to.push(PinRef {
+                        node_name: from_node.to_string(),
+                        pin_id: fid,
+                    });
                 }
             }
         }
@@ -220,24 +242,34 @@ pub enum ReplicationMode {
 impl BpVariable {
     pub fn new(name: impl Into<String>, var_type: PinType) -> Self {
         Self {
-            name: name.into(), var_type, default_value: None,
-            is_exposed: false, category: None, tooltip: None,
+            name: name.into(),
+            var_type,
+            default_value: None,
+            is_exposed: false,
+            category: None,
+            tooltip: None,
             replication: ReplicationMode::None,
         }
     }
 
-    pub fn exposed(mut self) -> Self { self.is_exposed = true; self }
+    pub fn exposed(mut self) -> Self {
+        self.is_exposed = true;
+        self
+    }
 
     pub fn in_category(mut self, cat: impl Into<String>) -> Self {
-        self.category = Some(cat.into()); self
+        self.category = Some(cat.into());
+        self
     }
 
     pub fn with_default(mut self, val: impl Into<String>) -> Self {
-        self.default_value = Some(val.into()); self
+        self.default_value = Some(val.into());
+        self
     }
 
     pub fn replicated(mut self) -> Self {
-        self.replication = ReplicationMode::Replicated; self
+        self.replication = ReplicationMode::Replicated;
+        self
     }
 }
 
@@ -268,7 +300,10 @@ impl Blueprint {
         if !self.graphs.iter().any(|g| g.name == "EventGraph") {
             self.graphs.push(BpGraph::event_graph());
         }
-        self.graphs.iter_mut().find(|g| g.name == "EventGraph").unwrap()
+        self.graphs
+            .iter_mut()
+            .find(|g| g.name == "EventGraph")
+            .unwrap()
     }
 
     pub fn function_graph(&mut self, name: impl Into<String>) -> &mut BpGraph {
@@ -279,7 +314,9 @@ impl Blueprint {
         self.graphs.iter_mut().find(|g| g.name == name).unwrap()
     }
 
-    pub fn add_variable(&mut self, var: BpVariable) { self.variables.push(var); }
+    pub fn add_variable(&mut self, var: BpVariable) {
+        self.variables.push(var);
+    }
 
     pub fn implement_interface(&mut self, interface: impl Into<String>) {
         self.interfaces.push(interface.into());
@@ -289,4 +326,3 @@ impl Blueprint {
         self.graphs.iter().flat_map(|g| g.nodes.iter())
     }
 }
-

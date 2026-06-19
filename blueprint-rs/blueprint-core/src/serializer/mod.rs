@@ -1,5 +1,5 @@
-pub mod t3d;
 pub mod json;
+pub mod t3d;
 
-pub use t3d::T3dSerializer;
 pub use json::JsonSerializer;
+pub use t3d::T3dSerializer;

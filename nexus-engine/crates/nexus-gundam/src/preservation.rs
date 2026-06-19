@@ -1,8 +1,8 @@
-use std::collections::HashMap;
-use std::sync::RwLock;
+use crate::generated_gundam::{OntologyName, PreservationDomainCategory};
 use anyhow::{anyhow, Result};
 use sha2::{Digest, Sha256};
-use crate::generated_gundam::{PreservationDomainCategory, OntologyName};
+use std::collections::HashMap;
+use std::sync::RwLock;
 
 #[derive(Debug, Clone)]
 pub struct PreservationArtifact<Dom: PreservationDomainCategory> {
@@ -16,9 +16,18 @@ pub struct PreservationArtifact<Dom: PreservationDomainCategory> {
 }
 
 pub trait PreservationLayer {
-    fn preserve_artifact<Dom: PreservationDomainCategory + OntologyName>(&self, artifact: PreservationArtifact<Dom>) -> Result<String>;
-    fn retrieve_artifact<Dom: PreservationDomainCategory + OntologyName + Default>(&self, id: &str) -> Result<PreservationArtifact<Dom>>;
-    fn list_artifacts_by_domain<Dom: PreservationDomainCategory + OntologyName + Default>(&self, domain: Dom) -> Result<Vec<PreservationArtifact<Dom>>>;
+    fn preserve_artifact<Dom: PreservationDomainCategory + OntologyName>(
+        &self,
+        artifact: PreservationArtifact<Dom>,
+    ) -> Result<String>;
+    fn retrieve_artifact<Dom: PreservationDomainCategory + OntologyName + Default>(
+        &self,
+        id: &str,
+    ) -> Result<PreservationArtifact<Dom>>;
+    fn list_artifacts_by_domain<Dom: PreservationDomainCategory + OntologyName + Default>(
+        &self,
+        domain: Dom,
+    ) -> Result<Vec<PreservationArtifact<Dom>>>;
     fn verify_integrity(&self, id: &str) -> Result<bool>;
 }
 
@@ -48,7 +57,10 @@ impl GundamPreservationManager {
 }
 
 impl PreservationLayer for GundamPreservationManager {
-    fn preserve_artifact<Dom: PreservationDomainCategory + OntologyName>(&self, mut artifact: PreservationArtifact<Dom>) -> Result<String> {
+    fn preserve_artifact<Dom: PreservationDomainCategory + OntologyName>(
+        &self,
+        mut artifact: PreservationArtifact<Dom>,
+    ) -> Result<String> {
         let mut hasher = Sha256::new();
         hasher.update(&artifact.assets_blob);
         let calculated_hash = format!("{:x}", hasher.finalize());
@@ -66,19 +78,34 @@ impl PreservationLayer for GundamPreservationManager {
             hash: calculated_hash.clone(),
         };
 
-        let mut write_guard = self.registry.write().map_err(|e| anyhow!("Failed to acquire write lock: {}", e))?;
+        let mut write_guard = self
+            .registry
+            .write()
+            .map_err(|e| anyhow!("Failed to acquire write lock: {}", e))?;
         write_guard.insert(stored.id.clone(), stored);
 
         Ok(calculated_hash)
     }
 
-    fn retrieve_artifact<Dom: PreservationDomainCategory + OntologyName + Default>(&self, id: &str) -> Result<PreservationArtifact<Dom>> {
-        let read_guard = self.registry.read().map_err(|e| anyhow!("Failed to acquire read lock: {}", e))?;
-        let stored = read_guard.get(id).ok_or_else(|| anyhow!("Artifact not found: {}", id))?;
+    fn retrieve_artifact<Dom: PreservationDomainCategory + OntologyName + Default>(
+        &self,
+        id: &str,
+    ) -> Result<PreservationArtifact<Dom>> {
+        let read_guard = self
+            .registry
+            .read()
+            .map_err(|e| anyhow!("Failed to acquire read lock: {}", e))?;
+        let stored = read_guard
+            .get(id)
+            .ok_or_else(|| anyhow!("Artifact not found: {}", id))?;
 
         let expected_domain = Dom::ontology_name();
         if stored.domain != expected_domain {
-            return Err(anyhow!("Domain mismatch: expected {}, found {}", expected_domain, stored.domain));
+            return Err(anyhow!(
+                "Domain mismatch: expected {}, found {}",
+                expected_domain,
+                stored.domain
+            ));
         }
 
         Ok(PreservationArtifact {
@@ -92,8 +119,14 @@ impl PreservationLayer for GundamPreservationManager {
         })
     }
 
-    fn list_artifacts_by_domain<Dom: PreservationDomainCategory + OntologyName + Default>(&self, _domain: Dom) -> Result<Vec<PreservationArtifact<Dom>>> {
-        let read_guard = self.registry.read().map_err(|e| anyhow!("Failed to acquire read lock: {}", e))?;
+    fn list_artifacts_by_domain<Dom: PreservationDomainCategory + OntologyName + Default>(
+        &self,
+        _domain: Dom,
+    ) -> Result<Vec<PreservationArtifact<Dom>>> {
+        let read_guard = self
+            .registry
+            .read()
+            .map_err(|e| anyhow!("Failed to acquire read lock: {}", e))?;
         let expected_domain = Dom::ontology_name();
         let filtered = read_guard
             .values()
@@ -112,8 +145,13 @@ impl PreservationLayer for GundamPreservationManager {
     }
 
     fn verify_integrity(&self, id: &str) -> Result<bool> {
-        let read_guard = self.registry.read().map_err(|e| anyhow!("Failed to acquire read lock: {}", e))?;
-        let stored = read_guard.get(id).ok_or_else(|| anyhow!("Artifact not found: {}", id))?;
+        let read_guard = self
+            .registry
+            .read()
+            .map_err(|e| anyhow!("Failed to acquire read lock: {}", e))?;
+        let stored = read_guard
+            .get(id)
+            .ok_or_else(|| anyhow!("Artifact not found: {}", id))?;
 
         let mut hasher = Sha256::new();
         hasher.update(&stored.assets_blob);

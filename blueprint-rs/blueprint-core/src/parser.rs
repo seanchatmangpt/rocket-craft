@@ -95,16 +95,19 @@ static HANDLER_REGISTRY: OnceLock<HashMap<&'static str, NodeHandler>> = OnceLock
 fn handler_registry() -> &'static HashMap<&'static str, NodeHandler> {
     HANDLER_REGISTRY.get_or_init(|| {
         let mut m: HashMap<&'static str, NodeHandler> = HashMap::new();
-        m.insert("K2Node_Event",         handle_event);
-        m.insert("K2Node_CustomEvent",   handle_custom_event);
-        m.insert("K2Node_CallFunction",  handle_call_function);
-        m.insert("K2Node_CommutativeAssociativeBinaryOperator", handle_commutative_binary_operator);
-        m.insert("K2Node_IfThenElse",    handle_if_then_else);
-        m.insert("K2Node_VariableGet",   handle_variable_get);
-        m.insert("K2Node_VariableSet",   handle_variable_set);
+        m.insert("K2Node_Event", handle_event);
+        m.insert("K2Node_CustomEvent", handle_custom_event);
+        m.insert("K2Node_CallFunction", handle_call_function);
+        m.insert(
+            "K2Node_CommutativeAssociativeBinaryOperator",
+            handle_commutative_binary_operator,
+        );
+        m.insert("K2Node_IfThenElse", handle_if_then_else);
+        m.insert("K2Node_VariableGet", handle_variable_get);
+        m.insert("K2Node_VariableSet", handle_variable_set);
         m.insert("K2Node_MacroInstance", handle_macro_instance);
-        m.insert("K2Node_Select",        handle_select);
-        m.insert("K2Node_ForEachLoop",   handle_for_each_loop);
+        m.insert("K2Node_Select", handle_select);
+        m.insert("K2Node_ForEachLoop", handle_for_each_loop);
         m
     })
 }
@@ -120,11 +123,16 @@ fn handle_event(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
         } else if ev_ref.contains("ReceiveHit") {
             Ok(format!("let {var_name} = builder.on_hit_node();\n"))
         } else if ev_ref.contains("ReceiveActorBeginOverlap") {
-            Ok(format!("let {var_name} = builder.on_overlap_begin_node();\n"))
+            Ok(format!(
+                "let {var_name} = builder.on_overlap_begin_node();\n"
+            ))
         } else if ev_ref.contains("ReceiveActorEndOverlap") {
             Ok(format!("let {var_name} = builder.on_overlap_end_node();\n"))
         } else {
-            Err(ParseError { line: 0, message: format!("Unsupported K2Node_Event: {}", ev_ref) })
+            Err(ParseError {
+                line: 0,
+                message: format!("Unsupported K2Node_Event: {}", ev_ref),
+            })
         }
     } else {
         Ok(format!("let {var_name} = builder.begin_play_node();\n"))
@@ -132,30 +140,49 @@ fn handle_event(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
 }
 
 fn handle_custom_event(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
-    let ev_name = node.properties.get("CustomFunctionName")
+    let ev_name = node
+        .properties
+        .get("CustomFunctionName")
         .map(|s| s.trim_matches('"').to_string())
         .unwrap_or_else(|| "MyEvent".to_string());
-    Ok(format!("let {var_name} = builder.custom_event_node(\"{ev_name}\");\n"))
+    Ok(format!(
+        "let {var_name} = builder.custom_event_node(\"{ev_name}\");\n"
+    ))
 }
 
 fn handle_call_function(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
-    let fn_ref = node.properties.get("FunctionReference")
+    let fn_ref = node
+        .properties
+        .get("FunctionReference")
         .ok_or_else(|| ParseError {
             line: 0,
-            message: format!("K2Node_CallFunction '{}' has no FunctionReference property", node.name),
+            message: format!(
+                "K2Node_CallFunction '{}' has no FunctionReference property",
+                node.name
+            ),
         })?;
     if fn_ref.contains("PrintString") {
-        let default_str = node.pins.iter()
+        let default_str = node
+            .pins
+            .iter()
             .find(|p| p.name == "InString")
             .and_then(|p| p.default_value.as_deref())
             .unwrap_or("Hello!");
-        Ok(format!("let {var_name} = builder.print_string(\"{default_str}\");\n"))
+        Ok(format!(
+            "let {var_name} = builder.print_string(\"{default_str}\");\n"
+        ))
     } else if fn_ref.contains("SetActorLocation") || fn_ref.contains("K2_SetActorLocation") {
-        Ok(format!("let {var_name} = builder.set_actor_location_node();\n"))
+        Ok(format!(
+            "let {var_name} = builder.set_actor_location_node();\n"
+        ))
     } else if fn_ref.contains("GetActorLocation") || fn_ref.contains("K2_GetActorLocation") {
-        Ok(format!("let {var_name} = builder.get_actor_location_node();\n"))
+        Ok(format!(
+            "let {var_name} = builder.get_actor_location_node();\n"
+        ))
     } else if fn_ref.contains("SetActorRotation") || fn_ref.contains("K2_SetActorRotation") {
-        Ok(format!("let {var_name} = builder.set_actor_rotation_node();\n"))
+        Ok(format!(
+            "let {var_name} = builder.set_actor_rotation_node();\n"
+        ))
     } else if fn_ref.contains("SpawnActor") || fn_ref.contains("BeginSpawningActorFromClass") {
         Ok(format!("let {var_name} = builder.spawn_actor_node();\n"))
     } else if fn_ref.contains("DestroyActor") || fn_ref.contains("K2_DestroyActor") {
@@ -171,7 +198,10 @@ fn handle_call_function(node: &BpNode, var_name: &str) -> Result<String, ParseEr
     } else {
         Err(ParseError {
             line: 0,
-            message: format!("Unsupported K2Node_CallFunction FunctionReference: {}", fn_ref),
+            message: format!(
+                "Unsupported K2Node_CallFunction FunctionReference: {}",
+                fn_ref
+            ),
         })
     }
 }
@@ -187,7 +217,10 @@ fn handle_commutative_binary_operator(node: &BpNode, var_name: &str) -> Result<S
     } else {
         Err(ParseError {
             line: 0,
-            message: format!("Unsupported K2Node_CommutativeAssociativeBinaryOperator FunctionReference: {}", fn_ref),
+            message: format!(
+                "Unsupported K2Node_CommutativeAssociativeBinaryOperator FunctionReference: {}",
+                fn_ref
+            ),
         })
     }
 }
@@ -197,7 +230,8 @@ fn handle_if_then_else(_node: &BpNode, var_name: &str) -> Result<String, ParseEr
 }
 
 fn extract_var_name_prop(node: &BpNode) -> String {
-    node.properties.get("VariableName")
+    node.properties
+        .get("VariableName")
         .or_else(|| node.properties.get("VariableReference"))
         .map(|s| {
             let s = s.trim();
@@ -213,23 +247,31 @@ fn extract_var_name_prop(node: &BpNode) -> String {
 
 fn handle_variable_get(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
     let prop = extract_var_name_prop(node);
-    Ok(format!("let {var_name} = builder.variable_get_node(\"{prop}\");\n"))
+    Ok(format!(
+        "let {var_name} = builder.variable_get_node(\"{prop}\");\n"
+    ))
 }
 
 fn handle_variable_set(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
     let prop = extract_var_name_prop(node);
-    Ok(format!("let {var_name} = builder.variable_set_node(\"{prop}\");\n"))
+    Ok(format!(
+        "let {var_name} = builder.variable_set_node(\"{prop}\");\n"
+    ))
 }
 
 fn handle_macro_instance(node: &BpNode, var_name: &str) -> Result<String, ParseError> {
-    let macro_name = node.properties.get("MacroGraphReference")
+    let macro_name = node
+        .properties
+        .get("MacroGraphReference")
         .and_then(|s| {
             let pos = s.find("MacroName=\"")?;
             let after = &s[pos + 11..];
             Some(after.split('"').next().unwrap_or("Macro").to_string())
         })
         .unwrap_or_else(|| node.name.clone());
-    Ok(format!("let {var_name} = builder.macro_instance_node(\"{macro_name}\");\n"))
+    Ok(format!(
+        "let {var_name} = builder.macro_instance_node(\"{macro_name}\");\n"
+    ))
 }
 
 fn handle_select(_node: &BpNode, var_name: &str) -> Result<String, ParseError> {
@@ -253,7 +295,11 @@ fn handle_for_each_loop(_node: &BpNode, var_name: &str) -> Result<String, ParseE
 ///
 /// Returns an error if a node class or event/function reference is not
 /// recognised and cannot be mapped to a [`crate::builder::BlueprintBuilder`] call.
-pub fn generate_rust_code(nodes: &[BpNode], bp_name: &str, parent: &str) -> Result<String, ParseError> {
+pub fn generate_rust_code(
+    nodes: &[BpNode],
+    bp_name: &str,
+    parent: &str,
+) -> Result<String, ParseError> {
     let mut out = String::new();
     out.push_str(&format!(
         "let mut builder = BlueprintBuilder::new(\"{}\", \"{}\");\n",
@@ -265,7 +311,7 @@ pub fn generate_rust_code(nodes: &[BpNode], bp_name: &str, parent: &str) -> Resu
 
     for (i, node) in nodes.iter().enumerate() {
         let var_name = format!("node_{i}");
-        let short_class = node.class.split('.').last().unwrap_or(&node.class);
+        let short_class = node.class.split('.').next_back().unwrap_or(&node.class);
 
         let code = registry
             .get(short_class)
@@ -283,17 +329,13 @@ pub fn generate_rust_code(nodes: &[BpNode], bp_name: &str, parent: &str) -> Resu
     out.push_str("\n// Connections:\n");
     for node in nodes {
         for pin in &node.pins {
-            if pin.direction == PinDirection::Output
-                && pin.pin_type.category == PinCategory::Exec
-            {
+            if pin.direction == PinDirection::Output && pin.pin_type.category == PinCategory::Exec {
                 for link in &pin.linked_to {
                     if let (Some(from_var), Some(to_var)) = (
                         node_vars.get(node.name.as_str()),
                         node_vars.get(link.node_name.as_str()),
                     ) {
-                        out.push_str(&format!(
-                            "builder.exec_connect(&{from_var}, &{to_var});\n"
-                        ));
+                        out.push_str(&format!("builder.exec_connect(&{from_var}, &{to_var});\n"));
                     }
                 }
             }
@@ -331,7 +373,7 @@ where
 
     let mut node = BpNode::new(class, name);
 
-    while let Some((line_num, line)) = lines.next() {
+    for (line_num, line) in lines.by_ref() {
         let trimmed = line.trim();
 
         if trimmed == "End Object" {
@@ -386,7 +428,7 @@ fn parse_pin_line(line: &str, line_num: usize) -> Result<Option<Pin>, ParseError
     let pin_id = attrs
         .get("PinId")
         .map(|s| UeGuid(s.trim_matches('"').to_string()))
-        .unwrap_or_else(UeGuid::new);
+        .unwrap_or_default();
 
     let pin_name = attrs
         .get("PinName")
@@ -413,21 +455,16 @@ fn parse_pin_line(line: &str, line_num: usize) -> Result<Option<Pin>, ParseError
         .unwrap_or("exec");
     let category = parse_pin_category(category_str);
 
-    let sub_category_object = attrs
-        .get("PinType.PinSubCategoryObject")
-        .and_then(|s| {
-            let trimmed = s.trim();
-            if trimmed == "None" {
-                None
-            } else {
-                Some(trimmed.to_string())
-            }
-        });
+    let sub_category_object = attrs.get("PinType.PinSubCategoryObject").and_then(|s| {
+        let trimmed = s.trim();
+        if trimmed == "None" {
+            None
+        } else {
+            Some(trimmed.to_string())
+        }
+    });
 
-    let container = match attrs
-        .get("PinType.ContainerType")
-        .map(|s| s.trim())
-    {
+    let container = match attrs.get("PinType.ContainerType").map(|s| s.trim()) {
         Some("Array") => ContainerType::Array,
         Some("Set") => ContainerType::Set,
         Some("Map") => ContainerType::Map,
@@ -447,10 +484,7 @@ fn parse_pin_line(line: &str, line_num: usize) -> Result<Option<Pin>, ParseError
         .get("DefaultValue")
         .map(|s| s.trim_matches('"').to_string());
 
-    let is_hidden = attrs
-        .get("bHidden")
-        .map(|s| s == "True")
-        .unwrap_or(false);
+    let is_hidden = attrs.get("bHidden").map(|s| s == "True").unwrap_or(false);
     let is_not_connectable = attrs
         .get("bNotConnectable")
         .map(|s| s == "True")
@@ -637,9 +671,7 @@ fn extract_attr(s: &str, key: &str) -> Option<String> {
     let pos = s.find(key)?;
     let after = &s[pos + key.len()..];
     // Values end at space (before the next attribute)
-    let end = after
-        .find(|c: char| c == ' ')
-        .unwrap_or(after.len());
+    let end = after.find(' ').unwrap_or(after.len());
     let raw = after[..end].trim_matches('"');
     if raw.is_empty() {
         None
@@ -682,17 +714,14 @@ mod tests {
         // Build a graph via the serialiser so the test data stays in sync.
         let mut graph = BpGraph::new("EventGraph");
 
-        let event_node = BpNode::new(
-            "/Script/BlueprintGraph.K2Node_Event",
-            "K2Node_Event_0",
-        )
-        .at(64, -16)
-        .with_property(
-            "EventReference",
-            "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"ReceiveBeginPlay\")",
-        )
-        .with_property("bOverrideFunction", "True")
-        .with_pin(Pin::exec_output("then"));
+        let event_node = BpNode::new("/Script/BlueprintGraph.K2Node_Event", "K2Node_Event_0")
+            .at(64, -16)
+            .with_property(
+                "EventReference",
+                "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"ReceiveBeginPlay\")",
+            )
+            .with_property("bOverrideFunction", "True")
+            .with_pin(Pin::exec_output("then"));
 
         let mut in_str = Pin::data_input("InString", PinType::string());
         in_str.default_value = Some("Hello!".to_string());
@@ -769,9 +798,14 @@ mod tests {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
         let ev = &nodes[0];
-        let ev_ref = ev.properties.get("EventReference")
+        let ev_ref = ev
+            .properties
+            .get("EventReference")
             .expect("EventReference property should be present");
-        assert!(ev_ref.contains("ReceiveBeginPlay"), "EventReference should contain ReceiveBeginPlay");
+        assert!(
+            ev_ref.contains("ReceiveBeginPlay"),
+            "EventReference should contain ReceiveBeginPlay"
+        );
     }
 
     #[test]
@@ -779,9 +813,14 @@ mod tests {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
         let call = &nodes[1];
-        let fn_ref = call.properties.get("FunctionReference")
+        let fn_ref = call
+            .properties
+            .get("FunctionReference")
             .expect("FunctionReference should be present");
-        assert!(fn_ref.contains("PrintString"), "FunctionReference should contain PrintString");
+        assert!(
+            fn_ref.contains("PrintString"),
+            "FunctionReference should contain PrintString"
+        );
     }
 
     #[test]
@@ -799,7 +838,9 @@ mod tests {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
         let call = &nodes[1];
-        let exec_pin = call.find_pin("execute").expect("'execute' pin should be present");
+        let exec_pin = call
+            .find_pin("execute")
+            .expect("'execute' pin should be present");
         assert_eq!(exec_pin.direction, PinDirection::Input);
         assert_eq!(exec_pin.pin_type.category, PinCategory::Exec);
     }
@@ -809,7 +850,9 @@ mod tests {
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
         let call = &nodes[1];
-        let in_str = call.find_pin("InString").expect("'InString' pin should be present");
+        let in_str = call
+            .find_pin("InString")
+            .expect("'InString' pin should be present");
         assert_eq!(
             in_str.default_value.as_deref(),
             Some("Hello!"),
@@ -826,12 +869,9 @@ mod tests {
         // Build a connected graph so we get real LinkedTo in the T3D.
         let mut graph = BpGraph::new("EventGraph");
 
-        let event_node = BpNode::new(
-            "/Script/BlueprintGraph.K2Node_Event",
-            "K2Node_Event_0",
-        )
-        .at(0, 0)
-        .with_pin(Pin::exec_output("then"));
+        let event_node = BpNode::new("/Script/BlueprintGraph.K2Node_Event", "K2Node_Event_0")
+            .at(0, 0)
+            .with_pin(Pin::exec_output("then"));
 
         let call_node = BpNode::new(
             "/Script/BlueprintGraph.K2Node_CallFunction",
@@ -856,8 +896,7 @@ mod tests {
             "then pin should have a LinkedTo entry"
         );
         assert_eq!(
-            then_pin.linked_to[0].node_name,
-            "K2Node_CallFunction_0",
+            then_pin.linked_to[0].node_name, "K2Node_CallFunction_0",
             "LinkedTo should reference K2Node_CallFunction_0"
         );
     }
@@ -866,12 +905,9 @@ mod tests {
     fn parse_bidirectional_links() {
         let mut graph = BpGraph::new("EventGraph");
 
-        let event_node = BpNode::new(
-            "/Script/BlueprintGraph.K2Node_Event",
-            "K2Node_Event_0",
-        )
-        .at(0, 0)
-        .with_pin(Pin::exec_output("then"));
+        let event_node = BpNode::new("/Script/BlueprintGraph.K2Node_Event", "K2Node_Event_0")
+            .at(0, 0)
+            .with_pin(Pin::exec_output("then"));
 
         let call_node = BpNode::new(
             "/Script/BlueprintGraph.K2Node_CallFunction",
@@ -988,7 +1024,10 @@ End Object
         let t3d = two_node_t3d();
         let nodes = parse_t3d(&t3d).unwrap();
         let code = generate_rust_code(&nodes, "TestBP", "Pawn").unwrap();
-        assert!(code.contains("to_t3d()"), "generated code should end with to_t3d()");
+        assert!(
+            code.contains("to_t3d()"),
+            "generated code should end with to_t3d()"
+        );
     }
 
     #[test]
@@ -1011,8 +1050,16 @@ End Object
         let nodes = parse_t3d(&t3d).unwrap();
         let code = generate_rust_code(&nodes, "MathBP", "Actor").unwrap();
 
-        assert!(code.contains("add_int()"), "should emit add_int() for Add_IntInt: {}", code);
-        assert!(code.contains("subtract_int()"), "should emit subtract_int() for Subtract_IntInt: {}", code);
+        assert!(
+            code.contains("add_int()"),
+            "should emit add_int() for Add_IntInt: {}",
+            code
+        );
+        assert!(
+            code.contains("subtract_int()"),
+            "should emit subtract_int() for Subtract_IntInt: {}",
+            code
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -1043,7 +1090,8 @@ End Object
     #[test]
     fn pin_attrs_nested_parens() {
         // LinkedTo=(NodeName GUID,) contains a comma inside parens — must not split.
-        let attrs = parse_pin_attrs("PinId=AABB,LinkedTo=(K2Node_CallFunction_0 CCDD,),bHidden=False");
+        let attrs =
+            parse_pin_attrs("PinId=AABB,LinkedTo=(K2Node_CallFunction_0 CCDD,),bHidden=False");
         let lt = attrs.get("LinkedTo").expect("LinkedTo should be present");
         assert!(lt.contains("K2Node_CallFunction_0"), "LinkedTo value: {lt}");
         assert_eq!(attrs.get("bHidden").map(|s| s.as_str()), Some("False"));
@@ -1056,6 +1104,9 @@ End Object
         assert!(attrs.contains_key("PinId"));
         assert!(attrs.contains_key("PinName"));
         // The trailing comma produces an empty key which should not be inserted.
-        assert!(!attrs.contains_key(""), "empty key from trailing comma should not be inserted");
+        assert!(
+            !attrs.contains_key(""),
+            "empty key from trailing comma should not be inserted"
+        );
     }
 }

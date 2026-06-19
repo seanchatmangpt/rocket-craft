@@ -1,5 +1,5 @@
-use ib4_core::types::{AttackDir, MagicType, StatusEffect};
 use crate::parry::ParryOutcome;
+use ib4_core::types::{AttackDir, MagicType, StatusEffect};
 
 #[derive(Debug, Clone)]
 pub enum CombatEvent {
