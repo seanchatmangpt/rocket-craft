@@ -153,3 +153,63 @@ impl std::fmt::Display for WorkerError {
 }
 
 impl std::error::Error for WorkerError {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── WasmWorker typestate transitions (native target) ──────────────────────
+
+    #[test]
+    fn new_creates_uninitialized_worker() {
+        let w = WasmWorker::<Uninitialized>::new("worker.js", 1);
+        assert_eq!(w.script_url, "worker.js");
+        assert_eq!(w.worker_id, 1);
+    }
+
+    #[test]
+    fn start_transitions_to_running() {
+        let w = WasmWorker::<Uninitialized>::new("worker.js", 7)
+            .start()
+            .expect("start must succeed on native target");
+        assert_eq!(w.worker_id(), 7);
+        assert_eq!(w.script_url(), "worker.js");
+    }
+
+    #[test]
+    fn running_pause_resume_roundtrip() {
+        let running = WasmWorker::<Uninitialized>::new("w.js", 2).start().unwrap();
+        let paused = running.pause();
+        let resumed = paused.resume();
+        assert_eq!(resumed.worker_id(), 2);
+    }
+
+    #[test]
+    fn running_terminate_is_terminated() {
+        let running = WasmWorker::<Uninitialized>::new("w.js", 3).start().unwrap();
+        let terminated = running.terminate();
+        assert!(terminated.is_terminated());
+    }
+
+    #[test]
+    fn paused_terminate_is_terminated() {
+        let running = WasmWorker::<Uninitialized>::new("w.js", 4).start().unwrap();
+        let terminated = running.pause().terminate();
+        assert!(terminated.is_terminated());
+    }
+
+    // ── WorkerError display ───────────────────────────────────────────────────
+
+    #[test]
+    fn worker_error_creation_failed_display() {
+        let e = WorkerError::CreationFailed("no DOM".into());
+        assert!(e.to_string().contains("Failed to create worker"));
+        assert!(e.to_string().contains("no DOM"));
+    }
+
+    #[test]
+    fn worker_error_send_failed_display() {
+        let e = WorkerError::SendFailed("channel closed".into());
+        assert!(e.to_string().contains("send failed"));
+    }
+}
