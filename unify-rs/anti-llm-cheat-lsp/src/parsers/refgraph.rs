@@ -110,3 +110,107 @@ pub fn detect_transitive_failset(all_obs: &[Observation]) -> Vec<Observation> {
 
     new_obs
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn ref_obs(caller: &str, callee: &str) -> Observation {
+        Observation {
+            file_path: "refgraph".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "fn_reference".into(),
+            construct: caller.into(),
+            context: format!("{} -> {}", caller, callee),
+            message: String::new(),
+        }
+    }
+
+    fn seed_obs(name: &str) -> Observation {
+        Observation {
+            file_path: "src/lib.rs".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "unwitnessed_seed".into(),
+            construct: name.into(), context: String::new(), message: String::new(),
+        }
+    }
+
+    // ── extract_unwitnessed_seeds ─────────────────────────────────────────────
+
+    #[test]
+    fn extracts_single_unwitnessed_annotation() {
+        let content = "// @unwitnessed: compute_score\nfn compute_score() {}";
+        let obs = extract_unwitnessed_seeds("src/lib.rs", content);
+        assert_eq!(obs.len(), 1);
+        assert_eq!(obs[0].construct, "compute_score");
+        assert_eq!(obs[0].line, 1);
+    }
+
+    #[test]
+    fn extracts_multiple_annotations() {
+        let content = "// @unwitnessed: foo\n// @unwitnessed: bar\n";
+        let obs = extract_unwitnessed_seeds("src/lib.rs", content);
+        assert_eq!(obs.len(), 2);
+    }
+
+    #[test]
+    fn ignores_lines_without_annotation() {
+        let content = "// this is just a comment\nfn foo() {}";
+        let obs = extract_unwitnessed_seeds("src/lib.rs", content);
+        assert!(obs.is_empty());
+    }
+
+    #[test]
+    fn annotation_without_name_is_ignored() {
+        let content = "// @unwitnessed:\n";
+        let obs = extract_unwitnessed_seeds("src/lib.rs", content);
+        assert!(obs.is_empty());
+    }
+
+    // ── detect_transitive_failset ─────────────────────────────────────────────
+
+    #[test]
+    fn no_seeds_produces_no_failset() {
+        let obs = detect_transitive_failset(&[ref_obs("a", "b")]);
+        assert!(obs.is_empty());
+    }
+
+    #[test]
+    fn direct_caller_becomes_failset_member() {
+        let obs = [seed_obs("bad"), ref_obs("caller_a", "bad")];
+        let result = detect_transitive_failset(&obs);
+        assert!(result.iter().any(|o| o.construct == "caller_a"));
+    }
+
+    #[test]
+    fn transitive_caller_becomes_failset_member() {
+        let obs = [
+            seed_obs("bad"),
+            ref_obs("middle", "bad"),
+            ref_obs("outer", "middle"),
+        ];
+        let result = detect_transitive_failset(&obs);
+        assert!(result.iter().any(|o| o.construct == "outer"));
+    }
+
+    #[test]
+    fn failset_member_has_failset_member_kind() {
+        let obs = [seed_obs("bad"), ref_obs("caller", "bad")];
+        let result = detect_transitive_failset(&obs);
+        assert!(result.iter().all(|o| o.kind == "failset_member"));
+    }
+
+    #[test]
+    fn cycle_does_not_produce_infinite_loop() {
+        // a -> b -> a (cycle)
+        let obs = [
+            seed_obs("a"),
+            ref_obs("b", "a"),
+            ref_obs("a", "b"), // cycle back
+        ];
+        let result = detect_transitive_failset(&obs);
+        // Should terminate; 'b' is a failset member
+        assert!(result.iter().any(|o| o.construct == "b"));
+    }
+}

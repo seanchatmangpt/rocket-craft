@@ -113,3 +113,122 @@ pub fn detect_contract_schism(all_obs: &[Observation]) -> Vec<Observation> {
 pub fn parse_contract_json(_fp: &str, _c: &str) -> Vec<Observation> {
     vec![]
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn fn_def(file: &str, name: &str) -> Observation {
+        Observation {
+            file_path: file.into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "fn_definition".into(),
+            construct: name.into(), context: String::new(), message: String::new(),
+        }
+    }
+
+    // ── extract_breed_id ──────────────────────────────────────────────────────
+
+    #[test]
+    fn extracts_breed_id_from_src_path() {
+        assert_eq!(extract_breed_id("src/breeds/my_breed/lib.rs"), Some("my_breed"));
+    }
+
+    #[test]
+    fn extracts_breed_id_from_rs_file() {
+        assert_eq!(extract_breed_id("breeds/foo.rs"), Some("foo"));
+    }
+
+    #[test]
+    fn returns_none_when_no_breeds_segment() {
+        assert!(extract_breed_id("src/lib.rs").is_none());
+    }
+
+    // ── detect_contract_schism ────────────────────────────────────────────────
+
+    #[test]
+    fn no_observations_produces_no_schism() {
+        assert!(detect_contract_schism(&[]).is_empty());
+    }
+
+    #[test]
+    fn zero_fn_overlap_triggers_contract_001() {
+        let src_path = "src/breeds/alpha/src/lib.rs";
+        let test_path = "src/breeds/alpha/tests/oracle.rs";
+        let obs: Vec<Observation> = vec![
+            fn_def(src_path, "compute"),
+            fn_def(src_path, "normalize"),
+            fn_def(src_path, "validate"),
+            fn_def(test_path, "check_x"),
+            fn_def(test_path, "check_y"),
+            fn_def(test_path, "check_z"),
+        ];
+        let result = detect_contract_schism(&obs);
+        assert!(result.iter().any(|o| o.construct == "contract_vocab_divergence"));
+    }
+
+    #[test]
+    fn shared_fn_overlap_does_not_trigger_001() {
+        let src_path = "src/breeds/beta/src/lib.rs";
+        let test_path = "src/breeds/beta/tests/oracle.rs";
+        let obs: Vec<Observation> = vec![
+            fn_def(src_path, "compute"),
+            fn_def(src_path, "normalize"),
+            fn_def(src_path, "validate"),
+            fn_def(test_path, "compute"),   // overlap!
+            fn_def(test_path, "check_y"),
+            fn_def(test_path, "check_z"),
+        ];
+        let result = detect_contract_schism(&obs);
+        assert!(!result.iter().any(|o| o.construct == "contract_vocab_divergence"));
+    }
+
+    #[test]
+    fn shadow_fn_triggers_contract_002() {
+        let src_path = "src/breeds/gamma/src/lib.rs";
+        let test_path = "src/breeds/gamma/tests/oracle.rs";
+        let obs: Vec<Observation> = vec![
+            fn_def(src_path, "compute"),
+            fn_def(src_path, "normalize"),
+            fn_def(src_path, "validate"),
+            fn_def(test_path, "compute"),   // shadow!
+            fn_def(test_path, "check_y"),
+            fn_def(test_path, "check_z"),
+        ];
+        let result = detect_contract_schism(&obs);
+        assert!(result.iter().any(|o| o.construct == "contract_fn_shadow"));
+    }
+
+    #[test]
+    fn new_and_run_shadows_are_not_flagged() {
+        let src_path = "src/breeds/delta/src/lib.rs";
+        let test_path = "src/breeds/delta/tests/oracle.rs";
+        let obs: Vec<Observation> = vec![
+            fn_def(src_path, "new"),
+            fn_def(src_path, "run"),
+            fn_def(src_path, "default"),
+            fn_def(test_path, "new"),   // allowed shadow
+            fn_def(test_path, "run"),   // allowed shadow
+            fn_def(test_path, "default"),
+        ];
+        let result = detect_contract_schism(&obs);
+        // no shadow violation for allowed fns
+        assert!(!result.iter().any(|o| o.construct == "contract_fn_shadow"));
+    }
+
+    #[test]
+    fn threshold_below_three_fns_does_not_trigger_001() {
+        let src_path = "src/breeds/tiny/src/lib.rs";
+        let test_path = "src/breeds/tiny/tests/oracle.rs";
+        let obs: Vec<Observation> = vec![
+            fn_def(src_path, "a"),
+            fn_def(src_path, "b"),
+            fn_def(test_path, "x"),
+            fn_def(test_path, "y"),
+        ];
+        // only 2 fns each — under the threshold of 3
+        let result = detect_contract_schism(&obs);
+        assert!(!result.iter().any(|o| o.construct == "contract_vocab_divergence"));
+    }
+}
