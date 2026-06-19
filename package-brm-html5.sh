@@ -7,8 +7,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROCKET_JSON="$SCRIPT_DIR/.rocket.json"
 LOG="$HOME/ue4-build.log"
-UPROJECT="/Users/sac/rocket-craft/versions/4.27.0/Brm.uproject"
-ARCHIVE_DIR="/Users/sac/rocket-craft/pwa-staff/manufactured"
+UPROJECT="/Users/sac/rocket-craft/versions/Brm427/Brm.uproject"
+ARCHIVE_DIR="/tmp/brm-html5-archive"
 
 log() {
     local ts
@@ -80,15 +80,18 @@ UAT_LOG="$HOME/ue4-uat-brm-html5.log"
 log "Running RunUAT BuildCookRun for HTML5..."
 log "UAT log: $UAT_LOG"
 
+# Proven Cook 7 flag sequence (do NOT change without re-testing):
+# -build -cook -stage -pak -package -archive -IgnoreCookErrors
+# Missing -package: Brm.html/Brm.data never generated (emscripten file_packager.py skipped)
+# -SkipCookingErrors does NOT work; -IgnoreCookErrors is the real UAT flag (ProjectParams.cs)
 if ! arch -x86_64 bash "$UAT_SH" BuildCookRun \
     -project="$UPROJECT" \
-    -platform=HTML5 \
-    -clientconfig=Shipping \
-    -cook \
-    -stage \
-    -package \
-    -archivedirectory="$ARCHIVE_DIR" \
     -noP4 \
+    -platform=HTML5 \
+    -clientconfig=Development \
+    -cook -build -stage -pak -package -archive \
+    -IgnoreCookErrors \
+    -archivedirectory="$ARCHIVE_DIR" \
     >> "$UAT_LOG" 2>&1; then
     fail "RunUAT BuildCookRun (HTML5) FAILED" "$UAT_LOG"
 fi
@@ -103,7 +106,7 @@ if [[ -z "$WASM_FILE" ]]; then
 fi
 
 WASM_SIZE=$(stat -f%z "$WASM_FILE" 2>/dev/null || stat -c%s "$WASM_FILE" 2>/dev/null)
-MIN_WASM=$((10 * 1024 * 1024))  # 10 MB
+MIN_WASM=$((50 * 1024 * 1024))  # 50 MB — real Brm.wasm is ~175 MB
 
 if [[ "$WASM_SIZE" -le "$MIN_WASM" ]]; then
     fail "WASM file too small: $WASM_FILE (${WASM_SIZE} bytes, expected >10 MB)" "$UAT_LOG"
@@ -134,10 +137,10 @@ log "STAGE 5 COMPLETE"
 # ── Stage 6 hand-off ────────────────────────────────────────────────────────
 # Automatically run Stage 6 (post-build serve + Playwright proof) now that
 # StagedBuilds/HTML5/ has been populated by RunUAT above.
-STAGE6="$SCRIPT_DIR/stage6-serve-and-test.sh"
+STAGE6="$SCRIPT_DIR/verify_html5_pipeline.sh"
 if [[ -x "$STAGE6" ]]; then
-    log "Handing off to Stage 6..."
-    exec bash "$STAGE6"
+    log "Handing off to Stage 6 (verify_html5_pipeline.sh)..."
+    exec bash "$STAGE6" "$ARCHIVE_DIR"
 else
-    log "WARNING: $STAGE6 not found or not executable — skipping Stage 6"
+    log "Stage 6 script not found — run manually: ./verify_html5_pipeline.sh $ARCHIVE_DIR"
 fi
