@@ -161,3 +161,77 @@ pub fn run_lock(repo_root: &Path) -> Result<()> {
     let locker = EcosystemLocker::new(repo_root);
     locker.enforce_unified_lock()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeSet;
+
+    #[test]
+    fn ecosystem_locker_new_sets_root_path() {
+        let locker = EcosystemLocker::new("/tmp/fake-repo");
+        assert!(locker.root_path.ends_with("fake-repo"));
+    }
+
+    #[test]
+    fn unified_lock_serializes_and_deserializes() {
+        let mut deps = BTreeMap::new();
+        deps.insert(
+            "serde".into(),
+            LockedDependency {
+                name: "serde".into(),
+                version: "1.0.200".into(),
+                source: "registry+https://github.com/rust-lang/crates.io-index".into(),
+                expected_features: BTreeSet::from(["derive".into()]),
+            },
+        );
+        let lock = UnifiedLock {
+            version: 1,
+            law: "A = μ(O*)".into(),
+            workspaces: BTreeSet::from(["nexus-engine".into()]),
+            dependencies: deps,
+        };
+        let json = serde_json::to_string(&lock).expect("serialize");
+        let decoded: UnifiedLock = serde_json::from_str(&json).expect("deserialize");
+        assert_eq!(decoded.version, 1);
+        assert_eq!(decoded.law, "A = μ(O*)");
+        assert!(decoded.dependencies.contains_key("serde"));
+    }
+
+    #[test]
+    fn locked_dependency_clone_is_independent() {
+        let dep = LockedDependency {
+            name: "tokio".into(),
+            version: "1.38.0".into(),
+            source: "registry".into(),
+            expected_features: BTreeSet::from(["full".into()]),
+        };
+        let mut cloned = dep.clone();
+        cloned.version = "1.99.0".into();
+        assert_eq!(dep.version, "1.38.0"); // original unaffected
+    }
+
+    #[test]
+    fn unified_lock_workspaces_are_sorted() {
+        let lock = UnifiedLock {
+            version: 1,
+            law: "A = μ(O*)".into(),
+            workspaces: BTreeSet::from([
+                "nexus-engine".into(),
+                "blueprint-rs".into(),
+                "genie3-rs".into(),
+            ]),
+            dependencies: BTreeMap::new(),
+        };
+        let mut sorted = lock.workspaces.iter().cloned().collect::<Vec<_>>();
+        sorted.sort();
+        let actual: Vec<_> = lock.workspaces.iter().cloned().collect();
+        assert_eq!(sorted, actual); // BTreeSet iterates in sorted order
+    }
+
+    #[test]
+    fn run_lock_with_nonexistent_repo_returns_err() {
+        let result = run_lock(Path::new("/tmp/does-not-exist-abc123"));
+        assert!(result.is_err());
+    }
+}
