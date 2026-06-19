@@ -329,3 +329,116 @@ pub enum SessionError {
     #[error("insufficient gold: need {need}, have {have}")]
     InsufficientGold { need: u32, have: u32 },
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn connecting() -> PlayerSession<Connecting> {
+        PlayerSession::new(42, "Pilot42".into())
+    }
+
+    // ── builder ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn builder_rejects_zero_player_id() {
+        let result = PlayerSessionBuilder::new()
+            .player_id(0)
+            .username("x".into())
+            .build();
+        assert!(matches!(result, Err(SessionBuildError::ZeroPlayerId)));
+    }
+
+    #[test]
+    fn builder_rejects_blank_username() {
+        let result = PlayerSessionBuilder::new()
+            .player_id(1)
+            .username("   ".into())
+            .build();
+        assert!(matches!(result, Err(SessionBuildError::EmptyUsername)));
+    }
+
+    #[test]
+    fn builder_succeeds_with_valid_fields() {
+        let session = PlayerSessionBuilder::new()
+            .player_id(7)
+            .username("Heero".into())
+            .build()
+            .unwrap();
+        assert_eq!(session.player_id, 7);
+        assert_eq!(session.username, "Heero");
+    }
+
+    // ── Connecting → Authenticated ────────────────────────────────────────────
+
+    #[test]
+    fn valid_token_authenticates() {
+        let auth = connecting().authenticate(true).unwrap();
+        assert_eq!(auth.player_id, 42);
+    }
+
+    #[test]
+    fn invalid_token_returns_auth_failed() {
+        let result = connecting().authenticate(false);
+        assert!(matches!(result, Err(SessionError::AuthFailed)));
+    }
+
+    // ── Connecting → Disconnected (reject) ───────────────────────────────────
+
+    #[test]
+    fn reject_produces_disconnected_session() {
+        let disc = connecting().reject();
+        assert_eq!(disc.player_id, 42);
+    }
+
+    // ── Authenticated → InLobby ───────────────────────────────────────────────
+
+    #[test]
+    fn authenticated_can_enter_lobby() {
+        let lobby = connecting().authenticate(true).unwrap().enter_lobby();
+        assert_eq!(lobby.player_id, 42);
+    }
+
+    // ── InLobby → InMatch ────────────────────────────────────────────────────
+
+    #[test]
+    fn lobby_can_enter_match() {
+        let lobby = connecting().authenticate(true).unwrap().enter_lobby();
+        let (in_match, match_id) = lobby.enter_match(99);
+        assert_eq!(in_match.player_id, 42);
+        assert_eq!(match_id, 99);
+    }
+
+    // ── InLobby → Spectating ─────────────────────────────────────────────────
+
+    #[test]
+    fn lobby_can_spectate() {
+        let lobby = connecting().authenticate(true).unwrap().enter_lobby();
+        let (spectating, match_id) = lobby.spectate(77);
+        assert_eq!(spectating.player_id, 42);
+        assert_eq!(match_id, 77);
+    }
+
+    // ── InMatch → InLobby (match complete) ───────────────────────────────────
+
+    #[test]
+    fn match_complete_returns_to_lobby() {
+        let lobby = connecting()
+            .authenticate(true)
+            .unwrap()
+            .enter_lobby();
+        let (in_match, _) = lobby.enter_match(1);
+        let back_in_lobby = in_match.match_complete();
+        assert_eq!(back_in_lobby.player_id, 42);
+    }
+
+    // ── Spectating → InLobby ─────────────────────────────────────────────────
+
+    #[test]
+    fn spectating_can_leave_to_lobby() {
+        let lobby = connecting().authenticate(true).unwrap().enter_lobby();
+        let (spectating, _) = lobby.spectate(5);
+        let back = spectating.leave_spectate();
+        assert_eq!(back.player_id, 42);
+    }
+}
