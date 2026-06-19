@@ -77,3 +77,66 @@ impl Default for AndonGate {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_gate_is_open() {
+        let g = AndonGate::new();
+        assert!(g.is_open());
+        assert_eq!(g.check(), Ok(()));
+        assert_eq!(g.event_count(), 0);
+    }
+
+    #[test]
+    fn raise_blocks_operations() {
+        let mut g = AndonGate::new();
+        g.raise("conformance failure");
+        assert!(!g.is_open());
+        assert_eq!(g.check(), Err("conformance failure".into()));
+    }
+
+    #[test]
+    fn raise_records_history() {
+        let mut g = AndonGate::new();
+        g.raise("reason");
+        assert_eq!(g.event_count(), 1);
+    }
+
+    #[test]
+    fn lower_opens_gate_after_raise() {
+        let mut g = AndonGate::new();
+        g.raise("bad");
+        g.lower();
+        assert!(g.is_open());
+        assert_eq!(g.check(), Ok(()));
+    }
+
+    #[test]
+    fn lower_records_history() {
+        let mut g = AndonGate::new();
+        g.raise("bad");
+        g.lower();
+        assert_eq!(g.event_count(), 2);
+        assert_eq!(g.history()[1].0, AndonState::Open);
+    }
+
+    #[test]
+    fn multiple_raises_accumulate_history() {
+        let mut g = AndonGate::new();
+        g.raise("a");
+        g.raise("b");
+        assert_eq!(g.event_count(), 2);
+        if let AndonState::Raised(r) = &g.state() {
+            assert_eq!(r, "b");
+        } else { panic!("wrong state"); }
+    }
+
+    #[test]
+    fn default_equals_new() {
+        let g: AndonGate = Default::default();
+        assert!(g.is_open());
+    }
+}

@@ -102,3 +102,87 @@ impl OcelLog {
         serde_json::to_string_pretty(self)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn make_event(id: &str, activity: &str, object_refs: Vec<OcelObjectRef>) -> OcelEvent {
+        OcelEvent {
+            id: id.into(), activity: activity.into(),
+            timestamp_ms: 1000,
+            object_refs,
+            attributes: serde_json::Map::new(),
+        }
+    }
+
+    fn obj_ref(object_id: &str) -> OcelObjectRef {
+        OcelObjectRef { object_id: object_id.into(), qualifier: "target".into() }
+    }
+
+    // ── OcelObject ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_object_has_empty_changes() {
+        let obj = OcelObject::new("p-1", "MechPart");
+        assert_eq!(obj.id, "p-1");
+        assert_eq!(obj.object_type, "MechPart");
+        assert!(obj.attribute_changes.is_empty());
+    }
+
+    #[test]
+    fn with_attr_change_appends_change() {
+        let obj = OcelObject::new("p-1", "MechPart")
+            .with_attr_change("status", json!("active"), 500);
+        assert_eq!(obj.attribute_changes.len(), 1);
+        assert_eq!(obj.attribute_changes[0].attribute, "status");
+        assert_eq!(obj.attribute_changes[0].timestamp_ms, 500);
+    }
+
+    // ── OcelLog ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn empty_log_is_valid() {
+        let log = OcelLog::default();
+        assert!(log.validate().is_empty());
+    }
+
+    #[test]
+    fn valid_event_ref_produces_no_violation() {
+        let mut log = OcelLog::default();
+        log.add_object(OcelObject::new("obj-1", "MechPart"));
+        log.add_event(make_event("e-1", "Assemble", vec![obj_ref("obj-1")]));
+        assert!(log.validate().is_empty());
+    }
+
+    #[test]
+    fn unknown_object_ref_produces_violation() {
+        let mut log = OcelLog::default();
+        log.add_event(make_event("e-1", "Assemble", vec![obj_ref("missing")]));
+        let v = log.validate();
+        assert!(!v.is_empty());
+        assert!(v[0].contains("missing"));
+    }
+
+    #[test]
+    fn non_monotonic_attribute_change_produces_violation() {
+        let mut log = OcelLog::default();
+        let obj = OcelObject::new("o-1", "Part")
+            .with_attr_change("heat", json!(100), 1000)
+            .with_attr_change("heat", json!(200), 500); // going backwards in time
+        log.add_object(obj);
+        let v = log.validate();
+        assert!(!v.is_empty());
+        assert!(v[0].contains("non-monotonic"));
+    }
+
+    #[test]
+    fn to_json_pretty_roundtrips() {
+        let mut log = OcelLog::default();
+        log.add_object(OcelObject::new("x", "Type"));
+        let json = log.to_json_pretty().unwrap();
+        let back: OcelLog = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.objects.len(), 1);
+    }
+}
