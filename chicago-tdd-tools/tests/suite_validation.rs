@@ -1,9 +1,9 @@
 use std::fs;
-use std::path::PathBuf;
-use std::process::{Command, Child, Stdio};
-use std::time::{Duration, Instant};
-use std::thread;
 use std::net::TcpStream;
+use std::path::PathBuf;
+use std::process::{Child, Command, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
 
 struct ChildGuard(Child);
 
@@ -70,7 +70,10 @@ fn validate_entire_game_suite_on_es3_pipeline() {
         .filter(|e| e.file_name().to_string_lossy().ends_with("-Shipping.html"))
         .collect();
 
-    assert!(!games.is_empty(), "No manufactured games found in pwa-staff/");
+    assert!(
+        !games.is_empty(),
+        "No manufactured games found in pwa-staff/"
+    );
 
     let mut buffered_receipts = Vec::new();
 
@@ -89,13 +92,18 @@ fn validate_entire_game_suite_on_es3_pipeline() {
             .status()
             .expect("Failed to execute Playwright");
 
-        assert!(status.success(), "Manufacturing Gate FAILED for game: {}", game_name);
+        assert!(
+            status.success(),
+            "Manufacturing Gate FAILED for game: {}",
+            game_name
+        );
 
         // Buffer the generated receipt in memory
         let test_results_dir = pwa_dir.join("test-results");
         let src_receipt = test_results_dir.join("tps-dflss-receipt.json");
         if src_receipt.exists() {
-            let content = fs::read_to_string(&src_receipt).expect("Failed to read generated receipt");
+            let content =
+                fs::read_to_string(&src_receipt).expect("Failed to read generated receipt");
             buffered_receipts.push((game_name.clone(), content));
         }
     }
@@ -118,4 +126,3 @@ fn validate_entire_game_suite_on_es3_pipeline() {
         }
     }
 }
-

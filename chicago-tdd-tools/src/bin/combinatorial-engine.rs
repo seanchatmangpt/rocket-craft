@@ -1,25 +1,25 @@
+use anyhow::{Context, Result};
+use clap::Parser;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
-use anyhow::{Context, Result};
-use clap::Parser;
 
 use chicago_tdd_tools::{
-    discover_games,
-    explore_state_space,
     coordinate::{
-        InfinityBladeCoordinateSystem,
-        GundamSessionSimulation,
+        GundamCoordinateSystem, GundamSessionSimulation, InfinityBladeCoordinateSystem,
         SessionState,
-        GundamCoordinateSystem,
     },
+    discover_games, explore_state_space,
 };
 use ib4_mud::session::GameSession;
 use nexus_session::player::PlayerProfile;
 
 #[derive(Parser, Debug)]
-#[command(name = "combinatorial-engine", about = "Rocket-Craft Combinatorial State Space Exploration Engine")]
+#[command(
+    name = "combinatorial-engine",
+    about = "Rocket-Craft Combinatorial State Space Exploration Engine"
+)]
 struct Cli {
     /// Output path for the JSON report
     #[arg(short, long, default_value = "combinatorial_report.json")]
@@ -58,7 +58,10 @@ fn run_engine(cli: Cli) -> Result<()> {
     let mut found_gundam = false;
 
     for game in &discovered {
-        println!("  Discovered game: {} (crate: {})", game.name, game.crate_name);
+        println!(
+            "  Discovered game: {} (crate: {})",
+            game.name, game.crate_name
+        );
         if game.name == "Infinity Blade 4 MUD" {
             found_ib4 = true;
         }
@@ -68,7 +71,10 @@ fn run_engine(cli: Cli) -> Result<()> {
     }
 
     if !found_ib4 || !found_gundam {
-        anyhow::bail!("Could not discover both 'Infinity Blade 4 MUD' and 'Gundam Nexus'. Discovered: {:?}", discovered);
+        anyhow::bail!(
+            "Could not discover both 'Infinity Blade 4 MUD' and 'Gundam Nexus'. Discovered: {:?}",
+            discovered
+        );
     }
 
     // 2. Instantiate initial states and systems
@@ -109,7 +115,10 @@ fn run_engine(cli: Cli) -> Result<()> {
     }
 
     println!("\nGame: Gundam Nexus");
-    println!("Visited States Count: {}", gundam_result.visited_states_count);
+    println!(
+        "Visited States Count: {}",
+        gundam_result.visited_states_count
+    );
     println!("Transitions Count: {}", gundam_result.transitions.len());
     println!("Transitions:");
     for (src, mv, dst) in &gundam_result.transitions {
@@ -143,16 +152,22 @@ fn run_engine(cli: Cli) -> Result<()> {
     }
 
     let mut games = HashMap::new();
-    games.insert("Infinity Blade 4 MUD".to_string(), GameSummary {
-        visited_states_count: ib4_result.visited_states_count,
-        transition_count: ib4_result.transitions.len(),
-        errors: ib4_result.errors,
-    });
-    games.insert("Gundam Nexus".to_string(), GameSummary {
-        visited_states_count: gundam_result.visited_states_count,
-        transition_count: gundam_result.transitions.len(),
-        errors: gundam_result.errors,
-    });
+    games.insert(
+        "Infinity Blade 4 MUD".to_string(),
+        GameSummary {
+            visited_states_count: ib4_result.visited_states_count,
+            transition_count: ib4_result.transitions.len(),
+            errors: ib4_result.errors,
+        },
+    );
+    games.insert(
+        "Gundam Nexus".to_string(),
+        GameSummary {
+            visited_states_count: gundam_result.visited_states_count,
+            transition_count: gundam_result.transitions.len(),
+            errors: gundam_result.errors,
+        },
+    );
 
     let report = CombinatorialReport {
         total_states_visited: ib4_result.visited_states_count + gundam_result.visited_states_count,
@@ -161,9 +176,12 @@ fn run_engine(cli: Cli) -> Result<()> {
         games,
     };
 
-    let report_json = serde_json::to_string_pretty(&report).context("Failed to serialize report JSON")?;
-    let mut file = File::create(&cli.output).with_context(|| format!("Failed to create report file at {:?}", cli.output))?;
-    file.write_all(report_json.as_bytes()).context("Failed to write report content to file")?;
+    let report_json =
+        serde_json::to_string_pretty(&report).context("Failed to serialize report JSON")?;
+    let mut file = File::create(&cli.output)
+        .with_context(|| format!("Failed to create report file at {:?}", cli.output))?;
+    file.write_all(report_json.as_bytes())
+        .context("Failed to write report content to file")?;
 
     println!("Report successfully generated at: {:?}", cli.output);
 

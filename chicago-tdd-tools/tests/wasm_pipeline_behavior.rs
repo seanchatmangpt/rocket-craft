@@ -1,6 +1,6 @@
-use un_test_utils::UnrealEnvMock;
-use unify_wasm::packager::{WasmPackager, PackageOptions};
 use std::fs;
+use un_test_utils::UnrealEnvMock;
+use unify_wasm::packager::{PackageOptions, WasmPackager};
 
 #[test]
 fn should_package_wasm_build_successfully() {
@@ -27,28 +27,50 @@ fn should_package_wasm_build_successfully() {
         map_name: "ManufacturedWorld".to_string(),
     };
 
-    let staging_dir = env_mock.project_path.parent().unwrap()
+    let staging_dir = env_mock
+        .project_path
+        .parent()
+        .unwrap()
         .join("MyProject")
         .join("Saved")
         .join("StagedBuilds")
         .join("HTML5");
-        
+
     fs::create_dir_all(&staging_dir).expect("Failed to create staging dir");
-    fs::write(staging_dir.join("MyProject-HTML5-Shipping.html"), "mock html").unwrap();
+    fs::write(
+        staging_dir.join("MyProject-HTML5-Shipping.html"),
+        "mock html",
+    )
+    .unwrap();
     fs::write(staging_dir.join("MyProject-HTML5-Shipping.js"), "mock js").unwrap();
-    fs::write(staging_dir.join("MyProject-HTML5-Shipping.wasm"), "mock wasm").unwrap();
-    fs::write(staging_dir.join("MyProject-HTML5-Shipping.data"), "mock data").unwrap();
+    fs::write(
+        staging_dir.join("MyProject-HTML5-Shipping.wasm"),
+        "mock wasm",
+    )
+    .unwrap();
+    fs::write(
+        staging_dir.join("MyProject-HTML5-Shipping.data"),
+        "mock data",
+    )
+    .unwrap();
 
     // 3. Act
     let result = packager.package_html5(&options);
 
     // 4. Assert
-    assert!(result.is_ok(), "Packaging should succeed: {:?}", result.err());
-    
+    assert!(
+        result.is_ok(),
+        "Packaging should succeed: {:?}",
+        result.err()
+    );
+
     // Actually, WasmPackager should copy the results to output_dir
     assert!(output_dir.exists(), "Output directory should exist");
-    assert!(output_dir.join("MyProject-HTML5-Shipping.wasm").exists(), "Wasm file should be packaged");
-    
+    assert!(
+        output_dir.join("MyProject-HTML5-Shipping.wasm").exists(),
+        "Wasm file should be packaged"
+    );
+
     // In our test, UAT is mocked, so we just check if it executed without error
     // In a real Chicago TDD, if we simulate the engine, we might want the mock to emit files.
     // un_test_utils writes "mock uat" as an executable.
@@ -72,7 +94,11 @@ fn should_pass_es3_and_webgl2_flags_to_uat() {
     let uat_path = env_mock.uat_path();
     #[cfg(windows)]
     {
-        fs::write(&uat_path, format!("@echo %* > \"{}\"\nexit /b 0", log_path.display())).unwrap();
+        fs::write(
+            &uat_path,
+            format!("@echo %* > \"{}\"\nexit /b 0", log_path.display()),
+        )
+        .unwrap();
     }
     #[cfg(not(windows))]
     {
@@ -81,7 +107,7 @@ fn should_pass_es3_and_webgl2_flags_to_uat() {
             log_path.display()
         );
         fs::write(&uat_path, script_content).unwrap();
-        
+
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
@@ -104,24 +130,43 @@ fn should_pass_es3_and_webgl2_flags_to_uat() {
     };
 
     // Setup staging dir so packaging doesn't fail on copying
-    let staging_dir = env_mock.project_path.parent().unwrap()
+    let staging_dir = env_mock
+        .project_path
+        .parent()
+        .unwrap()
         .join("MyProject")
         .join("Saved")
         .join("StagedBuilds")
         .join("HTML5");
-        
+
     fs::create_dir_all(&staging_dir).expect("Failed to create staging dir");
-    fs::write(staging_dir.join("MyProject-HTML5-Shipping.html"), "mock html").unwrap();
+    fs::write(
+        staging_dir.join("MyProject-HTML5-Shipping.html"),
+        "mock html",
+    )
+    .unwrap();
     fs::write(staging_dir.join("MyProject-HTML5-Shipping.js"), "mock js").unwrap();
-    fs::write(staging_dir.join("MyProject-HTML5-Shipping.wasm"), "mock wasm").unwrap();
-    fs::write(staging_dir.join("MyProject-HTML5-Shipping.data"), "mock data").unwrap();
+    fs::write(
+        staging_dir.join("MyProject-HTML5-Shipping.wasm"),
+        "mock wasm",
+    )
+    .unwrap();
+    fs::write(
+        staging_dir.join("MyProject-HTML5-Shipping.data"),
+        "mock data",
+    )
+    .unwrap();
 
     // 3. Act
     let result = packager.package_html5(&options);
 
     // 4. Assert
-    assert!(result.is_ok(), "Packaging should succeed: {:?}", result.err());
-    
+    assert!(
+        result.is_ok(),
+        "Packaging should succeed: {:?}",
+        result.err()
+    );
+
     // Check the recorded arguments via byte-level token parsing — no string .contains() allowed.
     // The mock UAT script writes the expanded argument list to the log file.
     let recorded_bytes = fs::read(&log_path).expect("Failed to read uat_args.log");
@@ -136,10 +181,28 @@ fn should_pass_es3_and_webgl2_flags_to_uat() {
     let has_webgl2 = tokens.iter().any(|t| *t == b"-webgl2");
     let has_platform_html5 = tokens.iter().any(|t| *t == b"-platform=HTML5");
 
-    assert!(has_es3, "UAT should be called with -es3 flag; tokens: {:?}",
-        tokens.iter().map(|t| std::str::from_utf8(t).unwrap_or("<binary>")).collect::<Vec<_>>());
-    assert!(has_webgl2, "UAT should be called with -webgl2 flag; tokens: {:?}",
-        tokens.iter().map(|t| std::str::from_utf8(t).unwrap_or("<binary>")).collect::<Vec<_>>());
-    assert!(has_platform_html5, "UAT should be called with -platform=HTML5; tokens: {:?}",
-        tokens.iter().map(|t| std::str::from_utf8(t).unwrap_or("<binary>")).collect::<Vec<_>>());
+    assert!(
+        has_es3,
+        "UAT should be called with -es3 flag; tokens: {:?}",
+        tokens
+            .iter()
+            .map(|t| std::str::from_utf8(t).unwrap_or("<binary>"))
+            .collect::<Vec<_>>()
+    );
+    assert!(
+        has_webgl2,
+        "UAT should be called with -webgl2 flag; tokens: {:?}",
+        tokens
+            .iter()
+            .map(|t| std::str::from_utf8(t).unwrap_or("<binary>"))
+            .collect::<Vec<_>>()
+    );
+    assert!(
+        has_platform_html5,
+        "UAT should be called with -platform=HTML5; tokens: {:?}",
+        tokens
+            .iter()
+            .map(|t| std::str::from_utf8(t).unwrap_or("<binary>"))
+            .collect::<Vec<_>>()
+    );
 }

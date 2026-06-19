@@ -1,5 +1,5 @@
-use std::collections::{VecDeque, HashSet};
 use crate::coordinate::GameCoordinateSystem;
+use std::collections::{HashSet, VecDeque};
 
 pub struct TraversalResult {
     pub visited_states_count: usize,

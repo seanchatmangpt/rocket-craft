@@ -63,6 +63,7 @@ fmt-check:
     cd chicago-tdd-tools && cargo fmt -- --check
     cd unify-rs && cargo fmt -- --check
     cd infinity-blade-4/mud && cargo fmt -- --check
+    cd asset-pipeline && cargo fmt -- --check
 
 # Apply Rust formatting across all workspaces
 fmt:
@@ -72,6 +73,7 @@ fmt:
     cd chicago-tdd-tools && cargo fmt
     cd unify-rs && cargo fmt
     cd infinity-blade-4/mud && cargo fmt
+    cd asset-pipeline && cargo fmt
 
 # Run clippy across all Rust workspaces
 clippy:
@@ -81,6 +83,7 @@ clippy:
     cd chicago-tdd-tools && cargo clippy --all-features 2>&1 | grep "^warning\|^error" | grep -v "unknown lint" || true
     cd unify-rs && cargo clippy --all 2>&1 | grep "^warning\|^error" | grep -v "unknown lint\|wasm4pm" || true
     cd infinity-blade-4/mud && cargo clippy --all 2>&1 | grep "^warning\|^error" || true
+    cd asset-pipeline && cargo clippy 2>&1 | grep "^warning\|^error" || true
 
 # Full CI gate: fmt-check + clippy + test + typecheck
 ci:
@@ -99,6 +102,7 @@ test-rust:
     cd chicago-tdd-tools && cargo test --all-features
     cd unify-rs && cargo test --all
     cd infinity-blade-4/mud && cargo test --all
+    cd asset-pipeline && cargo test
 
 # Run pwa-staff unit tests (vitest)
 test-pwa:

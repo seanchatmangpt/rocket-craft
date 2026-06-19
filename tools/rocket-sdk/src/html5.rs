@@ -13,7 +13,11 @@ pub struct Html5Cook {
 }
 
 impl Html5Cook {
-    pub fn new(engine_root: impl Into<PathBuf>, project: impl Into<PathBuf>, archive_dir: impl Into<PathBuf>) -> Self {
+    pub fn new(
+        engine_root: impl Into<PathBuf>,
+        project: impl Into<PathBuf>,
+        archive_dir: impl Into<PathBuf>,
+    ) -> Self {
         Self {
             engine_root: engine_root.into(),
             project: project.into(),
@@ -75,11 +79,15 @@ pub struct Html5Setup {
 
 impl Html5Setup {
     pub fn new(engine_root: impl Into<PathBuf>) -> Self {
-        Self { engine_root: engine_root.into() }
+        Self {
+            engine_root: engine_root.into(),
+        }
     }
 
     pub fn run(&self) -> Result<()> {
-        let setup_sh = self.engine_root.join("Engine/Platforms/HTML5/HTML5Setup.sh");
+        let setup_sh = self
+            .engine_root
+            .join("Engine/Platforms/HTML5/HTML5Setup.sh");
         if !setup_sh.exists() {
             bail!("HTML5Setup.sh not found at {}", setup_sh.display());
         }
@@ -89,8 +97,17 @@ impl Html5Setup {
         // chmod +x all HTML5 shell scripts (emsdk tarball sometimes loses execute bits)
         let _ = Command::new("find")
             .args([
-                self.engine_root.join("Engine/Platforms/HTML5").to_str().unwrap(),
-                "-name", "*.sh", "-exec", "chmod", "+x", "{}", ";",
+                self.engine_root
+                    .join("Engine/Platforms/HTML5")
+                    .to_str()
+                    .unwrap(),
+                "-name",
+                "*.sh",
+                "-exec",
+                "chmod",
+                "+x",
+                "{}",
+                ";",
             ])
             .status();
 
@@ -154,19 +171,29 @@ fn ensure_metal_toolchain() -> Result<()> {
 /// creates a sibling symlink with a letter-starting name if needed.
 /// .NET Path.GetFullPath() does NOT resolve symlinks, so UHT sees the link name.
 fn ensure_letter_start_symlink(project: &Path) -> Result<PathBuf> {
-    let project_dir = project.parent().ok_or_else(|| anyhow::anyhow!("project has no parent dir"))?;
-    let parent = project_dir.parent().ok_or_else(|| anyhow::anyhow!("project dir has no parent"))?;
-    let dir_name = project_dir.file_name()
+    let project_dir = project
+        .parent()
+        .ok_or_else(|| anyhow::anyhow!("project has no parent dir"))?;
+    let parent = project_dir
+        .parent()
+        .ok_or_else(|| anyhow::anyhow!("project dir has no parent"))?;
+    let dir_name = project_dir
+        .file_name()
         .and_then(|n| n.to_str())
         .ok_or_else(|| anyhow::anyhow!("project dir name is not valid UTF-8"))?;
 
-    let starts_with_digit = dir_name.chars().next().map(|c| c.is_ascii_digit()).unwrap_or(false);
+    let starts_with_digit = dir_name
+        .chars()
+        .next()
+        .map(|c| c.is_ascii_digit())
+        .unwrap_or(false);
     if !starts_with_digit {
         return Ok(project.to_path_buf());
     }
 
     // Build a letter-starting name: strip leading digits, prefix with project stem
-    let project_stem = project.file_stem()
+    let project_stem = project
+        .file_stem()
         .and_then(|n| n.to_str())
         .unwrap_or("Project");
     let suffix: String = dir_name.chars().filter(|c| c.is_alphanumeric()).collect();
@@ -175,13 +202,19 @@ fn ensure_letter_start_symlink(project: &Path) -> Result<PathBuf> {
 
     if !link_path.exists() {
         #[cfg(unix)]
-        std::os::unix::fs::symlink(project_dir, &link_path)
-            .with_context(|| format!("create symlink {} → {}", link_path.display(), project_dir.display()))?;
+        std::os::unix::fs::symlink(project_dir, &link_path).with_context(|| {
+            format!(
+                "create symlink {} → {}",
+                link_path.display(),
+                project_dir.display()
+            )
+        })?;
         #[cfg(not(unix))]
         bail!("symlink creation is not supported on this platform — rename the project directory to start with a letter");
     }
 
-    let uproject_name = project.file_name()
+    let uproject_name = project
+        .file_name()
         .ok_or_else(|| anyhow::anyhow!("project has no file name"))?;
     Ok(link_path.join(uproject_name))
 }
@@ -189,10 +222,8 @@ fn ensure_letter_start_symlink(project: &Path) -> Result<PathBuf> {
 fn ensure_git_wrapper() -> Result<()> {
     let wrapper = Path::new(GIT_WRAPPER_DIR).join("git");
     if !wrapper.exists() {
-        std::fs::create_dir_all(GIT_WRAPPER_DIR)
-            .context("create git wrapper dir")?;
-        std::fs::write(&wrapper, "#!/bin/sh\nexit 0\n")
-            .context("write git wrapper")?;
+        std::fs::create_dir_all(GIT_WRAPPER_DIR).context("create git wrapper dir")?;
+        std::fs::write(&wrapper, "#!/bin/sh\nexit 0\n").context("write git wrapper")?;
         use std::os::unix::fs::PermissionsExt;
         std::fs::set_permissions(&wrapper, std::fs::Permissions::from_mode(0o755))
             .context("chmod git wrapper")?;
@@ -212,5 +243,78 @@ fn check_exit(status: ExitStatus, label: &str) -> Result<()> {
         Ok(())
     } else {
         bail!("{label} failed with exit code {:?}", status.code())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    fn make_uproject(base: &Path, dir_name: &str, project_name: &str) -> PathBuf {
+        let proj_dir = base.join(dir_name);
+        std::fs::create_dir_all(&proj_dir).unwrap();
+        let uproject = proj_dir.join(format!("{project_name}.uproject"));
+        std::fs::write(&uproject, "{}").unwrap();
+        uproject
+    }
+
+    #[test]
+    fn letter_start_dir_unchanged() {
+        let dir = TempDir::new().unwrap();
+        let uproject = make_uproject(dir.path(), "Brm427", "Brm");
+        let result = ensure_letter_start_symlink(&uproject).unwrap();
+        // Already starts with a letter — returned path should equal input
+        assert_eq!(result, uproject);
+    }
+
+    #[test]
+    fn digit_start_dir_gets_symlink() {
+        let dir = TempDir::new().unwrap();
+        let uproject = make_uproject(dir.path(), "4.27.0", "Brm");
+        let result = ensure_letter_start_symlink(&uproject).unwrap();
+        // Result must start with a letter
+        let link_name = result
+            .parent()
+            .unwrap()
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap();
+        assert!(
+            link_name.starts_with(|c: char| c.is_ascii_alphabetic()),
+            "symlink name '{link_name}' should start with a letter"
+        );
+        // The .uproject file must be reachable through the symlink
+        assert!(
+            result.exists(),
+            "uproject must be accessible via symlink at {}",
+            result.display()
+        );
+    }
+
+    #[test]
+    fn symlink_idempotent() {
+        let dir = TempDir::new().unwrap();
+        let uproject = make_uproject(dir.path(), "4.27.0", "Brm");
+        let r1 = ensure_letter_start_symlink(&uproject).unwrap();
+        let r2 = ensure_letter_start_symlink(&uproject).unwrap();
+        assert_eq!(r1, r2, "calling twice must return the same path");
+    }
+
+    #[test]
+    fn git_wrapper_is_created() {
+        let wrapper = Path::new(GIT_WRAPPER_DIR).join("git");
+        ensure_git_wrapper().unwrap();
+        assert!(wrapper.exists(), "git wrapper must exist at {}", wrapper.display());
+        let content = std::fs::read_to_string(&wrapper).unwrap();
+        assert!(content.contains("exit 0"));
+    }
+
+    #[test]
+    fn prepend_to_path_contains_dir() {
+        let result = prepend_to_path("/my/custom/dir");
+        assert!(result.starts_with("/my/custom/dir"), "prepended dir must be first in PATH");
+        assert!(result.contains(':'), "must contain a PATH separator");
     }
 }

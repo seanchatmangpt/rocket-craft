@@ -910,6 +910,7 @@ name = "nexus-mud"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "blake3",
  "chrono",
  "nexus-gundam",
  "nexus-pmme",
@@ -917,7 +918,6 @@ dependencies = [
  "nexus-types",
  "serde",
  "serde_json",
- "sha2",
  "thiserror 2.0.18",
  "wasm4pm",
  "wasm4pm-compat",

@@ -1,7 +1,7 @@
-use std::sync::{Arc, Mutex};
-use std::io::Write;
 use std::fs::File;
+use std::io::Write;
 use std::path::Path;
+use std::sync::{Arc, Mutex};
 
 /// Severity levels for log messages.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -79,7 +79,12 @@ impl TuiBufferSink {
     /// Creates a new `TuiBufferSink` and returns it along with a handle to the shared buffer.
     pub fn new() -> (Self, Arc<Mutex<Vec<String>>>) {
         let buffer = Arc::new(Mutex::new(Vec::new()));
-        (Self { buffer: buffer.clone() }, buffer)
+        (
+            Self {
+                buffer: buffer.clone(),
+            },
+            buffer,
+        )
     }
 }
 
@@ -158,23 +163,23 @@ impl Default for Logger {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::NamedTempFile;
     use std::fs;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_logger_fanning_out() {
         let mut logger = Logger::new();
-        
+
         let (tui_sink, buffer) = TuiBufferSink::new();
         logger.add_sink(Box::new(tui_sink));
-        
+
         let temp_file = NamedTempFile::new().unwrap();
         let file_path = temp_file.path().to_owned();
         let file_sink = FileSink::new(&file_path).unwrap();
         logger.add_sink(Box::new(file_sink));
-        
+
         logger.info("Test message");
-        
+
         // Check TUI buffer
         {
             let buf = buffer.lock().unwrap();
@@ -182,7 +187,7 @@ mod tests {
             assert!(buf[0].contains("INFO"));
             assert!(buf[0].contains("Test message"));
         }
-        
+
         // Check File
         {
             let content = fs::read_to_string(file_path).unwrap();
@@ -196,11 +201,11 @@ mod tests {
         let mut logger = Logger::with_level(LogLevel::Warn);
         let (tui_sink, buffer) = TuiBufferSink::new();
         logger.add_sink(Box::new(tui_sink));
-        
+
         logger.info("Should be ignored");
         logger.warn("Should be recorded");
         logger.error("Should be recorded");
-        
+
         let buf = buffer.lock().unwrap();
         assert_eq!(buf.len(), 2);
         assert!(buf[0].contains("WARN"));

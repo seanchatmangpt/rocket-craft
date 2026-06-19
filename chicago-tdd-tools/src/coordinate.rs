@@ -2,8 +2,8 @@ use anyhow::Result;
 use ib4_core::types::{AttackDir, MagicType};
 use ib4_mud::command::Command;
 use ib4_mud::session::GameSession;
-use nexus_session::player::PlayerProfile;
 use nexus_session::inventory::Item;
+use nexus_session::player::PlayerProfile;
 
 pub trait GameCoordinateSystem {
     type State;
@@ -60,9 +60,21 @@ impl GameCoordinateSystem for InfinityBladeCoordinateSystem {
     fn state_to_coordinate(&self, state: &Self::State) -> String {
         let bloodline = state.player.bloodline;
         let hp_class = get_hp_class(state.player.health, state.player.max_health);
-        let enemy_id = state.current_enemy.as_ref().map(|e| map_enemy_id(&e.id)).unwrap_or("None");
-        let enemy_hp_class = state.current_enemy.as_ref().map(|e| get_hp_class(e.current_hp, e.base_hp)).unwrap_or("None");
-        let enemy_phase = state.current_enemy.as_ref().map(|e| format!("ep{}", e.phase)).unwrap_or_else(|| "ep0".to_string());
+        let enemy_id = state
+            .current_enemy
+            .as_ref()
+            .map(|e| map_enemy_id(&e.id))
+            .unwrap_or("None");
+        let enemy_hp_class = state
+            .current_enemy
+            .as_ref()
+            .map(|e| get_hp_class(e.current_hp, e.base_hp))
+            .unwrap_or("None");
+        let enemy_phase = state
+            .current_enemy
+            .as_ref()
+            .map(|e| format!("ep{}", e.phase))
+            .unwrap_or_else(|| "ep0".to_string());
         let announced_attack = match &state.announced_attack {
             Some(AttackDir::Overhead) => "aO",
             Some(AttackDir::Left) => "aL",
@@ -74,7 +86,14 @@ impl GameCoordinateSystem for InfinityBladeCoordinateSystem {
 
         format!(
             "b{}:{}:{}:{}:{}:{}:{}:{}",
-            bloodline, hp_class, enemy_id, enemy_hp_class, enemy_phase, announced_attack, in_combat, combo
+            bloodline,
+            hp_class,
+            enemy_id,
+            enemy_hp_class,
+            enemy_phase,
+            announced_attack,
+            in_combat,
+            combo
         )
     }
 
@@ -279,10 +298,14 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
                 next.state = SessionState::Disconnected;
             }
             (SessionState::InLobby, GundamMove::EnterMatch(match_id)) => {
-                next.state = SessionState::InMatch { match_id: *match_id };
+                next.state = SessionState::InMatch {
+                    match_id: *match_id,
+                };
             }
             (SessionState::InLobby, GundamMove::Spectate(match_id)) => {
-                next.state = SessionState::Spectating { match_id: *match_id };
+                next.state = SessionState::Spectating {
+                    match_id: *match_id,
+                };
             }
             (SessionState::InLobby, GundamMove::Disconnect) => {
                 next.state = SessionState::Disconnected;
@@ -291,7 +314,8 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
                 next.profile.apply_xp_gain(*amount);
             }
             (SessionState::InLobby, GundamMove::SpendGold(amount)) => {
-                next.profile.spend_gold(*amount)
+                next.profile
+                    .spend_gold(*amount)
                     .map_err(|e| anyhow::anyhow!("Spend gold failed: {}", e))?;
             }
             (SessionState::InLobby, GundamMove::InventoryAdd) => {

@@ -1,9 +1,9 @@
 use std::fs;
-use std::path::PathBuf;
-use std::process::{Command, Child, Stdio};
-use std::time::{Duration, Instant};
-use std::thread;
 use std::net::TcpStream;
+use std::path::PathBuf;
+use std::process::{Child, Command, Stdio};
+use std::thread;
+use std::time::{Duration, Instant};
 
 struct ChildGuard(Child);
 
@@ -81,7 +81,10 @@ fn run_orchestrator() -> Result<(), anyhow::Error> {
         .status()?;
 
     if !playwright_status.success() {
-        anyhow::bail!("Playwright visual delta test failed with status: {:?}", playwright_status);
+        anyhow::bail!(
+            "Playwright visual delta test failed with status: {:?}",
+            playwright_status
+        );
     }
     tracing::info!("Playwright test run succeeded.");
 
@@ -116,11 +119,42 @@ fn run_orchestrator() -> Result<(), anyhow::Error> {
     }
 
     tracing::info!("\n=== Cryptographic Receipt Validated ===");
-    tracing::info!("Timestamp: {}", receipt.get("timestamp").and_then(|v| v.as_str()).unwrap_or("N/A"));
-    tracing::info!("Prompt: {}", receipt.get("prompt").and_then(|v| v.as_str()).unwrap_or("N/A"));
-    tracing::info!("Verdict: {}", receipt.get("verdict").and_then(|v| v.as_str()).unwrap_or("N/A"));
-    tracing::info!("Visual Delta: {}", receipt.get("visualDelta").and_then(|v| v.as_u64()).map(|d| d.to_string()).unwrap_or_else(|| "N/A".to_string()));
-    tracing::info!("Signature: {}", receipt.get("signature").and_then(|v| v.as_str()).unwrap_or("N/A"));
+    tracing::info!(
+        "Timestamp: {}",
+        receipt
+            .get("timestamp")
+            .and_then(|v| v.as_str())
+            .unwrap_or("N/A")
+    );
+    tracing::info!(
+        "Prompt: {}",
+        receipt
+            .get("prompt")
+            .and_then(|v| v.as_str())
+            .unwrap_or("N/A")
+    );
+    tracing::info!(
+        "Verdict: {}",
+        receipt
+            .get("verdict")
+            .and_then(|v| v.as_str())
+            .unwrap_or("N/A")
+    );
+    tracing::info!(
+        "Visual Delta: {}",
+        receipt
+            .get("visualDelta")
+            .and_then(|v| v.as_u64())
+            .map(|d| d.to_string())
+            .unwrap_or_else(|| "N/A".to_string())
+    );
+    tracing::info!(
+        "Signature: {}",
+        receipt
+            .get("signature")
+            .and_then(|v| v.as_str())
+            .unwrap_or("N/A")
+    );
     tracing::info!("=======================================\n");
 
     Ok(())

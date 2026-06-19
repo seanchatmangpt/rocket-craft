@@ -10,26 +10,22 @@
 //! - `coordinate`: Formal state space coordinate definitions.
 //! - `aimbot`: State space traversal and exploration algorithms.
 
-pub mod domain;
-pub mod cli;
-pub mod logging;
-pub mod discovery;
-pub mod coordinate;
 pub mod aimbot;
+pub mod cli;
+pub mod coordinate;
+pub mod discovery;
+pub mod domain;
+pub mod logging;
 
-pub use domain::account::Account;
-pub use domain::transfer::TransferService;
-pub use domain::environment::TestEnvironment;
+pub use aimbot::{TraversalResult, explore_state_space};
 pub use cli::ClapNoun;
-pub use discovery::{discover_games, DiscoveredGame};
 pub use coordinate::{
-    GameCoordinateSystem,
-    InfinityBladeCoordinateSystem,
-    GundamSessionSimulation,
-    SessionState,
-    GundamMove,
-    GundamCoordinateSystem,
+    GameCoordinateSystem, GundamCoordinateSystem, GundamMove, GundamSessionSimulation,
+    InfinityBladeCoordinateSystem, SessionState,
 };
-pub use aimbot::{explore_state_space, TraversalResult};
+pub use discovery::{DiscoveredGame, discover_games};
+pub use domain::account::Account;
+pub use domain::environment::TestEnvironment;
+pub use domain::transfer::TransferService;
 
-pub use logging::{Logger, LogLevel, LogSink, StdoutSink, FileSink, TuiBufferSink};
+pub use logging::{FileSink, LogLevel, LogSink, Logger, StdoutSink, TuiBufferSink};

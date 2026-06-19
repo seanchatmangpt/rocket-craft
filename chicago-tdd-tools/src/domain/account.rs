@@ -2,9 +2,9 @@
 //!
 //! Provides the `Account` struct representing bank accounts with balance manipulation operations.
 
-use clap::Subcommand;
 use crate::cli::ClapNoun;
 use anyhow::Result;
+use clap::Subcommand;
 
 /// Represents a bank account with a balance.
 ///

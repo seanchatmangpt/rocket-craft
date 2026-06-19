@@ -1,21 +1,41 @@
-use genie_core::spec::{WorldSpec, Place, Bounds3D, Vector3, Actor, Placement};
 use genie_core::layout::LayoutCompiler;
+use genie_core::spec::{Actor, Bounds3D, Place, Placement, Vector3, WorldSpec};
 
 #[test]
 fn should_compile_world_spec_to_t3d_map() {
     // 1. Setup Data (SUT state)
     let mut spec = WorldSpec::new();
 
-    let room = Place::new("room_test", "Test Room", Bounds3D {
-        center: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
-        half_extents: Vector3 { x: 100.0, y: 100.0, z: 50.0 },
-    });
+    let room = Place::new(
+        "room_test",
+        "Test Room",
+        Bounds3D {
+            center: Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            half_extents: Vector3 {
+                x: 100.0,
+                y: 100.0,
+                z: 50.0,
+            },
+        },
+    );
     spec.places.push(room);
 
     let mut welder = Actor::new("bot_1", "Welder", "RoboticWelder", "room_test");
     welder.placement = Placement {
-        position: Vector3 { x: 10.0, y: 10.0, z: 0.0 },
-        rotation: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+        position: Vector3 {
+            x: 10.0,
+            y: 10.0,
+            z: 0.0,
+        },
+        rotation: Vector3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        },
     };
     spec.actors.push(welder);
 
@@ -70,27 +90,59 @@ fn should_handle_relative_positioning_of_actors_in_different_places() {
     let mut spec = WorldSpec::new();
 
     // Place 1 at origin
-    let room1 = Place::new("room_1", "Room 1", Bounds3D {
-        center: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
-        half_extents: Vector3 { x: 100.0, y: 100.0, z: 50.0 },
-    });
+    let room1 = Place::new(
+        "room_1",
+        "Room 1",
+        Bounds3D {
+            center: Vector3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            half_extents: Vector3 {
+                x: 100.0,
+                y: 100.0,
+                z: 50.0,
+            },
+        },
+    );
     spec.places.push(room1);
 
     // Place 2 shifted
-    let room2 = Place::new("room_2", "Room 2", Bounds3D {
-        center: Vector3 { x: 500.0, y: 0.0, z: 0.0 },
-        half_extents: Vector3 { x: 100.0, y: 100.0, z: 50.0 },
-    });
+    let room2 = Place::new(
+        "room_2",
+        "Room 2",
+        Bounds3D {
+            center: Vector3 {
+                x: 500.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            half_extents: Vector3 {
+                x: 100.0,
+                y: 100.0,
+                z: 50.0,
+            },
+        },
+    );
     spec.places.push(room2);
 
     // Actor in room 1
     let mut actor1 = Actor::new("actor_1", "Actor 1", "RoboticWelder", "room_1");
-    actor1.placement.position = Vector3 { x: 50.0, y: 0.0, z: 0.0 };
+    actor1.placement.position = Vector3 {
+        x: 50.0,
+        y: 0.0,
+        z: 0.0,
+    };
     spec.actors.push(actor1);
 
     // Actor in room 2: absolute X = parent_center.x(500) + relative.x(50) = 550
     let mut actor2 = Actor::new("actor_2", "Actor 2", "RoboticWelder", "room_2");
-    actor2.placement.position = Vector3 { x: 50.0, y: 0.0, z: 0.0 };
+    actor2.placement.position = Vector3 {
+        x: 50.0,
+        y: 0.0,
+        z: 0.0,
+    };
     spec.actors.push(actor2);
 
     let t3d_output = LayoutCompiler::compile(&spec);

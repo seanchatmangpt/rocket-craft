@@ -1,6 +1,6 @@
+use std::fs;
 use std::path::PathBuf;
 use tempfile::TempDir;
-use std::fs;
 
 /// Manages a temporary file system environment for testing.
 ///
@@ -24,10 +24,10 @@ impl TestEnvironment {
     pub fn new() -> anyhow::Result<Self> {
         let temp_dir = TempDir::new()?;
         let original_dir = std::env::current_dir()?;
-        
+
         // We don't change directory here, because it's global and can affect other tests.
         // Instead, the SUT should be able to accept a base path.
-        
+
         Ok(Self {
             temp_dir,
             original_dir,
