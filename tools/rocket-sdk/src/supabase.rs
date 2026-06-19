@@ -1,6 +1,6 @@
+use anyhow::Result;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use anyhow::Result;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Player {
@@ -40,7 +40,7 @@ impl SupabaseService {
             .header("Authorization", &format!("Bearer {}", self.anon_key))
             .send()
             .await?;
-        
+
         response.error_for_status_ref()?;
 
         let players = response.json::<Vec<Player>>().await?;
@@ -57,7 +57,7 @@ impl SupabaseService {
             .await?;
 
         response.error_for_status_ref()?;
-        
+
         let leaderboard = response.json::<Vec<LeaderboardEntry>>().await?;
         Ok(leaderboard)
     }

@@ -6,10 +6,12 @@ use serde_json::Value;
 
 fn do_validate_receipt(file: String) -> Result<Value> {
     use std::fs;
-    let raw = fs::read_to_string(&file)
-        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("cannot read {}: {}", file, e)))?;
-    let val: Value = serde_json::from_str(&raw)
-        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("invalid JSON in {}: {}", file, e)))?;
+    let raw = fs::read_to_string(&file).map_err(|e| {
+        clap_noun_verb::NounVerbError::execution_error(format!("cannot read {}: {}", file, e))
+    })?;
+    let val: Value = serde_json::from_str(&raw).map_err(|e| {
+        clap_noun_verb::NounVerbError::execution_error(format!("invalid JSON in {}: {}", file, e))
+    })?;
     let mut errors: Vec<String> = Vec::new();
 
     for field in &["verdict", "output_hash", "run_id", "timestamp", "signature"] {
@@ -43,17 +45,25 @@ fn do_validate_receipt(file: String) -> Result<Value> {
     // visual delta must exceed motion threshold (100 px) when present
     if let Some(delta) = val.get("visualDelta").and_then(|v| v.as_u64()) {
         if delta < 100 {
-            errors.push(format!("visualDelta={delta} < 100 — no physics motion detected"));
+            errors.push(format!(
+                "visualDelta={delta} < 100 — no physics motion detected"
+            ));
         }
     }
 
     if errors.is_empty() {
         let run_id = val.get("run_id").and_then(|v| v.as_str()).unwrap_or("?");
-        let hash = val.get("output_hash").and_then(|v| v.as_str()).unwrap_or("?");
+        let hash = val
+            .get("output_hash")
+            .and_then(|v| v.as_str())
+            .unwrap_or("?");
         println!("PASS  run={run_id}  output={hash}  file={file}");
         Ok(serde_json::json!({"status": "pass", "file": file, "run_id": run_id}))
     } else {
-        Err(clap_noun_verb::NounVerbError::execution_error(format!("FAIL {file}: {}", errors.join("; "))))
+        Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "FAIL {file}: {}",
+            errors.join("; ")
+        )))
     }
 }
 

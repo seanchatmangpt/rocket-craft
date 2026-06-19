@@ -1,19 +1,19 @@
-pub mod manifest;
-pub mod error;
+pub mod audit_affidavit;
 pub mod config;
-pub mod setup;
 pub mod crypto;
 pub mod doctor;
-pub mod supabase;
-pub mod audit_affidavit;
+pub mod error;
 pub mod html5;
+pub mod manifest;
+pub mod setup;
+pub mod supabase;
 pub mod wasm;
 pub use html5::{Html5Cook, Html5Setup};
 
-use std::path::{Path, PathBuf};
-use anyhow::Result;
-pub use unrdf::Project as SemanticProject;
 pub use crate::manifest::Manifest;
+use anyhow::Result;
+use std::path::{Path, PathBuf};
+pub use unrdf::Project as SemanticProject;
 
 /// Core context for the Rocket SDK, providing access to the project workspace and manifest.
 pub struct RocketContext {
@@ -103,8 +103,16 @@ pub struct UatBuildExecutor;
 
 impl BuildExecutor for UatBuildExecutor {
     fn execute(&self, build: &Build, ue4_root: &Path) -> Result<()> {
-        let uat_name = if cfg!(windows) { "RunUAT.bat" } else { "RunUAT.sh" };
-        let uat_path = ue4_root.join("Engine").join("Build").join("BatchFiles").join(uat_name);
+        let uat_name = if cfg!(windows) {
+            "RunUAT.bat"
+        } else {
+            "RunUAT.sh"
+        };
+        let uat_path = ue4_root
+            .join("Engine")
+            .join("Build")
+            .join("BatchFiles")
+            .join(uat_name);
 
         let status = std::process::Command::new(&uat_path)
             .arg("BuildCookRun")

@@ -152,11 +152,20 @@ fn main() -> Result<()> {
             "Preflight: {} files checked, {} errors, {}",
             pf.files_checked,
             pf.errors.len(),
-            if pf.passed { "PASSED".green() } else { "FAILED".red() }
+            if pf.passed {
+                "PASSED".green()
+            } else {
+                "FAILED".red()
+            }
         );
         if !pf.passed {
             for e in &pf.errors {
-                log!("  PREFLIGHT ERROR: {}:{} — {}", e.file, e.line.unwrap_or(0), e.message);
+                log!(
+                    "  PREFLIGHT ERROR: {}:{} — {}",
+                    e.file,
+                    e.line.unwrap_or(0),
+                    e.message
+                );
             }
             receipt.preflight = Some(pf);
             write_receipt(engine, &receipt)?;
@@ -174,7 +183,13 @@ fn main() -> Result<()> {
 
     for target in targets {
         log!("--- Building: {} Mac Development ---", target);
-        let result = build_target(target, &build_sh, args.stall_secs, &args.ubt_args, &mut log_file)?;
+        let result = build_target(
+            target,
+            &build_sh,
+            args.stall_secs,
+            &args.ubt_args,
+            &mut log_file,
+        )?;
 
         let ok = result.success;
         let stalled = result.stalled;
@@ -184,7 +199,8 @@ fn main() -> Result<()> {
             write_receipt(engine, &receipt)?;
             bail!(
                 "BLOCKED: {} stalled (no output for {}s) — killed. Receipt written.",
-                target, args.stall_secs
+                target,
+                args.stall_secs
             );
         }
         if !ok {
@@ -201,13 +217,20 @@ fn main() -> Result<()> {
                 receipt_path(engine).display()
             );
         }
-        log!("Finished: {} Mac Development ({:.1}s)", target, receipt.targets.last().unwrap().duration_secs);
+        log!(
+            "Finished: {} Mac Development ({:.1}s)",
+            target,
+            receipt.targets.last().unwrap().duration_secs
+        );
     }
 
     // ── Verify editor binary ──────────────────────────────────────────────────
     let editor_bin = engine.join("Engine/Binaries/Mac/UE4Editor");
     if !editor_bin.exists() {
-        bail!("BLOCKED: UE4Editor binary not found at {} after build", editor_bin.display());
+        bail!(
+            "BLOCKED: UE4Editor binary not found at {} after build",
+            editor_bin.display()
+        );
     }
 
     let size_bytes = fs::metadata(&editor_bin)?.len();
@@ -246,9 +269,8 @@ fn main() -> Result<()> {
 // ── Preflight ─────────────────────────────────────────────────────────────────
 
 fn run_preflight(engine: &Path, log_file: &mut fs::File) -> Result<PreflightResult> {
-    let html5_private = engine.join(
-        "Engine/Platforms/HTML5/Source/Developer/HTML5TargetPlatform/Private",
-    );
+    let html5_private =
+        engine.join("Engine/Platforms/HTML5/Source/Developer/HTML5TargetPlatform/Private");
 
     let mut cpp_files: Vec<PathBuf> = vec![];
     if html5_private.exists() {
@@ -258,7 +280,10 @@ fn run_preflight(engine: &Path, log_file: &mut fs::File) -> Result<PreflightResu
             .filter_map(|e| e.ok())
         {
             let p = entry.path().to_path_buf();
-            if matches!(p.extension().and_then(|s| s.to_str()), Some("cpp") | Some("h")) {
+            if matches!(
+                p.extension().and_then(|s| s.to_str()),
+                Some("cpp") | Some("h")
+            ) {
                 cpp_files.push(p);
             }
         }
@@ -267,9 +292,10 @@ fn run_preflight(engine: &Path, log_file: &mut fs::File) -> Result<PreflightResu
     let mut all_errors: Vec<ExtractedError> = vec![];
 
     // clang -fsyntax-only each .cpp (not .h — headers are checked via their including .cpp)
-    let cpp_only: Vec<&PathBuf> = cpp_files.iter().filter(|p| {
-        p.extension().and_then(|s| s.to_str()) == Some("cpp")
-    }).collect();
+    let cpp_only: Vec<&PathBuf> = cpp_files
+        .iter()
+        .filter(|p| p.extension().and_then(|s| s.to_str()) == Some("cpp"))
+        .collect();
 
     let include_flags = format!(
         "-I{}/Engine/Source -I{} -I{}/Engine/Source/Runtime/Core/Public \
@@ -290,14 +316,25 @@ fn run_preflight(engine: &Path, log_file: &mut fs::File) -> Result<PreflightResu
             Ok(out) if !out.status.success() => {
                 let stderr = String::from_utf8_lossy(&out.stderr);
                 for e in parse_clang_errors(&stderr, cpp) {
-                    writeln!(log_file, "[PREFLIGHT] {}: {} — {}", e.file, e.line.unwrap_or(0), e.message).ok();
+                    writeln!(
+                        log_file,
+                        "[PREFLIGHT] {}: {} — {}",
+                        e.file,
+                        e.line.unwrap_or(0),
+                        e.message
+                    )
+                    .ok();
                     all_errors.push(e);
                 }
             }
             Err(e) => {
                 // clang not in PATH — skip preflight gracefully
                 writeln!(log_file, "[PREFLIGHT] clang not available: {e} — skipping").ok();
-                return Ok(PreflightResult { files_checked: 0, errors: vec![], passed: true });
+                return Ok(PreflightResult {
+                    files_checked: 0,
+                    errors: vec![],
+                    passed: true,
+                });
             }
             _ => {}
         }
@@ -390,7 +427,12 @@ fn build_target(
 
         let idle = last_watch.lock().unwrap().elapsed();
         if idle > stall_timeout {
-            writeln!(log_file, "[watchdog] STALL detected: {}s of silence — killing", idle.as_secs()).ok();
+            writeln!(
+                log_file,
+                "[watchdog] STALL detected: {}s of silence — killing",
+                idle.as_secs()
+            )
+            .ok();
             stalled = true;
             let _ = child.kill();
             break;
@@ -428,7 +470,12 @@ fn parse_clang_errors(stderr: &str, source: &Path) -> Vec<ExtractedError> {
             let file = parts[0].to_string();
             let line = parts[1].parse::<u32>().ok();
             let message = parts.get(4).unwrap_or(&"").trim().to_string();
-            out.push(ExtractedError { file, line, message, raw: raw.to_string() });
+            out.push(ExtractedError {
+                file,
+                line,
+                message,
+                raw: raw.to_string(),
+            });
         } else {
             out.push(ExtractedError {
                 file: source.display().to_string(),
@@ -486,7 +533,9 @@ fn hash_file(path: &Path) -> Result<String> {
     let mut buf = [0u8; 65536];
     loop {
         let n = file.read(&mut buf)?;
-        if n == 0 { break; }
+        if n == 0 {
+            break;
+        }
         hasher.update(&buf[..n]);
     }
     Ok(hasher.finalize().to_hex().to_string())

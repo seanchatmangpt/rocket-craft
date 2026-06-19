@@ -29,9 +29,9 @@ fn do_html5_serve(dir: Option<String>, port: Option<u16>) -> Result<Value> {
     let port = port.unwrap_or(8080);
     let path = PathBuf::from(&dir);
     if !path.exists() {
-        return Err(clap_noun_verb::NounVerbError::execution_error(
-            format!("HTML5 package directory not found: {dir}")
-        ));
+        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "HTML5 package directory not found: {dir}"
+        )));
     }
     println!("Serving {dir} on http://0.0.0.0:{port}");
     let status = Command::new("python3")
@@ -40,23 +40,32 @@ fn do_html5_serve(dir: Option<String>, port: Option<u16>) -> Result<Value> {
         .status()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
     if !status.success() {
-        return Err(clap_noun_verb::NounVerbError::execution_error(
-            format!("http.server exited with {status}")
-        ));
+        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "http.server exited with {status}"
+        )));
     }
     Ok(serde_json::json!({"status": "ok"}))
 }
 
-fn do_html5_cook(project: String, archive: Option<String>, config: Option<String>) -> Result<Value> {
+fn do_html5_cook(
+    project: String,
+    archive: Option<String>,
+    config: Option<String>,
+) -> Result<Value> {
     let root = std::env::current_dir()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
     let ctx = rocket_sdk::RocketContext::load(&root)
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
-    let proj = ctx.manifest.projects().iter()
+    let proj = ctx
+        .manifest
+        .projects()
+        .iter()
         .find(|p| p.name == project)
-        .ok_or_else(|| clap_noun_verb::NounVerbError::execution_error(
-            format!("project '{project}' not found in project-manifest.json")
-        ))?;
+        .ok_or_else(|| {
+            clap_noun_verb::NounVerbError::execution_error(format!(
+                "project '{project}' not found in project-manifest.json"
+            ))
+        })?;
 
     let uproject = root.join(&proj.uproject_path);
     let archive_dir = archive
@@ -64,7 +73,11 @@ fn do_html5_cook(project: String, archive: Option<String>, config: Option<String
         .unwrap_or_else(|| std::path::PathBuf::from("/tmp/brm-html5-archive"));
     let engine = ue4_root();
 
-    println!("HTML5 cook: {} → {}", uproject.display(), archive_dir.display());
+    println!(
+        "HTML5 cook: {} → {}",
+        uproject.display(),
+        archive_dir.display()
+    );
     println!("Engine: {}", engine.display());
 
     let mut cook = rocket_sdk::Html5Cook::new(&engine, &uproject, &archive_dir);

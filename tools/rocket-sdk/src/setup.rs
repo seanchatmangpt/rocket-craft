@@ -1,8 +1,8 @@
-use std::path::{Path, PathBuf};
-use std::env;
-use inquire::{Confirm, Text, Select};
-use tracing::{info, warn, error, instrument};
 use crate::config::RocketConfig;
+use inquire::{Confirm, Select, Text};
+use std::env;
+use std::path::{Path, PathBuf};
+use tracing::{error, info, instrument, warn};
 
 /// Locate the UE4 engine root from `.rocket.json` / `UE4_ROOT` / common paths.
 pub fn find_engine_root() -> anyhow::Result<PathBuf> {
@@ -18,9 +18,9 @@ pub fn run_setup() -> anyhow::Result<()> {
     info!("Starting Rocket Craft Project Setup");
 
     let mut config = RocketConfig::load()?;
-    
+
     let ue4_root = find_ue4_root(&config)?;
-    
+
     if let Some(root) = ue4_root {
         info!("Found Unreal Engine 4.27 HTML5 ES3 at: {:?}", root);
         config.ue4_root = Some(root);
@@ -76,7 +76,7 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
         if validate_ue4_root(&path) && !candidates.contains(&path) {
             candidates.push(path.clone());
         }
-        
+
         // Also check relative to project root
         if let Ok(cwd) = env::current_dir() {
             let abs_path = cwd.join(&path);
@@ -87,12 +87,14 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
     }
 
     if !candidates.is_empty() {
-        let mut options: Vec<String> = candidates.iter()
+        let mut options: Vec<String> = candidates
+            .iter()
             .map(|p| p.to_string_lossy().to_string())
             .collect();
         options.push("Enter path manually...".to_string());
 
-        let selection = Select::new("Select Unreal Engine 4.27 HTML5 ES3 root:", options).prompt()?;
+        let selection =
+            Select::new("Select Unreal Engine 4.27 HTML5 ES3 root:", options).prompt()?;
 
         if selection == "Enter path manually..." {
             prompt_manual_path()
@@ -105,17 +107,21 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
 }
 
 fn prompt_manual_path() -> anyhow::Result<Option<PathBuf>> {
-    let input = Text::new("Please enter the path to your Unreal Engine 4.27 HTML5 ES3 root:").prompt()?;
-    
+    let input =
+        Text::new("Please enter the path to your Unreal Engine 4.27 HTML5 ES3 root:").prompt()?;
+
     let path = PathBuf::from(input);
     if validate_ue4_root(&path) {
         Ok(Some(path))
     } else {
-        warn!("Provided path does not seem to contain a valid RunUAT script: {:?}", path);
+        warn!(
+            "Provided path does not seem to contain a valid RunUAT script: {:?}",
+            path
+        );
         let confirm = Confirm::new("Use this path anyway?")
             .with_default(false)
             .prompt()?;
-        
+
         if confirm {
             Ok(Some(path))
         } else {
@@ -125,7 +131,15 @@ fn prompt_manual_path() -> anyhow::Result<Option<PathBuf>> {
 }
 
 fn validate_ue4_root(path: &Path) -> bool {
-    let uat_name = if cfg!(windows) { "RunUAT.bat" } else { "RunUAT.sh" };
-    let uat_path = path.join("Engine").join("Build").join("BatchFiles").join(uat_name);
+    let uat_name = if cfg!(windows) {
+        "RunUAT.bat"
+    } else {
+        "RunUAT.sh"
+    };
+    let uat_path = path
+        .join("Engine")
+        .join("Build")
+        .join("BatchFiles")
+        .join(uat_name);
     uat_path.exists()
 }

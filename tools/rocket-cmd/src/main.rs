@@ -2,15 +2,11 @@
 // longer emits it automatically. On Linux x86_64 the OS handles guard pages,
 // so a no-op stub is safe for debug/development builds.
 #[cfg(target_arch = "x86_64")]
-core::arch::global_asm!(
-    ".globl __rust_probestack",
-    "__rust_probestack:",
-    "ret",
-);
+core::arch::global_asm!(".globl __rust_probestack", "__rust_probestack:", "ret",);
 
 mod compliance;
-pub mod lock;
 pub mod inspect;
+pub mod lock;
 pub mod registry;
 mod verbs; // must be imported so linkme slice is populated
 

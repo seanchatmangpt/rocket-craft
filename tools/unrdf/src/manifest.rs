@@ -39,7 +39,8 @@ pub struct Manifest {
 impl Manifest {
     /// Parse a manifest from a TOML string.
     pub fn from_toml(toml: &str) -> Result<Self, ManifestError> {
-        let manifest: Self = toml::from_str(toml).map_err(|e| ManifestError::Parse(e.to_string()))?;
+        let manifest: Self =
+            toml::from_str(toml).map_err(|e| ManifestError::Parse(e.to_string()))?;
         if manifest.name.is_empty() {
             return Err(ManifestError::MissingField("name".into()));
         }

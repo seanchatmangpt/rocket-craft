@@ -1,7 +1,7 @@
+use mockall::automock;
+use std::fs;
 use std::path::PathBuf;
 use tempfile::TempDir;
-use std::fs;
-use mockall::automock;
 
 /// A trait for executing commands related to Unreal Engine.
 ///
@@ -42,24 +42,33 @@ impl UnrealEnvMock {
         let engine_path = root_path.join("Engine");
         fs::create_dir_all(engine_path.join("Binaries/Win64"))?;
         fs::create_dir_all(engine_path.join("Binaries/DotNET"))?;
-        
+
         // Mock Editor, UBT, and UAT
         #[cfg(windows)]
         {
-            fs::write(engine_path.join("Binaries/DotNET/UnrealBuildTool.exe"), "@echo off\nexit /b 0")?;
-            fs::write(engine_path.join("Binaries/DotNET/AutomationTool.exe"), "@echo off\nexit /b 0")?;
-            fs::write(engine_path.join("Binaries/Win64/UE4Editor.exe"), "@echo off\nexit /b 0")?;
+            fs::write(
+                engine_path.join("Binaries/DotNET/UnrealBuildTool.exe"),
+                "@echo off\nexit /b 0",
+            )?;
+            fs::write(
+                engine_path.join("Binaries/DotNET/AutomationTool.exe"),
+                "@echo off\nexit /b 0",
+            )?;
+            fs::write(
+                engine_path.join("Binaries/Win64/UE4Editor.exe"),
+                "@echo off\nexit /b 0",
+            )?;
         }
         #[cfg(not(windows))]
         {
             let ubt_path = engine_path.join("Binaries/DotNET/UnrealBuildTool");
             let uat_path = engine_path.join("Binaries/DotNET/AutomationTool");
-            
+
             let mac_editor_dir = engine_path.join("Binaries/Mac");
             let linux_editor_dir = engine_path.join("Binaries/Linux");
             fs::create_dir_all(&mac_editor_dir)?;
             fs::create_dir_all(&linux_editor_dir)?;
-            
+
             let mac_editor_path = mac_editor_dir.join("UE4Editor");
             let linux_editor_path = linux_editor_dir.join("UE4Editor");
 
@@ -111,7 +120,10 @@ impl UnrealEnvMock {
     /// Returns an error if the file cannot be written.
     pub fn write_uproject(&self, content: &str) -> anyhow::Result<()> {
         let name = self.project_path.file_name().unwrap().to_str().unwrap();
-        fs::write(self.project_path.join(format!("{}.uproject", name)), content)?;
+        fs::write(
+            self.project_path.join(format!("{}.uproject", name)),
+            content,
+        )?;
         Ok(())
     }
 

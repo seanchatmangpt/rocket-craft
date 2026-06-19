@@ -88,12 +88,12 @@ impl Law for AndroidKeystoreLaw {
         // Check if there are any Android-related files or configurations
         // For simplicity, let's check if there's an 'Android' directory in any project version
         // or a DefaultEngine.ini that mentions Android.
-        
+
         // In this workspace, Android keystores are expected if there's an Android platform folder.
         // Let's check for keystore files (*.keystore or *.jks)
-        
+
         let mut has_android = false;
-        
+
         // Search for Android platform directories
         let walker = ignore::WalkBuilder::new(project_path).build();
         for entry in walker {
@@ -101,7 +101,7 @@ impl Law for AndroidKeystoreLaw {
                 Ok(e) => e,
                 Err(_) => continue,
             };
-            
+
             if entry.path().is_dir() && entry.path().to_string_lossy().contains("Android") {
                 has_android = true;
                 break;
@@ -118,18 +118,22 @@ impl Law for AndroidKeystoreLaw {
                     Ok(e) => e,
                     Err(_) => continue,
                 };
-                
-                let is_keystore = entry.path().extension().is_some_and(|ext| ext == "keystore" || ext == "jks");
+
+                let is_keystore = entry
+                    .path()
+                    .extension()
+                    .is_some_and(|ext| ext == "keystore" || ext == "jks");
                 if is_keystore {
                     has_keystore = true;
                     break;
                 }
             }
-            
+
             if !has_keystore {
                 return Err(LawError {
                     law_name: self.name().to_string(),
-                    message: "Android target detected but no .keystore or .jks file found.".to_string(),
+                    message: "Android target detected but no .keystore or .jks file found."
+                        .to_string(),
                 });
             }
         }

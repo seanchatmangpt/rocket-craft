@@ -52,7 +52,9 @@ pub struct Machine<L, P> {
 
 impl<L, P: std::fmt::Debug> std::fmt::Debug for Machine<L, P> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Machine").field("phase", &self.phase).finish()
+        f.debug_struct("Machine")
+            .field("phase", &self.phase)
+            .finish()
     }
 }
 
@@ -195,7 +197,11 @@ mod tests {
         let dir = TempDir::new().unwrap();
         let path = write_manifest(&dir, sample_json());
         let manifest = Manifest::load(&path).unwrap();
-        let brm = manifest.projects().iter().find(|p| p.name == "Brm").unwrap();
+        let brm = manifest
+            .projects()
+            .iter()
+            .find(|p| p.name == "Brm")
+            .unwrap();
         assert!(brm.targets.contains(&"BrmEditor".to_string()));
     }
 
@@ -210,7 +216,8 @@ mod tests {
     #[test]
     fn project_with_empty_name_rejected() {
         let dir = TempDir::new().unwrap();
-        let json = r#"{"projects": [{"name": "", "uproject_path": "foo.uproject", "targets": []}]}"#;
+        let json =
+            r#"{"projects": [{"name": "", "uproject_path": "foo.uproject", "targets": []}]}"#;
         let path = write_manifest(&dir, json);
         let err = Manifest::load(&path).unwrap_err();
         assert!(err.to_string().contains("no name"));

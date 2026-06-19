@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 use std::fs;
+use std::path::PathBuf;
 
 use crate::error::RocketError;
 
@@ -13,10 +13,8 @@ impl RocketConfig {
     pub fn load() -> anyhow::Result<Self> {
         let config_path = PathBuf::from(".rocket.json");
         if config_path.exists() {
-            let content = fs::read_to_string(&config_path)
-                .map_err(RocketError::Io)?;
-            let config: Self = serde_json::from_str(&content)
-                .map_err(RocketError::Json)?;
+            let content = fs::read_to_string(&config_path).map_err(RocketError::Io)?;
+            let config: Self = serde_json::from_str(&content).map_err(RocketError::Json)?;
             Ok(config)
         } else {
             Ok(Self::default())

@@ -306,7 +306,11 @@ mod tests {
     fn git_wrapper_is_created() {
         let wrapper = Path::new(GIT_WRAPPER_DIR).join("git");
         ensure_git_wrapper().unwrap();
-        assert!(wrapper.exists(), "git wrapper must exist at {}", wrapper.display());
+        assert!(
+            wrapper.exists(),
+            "git wrapper must exist at {}",
+            wrapper.display()
+        );
         let content = std::fs::read_to_string(&wrapper).unwrap();
         assert!(content.contains("exit 0"));
     }
@@ -314,7 +318,10 @@ mod tests {
     #[test]
     fn prepend_to_path_contains_dir() {
         let result = prepend_to_path("/my/custom/dir");
-        assert!(result.starts_with("/my/custom/dir"), "prepended dir must be first in PATH");
+        assert!(
+            result.starts_with("/my/custom/dir"),
+            "prepended dir must be first in PATH"
+        );
         assert!(result.contains(':'), "must contain a PATH separator");
     }
 }

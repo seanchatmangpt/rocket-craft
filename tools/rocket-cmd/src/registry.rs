@@ -1,10 +1,10 @@
-use std::path::{Path, PathBuf};
-use std::fs;
-use std::io::{self, BufRead};
-use walkdir::WalkDir;
-use serde::{Deserialize, Serialize};
 use blake3;
 use colored::*;
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io::{self, BufRead};
+use std::path::{Path, PathBuf};
+use walkdir::WalkDir;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -43,9 +43,24 @@ fn calculate_file_hashes(path: &Path) -> anyhow::Result<(String, String)> {
 }
 
 pub fn run_copy(manifest_path: &str) -> anyhow::Result<()> {
-    println!("{}", "====================================================".cyan().bold());
-    println!("{}", "      Consolidate Ontology Catalogue (Rust)        ".cyan().bold());
-    println!("{}", "====================================================".cyan().bold());
+    println!(
+        "{}",
+        "===================================================="
+            .cyan()
+            .bold()
+    );
+    println!(
+        "{}",
+        "      Consolidate Ontology Catalogue (Rust)        "
+            .cyan()
+            .bold()
+    );
+    println!(
+        "{}",
+        "===================================================="
+            .cyan()
+            .bold()
+    );
 
     let home = get_home_dir()?;
     let target_base = home.join("ggen/ontology_catalogue");
@@ -88,7 +103,11 @@ pub fn run_copy(manifest_path: &str) -> anyhow::Result<()> {
 
         if let Some(parent) = dest_path.parent() {
             if let Err(e) = fs::create_dir_all(parent) {
-                eprintln!("[WARN] Failed to create directories for '{}': {}", dest_path.display(), e);
+                eprintln!(
+                    "[WARN] Failed to create directories for '{}': {}",
+                    dest_path.display(),
+                    e
+                );
                 errors += 1;
                 continue;
             }
@@ -99,34 +118,76 @@ pub fn run_copy(manifest_path: &str) -> anyhow::Result<()> {
                 copied += 1;
             }
             Err(e) => {
-                eprintln!("[WARN] Failed to copy '{}' to '{}': {}", src_path.display(), dest_path.display(), e);
+                eprintln!(
+                    "[WARN] Failed to copy '{}' to '{}': {}",
+                    src_path.display(),
+                    dest_path.display(),
+                    e
+                );
                 errors += 1;
             }
         }
     }
 
-    println!("{}", "----------------------------------------------------".cyan().bold());
-    println!("{} Catalogue consolidation complete.", "[SUCCESS]".green().bold());
-    println!("Summary: Copied={}, Skipped={}, Errors={}", copied, skipped, errors);
-    println!("{}", "====================================================".cyan().bold());
+    println!(
+        "{}",
+        "----------------------------------------------------"
+            .cyan()
+            .bold()
+    );
+    println!(
+        "{} Catalogue consolidation complete.",
+        "[SUCCESS]".green().bold()
+    );
+    println!(
+        "Summary: Copied={}, Skipped={}, Errors={}",
+        copied, skipped, errors
+    );
+    println!(
+        "{}",
+        "===================================================="
+            .cyan()
+            .bold()
+    );
 
     Ok(())
 }
 
 pub fn run_index() -> anyhow::Result<()> {
-    println!("{}", "====================================================".cyan().bold());
-    println!("{}", "    Index O-Crates (Registry Builder - Rust)        ".cyan().bold());
-    println!("{}", "====================================================".cyan().bold());
+    println!(
+        "{}",
+        "===================================================="
+            .cyan()
+            .bold()
+    );
+    println!(
+        "{}",
+        "    Index O-Crates (Registry Builder - Rust)        "
+            .cyan()
+            .bold()
+    );
+    println!(
+        "{}",
+        "===================================================="
+            .cyan()
+            .bold()
+    );
 
     let home = get_home_dir()?;
     let catalogue_root = home.join("ggen/ontology_catalogue");
     let marketplace_root = home.join("ggen/marketplace");
     let index_json = marketplace_root.join("registry/index.json");
 
-    println!("Indexing O-Crates in catalogue: {}", catalogue_root.display());
+    println!(
+        "Indexing O-Crates in catalogue: {}",
+        catalogue_root.display()
+    );
 
     if !catalogue_root.exists() {
-        anyhow::bail!("Catalogue root directory does not exist: {}", catalogue_root.display());
+        anyhow::bail!(
+            "Catalogue root directory does not exist: {}",
+            catalogue_root.display()
+        );
     }
 
     let registry_dir = marketplace_root.join("registry");
@@ -173,7 +234,7 @@ pub fn run_index() -> anyhow::Result<()> {
             if file_entry.file_type().is_file() {
                 let file_path = file_entry.path();
                 let file_name = file_path.file_name().and_then(|s| s.to_str()).unwrap_or("");
-                
+
                 let mut matches = false;
                 if file_name.ends_with(".ttl") {
                     ttl_count += 1;
@@ -204,7 +265,11 @@ pub fn run_index() -> anyhow::Result<()> {
                     crate_blake_hasher.update(blake_hex.as_bytes());
                 }
                 Err(e) => {
-                    eprintln!("[WARN] Failed to compute hash for '{}': {}", f_path.display(), e);
+                    eprintln!(
+                        "[WARN] Failed to compute hash for '{}': {}",
+                        f_path.display(),
+                        e
+                    );
                 }
             }
         }
@@ -223,22 +288,45 @@ pub fn run_index() -> anyhow::Result<()> {
         });
 
         // Update registry: remove existing with same ID
-        if let Some(pos) = registry.iter().position(|item| item.get("id").and_then(|v| v.as_str()) == Some(crate_id.as_str())) {
+        if let Some(pos) = registry
+            .iter()
+            .position(|item| item.get("id").and_then(|v| v.as_str()) == Some(crate_id.as_str()))
+        {
             registry.remove(pos);
         }
         registry.push(crate_meta);
         crate_count += 1;
 
-        println!("{} Indexed Crate: {} (Ontologies: {}, Queries: {})", "[INFO]".blue().bold(), crate_id.bold(), ttl_count, rq_count);
+        println!(
+            "{} Indexed Crate: {} (Ontologies: {}, Queries: {})",
+            "[INFO]".blue().bold(),
+            crate_id.bold(),
+            ttl_count,
+            rq_count
+        );
     }
 
     let serialized = serde_json::to_string_pretty(&registry)?;
     fs::write(&index_json, serialized)?;
 
-    println!("{}", "----------------------------------------------------".cyan().bold());
-    println!("{} Indexed {} O-Crates successfully into registry.", "[SUCCESS]".green().bold(), crate_count);
+    println!(
+        "{}",
+        "----------------------------------------------------"
+            .cyan()
+            .bold()
+    );
+    println!(
+        "{} Indexed {} O-Crates successfully into registry.",
+        "[SUCCESS]".green().bold(),
+        crate_count
+    );
     println!("Registry location: {}", index_json.display());
-    println!("{}", "====================================================".cyan().bold());
+    println!(
+        "{}",
+        "===================================================="
+            .cyan()
+            .bold()
+    );
 
     Ok(())
 }

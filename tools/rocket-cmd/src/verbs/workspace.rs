@@ -17,9 +17,13 @@ fn do_clean() -> Result<Value> {
     use walkdir::WalkDir;
     tracing::info!("{}", "=== Cleaning Workspace ===");
     let targets = ["Binaries", "Intermediate", "Saved"];
-    for entry in WalkDir::new("versions").into_iter().filter_map(|e| e.ok()).filter(|e| {
-        e.file_type().is_dir() && targets.contains(&e.file_name().to_string_lossy().as_ref())
-    }) {
+    for entry in WalkDir::new("versions")
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| {
+            e.file_type().is_dir() && targets.contains(&e.file_name().to_string_lossy().as_ref())
+        })
+    {
         fs::remove_dir_all(entry.path())
             .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{}", e)))?;
     }

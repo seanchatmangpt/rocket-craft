@@ -29,20 +29,51 @@ fn do_doctor() -> Result<Value> {
 
 fn do_capabilities() -> Result<Value> {
     let capabilities = [
-        ("Multiplatform Orchestration", "Unified build system for Windows, Linux, Android, and HTML5 (Web)."),
-        ("Semantic Compliance", "Law-based project auditing via the ComplianceEngine and knhk plugin system."),
-        ("Generative SDK", "Zero-cost typestate kernel in rocket-sdk for safe UE project manipulation."),
-        ("PWA Optimization", "Automated asset manifest generation and mobile-ready PWA scaffolding."),
-        ("Crypto Automation", "Automated Android keystore generation and lifecycle management."),
-        ("Environment Diagnostics", "Rocket Doctor for programmatic workspace health and dependency checks."),
-        ("Log Streaming", "Real-time colorized log tailing with semantic highlighting for UE4 builds."),
-        ("TUI Dashboard", "Interactive terminal UI for project management (built with ratatui)."),
-        ("Wasm Plugin System", "Extensible compliance laws via WebAssembly (Wasmer integration)."),
-        ("Chicago TDD Integration", "Automated test orchestration across Rust and Python validation suites."),
+        (
+            "Multiplatform Orchestration",
+            "Unified build system for Windows, Linux, Android, and HTML5 (Web).",
+        ),
+        (
+            "Semantic Compliance",
+            "Law-based project auditing via the ComplianceEngine and knhk plugin system.",
+        ),
+        (
+            "Generative SDK",
+            "Zero-cost typestate kernel in rocket-sdk for safe UE project manipulation.",
+        ),
+        (
+            "PWA Optimization",
+            "Automated asset manifest generation and mobile-ready PWA scaffolding.",
+        ),
+        (
+            "Crypto Automation",
+            "Automated Android keystore generation and lifecycle management.",
+        ),
+        (
+            "Environment Diagnostics",
+            "Rocket Doctor for programmatic workspace health and dependency checks.",
+        ),
+        (
+            "Log Streaming",
+            "Real-time colorized log tailing with semantic highlighting for UE4 builds.",
+        ),
+        (
+            "TUI Dashboard",
+            "Interactive terminal UI for project management (built with ratatui).",
+        ),
+        (
+            "Wasm Plugin System",
+            "Extensible compliance laws via WebAssembly (Wasmer integration).",
+        ),
+        (
+            "Chicago TDD Integration",
+            "Automated test orchestration across Rust and Python validation suites.",
+        ),
     ];
-    let caps_json: Vec<Value> = capabilities.iter().map(|(name, desc)| {
-        serde_json::json!({"name": name, "description": desc})
-    }).collect();
+    let caps_json: Vec<Value> = capabilities
+        .iter()
+        .map(|(name, desc)| serde_json::json!({"name": name, "description": desc}))
+        .collect();
     Ok(serde_json::json!({"capabilities": caps_json}))
 }
 
@@ -51,15 +82,19 @@ fn do_config(key: String) -> Result<Value> {
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{}", e)))?;
     let val = match key.as_str() {
         "ue4_root" => config.ue4_root.map(|p| p.display().to_string()),
-        other => return Err(clap_noun_verb::NounVerbError::execution_error(
-            format!("unknown config key '{}'. Known keys: ue4_root", other)
-        )),
+        other => {
+            return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+                "unknown config key '{}'. Known keys: ue4_root",
+                other
+            )))
+        }
     };
     match val {
         Some(v) => Ok(serde_json::json!({"key": key, "value": v})),
-        None => Err(clap_noun_verb::NounVerbError::execution_error(
-            format!("key '{}' is not set in .rocket.json", key)
-        )),
+        None => Err(clap_noun_verb::NounVerbError::execution_error(format!(
+            "key '{}' is not set in .rocket.json",
+            key
+        ))),
     }
 }
 
@@ -73,9 +108,11 @@ fn do_root() -> Result<Value> {
             println!("{}", path);
             return Ok(serde_json::json!({"root": path}));
         }
-        dir = dir.parent().ok_or_else(|| clap_noun_verb::NounVerbError::execution_error(
-            "project-manifest.json not found in any parent directory".to_string()
-        ))?;
+        dir = dir.parent().ok_or_else(|| {
+            clap_noun_verb::NounVerbError::execution_error(
+                "project-manifest.json not found in any parent directory".to_string(),
+            )
+        })?;
     }
 }
 

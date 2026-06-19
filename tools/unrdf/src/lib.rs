@@ -1,13 +1,13 @@
 pub mod manifest;
-pub mod triple;
-pub mod store;
-pub mod sparql;
-pub mod shacl;
-pub mod project_bridge;
 pub mod pipeline;
+pub mod project_bridge;
+pub mod shacl;
+pub mod sparql;
+pub mod store;
+pub mod triple;
 
-pub use triple::{Term, Triple};
 pub use store::TripleStore;
+pub use triple::{Term, Triple};
 
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
@@ -98,7 +98,7 @@ impl Manifest<Pending> {
     pub fn ingest(self) -> Result<Manifest<Ingested>, UnrdfError> {
         let content = std::fs::read_to_string(&self.state.path)?;
         let raw: RawManifest = serde_json::from_str(&content)?;
-        
+
         Ok(Manifest {
             state: Ingested {
                 path: self.state.path,
@@ -142,7 +142,7 @@ impl Manifest<Ingested> {
         std::fs::write(&self.state.path, content)?;
         Ok(())
     }
-    
+
     /// Verifies that all project files referenced in the manifest exist and transitions to `Validated`.
     ///
     /// # Errors

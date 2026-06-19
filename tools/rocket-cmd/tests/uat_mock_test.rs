@@ -1,5 +1,5 @@
-use un_test_utils::{UnrealEnvMock, MockUnrealCommandExecutor, UnrealCommandExecutor};
 use anyhow::Result;
+use un_test_utils::{MockUnrealCommandExecutor, UnrealCommandExecutor, UnrealEnvMock};
 
 #[test]
 fn test_uat_execution_mock() -> Result<()> {
@@ -9,13 +9,14 @@ fn test_uat_execution_mock() -> Result<()> {
 
     // 2. Setup the mock executor
     let mut mock_executor = MockUnrealCommandExecutor::new();
-    
+
     // Define the expected call to UAT
-    mock_executor.expect_exec()
+    mock_executor
+        .expect_exec()
         .withf(|command, args| {
-            command.ends_with("AutomationTool") && 
-            args.iter().any(|a| a == "-cook") &&
-            args.iter().any(|a| a == "-build")
+            command.ends_with("AutomationTool")
+                && args.iter().any(|a| a == "-cook")
+                && args.iter().any(|a| a == "-build")
         })
         .times(1)
         .returning(|_, _| Ok("Build Successful".to_string()));
@@ -33,6 +34,6 @@ fn test_uat_execution_mock() -> Result<()> {
 
     // 4. Verify
     assert_eq!(result, "Build Successful");
-    
+
     Ok(())
 }

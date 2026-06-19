@@ -54,12 +54,19 @@ impl EcosystemLocker {
         let mut processed_cells = BTreeSet::new();
         let mut violations = Vec::new();
 
-        println!("{}", "==> Bounding the Rust Ecosystem (A=μ(O*))".bold().blue());
+        println!(
+            "{}",
+            "==> Bounding the Rust Ecosystem (A=μ(O*))".bold().blue()
+        );
 
         for cell in cells.iter() {
             let manifest = self.root_path.join(cell).join("Cargo.toml");
             if !manifest.exists() {
-                return Err(eyre!("Cell {} missing manifest at {}", cell, manifest.display()));
+                return Err(eyre!(
+                    "Cell {} missing manifest at {}",
+                    cell,
+                    manifest.display()
+                ));
             }
 
             println!("    {} Mapping cell: {}", "[O*]".cyan(), cell);
@@ -98,7 +105,9 @@ impl EcosystemLocker {
                             } else {
                                 // Combinatorially merge required features across cells
                                 let mut merged = existing.clone();
-                                merged.expected_features.extend(incoming_dep.expected_features);
+                                merged
+                                    .expected_features
+                                    .extend(incoming_dep.expected_features);
                                 unified_deps.insert(pkg.name.clone(), merged);
                             }
                         } else {
@@ -112,11 +121,18 @@ impl EcosystemLocker {
         }
 
         if !violations.is_empty() {
-            println!("{}", "DETERMINISM VIOLATION: Ecosystem divergence detected!".red().bold());
+            println!(
+                "{}",
+                "DETERMINISM VIOLATION: Ecosystem divergence detected!"
+                    .red()
+                    .bold()
+            );
             for v in violations {
                 println!("  - {}", v.yellow());
             }
-            return Err(eyre!("Ecosystem boundary broken. Unified constraints failed."));
+            return Err(eyre!(
+                "Ecosystem boundary broken. Unified constraints failed."
+            ));
         }
 
         let unified = UnifiedLock {
@@ -131,7 +147,11 @@ impl EcosystemLocker {
         let content = serde_json::to_string_pretty(&unified)?;
         fs::write(&lock_path, content).wrap_err("Failed to commit rocket.lock to disk")?;
 
-        println!("{} Unified boundary locked deterministically: {}", "[A]".bold().green(), lock_path.display());
+        println!(
+            "{} Unified boundary locked deterministically: {}",
+            "[A]".bold().green(),
+            lock_path.display()
+        );
         Ok(())
     }
 }

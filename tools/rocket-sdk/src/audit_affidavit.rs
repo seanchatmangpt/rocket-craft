@@ -216,7 +216,10 @@ mod tests {
         let path = persist_receipt(&receipt, dir.path()).unwrap();
 
         assert!(path.exists(), "timestamped file must exist");
-        assert!(dir.path().join(".ggen/receipts/latest.json").exists(), "latest.json must exist");
+        assert!(
+            dir.path().join(".ggen/receipts/latest.json").exists(),
+            "latest.json must exist"
+        );
 
         let loaded: Receipt = serde_json::from_str(&fs::read_to_string(&path).unwrap()).unwrap();
         assert_eq!(loaded.events.len(), 3);

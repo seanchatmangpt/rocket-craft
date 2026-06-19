@@ -1,5 +1,5 @@
-use serde::Serialize;
 use chrono::{DateTime, Utc};
+use serde::Serialize;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -215,11 +215,13 @@ impl RocketDoctor {
                 name: "Versions Directory".to_string(),
                 status: CheckStatus::Fail,
                 message: "versions/ directory MISSING or not a directory".to_string(),
-                details: Some("This directory should contain the Unreal Engine projects.".to_string()),
+                details: Some(
+                    "This directory should contain the Unreal Engine projects.".to_string(),
+                ),
             }
         }
     }
-    
+
     fn check_anti_llm_cheat_lsp(&self) -> CheckResult {
         match Command::new("anti-llm-cheat-lsp").arg("--version").output() {
             Ok(output) => CheckResult {
@@ -242,18 +244,18 @@ impl RocketDoctor {
     fn check_ue4_root(&self) -> CheckResult {
         let rocket_json = self.project_root.join(".rocket.json");
         if rocket_json.exists() {
-             if let Ok(content) = std::fs::read_to_string(&rocket_json) {
-                 if content.contains("ue4_root") {
-                     return CheckResult {
+            if let Ok(content) = std::fs::read_to_string(&rocket_json) {
+                if content.contains("ue4_root") {
+                    return CheckResult {
                         name: "UE4 Root".to_string(),
                         status: CheckStatus::Pass,
                         message: "UE4 root configured in .rocket.json".to_string(),
                         details: None,
                     };
-                 }
-             }
+                }
+            }
         }
-        
+
         if std::env::var("UE4_ROOT").is_ok() {
             CheckResult {
                 name: "UE4 Root".to_string(),
@@ -339,13 +341,20 @@ impl RocketDoctor {
             }
         } else {
             let mut missing = Vec::new();
-            if !ws_ok { missing.push("WebSocketNetworking"); }
-            if !varest_ok { missing.push("VaRest"); }
+            if !ws_ok {
+                missing.push("WebSocketNetworking");
+            }
+            if !varest_ok {
+                missing.push("VaRest");
+            }
             CheckResult {
                 name: "UE4 Plugins".to_string(),
                 status: CheckStatus::Fail,
                 message: format!("Missing plugins: {}", missing.join(", ")),
-                details: Some("Ensure your UE4.24 build includes WebSocketNetworking and VaRest plugins.".to_string()),
+                details: Some(
+                    "Ensure your UE4.24 build includes WebSocketNetworking and VaRest plugins."
+                        .to_string(),
+                ),
             }
         }
     }
@@ -378,7 +387,7 @@ mod tests {
         let dir = tempdir().unwrap();
         let manifest_path = dir.path().join("project-manifest.json");
         fs::write(&manifest_path, "{}").unwrap();
-        
+
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_manifest();
         assert_eq!(result.status, CheckStatus::Pass);
@@ -398,18 +407,24 @@ mod tests {
     fn test_check_git_status_with_repo() {
         let dir = tempdir().unwrap();
         let _repo = git2::Repository::init(dir.path()).unwrap();
-        
+
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_git_status();
-        
+
         // Initial repo might have no HEAD yet
         assert_eq!(result.status, CheckStatus::Pass);
-        assert_eq!(result.message, "Branch: HEAD detached or empty, no uncommitted changes");
+        assert_eq!(
+            result.message,
+            "Branch: HEAD detached or empty, no uncommitted changes"
+        );
 
         // Add a file
         fs::write(dir.path().join("test.txt"), "hello").unwrap();
         let result = doctor.check_git_status();
         assert_eq!(result.status, CheckStatus::Warn);
-        assert_eq!(result.message, "Branch: HEAD detached or empty, 1 uncommitted changes");
+        assert_eq!(
+            result.message,
+            "Branch: HEAD detached or empty, 1 uncommitted changes"
+        );
     }
 }

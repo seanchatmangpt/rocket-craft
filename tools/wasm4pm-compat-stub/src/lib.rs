@@ -70,10 +70,7 @@ pub mod admission {
 
         fn admit(
             raw: Evidence<Self::Raw, Raw, Self::Witness>,
-        ) -> Result<
-            Admission<Self::Admitted, Self::Witness>,
-            Refusal<Self::Reason, Self::Witness>,
-        >;
+        ) -> Result<Admission<Self::Admitted, Self::Witness>, Refusal<Self::Reason, Self::Witness>>;
     }
 
     pub struct Refusal<R, W> {

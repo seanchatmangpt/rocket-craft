@@ -1,10 +1,10 @@
-use std::path::Path;
-use std::fs;
-use knhk::{Law, LawError, Validator};
+use color_eyre::eyre::Result;
 use knhk::plugin::PluginHost;
+use knhk::{Law, LawError, Validator};
 use rocket_sdk::manifest::Project;
 use serde::Serialize;
-use color_eyre::eyre::Result;
+use std::fs;
+use std::path::Path;
 
 /// Law that runs `anti-llm-cheat-lsp` over the project's `src/` directory.
 /// Skips gracefully when the binary is not installed.
@@ -51,7 +51,8 @@ impl Law for AntiCheatLaw {
         if !status.success() {
             return Err(LawError {
                 law_name: "anti-llm-cheat".to_string(),
-                message: "anti-llm-cheat-lsp scan detected fabricated evidence patterns".to_string(),
+                message: "anti-llm-cheat-lsp scan detected fabricated evidence patterns"
+                    .to_string(),
             });
         }
         Ok(())
@@ -103,7 +104,10 @@ impl ComplianceEngine {
             for entry in fs::read_dir(plugins_dir)? {
                 let entry = entry?;
                 if entry.path().extension().and_then(|s| s.to_str()) == Some("wasm") {
-                    let law = self.plugin_host.load_law(&entry.path()).map_err(|e| color_eyre::eyre::eyre!("{}", e))?;
+                    let law = self
+                        .plugin_host
+                        .load_law(&entry.path())
+                        .map_err(|e| color_eyre::eyre::eyre!("{}", e))?;
                     self.validator.add_law(Box::new(law));
                 }
             }
@@ -114,7 +118,7 @@ impl ComplianceEngine {
     pub fn check_project(&self, project: &Project) -> ComplianceResult {
         let project_dir = project.uproject_path.parent().unwrap_or(Path::new("."));
         let errors = self.validator.validate_all(project_dir);
-        
+
         ComplianceResult {
             project_name: project.name.clone(),
             passed: errors.is_empty(),

@@ -1,4 +1,7 @@
-use crate::{triple::{Term, Triple}, store::TripleStore};
+use crate::{
+    store::TripleStore,
+    triple::{Term, Triple},
+};
 
 /// Lifecycle state: manifest path known but not yet loaded.
 #[derive(Debug)]
