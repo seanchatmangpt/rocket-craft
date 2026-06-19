@@ -542,12 +542,23 @@ impl RocketDoctor {
     /// Looks for the default archive directory (`/tmp/brm-html5-archive`) first,
     /// then falls back to `manufactured/` in the project root.
     fn check_html5_package(&self) -> CheckResult {
-        let candidates = [
+        // Prefer manifest-derived archive paths (project-name-based) over hardcoded defaults.
+        let manifest_paths: Vec<PathBuf> = crate::Manifest::load(self.project_root.join("project-manifest.json"))
+            .map(|m| {
+                m.projects().iter()
+                    .map(|p| PathBuf::from(format!("/tmp/{}-html5-archive/HTML5", p.name.to_lowercase())))
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        let mut candidates: Vec<PathBuf> = manifest_paths;
+        candidates.extend([
             PathBuf::from("/tmp/brm-html5-archive/HTML5"),
             PathBuf::from("/tmp/brm-html5-archive"),
             self.project_root.join("manufactured"),
             self.project_root.join("pwa-staff/manufactured"),
-        ];
+        ]);
+        candidates.dedup();
 
         let archive_dir = candidates.iter().find(|d| d.exists());
 
