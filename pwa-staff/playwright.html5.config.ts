@@ -11,7 +11,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: 0,
   workers: 1,
-  timeout: 180000, // 3 min — UE4 HTML5 needs 30s+ to stream assets and render first frame
+  timeout: 240000, // 4 min — UE4 HTML5 needs 30s+ to stream assets and render first frame; extra for baseline+input
   reporter: [['html', { outputFolder: 'html5-report' }], ['list']],
   use: {
     baseURL: 'http://localhost:8080',

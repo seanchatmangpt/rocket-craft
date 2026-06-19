@@ -44,16 +44,25 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       // asset streaming, map load, first frame. 30s covers typical startup.
       await page.waitForTimeout(30000);
 
-      // Focus the canvas to accept keyboard input
+      // Click the canvas to give it focus and drive pointer events (UE4 HTML5 requires a
+      // pointer interaction before it will accept keyboard events on most browsers).
       try {
-        await page.focus('#canvas');
+        const canvas = page.locator('canvas').first();
+        await canvas.click({ timeout: 5000 });
+        console.log('Canvas clicked successfully');
       } catch (e) {
-        console.warn('Canvas element could not be focused', e);
+        console.warn('Canvas click failed, falling back to focus:', e);
+        try {
+          await page.focus('#canvas');
+        } catch (e2) {
+          console.warn('Canvas focus also failed:', e2);
+        }
       }
 
-      // 3. Dynamic Baseline Quality Check
+      // 3. Dynamic Baseline Quality Check — wait extra after click for first render frame
+      await page.waitForTimeout(5000);
       const beforeBuffer1 = await page.screenshot();
-      await page.waitForTimeout(3000); // Wait to capture idle animation noise
+      await page.waitForTimeout(5000); // Wait to capture idle animation noise
       const beforeBuffer2 = await page.screenshot();
 
       const pixelmatchModule = await import('pixelmatch');
@@ -74,7 +83,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       inputTrace.push('Space');
       await page.keyboard.down('W');
       inputTrace.push('W');
-      await page.waitForTimeout(3000); // 3s — enough for physics ticks + visible vehicle motion
+      await page.waitForTimeout(8000); // 8s — UE4 HTML5 physics tick rate is slower; allow motion to accumulate
       await page.keyboard.up('Space');
       await page.keyboard.up('W');
 
