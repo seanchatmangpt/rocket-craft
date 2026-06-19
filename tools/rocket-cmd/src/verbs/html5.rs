@@ -174,3 +174,91 @@ fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>) -> Result<Value
 fn verify_html5(archive: Option<String>, min_mb: Option<f64>) -> Result<Value> {
     do_html5_verify(archive, min_mb)
 }
+
+fn do_html5_status() -> Result<Value> {
+    let root = std::env::current_dir()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    // 1. Engine presence
+    let engine = ue4_root();
+    let uat = engine.join("Engine/Build/BatchFiles/RunUAT.sh");
+    let engine_ok = uat.exists();
+
+    // 2. emsdk presence
+    let emsdk = engine.join("Engine/Platforms/HTML5/Build/emsdk");
+    let emsdk_ok = emsdk.exists();
+
+    // 3. Package verification
+    let archive = "/tmp/brm-html5-archive/HTML5";
+    let pkg_report = rocket_sdk::Html5PackageVerifier::new(archive)
+        .verify()
+        .ok();
+
+    let pkg_verdict = pkg_report
+        .as_ref()
+        .map(|r| if r.is_real_package { "REAL" } else { "STUB" })
+        .unwrap_or("MISSING");
+
+    let wasm_mb = pkg_report.as_ref().and_then(|r| {
+        r.wasm_files.iter().find_map(|f| {
+            if let rocket_sdk::WasmVerdict::Real { size_bytes } = f.verdict {
+                Some(size_bytes as f64 / 1_048_576.0)
+            } else {
+                None
+            }
+        })
+    });
+
+    // 4. Serve port availability
+    let port_free = std::net::TcpListener::bind("0.0.0.0:8080").is_ok();
+
+    // 5. Manifest projects
+    let manifest_result = rocket_sdk::RocketContext::load(&root);
+    let (total_projects, present_projects) = match &manifest_result {
+        Ok(ctx) => {
+            let total = ctx.projects().len();
+            let present = ctx.projects().iter().filter(|p| p.absolute_uproject_path().exists()).count();
+            (total, present)
+        }
+        Err(_) => (0, 0),
+    };
+
+    let overall = if engine_ok && pkg_verdict == "REAL" { "READY" } else { "NOT READY" };
+
+    println!("=== HTML5 Pipeline Status ===");
+    println!("[{}] Engine: {}", if engine_ok { "PASS" } else { "FAIL" }, engine.display());
+    println!("[{}] emsdk: {}", if emsdk_ok { "PASS" } else { "WARN" }, emsdk.display());
+    println!("[{}] Package: {} ({})", pkg_verdict, archive,
+        wasm_mb.map(|mb| format!("{mb:.1} MB")).unwrap_or_else(|| "n/a".into()));
+    println!("[{}] Port 8080: {}", if port_free { "FREE" } else { "IN USE" }, if port_free { "available for serve" } else { "already bound" });
+    println!("[INFO] Projects: {present_projects}/{total_projects} present on disk");
+    println!("\n[{overall}] Pipeline is {}", overall.to_lowercase());
+
+    Ok(serde_json::json!({
+        "overall": overall,
+        "engine": {
+            "root": engine.display().to_string(),
+            "uat_present": engine_ok,
+            "emsdk_present": emsdk_ok,
+        },
+        "package": {
+            "archive": archive,
+            "verdict": pkg_verdict,
+            "wasm_mb": wasm_mb,
+        },
+        "port_8080_free": port_free,
+        "manifest": {
+            "total_projects": total_projects,
+            "present_projects": present_projects,
+        },
+    }))
+}
+
+/// Show the current state of the HTML5 pipeline in one shot
+///
+/// Reports: engine root, emsdk, last cooked package verdict, serve port availability,
+/// and project manifest presence. Use before running `html5 cook` or `html5 serve`.
+#[verb("status", "html5")]
+fn status_html5() -> Result<Value> {
+    do_html5_status()
+}
