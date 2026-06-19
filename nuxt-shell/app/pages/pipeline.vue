@@ -96,12 +96,16 @@ const healthColor = computed(() => {
   return '#ef4444';
 });
 
+// Process conformance (Van der Aalst fitness/precision/generalization/simplicity)
+const { conformance, fitnessLabel, fitnessColor, load: loadConformance } = useProcessConformance();
+
 let timer: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
   loadHealth();
   loadChainStatus();
-  timer = setInterval(() => { loadHealth(); loadChainStatus(); }, 30_000);
+  loadConformance();
+  timer = setInterval(() => { loadHealth(); loadChainStatus(); loadConformance(); }, 30_000);
 });
 
 onUnmounted(() => {
@@ -191,6 +195,51 @@ onUnmounted(() => {
         </div>
       </section>
 
+      <!-- Process conformance (Van der Aalst four quality dimensions) -->
+      <section v-if="conformance" class="conformance-section">
+        <h2>Process Conformance</h2>
+        <p class="conformance-model">Declared model: <code>GameSessionStarted → FrameRendered → InputAdmitted*</code></p>
+        <div class="conformance-verdict" :style="{ color: fitnessColor }">
+          {{ fitnessLabel }} ({{ conformance.conformant_sessions }}/{{ conformance.total_sessions }} sessions)
+        </div>
+        <div class="conformance-metrics">
+          <div class="cmetric" :title="'Fraction of sessions containing all required activities'">
+            <span class="cmetric-val" :style="{ color: fitnessColor }">{{ (conformance.fitness * 100).toFixed(1) }}%</span>
+            <span class="cmetric-label">Fitness</span>
+          </div>
+          <div class="cmetric" :title="'Fraction of sessions with no unexpected activity types'">
+            <span class="cmetric-val">{{ (conformance.precision * 100).toFixed(1) }}%</span>
+            <span class="cmetric-label">Precision</span>
+          </div>
+          <div class="cmetric" :title="'Fraction of required activities seen at least once'">
+            <span class="cmetric-val">{{ (conformance.generalization * 100).toFixed(1) }}%</span>
+            <span class="cmetric-label">Generalization</span>
+          </div>
+          <div class="cmetric" :title="'Model simplicity (1.0 = single trace, no branches)'">
+            <span class="cmetric-val">{{ (conformance.simplicity * 100).toFixed(0) }}%</span>
+            <span class="cmetric-label">Simplicity</span>
+          </div>
+        </div>
+        <details v-if="conformance.non_conformant.length" class="non-conformant">
+          <summary>{{ conformance.non_conformant.length }} non-conformant session(s)</summary>
+          <ul>
+            <li v-for="nc in conformance.non_conformant" :key="nc.session_id">
+              <span class="nc-sid">{{ nc.session_id.slice(0, 8) }}…</span>
+              <span v-if="nc.missing.length" class="nc-missing"> missing: {{ nc.missing.join(', ') }}</span>
+              <span v-if="nc.extra.length" class="nc-extra"> extra: {{ nc.extra.join(', ') }}</span>
+              <a
+                class="ocel-dl-link"
+                :href="`/api/game/ocel-export?session_id=${nc.session_id}`"
+                :download="`ocel2-${nc.session_id.slice(0, 8)}.json`"
+              >↓ OCEL 2.0</a>
+            </li>
+          </ul>
+        </details>
+        <div v-if="conformance.all_activities_seen.length" class="activities-seen">
+          All activity types seen: {{ conformance.all_activities_seen.join(' · ') }}
+        </div>
+      </section>
+
       <!-- Last receipt -->
       <section v-if="health?.last_receipt_at" class="last-receipt">
         <span>Last receipt: {{ new Date(health.last_receipt_at).toLocaleString() }}</span>
@@ -241,6 +290,23 @@ onUnmounted(() => {
 .break-seq { color: #f97316; }
 .ocel-dl-link { color: #7dd3fc; text-decoration: none; font-size: 0.75rem; border: 1px solid #334155; padding: 0.1rem 0.4rem; border-radius: 2px; white-space: nowrap; }
 .ocel-dl-link:hover { background: #1e293b; }
+.conformance-section { margin-bottom: 2rem; }
+.conformance-section h2 { font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.25rem; }
+.conformance-model { font-size: 0.75rem; color: #475569; margin: 0 0 0.75rem; }
+.conformance-model code { color: #7dd3fc; }
+.conformance-verdict { font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; }
+.conformance-metrics { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.cmetric { background: #1e293b; border-radius: 4px; padding: 0.75rem; text-align: center; flex: 1; }
+.cmetric-val { display: block; font-size: 1.4rem; font-weight: 700; color: #7dd3fc; }
+.cmetric-label { display: block; font-size: 0.65rem; color: #64748b; margin-top: 0.2rem; }
+.non-conformant { font-size: 0.8rem; color: #fca5a5; margin-bottom: 0.5rem; }
+.non-conformant summary { cursor: pointer; color: #f97316; }
+.non-conformant ul { list-style: none; padding: 0.5rem 0 0 1rem; margin: 0; }
+.non-conformant li { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.2rem 0; }
+.nc-sid { font-weight: 600; color: #94a3b8; }
+.nc-missing { color: #f87171; }
+.nc-extra { color: #fb923c; }
+.activities-seen { font-size: 0.72rem; color: #475569; margin-top: 0.5rem; }
 .last-receipt { font-size: 0.8rem; color: #94a3b8; margin-bottom: 1.5rem; }
 .pipeline-nav { display: flex; gap: 1.5rem; }
 .pipeline-nav a { color: #7dd3fc; text-decoration: none; font-size: 0.875rem; }
