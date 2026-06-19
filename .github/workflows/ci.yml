@@ -177,3 +177,23 @@ jobs:
 
       - name: Test
         run: cargo test --workspace
+
+  rocket-simulator:
+    name: Rust — rocket-simulator
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rocket-simulator
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rocket-simulator
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace

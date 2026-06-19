@@ -279,7 +279,6 @@ mod tests {
             );
         }
     }
-}
 
     #[test]
     fn rocket_contract_new_sets_defaults() {
@@ -312,3 +311,4 @@ mod tests {
         // BLAKE3 output hex-encoded = 64 chars
         assert_eq!(c.compute_hash().len(), 64);
     }
+}
