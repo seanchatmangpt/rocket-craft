@@ -160,3 +160,136 @@ impl PreservationLayer for GundamPreservationManager {
         Ok(calculated_hash == stored.hash)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::generated_gundam::{Arcades, FlashGames};
+
+    fn mgr() -> GundamPreservationManager {
+        GundamPreservationManager::new()
+    }
+
+    fn arcades_artifact(id: &str, data: &[u8]) -> PreservationArtifact<Arcades> {
+        PreservationArtifact {
+            id: id.to_string(),
+            domain: Arcades,
+            name: format!("artifact-{id}"),
+            original_url: None,
+            metadata: HashMap::new(),
+            assets_blob: data.to_vec(),
+            hash: String::new(), // computed by preserve_artifact
+        }
+    }
+
+    // ── preserve + retrieve round-trip ────────────────────────────────────────
+
+    #[test]
+    fn preserve_returns_sha256_hex_string() {
+        let m = mgr();
+        let hash = m.preserve_artifact(arcades_artifact("a1", b"hello")).unwrap();
+        assert_eq!(hash.len(), 64); // SHA-256 is 32 bytes = 64 hex chars
+        assert!(hash.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn retrieve_after_preserve_recovers_data() {
+        let m = mgr();
+        m.preserve_artifact(arcades_artifact("a2", b"gundam data")).unwrap();
+        let art: PreservationArtifact<Arcades> = m.retrieve_artifact("a2").unwrap();
+        assert_eq!(art.assets_blob, b"gundam data");
+        assert_eq!(art.name, "artifact-a2");
+    }
+
+    #[test]
+    fn retrieve_nonexistent_returns_error() {
+        let m = mgr();
+        let result: Result<PreservationArtifact<Arcades>> = m.retrieve_artifact("missing");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("not found"));
+    }
+
+    #[test]
+    fn retrieve_with_wrong_domain_returns_domain_mismatch_error() {
+        let m = mgr();
+        m.preserve_artifact(arcades_artifact("a3", b"data")).unwrap();
+        // retrieve as FlashGames when stored as Arcades
+        let result: Result<PreservationArtifact<FlashGames>> = m.retrieve_artifact("a3");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().to_string().contains("mismatch"));
+    }
+
+    // ── verify_integrity ─────────────────────────────────────────────────────
+
+    #[test]
+    fn verify_integrity_passes_for_stored_artifact() {
+        let m = mgr();
+        m.preserve_artifact(arcades_artifact("a4", b"blob")).unwrap();
+        assert!(m.verify_integrity("a4").unwrap());
+    }
+
+    #[test]
+    fn verify_integrity_missing_id_returns_error() {
+        let m = mgr();
+        assert!(m.verify_integrity("no-such-id").is_err());
+    }
+
+    // ── list_artifacts_by_domain ──────────────────────────────────────────────
+
+    #[test]
+    fn list_by_domain_returns_only_matching_domain() {
+        let m = mgr();
+        m.preserve_artifact(arcades_artifact("arc1", b"d1")).unwrap();
+        m.preserve_artifact(arcades_artifact("arc2", b"d2")).unwrap();
+        // Store a FlashGames artifact too
+        m.preserve_artifact(PreservationArtifact {
+            id: "flash1".into(), domain: FlashGames, name: "flash-game".into(),
+            original_url: None, metadata: HashMap::new(),
+            assets_blob: b"flash data".to_vec(), hash: String::new(),
+        }).unwrap();
+
+        let arcades_list: Vec<PreservationArtifact<Arcades>> =
+            m.list_artifacts_by_domain(Arcades).unwrap();
+        assert_eq!(arcades_list.len(), 2);
+        assert!(arcades_list.iter().all(|a| a.domain == Arcades));
+    }
+
+    #[test]
+    fn list_by_domain_empty_when_none_stored() {
+        let m = mgr();
+        let list: Vec<PreservationArtifact<Arcades>> = m.list_artifacts_by_domain(Arcades).unwrap();
+        assert!(list.is_empty());
+    }
+
+    // ── hash determinism ──────────────────────────────────────────────────────
+
+    #[test]
+    fn same_data_produces_same_hash() {
+        let m = mgr();
+        let h1 = m.preserve_artifact(arcades_artifact("x1", b"repeatable")).unwrap();
+        let h2 = m.preserve_artifact(arcades_artifact("x2", b"repeatable")).unwrap();
+        assert_eq!(h1, h2);
+    }
+
+    #[test]
+    fn different_data_produces_different_hash() {
+        let m = mgr();
+        let h1 = m.preserve_artifact(arcades_artifact("y1", b"aaa")).unwrap();
+        let h2 = m.preserve_artifact(arcades_artifact("y2", b"bbb")).unwrap();
+        assert_ne!(h1, h2);
+    }
+
+    // ── metadata round-trip ────────────────────────────────────────────────────
+
+    #[test]
+    fn metadata_preserved_through_store_and_retrieve() {
+        let m = mgr();
+        let mut art = arcades_artifact("m1", b"meta test");
+        art.metadata.insert("platform".into(), "Atari 2600".into());
+        art.metadata.insert("year".into(), "1977".into());
+        m.preserve_artifact(art).unwrap();
+        let retrieved: PreservationArtifact<Arcades> = m.retrieve_artifact("m1").unwrap();
+        assert_eq!(retrieved.metadata.get("platform").unwrap(), "Atari 2600");
+        assert_eq!(retrieved.metadata.get("year").unwrap(), "1977");
+    }
+}
