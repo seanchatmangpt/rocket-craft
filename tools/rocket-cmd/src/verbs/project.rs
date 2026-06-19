@@ -110,13 +110,18 @@ fn do_build(
             ))
         })?;
     let platform_val = platform.unwrap_or_else(|| "Win64".to_string());
-    let config = rocket_sdk::config::RocketConfig::load()
-        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{}", e)))?;
-    let ue4_root = config.ue4_root.ok_or_else(|| {
-        clap_noun_verb::NounVerbError::execution_error(
-            "UE4_ROOT not set. Run 'rocket env setup' first.".to_string(),
-        )
-    })?;
+    // Resolve engine root: UE4_ROOT env var → .rocket.json → error
+    let ue4_root = if let Ok(env_root) = std::env::var("UE4_ROOT") {
+        std::path::PathBuf::from(env_root)
+    } else {
+        let config = rocket_sdk::config::RocketConfig::load()
+            .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{}", e)))?;
+        config.ue4_root.ok_or_else(|| {
+            clap_noun_verb::NounVerbError::execution_error(
+                "UE4_ROOT not set. Set the UE4_ROOT env var or run 'rocket env setup'.".to_string(),
+            )
+        })?
+    };
     let uat_name = if cfg!(windows) {
         "RunUAT.bat"
     } else {
@@ -236,27 +241,37 @@ fn do_audit() -> Result<Value> {
 fn do_test() -> Result<Value> {
     use std::process::Command;
     tracing::info!("{}", "=== Running All Tests ===");
-    let status = Command::new("cargo")
-        .arg("test")
-        .arg("--workspace")
-        .current_dir("tools")
-        .status()
-        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{}", e)))?;
-    if !status.success() {
-        return Err(clap_noun_verb::NounVerbError::execution_error(
-            "Rust workspace tests failed".to_string(),
-        ));
+
+    // All 7 Rust workspaces with their respective cargo-test flags.
+    // Matches the `just test-rust` Justfile recipe exactly.
+    let workspaces: &[(&str, &[&str])] = &[
+        ("tools", &["test", "--all"]),
+        ("nexus-engine", &["test", "--all"]),
+        ("blueprint-rs", &["test", "--all"]),
+        ("chicago-tdd-tools", &["test", "--all-features"]),
+        ("unify-rs", &["test", "--all"]),
+        ("infinity-blade-4/mud", &["test", "--all"]),
+        ("asset-pipeline", &["test"]),
+    ];
+
+    for (dir, args) in workspaces {
+        tracing::info!("  Testing {}...", dir);
+        let status = Command::new("cargo")
+            .args(*args)
+            .current_dir(dir)
+            .status()
+            .map_err(|e| {
+                clap_noun_verb::NounVerbError::execution_error(format!(
+                    "failed to spawn cargo test in {dir}: {e}"
+                ))
+            })?;
+        if !status.success() {
+            return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+                "{dir} tests failed"
+            )));
+        }
     }
-    let status = Command::new("cargo")
-        .arg("test")
-        .current_dir("chicago-tdd-tools")
-        .status()
-        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{}", e)))?;
-    if !status.success() {
-        return Err(clap_noun_verb::NounVerbError::execution_error(
-            "Chicago TDD Tools tests failed".to_string(),
-        ));
-    }
+
     do_asset_validation()?;
     tracing::info!("\n{}", "All tests passed!");
     Ok(serde_json::json!({"status": "ok"}))
