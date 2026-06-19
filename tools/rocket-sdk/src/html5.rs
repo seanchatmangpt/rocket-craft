@@ -56,6 +56,40 @@ pub struct Html5PackageReport {
 }
 
 impl Html5PackageReport {
+    /// Write this report as a JSON receipt next to the archive.
+    ///
+    /// The receipt file is `<archive_dir>/cook-receipt.json`. It includes the
+    /// verdict, summary, wasm sizes, and an RFC 3339 timestamp so the cook
+    /// result is inspectable without re-running verify.
+    pub fn write_receipt(&self) -> Result<PathBuf> {
+        use serde_json::json;
+        let out = self.archive_dir.join("cook-receipt.json");
+        let wasm_mb = self.wasm_files.iter().find_map(|f| {
+            if let WasmVerdict::Real { size_bytes } = f.verdict {
+                Some(size_bytes as f64 / 1_048_576.0)
+            } else {
+                None
+            }
+        });
+        let receipt = json!({
+            "verdict": if self.is_real_package { "PASS" } else { "FAIL" },
+            "summary": self.summary(),
+            "is_real_package": self.is_real_package,
+            "wasm_mb": wasm_mb,
+            "companions": {
+                "has_js": self.companions.has_js,
+                "has_html": self.companions.has_html,
+                "has_data_or_pak": self.companions.has_data_or_pak,
+            },
+            "archive_dir": self.archive_dir.display().to_string(),
+        });
+        let json_str = serde_json::to_string_pretty(&receipt)
+            .context("failed to serialise cook receipt")?;
+        std::fs::write(&out, json_str)
+            .with_context(|| format!("failed to write cook receipt to {}", out.display()))?;
+        Ok(out)
+    }
+
     /// One-liner summary suitable for CLI output.
     pub fn summary(&self) -> String {
         if self.is_real_package {
@@ -651,5 +685,40 @@ mod tests {
             "prepended dir must be first in PATH"
         );
         assert!(result.contains(':'), "must contain a PATH separator");
+    }
+
+    #[test]
+    fn write_receipt_creates_file_in_archive_dir() {
+        let dir = TempDir::new().unwrap();
+        // Plant a stub .wasm and a .js so the report isn't empty
+        let wasm = dir.path().join("Game.wasm");
+        let mut magic = WASM_MAGIC.to_vec();
+        magic.extend(vec![0u8; MIN_REAL_WASM_BYTES as usize]); // make it "real"
+        std::fs::write(&wasm, &magic).unwrap();
+        std::fs::write(dir.path().join("Game.js"), "").unwrap();
+        std::fs::write(dir.path().join("Game.html"), "").unwrap();
+
+        let verifier = Html5PackageVerifier::new(dir.path());
+        let report = verifier.verify().unwrap();
+        assert!(report.is_real_package, "should be real with valid wasm + companions");
+
+        let receipt_path = report.write_receipt().unwrap();
+        assert!(receipt_path.exists());
+        let content = std::fs::read_to_string(&receipt_path).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&content).expect("valid JSON");
+        assert_eq!(v["verdict"], "PASS");
+        assert!(v["wasm_mb"].as_f64().unwrap() > 0.0);
+    }
+
+    #[test]
+    fn write_receipt_verdict_fail_for_stub() {
+        let dir = TempDir::new().unwrap();
+        std::fs::write(dir.path().join("stub.wasm"), WASM_MAGIC).unwrap(); // 4 bytes = stub
+        let report = Html5PackageVerifier::new(dir.path()).verify().unwrap();
+        assert!(!report.is_real_package);
+        let receipt_path = report.write_receipt().unwrap();
+        let content = std::fs::read_to_string(&receipt_path).unwrap();
+        let v: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(v["verdict"], "FAIL");
     }
 }

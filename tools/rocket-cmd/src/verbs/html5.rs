@@ -150,6 +150,12 @@ fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>) -> Result<Value
     let verdict = if report.is_real_package { "PASS" } else { "FAIL" };
     println!("[{verdict}] {}", report.summary());
 
+    // Write cook-receipt.json alongside the archive for pipeline traceability
+    match report.write_receipt() {
+        Ok(path) => println!("[receipt] {}", path.display()),
+        Err(e) => println!("[receipt] warning: could not write receipt — {e:#}"),
+    }
+
     let wasm_list: Vec<serde_json::Value> = report.wasm_files.iter().map(|f| {
         let (verdict_str, size) = match &f.verdict {
             rocket_sdk::WasmVerdict::Real { size_bytes } => ("real", *size_bytes),
