@@ -115,3 +115,85 @@ impl PredictionState {
         self.authority_mutation_detected
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::authority::AuthorityState;
+
+    #[test]
+    fn new_prediction_state_has_correct_count() {
+        let p = PredictionState::new(6);
+        assert_eq!(p.future_heat.len(), 6);
+        assert_eq!(p.confidence.len(), 6);
+    }
+
+    #[test]
+    fn predict_n_ticks_does_not_mutate_admitted_state() {
+        let admitted = AuthorityState::new(4);
+        let admitted_heat_before: Vec<u8> = admitted.heat.clone();
+        let mut pred = PredictionState::new(4);
+        pred.predict_n_ticks(&admitted, 5);
+        assert_eq!(admitted.heat, admitted_heat_before);
+    }
+
+    #[test]
+    fn predict_n_ticks_increases_future_heat() {
+        let mut admitted = AuthorityState::new(2);
+        admitted.heat[0] = 3;
+        let mut pred = PredictionState::new(2);
+        pred.predict_n_ticks(&admitted, 4);
+        assert_eq!(pred.future_heat[0], 7); // 3 + 4 = 7
+    }
+
+    #[test]
+    fn predict_n_ticks_clamps_heat_at_max_class() {
+        let mut admitted = AuthorityState::new(1);
+        admitted.heat[0] = 14;
+        let mut pred = PredictionState::new(1);
+        pred.predict_n_ticks(&admitted, 10); // 14 + 10 = 24, clamped to 15
+        assert_eq!(pred.future_heat[0], crate::authority::MAX_CLASS);
+    }
+
+    #[test]
+    fn predict_n_ticks_confidence_degrades_with_ticks() {
+        let admitted = AuthorityState::new(1);
+        let mut pred = PredictionState::new(1);
+        pred.predict_n_ticks(&admitted, 3);
+        assert_eq!(pred.confidence[0], 12); // 15 - 3 = 12
+    }
+
+    #[test]
+    fn predict_n_ticks_confidence_saturates_at_zero_for_high_ticks() {
+        let admitted = AuthorityState::new(1);
+        let mut pred = PredictionState::new(1);
+        pred.predict_n_ticks(&admitted, 20); // 15.saturating_sub(20) = 0
+        assert_eq!(pred.confidence[0], 0);
+    }
+
+    #[test]
+    fn attempt_authority_promotion_always_returns_error() {
+        let mut pred = PredictionState::new(2);
+        let result = pred.attempt_authority_promotion();
+        assert!(matches!(result, Err(crate::error::RefusalReason::PredictionAuthorityMutation)));
+    }
+
+    #[test]
+    fn authority_mutation_detected_after_promotion_attempt() {
+        let mut pred = PredictionState::new(1);
+        assert!(!pred.authority_mutation_detected());
+        let _ = pred.attempt_authority_promotion();
+        assert!(pred.authority_mutation_detected());
+    }
+
+    #[test]
+    fn discard_zeros_all_future_buffers() {
+        let mut admitted = AuthorityState::new(3);
+        admitted.heat[0] = 10;
+        let mut pred = PredictionState::new(3);
+        pred.predict_n_ticks(&admitted, 2);
+        pred.discard();
+        assert!(pred.future_heat.iter().all(|&v| v == 0));
+        assert!(pred.future_damage.iter().all(|&v| v == 0));
+    }
+}
