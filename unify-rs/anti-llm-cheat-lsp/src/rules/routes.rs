@@ -44,3 +44,66 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, message: &str, context: &str) -> Observation {
+        Observation {
+            file_path: "f.rs".into(), start_byte: 0, end_byte: 0,
+            line: 1, column: 1,
+            kind: "route".into(),
+            construct: construct.into(),
+            context: context.into(),
+            message: message.into(),
+        }
+    }
+
+    #[test]
+    fn route_001_fires_on_routing_to_packplan_construct() {
+        let o = obs("Routing to PackPlan", "", "");
+        let diags = evaluate(&[o]);
+        assert!(diags.iter().any(|d| d.code == "ANTI-LLM-ROUTE-001"));
+    }
+
+    #[test]
+    fn route_001_fires_when_context_contains_routing_string() {
+        let o = obs("other", "", "Routing to PackPlan -> Staging");
+        let diags = evaluate(&[o]);
+        assert!(diags.iter().any(|d| d.code == "ANTI-LLM-ROUTE-001"));
+    }
+
+    #[test]
+    fn route_008_fires_on_static_scan_construct() {
+        let o = obs("static scan as route proof", "", "");
+        let diags = evaluate(&[o]);
+        assert!(diags.iter().any(|d| d.code == "ANTI-LLM-ROUTE-008"));
+    }
+
+    #[test]
+    fn route_008_fires_when_message_contains_both_phrases() {
+        let o = obs("other", "static scan as route proof evidence", "");
+        let diags = evaluate(&[o]);
+        assert!(diags.iter().any(|d| d.code == "ANTI-LLM-ROUTE-008"));
+    }
+
+    #[test]
+    fn no_obs_produces_no_diags() {
+        assert!(evaluate(&[]).is_empty());
+    }
+
+    #[test]
+    fn unrelated_obs_produces_no_diags() {
+        let o = obs("console.log", "just a log", "");
+        assert!(evaluate(&[o]).is_empty());
+    }
+
+    #[test]
+    fn route_001_is_blocking() {
+        let o = obs("Routing to PackPlan", "", "");
+        let diags = evaluate(&[o]);
+        assert!(diags.iter().all(|d| d.blocking));
+    }
+}
