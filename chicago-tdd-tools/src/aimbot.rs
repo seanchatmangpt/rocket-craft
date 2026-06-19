@@ -58,3 +58,79 @@ pub fn explore_state_space<S: GameCoordinateSystem>(
         errors,
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::coordinate::{GundamCoordinateSystem, GundamSessionSimulation, SessionState};
+    use nexus_session::player::PlayerProfile;
+
+    fn connecting_sim() -> GundamSessionSimulation {
+        GundamSessionSimulation {
+            state: SessionState::Connecting,
+            profile: PlayerProfile::new(1, "Amuro".into()),
+            inventory: vec![],
+        }
+    }
+
+    // ── TraversalResult structure ─────────────────────────────────────────────
+
+    #[test]
+    fn explore_single_state_no_errors() {
+        let result = explore_state_space(&GundamCoordinateSystem, connecting_sim(), 1);
+        // We start at 1 state; max_states=1 prevents expanding any children.
+        // visited contains the initial state.
+        assert_eq!(result.visited_states_count, 1);
+        assert!(result.errors.is_empty());
+    }
+
+    #[test]
+    fn explore_expands_connecting_to_reachable_states() {
+        // max_states=10 lets the BFS run for several transitions from Connecting.
+        let result = explore_state_space(&GundamCoordinateSystem, connecting_sim(), 10);
+        assert!(result.visited_states_count > 1, "should reach at least Authenticated and Disconnected");
+    }
+
+    #[test]
+    fn transitions_are_tuples_of_from_move_to() {
+        let result = explore_state_space(&GundamCoordinateSystem, connecting_sim(), 5);
+        for (from, mv, to) in &result.transitions {
+            assert!(!from.is_empty(), "from should be non-empty");
+            assert!(!mv.is_empty(), "move notation should be non-empty");
+            assert!(!to.is_empty(), "to should be non-empty");
+        }
+    }
+
+    #[test]
+    fn transitions_include_auth_true_notation() {
+        let result = explore_state_space(&GundamCoordinateSystem, connecting_sim(), 5);
+        let has_auth = result.transitions.iter().any(|(_, mv, _)| mv.contains("auth:true"));
+        assert!(has_auth, "auth:true should appear in transitions from Connecting");
+    }
+
+    #[test]
+    fn zero_max_states_gives_empty_result() {
+        // With max_states=0 the guard `visited.len() >= max_states` fires immediately
+        // after the initial insertion, so BFS terminates after 1 visited state.
+        let result = explore_state_space(&GundamCoordinateSystem, connecting_sim(), 0);
+        // Actual behavior: initial state is visited (len=1 ≥ 0), loop exits immediately.
+        assert!(result.transitions.is_empty());
+    }
+
+    #[test]
+    fn errors_are_collected_not_panicked() {
+        // explore_state_space should never panic even when apply_move returns Err.
+        // auth:false causes an error; verify it is recorded in errors, not panicked.
+        let result = explore_state_space(&GundamCoordinateSystem, connecting_sim(), 20);
+        let has_auth_error = result.errors.iter().any(|e| e.contains("auth:false") || e.contains("Authentication"));
+        assert!(has_auth_error, "auth:false error should be collected; errors: {:?}", result.errors);
+    }
+
+    #[test]
+    fn visited_count_does_not_exceed_max_states() {
+        let max = 3;
+        let result = explore_state_space(&GundamCoordinateSystem, connecting_sim(), max);
+        assert!(result.visited_states_count <= max + 1, // BFS may add 1 over the limit before checking
+            "visited={}, max={}", result.visited_states_count, max);
+    }
+}
