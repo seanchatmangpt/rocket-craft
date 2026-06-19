@@ -96,17 +96,33 @@ impl Html5PackageReport {
                 None
             }
         });
+        // RFC 3339 timestamp via SystemTime → seconds since UNIX epoch
+        let timestamp_secs = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let wasm_files_json: Vec<serde_json::Value> = self.wasm_files.iter().map(|f| {
+            let (verdict_str, size_bytes) = match &f.verdict {
+                WasmVerdict::Real { size_bytes } => ("real", *size_bytes),
+                WasmVerdict::Stub { size_bytes } => ("stub", *size_bytes),
+                WasmVerdict::NotWasm { .. } => ("not_wasm", 0),
+                WasmVerdict::Unreadable { .. } => ("unreadable", 0),
+            };
+            json!({ "path": f.path.display().to_string(), "verdict": verdict_str, "size_bytes": size_bytes })
+        }).collect();
         let receipt = json!({
             "verdict": if self.is_real_package { "PASS" } else { "FAIL" },
             "summary": self.summary(),
             "is_real_package": self.is_real_package,
             "wasm_mb": wasm_mb,
+            "wasm_files": wasm_files_json,
             "companions": {
                 "has_js": self.companions.has_js,
                 "has_html": self.companions.has_html,
                 "has_data_or_pak": self.companions.has_data_or_pak,
             },
             "archive_dir": self.archive_dir.display().to_string(),
+            "verified_at_unix_secs": timestamp_secs,
         });
         let json_str = serde_json::to_string_pretty(&receipt)
             .context("failed to serialise cook receipt")?;
@@ -819,6 +835,12 @@ mod tests {
         let v: serde_json::Value = serde_json::from_str(&content).expect("valid JSON");
         assert_eq!(v["verdict"], "PASS");
         assert!(v["wasm_mb"].as_f64().unwrap() > 0.0);
+        // New fields added to receipt
+        assert!(v["verified_at_unix_secs"].as_u64().unwrap() > 0, "timestamp must be > 0");
+        assert!(v["wasm_files"].is_array(), "wasm_files array must be present");
+        let wasm_arr = v["wasm_files"].as_array().unwrap();
+        assert!(!wasm_arr.is_empty(), "wasm_files must not be empty");
+        assert_eq!(wasm_arr[0]["verdict"], "real");
     }
 
     #[test]
@@ -831,6 +853,8 @@ mod tests {
         let content = std::fs::read_to_string(&receipt_path).unwrap();
         let v: serde_json::Value = serde_json::from_str(&content).unwrap();
         assert_eq!(v["verdict"], "FAIL");
+        // Timestamp and wasm_files are always present regardless of verdict
+        assert!(v["verified_at_unix_secs"].as_u64().is_some(), "timestamp field must exist on FAIL receipt");
     }
 
     #[test]
