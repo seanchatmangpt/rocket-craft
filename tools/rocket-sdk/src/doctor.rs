@@ -47,6 +47,7 @@ impl RocketDoctor {
             self.check_rust(),
             self.check_python(),
             self.check_manifest(),
+            self.check_manifest_projects(),
             self.check_versions_dir(),
             self.check_ue4_root(),
             self.check_ue4_plugins(),
@@ -204,6 +205,97 @@ impl RocketDoctor {
                 status: CheckStatus::Fail,
                 message: "project-manifest.json MISSING".to_string(),
                 details: Some("Run 'rocket sync' to generate it.".to_string()),
+            }
+        }
+    }
+
+    /// Validate that every project declared in `project-manifest.json` has its
+    /// `.uproject` file on disk. Returns Warn if the manifest is absent (covered
+    /// by `check_manifest`). Reports each missing uproject file in `details`.
+    fn check_manifest_projects(&self) -> CheckResult {
+        let manifest_path = self.project_root.join("project-manifest.json");
+        if !manifest_path.exists() {
+            return CheckResult {
+                name: "Manifest Projects".to_string(),
+                status: CheckStatus::Warn,
+                message: "Skipped: project-manifest.json not found".to_string(),
+                details: None,
+            };
+        }
+
+        let content = match std::fs::read_to_string(&manifest_path) {
+            Ok(c) => c,
+            Err(e) => {
+                return CheckResult {
+                    name: "Manifest Projects".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("Cannot read project-manifest.json: {e}"),
+                    details: None,
+                };
+            }
+        };
+
+        let manifest: serde_json::Value = match serde_json::from_str(&content) {
+            Ok(v) => v,
+            Err(e) => {
+                return CheckResult {
+                    name: "Manifest Projects".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("project-manifest.json is invalid JSON: {e}"),
+                    details: None,
+                };
+            }
+        };
+
+        let projects = match manifest.get("projects").and_then(|p| p.as_array()) {
+            Some(arr) => arr.clone(),
+            None => {
+                return CheckResult {
+                    name: "Manifest Projects".to_string(),
+                    status: CheckStatus::Warn,
+                    message: "No 'projects' array in manifest".to_string(),
+                    details: None,
+                };
+            }
+        };
+
+        let mut missing = Vec::new();
+        let mut total = 0usize;
+
+        for proj in &projects {
+            if let Some(uproject_path) = proj.get("uproject_path").and_then(|p| p.as_str()) {
+                total += 1;
+                let full_path = if std::path::Path::new(uproject_path).is_absolute() {
+                    PathBuf::from(uproject_path)
+                } else {
+                    self.project_root.join(uproject_path)
+                };
+                if !full_path.exists() {
+                    let name = proj
+                        .get("name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or(uproject_path);
+                    missing.push(format!("{name} ({uproject_path})"));
+                }
+            }
+        }
+
+        if missing.is_empty() {
+            CheckResult {
+                name: "Manifest Projects".to_string(),
+                status: CheckStatus::Pass,
+                message: format!("All {total} declared .uproject files present on disk"),
+                details: None,
+            }
+        } else {
+            CheckResult {
+                name: "Manifest Projects".to_string(),
+                status: CheckStatus::Fail,
+                message: format!(
+                    "{}/{total} .uproject files MISSING",
+                    missing.len()
+                ),
+                details: Some(missing.join("\n")),
             }
         }
     }
@@ -844,6 +936,83 @@ mod tests {
         assert_eq!(result.status, CheckStatus::Pass);
         assert!(result.message.contains("RunUAT.sh"));
         assert!(result.message.contains("HTML5Setup.sh"));
+    }
+
+    // ── check_manifest_projects ───────────────────────────────────────────────
+
+    #[test]
+    fn manifest_projects_warns_when_manifest_absent() {
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Warn);
+    }
+
+    #[test]
+    fn manifest_projects_warns_on_missing_projects_key() {
+        let dir = tempdir().unwrap();
+        fs::write(dir.path().join("project-manifest.json"), r#"{"version": 1}"#).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("No 'projects'"));
+    }
+
+    #[test]
+    fn manifest_projects_fails_on_invalid_json() {
+        let dir = tempdir().unwrap();
+        fs::write(dir.path().join("project-manifest.json"), b"not json").unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("invalid JSON"));
+    }
+
+    #[test]
+    fn manifest_projects_passes_when_all_uprojects_exist() {
+        let dir = tempdir().unwrap();
+        let uproject = dir.path().join("Game.uproject");
+        fs::write(&uproject, b"{}").unwrap();
+        let manifest = serde_json::json!({
+            "projects": [{"name": "Game", "uproject_path": uproject.to_str().unwrap()}]
+        });
+        fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Pass);
+        assert!(result.message.contains("1 declared"));
+    }
+
+    #[test]
+    fn manifest_projects_fails_when_uproject_missing() {
+        let dir = tempdir().unwrap();
+        let manifest = serde_json::json!({
+            "projects": [{"name": "Ghost", "uproject_path": "/nonexistent/Ghost.uproject"}]
+        });
+        fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("MISSING"));
+        assert!(result.details.as_deref().unwrap_or("").contains("Ghost"));
+    }
+
+    #[test]
+    fn manifest_projects_reports_partial_missing() {
+        let dir = tempdir().unwrap();
+        let present = dir.path().join("Present.uproject");
+        fs::write(&present, b"{}").unwrap();
+        let manifest = serde_json::json!({
+            "projects": [
+                {"name": "Present", "uproject_path": present.to_str().unwrap()},
+                {"name": "Missing", "uproject_path": "/nonexistent/Missing.uproject"}
+            ]
+        });
+        fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("1/2"));
     }
 
     #[test]
