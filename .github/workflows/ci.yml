@@ -138,6 +138,26 @@ jobs:
       - name: Test
         run: cargo test --workspace
 
+  genie3-rs:
+    name: Rust — genie3-rs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: genie3-rs
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: genie3-rs
+
+      - name: Build
+        run: cargo build
+
+      - name: Test
+        run: cargo test
+
   ib4-mud:
     name: Rust — infinity-blade-4 MUD
     runs-on: ubuntu-latest
