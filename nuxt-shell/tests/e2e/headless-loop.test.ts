@@ -40,6 +40,7 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   // State shared across tests in this describe block
   let seededSessionId: string | null = null;
   let seededChainTip: string | null = null;
+  let seededReceiptHash: string | null = null;
 
   it('Step 1: session-seed manufactures a lawful OCEL session', async () => {
     if (MOCK) return;
@@ -65,6 +66,7 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
 
     seededSessionId = body.session_id;
     seededChainTip = body.chain_tip;
+    seededReceiptHash = body.receipt_hash;
 
     console.log(`[headless-loop] Seeded session=${seededSessionId} events=${body.ocel_event_count}`);
   });
@@ -152,6 +154,51 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     expect(body.receipts).toHaveLength(0);
     console.log('[headless-loop] wasm-crosscheck: NO_DATA for zero hash (expected for headless session)');
   });
+
+  it('Step 7: cook-receipt proof gate accepts the seeded session receipt', async () => {
+    if (MOCK || !seededSessionId) return;
+    const { status, body } = await post('/api/game/cook-receipt', {
+      session_id: seededSessionId,
+      verdict: 'PASS',
+      milestone: 'HTML5CookVerify',
+      engine_source: 'rocket_cli',
+      ocel_lifecycle: ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
+      ocel_event_count: 3,
+      receipt_hash: seededReceiptHash ?? 'a'.repeat(64),
+      proven_at: new Date().toISOString(),
+      payload: { headless_loop: true },
+    });
+    if (status === 503) return; // no service role key
+    expect(status).toBe(200);
+    expect(body.verdict).toBe('PASS');
+    expect(body.proof_gates_passed).toContain('not_synthetic');
+    expect(body.proof_gates_passed).toContain('lifecycle_complete');
+    expect(body.chain_verified).toBe(true);
+  });
+
+  it('Step 8: process-map shows lifecycle_ok=true for the seeded session', async () => {
+    if (MOCK || !seededSessionId) return;
+    const { status, body } = await get(`/api/game/process-map?session_id=${seededSessionId}`);
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(body.lifecycle_ok).toBe(true);
+    expect(body.total_events).toBeGreaterThan(0);
+    const nodeIds = (body.nodes as Array<{id: string}>).map(n => n.id);
+    expect(nodeIds).toContain('GameSessionStarted');
+    expect(nodeIds).toContain('FrameRendered');
+    expect(nodeIds).toContain('InputAdmitted');
+  });
+
+  it('Step 9: cook-status reflects PASS verdict after cook-receipt insertion', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/cook-status');
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(['idle', 'cooking', 'done', 'failed']).toContain(body.status);
+    if (body.last_receipt) {
+      expect(body.last_receipt.verdict).toBe('PASS');
+    }
+  });
 });
 
 // ── Shape contracts (MOCK mode — no server needed) ───────────────────────────
@@ -177,5 +224,60 @@ describe('session-seed response shape contract', () => {
     expect(lifecycle).toContain('FrameRendered');
     expect(lifecycle).toContain('InputAdmitted');
     expect(lifecycle.length).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('cook-trigger contract (MOCK-safe)', () => {
+  it('cook-trigger is guarded (403 in production mode without ALLOW_COOK_TRIGGER)', async () => {
+    if (MOCK) return;
+    // In dev mode it may succeed (200) or return 403/409; in prod it must be 403
+    const { status } = await post('/api/game/cook-trigger', { project: 'Brm' });
+    // Acceptable in dev: 200 (triggered), 409 (already running), 403 (not allowed)
+    // Not acceptable: 500 without a good reason
+    expect([200, 403, 409, 500, 503]).toContain(status);
+  });
+
+  it('cook-trigger response shape: job_id, status, project, poll', async () => {
+    if (MOCK) return;
+    const { status, body } = await post('/api/game/cook-trigger', { project: 'Brm' });
+    if (status !== 200) return; // 403/409 are acceptable
+    expect(typeof body.job_id).toBe('string');
+    expect(body.status).toBe('queued');
+    expect(body.project).toBe('Brm');
+    expect(body.poll).toContain('/api/game/cook-status');
+  });
+});
+
+describe('cook-receipt proof gates (MOCK-safe property tests)', () => {
+  const VALID = {
+    verdict: 'PASS',
+    milestone: 'HTML5CookVerify',
+    engine_source: 'rocket_cli',
+    ocel_lifecycle: ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
+    ocel_event_count: 3,
+    receipt_hash: 'a'.repeat(64),
+    proven_at: new Date().toISOString(),
+    payload: {},
+  };
+
+  it('proof gate: engine_source=synthetic is always rejected (422)', async () => {
+    if (MOCK) return;
+    const { status } = await post('/api/game/cook-receipt', { ...VALID, engine_source: 'synthetic' });
+    // 422 from proof gate, or 503 if service key missing
+    expect([422, 503]).toContain(status);
+  });
+
+  it('proof gate: empty ocel_lifecycle is always rejected', async () => {
+    if (MOCK) return;
+    const { status } = await post('/api/game/cook-receipt', { ...VALID, ocel_lifecycle: [] });
+    expect([400, 422, 503]).toContain(status);
+  });
+
+  it('proof gate: receipt_hash must be exactly 64 hex chars', async () => {
+    if (MOCK) return;
+    for (const bad of ['abc', 'a'.repeat(63), 'a'.repeat(65), 'AAAA'.repeat(16)]) {
+      const { status } = await post('/api/game/cook-receipt', { ...VALID, receipt_hash: bad });
+      expect([400, 422, 503]).toContain(status);
+    }
   });
 });

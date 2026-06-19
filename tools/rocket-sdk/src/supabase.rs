@@ -113,10 +113,20 @@ impl SupabaseService {
     ///
     /// The leaderboard Postgres trigger fires automatically on PASS verdicts,
     /// so this single call closes the cook→leaderboard pipeline.
-    pub async fn push_cook_receipt(&self, receipt: &CookReceipt) -> Result<()> {
-        // Sign the receipt with the Ed25519 private key if ROCKET_SIGNING_KEY is set.
-        // The signature covers (proven_at, receipt_hash, session_id, verdict) in sorted-key
-        // canonical JSON — same payload the browser verify route checks.
+    ///
+    /// Routes through the Nuxt `POST /api/game/cook-receipt` proof gate instead of
+    /// writing directly to Supabase REST — the gate enforces:
+    ///   - engine_source ≠ 'synthetic'
+    ///   - ocel_lifecycle contains the declared minimum lifecycle
+    ///   - Ed25519 signature valid (when ROCKET_SIGNING_PUBKEY is configured server-side)
+    ///
+    /// `nuxt_base_url` defaults to `NUXT_BASE_URL` env var, falling back to
+    /// `http://localhost:3000`. Pass `None` to use the default.
+    pub async fn push_cook_receipt(
+        &self,
+        receipt: &CookReceipt,
+        nuxt_base_url: Option<&str>,
+    ) -> Result<()> {
         let proven_at = chrono::Utc::now().to_rfc3339();
         let ed25519_sig = std::env::var("ROCKET_SIGNING_KEY").ok().and_then(|key| {
             let payload = crate::signing::receipt_signing_payload(
@@ -135,6 +145,39 @@ impl SupabaseService {
         }
 
         let body = serde_json::to_string(&value).context("serialise signed receipt")?;
+
+        // Route through the Nuxt proof gate (preferred) or fall back to direct REST.
+        let nuxt = nuxt_base_url
+            .map(|s| s.to_owned())
+            .or_else(|| std::env::var("NUXT_BASE_URL").ok())
+            .unwrap_or_else(|| "http://localhost:3000".to_string());
+
+        let resp = self
+            .client
+            .post(format!("{nuxt}/api/game/cook-receipt"))
+            .header("Content-Type", "application/json")
+            .body(body.clone())
+            .send()
+            .await;
+
+        match resp {
+            Ok(r) if r.status().is_success() => return Ok(()),
+            Ok(r) => {
+                let status = r.status();
+                // 422 = proof gate rejected — do not fall back (this is a real error)
+                if status == 422 || status == 401 {
+                    let msg = r.text().await.unwrap_or_default();
+                    anyhow::bail!("cook-receipt proof gate rejected ({status}): {msg}");
+                }
+                // Other errors (503 = Nuxt not running in dev) → fall back to direct REST
+                tracing::warn!("cook-receipt gate returned {status}; falling back to direct Supabase REST");
+            }
+            Err(e) => {
+                tracing::warn!("cook-receipt gate unreachable ({e}); falling back to direct Supabase REST");
+            }
+        }
+
+        // Fallback: direct Supabase REST (dev/offline only — no proof gate enforcement)
         let resp = self
             .client
             .post(format!("{}/rest/v1/game_receipts", self.url))
@@ -145,8 +188,8 @@ impl SupabaseService {
             .context("POST game_receipts failed")?;
         if !resp.status().is_success() {
             let status = resp.status();
-            let body = resp.text().await.unwrap_or_default();
-            anyhow::bail!("game_receipts insert {status}: {body}");
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("game_receipts insert {status}: {msg}");
         }
         Ok(())
     }

@@ -268,8 +268,8 @@ impl Html5PackageReport {
             eprintln!("[warn] push_ocel_events failed (non-fatal): {e}");
         }
 
-        // Push receipt (Postgres trigger fires on PASS to update leaderboard).
-        svc.push_cook_receipt(&receipt).await?;
+        // Push receipt through the Nuxt proof gate (falls back to direct REST if Nuxt is down).
+        svc.push_cook_receipt(&receipt, None).await?;
 
         // Close the game_session row now that we have a receipt hash.
         if let Some(sid) = &self.cook_session_id {
