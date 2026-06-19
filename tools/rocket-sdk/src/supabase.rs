@@ -62,3 +62,49 @@ impl SupabaseService {
         Ok(leaderboard)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn supabase_service_new_stores_url_and_key() {
+        let svc = SupabaseService::new("http://localhost:54321".into(), "my-key".into());
+        assert_eq!(svc.url, "http://localhost:54321");
+        assert_eq!(svc.anon_key, "my-key");
+    }
+
+    #[test]
+    fn player_deserializes_from_json() {
+        let p: Player = serde_json::from_value(json!({
+            "id": 1, "name": "Alice", "score": 9001
+        })).unwrap();
+        assert_eq!(p.id, 1);
+        assert_eq!(p.name, "Alice");
+        assert_eq!(p.score, 9001);
+    }
+
+    #[test]
+    fn player_serializes_to_json() {
+        let p = Player { id: 2, name: "Bob".into(), score: 42 };
+        let v = serde_json::to_value(&p).unwrap();
+        assert_eq!(v["name"], "Bob");
+        assert_eq!(v["score"], 42);
+    }
+
+    #[test]
+    fn leaderboard_entry_roundtrips() {
+        let entry = LeaderboardEntry { id: 1, player_id: 7, score: 500, rank: 3 };
+        let json = serde_json::to_string(&entry).unwrap();
+        let back: LeaderboardEntry = serde_json::from_str(&json).unwrap();
+        assert_eq!(back.player_id, 7);
+        assert_eq!(back.rank, 3);
+    }
+
+    #[test]
+    fn player_debug_format_contains_name() {
+        let p = Player { id: 1, name: "Tester".into(), score: 0 };
+        assert!(format!("{:?}", p).contains("Tester"));
+    }
+}
