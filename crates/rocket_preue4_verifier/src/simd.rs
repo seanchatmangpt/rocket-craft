@@ -85,3 +85,71 @@ pub fn verify_simd_scalar_equivalence(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── batch_update_damage_simd_equiv ────────────────────────────────────────
+
+    #[test]
+    fn simd_matches_scalar_for_small_input() {
+        let heat =   [0u8, 5, 10, 15];
+        let stress = [0u8, 5, 10, 15];
+        let sh =     [15u8, 10, 5, 0];
+        let mut damage = [0u8; 4];
+        batch_update_damage_simd_equiv(&heat, &stress, &sh, &mut damage).unwrap();
+        for i in 0..4 {
+            let expected = crate::transitions::scalar_failure_risk(heat[i], stress[i], sh[i]);
+            assert_eq!(damage[i], expected, "divergence at i={i}");
+        }
+    }
+
+    #[test]
+    fn simd_processes_exact_16_lane_chunk() {
+        let heat   = vec![3u8; 16];
+        let stress = vec![3u8; 16];
+        let sh     = vec![9u8; 16];
+        let mut damage = vec![0u8; 16];
+        batch_update_damage_simd_equiv(&heat, &stress, &sh, &mut damage).unwrap();
+        let expected = crate::transitions::scalar_failure_risk(3, 3, 9);
+        assert!(damage.iter().all(|&v| v == expected));
+    }
+
+    #[test]
+    fn simd_processes_more_than_16_with_remainder() {
+        let n = 20usize;
+        let heat   = vec![2u8; n];
+        let stress = vec![4u8; n];
+        let sh     = vec![12u8; n];
+        let mut damage = vec![0u8; n];
+        batch_update_damage_simd_equiv(&heat, &stress, &sh, &mut damage).unwrap();
+        let expected = crate::transitions::scalar_failure_risk(2, 4, 12);
+        assert!(damage.iter().all(|&v| v == expected));
+    }
+
+    #[test]
+    fn simd_returns_error_on_mismatched_lengths() {
+        let heat   = vec![0u8; 4];
+        let stress = vec![0u8; 3]; // wrong length
+        let sh     = vec![15u8; 4];
+        let mut damage = vec![0u8; 4];
+        assert!(batch_update_damage_simd_equiv(&heat, &stress, &sh, &mut damage).is_err());
+    }
+
+    // ── verify_simd_scalar_equivalence ────────────────────────────────────────
+
+    #[test]
+    fn equivalence_holds_for_all_class_values() {
+        // Run on a representative sample spanning the full [0,15] range.
+        let vals: Vec<u8> = (0..16).collect();
+        let result = verify_simd_scalar_equivalence(&vals, &vals, &vals);
+        assert!(result.is_ok(), "equivalence failed: {result:?}");
+    }
+
+    #[test]
+    fn equivalence_holds_for_zero_length_input() {
+        let result = verify_simd_scalar_equivalence(&[], &[], &[]);
+        assert!(result.is_ok());
+    }
+}
