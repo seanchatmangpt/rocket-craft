@@ -80,6 +80,9 @@ pub struct Html5PackageReport {
     pub is_real_package: bool,
     /// True when the UI-input pointer-lock patch has been applied to the HTML files.
     pub ui_input_patched: bool,
+    /// UUID of the `game_sessions` row opened for this cook run, if Supabase is configured.
+    /// `None` when running offline. Set by [`Html5PackageVerifier::with_cook_session_id`].
+    pub cook_session_id: Option<String>,
 }
 
 impl Html5PackageReport {
@@ -155,20 +158,15 @@ impl Html5PackageReport {
             }
         });
 
-        // Derive a stable receipt hash from the summary + timestamp.
-        // Full SHA-256 requires the sha2 crate; use a simple FNV-style fold for
-        // a deterministic, collision-resistant hex string without a new dep.
+        // SHA-256 receipt hash using ring (already a dependency for Ed25519 signing).
         let hash_input = format!(
             "{}|{}|{}",
             self.summary(),
             timestamp_secs,
             self.archive_dir.display()
         );
-        let receipt_hash = hash_input
-            .bytes()
-            .fold(0xcbf29ce484222325u64, |acc, b| {
-                acc.wrapping_mul(0x100000001b3).wrapping_add(b as u64)
-            });
+        let digest = ring::digest::digest(&ring::digest::SHA256, hash_input.as_bytes());
+        let receipt_hash: String = digest.as_ref().iter().map(|b| format!("{b:02x}")).collect();
 
         // OCEL lifecycle: ordered activity names emitted by the cook pipeline.
         let mut lifecycle = vec!["CookStarted".to_string()];
@@ -189,13 +187,13 @@ impl Html5PackageReport {
         payload.insert("summary".into(), serde_json::json!(self.summary()));
 
         crate::supabase::CookReceipt {
-            session_id: None,
+            session_id: self.cook_session_id.clone(),
             verdict: if self.is_real_package { "PASS".into() } else { "FAIL".into() },
             milestone: "HTML5CookVerify".into(),
             ocel_lifecycle: lifecycle,
             ocel_event_count,
             engine_source: "rocket_cli".into(),
-            receipt_hash: format!("{receipt_hash:016x}"),
+            receipt_hash,
             proven_at: format!("{timestamp_secs}"),
             payload,
         }
@@ -213,45 +211,61 @@ impl Html5PackageReport {
 
         // Build individual OCEL event rows from the lifecycle list.
         // Timestamps are spaced 1 second apart starting from proven_at.
+        // Hash chain uses SHA-256 via ring (same dep as Ed25519 signing) so
+        // verify_event_chain RPC can check cook events alongside browser events.
         let base_ms = receipt.proven_at.parse::<u64>().unwrap_or(0) * 1_000;
         let mut prev_hash: Option<String> = None;
-        let events: Vec<crate::supabase::OcelEventRow> = receipt.ocel_lifecycle.iter()
-            .enumerate()
-            .map(|(i, activity)| {
-                let timestamp_ms = base_ms + (i as u64 * 1_000);
-                let attr_json = serde_json::json!({ "stage_index": i });
-                // Minimal hash chain: FNV of prev_hash||activity||timestamp
-                let chain_input = format!(
-                    "{}{}{}",
-                    prev_hash.as_deref().unwrap_or("genesis"),
-                    activity,
-                    timestamp_ms
-                );
-                let event_hash = format!("{:016x}", chain_input.bytes().fold(
-                    0xcbf29ce484222325u64,
-                    |acc, b| acc.wrapping_mul(0x100000001b3).wrapping_add(b as u64),
-                ));
-                let row = crate::supabase::OcelEventRow {
-                    session_id: None,
-                    activity: activity.clone(),
-                    timestamp_ms,
-                    object_refs: vec![format!("cook:{}", self.archive_dir.display())],
-                    attributes: attr_json,
-                    prev_hash: prev_hash.clone(),
-                    event_hash: event_hash.clone(),
-                    seq: i as u32,
-                };
-                prev_hash = Some(event_hash);
-                row
-            })
-            .collect();
+        let cook_obj = format!("cook:{}", self.archive_dir.display());
+        let mut events: Vec<crate::supabase::OcelEventRow> = Vec::new();
+        for (i, activity) in receipt.ocel_lifecycle.iter().enumerate() {
+            let timestamp_ms = base_ms + (i as u64 * 1_000);
+            let attr_json = serde_json::json!({ "stage_index": i });
+            // SHA-256 chain: matches the formula verify_event_chain and the browser use.
+            // Canonical input: sorted-key JSON object, same as useHashChain.computeEventHash.
+            let chain_payload = serde_json::json!({
+                "data": { "object_refs": [&cook_obj], "attributes": { "stage_index": i } },
+                "id": format!("cook-{i}"),
+                "prev_hash": prev_hash,
+                "timestamp": chrono::DateTime::from_timestamp((timestamp_ms / 1000) as i64, 0)
+                    .map(|dt| dt.to_rfc3339())
+                    .unwrap_or_default(),
+                "type": activity,
+            });
+            let payload_str = serde_json::to_string(&chain_payload).unwrap_or_default();
+            let digest = ring::digest::digest(&ring::digest::SHA256, payload_str.as_bytes());
+            let event_hash: String = digest.as_ref().iter().map(|b| format!("{b:02x}")).collect();
+            let row = crate::supabase::OcelEventRow {
+                session_id: self.cook_session_id.clone(),
+                activity: activity.clone(),
+                timestamp_ms,
+                object_refs: vec![cook_obj.clone()],
+                attributes: attr_json,
+                prev_hash: prev_hash.clone(),
+                event_hash: event_hash.clone(),
+                seq: i as u32,
+            };
+            prev_hash = Some(event_hash);
+            events.push(row);
+        }
 
-        // Push receipt first (trigger fires on INSERT into game_receipts)
-        svc.push_cook_receipt(&receipt).await?;
-
-        // Push individual events — non-fatal on failure
+        // Push OCEL events first so the session has evidence before the receipt lands.
+        // Non-fatal on failure — the receipt is the authoritative record.
         if let Err(e) = svc.push_ocel_events(&events).await {
             eprintln!("[warn] push_ocel_events failed (non-fatal): {e}");
+        }
+
+        // Push receipt (Postgres trigger fires on PASS to update leaderboard).
+        svc.push_cook_receipt(&receipt).await?;
+
+        // Close the game_session row now that we have a receipt hash.
+        if let Some(sid) = &self.cook_session_id {
+            if let Err(e) = svc.close_cook_session(
+                sid,
+                &receipt.verdict,
+                Some(&receipt.receipt_hash),
+            ).await {
+                eprintln!("[warn] close_cook_session failed (non-fatal): {e}");
+            }
         }
         Ok(())
     }
@@ -297,6 +311,8 @@ pub struct Html5PackageVerifier {
     pub archive_dir: PathBuf,
     /// Override the minimum size threshold (default: 10 MB).
     pub min_wasm_bytes: u64,
+    /// Optional `game_sessions` UUID to attach to OCEL events pushed to Supabase.
+    pub cook_session_id: Option<String>,
 }
 
 impl Html5PackageVerifier {
@@ -304,11 +320,23 @@ impl Html5PackageVerifier {
         Self {
             archive_dir: archive_dir.into(),
             min_wasm_bytes: MIN_REAL_WASM_BYTES,
+            cook_session_id: None,
         }
     }
 
     pub fn with_min_wasm_bytes(mut self, bytes: u64) -> Self {
         self.min_wasm_bytes = bytes;
+        self
+    }
+
+    /// Attach a pre-created `game_sessions` UUID so the resulting report's
+    /// OCEL events are linked to a verifiable session in Supabase.
+    ///
+    /// When set, [`Html5PackageReport::push_to_supabase`] tags all OCEL event
+    /// rows with this session_id so `verify_event_chain(session_id)` can prove
+    /// the cook pipeline ran its declared lifecycle in lawful order.
+    pub fn with_cook_session_id(mut self, session_id: impl Into<String>) -> Self {
+        self.cook_session_id = Some(session_id.into());
         self
     }
 
@@ -358,6 +386,7 @@ impl Html5PackageVerifier {
             companions,
             is_real_package,
             ui_input_patched,
+            cook_session_id: self.cook_session_id.clone(),
         })
     }
 
@@ -1354,8 +1383,8 @@ mod tests {
         let dir = TempDir::new().unwrap();
         let report = make_real_report(&dir);
         let receipt = report.as_supabase_receipt();
-        // Hash must be a 16-char lowercase hex string (u64 FNV)
-        assert_eq!(receipt.receipt_hash.len(), 16);
+        // Hash is a 64-char lowercase SHA-256 hex string.
+        assert_eq!(receipt.receipt_hash.len(), 64);
         assert!(receipt.receipt_hash.chars().all(|c| c.is_ascii_hexdigit()));
     }
 

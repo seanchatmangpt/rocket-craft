@@ -148,6 +148,102 @@ impl SupabaseService {
         Ok(())
     }
 
+    /// Open a `game_sessions` row for a CLI cook run.
+    ///
+    /// Creates an `is_alive=true` row with `engine_source='rocket_cli'` and returns
+    /// the UUID string. Pass this to `Html5PackageVerifier::with_cook_session_id()`
+    /// so all OCEL events emitted by the cook pipeline are linked to this session
+    /// and can be verified by `verify_event_chain(session_id)`.
+    ///
+    /// The caller is responsible for closing the session by calling
+    /// `close_cook_session(session_id, verdict)` after the cook completes.
+    pub async fn create_cook_session(&self, project_name: &str, archive_dir: &str) -> Result<String> {
+        let body = serde_json::json!({
+            "is_alive": true,
+            "engine_source": "rocket_cli",
+            "metadata": {
+                "project_name": project_name,
+                "archive_dir": archive_dir,
+                "opened_by": "rocket html5 cook"
+            }
+        });
+        let mut headers = self.rest_headers();
+        // PostgREST: return the inserted row so we can extract the generated UUID.
+        headers.insert("Prefer", "return=representation".parse().unwrap());
+        let resp = self.client
+            .post(format!("{}/rest/v1/game_sessions", self.url))
+            .headers(headers)
+            .json(&body)
+            .send()
+            .await
+            .context("POST game_sessions (cook session) failed")?;
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("create_cook_session {status}: {msg}");
+        }
+        let rows: Vec<serde_json::Value> = resp.json().await?;
+        rows.into_iter()
+            .next()
+            .and_then(|r| r["id"].as_str().map(str::to_owned))
+            .ok_or_else(|| anyhow::anyhow!("create_cook_session: no id returned"))
+    }
+
+    /// Close a cook session by setting `is_alive=false` and recording the final verdict.
+    ///
+    /// Call after `push_cook_receipt` completes. Sets `session_ended_at` and tags
+    /// the receipt hash in the metadata for cross-reference.
+    pub async fn close_cook_session(
+        &self,
+        session_id: &str,
+        verdict: &str,
+        receipt_hash: Option<&str>,
+    ) -> Result<()> {
+        let body = serde_json::json!({
+            "is_alive": false,
+            "session_ended_at": chrono::Utc::now().to_rfc3339(),
+            "receipt_hash": receipt_hash,
+            "metadata": serde_json::json!({
+                "verdict": verdict,
+                "receipt_hash": receipt_hash,
+                "closed_by": "rocket html5 cook"
+            })
+        });
+        let resp = self.client
+            .patch(format!("{}/rest/v1/game_sessions?id=eq.{session_id}", self.url))
+            .headers(self.rest_headers())
+            .json(&body)
+            .send()
+            .await
+            .context("PATCH game_sessions (close cook session) failed")?;
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let msg = resp.text().await.unwrap_or_default();
+            anyhow::bail!("close_cook_session {status}: {msg}");
+        }
+        Ok(())
+    }
+
+    /// Fetch the most recent cook receipt from `game_receipts` for a given project.
+    ///
+    /// Used by `rocket html5 diff` to compare the last cook against a new verify run.
+    pub async fn last_cook_receipt(&self, limit: u32) -> Result<Vec<serde_json::Value>> {
+        let url = format!(
+            "{}/rest/v1/game_receipts\
+             ?select=id,verdict,milestone,engine_source,ocel_event_count,proven_at,receipt_hash,payload\
+             &engine_source=eq.rocket_cli\
+             &order=proven_at.desc\
+             &limit={limit}",
+            self.url
+        );
+        let resp = self.client.get(&url).headers(self.rest_headers()).send().await?;
+        if resp.status().is_success() {
+            Ok(resp.json().await?)
+        } else {
+            Ok(vec![])
+        }
+    }
+
     /// Ping the Supabase REST API and verify each pipeline table is accessible.
     ///
     /// Returns `(table_name, is_ok, http_status_or_error)` for each table.

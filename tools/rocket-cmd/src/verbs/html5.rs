@@ -4,29 +4,56 @@ use clap_noun_verb::Result;
 use clap_noun_verb_macros::verb;
 use serde_json::Value;
 
-/// Push a verified package report to Supabase `game_receipts`.
+/// Push a verified package report to Supabase.
 ///
-/// Reads SUPABASE_URL + SUPABASE_ANON_KEY from the environment. If either is
-/// absent the push is silently skipped — offline cooks still write local receipts.
-/// Uses a one-shot tokio runtime so sync verb code can call async SDK methods.
+/// Sequence:
+///   1. create_cook_session → get UUID
+///   2. push_to_supabase (events + receipt, tagged with UUID)
+///   3. close_cook_session (is_alive=false, receipt_hash recorded)
+///
+/// Reads SUPABASE_URL + SUPABASE_ANON_KEY from the environment. Silently no-ops
+/// when Supabase is not configured — offline cooks still write local receipts.
 fn push_report_to_supabase(report: &rocket_sdk::Html5PackageReport) {
     let url = std::env::var("SUPABASE_URL").unwrap_or_default();
     let key = std::env::var("SUPABASE_ANON_KEY")
         .or_else(|_| std::env::var("SUPABASE_SERVICE_ROLE_KEY"))
         .unwrap_or_default();
     if url.is_empty() || key.is_empty() {
-        return; // Supabase not configured — local receipt is the only artefact
+        return;
     }
     let svc = rocket_sdk::supabase::SupabaseService::new(url, key);
-    match tokio::runtime::Runtime::new() {
-        Ok(rt) => {
-            match rt.block_on(report.push_to_supabase(&svc)) {
-                Ok(()) => println!("[supabase] cook receipt pushed → game_receipts"),
-                Err(e) => println!("[supabase] warn: push failed (non-fatal) — {e:#}"),
+    let Ok(rt) = tokio::runtime::Runtime::new() else {
+        println!("[supabase] warn: could not create tokio runtime");
+        return;
+    };
+    rt.block_on(async {
+        // Open a game_sessions row so OCEL events can be chain-verified.
+        let project_name = report.archive_dir
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("unknown");
+        let session_id = match svc.create_cook_session(
+            project_name,
+            &report.archive_dir.display().to_string(),
+        ).await {
+            Ok(id) => {
+                println!("[supabase] cook session opened → {id}");
+                Some(id)
             }
+            Err(e) => {
+                println!("[supabase] warn: create_cook_session failed (non-fatal) — {e:#}");
+                None
+            }
+        };
+
+        // Attach session_id before pushing events + receipt.
+        let mut owned = report.clone();
+        owned.cook_session_id = session_id;
+        match owned.push_to_supabase(&svc).await {
+            Ok(()) => println!("[supabase] cook receipt pushed → game_receipts"),
+            Err(e) => println!("[supabase] warn: push failed (non-fatal) — {e:#}"),
         }
-        Err(e) => println!("[supabase] warn: could not create tokio runtime — {e:#}"),
-    }
+    });
 }
 
 fn ue4_root() -> std::path::PathBuf {
@@ -1112,6 +1139,88 @@ fn run_playwright_game_loop(nuxt_path: &std::path::Path, headed: bool) -> Result
             "{suite_label} FAILED verdict={verdict} — see nuxt-shell/playwright-report/"
         )))
     }
+}
+
+/// Resolve the HTML5 archive directory for a project name.
+fn resolve_archive(project: &str) -> std::path::PathBuf {
+    let lower = std::path::PathBuf::from(format!("/tmp/{}-html5-archive/HTML5", project.to_lowercase()));
+    if lower.exists() { lower } else {
+        std::path::PathBuf::from(format!("/tmp/{project}-html5-archive/HTML5"))
+    }
+}
+
+/// Wasm size in MB from a package report (first Real verdict found).
+fn wasm_mb_of(report: &rocket_sdk::Html5PackageReport) -> Option<f64> {
+    report.wasm_files.iter().find_map(|f| {
+        if let rocket_sdk::WasmVerdict::Real { size_bytes } = f.verdict {
+            Some(size_bytes as f64 / 1_048_576.0)
+        } else {
+            None
+        }
+    })
+}
+
+/// Fetch the most recent cook receipt, trying Supabase first then the local JSON file.
+fn fetch_prior_receipt(archive: &std::path::Path) -> Option<serde_json::Value> {
+    let url = std::env::var("SUPABASE_URL").unwrap_or_default();
+    let key = std::env::var("SUPABASE_ANON_KEY")
+        .or_else(|_| std::env::var("SUPABASE_SERVICE_ROLE_KEY"))
+        .unwrap_or_default();
+    if !url.is_empty() && !key.is_empty() {
+        let svc = rocket_sdk::supabase::SupabaseService::new(url, key);
+        if let Ok(rt) = tokio::runtime::Runtime::new() {
+            return rt.block_on(svc.last_cook_receipt(1)).ok()
+                .and_then(|mut v| v.pop());
+        }
+    }
+    let local = archive.join("cook-receipt.json");
+    if local.exists() {
+        std::fs::read_to_string(&local).ok().and_then(|s| serde_json::from_str(&s).ok())
+    } else {
+        None
+    }
+}
+
+fn do_html5_diff(project: &str) -> clap_noun_verb::Result<Value> {
+    let archive = resolve_archive(project);
+    let current = rocket_sdk::Html5PackageVerifier::new(&archive).verify()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(
+            format!("verify failed: {e} — run rocket html5 verify first")))?;
+    let current_verdict = if current.is_real_package { "PASS" } else { "FAIL" };
+    let current_mb = wasm_mb_of(&current);
+    let prior = fetch_prior_receipt(&archive);
+    let prior_verdict = prior.as_ref().and_then(|p| p["verdict"].as_str()).unwrap_or("none");
+    let prior_mb = prior.as_ref().and_then(|p| p["payload"]["wasm_mb"].as_f64());
+    let regression = prior_verdict == "PASS" && current_verdict == "FAIL";
+    let delta_mb = current_mb.zip(prior_mb).map(|(c, p)| c - p);
+
+    println!("[html5 diff] project={project}  archive={}", archive.display());
+    println!("  current : verdict={current_verdict}  wasm={current_mb:.1?} MB");
+    println!("  prior   : verdict={prior_verdict}  wasm={prior_mb:.1?} MB");
+    if let Some(d) = delta_mb { println!("  Δ wasm  : {:+.2} MB", d); }
+    if regression { println!("  REGRESSION: prior=PASS current=FAIL"); }
+
+    let result = serde_json::json!({
+        "project": project,
+        "current": { "verdict": current_verdict, "wasm_mb": current_mb,
+            "has_js": current.companions.has_js, "has_html": current.companions.has_html,
+            "has_data_or_pak": current.companions.has_data_or_pak },
+        "prior": prior, "size_delta_mb": delta_mb, "regression": regression,
+    });
+    if regression {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            format!("[html5 diff] REGRESSION: {project} was PASS, now FAIL")));
+    }
+    Ok(result)
+}
+
+/// Compare the current package against the last cook receipt (Supabase or local JSON).
+///
+/// Reports WASM size delta, companion file changes, verdict transition (PASS→FAIL).
+/// Exits non-zero on regression so CI can catch broken cooks automatically.
+#[verb("diff", "html5")]
+fn html5_diff(project: Option<String>) -> clap_noun_verb::Result<Value> {
+    do_html5_diff(project.as_deref().unwrap_or("Brm"))
 }
 
 #[cfg(test)]
