@@ -91,3 +91,105 @@ pub fn classify_lod(inputs: &LodInputs) -> Result<LodOutput, RefusalReason> {
 pub fn batch_classify(inputs: &[LodInputs]) -> Vec<Result<LodOutput, RefusalReason>> {
     inputs.iter().map(classify_lod).collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn inputs_with_authority(score: u8) -> LodInputs {
+        LodInputs {
+            distance_class: 0,
+            mission_relevance: score,
+            damage_class: 0,
+            threat_class: 0,
+            interaction_probability: 0,
+            process_step_relevance: 0,
+            prediction_relevance: 0,
+        }
+    }
+
+    // ── LodClass ordering ─────────────────────────────────────────────────────
+
+    #[test]
+    fn lod_class_crown_is_lowest_value() {
+        assert!(LodClass::Crown < LodClass::Primary);
+        assert!(LodClass::Primary < LodClass::Secondary);
+        assert!(LodClass::Secondary < LodClass::Tertiary);
+        assert!(LodClass::Tertiary < LodClass::Background);
+    }
+
+    // ── classify_lod thresholds ───────────────────────────────────────────────
+
+    #[test]
+    fn score_13_classifies_crown_with_explicit_authority() {
+        let inputs = inputs_with_authority(13); // mission_relevance >= 13 → ok
+        let out = classify_lod(&inputs).unwrap();
+        assert_eq!(out.lod_class, LodClass::Crown);
+        assert_eq!(out.projection_priority, 255);
+        assert!(out.authority_required);
+    }
+
+    #[test]
+    fn score_13_without_individual_authority_field_returns_error() {
+        // authority_score = max(interaction_probability=13, ...) — but not from
+        // mission/damage/threat/process → CROWN refused
+        let inputs = LodInputs {
+            distance_class: 0,
+            mission_relevance: 0,
+            damage_class: 0,
+            threat_class: 0,
+            interaction_probability: 13, // drives score but NOT an authority field
+            process_step_relevance: 0,
+            prediction_relevance: 0,
+        };
+        let result = classify_lod(&inputs);
+        assert!(result.is_err());
+        assert!(matches!(result.unwrap_err(), RefusalReason::LodDemotedCrownFeature { .. }));
+    }
+
+    #[test]
+    fn score_9_to_12_classifies_primary() {
+        let inputs = inputs_with_authority(9);
+        let out = classify_lod(&inputs).unwrap();
+        assert_eq!(out.lod_class, LodClass::Primary);
+        assert_eq!(out.projection_priority, 200);
+        assert!(out.authority_required);
+    }
+
+    #[test]
+    fn score_5_to_8_classifies_secondary() {
+        let inputs = inputs_with_authority(5);
+        let out = classify_lod(&inputs).unwrap();
+        assert_eq!(out.lod_class, LodClass::Secondary);
+        assert!(!out.authority_required);
+    }
+
+    #[test]
+    fn score_2_to_4_classifies_tertiary() {
+        let inputs = inputs_with_authority(2);
+        let out = classify_lod(&inputs).unwrap();
+        assert_eq!(out.lod_class, LodClass::Tertiary);
+        assert_eq!(out.projection_priority, 64);
+    }
+
+    #[test]
+    fn score_0_to_1_classifies_background() {
+        let inputs = inputs_with_authority(0);
+        let out = classify_lod(&inputs).unwrap();
+        assert_eq!(out.lod_class, LodClass::Background);
+        assert_eq!(out.projection_priority, 16);
+        assert!(!out.authority_required);
+    }
+
+    #[test]
+    fn prediction_relevance_alone_cannot_grant_crown() {
+        let inputs = LodInputs {
+            distance_class: 0, mission_relevance: 0, damage_class: 0,
+            threat_class: 0, interaction_probability: 0,
+            process_step_relevance: 0,
+            prediction_relevance: 15, // high but excluded from authority
+        };
+        let out = classify_lod(&inputs).unwrap();
+        assert_eq!(out.lod_class, LodClass::Background);
+    }
+}

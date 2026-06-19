@@ -105,3 +105,147 @@ impl MotionTrace {
         Ok((0, 0))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn fire_trace(phases: Vec<MotionPhase>, socket: bool, heat: u8) -> MotionTrace {
+        MotionTrace {
+            family: MotionFamily::FireWeapon,
+            phases,
+            socket_available: socket,
+            heat_class: heat,
+            stress_class: 0,
+            leg_damage_class: 0,
+        }
+    }
+
+    // ── FireWeapon validation ─────────────────────────────────────────────────
+
+    #[test]
+    fn fire_weapon_valid_with_plant_and_socket() {
+        let t = fire_trace(
+            vec![MotionPhase::PlantFeet, MotionPhase::Fire],
+            true, 0,
+        );
+        let (dh, ds) = t.validate_and_compute_effects().unwrap();
+        assert_eq!(dh, 2); // fire +2 heat
+        assert_eq!(ds, 0); // no AbsorbRecoil in trace
+    }
+
+    #[test]
+    fn fire_weapon_without_plant_feet_returns_error() {
+        let t = fire_trace(vec![MotionPhase::Fire], true, 0);
+        assert!(matches!(
+            t.validate_and_compute_effects().unwrap_err(),
+            crate::error::RefusalReason::MotionClearanceViolation { .. }
+        ));
+    }
+
+    #[test]
+    fn fire_weapon_without_socket_returns_missing_socket() {
+        let t = fire_trace(
+            vec![MotionPhase::PlantFeet, MotionPhase::Fire],
+            false, 0,
+        );
+        assert!(matches!(
+            t.validate_and_compute_effects().unwrap_err(),
+            crate::error::RefusalReason::MissingSocket { .. }
+        ));
+    }
+
+    #[test]
+    fn fire_weapon_high_heat_without_vent_returns_error() {
+        let t = fire_trace(
+            vec![MotionPhase::PlantFeet, MotionPhase::Fire],
+            true, 12, // heat_class >= 12 requires VentHeat
+        );
+        assert!(matches!(
+            t.validate_and_compute_effects().unwrap_err(),
+            crate::error::RefusalReason::MotionClearanceViolation { .. }
+        ));
+    }
+
+    #[test]
+    fn fire_weapon_high_heat_with_vent_passes() {
+        let t = fire_trace(
+            vec![MotionPhase::PlantFeet, MotionPhase::VentHeat, MotionPhase::Fire],
+            true, 12,
+        );
+        assert!(t.validate_and_compute_effects().is_ok());
+    }
+
+    #[test]
+    fn absorb_recoil_adds_stress_delta() {
+        let t = fire_trace(
+            vec![MotionPhase::PlantFeet, MotionPhase::Fire, MotionPhase::AbsorbRecoil],
+            true, 0,
+        );
+        let (dh, ds) = t.validate_and_compute_effects().unwrap();
+        assert_eq!(dh, 2);
+        assert_eq!(ds, 1);
+    }
+
+    // ── Walk / Run validation ─────────────────────────────────────────────────
+
+    #[test]
+    fn run_with_low_leg_damage_passes() {
+        let t = MotionTrace {
+            family: MotionFamily::Run,
+            phases: vec![MotionPhase::Stride],
+            socket_available: true,
+            heat_class: 0,
+            stress_class: 0,
+            leg_damage_class: 5,
+        };
+        assert!(t.validate_and_compute_effects().is_ok());
+    }
+
+    #[test]
+    fn run_with_leg_damage_12_or_higher_returns_error() {
+        let t = MotionTrace {
+            family: MotionFamily::Run,
+            phases: vec![MotionPhase::Stride],
+            socket_available: true,
+            heat_class: 0,
+            stress_class: 0,
+            leg_damage_class: 12,
+        };
+        assert!(matches!(
+            t.validate_and_compute_effects().unwrap_err(),
+            crate::error::RefusalReason::MotionClearanceViolation { .. }
+        ));
+    }
+
+    #[test]
+    fn walk_with_high_leg_damage_passes_degraded() {
+        let t = MotionTrace {
+            family: MotionFamily::Walk,
+            phases: vec![MotionPhase::Stride],
+            socket_available: true,
+            heat_class: 0,
+            stress_class: 0,
+            leg_damage_class: 15, // high but Walk is admitted
+        };
+        let (dh, ds) = t.validate_and_compute_effects().unwrap();
+        assert_eq!(dh, 0);
+        assert_eq!(ds, 0);
+    }
+
+    #[test]
+    fn other_motion_families_return_zero_effects() {
+        for family in [MotionFamily::Brace, MotionFamily::Recover, MotionFamily::Repair] {
+            let t = MotionTrace {
+                family,
+                phases: vec![],
+                socket_available: true,
+                heat_class: 0,
+                stress_class: 0,
+                leg_damage_class: 0,
+            };
+            let (dh, ds) = t.validate_and_compute_effects().unwrap();
+            assert_eq!((dh, ds), (0, 0));
+        }
+    }
+}
