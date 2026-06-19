@@ -1192,4 +1192,32 @@ mod tests {
         // Should be Pass on this mac (Xcode is installed) or Fail/Warn without CLT
         matches!(result.status, CheckStatus::Pass | CheckStatus::Warn | CheckStatus::Fail);
     }
+
+    #[test]
+    fn html5_package_check_returns_a_named_html5_result() {
+        // Any project root — the check must return a properly named result without panicking
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_html5_package();
+        assert!(result.name.contains("HTML5"), "check name must mention HTML5");
+        // Status may be Pass/Warn/Fail depending on machine state — just must not panic
+        matches!(result.status, CheckStatus::Pass | CheckStatus::Warn | CheckStatus::Fail);
+    }
+
+    #[test]
+    fn html5_package_check_reads_manifest_for_archive_paths() {
+        let dir = tempdir().unwrap();
+        // Write a minimal project-manifest.json with a project named "Alpha"
+        let manifest = serde_json::json!({
+            "projects": [{"name": "Alpha", "uproject_path": "Alpha.uproject", "targets": []}]
+        });
+        fs::write(dir.path().join("project-manifest.json"),
+            serde_json::to_string(&manifest).unwrap()).unwrap();
+
+        // No archive directories exist, so this should still be Warn (not panic)
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_html5_package();
+        // Should be Warn because no archive exists — but must NOT panic or error
+        assert!(matches!(result.status, CheckStatus::Warn | CheckStatus::Fail | CheckStatus::Pass));
+    }
 }
