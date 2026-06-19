@@ -158,3 +158,49 @@ fn config_env(key: String) -> Result<Value> {
 fn root_env() -> Result<Value> {
     do_root()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn do_capabilities_returns_10_capabilities() {
+        let result = do_capabilities().unwrap();
+        let caps = result["capabilities"].as_array().unwrap();
+        assert_eq!(caps.len(), 10);
+    }
+
+    #[test]
+    fn do_capabilities_all_entries_have_name_and_description() {
+        let result = do_capabilities().unwrap();
+        let caps = result["capabilities"].as_array().unwrap();
+        for cap in caps {
+            assert!(cap["name"].is_string(), "missing name");
+            assert!(cap["description"].is_string(), "missing description");
+            assert!(!cap["name"].as_str().unwrap().is_empty(), "empty name");
+            assert!(
+                !cap["description"].as_str().unwrap().is_empty(),
+                "empty description"
+            );
+        }
+    }
+
+    #[test]
+    fn do_capabilities_names_are_unique() {
+        let result = do_capabilities().unwrap();
+        let caps = result["capabilities"].as_array().unwrap();
+        let names: Vec<_> = caps.iter().map(|c| c["name"].as_str().unwrap()).collect();
+        let unique: std::collections::HashSet<_> = names.iter().collect();
+        assert_eq!(names.len(), unique.len(), "duplicate capability name");
+    }
+
+    #[test]
+    fn do_capabilities_includes_wasm_plugin_system() {
+        let result = do_capabilities().unwrap();
+        let caps = result["capabilities"].as_array().unwrap();
+        assert!(caps.iter().any(|c| c["name"]
+            .as_str()
+            .unwrap()
+            .contains("Wasm Plugin System")));
+    }
+}
