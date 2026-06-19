@@ -23,12 +23,16 @@ Rocket Craft is a multi-game Unreal Engine 4.24 monorepo containing six UE4 game
 ./rocket crypto generate  # Generate Android keystores
 ./rocket wasm --file path/to/plugin.wasm  # Execute a WASM compliance plugin
 
-# HTML5 pipeline (Brm project — proven working, Cook 7)
+# HTML5 pipeline (Brm project — proven working, Stage 6 PASS)
+./rocket html5 preflight --project Brm  # Check prereqs (engine, emsdk, Python 3, disk, Rosetta) before cook
 ./rocket html5 cook --project Brm        # UAT BuildCookRun → Brm.wasm (175 MB) in /tmp/brm-html5-archive/HTML5/
+./rocket html5 verify                    # Verify WASM magic bytes + size + companion files
 ./rocket html5 serve --port 8080         # Serve manufactured/ dir on :8080
+./rocket html5 status                    # Pipeline summary: engine, package, port, manifest
 ./verify_html5_pipeline.sh               # Full Stage 6 proof: cook → serve → Playwright → receipt PASS
-# Playwright config: pwa-staff/playwright.html5.config.ts (headless:false, Metal GPU WebGL2, timeout:180s)
-# Receipt: pwa-staff/test-results/tps-dflss-receipt.json (verdict=PASS, visualDelta≥20)
+# Playwright config: pwa-staff/playwright.html5.config.ts (headless:false, Metal GPU WebGL2, timeout:240s)
+# Receipt: pwa-staff/test-results/tps-dflss-receipt.json (verdict=PASS, 362762 non-black pixels proven)
+# Stage 6 proven 2026-06-19: real UE4 WebGL2 on Apple M3 Metal, 175.4 MB Brm.wasm
 ```
 
 ### Per-Workspace Rust
