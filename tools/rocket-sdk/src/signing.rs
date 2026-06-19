@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     fn receipt_payload_is_sorted_json() {
-        let payload = receipt_signing_payload(Some("sess-1"), "PASS", "sha256:abc", "2026-01-01T00:00:00Z");
+        let payload = receipt_signing_payload(Some("sess-1"), "PASS", "blake3:abc", "2026-01-01T00:00:00Z");
         let s = String::from_utf8(payload).unwrap();
         assert!(s.contains("\"proven_at\""));
         assert!(s.contains("\"receipt_hash\""));

@@ -23,7 +23,8 @@ import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as net from 'net';
-import * as crypto from 'crypto';
+import { blake3 } from '@noble/hashes/blake3';
+const blake3Hex = (s: string): string => Buffer.from(blake3(Buffer.from(s))).toString('hex');
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -142,10 +143,7 @@ test.describe('Real UE4 game loop (requires live asset server on :8080)', () => 
     await page.waitForTimeout(500); // let download trigger
 
     // Build receipt with real engine_source
-    const receiptHash = crypto
-      .createHash('sha256')
-      .update(`real_ue4:${eventCount}:${engineReadyEventCount}`)
-      .digest('hex');
+    const receiptHash = blake3Hex(`real_ue4:${eventCount}:${engineReadyEventCount}`);
 
     const receipt = {
       verdict: 'PASS',
@@ -156,7 +154,7 @@ test.describe('Real UE4 game loop (requires live asset server on :8080)', () => 
       ocel_events_at_engine_ready: engineReadyEventCount,
       ocel_lifecycle: ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
       intents_driven: ['MoveForward', 'Interact', 'NextStation', 'MoveForward'],
-      receipt_hash: `sha256:${receiptHash}`,
+      receipt_hash: `blake3:${receiptHash}`,
       proven_at_iso: new Date().toISOString(),
     };
 

@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { createHash } from 'crypto';
-const hashJsonString = (s: string) => createHash('sha256').update(s).digest('hex');
+import { blake3 } from '@noble/hashes/blake3';
+const blake3Hex = (s: string | Buffer): string => Buffer.from(blake3(typeof s === 'string' ? Buffer.from(s) : s)).toString('hex');
+const hashJsonString = blake3Hex;
 import { PNG } from 'pngjs';
 import { createClient } from '@supabase/supabase-js';
 
@@ -203,7 +204,7 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       for (const candidate of wasmCandidates) {
         if (fs.existsSync(candidate)) {
           const wasmBytes = fs.readFileSync(candidate);
-          output_hash = 'sha256:' + createHash('sha256').update(wasmBytes).digest('hex');
+          output_hash = 'blake3:' + blake3Hex(wasmBytes);
           break;
         }
       }

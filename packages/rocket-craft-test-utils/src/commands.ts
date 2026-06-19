@@ -1,9 +1,9 @@
 import { spawnSync } from 'node:child_process'
-import { createHash } from 'node:crypto'
+import { blake3 } from '@noble/hashes/blake3'
 import type { CommandReceipt, RocketResidual } from './types.js'
 
 function hash(s: string): string {
-  return createHash('sha256').update(s).digest('hex')
+  return Buffer.from(blake3(Buffer.from(s))).toString('hex')
 }
 
 function run(command: string, args: string[], cwd: string): CommandReceipt {

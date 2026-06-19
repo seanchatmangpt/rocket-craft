@@ -8,7 +8,7 @@
  * Returns: { verified: boolean, algorithm: "Ed25519", error?: string }
  *
  * The signing payload is canonical sorted-key JSON:
- *   {"proven_at":<iso>, "receipt_hash":<sha256:hex>, "session_id":<uuid|null>, "verdict":<PASS|FAIL>}
+ *   {"proven_at":<iso>, "receipt_hash":<blake3:hex>, "session_id":<uuid|null>, "verdict":<PASS|FAIL>}
  * This must match signing.rs::receipt_signing_payload exactly.
  */
 

@@ -1,8 +1,8 @@
-import { createHash } from 'node:crypto'
+import { blake3 } from '@noble/hashes/blake3'
 import type { VisualDeltaResult, RocketResidual } from './types.js'
 
 export function hashBuffer(buf: Buffer | Uint8Array): string {
-  return createHash('sha256').update(buf).digest('hex')
+  return Buffer.from(blake3(buf)).toString('hex')
 }
 
 export function computePixelDelta(baseline: Buffer, after: Buffer): number {

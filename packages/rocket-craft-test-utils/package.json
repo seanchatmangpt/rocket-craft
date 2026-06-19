@@ -30,8 +30,17 @@
     "@supabase/supabase-js": ">=2.0.0"
   },
   "peerDependenciesMeta": {
-    "@nuxt/test-utils": { "optional": true },
-    "@playwright/test": { "optional": true },
-    "@supabase/supabase-js": { "optional": true }
+    "@nuxt/test-utils": {
+      "optional": true
+    },
+    "@playwright/test": {
+      "optional": true
+    },
+    "@supabase/supabase-js": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0"
   }
 }

@@ -13,6 +13,7 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
+    "@noble/hashes": "^2.2.0",
     "@nuxt/ui": "^4.9.0",
     "@supabase/supabase-js": "^2.108.2",
     "@vueuse/core": "^12.8.2",

@@ -21,7 +21,8 @@
 import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as crypto from 'crypto';
+import { blake3 } from '@noble/hashes/blake3';
+const blake3Hex = (s: string): string => Buffer.from(blake3(Buffer.from(s))).toString('hex');
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -171,10 +172,7 @@ test.describe('OCEL+OTel full game loop', () => {
     await page.screenshot({ path: 'playwright-report/game-loop-live.png', fullPage: false });
 
     // Build receipt
-    const receiptHash = crypto
-      .createHash('sha256')
-      .update(`synthetic:${eventCount}:${Date.now()}`)
-      .digest('hex');
+    const receiptHash = blake3Hex(`synthetic:${eventCount}:${Date.now()}`);
 
     const receipt = {
       verdict: 'PASS',

@@ -2,9 +2,15 @@
  * Hash Chain Composable for Tamper Evidence
  * Ported from dashboard.bak/app/composables/useHashChain.js to TypeScript (Nuxt 4).
  *
+ * Algorithm: BLAKE3 (via @noble/hashes/blake3) — replaces SHA-256.
+ * BLAKE3 is faster, constant-time, and produces 32-byte / 64-char hex output
+ * identical in shape to SHA-256 hex. WebCrypto does not support BLAKE3, so
+ * @noble/hashes is used for both browser and server contexts.
+ *
  * Van der Aalst doctrine: if the event log cannot prove a lawful process happened,
  * then it did not work.
  */
+import { blake3 } from '@noble/hashes/blake3'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -52,15 +58,18 @@ export interface ChainVerifyResult {
 
 // ── Implementation ────────────────────────────────────────────────────────────
 
-/**
- * Convert a 32-byte ArrayBuffer to a lowercase hex string.
- * Shared by computeEventHash and computeMerkleRoot.
- */
-function bufferToHex(buffer: ArrayBuffer): string {
-  return Array.from(new Uint8Array(buffer))
+/** Encode a Uint8Array as lowercase hex — shared by all hash operations. */
+function uint8ToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
 }
+
+/** BLAKE3 hash of a UTF-8 string, returned as lowercase hex. */
+function blake3Hex(input: string): string {
+  return uint8ToHex(blake3(new TextEncoder().encode(input)))
+}
+
 
 /**
  * useHashChain — cryptographic hash-chain utilities for tamper-evident event logging.
@@ -69,14 +78,14 @@ function bufferToHex(buffer: ArrayBuffer): string {
  */
 export function useHashChain() {
   /**
-   * Compute SHA-256 hash of an event.
+   * Compute BLAKE3 hash of an event.
    *
    * Canonical JSON is built from exactly these five keys in this order:
    *   { id, timestamp, type, data, prev_hash }
    * Changing key order would break all existing chain hashes — do not reorder.
    *
    * @param event - Event to hash; prev_hash defaults to null when absent.
-   * @returns Lowercase hex SHA-256 string.
+   * @returns Lowercase hex BLAKE3 string (64 chars).
    */
   const computeEventHash = async (event: HashChainEvent): Promise<string> => {
     const canonical = JSON.stringify({
@@ -86,10 +95,7 @@ export function useHashChain() {
       data: event.data,
       prev_hash: event.prev_hash ?? null,
     })
-
-    const encoded = new TextEncoder().encode(canonical)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
-    return bufferToHex(hashBuffer)
+    return blake3Hex(canonical)
   }
 
   /**
@@ -234,10 +240,10 @@ export function useHashChain() {
   /**
    * Compute a Merkle root over an array of hex hash strings.
    *
-   * Uses standard binary tree reduction: pairs are SHA-256(left + right),
+   * Uses standard binary tree reduction: pairs are BLAKE3(left + right),
    * odd nodes duplicate themselves.
    *
-   * @param hashes - Array of lowercase hex SHA-256 strings.
+   * @param hashes - Array of lowercase hex BLAKE3 strings.
    * @returns Merkle root hex string, or null for an empty input.
    */
   const computeMerkleRoot = async (hashes: string[]): Promise<string | null> => {
@@ -252,11 +258,7 @@ export function useHashChain() {
       for (let i = 0; i < currentLevel.length; i += 2) {
         const left = currentLevel[i]!
         const right = currentLevel[i + 1] ?? left // duplicate odd leaf
-
-        const combined = left + right
-        const encoded = new TextEncoder().encode(combined)
-        const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
-        nextLevel.push(bufferToHex(hashBuffer))
+        nextLevel.push(blake3Hex(left + right))
       }
 
       currentLevel = nextLevel

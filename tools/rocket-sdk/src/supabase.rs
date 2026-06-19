@@ -36,9 +36,9 @@ pub struct CookReceipt {
     pub ocel_event_count: u32,
     /// "rocket_cli" — distinguishes Rust-sourced receipts from browser receipts.
     pub engine_source: String,
-    /// SHA-256 hex of the serialised receipt payload.
+    /// BLAKE3 hex of the serialised receipt payload.
     pub receipt_hash: String,
-    /// SHA-256 hex of the WASM artifact bytes (cook-to-game cross-check, Gap 6).
+    /// BLAKE3 hex of the WASM artifact bytes (cook-to-game cross-check, Gap 6).
     /// None when no WASM file is present (dry-run or cook failure).
     pub output_hash: Option<String>,
     /// RFC 3339 timestamp.

@@ -24,19 +24,19 @@ describe('receipt chain — valid fixture', () => {
   })
 
   it('detects mutation between original and tampered receipt', () => {
-    const original = buildReceipt(1, 'Interact', 'game-shell', 'sha256:abc')
-    const mutated: RocketReceipt = { ...original, receipt: 'sha256:TAMPERED' }
+    const original = buildReceipt(1, 'Interact', 'game-shell', 'blake3:abc')
+    const mutated: RocketReceipt = { ...original, receipt: 'blake3:TAMPERED' }
     expect(detectMutation(original, mutated)).toBe(true)
   })
 
   it('does NOT flag identical receipts as mutated', () => {
-    const r = buildReceipt(1, 'Interact', 'game-shell', 'sha256:abc')
+    const r = buildReceipt(1, 'Interact', 'game-shell', 'blake3:abc')
     expect(detectMutation(r, { ...r })).toBe(false)
   })
 
   it('genesis receipt must not have prev_hash', () => {
     const chain: RocketReceipt[] = [
-      buildReceipt(1, 'Interact', 'shell', 'sha256:aaa', { prev_hash: 'sha256:SHOULDNOTEXIST' }),
+      buildReceipt(1, 'Interact', 'shell', 'blake3:aaa', { prev_hash: 'blake3:SHOULDNOTEXIST' }),
     ]
     const residuals = validateReceiptChain(chain)
     expect(residuals.some(r => r.code === 'RECEIPT-GENESIS-HAS-PREV')).toBe(true)

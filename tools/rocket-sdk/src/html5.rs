@@ -119,14 +119,11 @@ impl Html5PackageReport {
             };
             json!({ "path": f.path.display().to_string(), "verdict": verdict_str, "size_bytes": size_bytes })
         }).collect();
-        // Compute output_hash: SHA-256 of WASM bytes for Gap 6 cook-to-game cross-check.
+        // Compute output_hash: BLAKE3 of WASM bytes for Gap 6 cook-to-game cross-check.
         let output_hash: Option<String> = self.wasm_files.iter()
             .find(|f| matches!(f.verdict, WasmVerdict::Real { .. }))
             .and_then(|f| std::fs::read(&f.path).ok())
-            .map(|bytes| {
-                let d = ring::digest::digest(&ring::digest::SHA256, &bytes);
-                d.as_ref().iter().map(|b| format!("{b:02x}")).collect()
-            });
+            .map(|bytes| blake3::hash(&bytes).to_hex().to_string());
         let receipt = json!({
             "verdict": if self.is_real_package { "PASS" } else { "FAIL" },
             "summary": self.summary(),
@@ -153,8 +150,8 @@ impl Html5PackageReport {
     /// Build a `CookReceipt` for pushing to Supabase.
     ///
     /// Returns the receipt value so the caller can log or inspect it before
-    /// the async push.  Uses a SHA-256 hex digest of the summary string as
-    /// the receipt hash (lightweight, deterministic, no external crate needed).
+    /// the async push.  Uses a BLAKE3 hex digest of the summary string as
+    /// the receipt hash (lightweight, deterministic, faster than SHA-256).
     pub fn as_supabase_receipt(&self) -> crate::supabase::CookReceipt {
         use std::collections::HashMap;
 
@@ -171,25 +168,21 @@ impl Html5PackageReport {
             }
         });
 
-        // SHA-256 receipt hash using ring (already a dependency for Ed25519 signing).
+        // BLAKE3 receipt hash — faster and safer than SHA-256; same 64-char hex output.
         let hash_input = format!(
             "{}|{}|{}",
             self.summary(),
             timestamp_secs,
             self.archive_dir.display()
         );
-        let digest = ring::digest::digest(&ring::digest::SHA256, hash_input.as_bytes());
-        let receipt_hash: String = digest.as_ref().iter().map(|b| format!("{b:02x}")).collect();
+        let receipt_hash: String = blake3::hash(hash_input.as_bytes()).to_hex().to_string();
 
-        // output_hash: SHA-256 of the actual WASM binary bytes (Gap 6 cook-to-game cross-check).
+        // output_hash: BLAKE3 of the actual WASM binary bytes (Gap 6 cook-to-game cross-check).
         // If the browser loads a different binary than the one cooked, these hashes diverge.
         let output_hash: Option<String> = self.wasm_files.iter()
             .find(|f| matches!(f.verdict, WasmVerdict::Real { .. }))
             .and_then(|f| std::fs::read(&f.path).ok())
-            .map(|bytes| {
-                let d = ring::digest::digest(&ring::digest::SHA256, &bytes);
-                d.as_ref().iter().map(|b| format!("{b:02x}")).collect()
-            });
+            .map(|bytes| blake3::hash(&bytes).to_hex().to_string());
 
         // OCEL lifecycle: prefer UAT log-derived events (richer evidence); fall back to
         // artifact-derived stages when no log events are available (offline verify).
@@ -253,8 +246,8 @@ impl Html5PackageReport {
 
         // Build individual OCEL event rows from the lifecycle list.
         // Timestamps are spaced 1 second apart starting from proven_at.
-        // Hash chain uses SHA-256 via ring (same dep as Ed25519 signing) so
-        // verify_event_chain RPC can check cook events alongside browser events.
+        // Hash chain uses BLAKE3 so verify_event_chain RPC can check cook events
+        // alongside browser events.
         let base_ms = receipt.proven_at.parse::<u64>().unwrap_or(0) * 1_000;
         let mut prev_hash: Option<String> = None;
         let cook_obj = format!("cook:{}", self.archive_dir.display());
@@ -262,7 +255,7 @@ impl Html5PackageReport {
         for (i, activity) in receipt.ocel_lifecycle.iter().enumerate() {
             let timestamp_ms = base_ms + (i as u64 * 1_000);
             let attr_json = serde_json::json!({ "stage_index": i });
-            // SHA-256 chain: matches the formula verify_event_chain and the browser use.
+            // BLAKE3 chain: matches the formula verify_event_chain and the browser use.
             // Canonical input: sorted-key JSON object, same as useHashChain.computeEventHash.
             let chain_payload = serde_json::json!({
                 "data": { "object_refs": [&cook_obj], "attributes": { "stage_index": i } },
@@ -274,8 +267,7 @@ impl Html5PackageReport {
                 "type": activity,
             });
             let payload_str = serde_json::to_string(&chain_payload).unwrap_or_default();
-            let digest = ring::digest::digest(&ring::digest::SHA256, payload_str.as_bytes());
-            let event_hash: String = digest.as_ref().iter().map(|b| format!("{b:02x}")).collect();
+            let event_hash: String = blake3::hash(payload_str.as_bytes()).to_hex().to_string();
             let row = crate::supabase::OcelEventRow {
                 session_id: self.cook_session_id.clone(),
                 activity: activity.clone(),
@@ -1545,7 +1537,7 @@ mod tests {
         let dir = TempDir::new().unwrap();
         let report = make_real_report(&dir);
         let receipt = report.as_supabase_receipt();
-        // Hash is a 64-char lowercase SHA-256 hex string.
+        // Hash is a 64-char lowercase BLAKE3 hex string.
         assert_eq!(receipt.receipt_hash.len(), 64);
         assert!(receipt.receipt_hash.chars().all(|c| c.is_ascii_hexdigit()));
     }
@@ -1785,13 +1777,10 @@ mod tests {
         let json: serde_json::Value = serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
 
         let hash = json["output_hash"].as_str().expect("output_hash must be present");
-        assert_eq!(hash.len(), 64, "SHA-256 hex must be 64 chars");
-        // Verify it's actually the SHA-256 of the file bytes
-        let expected = {
-            let d = ring::digest::digest(&ring::digest::SHA256, b"\0asm\x01\0\0\0test-payload");
-            d.as_ref().iter().map(|b| format!("{b:02x}")).collect::<String>()
-        };
-        assert_eq!(hash, expected, "output_hash must be SHA-256 of WASM bytes");
+        assert_eq!(hash.len(), 64, "BLAKE3 hex must be 64 chars");
+        // Verify it's actually the BLAKE3 of the file bytes
+        let expected = blake3::hash(b"\0asm\x01\0\0\0test-payload").to_hex().to_string();
+        assert_eq!(hash, expected, "output_hash must be BLAKE3 of WASM bytes");
     }
 
     #[test]

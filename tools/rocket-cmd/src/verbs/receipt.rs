@@ -201,7 +201,7 @@ mod tests {
     fn session_receipt_pass() -> Value {
         json!({
             "verdict": "PASS",
-            "output_hash": "sha256:a737628e84f38eec9ef91495d6fb1522710929f4a5e31496f12c0f1b5ac76f10",
+            "output_hash": "blake3:a737628e84f38eec9ef91495d6fb1522710929f4a5e31496f12c0f1b5ac76f10",
             "run_id": "tps-dflss-1781855287977",
             "timestamp": "2026-06-17T00:00:00Z",
             "signature": "deb3010a",
@@ -293,7 +293,7 @@ mod tests {
 
     #[test]
     fn session_receipt_missing_fields_caught() {
-        let r = json!({ "verdict": "PASS", "output_hash": "sha256:abc" });
+        let r = json!({ "verdict": "PASS", "output_hash": "blake3:abc" });
         let errs = validate_receipt_value(&r);
         assert!(errs.iter().any(|e| e.contains("missing field 'run_id'")));
         assert!(errs.iter().any(|e| e.contains("missing field 'timestamp'")));

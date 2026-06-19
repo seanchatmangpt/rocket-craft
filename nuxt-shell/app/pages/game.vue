@@ -28,7 +28,7 @@ const lastCommitVerdict = ref<string | null>(null);
 
 async function commitReceipt() {
   if (!dbSessionId.value) return;
-  const receiptHash = lastHash.value ? `sha256:${lastHash.value}` : `sha256:empty`;
+  const receiptHash = lastHash.value ? `blake3:${lastHash.value}` : `blake3:empty`;
 
   const result = await $fetch('/api/game/receipt', {
     method: 'POST',
@@ -138,10 +138,10 @@ async function downloadHashedOcelLog() {
         <button
           v-if="isPlaying"
           class="ocel-export"
-          title="Export OCEL log with SHA-256 hash chain + Merkle root"
+          title="Export OCEL log with BLAKE3 hash chain + Merkle root"
           data-testid="ocel-export-hashed-btn"
           @click="downloadHashedOcelLog"
-        >↓ OCEL+SHA256</button>
+        >↓ OCEL+BLAKE3</button>
         <button
           v-if="isPlaying && dbSessionId"
           class="receipt-commit"
