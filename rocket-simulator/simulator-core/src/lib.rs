@@ -280,3 +280,35 @@ mod tests {
         }
     }
 }
+
+    #[test]
+    fn rocket_contract_new_sets_defaults() {
+        let c = RocketContract::new("my-rocket".to_string(), 99);
+        assert_eq!(c.name, "my-rocket");
+        assert_eq!(c.world_seed, 99);
+        assert!(c.es3_enabled);
+        assert_eq!(c.target_platform, "HTML5");
+        assert!(c.features.contains(&"WASM".to_string()));
+        assert!(c.features.contains(&"WebGL2".to_string()));
+    }
+
+    #[test]
+    fn rocket_contract_hash_is_deterministic() {
+        let c1 = RocketContract::new("r".to_string(), 1);
+        let c2 = RocketContract::new("r".to_string(), 1);
+        assert_eq!(c1.compute_hash(), c2.compute_hash());
+    }
+
+    #[test]
+    fn rocket_contract_different_seeds_different_hashes() {
+        let c1 = RocketContract::new("r".to_string(), 1);
+        let c2 = RocketContract::new("r".to_string(), 2);
+        assert_ne!(c1.compute_hash(), c2.compute_hash());
+    }
+
+    #[test]
+    fn rocket_contract_hash_is_64_hex_chars() {
+        let c = RocketContract::new("x".to_string(), 0);
+        // BLAKE3 output hex-encoded = 64 chars
+        assert_eq!(c.compute_hash().len(), 64);
+    }
