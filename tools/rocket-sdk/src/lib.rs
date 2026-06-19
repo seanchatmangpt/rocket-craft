@@ -16,6 +16,7 @@ use std::path::{Path, PathBuf};
 pub use unrdf::Project as SemanticProject;
 
 /// Core context for the Rocket SDK, providing access to the project workspace and manifest.
+#[derive(Debug)]
 pub struct RocketContext {
     pub root: PathBuf,
     pub manifest: Manifest,
@@ -131,5 +132,164 @@ impl BuildExecutor for UatBuildExecutor {
         } else {
             Err(anyhow::anyhow!("Build failed with status: {}", status))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::{Arc, Mutex};
+    use tempfile::TempDir;
+    use unrdf::Project as UnrdfProject;
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    fn write_manifest(dir: &TempDir, projects: &[(&str, &str, &[&str])]) -> std::path::PathBuf {
+        let entries: Vec<serde_json::Value> = projects
+            .iter()
+            .map(|(name, path, targets)| {
+                serde_json::json!({
+                    "name": name,
+                    "uproject_path": path,
+                    "targets": targets
+                })
+            })
+            .collect();
+        let json = serde_json::to_string(&serde_json::json!({"projects": entries})).unwrap();
+        let path = dir.path().join("project-manifest.json");
+        std::fs::write(&path, json).unwrap();
+        path
+    }
+
+    /// A build executor that records invocations instead of spawning UAT.
+    #[derive(Clone, Default)]
+    struct MockExecutor {
+        calls: Arc<Mutex<Vec<(String, String, String)>>>,
+        should_fail: bool,
+    }
+
+    impl MockExecutor {
+        fn recorded(&self) -> Vec<(String, String, String)> {
+            self.calls.lock().unwrap().clone()
+        }
+        fn failing() -> Self {
+            Self {
+                calls: Arc::new(Mutex::new(vec![])),
+                should_fail: true,
+            }
+        }
+    }
+
+    impl BuildExecutor for MockExecutor {
+        fn execute(&self, build: &Build, ue4_root: &Path) -> Result<()> {
+            // Record (project_path, target, ue4_root) — platform tested separately
+            self.calls.lock().unwrap().push((
+                build.project_path.display().to_string(),
+                build.target.clone(),
+                ue4_root.display().to_string(),
+            ));
+            if self.should_fail {
+                Err(anyhow::anyhow!("mock failure"))
+            } else {
+                Ok(())
+            }
+        }
+    }
+
+    // ── RocketContext ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn context_loads_projects_from_manifest() {
+        let dir = TempDir::new().unwrap();
+        write_manifest(
+            &dir,
+            &[
+                ("Brm", "versions/4.27.0/Brm.uproject", &["Brm", "BrmEditor"]),
+                (
+                    "ShooterGame",
+                    "versions/4.24/ShooterGame.uproject",
+                    &["ShooterGame"],
+                ),
+            ],
+        );
+        let ctx = RocketContext::load(dir.path()).unwrap();
+        assert_eq!(ctx.projects().len(), 2);
+    }
+
+    #[test]
+    fn context_missing_manifest_errors() {
+        let dir = TempDir::new().unwrap();
+        let err = RocketContext::load(dir.path()).unwrap_err();
+        assert!(err.to_string().contains("manifest") || err.to_string().contains("No such file"));
+    }
+
+    // ── Project ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn project_absolute_path_joins_root() {
+        let dir = TempDir::new().unwrap();
+        write_manifest(
+            &dir,
+            &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])],
+        );
+        let ctx = RocketContext::load(dir.path()).unwrap();
+        let proj = &ctx.projects()[0];
+        let abs = proj.absolute_uproject_path();
+        assert!(
+            abs.starts_with(dir.path()),
+            "absolute path must be under the workspace root"
+        );
+        assert!(abs.ends_with("Brm.uproject"));
+    }
+
+    #[test]
+    fn project_name_and_targets_accessible() {
+        let inner = UnrdfProject {
+            name: "TestProj".into(),
+            uproject_path: "test/TestProj.uproject".into(),
+            targets: vec!["TestProj".into(), "TestProjEditor".into()],
+        };
+        let proj = Project::new(inner, "/workspace".into());
+        assert_eq!(proj.name(), "TestProj");
+        assert_eq!(proj.targets(), &["TestProj", "TestProjEditor"]);
+    }
+
+    // ── Build + BuildExecutor ─────────────────────────────────────────────────
+
+    #[test]
+    fn build_dispatches_to_executor() {
+        let dir = TempDir::new().unwrap();
+        write_manifest(
+            &dir,
+            &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])],
+        );
+        let ctx = RocketContext::load(dir.path()).unwrap();
+        let proj = &ctx.projects()[0];
+        let build = proj.build("Brm".into(), "HTML5".into());
+
+        let mock = MockExecutor::default();
+        let fake_ue4 = std::path::Path::new("/fake/ue4-root");
+        build.run(&mock, fake_ue4).unwrap();
+
+        let calls = mock.recorded();
+        assert_eq!(calls.len(), 1);
+        assert!(calls[0].0.contains("Brm.uproject"), "project path must contain Brm.uproject");
+        assert_eq!(calls[0].1, "Brm", "target must be 'Brm'");
+        assert_eq!(calls[0].2, "/fake/ue4-root", "ue4 root must match");
+    }
+
+    #[test]
+    fn failing_executor_propagates_error() {
+        let dir = TempDir::new().unwrap();
+        write_manifest(
+            &dir,
+            &[("Brm", "versions/4.27.0/Brm.uproject", &["Brm"])],
+        );
+        let ctx = RocketContext::load(dir.path()).unwrap();
+        let build = ctx.projects()[0].build("Brm".into(), "HTML5".into());
+        let err = build
+            .run(&MockExecutor::failing(), std::path::Path::new("/fake"))
+            .unwrap_err();
+        assert!(err.to_string().contains("mock failure"));
     }
 }
