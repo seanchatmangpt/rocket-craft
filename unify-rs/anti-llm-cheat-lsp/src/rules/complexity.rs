@@ -164,3 +164,134 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs_metric(file: &str, construct: &str) -> Observation {
+        Observation {
+            file_path: file.into(),
+            start_byte: 0,
+            end_byte: 0,
+            line: 1,
+            column: 0,
+            kind: "fn_metric".into(),
+            construct: construct.into(),
+            context: String::new(),
+            message: format!("{construct} in {file}"),
+        }
+    }
+
+    fn obs_ast(file: &str, construct: &str) -> Observation {
+        Observation {
+            kind: "ast_node".into(),
+            ..obs_metric(file, construct)
+        }
+    }
+
+    // ── gate: wrong kind is silently ignored ─────────────────────────────────
+
+    #[test]
+    fn non_metric_observation_produces_no_diag() {
+        let mut o = obs_metric("src/lib.rs", "fn_too_long");
+        o.kind = "raw_text".into();
+        assert!(evaluate(&[o]).is_empty());
+    }
+
+    // ── METRIC-001 ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn fn_too_long_triggers_metric_001() {
+        let diags = evaluate(&[obs_metric("src/lib.rs", "fn_too_long")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-METRIC-001");
+        assert!(!diags[0].blocking);
+    }
+
+    // ── METRIC-002 ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn fn_high_cyclomatic_triggers_metric_002() {
+        let diags = evaluate(&[obs_metric("src/lib.rs", "fn_high_cyclomatic")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-METRIC-002");
+    }
+
+    // ── METRIC-003 ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn fn_deep_nesting_triggers_metric_003() {
+        let diags = evaluate(&[obs_ast("src/lib.rs", "fn_deep_nesting")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-METRIC-003");
+    }
+
+    // ── METRIC-004 (blocking, breeds/ only) ──────────────────────────────────
+
+    #[test]
+    fn fn_literal_dense_in_breeds_is_blocking() {
+        let diags = evaluate(&[obs_metric("src/breeds/my_breed.rs", "fn_literal_dense")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-METRIC-004");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn fn_literal_dense_outside_breeds_is_ignored() {
+        let diags = evaluate(&[obs_metric("src/lib.rs", "fn_literal_dense")]);
+        assert!(diags.is_empty(), "fn_literal_dense outside breeds/ must not fire");
+    }
+
+    // ── METRIC-005 (blocking, breeds/ only) ──────────────────────────────────
+
+    #[test]
+    fn fn_large_match_in_breeds_is_blocking() {
+        let diags = evaluate(&[obs_metric("breeds/my.rs", "fn_large_match")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-METRIC-005");
+        assert!(diags[0].blocking);
+    }
+
+    // ── METRIC-006 ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn fn_deep_closures_triggers_metric_006_nonblocking() {
+        let diags = evaluate(&[obs_metric("src/lib.rs", "fn_deep_closures")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-METRIC-006");
+        assert!(!diags[0].blocking);
+    }
+
+    // ── HALSTEAD rules (breeds/ only) ────────────────────────────────────────
+
+    #[test]
+    fn halstead_low_volume_in_breeds() {
+        let diags = evaluate(&[obs_metric("src/breeds/x.rs", "halstead_low_volume")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-HALSTEAD-001");
+    }
+
+    #[test]
+    fn halstead_low_vocabulary_in_breeds() {
+        let diags = evaluate(&[obs_metric("breeds/x.rs", "halstead_low_vocabulary")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-HALSTEAD-002");
+    }
+
+    #[test]
+    fn halstead_operator_dominance_in_breeds() {
+        let diags = evaluate(&[obs_metric("breeds/x.rs", "halstead_operator_dominance")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-HALSTEAD-003");
+    }
+
+    #[test]
+    fn halstead_outside_breeds_is_ignored() {
+        for construct in &["halstead_low_volume", "halstead_low_vocabulary", "halstead_operator_dominance"] {
+            let diags = evaluate(&[obs_metric("src/lib.rs", construct)]);
+            assert!(diags.is_empty(), "{construct} outside breeds/ must not fire");
+        }
+    }
+
+    // ── empty ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn empty_obs_returns_no_diags() {
+        assert!(evaluate(&[]).is_empty());
+    }
+}
