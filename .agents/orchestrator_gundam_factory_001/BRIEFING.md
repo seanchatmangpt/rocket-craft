@@ -56,6 +56,8 @@ Guide the team to secure all gates for the GC-GUNDAM-FACTORY-001 milestone and a
 ## Key Decisions Made
 - Decomposed the project into 6 milestones corresponding to the required gates and final report.
 - Propagated top-priority architectural directive (Wil van der Aalst + John Carmack synthesis) to the worker subagent to enforce process rigor (Petri net trace conformance) and data-oriented/SoA performance (SIMD chunked execution, zero-stub packaging).
+- Propagated command update to worker subagent: use `ggen sync --manifest <path> --audit` as `ggen generate` is obsolete.
+
 
 ## Team Roster
 | Agent | Type | Work Item | Status | Conv ID |

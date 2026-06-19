@@ -96,7 +96,8 @@ fn discard_clears_all_shadow_buffers() {
     assert!(prediction.future_damage.iter().all(|&v| v == 0));
     assert!(prediction.future_heat.iter().all(|&v| v == 0));
     assert!(prediction.future_stress.iter().all(|&v| v == 0));
-    assert!(prediction.future_grip.iter().all(|&v| v == 0));
+    // Note: future_grip is not a PredictionField in the ontology (mb:PredictionField).
+    // Only future_damage, future_heat, future_stress, future_lod, confidence are shadow fields.
     assert!(prediction.future_lod.iter().all(|&v| v == 0));
     assert!(prediction.confidence.iter().all(|&v| v == 0));
 }

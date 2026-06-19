@@ -1,44 +1,21 @@
-{#-
-  simd_equiv.rs.tera
-  GC-MECHBIRTH-002 Manufacturing Template
-  Stamps out: src/simd.rs
-
-  Input binding:
-    simd_law      — row from extract_transition_kernels.sparql (SimdEquiv_GC_MECHBIRTH_002)
-    lane_width    — integer (mb:SimdLaneWidth mb:value)
-    residual_note — string (mb:SimdEquiv_GC_MECHBIRTH_002 mb:residual)
-
-  Carmack law: 16-lane u8 chunk = 128-bit register width floor (SSE2/NEON).
-  van der Aalst law: equivalence is a formal conformance check —
-    scalar trace and SIMD-shaped trace must produce identical event logs.
-
-  GC-MECHBIRTH-003 RESIDUAL: Replace inner loop with std::simd portable-SIMD
-  or SIMDe FFI once nightly or C shim is admitted to workspace.
--#}
+{#- simd_equiv.rs.tera — GC-MECHBIRTH-002 Manufacturing Template -#}
 //! SIMD/SIMDe Equivalence Layer.
 //! ⚠️ GENERATED FILE — do NOT edit by hand.
 //! Source of truth: ontology/mechbirth.ttl
 //! Generator:       ggen/templates/simd_equiv.rs.tera
 //! SPARQL:          ggen/sparql/extract_transition_kernels.sparql
 //!
-//! Equivalence law sourced from mb:SimdEquiv_GC_MECHBIRTH_002:
-//!   {{ simd_law.guarantee | default(value="chunked 16-lane arithmetic == scalar reference") }}
-//!
-//! RESIDUAL ({{ simd_law.residual | default(value="GC-MECHBIRTH-003") }}):
-//!   SIMDe FFI C intrinsic integration deferred.
+//! Equivalence law: chunked 16-lane arithmetic produces identical output to scalar.
+//! Lane width: 16 u8 lanes = 128-bit register floor (SSE2/NEON).
+//! RESIDUAL GC-MECHBIRTH-003: SIMDe FFI C intrinsic kernel deferred.
 
 use crate::error::RefusalReason;
 
-/// Lane width: {{ lane_width }} u8 lanes = 128-bit register floor.
-/// Sourced from mb:SimdLaneWidth mb:value.
-const LANE_WIDTH: usize = {{ lane_width }};
+/// Lane width sourced from mb:SimdLaneWidth mb:value = 16.
+const LANE_WIDTH: usize = 16;
 
-/// Process `n` elements in chunks of `LANE_WIDTH` lanes using chunked arithmetic.
-///
-/// Semantically mirrors a 128-bit SIMD kernel's data flow pattern.
-/// Returns `Err(InvalidAuthorityClass)` if input slice lengths are mismatched.
-///
-/// **RESIDUAL GC-MECHBIRTH-003**: Replace inner loop with `std::simd` or SIMDe FFI.
+/// Process n elements in LANE_WIDTH-lane chunks.
+/// Returns `Err(InvalidAuthorityClass)` if slice lengths are mismatched.
 pub fn batch_update_damage_simd_equiv(
     heat: &[u8],
     stress: &[u8],
@@ -53,10 +30,8 @@ pub fn batch_update_damage_simd_equiv(
         });
     }
 
-    // {{ lane_width }}-lane chunked pass — mirrors SIMD register width
     let mut i = 0usize;
     while i + LANE_WIDTH <= n {
-        // Unrolled: {{ lane_width }} lanes per iteration
         for j in 0..LANE_WIDTH {
             damage[i + j] = crate::transitions::scalar_failure_risk(
                 heat[i + j],
@@ -66,23 +41,16 @@ pub fn batch_update_damage_simd_equiv(
         }
         i += LANE_WIDTH;
     }
-
-    // Remainder lanes (tail < LANE_WIDTH)
     while i < n {
         damage[i] = crate::transitions::scalar_failure_risk(
             heat[i], stress[i], socket_health[i],
         );
         i += 1;
     }
-
     Ok(())
 }
 
-/// Verifies that the SIMD-equivalent path produces bit-identical output to scalar.
-///
-/// van der Aalst conformance: every (heat[i], stress[i], socket_health[i]) triple
-/// must produce identical tokens in both the scalar trace and SIMD-shaped trace.
-///
+/// Verifies bit-identical output between scalar and SIMD-equivalent paths.
 /// Returns `Err(SimdScalarDivergence { index })` at the first divergent lane.
 pub fn verify_simd_scalar_equivalence(
     heat: &[u8],
@@ -98,7 +66,6 @@ pub fn verify_simd_scalar_equivalence(
             heat[i], stress[i], socket_health[i],
         );
     }
-
     batch_update_damage_simd_equiv(heat, stress, socket_health, &mut simd_out)?;
 
     for i in 0..n {
@@ -106,6 +73,5 @@ pub fn verify_simd_scalar_equivalence(
             return Err(RefusalReason::SimdScalarDivergence { index: i });
         }
     }
-
     Ok(())
 }

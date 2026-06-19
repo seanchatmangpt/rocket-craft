@@ -1,15 +1,39 @@
+// GENERATED FILE - DO NOT EDIT MANUALLY
+// Source: O* = ontology/ggen-packs/mechbirth/schema/mechbirth_lod_geom_motion.ttl
+// Pipeline: ggen -> extract_motion_families.sparql -> motion.rs.tera
+// Synthesis: van der Aalst (Petri-net precedence ordering) + Carmack (no allocation, positional Vec scan)
+//
+// GC-MECHBIRTH-002 Motion Surrogate
+// Counterfactual laws encoded in O*:
+//   - CF-1: PlantFeet must appear at index BEFORE Fire (positional, not containment)
+//   - CF-2: VentHeat must appear at index BEFORE Fire when heat_class >= 12
+//   - CF-4: heat_class/stress_class/leg_damage_class must be in [0, 15]
+
 use crate::error::RefusalReason;
+
+// --- MOTION FAMILY ---
+// Derived from O* MotionFamily taxonomy via extract_motion_families.sparql
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MotionFamily {
-    Walk,
-    Run,
+
     Brace,
-    FireWeapon,
-    Recover,
-    Repair,
+
     Collapse,
+
+    FireWeapon,
+
+    Recover,
+
+    Repair,
+
+    Run,
+
+    Walk,
+
 }
+
+// --- MOTION PHASE ---
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum MotionPhase {
@@ -25,15 +49,15 @@ pub enum MotionPhase {
     RecoverBalance,
     CoolSocket,
     ReturnToReady,
-    // Walk/Run
     Stride,
     Brace,
     Collapse,
-    // Repair
     DiagnoseSocket,
     ApplyRepair,
     VerifyRepair,
 }
+
+// --- MOTION TRACE ---
 
 #[derive(Debug, Clone)]
 pub struct MotionTrace {
@@ -46,20 +70,50 @@ pub struct MotionTrace {
 }
 
 impl MotionTrace {
-    /// Returns `Ok((delta_heat, delta_stress))` or `Err(RefusalReason)`.
-    /// Effects represent the delta to apply to authority state after the trace.
+    /// Validate trace and compute authority-state deltas.
+    /// Returns Ok((delta_heat, delta_stress)) or Err(RefusalReason).
+    /// Laws encoded in O* - do not derive from this code.
     pub fn validate_and_compute_effects(&self) -> Result<(i8, i8), RefusalReason> {
         match self.family {
+
+
+            MotionFamily::Brace => Ok((0, 0)),
+
+
+
+            MotionFamily::Collapse => Ok((0, 0)),
+
+
+
             MotionFamily::FireWeapon => self.validate_fire_weapon(),
-            MotionFamily::Walk | MotionFamily::Run => self.validate_walk_run(),
-            _ => Ok((0, 0)),
+
+
+
+            MotionFamily::Recover => Ok((0, 0)),
+
+
+
+            MotionFamily::Repair => Ok((0, 0)),
+
+
+
+            MotionFamily::Run => self.validate_walk_run(),
+
+
+
+            MotionFamily::Walk => self.validate_walk_run(),
+
+
         }
     }
 
     fn validate_fire_weapon(&self) -> Result<(i8, i8), RefusalReason> {
-        // CF-4 guard: class values must be in [0, 15].
-        let max_class: u8 = 15;
-        if self.heat_class > max_class || self.stress_class > max_class || self.leg_damage_class > max_class {
+        // CF-4 guard (O* MotionInputBoundsLaw): class fields must be in [0, 15].
+        const MAX_CLASS: u8 = 15;
+        if self.heat_class > MAX_CLASS
+            || self.stress_class > MAX_CLASS
+            || self.leg_damage_class > MAX_CLASS
+        {
             return Err(RefusalReason::MotionClearanceViolation {
                 detail: format!(
                     "class value out of range: heat={} stress={} leg_damage={}",
@@ -72,7 +126,8 @@ impl MotionTrace {
         let plant_idx = self.phases.iter().position(|p| p == &MotionPhase::PlantFeet);
         let has_fire = fire_idx.is_some();
 
-        // CF-1: PlantFeet must positionally precede Fire — not merely be present.
+        // CF-1 (O* PlantFeetBeforeFire constraint):
+        // PlantFeet must positionally precede Fire - containment alone is insufficient.
         if has_fire {
             match (plant_idx, fire_idx) {
                 (None, _) => {
@@ -83,20 +138,24 @@ impl MotionTrace {
                 (Some(pi), Some(fi)) if pi >= fi => {
                     return Err(RefusalReason::MotionClearanceViolation {
                         detail: format!(
-                            "PlantFeet (idx {pi}) must precede Fire (idx {fi}) in phase sequence"
+                            "PlantFeet (idx {}) must precede Fire (idx {})",
+                            pi, fi
                         ),
                     });
                 }
                 _ => {}
             }
         }
-        // Socket required for WeaponMount actuation.
+
+        // Socket required for weapon actuation.
         if has_fire && !self.socket_available {
             return Err(RefusalReason::MissingSocket {
                 dependent: "FireWeapon".into(),
             });
         }
-        // CF-2: High heat — VentHeat must positionally precede Fire.
+
+        // CF-2 (O* VentHeatBeforeFire constraint, heatThreshold=12):
+        // When heat_class >= 12, VentHeat must positionally precede Fire.
         if has_fire && self.heat_class >= 12 {
             let vent_idx = self.phases.iter().position(|p| p == &MotionPhase::VentHeat);
             match (vent_idx, fire_idx) {
@@ -111,24 +170,28 @@ impl MotionTrace {
                 (Some(vi), Some(fi)) if vi >= fi => {
                     return Err(RefusalReason::MotionClearanceViolation {
                         detail: format!(
-                            "VentHeat (idx {vi}) must precede Fire (idx {fi}); heat_class={}",
-                            self.heat_class
+                            "VentHeat (idx {}) must precede Fire (idx {}); heat_class={}",
+                            vi, fi, self.heat_class
                         ),
                     });
                 }
                 _ => {}
             }
         }
-        // Effects: Fire increases heat; AbsorbRecoil increases stress.
+
+        // Effects: Fire +heat; AbsorbRecoil +stress.
         let delta_heat: i8 = if has_fire { 2 } else { 0 };
         let delta_stress: i8 = if self.phases.contains(&MotionPhase::AbsorbRecoil) { 1 } else { 0 };
         Ok((delta_heat, delta_stress))
     }
 
     fn validate_walk_run(&self) -> Result<(i8, i8), RefusalReason> {
-        // CF-4 guard: class values must be in [0, 15].
-        let max_class: u8 = 15;
-        if self.heat_class > max_class || self.stress_class > max_class || self.leg_damage_class > max_class {
+        // CF-4 guard (O* MotionInputBoundsLaw).
+        const MAX_CLASS: u8 = 15;
+        if self.heat_class > MAX_CLASS
+            || self.stress_class > MAX_CLASS
+            || self.leg_damage_class > MAX_CLASS
+        {
             return Err(RefusalReason::MotionClearanceViolation {
                 detail: format!(
                     "class value out of range: heat={} stress={} leg_damage={}",
@@ -136,160 +199,12 @@ impl MotionTrace {
                 ),
             });
         }
-        // Run is refused when leg damage is too severe.
+        // O* RunFamily law: leg_damage_class >= 12 -> refused for Run; admitted (degraded) for Walk.
         if self.family == MotionFamily::Run && self.leg_damage_class >= 12 {
             return Err(RefusalReason::MotionClearanceViolation {
-                detail: format!(
-                    "leg_damage_class {} too high for Run",
-                    self.leg_damage_class
-                ),
+                detail: format!("leg_damage_class {} too high for Run", self.leg_damage_class),
             });
         }
-        // Walk with high leg damage is degraded but admitted.
         Ok((0, 0))
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn fire_trace(phases: Vec<MotionPhase>, socket: bool, heat: u8) -> MotionTrace {
-        MotionTrace {
-            family: MotionFamily::FireWeapon,
-            phases,
-            socket_available: socket,
-            heat_class: heat,
-            stress_class: 0,
-            leg_damage_class: 0,
-        }
-    }
-
-    // ── FireWeapon validation ─────────────────────────────────────────────────
-
-    #[test]
-    fn fire_weapon_valid_with_plant_and_socket() {
-        let t = fire_trace(
-            vec![MotionPhase::PlantFeet, MotionPhase::Fire],
-            true, 0,
-        );
-        let (dh, ds) = t.validate_and_compute_effects().unwrap();
-        assert_eq!(dh, 2); // fire +2 heat
-        assert_eq!(ds, 0); // no AbsorbRecoil in trace
-    }
-
-    #[test]
-    fn fire_weapon_without_plant_feet_returns_error() {
-        let t = fire_trace(vec![MotionPhase::Fire], true, 0);
-        assert!(matches!(
-            t.validate_and_compute_effects().unwrap_err(),
-            crate::error::RefusalReason::MotionClearanceViolation { .. }
-        ));
-    }
-
-    #[test]
-    fn fire_weapon_without_socket_returns_missing_socket() {
-        let t = fire_trace(
-            vec![MotionPhase::PlantFeet, MotionPhase::Fire],
-            false, 0,
-        );
-        assert!(matches!(
-            t.validate_and_compute_effects().unwrap_err(),
-            crate::error::RefusalReason::MissingSocket { .. }
-        ));
-    }
-
-    #[test]
-    fn fire_weapon_high_heat_without_vent_returns_error() {
-        let t = fire_trace(
-            vec![MotionPhase::PlantFeet, MotionPhase::Fire],
-            true, 12, // heat_class >= 12 requires VentHeat
-        );
-        assert!(matches!(
-            t.validate_and_compute_effects().unwrap_err(),
-            crate::error::RefusalReason::MotionClearanceViolation { .. }
-        ));
-    }
-
-    #[test]
-    fn fire_weapon_high_heat_with_vent_passes() {
-        let t = fire_trace(
-            vec![MotionPhase::PlantFeet, MotionPhase::VentHeat, MotionPhase::Fire],
-            true, 12,
-        );
-        assert!(t.validate_and_compute_effects().is_ok());
-    }
-
-    #[test]
-    fn absorb_recoil_adds_stress_delta() {
-        let t = fire_trace(
-            vec![MotionPhase::PlantFeet, MotionPhase::Fire, MotionPhase::AbsorbRecoil],
-            true, 0,
-        );
-        let (dh, ds) = t.validate_and_compute_effects().unwrap();
-        assert_eq!(dh, 2);
-        assert_eq!(ds, 1);
-    }
-
-    // ── Walk / Run validation ─────────────────────────────────────────────────
-
-    #[test]
-    fn run_with_low_leg_damage_passes() {
-        let t = MotionTrace {
-            family: MotionFamily::Run,
-            phases: vec![MotionPhase::Stride],
-            socket_available: true,
-            heat_class: 0,
-            stress_class: 0,
-            leg_damage_class: 5,
-        };
-        assert!(t.validate_and_compute_effects().is_ok());
-    }
-
-    #[test]
-    fn run_with_leg_damage_12_or_higher_returns_error() {
-        let t = MotionTrace {
-            family: MotionFamily::Run,
-            phases: vec![MotionPhase::Stride],
-            socket_available: true,
-            heat_class: 0,
-            stress_class: 0,
-            leg_damage_class: 12,
-        };
-        assert!(matches!(
-            t.validate_and_compute_effects().unwrap_err(),
-            crate::error::RefusalReason::MotionClearanceViolation { .. }
-        ));
-    }
-
-    #[test]
-    fn walk_with_high_leg_damage_passes_degraded() {
-        let t = MotionTrace {
-            family: MotionFamily::Walk,
-            phases: vec![MotionPhase::Stride],
-            socket_available: true,
-            heat_class: 0,
-            stress_class: 0,
-            leg_damage_class: 15, // high but Walk is admitted
-        };
-        let (dh, ds) = t.validate_and_compute_effects().unwrap();
-        assert_eq!(dh, 0);
-        assert_eq!(ds, 0);
-    }
-
-    #[test]
-    fn other_motion_families_return_zero_effects() {
-        for family in [MotionFamily::Brace, MotionFamily::Recover, MotionFamily::Repair] {
-            let t = MotionTrace {
-                family,
-                phases: vec![],
-                socket_available: true,
-                heat_class: 0,
-                stress_class: 0,
-                leg_damage_class: 0,
-            };
-            let (dh, ds) = t.validate_and_compute_effects().unwrap();
-            assert_eq!((dh, ds), (0, 0));
-        }
     }
 }

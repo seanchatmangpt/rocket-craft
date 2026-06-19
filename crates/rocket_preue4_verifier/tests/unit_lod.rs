@@ -243,8 +243,8 @@ fn cf4_out_of_range_mission_relevance_is_refused() {
     };
     let result = classify_lod(&inputs);
     assert!(
-        matches!(result, Err(RefusalReason::LodRefused { .. })),
-        "CF-4: out-of-range mission_relevance must return LodRefused, got {:?}",
+        matches!(result, Err(RefusalReason::InvalidAuthorityClass { .. })),
+        "CF-4: out-of-range mission_relevance must return InvalidAuthorityClass, got {:?}",
         result
     );
 }
@@ -260,7 +260,7 @@ fn cf4_out_of_range_damage_class_is_refused() {
         process_step_relevance: 0,
         prediction_relevance: 0,
     };
-    assert!(matches!(classify_lod(&inputs), Err(RefusalReason::LodRefused { .. })));
+    assert!(matches!(classify_lod(&inputs), Err(RefusalReason::InvalidAuthorityClass { .. })));
 }
 
 #[test]
@@ -274,7 +274,7 @@ fn cf4_out_of_range_prediction_relevance_refused() {
         process_step_relevance: 0,
         prediction_relevance: 16, // just over limit
     };
-    assert!(matches!(classify_lod(&inputs), Err(RefusalReason::LodRefused { .. })));
+    assert!(matches!(classify_lod(&inputs), Err(RefusalReason::InvalidAuthorityClass { .. })));
 }
 
 #[test]

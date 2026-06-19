@@ -52,8 +52,9 @@ pub fn classify_lod(inputs: &LodInputs) -> Result<LodOutput, RefusalReason> {
     ];
     for (name, val) in fields {
         if val > MAX_CLASS {
-            return Err(RefusalReason::LodRefused {
-                detail: format!("input field '{name}' value {val} exceeds MAX_CLASS {MAX_CLASS}"),
+            return Err(RefusalReason::InvalidAuthorityClass {
+                field: format!("lod_input '{name}'"),
+                class: val,
             });
         }
     }

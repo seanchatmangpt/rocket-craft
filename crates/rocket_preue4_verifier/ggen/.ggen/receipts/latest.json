@@ -1,0 +1,34 @@
+{
+  "operation_id": "09c03e41-43d1-4c91-96ee-925f40455071",
+  "timestamp": "2026-06-19T18:38:52.355330Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.11",
+    "ggen.toml:103dabb89d4c5fcc664a451bed2446c52260756623d34b5d2e5de2b5f7507429",
+    "/Users/sac/rocket-craft/ontology/mechbirth.ttl:1d2934fc6a9019a4b72358cae0519ff8f1a521be3216fa8ba639ad2698917cfc",
+    "sparql/extract_authority_fields.sparql:cc6ae9f17efcf4cfe2604b6b0f09a05fc4c7c676da27c6c85c232a74e20493e8",
+    "templates/authority_state.rs.tera:b8b9b7c75a5292aba9676c18b0638462360e0b8542c5336c563a087268a0cb55",
+    "sparql/extract_refusal_reasons.sparql:7b7573e07e4b03142607ef90cc31f270ab07df4255a3521e4e9ee880493a5495",
+    "templates/error.rs.tera:710a786a1031b7b6dc92ee4bf9871aa58b0af65e89508b71dc9e2da22d878f80",
+    "sparql/extract_transition_kernels.sparql:2ee01080bee5b336820f38ededcde8eab72f62e9f09d36e6bad6260f8ef8371d",
+    "templates/transitions.rs.tera:c235c78b60f380abb01cef06e01ab5a48b4f128d31851e986d633b8dc835482b",
+    "sparql/extract_transition_kernels.sparql:2ee01080bee5b336820f38ededcde8eab72f62e9f09d36e6bad6260f8ef8371d",
+    "templates/simd_equiv.rs.tera:214b2981dffa83cff454e0555c999cecde521c34c2dfc703997519bf46b6a583",
+    "sparql/extract_prediction_fields.sparql:3a41372da617402d3aa700a41d2e1b87b9ab49790f1d28db82ccee40051fac3c",
+    "templates/prediction.rs.tera:d87cef3d08bd4f15ba870d313e82ac2588574e83490848b19c900223808cafe4",
+    "sparql/extract_verifier_gates.sparql:c737856d7c216f7e6cc97298c6662f52f9070585d32b748ef6f42ccbef1fb9bb",
+    "templates/verifier.rs.tera:36a548c9b1af7de8392f6cd61ce28c7af89f99139a654cc27a578243b5585d2f",
+    "sparql/extract_authority_fields.sparql:cc6ae9f17efcf4cfe2604b6b0f09a05fc4c7c676da27c6c85c232a74e20493e8",
+    "templates/MechBirthAuthorityState.h.tera:49d60750fabd6e7db505e03463e32ad21464a3bf85c4a7d0ae099955efe08dd2"
+  ],
+  "output_hashes": [
+    "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/authority.rs:d73a4cbe0d9789f461a0d675f56dd08cc7907ba50d78c151b43b1d0119b5636e",
+    "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/error.rs:0639607d0712a3662e9a77bd79db46ad43f95169500dea581bbe46861adae06d",
+    "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/transitions.rs:b402cd713d6c2e9cdb4dddd16b9a042c39818deaf7f70348fc505f11bee21c92",
+    "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/simd.rs:140655faf9d9be2ededff651ac89d77bd45bb677677c68276f2e8f1512b18241",
+    "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/prediction.rs:822787379de9b6428663e44bda9222eef30f3be175e981d841a412b8eb34176e",
+    "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/verifier.rs:28fcfe90942d717f373131ff7f3d69e55aeb36c35def6e932ef39aa1ea64aed7",
+    "/Users/sac/rocket-craft/generated/MechBirthAuthorityState.h:31f62abc7395ab93213f0c0cfa07fca122e719ce812502b92f838492e67caddf"
+  ],
+  "signature": "27afc70a30f74a9e6d48780fd32dd75b1e859188553ac78da5b87ba986943a04e62ca52dcc90ba109d8b4dfd9348eb32e36d7668b31ee5ce74aac1bcab31fc07",
+  "previous_receipt_hash": "9589e84024f5413b982fb396c1c18aa99ed06cef3ef86d332a9489bc0f0ad34e"
+}

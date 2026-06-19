@@ -1,0 +1,124 @@
+[project]
+name        = "rocket-preue4-verifier-ggen"
+version     = "0.1.0"
+description = "GC-MECHBIRTH-002: ggen manufacturing manifest. A = μ(O*). All artifacts stamped from mechbirth.ttl."
+authors     = ["GC-MECHBIRTH-002 Agent 1"]
+license     = "MIT"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ONTOLOGY SOURCE — O* (Admitted Truth Graph)
+# ─────────────────────────────────────────────────────────────────────────────
+
+[ontology]
+source        = "/Users/sac/rocket-craft/ontology/mechbirth.ttl"
+standard_only = false
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GENERATION
+# ─────────────────────────────────────────────────────────────────────────────
+
+[generation]
+output_dir = "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src"
+
+# RULE 1: authority_state.rs — SoA AuthorityState struct
+# SPARQL: extract_authority_fields.sparql
+# TEMPLATE: authority_state.rs.tera
+[[generation.rules]]
+name        = "authority_state"
+query       = { file = "sparql/extract_authority_fields.sparql" }
+template    = { file = "templates/authority_state.rs.tera" }
+output_file = "authority.rs"
+mode        = "Overwrite"
+
+# RULE 2: error.rs — RefusalReason taxonomy
+# SPARQL: extract_refusal_reasons.sparql
+# TEMPLATE: error.rs.tera
+[[generation.rules]]
+name        = "error_taxonomy"
+query       = { file = "sparql/extract_refusal_reasons.sparql" }
+template    = { file = "templates/error.rs.tera" }
+output_file = "error.rs"
+mode        = "Overwrite"
+
+# RULE 3: transitions.rs — branchless kernels
+# SPARQL: extract_transition_kernels.sparql
+# TEMPLATE: transitions.rs.tera
+[[generation.rules]]
+name        = "transitions"
+query       = { file = "sparql/extract_transition_kernels.sparql" }
+template    = { file = "templates/transitions.rs.tera" }
+output_file = "transitions.rs"
+mode        = "Overwrite"
+
+# RULE 4: simd.rs — SIMD equivalence layer (reuses kernel query)
+# SPARQL: extract_transition_kernels.sparql
+# TEMPLATE: simd_equiv.rs.tera
+[[generation.rules]]
+name        = "simd_equivalence"
+query       = { file = "sparql/extract_transition_kernels.sparql" }
+template    = { file = "templates/simd_equiv.rs.tera" }
+output_file = "simd.rs"
+mode        = "Overwrite"
+
+# RULE 5: prediction.rs — shadow engine
+# SPARQL: extract_prediction_fields.sparql
+# TEMPLATE: prediction.rs.tera
+[[generation.rules]]
+name        = "prediction_shadow"
+query       = { file = "sparql/extract_prediction_fields.sparql" }
+template    = { file = "templates/prediction.rs.tera" }
+output_file = "prediction.rs"
+mode        = "Overwrite"
+
+# RULE 6: verifier.rs — gate pipeline
+# SPARQL: extract_verifier_gates.sparql
+# TEMPLATE: verifier.rs.tera
+[[generation.rules]]
+name        = "verifier_pipeline"
+query       = { file = "sparql/extract_verifier_gates.sparql" }
+template    = { file = "templates/verifier.rs.tera" }
+output_file = "verifier.rs"
+mode        = "Overwrite"
+
+# RULE 7: MechBirthAuthorityState.h — UE4 C++ SoA header
+# Same SPARQL as rule 1 — different projection (A = μ(O*))
+[[generation.rules]]
+name        = "ue4_authority_header"
+query       = { file = "sparql/extract_authority_fields.sparql" }
+template    = { file = "templates/MechBirthAuthorityState.h.tera" }
+output_file = "/Users/sac/rocket-craft/generated/MechBirthAuthorityState.h"
+mode        = "Overwrite"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SYNC & QUALITY
+# ─────────────────────────────────────────────────────────────────────────────
+
+[sync]
+enabled        = true
+on_change      = "manual"
+validate_after = true
+conflict_mode  = "fail"
+
+[rdf]
+formats           = ["turtle"]
+default_format    = "turtle"
+strict_validation = true
+
+[templates]
+enable_caching = true
+auto_reload    = true
+
+[output]
+formatting  = "default"
+line_length = 100
+indent      = 4
+
+# ─────────────────────────────────────────────────────────────────────────────
+# INFERENCE — owl:subClassOf closure to resolve class hierarchy
+# ─────────────────────────────────────────────────────────────────────────────
+
+[inference]
+rules = [
+    { name = "subclass-closure",
+      construct = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> CONSTRUCT { ?s a ?parent } WHERE { ?s a ?child . ?child rdfs:subClassOf ?parent . }" }
+]

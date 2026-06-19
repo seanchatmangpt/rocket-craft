@@ -22,7 +22,7 @@ Build the automated Gundam Factory Walkthrough Projection.
 
 ## Project Status
 - **Phase**: in progress
-- **Details**: Relayed high-priority parent directive ("The current logic or approach is incorrect. Please find the counterfactuals immediately.") to the active Project Orchestrator on 2026-06-19T18:18:02Z. Also relayed top-priority architectural directive (Wil van der Aalst + John Carmack synthesis for process mining and anti-OOP/SIMD performance engineering) to the active Project Orchestrator on 2026-06-19T18:19:56Z. Relayed JIDOKA HALT to stop hand-writing Rust verifiers and pivot immediately to SPARQL extraction queries and Tera templates on 2026-06-19T18:21:44Z.
+- **Details**: Relayed parent directives on counterfactuals, Carmack/van der Aalst synthesis, and JIDOKA HALT to pivot to SPARQL/Tera. Relayed critical finding on 2026-06-19T18:32:39Z: `ggen generate` is removed; all manifests must be executed via `ggen sync --manifest <path>` (optionally with `--audit`).
 
 ## Victory Audit Status
 - **Triggered**: no

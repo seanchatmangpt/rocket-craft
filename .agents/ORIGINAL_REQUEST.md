@@ -1306,6 +1306,36 @@ You must pivot immediately. Stop writing Rust files. You must write:
 
 Convert all your current Rust and C++ designs into `ggen` `.tera` templates and `.sparql` extraction queries. Do not proceed with manual Rust coding.
 
+## 2026-06-19T18:31:11Z
+
+CRITICAL DIRECTIVE: `ggen generate` is NOT the correct command. The `ggen` documentation may be out of date.
+
+Do not guess the CLI arguments. You must perform a deep audit of the `~/ggen/` repository. Read the actual Rust source code (e.g., `src/main.rs`, `src/cli.rs`, or where the `clap` parser is defined), analyze the examples, and determine the *true*, up-to-date CLI commands and engine capabilities directly from the source code. Keep track of all findings and update your specification and execution plans accordingly.
+
+## 2026-06-19T18:32:35Z
+
+The Ggen Source Code Auditor has completed the deep audit of `~/ggen`.
+
+**CRITICAL FINDING: `ggen generate` has been completely removed.**
+
+The CLI uses a unified pipeline. The correct, up-to-date command to execute a `ggen.toml` manifest is:
+```bash
+ggen sync --manifest path/to/ggen.toml
+```
+(Or simply `ggen sync` if you are in the manifest directory). 
+Add `--audit` to capture a cryptographic receipt.
+
+The internal engine executes a strict 5-stage pipeline:
+- **μ₁ (Load/CONSTRUCT)**: Load `.ttl` ontology.
+- **μ₂ (Extract/SELECT)**: Run SPARQL queries.
+- **μ₃ (Generate/Tera)**: Templated generation into code.
+- **μ₄ (Validate/Canonicalize)**: Soundness gates (WvdA).
+- **μ₅ (Write/Receipt)**: Emit to disk and compute cryptographic SHA256 receipt.
+
+Update all runbooks, scripts, and specifications immediately to reflect `ggen sync` and the μ₁–μ₅ pipeline. You are cleared to proceed with executing the `ggen` pipeline using this syntax.
+
+
+
 
 
 

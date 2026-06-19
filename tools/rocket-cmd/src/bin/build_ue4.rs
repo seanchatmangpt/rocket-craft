@@ -233,7 +233,14 @@ fn main() -> Result<()> {
         );
     }
 
-    let size_bytes = fs::metadata(&editor_bin)?.len();
+    // On macOS, the loader binary is a dynamically linked stub.
+    // The main engine code lives in UE4Editor-Engine.dylib, which we measure for size.
+    let dylib_path = engine.join("Engine/Binaries/Mac/UE4Editor-Engine.dylib");
+    let size_bytes = if dylib_path.exists() {
+        fs::metadata(&dylib_path)?.len()
+    } else {
+        fs::metadata(&editor_bin)?.len()
+    };
     let size_mb = size_bytes / (1024 * 1024);
     if size_mb < 100 {
         bail!(
