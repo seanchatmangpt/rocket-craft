@@ -2907,6 +2907,7 @@ name = "rocket-sdk"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64",
  "blake3",
  "chrono",
  "colored",
@@ -2922,6 +2923,7 @@ dependencies = [
  "rayon",
  "rcgen",
  "reqwest",
+ "ring",
  "rust-ini",
  "serde",
  "serde_json",

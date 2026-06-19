@@ -17,6 +17,8 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 inquire = "0.7"
 rcgen = { version = "0.13", default-features = false, features = ["ring", "pem"] }
+ring = "0.17"
+base64 = "0.22"
 p12-keystore = "0.2"
 openssl = "0.10"
 indicatif = "0.17"

@@ -1,4 +1,5 @@
 pub mod audit_affidavit;
+pub mod signing;
 pub mod config;
 pub mod crypto;
 pub mod doctor;

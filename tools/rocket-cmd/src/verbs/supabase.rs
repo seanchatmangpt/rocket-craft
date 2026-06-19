@@ -38,6 +38,25 @@ fn print_ping_results(url: &str, checks: &[(String, bool, String)], health: u16)
 
 // ── Verbs ─────────────────────────────────────────────────────────────────────
 
+/// Generate an Ed25519 key pair for receipt signing.
+///
+/// Writes the keys to stdout in .env format. Copy them into nuxt-shell/.env:
+///   ROCKET_SIGNING_KEY=<private>
+///   ROCKET_SIGNING_PUBKEY=<public>
+///
+/// The private key is used by `rocket html5 verify` to sign cook receipts.
+/// The public key is used by the browser and verify_receipt server route to
+/// confirm the receipt originated from the real CLI pipeline (not forged).
+#[verb("keygen", "supabase")]
+fn supabase_keygen() -> Result<Value> {
+    let (priv_b64, pub_b64) = rocket_sdk::signing::generate_keypair()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+    println!("# Add these to nuxt-shell/.env and tools/.env");
+    println!("ROCKET_SIGNING_KEY={priv_b64}");
+    println!("ROCKET_SIGNING_PUBKEY={pub_b64}");
+    Ok(serde_json::json!({ "public_key": pub_b64 }))
+}
+
 /// Ping Supabase and verify that all pipeline tables exist.
 ///
 /// Reads SUPABASE_URL and SUPABASE_ANON_KEY / SUPABASE_SERVICE_ROLE_KEY from env.

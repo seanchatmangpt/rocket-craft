@@ -111,8 +111,27 @@ impl SupabaseService {
     /// The leaderboard Postgres trigger fires automatically on PASS verdicts,
     /// so this single call closes the cook→leaderboard pipeline.
     pub async fn push_cook_receipt(&self, receipt: &CookReceipt) -> Result<()> {
-        let body = serde_json::to_string(receipt)
-            .context("failed to serialise CookReceipt")?;
+        // Sign the receipt with the Ed25519 private key if ROCKET_SIGNING_KEY is set.
+        // The signature covers (proven_at, receipt_hash, session_id, verdict) in sorted-key
+        // canonical JSON — same payload the browser verify route checks.
+        let proven_at = chrono::Utc::now().to_rfc3339();
+        let ed25519_sig = std::env::var("ROCKET_SIGNING_KEY").ok().and_then(|key| {
+            let payload = crate::signing::receipt_signing_payload(
+                receipt.session_id.as_deref(),
+                &receipt.verdict,
+                &receipt.receipt_hash,
+                &proven_at,
+            );
+            crate::signing::sign(&key, &payload).ok()
+        });
+
+        let mut value = serde_json::to_value(receipt).context("serialise CookReceipt")?;
+        value["proven_at"] = serde_json::Value::String(proven_at);
+        if let Some(sig) = ed25519_sig {
+            value["ed25519_sig"] = serde_json::Value::String(sig);
+        }
+
+        let body = serde_json::to_string(&value).context("serialise signed receipt")?;
         let resp = self
             .client
             .post(format!("{}/rest/v1/game_receipts", self.url))
