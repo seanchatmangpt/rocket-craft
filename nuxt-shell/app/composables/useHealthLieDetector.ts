@@ -8,13 +8,14 @@
  * observable evidence. Rather than silently accepting contradictions, this
  * composable surfaces them as violations for the dashboard to display.
  *
- * Invariants checked:
+ * Invariants checked (server-side via /api/game/health-lies):
  *   LIE-1: A receipt claims PASS but has zero OCEL events
  *   LIE-2: A session is alive (is_alive=true) with no activity for >10 minutes
- *   LIE-3: pipeline_health returns DEGRADED but no receipts exist in last hour
  *   LIE-4: Any receipt has engine_source='synthetic' (must never reach the DB)
  *
  * Runs every 30 seconds when mounted; stops on unmount.
+ * Uses the server endpoint so 3 raw Supabase queries per scan
+ * become one $fetch call — service role key stays server-side.
  */
 
 export interface HealthLie {
@@ -24,6 +25,12 @@ export interface HealthLie {
   detected_at: number;
 }
 
+interface HealthLiesResponse {
+  lies: Array<Omit<HealthLie, 'detected_at'>>;
+  scanned_at: string;
+  all_clear: boolean;
+}
+
 const LIE_INTERVAL_MS = 30_000;
 
 export function useHealthLieDetector() {
@@ -31,84 +38,28 @@ export function useHealthLieDetector() {
   const isRunning = ref(false);
   const lastScan = ref<number>(0);
 
-  const { client } = useRocketSupabase();
+  function mergeLies(incoming: Array<Omit<HealthLie, 'detected_at'>>) {
+    const now = Date.now();
+    const incomingCodes = new Set(incoming.map(l => l.code));
 
-  function addLie(lie: HealthLie) {
-    // Deduplicate by code — only keep the most recent occurrence
-    lies.value = [lie, ...lies.value.filter(l => l.code !== lie.code)];
-  }
+    // Clear resolved lies; keep LIE-3 which is computed locally from health endpoint
+    const survived = lies.value.filter(l => !incomingCodes.has(l.code) && l.code === 'LIE-3');
 
-  function clearLie(code: HealthLie['code']) {
-    lies.value = lies.value.filter(l => l.code !== code);
-  }
-
-  async function scanLie1() {
-    // LIE-1: receipt claims PASS with zero OCEL events
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (client as any)
-      .from('game_receipts')
-      .select('id, verdict, ocel_event_count')
-      .eq('verdict', 'PASS')
-      .eq('ocel_event_count', 0)
-      .limit(5);
-    if (data?.length) {
-      addLie({
-        code: 'LIE-1',
-        description: `${data.length} PASS receipt(s) claim zero OCEL events — impossible without evidence`,
-        evidence: { receipts: data.map((r: { id: string }) => r.id) },
-        detected_at: Date.now(),
-      });
-    } else {
-      clearLie('LIE-1');
-    }
-  }
-
-  async function scanLie2() {
-    // LIE-2: session alive >10 min with no associated receipt
-    const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (client as any)
-      .from('game_sessions')
-      .select('id, session_started_at, project_name')
-      .eq('is_alive', true)
-      .lt('session_started_at', tenMinAgo)
-      .limit(5);
-    if (data?.length) {
-      addLie({
-        code: 'LIE-2',
-        description: `${data.length} session(s) alive for >10 min with no close — stale session leak`,
-        evidence: { sessions: data.map((s: { id: string; project_name: string }) => ({ id: s.id, project: s.project_name })) },
-        detected_at: Date.now(),
-      });
-    } else {
-      clearLie('LIE-2');
-    }
-  }
-
-  async function scanLie4() {
-    // LIE-4: any synthetic receipt reached the DB (guard migration should block these)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data } = await (client as any)
-      .from('game_receipts')
-      .select('id, engine_source')
-      .eq('engine_source', 'synthetic')
-      .limit(5);
-    if (data?.length) {
-      addLie({
-        code: 'LIE-4',
-        description: `${data.length} receipt(s) with engine_source=synthetic bypassed the guard trigger`,
-        evidence: { receipts: data.map((r: { id: string }) => r.id) },
-        detected_at: Date.now(),
-      });
-    } else {
-      clearLie('LIE-4');
-    }
+    lies.value = [
+      ...incoming.map(l => ({ ...l, detected_at: now })),
+      ...survived,
+    ];
   }
 
   async function scan() {
     if (!isRunning.value) return;
     lastScan.value = Date.now();
-    await Promise.allSettled([scanLie1(), scanLie2(), scanLie4()]);
+    try {
+      const result = await $fetch<HealthLiesResponse>('/api/game/health-lies');
+      mergeLies(result.lies);
+    } catch {
+      // Server unreachable — keep existing lies, don't clear them
+    }
   }
 
   let interval: ReturnType<typeof setInterval> | null = null;
