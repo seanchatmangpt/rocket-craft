@@ -147,3 +147,83 @@ impl Default for MessageBridge {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn state_update_json(tick: u64, health: u32, score: u64) -> String {
+        format!(
+            r#"{{"StateUpdate":{{"tick":{tick},"entity_count":3,"player_health":{health},"player_health_max":100,"player_score":{score}}}}}"#
+        )
+    }
+
+    #[test]
+    fn new_bridge_starts_zeroed() {
+        let b = MessageBridge::new();
+        assert_eq!(b.messages_processed, 0);
+        assert_eq!(b.last_tick, 0);
+        assert!(b.entity_positions.is_empty());
+    }
+
+    #[test]
+    fn process_invalid_json_returns_none_no_increment() {
+        let mut b = MessageBridge::new();
+        assert!(b.process("not-json").is_none());
+        assert_eq!(b.messages_processed, 0);
+    }
+
+    #[test]
+    fn process_state_update_increments_counter_and_updates_fields() {
+        let mut b = MessageBridge::new();
+        let hud = b.process(&state_update_json(42, 80, 999)).unwrap();
+        assert_eq!(b.messages_processed, 1);
+        assert_eq!(b.last_tick, 42);
+        assert_eq!(b.last_player_health, 80);
+        assert_eq!(b.last_score, 999);
+        assert_eq!(hud.player_health, 80);
+        assert_eq!(hud.score, 999);
+        assert_eq!(hud.game_tick, 42);
+    }
+
+    #[test]
+    fn process_entity_moved_updates_position_map() {
+        let mut b = MessageBridge::new();
+        let json = r#"{"EntityMoved":{"entity_id":7,"x":1.5,"y":2.5}}"#;
+        b.process(json).unwrap();
+        assert_eq!(b.entity_positions.get(&7), Some(&(1.5, 2.5)));
+    }
+
+    #[test]
+    fn process_entity_died_removes_from_position_map() {
+        let mut b = MessageBridge::new();
+        b.process(r#"{"EntityMoved":{"entity_id":7,"x":1.0,"y":2.0}}"#).unwrap();
+        b.process(r#"{"EntityDied":{"entity_id":7}}"#).unwrap();
+        assert!(!b.entity_positions.contains_key(&7));
+    }
+
+    #[test]
+    fn process_game_over_zeroes_player_health() {
+        let mut b = MessageBridge::new();
+        b.process(&state_update_json(1, 50, 0)).unwrap();
+        let hud = b.process(r#"{"GameOver":{"winner_score":9999,"total_ticks":100}}"#).unwrap();
+        assert_eq!(b.last_player_health, 0);
+        assert_eq!(hud.player_health, 0);
+        assert_eq!(hud.score, 9999);
+    }
+
+    #[test]
+    fn serialize_to_game_produces_valid_json() {
+        let b = MessageBridge::new();
+        let json = b.serialize_to_game(&UiToGameMessage::Pause).unwrap();
+        assert!(json.contains("Pause"));
+    }
+
+    #[test]
+    fn send_ping_encodes_seq() {
+        let b = MessageBridge::new();
+        let json = b.send_ping(42);
+        assert!(json.contains("42"));
+        assert!(json.contains("Ping"));
+    }
+}
