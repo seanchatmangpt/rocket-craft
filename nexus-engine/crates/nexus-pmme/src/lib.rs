@@ -1387,4 +1387,61 @@ mod tests {
         assert_eq!(err.gate, Gate::Gate4);
         assert!(err.reason.contains("is incompatible with mobility class"));
     }
+
+    // ── compute_weights unit tests ──────────────────────────────────────────
+
+    fn make_profile(faith: f32, ambition: f32, order: f32, knowledge: f32) -> CulturalProfile {
+        CulturalProfile {
+            planetary_values: PlanetaryValues {
+                faith, ambition, order, knowledge,
+                beauty: 0.5, community: 0.5,
+            },
+            _marker: PhantomData::<Earth>,
+        }
+    }
+
+    #[test]
+    fn high_faith_enables_angelic_wing_binder() {
+        let profile = make_profile(0.9, 0.5, 0.5, 0.5);
+        let weights = profile.compute_weights();
+        assert!(weights.angelic_wing_binder_probability > 0.5,
+            "high faith should produce high angelic wing binder probability");
+        assert!(weights.white_gold_material_bias, "high faith should bias white/gold material");
+    }
+
+    #[test]
+    fn low_faith_does_not_trigger_angelic_wing_binder() {
+        let profile = make_profile(0.3, 0.5, 0.5, 0.5);
+        let weights = profile.compute_weights();
+        assert!(weights.angelic_wing_binder_probability < 0.5);
+        assert!(!weights.white_gold_material_bias);
+    }
+
+    #[test]
+    fn high_order_enforces_symmetric_joints() {
+        let profile = make_profile(0.5, 0.5, 0.9, 0.5);
+        let weights = profile.compute_weights();
+        assert!(weights.symmetric_joint_layout_enforced);
+    }
+
+    #[test]
+    fn low_order_does_not_enforce_symmetric_joints() {
+        let profile = make_profile(0.5, 0.5, 0.5, 0.5);
+        let weights = profile.compute_weights();
+        assert!(!weights.symmetric_joint_layout_enforced);
+    }
+
+    #[test]
+    fn high_knowledge_requires_sensor_array() {
+        let profile = make_profile(0.5, 0.5, 0.5, 0.9);
+        let weights = profile.compute_weights();
+        assert!(weights.sensor_array_hardpoint_required);
+    }
+
+    #[test]
+    fn high_ambition_raises_heavy_weapon_mount_probability() {
+        let profile = make_profile(0.5, 0.9, 0.5, 0.5);
+        let weights = profile.compute_weights();
+        assert!(weights.heavy_weapon_mount_probability > 0.5);
+    }
 }
