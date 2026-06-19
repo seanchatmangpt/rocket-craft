@@ -44,11 +44,13 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
         }
     }
 
-    // 2. Check environment variable
-    if let Ok(env_root) = env::var("UE4_ROOT") {
-        let path = PathBuf::from(env_root);
-        if validate_ue4_root(&path) && !candidates.contains(&path) {
-            candidates.push(path);
+    // 2. Check environment variables (UE4_ROOT primary, UE_ROOT fallback)
+    for var in &["UE4_ROOT", "UE_ROOT"] {
+        if let Ok(env_root) = env::var(var) {
+            let path = PathBuf::from(env_root);
+            if validate_ue4_root(&path) && !candidates.contains(&path) {
+                candidates.push(path);
+            }
         }
     }
 
@@ -60,7 +62,10 @@ fn find_ue4_root(config: &RocketConfig) -> anyhow::Result<Option<PathBuf>> {
             PathBuf::from("D:\\ue-engines\\4.27-html\\myengine"),
         ]
     } else if cfg!(target_os = "macos") {
+        // Include the canonical clone target from the HTML5 ES3 fork plan.
+        let home = env::var("HOME").unwrap_or_else(|_| "/Users/sac".to_string());
         vec![
+            PathBuf::from(format!("{}/ue-4.27-html5-es3", home)),
             PathBuf::from("UnrealEngine-HTML5-ES3"),
             PathBuf::from("/Users/Shared/Epic Games/UE_4.27"),
         ]
