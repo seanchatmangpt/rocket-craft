@@ -56,7 +56,6 @@ interface DailyStatRow {
   pass_rate_pct: number | null;
 }
 
-const health = ref<PipelineHealth | null>(null);
 const chainStatus = ref<ChainVerifyResult | null>(null);
 const dailyStats = ref<DailyStatRow[]>([]);
 const loading = ref(true);
@@ -65,6 +64,17 @@ const liveViewers = ref(0);        // Realtime presence: other dashboard viewers
 const liveSessionsRT = ref(0);     // Realtime: game sessions with active OCEL streams
 
 const { client } = useRocketSupabase();
+
+// SSR-aware health: server fetches once, payload carries it to client with no
+// round-trip flash. useServerData revalidates client-side after 20 s (matching
+// the Nitro KV TTL on pipeline-health.get.ts).
+const ssrHealth = await useServerData<PipelineHealth>(
+  'pipeline:health',
+  () => $fetch<PipelineHealth>('/api/game/pipeline-health'),
+  { ttl: 20_000 },
+);
+const health = ref<PipelineHealth | null>(ssrHealth.value);
+watch(ssrHealth, v => { if (v) health.value = v; });
 
 // Load from cached Nitro KV endpoint (falls back to direct Supabase in dev if needed)
 async function loadHealth(bust = false) {

@@ -6,6 +6,9 @@ const { client } = useRocketSupabase();
 // Live updates when receipts arrive from browser sessions OR the Rust CLI cook pipeline
 const { receiptBus } = useRocketSessionRealtime();
 
+// Chain finality: shared singleton across all receipt rows (lazy, cached)
+const { finality, loading: finalityLoading, prove, proveAll } = useChainFinality();
+
 interface ReceiptRow {
   id: string;
   session_id: string | null;
@@ -15,6 +18,7 @@ interface ReceiptRow {
   ocel_lifecycle: string[];
   engine_source: string;
   receipt_hash: string;
+  output_hash: string | null;
   proven_at: string;
   ed25519_sig: string | null;
   payload: Record<string, unknown> | null;
@@ -31,19 +35,26 @@ async function loadReceipts() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error: err } = await (client as any)
     .from('game_receipts')
-    .select('id, session_id, verdict, milestone, ocel_event_count, ocel_lifecycle, engine_source, receipt_hash, proven_at, ed25519_sig, payload')
+    .select('id, session_id, verdict, milestone, ocel_event_count, ocel_lifecycle, engine_source, receipt_hash, output_hash, proven_at, ed25519_sig, payload')
     .order('proven_at', { ascending: false })
     .limit(50);
   loading.value = false;
   if (err) { error.value = err.message; return; }
   receipts.value = data ?? [];
+  // Prove chain finality for all PASS receipts (5-at-a-time, backgrounded)
+  const passRows = receipts.value.filter(r => r.verdict === 'PASS');
+  proveAll(passRows.map(r => ({ id: r.id, session_id: r.session_id, receipt_hash: r.receipt_hash })));
 }
 
 onMounted(loadReceipts);
 
-// Prepend new receipt immediately when Realtime fires
+// Prepend new receipt immediately when Realtime fires; auto-prove if PASS
 receiptBus.on((r) => {
-  receipts.value = [r as ReceiptRow, ...receipts.value].slice(0, 50);
+  const row = r as ReceiptRow;
+  receipts.value = [row, ...receipts.value].slice(0, 50);
+  if (row.verdict === 'PASS') {
+    prove(row.id, row.session_id, row.receipt_hash);
+  }
 });
 
 async function verifySig(r: ReceiptRow) {
@@ -71,7 +82,7 @@ async function verifySig(r: ReceiptRow) {
 }
 
 const verdictColor = (v: string) => v === 'PASS' ? '#00c853' : v === 'FAIL' ? '#ff4444' : '#888';
-const shortHash = (h: string) => h ? h.slice(0, 14) + '…' : '—';
+const shortHash = (h: string | null) => h ? h.slice(0, 14) + '…' : '—';
 const shortId = (id: string | null) => id ? id.slice(0, 8) : '—';
 
 const sigLabel: Record<string, string> = {
@@ -87,6 +98,25 @@ const sigColor: Record<string, string> = {
   fail: '#ff4444',
   unsigned: '#555',
   'no-key': '#555',
+};
+
+// Chain finality display helpers
+const chainVerdict = (id: string) => finality.value[id]?.verdict ?? (finalityLoading.value[id] ? 'PENDING' : null);
+const chainColor: Record<string, string> = {
+  PROVEN: '#00c853',
+  CHAIN_BROKEN: '#ff4444',
+  HASH_MISMATCH: '#ff8c00',
+  NO_EVENTS: '#555',
+  PENDING: '#888',
+  ERROR: '#ff4444',
+};
+const chainLabel: Record<string, string> = {
+  PROVEN: '⛓ PROVEN',
+  CHAIN_BROKEN: '✗ BROKEN',
+  HASH_MISMATCH: '≠ MISMATCH',
+  NO_EVENTS: '∅ NO EVENTS',
+  PENDING: '…',
+  ERROR: '⚠ ERR',
 };
 </script>
 
@@ -109,26 +139,52 @@ const sigColor: Record<string, string> = {
       <thead>
         <tr>
           <th>Verdict</th>
+          <th>Chain</th>
           <th>Milestone</th>
           <th>Events</th>
           <th>Engine</th>
           <th>Lifecycle</th>
           <th>Session</th>
-          <th>Hash</th>
+          <th>Receipt Hash</th>
+          <th>WASM Hash</th>
           <th>Signature</th>
           <th>Proven</th>
           <th>Proof</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="r in receipts" :key="r.id" :class="{ 'row-pass': r.verdict === 'PASS', 'row-fail': r.verdict === 'FAIL' }">
+        <tr
+          v-for="r in receipts"
+          :key="r.id"
+          :class="{
+            'row-pass': r.verdict === 'PASS' && chainVerdict(r.id) !== 'CHAIN_BROKEN',
+            'row-fail': r.verdict === 'FAIL' || chainVerdict(r.id) === 'CHAIN_BROKEN',
+          }"
+        >
           <td :style="{ color: verdictColor(r.verdict), fontWeight: 'bold' }">{{ r.verdict }}</td>
+          <!-- Chain finality: lazy-loaded PROVEN/CHAIN_BROKEN/HASH_MISMATCH/NO_EVENTS -->
+          <td class="chain-cell">
+            <span
+              v-if="r.verdict === 'PASS'"
+              class="chain-badge"
+              :style="{ color: chainColor[chainVerdict(r.id) ?? 'PENDING'] }"
+              :title="finality[r.id] ? `chain_verified=${finality[r.id].chain_verified} tip_matches=${finality[r.id].chain_tip_matches_hash}` : 'Loading…'"
+            >
+              {{ chainLabel[chainVerdict(r.id) ?? 'PENDING'] ?? '—' }}
+            </span>
+            <span v-else class="dimmed">—</span>
+          </td>
           <td class="mono small">{{ r.milestone }}</td>
           <td class="num">{{ r.ocel_event_count }}</td>
           <td class="mono small" :class="{ 'real-ue4': r.engine_source === 'real_ue4' }">{{ r.engine_source }}</td>
           <td class="lifecycle">{{ r.ocel_lifecycle?.join(' → ') ?? '—' }}</td>
           <td class="mono dimmed">{{ shortId(r.session_id) }}</td>
           <td class="mono dimmed" :title="r.receipt_hash">{{ shortHash(r.receipt_hash) }}</td>
+          <!-- output_hash: SHA-256 of the WASM binary (cook-to-game cross-check) -->
+          <td class="mono dimmed" :title="r.output_hash ?? 'No WASM hash — browser receipt'">
+            <span v-if="r.output_hash" class="wasm-hash">{{ shortHash(r.output_hash) }}</span>
+            <span v-else class="dimmed">—</span>
+          </td>
           <td>
             <button
               v-if="!sigStatus[r.id]"
@@ -154,6 +210,12 @@ const sigColor: Record<string, string> = {
               :download="`ocel2-${r.session_id.slice(0, 8)}.json`"
               title="Download OCEL 2.0 JSON for pm4py"
             >↓ OCEL</a>
+            <button
+              v-if="r.session_id && r.verdict === 'PASS' && !finality[r.id]"
+              class="proof-link proof-btn"
+              title="Prove OCEL chain finality"
+              @click="prove(r.id, r.session_id, r.receipt_hash)"
+            >⛓ Prove</button>
           </td>
         </tr>
       </tbody>
@@ -222,4 +284,13 @@ const sigColor: Record<string, string> = {
 .proof-link:hover { background: #1e293b; }
 .receipts-footer { margin-top: 1.5rem; font-size: 0.7rem; color: #334155; }
 .receipts-footer code { color: #555; }
+.chain-cell { white-space: nowrap; }
+.chain-badge { font-size: 0.72rem; font-weight: bold; letter-spacing: 0.02em; }
+.wasm-hash { color: #7dd3fc; font-size: 0.72rem; }
+.proof-btn {
+  background: none; border: 1px solid #1e3a5f; color: #7dd3fc;
+  cursor: pointer; font-size: 0.7rem; padding: 0.1rem 0.35rem;
+  border-radius: 2px; font-family: inherit;
+}
+.proof-btn:hover { background: #1e293b; }
 </style>
