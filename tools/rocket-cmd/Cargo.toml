@@ -34,6 +34,7 @@ wasmer = { version = "4.4.0", default-features = false, features = ["sys", "sing
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 blake3 = "1.5"
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
 
 [dev-dependencies]
 un-test-utils = { path = "../un-test-utils" }

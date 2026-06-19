@@ -4,6 +4,31 @@ use clap_noun_verb::Result;
 use clap_noun_verb_macros::verb;
 use serde_json::Value;
 
+/// Push a verified package report to Supabase `game_receipts`.
+///
+/// Reads SUPABASE_URL + SUPABASE_ANON_KEY from the environment. If either is
+/// absent the push is silently skipped — offline cooks still write local receipts.
+/// Uses a one-shot tokio runtime so sync verb code can call async SDK methods.
+fn push_report_to_supabase(report: &rocket_sdk::Html5PackageReport) {
+    let url = std::env::var("SUPABASE_URL").unwrap_or_default();
+    let key = std::env::var("SUPABASE_ANON_KEY")
+        .or_else(|_| std::env::var("SUPABASE_SERVICE_ROLE_KEY"))
+        .unwrap_or_default();
+    if url.is_empty() || key.is_empty() {
+        return; // Supabase not configured — local receipt is the only artefact
+    }
+    let svc = rocket_sdk::supabase::SupabaseService::new(url, key);
+    match tokio::runtime::Runtime::new() {
+        Ok(rt) => {
+            match rt.block_on(report.push_to_supabase(&svc)) {
+                Ok(()) => println!("[supabase] cook receipt pushed → game_receipts"),
+                Err(e) => println!("[supabase] warn: push failed (non-fatal) — {e:#}"),
+            }
+        }
+        Err(e) => println!("[supabase] warn: could not create tokio runtime — {e:#}"),
+    }
+}
+
 fn ue4_root() -> std::path::PathBuf {
     if let Ok(v) = std::env::var("UE4_ROOT") {
         return std::path::PathBuf::from(v);
@@ -164,6 +189,7 @@ fn do_html5_cook(
             println!("[{}] {}", v, report.summary());
             let rp = report.write_receipt().ok().map(|p| p.display().to_string());
             if let Some(ref p) = rp { println!("[receipt] {p}"); }
+            push_report_to_supabase(&report);
             (v.to_string(), rp)
         }
         Err(e) => {
@@ -295,6 +321,9 @@ fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>, project: Option
         Ok(path) => println!("[receipt] {}", path.display()),
         Err(e) => println!("[receipt] warning: could not write receipt — {e:#}"),
     }
+
+    // Push to Supabase if configured — non-fatal (cook is already done)
+    push_report_to_supabase(&report);
 
     let wasm_list: Vec<serde_json::Value> = report.wasm_files.iter().map(|f| {
         let (verdict_str, size) = match &f.verdict {
@@ -1021,28 +1050,66 @@ fn start_nuxt_server_if_needed(nuxt_path: &std::path::Path) -> Result<KillOnDrop
 }
 
 fn run_playwright_game_loop(nuxt_path: &std::path::Path, headed: bool) -> Result<Value> {
-    println!("[e2e] Running Playwright game-loop suite (headed={headed})...");
+    // Headed mode runs the real-UE4 suite (no synthetic injection, long timeout).
+    // Headless mode runs the fast OCEL pipeline CI suite (synthetic EngineReady, <60s).
+    let (spec, config_arg, receipt_name, suite_label) = if headed {
+        (
+            "e2e/real-ue4-game-loop.spec.ts",
+            Some("--config=playwright.ue4.config.ts"),
+            "real-ue4-receipt.json",
+            "real-UE4",
+        )
+    } else {
+        (
+            "e2e/game-loop.spec.ts",
+            None,
+            "game-loop-receipt.json",
+            "OCEL-pipeline",
+        )
+    };
+
+    println!("[e2e] Running Playwright {suite_label} suite (headed={headed})...");
+
     let mut cmd = std::process::Command::new("npx");
-    cmd.args(["playwright", "test", "e2e/game-loop.spec.ts", "--reporter=line"])
-        .current_dir(nuxt_path);
-    if headed { cmd.arg("--headed"); }
-    let status = cmd.status()
+    let mut args = vec!["playwright", "test", spec, "--reporter=line"];
+    if let Some(cfg) = config_arg { args.push(cfg); }
+    if headed { args.push("--headed"); }
+
+    let status = cmd.args(&args).current_dir(nuxt_path).status()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("playwright: {e}")))?;
 
-    let receipt_path = nuxt_path.join("playwright-report/game-loop-receipt.json");
+    let receipt_path = nuxt_path.join(format!("playwright-report/{receipt_name}"));
     let receipt: Option<serde_json::Value> = receipt_path.exists()
         .then(|| std::fs::read_to_string(&receipt_path).ok()
             .and_then(|s| serde_json::from_str(&s).ok()))
         .flatten();
     let verdict = receipt.as_ref().and_then(|v| v["verdict"].as_str()).unwrap_or("UNKNOWN");
+    let engine_source = receipt.as_ref()
+        .and_then(|v| v["engine_source"].as_str())
+        .unwrap_or("unknown");
+
+    if headed && engine_source == "synthetic" {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            "real-UE4 suite produced engine_source='synthetic' — \
+             EngineReady was not received from the real WASM. \
+             Ensure the UE4 asset server is running: rocket html5 serve --project Brm --background"
+                .to_string(),
+        ));
+    }
 
     if status.success() {
-        println!("[e2e] PASS — verdict={verdict}");
+        println!("[e2e] PASS — verdict={verdict} engine_source={engine_source}");
         println!("[e2e] Receipt: {}", receipt_path.display());
-        Ok(serde_json::json!({ "verdict": verdict, "receipt_path": receipt_path.display().to_string(), "receipt": receipt }))
+        Ok(serde_json::json!({
+            "verdict": verdict,
+            "engine_source": engine_source,
+            "suite": suite_label,
+            "receipt_path": receipt_path.display().to_string(),
+            "receipt": receipt,
+        }))
     } else {
         Err(clap_noun_verb::NounVerbError::execution_error(format!(
-            "game-loop FAILED verdict={verdict} — see nuxt-shell/playwright-report/"
+            "{suite_label} FAILED verdict={verdict} — see nuxt-shell/playwright-report/"
         )))
     }
 }
