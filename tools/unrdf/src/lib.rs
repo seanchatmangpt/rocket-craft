@@ -194,3 +194,115 @@ impl Manifest<Validated> {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use tempfile::tempdir;
+
+    fn write_manifest(dir: &std::path::Path, content: &str) -> PathBuf {
+        let path = dir.join("project-manifest.json");
+        fs::write(&path, content).unwrap();
+        path
+    }
+
+    // ── Pending → Ingested ─────────────────────────────────────────────────────
+
+    #[test]
+    fn ingest_reads_projects_from_json() {
+        let dir = tempdir().unwrap();
+        let path = write_manifest(dir.path(), r#"{"projects":[{"name":"Brm","uproject_path":"Brm.uproject","targets":[]}]}"#);
+        let manifest = Manifest::new(path).ingest().unwrap();
+        assert_eq!(manifest.projects().len(), 1);
+        assert_eq!(manifest.projects()[0].name, "Brm");
+    }
+
+    #[test]
+    fn ingest_returns_err_on_missing_file() {
+        let result = Manifest::new("/nonexistent/project-manifest.json").ingest();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn ingest_returns_err_on_invalid_json() {
+        let dir = tempdir().unwrap();
+        let path = write_manifest(dir.path(), "not json");
+        assert!(Manifest::new(path).ingest().is_err());
+    }
+
+    #[test]
+    fn ingest_empty_projects_array_ok() {
+        let dir = tempdir().unwrap();
+        let path = write_manifest(dir.path(), r#"{"projects":[]}"#);
+        let manifest = Manifest::new(path).ingest().unwrap();
+        assert!(manifest.projects().is_empty());
+    }
+
+    // ── Ingested helpers ───────────────────────────────────────────────────────
+
+    #[test]
+    fn from_projects_exposes_projects_and_path() {
+        let manifest = Manifest::from_projects(
+            "/some/path/manifest.json",
+            vec![Project { name: "Test".into(), uproject_path: "T.uproject".into(), targets: vec![] }],
+        );
+        assert_eq!(manifest.projects().len(), 1);
+        assert_eq!(manifest.path(), std::path::Path::new("/some/path/manifest.json"));
+    }
+
+    #[test]
+    fn ingested_save_roundtrips_to_disk() {
+        let dir = tempdir().unwrap();
+        let path = write_manifest(dir.path(), r#"{"projects":[]}"#);
+        let manifest = Manifest::from_projects(
+            &path,
+            vec![Project { name: "X".into(), uproject_path: "X.uproject".into(), targets: vec!["XEditor".into()] }],
+        );
+        manifest.save().unwrap();
+        let reloaded = Manifest::new(&path).ingest().unwrap();
+        assert_eq!(reloaded.projects()[0].name, "X");
+        assert_eq!(reloaded.projects()[0].targets, vec!["XEditor"]);
+    }
+
+    // ── Ingested → Validated ───────────────────────────────────────────────────
+
+    #[test]
+    fn validate_passes_when_all_uproject_files_exist() {
+        let dir = tempdir().unwrap();
+        let uproject = dir.path().join("Game.uproject");
+        fs::write(&uproject, b"{}").unwrap();
+        let manifest = Manifest::from_projects(
+            dir.path().join("project-manifest.json"),
+            vec![Project { name: "Game".into(), uproject_path: "Game.uproject".into(), targets: vec![] }],
+        );
+        assert!(manifest.validate().is_ok());
+    }
+
+    #[test]
+    fn validate_fails_when_uproject_missing() {
+        let dir = tempdir().unwrap();
+        let manifest = Manifest::from_projects(
+            dir.path().join("project-manifest.json"),
+            vec![Project { name: "Ghost".into(), uproject_path: "Ghost.uproject".into(), targets: vec![] }],
+        );
+        let err = match manifest.validate() { Ok(_) => panic!("expected Err"), Err(e) => e };
+        assert!(err.to_string().contains("Ghost"));
+    }
+
+    #[test]
+    fn validate_empty_projects_always_passes() {
+        let manifest = Manifest::from_projects("/tmp/manifest.json", vec![]);
+        assert!(manifest.validate().is_ok());
+    }
+
+    // ── Project::from tuple ────────────────────────────────────────────────────
+
+    #[test]
+    fn project_from_tuple_converts_fields() {
+        let p = Project::from(("Brm".to_string(), PathBuf::from("Brm.uproject"), vec!["BrmEditor".to_string()]));
+        assert_eq!(p.name, "Brm");
+        assert_eq!(p.uproject_path, PathBuf::from("Brm.uproject"));
+        assert_eq!(p.targets, vec!["BrmEditor"]);
+    }
+}
