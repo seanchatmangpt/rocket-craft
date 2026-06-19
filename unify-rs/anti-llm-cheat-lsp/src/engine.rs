@@ -283,3 +283,124 @@ pub fn evaluate_diagnostics_with_config(
     diags.retain(|d| seen.insert((d.file_path.clone(), d.line, d.code.clone())));
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    fn write_temp(content: &str, suffix: &str) -> NamedTempFile {
+        let mut f = tempfile::Builder::new()
+            .suffix(suffix)
+            .tempfile()
+            .unwrap();
+        f.write_all(content.as_bytes()).unwrap();
+        f
+    }
+
+    // ── byte_to_line ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn line_index_first_line_is_one() {
+        let content = b"hello\nworld\n";
+        let idx = build_line_index(content);
+        assert_eq!(byte_to_line(&idx, 0), 1);
+    }
+
+    #[test]
+    fn line_index_second_line_starts_after_newline() {
+        let content = b"hello\nworld\n";
+        let idx = build_line_index(content);
+        assert_eq!(byte_to_line(&idx, 6), 2);
+    }
+
+    #[test]
+    fn line_index_empty_content_returns_one() {
+        let idx = build_line_index(b"");
+        assert_eq!(byte_to_line(&idx, 0), 1);
+    }
+
+    // ── scan_file ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn scan_file_missing_path_returns_empty() {
+        let obs = scan_file("/nonexistent/totally/fake/path.rs");
+        assert!(obs.is_empty());
+    }
+
+    #[test]
+    fn scan_file_clean_rust_returns_no_raw_text() {
+        let f = write_temp("fn main() {}\n", ".rs");
+        let obs = scan_file(f.path().to_str().unwrap());
+        let raw: Vec<_> = obs.iter().filter(|o| o.kind == "raw_text").collect();
+        assert!(raw.is_empty(), "clean file should have no raw_text observations");
+    }
+
+    #[test]
+    fn scan_file_detects_raw_text_pattern() {
+        // "ANTI-LLM-OCEL-001-TRIGGER" is in RAW_SMELL_PATTERNS → kind = "raw_text".
+        let content = "// ANTI-LLM-OCEL-001-TRIGGER\nfn x() {}\n";
+        let f = write_temp(content, ".rs");
+        let obs = scan_file(f.path().to_str().unwrap());
+        assert!(
+            obs.iter().any(|o| o.kind == "raw_text"),
+            "known trigger string should produce a raw_text observation"
+        );
+    }
+
+    // ── scan_directory ───────────────────────────────────────────────────────
+
+    #[test]
+    fn scan_directory_missing_returns_empty() {
+        let obs = scan_directory("/nonexistent/dir");
+        assert!(obs.is_empty());
+    }
+
+    #[test]
+    fn scan_directory_empty_dir_returns_no_panic() {
+        let dir = tempfile::tempdir().unwrap();
+        let obs = scan_directory(dir.path().to_str().unwrap());
+        // Empty directory — only the ggen/contract/refgraph synthetic checks run,
+        // but they should not panic.
+        drop(obs);
+    }
+
+    // ── evaluate_diagnostics ─────────────────────────────────────────────────
+
+    #[test]
+    fn evaluate_diagnostics_empty_obs_returns_no_panic() {
+        let diags = evaluate_diagnostics(&[]);
+        // No observations → no diagnostics (some rules fire on empty, but none should panic).
+        drop(diags);
+    }
+
+    #[test]
+    fn evaluate_diagnostics_deduplicates_by_file_line_code() {
+        // Two identical observations should collapse to one diagnostic.
+        let obs1 = Observation {
+            kind: "raw_text".into(),
+            file_path: "fake.rs".into(),
+            line: 1,
+            column: 0,
+            start_byte: 0,
+            end_byte: 10,
+            construct: "raw_text".into(),
+            context: "ANTI-LLM-OCEL-001-TRIGGER".into(),
+            message: "trigger".into(),
+        };
+        let obs2 = obs1.clone();
+        let diags = evaluate_diagnostics(&[obs1, obs2]);
+        let matching: Vec<_> = diags
+            .iter()
+            .filter(|d| d.file_path == "fake.rs")
+            .collect();
+        // Dedup: at most one per (file, line, code) triple.
+        let unique_codes: std::collections::HashSet<_> = matching.iter().map(|d| &d.code).collect();
+        assert_eq!(
+            matching.len(),
+            unique_codes.len(),
+            "diagnostics must be deduplicated by (file, line, code)"
+        );
+    }
+}
