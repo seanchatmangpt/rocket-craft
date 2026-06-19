@@ -654,35 +654,44 @@ fn log_html5(lines: Option<u32>, follow: Option<bool>) -> Result<Value> {
 /// * `archive` - Override the archive directory
 #[verb("pipeline", "html5")]
 fn pipeline_html5(project: String, config: Option<String>, archive: Option<String>) -> Result<Value> {
+    let pipeline_start = std::time::Instant::now();
+
     // Step 1: preflight
     println!("[1/3] Running preflight checks for {}...", project);
+    let t0 = std::time::Instant::now();
     let preflight = do_html5_preflight(Some(project.clone()))?;
+    let preflight_secs = t0.elapsed().as_secs_f64();
     let all_pass = preflight["all_pass"].as_bool().unwrap_or(false);
     if !all_pass {
         return Err(clap_noun_verb::NounVerbError::execution_error(
             format!("Preflight failed for {}. Fix the above issues before cooking.", project)
         ));
     }
-    println!("[1/3] Preflight PASS\n");
+    println!("[1/3] Preflight PASS ({:.1}s)\n", preflight_secs);
 
     // Step 2: cook — default to Shipping for pipeline (production quality)
     let effective_config = config.unwrap_or_else(|| "Shipping".to_string());
     println!("[2/3] Cooking {} ({})...", project, effective_config);
+    let t0 = std::time::Instant::now();
     let cook_result = do_html5_cook(project.clone(), archive.clone(), Some(effective_config))?;
-    println!("[2/3] Cook complete\n");
+    let cook_secs = t0.elapsed().as_secs_f64();
+    println!("[2/3] Cook complete ({:.0}s)\n", cook_secs);
 
     // Step 3: verify (do_html5_cook already auto-verifies, but run explicitly for clean output)
     println!("[3/3] Verifying package...");
+    let t0 = std::time::Instant::now();
     let verify = do_html5_verify(archive, None, Some(project.clone()))?;
+    let verify_secs = t0.elapsed().as_secs_f64();
     let verdict = verify["verdict"].as_str().unwrap_or("UNKNOWN");
     if verdict != "PASS" {
         return Err(clap_noun_verb::NounVerbError::execution_error(
             format!("Package verification failed: verdict={verdict}")
         ));
     }
-    println!("[3/3] Verification PASS\n");
+    println!("[3/3] Verification PASS ({:.1}s)\n", verify_secs);
 
-    println!("[DONE] HTML5 pipeline complete for {project}");
+    let total_secs = pipeline_start.elapsed().as_secs_f64();
+    println!("[DONE] HTML5 pipeline complete for {project} ({:.0}s total)", total_secs);
     println!("  → Run 'rocket html5 serve --project {project}' to serve");
     println!("  → Run 'rocket html5 open --project {project}' to open in browser");
 
@@ -692,5 +701,11 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
         "cook": cook_result,
         "verify": verify,
         "pipeline_verdict": "PASS",
+        "timing_secs": {
+            "preflight": preflight_secs,
+            "cook": cook_secs,
+            "verify": verify_secs,
+            "total": total_secs,
+        }
     }))
 }
