@@ -345,3 +345,48 @@ fn do_html5_preflight(project: Option<String>) -> Result<Value> {
 fn preflight_html5(project: Option<String>) -> Result<Value> {
     do_html5_preflight(project)
 }
+
+/// Open the served HTML5 game in the default browser
+///
+/// Requires `html5 serve` to already be running. Opens the first `.html`
+/// file found in the archive directory in the system browser.
+///
+/// # Arguments
+/// * `archive` - Package directory (default: /tmp/brm-html5-archive/HTML5)
+/// * `port` - Port the server is listening on (default: 8080)
+#[verb("open", "html5")]
+fn open_html5(archive: Option<String>, port: Option<u16>) -> Result<Value> {
+    let dir = archive.unwrap_or_else(|| "/tmp/brm-html5-archive/HTML5".to_string());
+    let port = port.unwrap_or(8080);
+
+    // Find the first .html file in the archive dir
+    let html_file = std::fs::read_dir(&dir)
+        .ok()
+        .and_then(|mut entries| {
+            entries.find_map(|e| {
+                let e = e.ok()?;
+                let name = e.file_name().to_string_lossy().to_string();
+                if name.ends_with(".html") { Some(name) } else { None }
+            })
+        });
+
+    let url = match html_file {
+        Some(file) => format!("http://localhost:{port}/{file}"),
+        None => format!("http://localhost:{port}/"),
+    };
+
+    println!("Opening: {url}");
+
+    let status = std::process::Command::new("open")
+        .arg(&url)
+        .status()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+
+    if !status.success() {
+        return Err(clap_noun_verb::NounVerbError::execution_error(
+            "Failed to open browser — try opening the URL manually".to_string(),
+        ));
+    }
+
+    Ok(serde_json::json!({ "url": url }))
+}
