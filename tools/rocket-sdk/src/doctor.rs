@@ -54,6 +54,7 @@ impl RocketDoctor {
             self.check_html5_toolchain(),
             self.check_ggen(),
             self.check_anti_llm_cheat_lsp(),
+            self.check_node(),
             self.check_html5_package(),
             self.check_ue4_build_scripts(),
             self.check_nexus_types(),
@@ -400,12 +401,7 @@ impl RocketDoctor {
 
     fn check_html5_toolchain(&self) -> CheckResult {
         // 1. Verify Python 3 is available for UAT/UHT scripts.
-        let python_ok = match discover_python3() {
-            Some(path) => {
-                Some(format!("Python 3 at {}", path.display()))
-            }
-            None => None,
-        };
+        let python_ok = discover_python3().map(|path| format!("Python 3 at {}", path.display()));
 
         // 2. Verify emscripten — check engine-bundled emsdk first, then PATH.
         let emsdk_found = self.find_ue4_emsdk();
@@ -702,6 +698,65 @@ impl RocketDoctor {
                 ),
                 details: None,
             }
+        }
+    }
+
+    /// Quick compile-check of `nexus-types` — the zero-dependency root of the
+    /// nexus-engine workspace. A failure here means the foundational shared types
+    /// are broken, which would cascade to every other nexus crate.
+    /// Check that Node.js ≥20 and npm are available — required for `rocket pwa`.
+    fn check_node(&self) -> CheckResult {
+        let node_output = Command::new("node").arg("--version").output();
+        let npm_output = Command::new("npm").arg("--version").output();
+
+        let node_version = node_output.ok().and_then(|o| {
+            if o.status.success() {
+                String::from_utf8(o.stdout).ok().map(|s| s.trim().to_string())
+            } else {
+                None
+            }
+        });
+
+        let npm_ok = npm_output
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+
+        match (node_version, npm_ok) {
+            (Some(v), true) => {
+                // Warn if Node < 20 (pwa-staff requires Node 20.x)
+                let major: Option<u32> = v
+                    .trim_start_matches('v')
+                    .split('.')
+                    .next()
+                    .and_then(|s| s.parse().ok());
+                if major.map(|m| m >= 20).unwrap_or(false) {
+                    CheckResult {
+                        name: "Node.js".to_string(),
+                        status: CheckStatus::Pass,
+                        message: format!("Node.js {v} with npm"),
+                        details: None,
+                    }
+                } else {
+                    CheckResult {
+                        name: "Node.js".to_string(),
+                        status: CheckStatus::Warn,
+                        message: format!("Node.js {v} found but pwa-staff requires ≥20"),
+                        details: Some("Upgrade via nvm: `nvm install 20 && nvm use 20`".into()),
+                    }
+                }
+            }
+            (Some(v), false) => CheckResult {
+                name: "Node.js".to_string(),
+                status: CheckStatus::Warn,
+                message: format!("Node.js {v} found but npm not found"),
+                details: Some("Install npm: `npm install -g npm`".into()),
+            },
+            (None, _) => CheckResult {
+                name: "Node.js".to_string(),
+                status: CheckStatus::Warn,
+                message: "Node.js not found — required for `rocket pwa build`".to_string(),
+                details: Some("Install via nvm: `nvm install 20 && nvm use 20`".into()),
+            },
         }
     }
 
@@ -1038,5 +1093,25 @@ mod tests {
             result.message,
             "Branch: HEAD detached or empty, 1 uncommitted changes"
         );
+    }
+
+    // ── check_node ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn node_check_returns_a_result() {
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_node();
+        assert_eq!(result.name, "Node.js");
+        // Accept any status — the check should not panic regardless of env
+        matches!(result.status, CheckStatus::Pass | CheckStatus::Warn | CheckStatus::Fail);
+    }
+
+    #[test]
+    fn node_check_pass_or_warn_status_has_nonempty_message() {
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_node();
+        assert!(!result.message.is_empty());
     }
 }
