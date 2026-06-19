@@ -110,8 +110,10 @@ ue4-uat-*.log
 # Android Keystores
 *.keystore
 
-# Supabase
+# Supabase — ignore top-level supabase/ (local dev docker state)
+# but track the nuxt-shell migration source
 supabase/
+!nuxt-shell/supabase/
 *.env
 .env
 .env.*

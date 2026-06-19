@@ -1,6 +1,7 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Player {
@@ -15,6 +16,45 @@ pub struct LeaderboardEntry {
     pub player_id: i64,
     pub score: i64,
     pub rank: i64,
+}
+
+/// A cook receipt pushed from the Rust CLI to Supabase `game_receipts`.
+///
+/// Mirrors the shape written by `Html5PackageReport::write_receipt()` and
+/// accepted by the Nuxt server route `POST /api/game/receipt`.
+#[derive(Serialize, Debug)]
+pub struct CookReceipt {
+    /// `null` — CLI-initiated sessions have no browser player_id.
+    pub session_id: Option<String>,
+    /// "PASS" or "FAIL"
+    pub verdict: String,
+    /// Human label: "HTML5CookVerify", "WasmMagicCheck", etc.
+    pub milestone: String,
+    /// Ordered list of OCEL activities witnessed during the cook.
+    pub ocel_lifecycle: Vec<String>,
+    /// Total number of OCEL events emitted by the cook pipeline.
+    pub ocel_event_count: u32,
+    /// "rocket_cli" — distinguishes Rust-sourced receipts from browser receipts.
+    pub engine_source: String,
+    /// SHA-256 hex of the serialised receipt payload.
+    pub receipt_hash: String,
+    /// RFC 3339 timestamp.
+    pub proven_at: String,
+    /// Free-form metadata (wasm_mb, archive_dir, companion files, …).
+    pub payload: HashMap<String, serde_json::Value>,
+}
+
+/// An OCEL event batch item, for bulk-ingesting cook-pipeline events into Supabase.
+#[derive(Serialize, Debug)]
+pub struct OcelEventRow {
+    pub session_id: Option<String>,
+    pub activity: String,
+    pub timestamp_ms: u64,
+    pub object_refs: Vec<String>,
+    pub attributes: serde_json::Value,
+    pub prev_hash: Option<String>,
+    pub event_hash: String,
+    pub seq: u32,
 }
 
 pub struct SupabaseService {
@@ -32,34 +72,143 @@ impl SupabaseService {
         }
     }
 
+    fn rest_headers(&self) -> reqwest::header::HeaderMap {
+        let mut h = reqwest::header::HeaderMap::new();
+        h.insert("apikey", self.anon_key.parse().unwrap());
+        h.insert(
+            "Authorization",
+            format!("Bearer {}", self.anon_key).parse().unwrap(),
+        );
+        h.insert("Content-Type", "application/json".parse().unwrap());
+        h.insert("Prefer", "return=minimal".parse().unwrap());
+        h
+    }
+
     pub async fn get_players(&self) -> Result<Vec<Player>> {
         let response = self
             .client
             .get(format!("{}/rest/v1/players?select=*", self.url))
-            .header("apikey", &self.anon_key)
-            .header("Authorization", &format!("Bearer {}", self.anon_key))
+            .headers(self.rest_headers())
             .send()
             .await?;
-
         response.error_for_status_ref()?;
-
-        let players = response.json::<Vec<Player>>().await?;
-        Ok(players)
+        Ok(response.json::<Vec<Player>>().await?)
     }
 
     pub async fn get_leaderboard(&self) -> Result<Vec<LeaderboardEntry>> {
         let response = self
             .client
             .get(format!("{}/rest/v1/leaderboard?select=*", self.url))
-            .header("apikey", &self.anon_key)
-            .header("Authorization", &format!("Bearer {}", self.anon_key))
+            .headers(self.rest_headers())
             .send()
             .await?;
-
         response.error_for_status_ref()?;
+        Ok(response.json::<Vec<LeaderboardEntry>>().await?)
+    }
 
-        let leaderboard = response.json::<Vec<LeaderboardEntry>>().await?;
-        Ok(leaderboard)
+    /// Push a cook receipt to `game_receipts`.
+    ///
+    /// The leaderboard Postgres trigger fires automatically on PASS verdicts,
+    /// so this single call closes the cook→leaderboard pipeline.
+    pub async fn push_cook_receipt(&self, receipt: &CookReceipt) -> Result<()> {
+        let body = serde_json::to_string(receipt)
+            .context("failed to serialise CookReceipt")?;
+        let resp = self
+            .client
+            .post(format!("{}/rest/v1/game_receipts", self.url))
+            .headers(self.rest_headers())
+            .body(body)
+            .send()
+            .await
+            .context("POST game_receipts failed")?;
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            anyhow::bail!("game_receipts insert {status}: {body}");
+        }
+        Ok(())
+    }
+
+    /// Ping the Supabase REST API and verify each pipeline table is accessible.
+    ///
+    /// Returns `(table_name, is_ok, http_status_or_error)` for each table.
+    pub async fn ping(&self) -> (Vec<(String, bool, String)>, u16) {
+        let tables = ["game_receipts", "ocel_events", "game_sessions", "leaderboard", "players"];
+        let mut checks = Vec::new();
+
+        let health = self.client
+            .get(format!("{}/rest/v1/", self.url))
+            .header("apikey", &self.anon_key)
+            .send()
+            .await
+            .map(|r| r.status().as_u16())
+            .unwrap_or(0);
+
+        for table in &tables {
+            let resp = self.client
+                .get(format!("{}/rest/v1/{table}?limit=0", self.url))
+                .headers(self.rest_headers())
+                .send()
+                .await;
+            let (ok, msg) = match resp {
+                Ok(r) => {
+                    let s = r.status().as_u16();
+                    (s == 200 || s == 406, format!("HTTP {s}"))
+                }
+                Err(e) => (false, format!("error: {e}")),
+            };
+            checks.push((table.to_string(), ok, msg));
+        }
+        (checks, health)
+    }
+
+    /// Fetch the 10 most recent game receipts ordered by proven_at DESC.
+    pub async fn recent_receipts(&self) -> Result<Vec<serde_json::Value>> {
+        let resp = self.client
+            .get(format!(
+                "{}/rest/v1/game_receipts\
+                 ?select=id,verdict,milestone,engine_source,ocel_event_count,proven_at\
+                 &order=proven_at.desc&limit=10",
+                self.url
+            ))
+            .headers(self.rest_headers())
+            .send()
+            .await
+            .context("GET game_receipts failed")?;
+        if resp.status().is_success() {
+            Ok(resp.json::<Vec<serde_json::Value>>().await?)
+        } else {
+            Ok(vec![])
+        }
+    }
+
+    /// Bulk-insert OCEL events from a cook pipeline run into `ocel_events`.
+    ///
+    /// Uses PostgREST bulk insert (JSON array body).  Non-fatal on partial
+    /// failure — caller should log but not abort the cook pipeline.
+    pub async fn push_ocel_events(&self, events: &[OcelEventRow]) -> Result<()> {
+        if events.is_empty() {
+            return Ok(());
+        }
+        let body = serde_json::to_string(events)
+            .context("failed to serialise OCEL events")?;
+        let mut headers = self.rest_headers();
+        // Overwrite Prefer so PostgREST performs a bulk insert without returning rows.
+        headers.insert("Prefer", "return=minimal,resolution=merge-duplicates".parse().unwrap());
+        let resp = self
+            .client
+            .post(format!("{}/rest/v1/ocel_events", self.url))
+            .headers(headers)
+            .body(body)
+            .send()
+            .await
+            .context("POST ocel_events failed")?;
+        if !resp.status().is_success() {
+            let status = resp.status();
+            let body = resp.text().await.unwrap_or_default();
+            anyhow::bail!("ocel_events bulk insert {status}: {body}");
+        }
+        Ok(())
     }
 }
 
@@ -106,5 +255,45 @@ mod tests {
     fn player_debug_format_contains_name() {
         let p = Player { id: 1, name: "Tester".into(), score: 0 };
         assert!(format!("{:?}", p).contains("Tester"));
+    }
+
+    #[test]
+    fn cook_receipt_serializes_with_all_fields() {
+        let r = CookReceipt {
+            session_id: None,
+            verdict: "PASS".into(),
+            milestone: "HTML5CookVerify".into(),
+            ocel_lifecycle: vec!["CookStarted".into(), "WasmPackaged".into()],
+            ocel_event_count: 2,
+            engine_source: "rocket_cli".into(),
+            receipt_hash: "abc123".into(),
+            proven_at: "2026-06-19T00:00:00Z".into(),
+            payload: {
+                let mut m = HashMap::new();
+                m.insert("wasm_mb".into(), json!(175.4));
+                m
+            },
+        };
+        let v = serde_json::to_value(&r).unwrap();
+        assert_eq!(v["verdict"], "PASS");
+        assert_eq!(v["engine_source"], "rocket_cli");
+        assert_eq!(v["ocel_lifecycle"][0], "CookStarted");
+    }
+
+    #[test]
+    fn ocel_event_row_serializes() {
+        let evt = OcelEventRow {
+            session_id: None,
+            activity: "WasmPackaged".into(),
+            timestamp_ms: 1_700_000_000_000,
+            object_refs: vec!["brm-wasm".into()],
+            attributes: json!({ "size_mb": 175.4 }),
+            prev_hash: None,
+            event_hash: "deadbeef".into(),
+            seq: 1,
+        };
+        let v = serde_json::to_value(&evt).unwrap();
+        assert_eq!(v["activity"], "WasmPackaged");
+        assert_eq!(v["seq"], 1);
     }
 }

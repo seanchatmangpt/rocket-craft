@@ -1,0 +1,41 @@
+# Supabase local development configuration for rocket-craft nuxt-shell.
+# Run `supabase start` to spin up the local stack (requires Docker Desktop).
+# Run `supabase db push` to apply migrations to the local instance.
+# Run `supabase db push --db-url $SUPABASE_DB_URL` to apply to a hosted project.
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+# Supabase local anon key (safe to commit — only works against local instance)
+anon_key = "sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH"
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/game"]
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false  # dev only — disable for faster iteration
+
+[realtime]
+enabled = true
