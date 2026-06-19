@@ -95,3 +95,63 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(file: &str, construct: &str) -> Observation {
+        Observation {
+            file_path: file.into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "ast_node".into(),
+            construct: construct.into(), context: "ctx".into(), message: String::new(),
+        }
+    }
+
+    #[test]
+    fn empty_obs_returns_no_diags() {
+        assert!(evaluate(&[]).is_empty());
+    }
+
+    #[test]
+    fn trace_constant_push_in_prod_triggers_trace_001() {
+        let diags = evaluate(&[obs("src/lib.rs", "trace_constant_push")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-TRACE-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn trace_constant_push_in_test_is_allowed() {
+        let diags = evaluate(&[obs("tests/foo.rs", "trace_constant_push")]);
+        assert!(diags.iter().all(|d| d.code != "ANTI-LLM-TRACE-001"));
+    }
+
+    #[test]
+    fn trace_len_magic_assert_triggers_trace_002() {
+        let diags = evaluate(&[obs("src/lib.rs", "trace_len_magic_assert")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-TRACE-002");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn trace_static_format_triggers_trace_003() {
+        let diags = evaluate(&[obs("src/lib.rs", "trace_static_format")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-TRACE-003");
+    }
+
+    #[test]
+    fn trace_rules_exempt_test_paths() {
+        for construct in &["trace_len_magic_assert", "trace_static_format"] {
+            let diags = evaluate(&[obs("tests/bar.rs", construct)]);
+            assert!(diags.is_empty(), "{construct} in tests/ must not fire");
+        }
+    }
+
+    #[test]
+    fn unknown_construct_produces_no_diag() {
+        let diags = evaluate(&[obs("src/lib.rs", "some_other_construct")]);
+        assert!(diags.is_empty());
+    }
+}

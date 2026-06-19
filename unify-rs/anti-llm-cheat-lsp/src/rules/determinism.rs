@@ -135,3 +135,106 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(file: &str, kind: &str, construct: &str) -> Observation {
+        Observation {
+            file_path: file.into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: kind.into(), construct: construct.into(),
+            context: String::new(), message: String::new(),
+        }
+    }
+
+    #[test]
+    fn empty_returns_no_diags() {
+        assert!(evaluate(&[]).is_empty());
+    }
+
+    // ── CHEAT-001 ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn hardcoded_metric_triggers_cheat_001() {
+        let diags = evaluate(&[obs("src/breed.rs", "raw_text", "let fitness =")]);
+        assert_eq!(diags.len(), 1);
+        assert_eq!(diags[0].code, "ANTI-LLM-CHEAT-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn hardcoded_score_triggers_cheat_001() {
+        let diags = evaluate(&[obs("src/lib.rs", "raw_text", "let score =")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-CHEAT-001");
+    }
+
+    #[test]
+    fn unknown_raw_text_does_not_trigger_cheat_001() {
+        let diags = evaluate(&[obs("src/lib.rs", "raw_text", "let result =")]);
+        assert!(diags.iter().all(|d| d.code != "ANTI-LLM-CHEAT-001"));
+    }
+
+    // ── CHEAT-002 ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn seeded_rng_in_prod_triggers_cheat_002() {
+        let diags = evaluate(&[obs("src/lib.rs", "ast_node", "seed_from_u64")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-CHEAT-002");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn seeded_rng_in_test_file_is_allowed() {
+        let diags = evaluate(&[obs("tests/foo.rs", "ast_node", "seed_from_u64")]);
+        assert!(diags.iter().all(|d| d.code != "ANTI-LLM-CHEAT-002"));
+    }
+
+    #[test]
+    fn seeded_rng_in_negative_controls_fires() {
+        // negative_controls/ is explicitly NOT excluded
+        let diags = evaluate(&[obs("negative_controls/cheat.rs", "ast_node", "seed_from_u64")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-CHEAT-002");
+    }
+
+    // ── CHEAT-003 ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn hardcoded_output_hash_triggers_cheat_003() {
+        let diags = evaluate(&[obs("src/lib.rs", "raw_text", "\"output_hash\": \"")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-CHEAT-003");
+        assert!(diags[0].blocking);
+    }
+
+    // ── STRANGE-010 ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn allow_cheat_attr_in_prod_triggers_strange_010() {
+        let diags = evaluate(&[obs("src/lib.rs", "ast_node", "allow_cheat_attr")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-STRANGE-010");
+        assert!(!diags[0].blocking);
+    }
+
+    #[test]
+    fn allow_cheat_attr_in_test_is_allowed() {
+        let diags = evaluate(&[obs("tests/foo.rs", "ast_node", "allow_cheat_attr")]);
+        assert!(diags.iter().all(|d| d.code != "ANTI-LLM-STRANGE-010"));
+    }
+
+    // ── STRANGE-011 ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn unsafe_block_in_prod_triggers_strange_011() {
+        let diags = evaluate(&[obs("src/lib.rs", "ast_node", "unsafe_block")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-STRANGE-011");
+        assert!(!diags[0].blocking);
+    }
+
+    #[test]
+    fn unsafe_block_in_test_is_allowed() {
+        let diags = evaluate(&[obs("tests/foo.rs", "ast_node", "unsafe_block")]);
+        assert!(diags.iter().all(|d| d.code != "ANTI-LLM-STRANGE-011"));
+    }
+}

@@ -320,3 +320,108 @@ impl Renderer for WebGL2Renderer {
         self.frame_count
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── TestRenderer draw calls ───────────────────────────────────────────────
+
+    #[test]
+    fn new_renderer_has_no_calls() {
+        let r = TestRenderer::new();
+        assert_eq!(r.call_count(), 0);
+        assert_eq!(r.frame_count(), 0);
+    }
+
+    #[test]
+    fn clear_records_draw_call() {
+        let mut r = TestRenderer::new();
+        r.clear();
+        assert_eq!(r.call_count(), 1);
+        assert!(r.has_call(&DrawCall::Clear));
+    }
+
+    #[test]
+    fn draw_health_bar_records_call() {
+        let mut r = TestRenderer::new();
+        r.draw_health_bar(10.0, 20.0, 100.0, 10.0, 0.75);
+        assert!(r.has_call(&DrawCall::HealthBar {
+            x: 10.0, y: 20.0, width: 100.0, height: 10.0, percentage: 0.75
+        }));
+    }
+
+    #[test]
+    fn draw_score_records_call() {
+        let mut r = TestRenderer::new();
+        r.draw_score(9999);
+        assert!(r.has_call(&DrawCall::Score(9999)));
+    }
+
+    #[test]
+    fn draw_entity_count_records_call() {
+        let mut r = TestRenderer::new();
+        r.draw_entity_count(42);
+        assert!(r.has_call(&DrawCall::EntityCount(42)));
+    }
+
+    #[test]
+    fn draw_tick_records_call() {
+        let mut r = TestRenderer::new();
+        r.draw_tick(100);
+        assert!(r.has_call(&DrawCall::Tick(100)));
+    }
+
+    #[test]
+    fn present_increments_frame_count() {
+        let mut r = TestRenderer::new();
+        r.present();
+        assert_eq!(r.frame_count(), 1);
+        r.present();
+        assert_eq!(r.frame_count(), 2);
+    }
+
+    #[test]
+    fn present_records_present_draw_call() {
+        let mut r = TestRenderer::new();
+        r.present();
+        assert!(r.has_call(&DrawCall::Present));
+    }
+
+    #[test]
+    fn clear_calls_removes_all() {
+        let mut r = TestRenderer::new();
+        r.clear();
+        r.draw_score(1);
+        r.clear_calls();
+        assert_eq!(r.call_count(), 0);
+        // frame_count is unaffected by clearing the call buffer
+    }
+
+    #[test]
+    fn calls_of_type_filters_correctly() {
+        let mut r = TestRenderer::new();
+        r.clear();
+        r.draw_score(5);
+        r.clear();
+        let clears = r.calls_of_type("Clear");
+        assert_eq!(clears.len(), 2);
+        let scores = r.calls_of_type("Score");
+        assert_eq!(scores.len(), 1);
+    }
+
+    #[test]
+    fn full_frame_sequence() {
+        let mut r = TestRenderer::new();
+        r.clear();
+        r.draw_health_bar(0.0, 0.0, 200.0, 15.0, 0.5);
+        r.draw_score(100);
+        r.draw_entity_count(3);
+        r.draw_tick(1);
+        r.present();
+
+        assert_eq!(r.frame_count(), 1);
+        assert_eq!(r.call_count(), 6);
+        assert!(r.calls_of_type("HealthBar").len() == 1);
+    }
+}
