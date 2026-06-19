@@ -1,7 +1,7 @@
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs::File;
 use std::io::Read;
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Vec3 {
@@ -69,7 +69,10 @@ fn main() {
                 "Zone detected: {} ({}) at x:[{}, {}], y:[{}, {}]",
                 actor.name,
                 actor.label.as_deref().unwrap_or(""),
-                x_min, x_max, y_min, y_max
+                x_min,
+                x_max,
+                y_min,
+                y_max
             );
             zones.push(actor);
         }
@@ -89,7 +92,14 @@ fn main() {
     }
 
     // Check if we have at least one zone and one bot/other actor
-    let has_bot = actors.iter().any(|a| a.name.to_lowercase().contains("bot") || a.class_name.as_deref().unwrap_or("").to_lowercase().contains("bot"));
+    let has_bot = actors.iter().any(|a| {
+        a.name.to_lowercase().contains("bot")
+            || a.class_name
+                .as_deref()
+                .unwrap_or("")
+                .to_lowercase()
+                .contains("bot")
+    });
     if !has_bot {
         println!("Note: No actor with 'bot' in name or class found.");
     }

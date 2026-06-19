@@ -35,27 +35,21 @@ fn do_wasm_run(file: String) -> Result<Value> {
 
 fn do_wasm_verify(file: String, min_size: Option<u64>) -> Result<Value> {
     use std::path::Path;
-    let min_size = min_size.unwrap_or(1_048_576);
     let path = Path::new(&file);
-    // Basic check: read file, verify WASM magic bytes \0asm
-    let bytes = std::fs::read(path).map_err(|e| {
-        clap_noun_verb::NounVerbError::execution_error(format!("cannot read {}: {}", file, e))
+    let info = rocket_sdk::wasm::validate_wasm_artifact(path, min_size).map_err(|e| {
+        clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e))
     })?;
-    let size = bytes.len() as u64;
-    if size < min_size {
-        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
-            "WASM file too small: {} bytes (min: {} bytes)",
-            size, min_size
-        )));
-    }
-    if bytes.len() < 4 || &bytes[0..4] != b"\0asm" {
-        return Err(clap_noun_verb::NounVerbError::execution_error(format!(
-            "Invalid WASM magic bytes in: {}",
-            file
-        )));
-    }
-    println!("PASS: {} ({} MB)", file, size / 1_048_576);
-    Ok(serde_json::json!({"status": "pass", "path": file, "size_bytes": size}))
+    println!(
+        "PASS: {} ({:.1} MB)",
+        file,
+        info.size_bytes as f64 / 1_048_576.0
+    );
+    Ok(serde_json::json!({
+        "status": "pass",
+        "path": file,
+        "size_bytes": info.size_bytes,
+        "size_mb": info.size_bytes as f64 / 1_048_576.0,
+    }))
 }
 
 /// Execute a WASM plugin directly

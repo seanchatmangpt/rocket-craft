@@ -1,16 +1,25 @@
 // Genuine WebAssembly Gait Engine
 
 #[no_mangle]
-pub extern "C" fn get_gait_rotation_x(bone_id: i32, sec: f32, is_moving: i32, is_space: i32) -> f32 {
+pub extern "C" fn get_gait_rotation_x(
+    bone_id: i32,
+    sec: f32,
+    is_moving: i32,
+    is_space: i32,
+) -> f32 {
     let mut rot = 0.0;
     if is_moving != 0 {
-        if bone_id == 6 { // left_leg
+        if bone_id == 6 {
+            // left_leg
             rot = (sec * 12.0).sin() * 0.7;
-        } else if bone_id == 7 { // right_leg
+        } else if bone_id == 7 {
+            // right_leg
             rot = -(sec * 12.0).sin() * 0.7;
-        } else if bone_id == 4 { // left_arm
+        } else if bone_id == 4 {
+            // left_arm
             rot = -(sec * 12.0).sin() * 0.4;
-        } else if bone_id == 5 { // right_arm
+        } else if bone_id == 5 {
+            // right_arm
             rot = (sec * 12.0).sin() * 0.4;
         }
     }
@@ -21,12 +30,19 @@ pub extern "C" fn get_gait_rotation_x(bone_id: i32, sec: f32, is_moving: i32, is
 }
 
 #[no_mangle]
-pub extern "C" fn get_gait_rotation_z(bone_id: i32, _sec: f32, _is_moving: i32, is_space: i32) -> f32 {
+pub extern "C" fn get_gait_rotation_z(
+    bone_id: i32,
+    _sec: f32,
+    _is_moving: i32,
+    is_space: i32,
+) -> f32 {
     let mut rot = 0.0;
     if is_space != 0 {
-        if bone_id == 4 { // left_arm
+        if bone_id == 4 {
+            // left_arm
             rot = 1.3;
-        } else if bone_id == 5 { // right_arm
+        } else if bone_id == 5 {
+            // right_arm
             rot = -1.3;
         }
     }
@@ -37,7 +53,8 @@ pub extern "C" fn get_gait_rotation_z(bone_id: i32, _sec: f32, _is_moving: i32, 
 pub extern "C" fn get_foundry_rotation(bone_id: i32, axis: i32, sec: f32) -> f32 {
     // bone_id: 1 = spine, 2 = torso, 3 = head, 4 = left_arm, 5 = right_arm, 6 = left_leg, 7 = right_leg
     match bone_id {
-        1 => { // spine: [sec * 0.5, sec * 0.7, sec * 0.3]
+        1 => {
+            // spine: [sec * 0.5, sec * 0.7, sec * 0.3]
             match axis {
                 0 => sec * 0.5,
                 1 => sec * 0.7,
@@ -45,7 +62,8 @@ pub extern "C" fn get_foundry_rotation(bone_id: i32, axis: i32, sec: f32) -> f32
                 _ => 0.0,
             }
         }
-        2 => { // torso: [sec * 0.6, sec * 0.4, sec * 0.8]
+        2 => {
+            // torso: [sec * 0.6, sec * 0.4, sec * 0.8]
             match axis {
                 0 => sec * 0.6,
                 1 => sec * 0.4,
@@ -53,7 +71,8 @@ pub extern "C" fn get_foundry_rotation(bone_id: i32, axis: i32, sec: f32) -> f32
                 _ => 0.0,
             }
         }
-        3 => { // head: [sec * 0.3, sec * 0.9, sec * 0.2]
+        3 => {
+            // head: [sec * 0.3, sec * 0.9, sec * 0.2]
             match axis {
                 0 => sec * 0.3,
                 1 => sec * 0.9,
@@ -61,7 +80,8 @@ pub extern "C" fn get_foundry_rotation(bone_id: i32, axis: i32, sec: f32) -> f32
                 _ => 0.0,
             }
         }
-        4 => { // left_arm: [sec * 0.8, sec * 0.2, sec * 0.5]
+        4 => {
+            // left_arm: [sec * 0.8, sec * 0.2, sec * 0.5]
             match axis {
                 0 => sec * 0.8,
                 1 => sec * 0.2,
@@ -69,7 +89,8 @@ pub extern "C" fn get_foundry_rotation(bone_id: i32, axis: i32, sec: f32) -> f32
                 _ => 0.0,
             }
         }
-        5 => { // right_arm: [sec * 0.4, sec * 0.6, sec * 0.9]
+        5 => {
+            // right_arm: [sec * 0.4, sec * 0.6, sec * 0.9]
             match axis {
                 0 => sec * 0.4,
                 1 => sec * 0.6,
@@ -77,7 +98,8 @@ pub extern "C" fn get_foundry_rotation(bone_id: i32, axis: i32, sec: f32) -> f32
                 _ => 0.0,
             }
         }
-        6 => { // left_leg: [sec * 0.9, sec * 0.3, sec * 0.4]
+        6 => {
+            // left_leg: [sec * 0.9, sec * 0.3, sec * 0.4]
             match axis {
                 0 => sec * 0.9,
                 1 => sec * 0.3,
@@ -85,7 +107,8 @@ pub extern "C" fn get_foundry_rotation(bone_id: i32, axis: i32, sec: f32) -> f32
                 _ => 0.0,
             }
         }
-        7 => { // right_leg: [sec * 0.2, sec * 0.8, sec * 0.6]
+        7 => {
+            // right_leg: [sec * 0.2, sec * 0.8, sec * 0.6]
             match axis {
                 0 => sec * 0.2,
                 1 => sec * 0.8,
