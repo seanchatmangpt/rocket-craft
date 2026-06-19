@@ -117,3 +117,44 @@ impl DeploymentManager {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::spec::WorldSpec;
+    use tempfile::tempdir;
+
+    #[test]
+    fn deploy_fails_when_log_dir_does_not_exist() {
+        let spec = WorldSpec::new();
+        let err = DeploymentManager::deploy(&spec, Path::new("/nonexistent/dir/deploy.log"))
+            .unwrap_err();
+        assert!(matches!(err, GenieError::Deployment(_)));
+        assert!(err.to_string().contains("Deployment") || err.to_string().contains("Failed") || err.to_string().contains("log"));
+    }
+
+    #[test]
+    fn deploy_creates_log_file() {
+        let dir = tempdir().unwrap();
+        let log_path = dir.path().join("deploy.log");
+        let spec = WorldSpec::new();
+        // deploy will fail on the UE4 packager step (no engine), but should have
+        // created the log file before that point
+        let _ = DeploymentManager::deploy(&spec, &log_path);
+        assert!(log_path.exists(), "log file must be created before packager runs");
+        let content = std::fs::read_to_string(&log_path).unwrap();
+        assert!(content.contains("Genie 26 Deployment Log"));
+        assert!(content.contains("Timestamp MS"));
+    }
+
+    #[test]
+    fn deploy_log_records_place_count() {
+        let dir = tempdir().unwrap();
+        let log_path = dir.path().join("deploy.log");
+        let spec = WorldSpec::new(); // 0 places, 0 actors
+        let _ = DeploymentManager::deploy(&spec, &log_path);
+        let content = std::fs::read_to_string(&log_path).unwrap();
+        assert!(content.contains("Places: 0"));
+        assert!(content.contains("Actors: 0"));
+    }
+}
