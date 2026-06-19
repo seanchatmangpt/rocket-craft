@@ -806,11 +806,35 @@ fn do_html5_log(lines: Option<u32>, follow: bool) -> Result<Value> {
         ));
     }
 
+    // Surface cook errors without requiring --follow or a full tail read
+    let errors = extract_cook_errors(&log_path);
+    if !errors.is_empty() {
+        println!("[errors detected]");
+        for e in &errors {
+            println!("  {e}");
+        }
+    }
+
     Ok(serde_json::json!({
         "log": log_path.display().to_string(),
         "lines": n,
         "follow": follow,
+        "cook_errors": errors,
     }))
+}
+
+/// Scan a cook log for lines that signal failure without reading the entire file.
+/// Returns up to 20 matching lines (ERROR/FAILED/Fatal/PackagingError patterns).
+fn extract_cook_errors(log_path: &std::path::Path) -> Vec<String> {
+    use std::io::{BufRead, BufReader};
+    let Ok(file) = std::fs::File::open(log_path) else { return vec![]; };
+    let reader = BufReader::new(file);
+    let patterns = ["Error:", "ERROR:", "FAILED:", "Fatal:", "PackagingError", "LogCook: Error"];
+    reader.lines()
+        .filter_map(|l| l.ok())
+        .filter(|line| patterns.iter().any(|p| line.contains(p)))
+        .take(20)
+        .collect()
 }
 
 /// Show the tail of the most recent HTML5 cook log
@@ -947,6 +971,45 @@ mod tests {
         let dir = TempDir::new().unwrap();
         // Must not panic on an empty directory
         patch_html_for_ui_input(dir.path());
+    }
+
+    #[test]
+    fn extract_cook_errors_finds_error_lines() {
+        let dir = TempDir::new().unwrap();
+        let log = dir.path().join("ue4-cook.log");
+        fs::write(&log, "LogCook: Info: Processing...\nError: Missing asset 'Foo'\nLogCook: Info: Done\nERROR: Build failed\n").unwrap();
+
+        let errors = extract_cook_errors(&log);
+        assert_eq!(errors.len(), 2);
+        assert!(errors[0].contains("Missing asset"));
+        assert!(errors[1].contains("Build failed"));
+    }
+
+    #[test]
+    fn extract_cook_errors_empty_on_clean_log() {
+        let dir = TempDir::new().unwrap();
+        let log = dir.path().join("ue4-cook.log");
+        fs::write(&log, "LogCook: Info: Cook complete\nLogHTML5: Success\n").unwrap();
+
+        let errors = extract_cook_errors(&log);
+        assert!(errors.is_empty());
+    }
+
+    #[test]
+    fn extract_cook_errors_caps_at_20() {
+        let dir = TempDir::new().unwrap();
+        let log = dir.path().join("ue4-cook.log");
+        let many_errors: String = (0..30).map(|i| format!("Error: asset{i} missing\n")).collect();
+        fs::write(&log, many_errors).unwrap();
+
+        let errors = extract_cook_errors(&log);
+        assert_eq!(errors.len(), 20, "must cap at 20 errors");
+    }
+
+    #[test]
+    fn extract_cook_errors_missing_file_returns_empty() {
+        let errors = extract_cook_errors(std::path::Path::new("/nonexistent/cook.log"));
+        assert!(errors.is_empty());
     }
 
     #[test]
