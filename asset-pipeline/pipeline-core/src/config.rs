@@ -159,4 +159,29 @@ output_dir = "/tmp/out"
         assert_eq!(cfg.pipeline.max_file_mb, cfg2.pipeline.max_file_mb);
         assert_eq!(cfg.pipeline.blender_bin, cfg2.pipeline.blender_bin);
     }
+
+    #[test]
+    fn from_file_reads_and_parses_toml() {
+        let dir = tempfile::TempDir::new().unwrap();
+        let path = dir.path().join("pipeline.toml");
+        std::fs::write(&path, PipelineConfig::example_toml()).unwrap();
+        let cfg = PipelineConfig::from_file(&path).expect("from_file should succeed");
+        assert_eq!(cfg.pipeline.max_file_mb, 500);
+        assert_eq!(cfg.pipeline.log_level, "info");
+    }
+
+    #[test]
+    fn from_file_returns_error_for_missing_file() {
+        let result = PipelineConfig::from_file(std::path::Path::new("/nonexistent/pipeline.toml"));
+        assert!(result.is_err());
+        if let Err(PipelineError::Config(msg)) = result {
+            assert!(!msg.is_empty());
+        }
+    }
+
+    #[test]
+    fn validate_passes_for_valid_config() {
+        let cfg: PipelineConfig = toml::from_str(PipelineConfig::example_toml()).unwrap();
+        assert!(cfg.validate().is_ok());
+    }
 }
