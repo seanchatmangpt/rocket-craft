@@ -149,4 +149,24 @@ mod tests {
         let result = Manifest::from_toml(toml);
         assert!(result.is_err());
     }
+
+    #[test]
+    fn default_for_name_is_preserved() {
+        let m = Manifest::default_for("my-crate");
+        assert_eq!(m.name, "my-crate");
+    }
+
+    #[test]
+    fn to_toml_round_trips_name() {
+        let m = Manifest::default_for("rocket-rdf");
+        let toml = m.to_toml();
+        let parsed = Manifest::from_toml(&toml).unwrap();
+        assert_eq!(parsed.name, "rocket-rdf");
+    }
+
+    #[test]
+    fn from_toml_invalid_syntax_returns_error() {
+        let result = Manifest::from_toml("<<< invalid >>>");
+        assert!(result.is_err());
+    }
 }
