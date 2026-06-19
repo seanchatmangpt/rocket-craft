@@ -491,3 +491,116 @@ impl ListingMetadata {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── MarketObjectType ──────────────────────────────────────────────────────
+
+    #[test]
+    fn market_object_type_as_str_nonempty() {
+        let types = [
+            MarketObjectType::Player, MarketObjectType::Listing,
+            MarketObjectType::Mech, MarketObjectType::FarmCell,
+        ];
+        for t in &types {
+            assert!(!t.as_str().is_empty(), "{:?}.as_str() must not be empty", t);
+        }
+    }
+
+    // ── MarketEventKind ───────────────────────────────────────────────────────
+
+    #[test]
+    fn event_kind_activity_names_are_nonempty() {
+        let kinds = [
+            MarketEventKind::Listed, MarketEventKind::BidPlaced,
+            MarketEventKind::SaleCompleted, MarketEventKind::CropHarvested,
+        ];
+        for k in &kinds {
+            assert!(!k.activity_name().is_empty(), "{:?}.activity_name() must not be empty", k);
+        }
+    }
+
+    #[test]
+    fn event_kind_planetary_affinity_nonempty() {
+        assert!(!MarketEventKind::TokenMinted.planetary_affinity().is_empty());
+        assert!(!MarketEventKind::CropPlanted.planetary_affinity().is_empty());
+    }
+
+    // ── MarketEvent ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn market_event_new_sets_fields() {
+        let ev = MarketEvent::new("ev-001", MarketEventKind::Listed, 1000);
+        assert_eq!(ev.id, "ev-001");
+        assert_eq!(ev.timestamp_ms, 1000);
+        assert!(ev.object_refs.is_empty());
+        assert!(ev.attributes.is_empty());
+    }
+
+    #[test]
+    fn with_object_appends_ref() {
+        let ev = MarketEvent::new("ev-1", MarketEventKind::BidPlaced, 0)
+            .with_object("listing-42", "subject");
+        assert_eq!(ev.object_refs.len(), 1);
+        assert_eq!(ev.object_refs[0].object_id, "listing-42");
+        assert_eq!(ev.object_refs[0].qualifier, "subject");
+    }
+
+    #[test]
+    fn with_attr_inserts_value() {
+        let ev = MarketEvent::new("ev-2", MarketEventKind::SaleCompleted, 0)
+            .with_attr("price", 500_i64);
+        assert!(ev.attributes.contains_key("price"));
+    }
+
+    #[test]
+    fn into_ocel_event_preserves_id_and_timestamp() {
+        let ev = MarketEvent::new("ev-3", MarketEventKind::ReceiptVerified, 9999)
+            .into_ocel_event();
+        assert_eq!(ev.id, "ev-3");
+        assert_eq!(ev.timestamp_ms, 9999);
+        assert!(!ev.activity.is_empty());
+    }
+
+    // ── factory functions ─────────────────────────────────────────────────────
+
+    #[test]
+    fn listing_event_sets_id_and_kind() {
+        let meta = ListingMetadata::simple(1000, "Earth");
+        let ev = listing_event("lst-1", "asset-1", "seller-1", "mkt-1", meta, "ev-lst-1", 100);
+        assert_eq!(ev.id, "ev-lst-1");
+        // factory attaches at least 4 object refs (listing, asset, seller, market)
+        assert!(ev.object_refs.len() >= 4);
+    }
+
+    #[test]
+    fn prediction_event_sets_id() {
+        let ev = prediction_event("pred-1", "player-1", "mkt-1", "will-battle-win", 250, "ev-p-1", 200);
+        assert_eq!(ev.id, "ev-p-1");
+        assert_eq!(ev.timestamp_ms, 200);
+    }
+
+    #[test]
+    fn farm_session_events_returns_multiple_events() {
+        let events = farm_session_events("crop-1", "farm-1", "player-1", "eden-1", 300);
+        assert!(events.len() >= 4, "farm session should produce plant/tend/harvest/deliver");
+    }
+
+    #[test]
+    fn faction_token_mint_sets_id() {
+        let ev = faction_token_mint("tok-1", "faction-moon", "player-1", 100, "ev-mint-1", 400);
+        assert_eq!(ev.id, "ev-mint-1");
+        assert!(ev.attributes.contains_key("initial_supply"));
+    }
+
+    // ── ListingMetadata ───────────────────────────────────────────────────────
+
+    #[test]
+    fn listing_metadata_simple_sets_price() {
+        let m = ListingMetadata::simple(500, "Mars");
+        assert_eq!(m.price_credits, 500);
+        assert_eq!(m.planet_origin, "Mars");
+    }
+}
