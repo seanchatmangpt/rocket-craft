@@ -58,3 +58,51 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str) -> Observation {
+        Observation {
+            file_path: "tests/foo.rs".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "test_smell".into(),
+            construct: construct.into(), context: String::new(), message: String::new(),
+        }
+    }
+
+    #[test]
+    fn empty_returns_no_diags() { assert!(evaluate(&[]).is_empty()); }
+
+    #[test]
+    fn assert_contains_string_triggers_test_001() {
+        let d = evaluate(&[obs("assert_contains_string")]);
+        assert_eq!(d[0].code, "ANTI-LLM-TEST-001");
+        assert!(d[0].blocking);
+    }
+
+    #[test]
+    fn assert_contains_triggers_test_001() {
+        let d = evaluate(&[obs("assert_contains")]);
+        assert_eq!(d[0].code, "ANTI-LLM-TEST-001");
+    }
+
+    #[test]
+    fn assert_contains_structural_produces_no_diag() {
+        assert!(evaluate(&[obs("assert_contains_structural")]).is_empty());
+    }
+
+    #[test]
+    fn negative_control_reference_triggers_test_003() {
+        let d = evaluate(&[obs("negative_control_reference")]);
+        assert_eq!(d[0].code, "ANTI-LLM-TEST-003");
+        assert!(d[0].blocking);
+    }
+
+    #[test]
+    fn unknown_construct_produces_no_diag() {
+        assert!(evaluate(&[obs("normal_assertion")]).is_empty());
+    }
+}
