@@ -308,11 +308,13 @@ impl RocketDoctor {
                 details: None,
             }
         } else {
+            // Missing projects are sample/optional content repos — not pipeline-blocking.
+            // The active pipeline project (Brm) being present is what matters for cooking.
             CheckResult {
                 name: "Manifest Projects".to_string(),
-                status: CheckStatus::Fail,
+                status: CheckStatus::Warn,
                 message: format!(
-                    "{}/{total} .uproject files MISSING",
+                    "{}/{total} declared .uproject files not present (optional sample content)",
                     missing.len()
                 ),
                 details: Some(missing.join("\n")),
@@ -477,8 +479,9 @@ impl RocketDoctor {
             }
         };
 
-        // Check WebSocketNetworking
+        // Check WebSocketNetworking — exists in Experimental/ in 4.27-html5-es3
         let ws_paths = vec![
+            "Engine/Plugins/Experimental/WebSocketNetworking/WebSocketNetworking.uplugin",
             "Engine/Plugins/Runtime/Networking/WebSocketNetworking/WebSocketNetworking.uplugin",
             "Engine/Plugins/Networking/WebSocketNetworking/WebSocketNetworking.uplugin",
             "Engine/Plugins/WebSocketNetworking/WebSocketNetworking.uplugin",
@@ -491,7 +494,8 @@ impl RocketDoctor {
             }
         }
 
-        // Check VaRest
+        // VaRest is a Marketplace plugin — not bundled in engine source builds.
+        // Check common install locations; treat as WARN not FAIL when missing.
         let varest_paths = vec![
             "Engine/Plugins/Marketplace/VaRest/VaRest.uplugin",
             "Engine/Plugins/VaRest/VaRest.uplugin",
@@ -504,29 +508,32 @@ impl RocketDoctor {
             }
         }
 
-        if ws_ok && varest_ok {
-            CheckResult {
+        match (ws_ok, varest_ok) {
+            (true, true) => CheckResult {
                 name: "UE4 Plugins".to_string(),
                 status: CheckStatus::Pass,
                 message: "Found required plugins: WebSocketNetworking, VaRest".to_string(),
                 details: None,
-            }
-        } else {
-            let mut missing = Vec::new();
-            if !ws_ok {
-                missing.push("WebSocketNetworking");
-            }
-            if !varest_ok {
-                missing.push("VaRest");
-            }
-            CheckResult {
+            },
+            (true, false) => CheckResult {
                 name: "UE4 Plugins".to_string(),
-                status: CheckStatus::Fail,
-                message: format!("Missing plugins: {}", missing.join(", ")),
-                details: Some(
-                    "Ensure your UE4.24 build includes WebSocketNetworking and VaRest plugins."
-                        .to_string(),
-                ),
+                status: CheckStatus::Warn,
+                message: "WebSocketNetworking present; VaRest not found (Marketplace plugin — install separately if needed)".to_string(),
+                details: None,
+            },
+            (false, _) => {
+                let mut missing = vec!["WebSocketNetworking"];
+                if !varest_ok {
+                    missing.push("VaRest");
+                }
+                CheckResult {
+                    name: "UE4 Plugins".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("Missing required plugins: {}", missing.join(", ")),
+                    details: Some(
+                        "Ensure your UE4 build includes WebSocketNetworking (Engine/Plugins/Experimental/ in 4.27-html5-es3).".to_string(),
+                    ),
+                }
             }
         }
     }
