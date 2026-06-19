@@ -145,3 +145,111 @@ fn strip_quotes(s: &str) -> String {
     }
     trimmed.to_string()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── IntentParser::parse ───────────────────────────────────────────────────
+
+    #[test]
+    fn parse_empty_intent_returns_empty_spec() {
+        let spec = IntentParser::parse("").unwrap();
+        assert!(spec.places.is_empty() && spec.actors.is_empty());
+    }
+
+    #[test]
+    fn parse_place_command() {
+        let spec = IntentParser::parse(
+            r#"create place zone-1 name "Production Floor" at(0.0, 0.0, 0.0) bounds(50.0, 50.0, 10.0)"#
+        ).unwrap();
+        assert_eq!(spec.places.len(), 1);
+        assert_eq!(spec.places[0].id, "zone-1");
+        assert_eq!(spec.places[0].name, "Production Floor"); // quotes stripped
+    }
+
+    #[test]
+    fn parse_actor_command() {
+        let spec = IntentParser::parse(
+            r#"create actor hero-1 name Hero role Player in zone-1"#
+        ).unwrap();
+        assert_eq!(spec.actors.len(), 1);
+        assert_eq!(spec.actors[0].id, "hero-1");
+        assert_eq!(spec.actors[0].role, "Player");
+        assert_eq!(spec.actors[0].place_id, "zone-1");
+    }
+
+    #[test]
+    fn parse_object_command() {
+        let spec = IntentParser::parse(
+            r#"create object crate-1 name "Supply Crate" class Box in zone-1"#
+        ).unwrap();
+        assert_eq!(spec.objects.len(), 1);
+        assert_eq!(spec.objects[0].id, "crate-1");
+        assert_eq!(spec.objects[0].class, "Box");
+    }
+
+    #[test]
+    fn parse_relationship_controls_type() {
+        let spec = IntentParser::parse(
+            "create relationship r1 controls from actor-1 to actor-2"
+        ).unwrap();
+        assert_eq!(spec.relationships.len(), 1);
+        assert!(matches!(spec.relationships[0].rel_type, RelationshipType::Controls));
+    }
+
+    #[test]
+    fn parse_relationship_custom_type() {
+        let spec = IntentParser::parse(
+            "create relationship r1 mentors from actor-1 to actor-2"
+        ).unwrap();
+        assert!(matches!(&spec.relationships[0].rel_type, RelationshipType::Custom(s) if s == "mentors"));
+    }
+
+    #[test]
+    fn parse_rule_with_severity_error() {
+        let spec = IntentParser::parse(
+            r#"create rule rule-1 name "Safety Check" expression "machine.temp > 80" severity error"#
+        ).unwrap();
+        assert_eq!(spec.rules.len(), 1);
+        assert_eq!(spec.rules[0].severity, RuleSeverity::Error);
+    }
+
+    #[test]
+    fn parse_unknown_rule_severity_returns_err() {
+        let err = IntentParser::parse(
+            r#"create rule r1 name Test expression x severity critical"#
+        ).unwrap_err();
+        assert!(err.to_string().contains("unknown rule severity"));
+    }
+
+    #[test]
+    fn parse_unrecognized_command_returns_err() {
+        let err = IntentParser::parse("teleport hero to mars").unwrap_err();
+        assert!(err.to_string().contains("did not match"));
+    }
+
+    #[test]
+    fn parse_multiline_with_comments() {
+        let intent = "# header comment\n\ncreate actor a1 name Alice role Player in zone-1";
+        let spec = IntentParser::parse(intent).unwrap();
+        assert_eq!(spec.actors.len(), 1);
+    }
+
+    // ── strip_quotes helper ───────────────────────────────────────────────────
+
+    #[test]
+    fn strip_quotes_removes_double_quotes() {
+        assert_eq!(strip_quotes("\"hello\""), "hello");
+    }
+
+    #[test]
+    fn strip_quotes_removes_single_quotes() {
+        assert_eq!(strip_quotes("'world'"), "world");
+    }
+
+    #[test]
+    fn strip_quotes_leaves_unquoted_unchanged() {
+        assert_eq!(strip_quotes("bare"), "bare");
+    }
+}
