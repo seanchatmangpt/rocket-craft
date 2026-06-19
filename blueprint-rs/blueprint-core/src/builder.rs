@@ -950,4 +950,68 @@ mod tests {
         assert!(t3d.contains("ReceiveBeginPlay"));
         assert!(t3d.contains("PrintString"));
     }
+
+    #[test]
+    fn variable_declared_in_json() {
+        // T3D serializer only emits graph nodes; variables live in the JSON output
+        let bp = BlueprintBuilder::new("PlayerChar", "Character")
+            .variable("Stamina", VarType::Float, Some("100.0".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("Stamina"), "variable name must appear in JSON output");
+    }
+
+    #[test]
+    fn custom_event_appears_in_t3d() {
+        let t3d = BlueprintBuilder::new("MyActor", "Actor")
+            .custom_event("OnDamageTaken", |ev| {
+                ev.print("damage taken");
+            })
+            .to_t3d();
+        assert!(t3d.contains("OnDamageTaken") || t3d.contains("CustomEvent"),
+            "custom event name or CustomEvent node must appear in T3D");
+    }
+
+    #[test]
+    fn end_play_event_appears_in_t3d() {
+        let t3d = BlueprintBuilder::new("MyActor", "Actor")
+            .end_play(|ev| {
+                ev.print("cleaning up");
+            })
+            .to_t3d();
+        assert!(t3d.contains("ReceiveEndPlay") || t3d.contains("EndPlay"),
+            "end play event must appear in T3D");
+    }
+
+    #[test]
+    fn to_json_produces_valid_json() {
+        let bp = BlueprintBuilder::new("TestBP", "Actor")
+            .variable("Hp", VarType::Int, None)
+            .begin_play(|ev| { ev.print("start"); });
+        let json = bp.to_json().expect("should serialize to JSON");
+        let parsed: serde_json::Value = serde_json::from_str(&json).expect("must be valid JSON");
+        assert!(parsed.is_object() || parsed.is_array(),
+            "JSON output must be an object or array");
+    }
+
+    #[test]
+    fn branch_node_appears_in_t3d() {
+        let mut builder = BlueprintBuilder::new("LogicActor", "Actor");
+        let _branch = builder.branch_node();
+        let t3d = builder.to_t3d();
+        assert!(t3d.contains("Branch") || t3d.contains("K2Node_IfThenElse"),
+            "branch node must appear in T3D output");
+    }
+
+    #[test]
+    fn multiple_variables_all_appear_in_json() {
+        // T3D only emits graph nodes; variables appear in JSON output
+        let bp = BlueprintBuilder::new("StatsActor", "Actor")
+            .variable("Health", VarType::Int, Some("100".into()))
+            .variable("Mana", VarType::Int, Some("50".into()))
+            .variable("Stamina", VarType::Float, Some("75.0".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("Health"));
+        assert!(json.contains("Mana"));
+        assert!(json.contains("Stamina"));
+    }
 }
