@@ -21,11 +21,14 @@ fn do_html5_setup() -> Result<Value> {
     Ok(serde_json::json!({"status": "ok", "engine": engine.display().to_string()}))
 }
 
-fn do_html5_serve(dir: Option<String>, port: Option<u16>) -> Result<Value> {
+fn do_html5_serve(dir: Option<String>, port: Option<u16>, project: Option<String>) -> Result<Value> {
     use std::path::PathBuf;
     use std::process::Command;
 
-    let dir = dir.unwrap_or_else(|| "/tmp/brm-html5-archive/HTML5".to_string());
+    let dir = dir.unwrap_or_else(|| {
+        let name = project.as_deref().unwrap_or("brm").to_lowercase();
+        format!("/tmp/{name}-html5-archive/HTML5")
+    });
     let port = port.unwrap_or(8080);
     let path = PathBuf::from(&dir);
     if !path.exists() {
@@ -33,9 +36,29 @@ fn do_html5_serve(dir: Option<String>, port: Option<u16>) -> Result<Value> {
             "HTML5 package directory not found: {dir}"
         )));
     }
-    println!("Serving {dir} on http://0.0.0.0:{port}");
+
+    // Inline Python server with COOP/COEP headers — required for SharedArrayBuffer
+    // and wasm-threads. Uses HTTPServer directly (test() API changed in 3.13+).
+    let server_script = r#"
+import http.server, sys, os
+
+class CoepHandler(http.server.SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
+        super().end_headers()
+    def log_message(self, fmt, *args):
+        pass  # suppress per-request noise
+
+port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+print(f"Serving on http://0.0.0.0:{port} (COOP/COEP enabled)", flush=True)
+with http.server.HTTPServer(("0.0.0.0", port), CoepHandler) as httpd:
+    httpd.serve_forever()
+"#;
+
+    println!("Serving {dir} on http://0.0.0.0:{port} (COOP/COEP headers enabled)");
     let status = Command::new("python3")
-        .args(["-m", "http.server", &port.to_string(), "--bind", "0.0.0.0"])
+        .args(["-c", server_script, &port.to_string()])
         .current_dir(&path)
         .status()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
@@ -101,10 +124,29 @@ fn do_html5_cook(
     cook.run()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
 
+    // Auto-verify and write cook receipt after a successful cook
+    let archive_html5 = archive_dir.join("HTML5");
+    let verify_dir = if archive_html5.exists() { &archive_html5 } else { &archive_dir };
+    let (pkg_verdict, receipt_path) = match rocket_sdk::Html5PackageVerifier::new(verify_dir).verify() {
+        Ok(report) => {
+            let v = if report.is_real_package { "PASS" } else { "FAIL" };
+            println!("[{}] {}", v, report.summary());
+            let rp = report.write_receipt().ok().map(|p| p.display().to_string());
+            if let Some(ref p) = rp { println!("[receipt] {p}"); }
+            (v.to_string(), rp)
+        }
+        Err(e) => {
+            println!("[WARN] post-cook verify failed: {e:#}");
+            ("UNKNOWN".to_string(), None)
+        }
+    };
+
     Ok(serde_json::json!({
         "status": "ok",
         "project": proj.name,
         "archive": archive_dir.display().to_string(),
+        "verify_verdict": pkg_verdict,
+        "receipt": receipt_path,
     }))
 }
 
@@ -120,8 +162,8 @@ fn setup_html5() -> Result<Value> {
 /// * `dir` - Directory containing the HTML5 package (default: /tmp/brm-html5-archive/HTML5)
 /// * `port` - Port to listen on (default: 8080)
 #[verb("serve", "html5")]
-fn serve_html5(dir: Option<String>, port: Option<u16>) -> Result<Value> {
-    do_html5_serve(dir, port)
+fn serve_html5(dir: Option<String>, port: Option<u16>, project: Option<String>) -> Result<Value> {
+    do_html5_serve(dir, port, project)
 }
 
 /// Cook + package a UE4 project for HTML5 via RunUAT BuildCookRun
