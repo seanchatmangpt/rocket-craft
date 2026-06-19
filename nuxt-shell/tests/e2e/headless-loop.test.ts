@@ -69,18 +69,21 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     console.log(`[headless-loop] Seeded session=${seededSessionId} events=${body.ocel_event_count}`);
   });
 
-  it('Step 2: chain-verify confirms seeded session has intact hash chain', async () => {
+  it('Step 2: session-replay confirms every event in the seeded chain is intact', async () => {
     if (MOCK || !seededSessionId) return;
-    const { status, body } = await get(`/api/game/chain-verify?session_id=${seededSessionId}`);
+    const { status, body } = await get(`/api/game/session-replay?session_id=${seededSessionId}`);
     if (status === 503) return;
-    expect([200]).toContain(status);
+    expect(status).toBe(200);
 
-    // The seeded chain must be intact — session-seed builds it lawfully
-    if (status === 200) {
-      expect(body.overall).toBe('PASS');
-      expect(body.breaks).toHaveLength(0);
-      console.log(`[headless-loop] chain-verify: overall=${body.overall} breaks=${body.breaks.length}`);
-    }
+    // session-seed builds a lawful BLAKE3 chain — every event must verify
+    expect(body.chain_intact).toBe(true);
+    expect(body.first_break_at).toBeNull();
+    expect(body.total_events).toBeGreaterThanOrEqual(3);
+
+    const events = body.events as Array<{ chain_ok: boolean }>;
+    const broken = events.filter(e => !e.chain_ok);
+    expect(broken).toHaveLength(0);
+    console.log(`[headless-loop] session-replay: ${events.length} events, all chain_ok=true`);
   });
 
   it('Step 3: receipt-finalize proves the chain with chain_tip as receipt_hash', async () => {
@@ -121,14 +124,16 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     if (status === 503 || status === 404) return;
     expect(status).toBe(200);
 
-    // OCEL 2.0 required top-level keys
-    expect(body).toHaveProperty('ocel:global-log');
-    expect(Array.isArray(body['ocel:events'])).toBe(true);
-    const events = body['ocel:events'] as Array<{ 'ocel:activity': string }>;
+    // OCEL 2.0 JSON format — objectTypes, eventTypes, objects, events (camelCase)
+    // See: ocel-export.get.ts toOcel2() — returns the OCEL 2.0 standard structure
+    expect(Array.isArray(body.objectTypes)).toBe(true);
+    expect(Array.isArray(body.eventTypes)).toBe(true);
+    expect(Array.isArray(body.events)).toBe(true);
+    const events = body.events as Array<{ type: string }>;
     expect(events.length).toBeGreaterThanOrEqual(3);
 
-    // The lawful lifecycle must appear in the exported log
-    const activities = events.map(e => e['ocel:activity']);
+    // The lawful lifecycle must appear in the exported log (OCEL 2.0: event.type = activity)
+    const activities = events.map((e: { type: string }) => e.type);
     expect(activities).toContain('GameSessionStarted');
     expect(activities).toContain('FrameRendered');
     expect(activities).toContain('InputAdmitted');

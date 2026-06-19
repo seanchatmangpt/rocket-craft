@@ -308,6 +308,97 @@ describe('POST /api/game/session-seed (headless seeder)', () => {
   });
 });
 
+// ── /api/game/leaderboard ─────────────────────────────────────────────────────
+describe('GET /api/game/leaderboard', () => {
+  it('returns rows[], total, offset, limit fields', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/leaderboard');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(Array.isArray(body.rows)).toBe(true);
+    expect(typeof body.total).toBe('number');
+    expect(typeof body.offset).toBe('number');
+    expect(typeof body.limit).toBe('number');
+    expect(body.limit).toBeLessThanOrEqual(100);
+  });
+
+  it('respects ?limit=5 param', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/leaderboard?limit=5');
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(body.limit).toBe(5);
+    expect(body.rows.length).toBeLessThanOrEqual(5);
+  });
+
+  it('contract: each leaderboard row has rank and player_id', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/leaderboard?limit=1');
+    if (status === 503 || body.rows.length === 0) return;
+    expect(status).toBe(200);
+    const row = body.rows[0];
+    expect(typeof row.rank).toBe('number');
+    expect(typeof row.player_id).toBe('string');
+  });
+});
+
+// ── /api/game/session-replay ──────────────────────────────────────────────────
+describe('GET /api/game/session-replay', () => {
+  it('rejects missing session_id', async () => {
+    if (MOCK) return;
+    const { status } = await get('/api/game/session-replay');
+    expect(status).toBe(400);
+  });
+
+  it('returns 404 for unknown session', async () => {
+    if (MOCK) return;
+    const { status } = await get('/api/game/session-replay?session_id=00000000-0000-0000-0000-000000000099');
+    expect([404, 503]).toContain(status);
+  });
+
+  it('contract: response has session_id, chain_intact, events[]', async () => {
+    if (MOCK) return;
+    // Use the zero-uuid to get a 404 — we test shape on a seeded session in headless-loop
+    const { status, body } = await get('/api/game/session-replay?session_id=00000000-0000-0000-0000-000000000098');
+    if (status === 503) return;
+    // 404 = no events (expected); anything else must have the right shape
+    if (status === 200) {
+      expect(typeof body.session_id).toBe('string');
+      expect(typeof body.chain_intact).toBe('boolean');
+      expect(typeof body.total_events).toBe('number');
+      expect(Array.isArray(body.events)).toBe(true);
+    } else {
+      expect(status).toBe(404);
+    }
+  });
+
+  it('full replay: seed → session-replay → chain_intact=true', async () => {
+    if (MOCK) return;
+    const seed = await post('/api/game/session-seed', {});
+    if (seed.status === 503 || seed.status === 403) return;
+    expect(seed.status).toBe(200);
+    const { session_id, ocel_event_count } = seed.body;
+
+    const replay = await get(`/api/game/session-replay?session_id=${session_id}`);
+    if (replay.status === 503) return;
+    expect(replay.status).toBe(200);
+
+    // A seed builds a lawful chain — must be intact
+    expect(replay.body.chain_intact).toBe(true);
+    expect(replay.body.first_break_at).toBeNull();
+    expect(replay.body.total_events).toBe(ocel_event_count);
+
+    // Every event must have chain_ok=true
+    const events = replay.body.events as Array<{ chain_ok: boolean; activity: string }>;
+    expect(events.every(e => e.chain_ok)).toBe(true);
+
+    // Lawful activities present
+    const activities = events.map(e => e.activity);
+    expect(activities).toContain('GameSessionStarted');
+    console.log(`[session-replay] chain_intact=true, ${events.length} events`);
+  });
+});
+
 beforeAll(() => {
   if (!MOCK) {
     console.log(`[pipeline-api.test] Running against ${BASE}`);
