@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# DEPRECATED — superseded by verify_html5_pipeline.sh (Cook 7, Stage 6 PASS)
+# genie-web/ has been deleted; this script no longer works.
+# Use: ./verify_html5_pipeline.sh
+echo "ERROR: verify_genie.sh is deprecated. Use ./verify_html5_pipeline.sh instead." >&2
+exit 1
 
 # verify_genie.sh
 # Genie 26 E2E Integration and Validation Script
