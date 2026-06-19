@@ -787,4 +787,40 @@ mod tests {
         let found = discover_emsdk_python(dir.path());
         assert!(found.is_none(), "should return None when no emsdk directory exists");
     }
+
+    // ── ensure_letter_start_symlink ──────────────────────────────────────────
+
+    #[test]
+    fn letter_start_dir_is_returned_unchanged() {
+        let tmp = TempDir::new().unwrap();
+        let project_dir = tmp.path().join("MyProject");
+        std::fs::create_dir_all(&project_dir).unwrap();
+        let uproject = project_dir.join("MyProject.uproject");
+        std::fs::write(&uproject, "{}").unwrap();
+
+        let result = ensure_letter_start_symlink(&uproject).unwrap();
+        assert_eq!(result, uproject, "letter-starting dir must pass through unchanged");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn digit_start_dir_creates_symlink_with_letter_prefix() {
+        let tmp = TempDir::new().unwrap();
+        let project_dir = tmp.path().join("4.27.0");
+        std::fs::create_dir_all(&project_dir).unwrap();
+        let uproject = project_dir.join("Brm.uproject");
+        std::fs::write(&uproject, "{}").unwrap();
+
+        let result = ensure_letter_start_symlink(&uproject).unwrap();
+
+        // The returned path must start with a letter
+        let link_stem = result.parent().unwrap().file_name().unwrap().to_str().unwrap();
+        assert!(
+            link_stem.chars().next().map(|c| c.is_ascii_alphabetic()).unwrap_or(false),
+            "symlink directory name must start with a letter, got: {}",
+            link_stem
+        );
+        // The symlink target directory must exist
+        assert!(result.parent().unwrap().exists(), "symlink must exist on disk");
+    }
 }
