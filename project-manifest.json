@@ -21,7 +21,7 @@
     },
     {
       "name": "Brm",
-      "uproject_path": "versions/4.27.0/Brm.uproject",
+      "uproject_path": "versions/v4_27_0/Brm.uproject",
       "targets": [
         "BrmServer",
         "BrmEditor",

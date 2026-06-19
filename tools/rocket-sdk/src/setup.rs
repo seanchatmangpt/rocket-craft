@@ -4,6 +4,15 @@ use inquire::{Confirm, Text, Select};
 use tracing::{info, warn, error, instrument};
 use crate::config::RocketConfig;
 
+/// Locate the UE4 engine root from `.rocket.json` / `UE4_ROOT` / common paths.
+pub fn find_engine_root() -> anyhow::Result<PathBuf> {
+    let config = RocketConfig::load()?;
+    find_ue4_root(&config)?
+        .ok_or_else(|| anyhow::anyhow!(
+            "UE4 engine root not found. Set UE4_ROOT or add '{{\"ue4_root\": \"...\"}}' to .rocket.json"
+        ))
+}
+
 #[instrument]
 pub fn run_setup() -> anyhow::Result<()> {
     info!("Starting Rocket Craft Project Setup");

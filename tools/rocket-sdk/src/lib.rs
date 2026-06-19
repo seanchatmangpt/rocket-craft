@@ -6,6 +6,9 @@ pub mod crypto;
 pub mod doctor;
 pub mod supabase;
 pub mod audit_affidavit;
+pub mod html5;
+pub mod wasm;
+pub use html5::{Html5Cook, Html5Setup};
 
 use std::path::{Path, PathBuf};
 use anyhow::Result;

@@ -2,18 +2,16 @@ use std::path::Path;
 use std::fs;
 use knhk::{Law, LawError, Validator};
 use knhk::plugin::PluginHost;
-use crate::manifest::Project;
+use rocket_sdk::manifest::Project;
 use serde::Serialize;
 use color_eyre::eyre::Result;
 
 /// Law that runs `anti-llm-cheat-lsp` over the project's `src/` directory.
 /// Skips gracefully when the binary is not installed.
-#[allow(dead_code)]
 pub struct AntiCheatLaw {
     config_path: std::path::PathBuf,
 }
 
-#[allow(dead_code)]
 impl AntiCheatLaw {
     pub fn new(config_path: std::path::PathBuf) -> Self {
         Self { config_path }
