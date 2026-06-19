@@ -211,3 +211,133 @@ impl<L: CombatMachineLaw> Machine<L, Dodging> {
     }
 }
 
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::parry::{AttackDir, ParryOutcome};
+
+    // A passthrough Law implementation for testing — delegates to direct math
+    pub struct DefaultLaw;
+
+    impl CombatMachineLaw for DefaultLaw {
+        fn begin_attack(hp: f32, max_hp: f32, combo_depth: u32, dir: AttackDir) -> Result<(f32, f32, u32, AttackDir), anyhow::Error> {
+            Ok((hp, max_hp, combo_depth, dir))
+        }
+        fn begin_parry(hp: f32, max_hp: f32, combo_depth: u32) -> Result<(f32, f32, u32), anyhow::Error> {
+            Ok((hp, max_hp, combo_depth))
+        }
+        fn begin_perfect_parry(hp: f32, max_hp: f32, combo_depth: u32, dir: AttackDir) -> Result<(f32, f32, u32, AttackDir), anyhow::Error> {
+            Ok((hp, max_hp, combo_depth, dir))
+        }
+        fn begin_dodge(hp: f32, max_hp: f32, combo_depth: u32) -> Result<(f32, f32, u32), anyhow::Error> {
+            Ok((hp, max_hp, combo_depth))
+        }
+        fn resolve_hit(hp: f32, max_hp: f32, combo_depth: u32, damage: f32, target_hp: &mut f32) -> Result<(f32, f32, u32), anyhow::Error> {
+            *target_hp = (*target_hp - damage).max(0.0);
+            Ok((hp, max_hp, (combo_depth + 1).min(5)))
+        }
+        fn resolve_blocked(hp: f32, max_hp: f32, _combo_depth: u32) -> Result<(f32, f32, u32), anyhow::Error> {
+            Ok((hp, max_hp, 0))
+        }
+        fn resolve_parry(hp: f32, max_hp: f32, combo_depth: u32, outcome: ParryOutcome, incoming_damage: f32) -> Result<(f32, f32, u32, ParryOutcome), anyhow::Error> {
+            let new_hp = match outcome {
+                ParryOutcome::Perfect => hp,
+                ParryOutcome::Normal  => (hp - incoming_damage * 0.1).max(0.0),
+                ParryOutcome::Miss    => (hp - incoming_damage).max(0.0),
+            };
+            Ok((new_hp, max_hp, combo_depth, outcome))
+        }
+        fn resolve_perfect_parry(hp: f32, max_hp: f32, combo_depth: u32, announced: AttackDir, player_dir: AttackDir, incoming_damage: f32) -> Result<(f32, f32, u32, ParryOutcome), anyhow::Error> {
+            if announced == player_dir {
+                Ok((hp, max_hp, combo_depth, ParryOutcome::Perfect))
+            } else {
+                Ok(((hp - incoming_damage * 0.1).max(0.0), max_hp, combo_depth, ParryOutcome::Normal))
+            }
+        }
+        fn resolve_dodge(hp: f32, max_hp: f32, combo_depth: u32) -> Result<(f32, f32, u32), anyhow::Error> {
+            Ok((hp, max_hp, combo_depth))
+        }
+    }
+
+    type M = Machine<DefaultLaw, Idle>;
+
+    // ── construction ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_machine_has_full_hp() {
+        let m: M = Machine::new(100.0);
+        assert_eq!(m.hp, 100.0);
+        assert_eq!(m.max_hp, 100.0);
+        assert_eq!(m.combo_depth, 0);
+    }
+
+    // ── Idle → Attacking → resolve_hit ───────────────────────────────────────
+
+    #[test]
+    fn attack_hit_deals_damage_and_increments_combo() {
+        let m: M = Machine::new(100.0);
+        let mut target = 200.0_f32;
+        let (attacking, _dir) = m.begin_attack(AttackDir::Overhead);
+        let idle = attacking.resolve_hit(30.0, &mut target);
+        assert_eq!(target, 170.0);
+        assert_eq!(idle.combo_depth, 1);
+    }
+
+    #[test]
+    fn attack_resolve_blocked_resets_combo() {
+        let m: M = Machine::new(100.0);
+        let (attacking, _) = m.begin_attack(AttackDir::Left);
+        let idle = attacking.resolve_blocked();
+        assert_eq!(idle.combo_depth, 0);
+    }
+
+    // ── Idle → Parrying ───────────────────────────────────────────────────────
+
+    #[test]
+    fn perfect_parry_takes_no_damage() {
+        let m: M = Machine::new(100.0);
+        let parrying = m.begin_parry();
+        let (idle, outcome) = parrying.resolve(ParryOutcome::Perfect, 50.0);
+        assert_eq!(outcome, ParryOutcome::Perfect);
+        assert_eq!(idle.hp, 100.0);
+    }
+
+    #[test]
+    fn normal_parry_takes_chip_damage() {
+        let m: M = Machine::new(100.0);
+        let parrying = m.begin_parry();
+        let (idle, _) = parrying.resolve(ParryOutcome::Normal, 50.0);
+        assert!((idle.hp - 95.0).abs() < 0.01);
+    }
+
+    // ── Idle → PerfectParrying ────────────────────────────────────────────────
+
+    #[test]
+    fn matching_direction_yields_perfect_outcome() {
+        let m: M = Machine::new(100.0);
+        let (pp, announced) = m.begin_perfect_parry(AttackDir::Right);
+        let (idle, outcome) = pp.resolve(announced, AttackDir::Right, 50.0);
+        assert_eq!(outcome, ParryOutcome::Perfect);
+        assert_eq!(idle.hp, 100.0);
+    }
+
+    #[test]
+    fn wrong_direction_degrades_to_normal() {
+        let m: M = Machine::new(100.0);
+        let (pp, _) = m.begin_perfect_parry(AttackDir::Left);
+        let (idle, outcome) = pp.resolve(AttackDir::Left, AttackDir::Right, 50.0);
+        assert_eq!(outcome, ParryOutcome::Normal);
+        assert!((idle.hp - 95.0).abs() < 0.01);
+    }
+
+    // ── Idle → Dodging ────────────────────────────────────────────────────────
+
+    #[test]
+    fn dodge_returns_to_idle_with_full_hp() {
+        let m: M = Machine::new(100.0);
+        let dodging = m.begin_dodge();
+        let idle = dodging.resolve();
+        assert_eq!(idle.hp, 100.0);
+    }
+}

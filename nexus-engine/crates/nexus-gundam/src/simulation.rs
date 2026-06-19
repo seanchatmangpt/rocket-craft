@@ -255,3 +255,143 @@ impl SimulationInterface for GundamNexusSimulation {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn sim() -> GundamNexusSimulation {
+        GundamNexusSimulation::new()
+    }
+
+    // ── initial state ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_sim_starts_in_explore_phase() {
+        let s = sim();
+        assert_eq!(s.get_state().current_phase, ExperiencePhase::Explore);
+    }
+
+    #[test]
+    fn new_sim_has_no_mechs_or_civilizations() {
+        let s = sim();
+        let state = s.get_state();
+        assert_eq!(state.active_mechs, 0);
+        assert_eq!(state.civilization_count, 0);
+    }
+
+    #[test]
+    fn new_sim_history_log_has_one_init_entry() {
+        let s = sim();
+        assert_eq!(s.history_log.len(), 1);
+        assert!(s.history_log[0].contains("initialized"));
+    }
+
+    // ── step_phase ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn step_phase_explore_to_discover() {
+        let mut s = sim();
+        let next = s.step_phase().unwrap();
+        assert_eq!(next, ExperiencePhase::Discover);
+    }
+
+    #[test]
+    fn step_phase_full_cycle_returns_to_explore() {
+        let mut s = sim();
+        // Explore→Discover→Build→Preserve→Expand→CreateHistory→BecomeMythology→Explore
+        for _ in 0..7 {
+            s.step_phase().unwrap();
+        }
+        assert_eq!(s.get_state().current_phase, ExperiencePhase::Explore);
+    }
+
+    #[test]
+    fn step_phase_appends_to_history_log() {
+        let mut s = sim();
+        let before = s.history_log.len();
+        s.step_phase().unwrap();
+        assert!(s.history_log.len() > before);
+    }
+
+    // ── run_simulation_cycle ──────────────────────────────────────────────────
+
+    #[test]
+    fn run_cycle_returns_current_state() {
+        let mut s = sim();
+        let state = s.run_simulation_cycle().unwrap();
+        assert_eq!(state.current_phase, ExperiencePhase::Explore);
+    }
+
+    #[test]
+    fn run_cycle_in_preserve_phase_increments_preserved_count() {
+        let mut s = sim();
+        // Advance to Preserve (3 steps: Explore→Discover→Build→Preserve)
+        for _ in 0..3 { s.step_phase().unwrap(); }
+        assert_eq!(s.get_state().current_phase, ExperiencePhase::Preserve);
+        let before = s.preserved_count;
+        s.run_simulation_cycle().unwrap();
+        assert_eq!(s.preserved_count, before + 1);
+    }
+
+    // ── spawn_mech ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn spawn_valid_mech_succeeds() {
+        let mut s = sim();
+        s.spawn_mech("Nu Gundam", "Warrior").unwrap();
+        assert_eq!(s.get_state().active_mechs, 1);
+    }
+
+    #[test]
+    fn spawn_mech_empty_name_is_rejected() {
+        let mut s = sim();
+        assert!(s.spawn_mech("", "Warrior").is_err());
+        assert!(s.spawn_mech("   ", "Warrior").is_err());
+    }
+
+    #[test]
+    fn spawn_mech_invalid_class_is_rejected() {
+        let mut s = sim();
+        assert!(s.spawn_mech("Unicorn", "GodKing").is_err());
+    }
+
+    #[test]
+    fn spawn_mech_all_valid_classes_succeed() {
+        let mut s = sim();
+        for class in ["Worker", "Explorer", "Builder", "Miner", "Trader", "Guardian", "Warrior", "Ark"] {
+            s.spawn_mech(class, class).unwrap();
+        }
+        assert_eq!(s.get_state().active_mechs, 8);
+    }
+
+    // ── form_civilization ─────────────────────────────────────────────────────
+
+    #[test]
+    fn form_civilization_on_valid_planet_succeeds() {
+        let mut s = sim();
+        s.form_civilization("Zanscare Empire", "Mars").unwrap();
+        assert_eq!(s.get_state().civilization_count, 1);
+    }
+
+    #[test]
+    fn form_civilization_empty_name_is_rejected() {
+        let mut s = sim();
+        assert!(s.form_civilization("", "Earth").is_err());
+    }
+
+    #[test]
+    fn form_civilization_unknown_planet_is_rejected() {
+        let mut s = sim();
+        assert!(s.form_civilization("Britannia", "Jupiter").is_err());
+    }
+
+    #[test]
+    fn form_civilization_all_valid_planets_succeed() {
+        let mut s = sim();
+        for planet in ["Earth", "Mars", "Venus", "Sentinel"] {
+            s.form_civilization(&format!("Civ-{planet}"), planet).unwrap();
+        }
+        assert_eq!(s.get_state().civilization_count, 4);
+    }
+}

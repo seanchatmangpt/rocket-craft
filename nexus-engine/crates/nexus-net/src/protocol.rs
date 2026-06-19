@@ -159,3 +159,106 @@ pub enum MatchEndReason {
     Timeout,
     Disconnect,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ser<T: serde::Serialize>(v: &T) -> String { serde_json::to_string(v).unwrap() }
+    fn de_action(s: &str) -> CombatAction { serde_json::from_str(s).unwrap() }
+    fn de_outcome(s: &str) -> CombatOutcome { serde_json::from_str(s).unwrap() }
+
+    // ── CombatAction round-trips ───────────────────────────────────────────────
+
+    #[test]
+    fn attack_overhead_round_trips() {
+        let a = CombatAction::Attack { dir: AttackDir::Overhead };
+        let json = ser(&a);
+        assert!(json.contains("\"Overhead\""));
+        assert!(matches!(de_action(&json), CombatAction::Attack { dir: AttackDir::Overhead }));
+    }
+
+    #[test]
+    fn parry_with_direction_round_trips() {
+        let a = CombatAction::Parry { dir: Some(AttackDir::Left) };
+        assert!(matches!(
+            de_action(&ser(&a)),
+            CombatAction::Parry { dir: Some(AttackDir::Left) }
+        ));
+    }
+
+    #[test]
+    fn parry_without_direction_round_trips() {
+        let a = CombatAction::Parry { dir: None };
+        assert!(matches!(de_action(&ser(&a)), CombatAction::Parry { dir: None }));
+    }
+
+    #[test]
+    fn dodge_round_trips() {
+        assert!(matches!(de_action(&ser(&CombatAction::Dodge)), CombatAction::Dodge));
+    }
+
+    #[test]
+    fn use_special_preserves_ability_id() {
+        let a = CombatAction::UseSpecial { ability_id: 3 };
+        assert!(matches!(de_action(&ser(&a)), CombatAction::UseSpecial { ability_id: 3 }));
+    }
+
+    #[test]
+    fn cast_magic_preserves_type() {
+        let a = CombatAction::CastMagic { magic_type: MagicType::Dark };
+        assert!(matches!(
+            de_action(&ser(&a)),
+            CombatAction::CastMagic { magic_type: MagicType::Dark }
+        ));
+    }
+
+    // ── CombatOutcome round-trips ─────────────────────────────────────────────
+
+    #[test]
+    fn hit_preserves_damage_and_combo() {
+        let o = CombatOutcome::Hit { damage: 35.0, new_hp: 65.0, combo_depth: 2 };
+        match de_outcome(&ser(&o)) {
+            CombatOutcome::Hit { damage, new_hp, combo_depth } => {
+                assert!((damage - 35.0).abs() < 0.001);
+                assert!((new_hp - 65.0).abs() < 0.001);
+                assert_eq!(combo_depth, 2);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn blocked_round_trips() {
+        assert!(matches!(de_outcome(&ser(&CombatOutcome::Blocked)), CombatOutcome::Blocked));
+    }
+
+    #[test]
+    fn player_died_preserves_id() {
+        let o = CombatOutcome::PlayerDied { player_id: 42 };
+        match de_outcome(&ser(&o)) {
+            CombatOutcome::PlayerDied { player_id } => assert_eq!(player_id, 42),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    // ── MatchEndReason ────────────────────────────────────────────────────────
+
+    #[test]
+    fn match_end_reason_variants_are_distinct() {
+        assert_ne!(MatchEndReason::Verified, MatchEndReason::Surrender);
+        assert_ne!(MatchEndReason::Timeout, MatchEndReason::Disconnect);
+    }
+
+    #[test]
+    fn match_state_snapshot_fields_are_accessible() {
+        let snap = MatchStateSnapshot {
+            match_id: 7, player1_hp: 500.0, player2_hp: 250.0,
+            player1_combo: 3, player2_combo: 0,
+            turn_number: 5, is_player1_turn: false,
+        };
+        assert_eq!(snap.match_id, 7);
+        assert_eq!(snap.turn_number, 5);
+        assert!(!snap.is_player1_turn);
+    }
+}
