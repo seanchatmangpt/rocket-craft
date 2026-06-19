@@ -202,6 +202,13 @@ impl Html5Cook {
         }
     }
 
+    /// Override the client config (defaults to `"Development"`).
+    /// Use `"Shipping"` for release packages.
+    pub fn with_client_config(mut self, config: impl Into<String>) -> Self {
+        self.client_config = config.into();
+        self
+    }
+
     /// Run the cook and verify the output is a real package.
     /// Returns the package report; call `report.is_real_package` to confirm success.
     pub fn run_and_verify(&self) -> Result<Html5PackageReport> {

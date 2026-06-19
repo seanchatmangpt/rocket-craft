@@ -80,8 +80,8 @@ fn do_html5_cook(
     );
     println!("Engine: {}", engine.display());
 
-    let mut cook = rocket_sdk::Html5Cook::new(&engine, &uproject, &archive_dir);
-    cook.client_config = config.unwrap_or_else(|| "Development".to_string());
+    let cook = rocket_sdk::Html5Cook::new(&engine, &uproject, &archive_dir)
+        .with_client_config(config.unwrap_or_else(|| "Development".to_string()));
     cook.run()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
 

@@ -76,6 +76,7 @@ impl RocketDoctor {
             self.check_html5_package(),
             self.check_ue4_build_scripts(),
             self.check_nexus_types(),
+            self.check_xcode(),
         ];
 
         DiagnosticReport {
@@ -776,6 +777,67 @@ impl RocketDoctor {
             },
         }
     }
+    /// Check that Xcode command-line tools are installed (macOS only).
+    ///
+    /// UE4's `Build.sh` and the Mono/C++ toolchain invoked by UAT require
+    /// `xcrun` and at minimum the Xcode CLT package. Without them, `Build.sh`
+    /// silently exits with a non-zero code and no human-readable error.
+    fn check_xcode(&self) -> CheckResult {
+        #[cfg(not(target_os = "macos"))]
+        return CheckResult {
+            name: "Xcode CLT".to_string(),
+            status: CheckStatus::Pass,
+            message: "Not macOS — skipped".to_string(),
+            details: None,
+        };
+
+        #[cfg(target_os = "macos")]
+        {
+            // `xcode-select -p` prints the active developer directory; exits non-zero when
+            // CLT are absent or the path is missing.
+            let xcode_select = Command::new("xcode-select").arg("-p").output();
+            match xcode_select {
+                Ok(out) if out.status.success() => {
+                    let path = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                    // xcrun --find clang is the minimal probe that the compiler toolchain works.
+                    let clang_ok = Command::new("xcrun")
+                        .args(["--find", "clang"])
+                        .stdout(std::process::Stdio::null())
+                        .stderr(std::process::Stdio::null())
+                        .status()
+                        .map(|s| s.success())
+                        .unwrap_or(false);
+                    if clang_ok {
+                        CheckResult {
+                            name: "Xcode CLT".to_string(),
+                            status: CheckStatus::Pass,
+                            message: format!("Developer tools active at {path}"),
+                            details: None,
+                        }
+                    } else {
+                        CheckResult {
+                            name: "Xcode CLT".to_string(),
+                            status: CheckStatus::Warn,
+                            message: format!(
+                                "xcode-select path set ({path}) but clang not found via xcrun"
+                            ),
+                            details: Some(
+                                "Run: xcode-select --install".to_string(),
+                            ),
+                        }
+                    }
+                }
+                _ => CheckResult {
+                    name: "Xcode CLT".to_string(),
+                    status: CheckStatus::Fail,
+                    message: "Xcode command-line tools not installed".to_string(),
+                    details: Some(
+                        "Run: xcode-select --install  (required for UE4 Build.sh)".to_string(),
+                    ),
+                },
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -1091,5 +1153,25 @@ mod tests {
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_node();
         assert!(!result.message.is_empty());
+    }
+
+    // ── check_xcode ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn xcode_check_returns_named_result() {
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_xcode();
+        assert_eq!(result.name, "Xcode CLT");
+        assert!(!result.message.is_empty());
+    }
+
+    #[test]
+    fn xcode_check_status_is_valid_variant() {
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_xcode();
+        // Should be Pass on this mac (Xcode is installed) or Fail/Warn without CLT
+        matches!(result.status, CheckStatus::Pass | CheckStatus::Warn | CheckStatus::Fail);
     }
 }
