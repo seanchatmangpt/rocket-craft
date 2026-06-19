@@ -61,3 +61,118 @@ pub fn validate_skin_stack(spec: &SkinSpec) -> Result<(), RefusalReason> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn minimal_spec() -> SkinSpec {
+        SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial],
+            damage_class_binding: 0,
+            heat_class_binding: 0,
+            has_thermal_vent_visible: true,
+            sponsor_livery_present: false,
+            repair_receipt: None,
+        }
+    }
+
+    #[test]
+    fn minimal_base_material_only_passes() {
+        assert!(validate_skin_stack(&minimal_spec()).is_ok());
+    }
+
+    #[test]
+    fn faction_palette_without_base_material_fails() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::FactionPalette], // no BaseMaterial
+            ..minimal_spec()
+        };
+        assert!(matches!(
+            validate_skin_stack(&spec).unwrap_err(),
+            RefusalReason::SkinOccludesRequiredFeature { .. }
+        ));
+    }
+
+    #[test]
+    fn faction_palette_with_base_material_passes() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial, SkinLayer::FactionPalette],
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_ok());
+    }
+
+    #[test]
+    fn sponsor_livery_without_thermal_zones_fails() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial],
+            sponsor_livery_present: true,
+            has_thermal_vent_visible: true,
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_err());
+    }
+
+    #[test]
+    fn sponsor_livery_hiding_thermal_vent_fails() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial, SkinLayer::ThermalZones],
+            sponsor_livery_present: true,
+            has_thermal_vent_visible: false, // vent occluded
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_err());
+    }
+
+    #[test]
+    fn sponsor_livery_with_thermal_zones_and_visible_vent_passes() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial, SkinLayer::ThermalZones],
+            sponsor_livery_present: true,
+            has_thermal_vent_visible: true,
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_ok());
+    }
+
+    #[test]
+    fn damage_masks_without_binding_fails() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial, SkinLayer::DamageMasks],
+            damage_class_binding: 0, // no binding
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_err());
+    }
+
+    #[test]
+    fn damage_masks_with_binding_passes() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial, SkinLayer::DamageMasks],
+            damage_class_binding: 5,
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_ok());
+    }
+
+    #[test]
+    fn repair_residue_without_receipt_fails() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial, SkinLayer::RepairResidue],
+            repair_receipt: None,
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_err());
+    }
+
+    #[test]
+    fn repair_residue_with_receipt_passes() {
+        let spec = SkinSpec {
+            layers: vec![SkinLayer::BaseMaterial, SkinLayer::RepairResidue],
+            repair_receipt: Some("receipt-abc123".into()),
+            ..minimal_spec()
+        };
+        assert!(validate_skin_stack(&spec).is_ok());
+    }
+}

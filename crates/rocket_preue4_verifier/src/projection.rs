@@ -67,3 +67,100 @@ pub fn validate_manifest(rows: &[ProjectionRow]) -> Vec<(String, RefusalReason)>
     }
     failures
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn admitted_row(id: &str, receipt: &str) -> ProjectionRow {
+        ProjectionRow {
+            projection_id: id.into(),
+            source_powl_step: "STEP_1".into(),
+            source_receipt: receipt.into(),
+            object_id: "obj-1".into(),
+            projection_type: ProjectionType::SetMeshVariant,
+            authority_inputs: vec!["damage_class".into()],
+            semantic_lod_class: "Primary".into(),
+            ue4_target_surface: "SM_Frame".into(),
+            admission_status: AdmissionStatus::Admitted,
+        }
+    }
+
+    // ── ProjectionRow::validate ───────────────────────────────────────────────
+
+    #[test]
+    fn admitted_row_with_receipt_passes() {
+        assert!(admitted_row("r1", "hash-abc").validate().is_ok());
+    }
+
+    #[test]
+    fn admitted_row_without_receipt_is_orphan() {
+        let row = admitted_row("r2", ""); // empty receipt
+        assert!(matches!(
+            row.validate().unwrap_err(),
+            RefusalReason::OrphanProjectionRow { .. }
+        ));
+    }
+
+    #[test]
+    fn refused_row_without_receipt_is_ok() {
+        let mut row = admitted_row("r3", "");
+        row.admission_status = AdmissionStatus::Refused;
+        assert!(row.validate().is_ok());
+    }
+
+    #[test]
+    fn residual_row_without_receipt_is_ok() {
+        let mut row = admitted_row("r4", "");
+        row.admission_status = AdmissionStatus::Residual;
+        assert!(row.validate().is_ok());
+    }
+
+    #[test]
+    fn crown_row_without_authority_inputs_fails() {
+        let mut row = admitted_row("r5", "hash-def");
+        row.semantic_lod_class = "Crown".into();
+        row.authority_inputs.clear();
+        assert!(matches!(
+            row.validate().unwrap_err(),
+            RefusalReason::OrphanProjectionRow { .. }
+        ));
+    }
+
+    #[test]
+    fn crown_row_with_authority_inputs_passes() {
+        let mut row = admitted_row("r6", "hash-ghi");
+        row.semantic_lod_class = "Crown".into();
+        assert!(row.validate().is_ok()); // already has authority_inputs
+    }
+
+    // ── validate_manifest ─────────────────────────────────────────────────────
+
+    #[test]
+    fn manifest_with_no_failures_returns_empty_vec() {
+        let rows = vec![
+            admitted_row("r1", "hash-1"),
+            admitted_row("r2", "hash-2"),
+        ];
+        assert!(validate_manifest(&rows).is_empty());
+    }
+
+    #[test]
+    fn manifest_collects_all_failures() {
+        let rows = vec![
+            admitted_row("r1", "hash-1"),   // ok
+            admitted_row("r2", ""),          // fail: orphan
+            admitted_row("r3", "hash-3"),   // ok
+            admitted_row("r4", ""),          // fail: orphan
+        ];
+        let failures = validate_manifest(&rows);
+        assert_eq!(failures.len(), 2);
+        assert!(failures.iter().any(|(id, _)| id == "r2"));
+        assert!(failures.iter().any(|(id, _)| id == "r4"));
+    }
+
+    #[test]
+    fn empty_manifest_returns_empty_vec() {
+        assert!(validate_manifest(&[]).is_empty());
+    }
+}
