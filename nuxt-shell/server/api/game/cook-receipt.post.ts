@@ -32,8 +32,7 @@
 import { createClient } from '@supabase/supabase-js'
 import * as ed from '@noble/ed25519'
 import { emitOtelSpans } from '../../utils/otlp-emitter'
-
-const DECLARED_LIFECYCLE = ['GameSessionStarted', 'FrameRendered', 'InputAdmitted']
+import { runProofGates } from '../../utils/proofGates'
 
 function canonicalJSON(obj: unknown): string {
   if (obj === null || obj === undefined) return 'null'
@@ -76,27 +75,10 @@ export default defineEventHandler(async (event) => {
     ed25519_sig,
   } = body ?? {}
 
-  // ── Proof gate 1: required fields ──────────────────────────────────────────
-  if (!verdict || !milestone || !engine_source || !receipt_hash) {
-    throw createError({ statusCode: 400, message: 'Missing required fields: verdict, milestone, engine_source, receipt_hash' })
-  }
-  if (typeof receipt_hash !== 'string' || receipt_hash.length !== 64 || !/^[0-9a-f]+$/.test(receipt_hash)) {
-    throw createError({ statusCode: 400, message: 'receipt_hash must be 64 hex chars (BLAKE3)' })
-  }
-
-  // ── Proof gate 2: synthetic engine REJECTED ─────────────────────────────────
-  if (engine_source === 'synthetic') {
-    throw createError({ statusCode: 422, message: 'engine_source: synthetic is rejected by the proof gate' })
-  }
-
-  // ── Proof gate 3: minimum lifecycle ────────────────────────────────────────
-  const lifecycle: string[] = Array.isArray(ocel_lifecycle) ? ocel_lifecycle : []
-  const missingActivities = DECLARED_LIFECYCLE.filter(a => !lifecycle.includes(a))
-  if (missingActivities.length > 0) {
-    throw createError({
-      statusCode: 422,
-      message: `ocel_lifecycle missing required activities: ${missingActivities.join(', ')}`,
-    })
+  // ── Proof gates (pure functions from proofGates.ts) ───────────────────────
+  const gateResult = runProofGates({ verdict, milestone, engine_source, receipt_hash, ocel_lifecycle })
+  if (!gateResult.ok) {
+    throw createError({ statusCode: gateResult.statusCode ?? 400, message: gateResult.message ?? 'Proof gate rejected' })
   }
 
   // ── Proof gate 4: Ed25519 signature (required in production) ───────────────
@@ -128,7 +110,7 @@ export default defineEventHandler(async (event) => {
       verdict,
       milestone,
       engine_source,
-      ocel_lifecycle: lifecycle,
+      ocel_lifecycle: Array.isArray(ocel_lifecycle) ? ocel_lifecycle : [],
       ocel_event_count: Number(ocel_event_count ?? 0),
       receipt_hash,
       output_hash: output_hash ?? null,
