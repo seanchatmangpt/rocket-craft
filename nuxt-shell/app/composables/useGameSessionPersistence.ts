@@ -134,7 +134,9 @@ export function useGameSessionPersistence() {
       .eq('id', dbSessionId.value);
   }
 
-  // Persist a verified receipt to Supabase
+  // Persist a verified receipt — routes through the server proof gate (cook-receipt.post.ts).
+  // Direct client inserts into game_receipts are removed: the proof gate is the only write
+  // path, ensuring chain verification always runs server-side before any row is stored.
   async function persistReceipt(receipt: {
     verdict: 'PASS' | 'FAIL' | 'PENDING';
     milestone: string;
@@ -144,40 +146,32 @@ export function useGameSessionPersistence() {
     payload: Record<string, unknown>;
   }) {
     if (!dbSessionId.value) return null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (client as any)
-      .from('game_receipts')
-      .insert({
-        session_id: dbSessionId.value,
-        verdict: receipt.verdict,
-        milestone: receipt.milestone,
-        ocel_event_count: syncedCount.value,
-        ocel_lifecycle: receipt.ocelLifecycle,
-        engine_source: receipt.engineSource,
-        receipt_hash: receipt.receiptHash,
-        proven_at: new Date().toISOString(),
-        payload: receipt.payload,
-      })
-      .select('id')
-      .single();
-    if (error) {
-      syncError.value = `Receipt persist failed: ${error.message}`;
+
+    let receiptId: string | null = null;
+    try {
+      const result = await $fetch<{ receipt_id: string; verdict: string; chain_verified: boolean }>('/api/game/cook-receipt', {
+        method: 'POST',
+        body: {
+          session_id: dbSessionId.value,
+          verdict: receipt.verdict,
+          milestone: receipt.milestone,
+          ocel_event_count: syncedCount.value,
+          ocel_lifecycle: receipt.ocelLifecycle,
+          engine_source: receipt.engineSource,
+          receipt_hash: receipt.receiptHash,
+          proven_at: new Date().toISOString(),
+          payload: receipt.payload,
+        },
+      });
+      receiptId = result.receipt_id;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      syncError.value = `Receipt proof gate rejected: ${msg}`;
       return null;
     }
 
-    // Server-side chain proof: stamp PROVEN/HASH_MISMATCH verdict on the receipt row
-    // This closes the gap where a client could insert a PASS receipt without chain verification
-    $fetch('/api/game/receipt-finalize', {
-      method: 'POST',
-      body: {
-        session_id: dbSessionId.value,
-        receipt_hash: receipt.receiptHash,
-        update_receipt: true,
-      },
-    }).catch(() => { /* Non-fatal: Supabase holds the receipt; proof runs on next query */ });
-
     await closeSession(receipt.receiptHash);
-    return data.id;
+    return receiptId;
   }
 
   return {
