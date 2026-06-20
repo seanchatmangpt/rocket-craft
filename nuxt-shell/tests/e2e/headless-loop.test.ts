@@ -565,3 +565,41 @@ describe('cook-receipt proof gates (MOCK-safe property tests)', () => {
     }
   });
 });
+
+// ── OTel → OCEL ingest (live) ─────────────────────────────────────────────────
+// Guards POST /api/otel/spans, which converts OTLP spans into ocel_events. This
+// endpoint was silently DEAD (insert used non-existent columns ts_ms/object_ref;
+// event_hash used a divergent formula) — its existing tests only run live + aren't
+// in CI, so nothing caught it. This step runs against real Supabase in CI.
+describe('OTel → OCEL ingest convergence (live)', () => {
+  it('OTLP spans become hash-convergent ocel_events rows', async () => {
+    if (MOCK) return;
+    const sid = `otel-loop-${Date.now()}`;
+    // Create the session row first (ocel_events.session_id FKs game_sessions).
+    const created = await post('/api/game/session', { browser_session_id: sid, engine_source: 'rocket_cli' });
+    if (created.status === 503) return;
+    expect(created.status).toBe(200);
+    const sessionId = created.body.session_id as string;
+
+    const body = {
+      resourceSpans: [{ scopeSpans: [{ spans: [
+        { name: 'GameSessionStarted', startTimeUnixNano: '1781000000000000000', attributes: [{ key: 'stage_index', value: { intValue: '0' } }] },
+        { name: 'FrameRendered', startTimeUnixNano: '1781000000200000000', attributes: [] },
+        { name: 'InputAdmitted', startTimeUnixNano: '1781000000400000000', attributes: [{ key: 'intent', value: { stringValue: 'Interact' } }] },
+      ] }] }],
+    };
+    const ingest = await post(`/api/otel/spans?session_id=${sessionId}&object_ref=cook:${sessionId}`, body);
+    if (ingest.status === 503) return;
+    expect(ingest.status).toBe(200); // was 500 — insert hit non-existent columns
+    expect(ingest.body.ingested).toBe(3);
+    expect(String(ingest.body.chain_tip)).toMatch(/^[0-9a-f]{64}$/);
+
+    // The stored event_hash must match the server's canonical recompute — proves the
+    // OTLP-ingest hash formula converges with session-seed/replay/Rust.
+    const replay = await get(`/api/game/session-replay?session_id=${sessionId}`);
+    expect(replay.status).toBe(200);
+    expect(replay.body.total_events).toBe(3);
+    expect(replay.body.hash_convergent).toBe(true);
+    console.log(`[headless-loop] otel→ocel: ingested=${ingest.body.ingested} hash_convergent=${replay.body.hash_convergent}`);
+  });
+});
