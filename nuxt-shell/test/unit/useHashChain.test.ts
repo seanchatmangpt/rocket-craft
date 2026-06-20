@@ -12,7 +12,18 @@
 import { describe, it, expect } from 'vitest'
 import { useHashChain, type HashChainEvent, type LinkedEvent } from '../../app/composables/useHashChain'
 
-const { computeEventHash, linkEvents, verifyChain, findBreaks } = useHashChain()
+const { computeEventHash, linkEvents, verifyChain, findBreaks, computeMerkleRoot } = useHashChain()
+
+describe('computeMerkleRoot cross-impl anchor (must match server merkle.ts)', () => {
+  it('pins the 2-leaf root H(a64 + b64)', async () => {
+    const a = 'a'.repeat(64), b = 'b'.repeat(64)
+    expect(await computeMerkleRoot([a, b])).toBe('f27ee0ad41ba8d44a592347ad98c260260d36a59aae97b8e8abc51a3f087bff7')
+  })
+  it('pins the 3-leaf root (odd leaf duplicated)', async () => {
+    const a = 'a'.repeat(64), b = 'b'.repeat(64), c = 'c'.repeat(64)
+    expect(await computeMerkleRoot([a, b, c])).toBe('60a0f2abfef2afd329bc5c2a8f6aa8db7b73eafc6794a7a043c843eac7507d31')
+  })
+})
 
 /** Build a full linked chain from an array of raw events */
 async function buildLinkedChain(events: HashChainEvent[]): Promise<LinkedEvent[]> {

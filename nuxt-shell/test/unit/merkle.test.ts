@@ -54,6 +54,22 @@ describe('computeMerkleRoot', () => {
     expect(computeMerkleRoot(hashes)).toBe(computeMerkleRoot(hashes))
   })
 
+  // ── Cross-implementation anchors ──────────────────────────────────────────
+  // These exact roots are the byte-level contract the BROWSER computeMerkleRoot
+  // (app/composables/useHashChain.ts — identical algorithm: BLAKE3(left+right),
+  // odd-leaf duplicated) must also produce. Pinning them prevents either impl
+  // from silently drifting (the same drift class that broke event_hash).
+
+  it('pins the 2-leaf root (cross-impl anchor: H(a64 + b64))', () => {
+    const a = 'a'.repeat(64), b = 'b'.repeat(64)
+    expect(computeMerkleRoot([a, b])).toBe('f27ee0ad41ba8d44a592347ad98c260260d36a59aae97b8e8abc51a3f087bff7')
+  })
+
+  it('pins the 3-leaf root (odd leaf duplicated: H(H(a+b) + H(c+c)))', () => {
+    const a = 'a'.repeat(64), b = 'b'.repeat(64), c = 'c'.repeat(64)
+    expect(computeMerkleRoot([a, b, c])).toBe('60a0f2abfef2afd329bc5c2a8f6aa8db7b73eafc6794a7a043c843eac7507d31')
+  })
+
   it('different inputs produce different roots', () => {
     const root1 = computeMerkleRoot([FAKE_HASH(1), FAKE_HASH(2)])
     const root2 = computeMerkleRoot([FAKE_HASH(1), FAKE_HASH(3)])
