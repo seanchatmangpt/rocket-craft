@@ -1,0 +1,84 @@
+version: "3.9"
+
+# Load secrets / config from a local .env file (not committed).
+# Copy .env.example to .env and fill in real values before running.
+
+services:
+  # ── rocket-cmd ──────────────────────────────────────────────────────────────
+  rocket:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rocket-craft/rocket-cmd:latest
+    volumes:
+      # Mount the repo so `rocket` commands can read project-manifest.json,
+      # source files, etc.  The UE4 binary assets in versions/ are excluded
+      # via .dockerignore when building the image; the bind-mount still
+      # exposes them at runtime if they exist on the host.
+      - .:/workspace
+    working_dir: /workspace
+    environment:
+      - UE4_ROOT=${UE4_ROOT:-/opt/ue4}
+      - SUPABASE_URL=${SUPABASE_URL:-http://supabase-rest:3000}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - supabase-db
+      - supabase-rest
+    networks:
+      - rocket-net
+
+  # ── Supabase Postgres ────────────────────────────────────────────────────────
+  supabase-db:
+    image: supabase/postgres:15.1.0.117
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+    volumes:
+      - supabase-db-data:/var/lib/postgresql/data
+    networks:
+      - rocket-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── PostgREST (Supabase REST API) ────────────────────────────────────────────
+  supabase-rest:
+    image: postgrest/postgrest:v12.0.2
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      PGRST_DB_URI: postgres://postgres:${POSTGRES_PASSWORD:-postgres}@supabase-db:5432/postgres
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters}
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+    networks:
+      - rocket-net
+
+  # ── PWA (pwa-staff) ──────────────────────────────────────────────────────────
+  pwa:
+    build:
+      context: pwa-staff
+      dockerfile: Dockerfile
+    image: rocket-craft/pwa-staff:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - rocket-net
+
+volumes:
+  supabase-db-data:
+
+networks:
+  rocket-net:
+    driver: bridge
