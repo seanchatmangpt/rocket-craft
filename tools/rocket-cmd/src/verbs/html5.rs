@@ -1148,7 +1148,7 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
     let pipeline_start = std::time::Instant::now();
 
     // Step 1: preflight
-    println!("[1/3] Running preflight checks for {}...", project);
+    println!("[1/4] Running preflight checks for {}...", project);
     let t0 = std::time::Instant::now();
     let preflight = do_html5_preflight(Some(project.clone()))?;
     let preflight_secs = t0.elapsed().as_secs_f64();
@@ -1158,20 +1158,20 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
             format!("Preflight failed for {}. Fix the above issues before cooking.", project)
         ));
     }
-    println!("[1/3] Preflight PASS ({:.1}s)\n", preflight_secs);
+    println!("[1/4] Preflight PASS ({:.1}s)\n", preflight_secs);
 
     // Step 2: cook — default to Shipping for pipeline (production quality)
     let effective_config = config.unwrap_or_else(|| "Shipping".to_string());
-    println!("[2/3] Cooking {} ({})...", project, effective_config);
+    println!("[2/4] Cooking {} ({})...", project, effective_config);
     let t0 = std::time::Instant::now();
     let cook_result = do_html5_cook(project.clone(), archive.clone(), Some(effective_config))?;
     let cook_secs = t0.elapsed().as_secs_f64();
-    println!("[2/3] Cook complete ({:.0}s)\n", cook_secs);
+    println!("[2/4] Cook complete ({:.0}s)\n", cook_secs);
 
     // Step 3: verify (do_html5_cook already auto-verifies, but run explicitly for clean output)
-    println!("[3/3] Verifying package...");
+    println!("[3/4] Verifying package...");
     let t0 = std::time::Instant::now();
-    let verify = do_html5_verify(archive, None, Some(project.clone()))?;
+    let verify = do_html5_verify(archive.clone(), None, Some(project.clone()))?;
     let verify_secs = t0.elapsed().as_secs_f64();
     let verdict = verify["verdict"].as_str().unwrap_or("UNKNOWN");
     if verdict != "PASS" {
@@ -1179,7 +1179,15 @@ fn pipeline_html5(project: String, config: Option<String>, archive: Option<Strin
             format!("Package verification failed: verdict={verdict}")
         ));
     }
-    println!("[3/3] Verification PASS ({:.1}s)\n", verify_secs);
+    println!("[3/4] Verification PASS ({:.1}s)\n", verify_secs);
+
+    // Step 4: tamper-check — confirm the binary on disk matches the receipt the cook
+    // just pushed (NO_PRIOR/NO_WASM are fine; a MISMATCH = TAMPER fails the pipeline).
+    println!("[4/4] Tamper check (disk binary vs pushed receipt)...");
+    let t0 = std::time::Instant::now();
+    let tamper = do_html5_tamper_check(archive, Some(project.clone()))?;
+    let tamper_secs = t0.elapsed().as_secs_f64();
+    println!("[4/4] Tamper check: {} ({:.1}s)\n", tamper["verdict"].as_str().unwrap_or("?"), tamper_secs);
 
     let total_secs = pipeline_start.elapsed().as_secs_f64();
     println!("[DONE] HTML5 pipeline complete for {project} ({:.0}s total)", total_secs);
