@@ -108,6 +108,19 @@ test.describe('Real UE4 game loop (requires live asset server on :8080)', () => 
     console.log(`[real-ue4-e2e] OCEL events at EngineReady: ${engineReadyEventCount}`);
     expect(engineReadyEventCount).toBeGreaterThanOrEqual(2); // GameSessionStarted + FrameRendered
 
+    // Instrument the REAL iframe canvas: record key events synthesized from intents.
+    // Proves the control plane actually reaches the game (intent → UE4Canvas →
+    // dispatchIntentKeyToCanvas → real canvas keydown), not just that OCEL fired.
+    await page.evaluate(() => {
+      const iframe = document.querySelector('iframe.ue4-frame') as HTMLIFrameElement | null;
+      const win = iframe?.contentWindow as (Window & { __rocketKeys?: string[] }) | null;
+      const doc = iframe?.contentDocument;
+      if (!win || !doc) return;
+      win.__rocketKeys = [];
+      const canvas = doc.getElementById('canvas') ?? doc.body;
+      canvas?.addEventListener('keydown', (e) => win.__rocketKeys!.push((e as KeyboardEvent).code));
+    });
+
     // Drive real game intents — these exercise the full input→UE4 pipeline
     await page.waitForTimeout(INTENT_SETTLE_MS); // let UE4 fully init before input
     await driveIntent(page, 'MoveForward', { value: 0.8 });
@@ -117,6 +130,19 @@ test.describe('Real UE4 game loop (requires live asset server on :8080)', () => 
     await driveIntent(page, 'NextStation');
     await page.waitForTimeout(500);
     await driveIntent(page, 'MoveForward', { value: 0.5 });
+    await page.waitForTimeout(500);
+
+    // Assert the synthetic keys actually landed on the real UE4 canvas.
+    const canvasKeys = await page.evaluate(() => {
+      const iframe = document.querySelector('iframe.ue4-frame') as HTMLIFrameElement | null;
+      return (iframe?.contentWindow as (Window & { __rocketKeys?: string[] }) | null)?.__rocketKeys ?? null;
+    });
+    if (canvasKeys !== null) {
+      // MoveForward→KeyW, Interact→KeyE were driven → must appear on the canvas.
+      expect(canvasKeys).toContain('KeyW');
+      expect(canvasKeys).toContain('KeyE');
+      console.log(`[real-ue4-e2e] control plane → canvas keys delivered: ${[...new Set(canvasKeys)].join(',')}`);
+    }
 
     // Wait for InputAdmitted events to appear in OCEL log
     const finalCount = await page.waitForFunction(
