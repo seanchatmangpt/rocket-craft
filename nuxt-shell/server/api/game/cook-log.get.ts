@@ -22,6 +22,7 @@ import { createReadStream, statSync, existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { createInterface } from 'node:readline';
 import { join } from 'node:path';
+import { classifyCookLogLine } from '../../utils/cookLogPatterns';
 
 const LOG_PATH = join(homedir(), 'ue4-cook-latest.log');
 const POLL_MS = 500;
@@ -34,68 +35,9 @@ interface CookLogEvent {
   line_no: number;
 }
 
-// Pattern table: mirrors Rust CookLogParser COOK_PATTERNS (tools/rocket-sdk/src/html5.rs).
-// Order matters — first match wins. Keep in sync with the Rust table.
-const PATTERNS: Array<{ match: string; activity: string }> = [
-  // ── UAT entry / setup ────────────────────────────────────────────────────
-  { match: 'BuildCookRun',                       activity: 'CookStarted' },
-  { match: 'HTML5Setup.sh',                      activity: 'HTML5SetupStarted' },
-  { match: 'HTML5Setup',                         activity: 'HTML5SetupStarted' },
-  { match: 'Success!',                           activity: 'HTML5SetupComplete' },
-  // ── Cook phase ───────────────────────────────────────────────────────────
-  { match: 'LogCook: Display: Cooking package',  activity: 'PackageCooking' },
-  { match: 'LogCook: Display: Cook complete',    activity: 'CookComplete' },
-  { match: 'Total cook time',                    activity: 'CookComplete' },
-  { match: 'LogCook: Display: Finished cooking', activity: 'CookComplete' },
-  // ── Shader compilation ───────────────────────────────────────────────────
-  { match: 'LogShaderCompilers:',                activity: 'ShaderCompileStarted' },
-  { match: 'ShaderCompileWorker',                activity: 'ShaderCompileStarted' },
-  { match: 'Shaders compiled',                   activity: 'ShadersCompiled' },
-  // ── Asset save phase ─────────────────────────────────────────────────────
-  { match: 'LogSave: Display: Saving package',   activity: 'AssetSaveStarted' },
-  { match: 'LogSave: Display: Saving cooked',    activity: 'AssetSaveStarted' },
-  // ── WASM / Emscripten compilation ────────────────────────────────────────
-  { match: 'LogHTML5PlatformEditor',             activity: 'WasmBuildStarted' },
-  { match: 'emcc',                               activity: 'EmscriptenInvoked' },
-  { match: 'wasm-opt',                           activity: 'WasmOptimized' },
-  // ── Pak / staging ────────────────────────────────────────────────────────
-  { match: 'LogPak: Display: Collecting files',  activity: 'PakStarted' },
-  { match: 'LogPak: Display: Created pak file',  activity: 'PakComplete' },
-  { match: 'LogStageAndPackage',                 activity: 'StagingStarted' },
-  { match: 'Staging complete',                   activity: 'StagingComplete' },
-  { match: 'Archiving',                          activity: 'ArchiveStarted' },
-  // ── Package finalisation ─────────────────────────────────────────────────
-  { match: 'Packaging complete',                 activity: 'PackageComplete' },
-  { match: 'Package was created',                activity: 'PackageCreated' },
-  { match: 'BuildCookRun: Completed',            activity: 'CookFinished' },
-  // ── Errors (last — only if no success pattern matched first) ─────────────
-  { match: 'CookLog: Error:',                    activity: 'CookError' },
-  { match: 'Error: Error:',                      activity: 'CookError' },
-  { match: 'Error:',                             activity: 'CookError' },
-  { match: 'ERROR:',                             activity: 'CookError' },
-  { match: 'FAILED:',                            activity: 'CookFailed' },
-  { match: 'returned exit code',                 activity: 'CookFailed' },
-  { match: 'exception was thrown',               activity: 'CookFailed' },
-];
-
-function classifyLine(line: string): Pick<CookLogEvent, 'activity' | 'detail'> | null {
-  for (const { match, activity } of PATTERNS) {
-    if (line.includes(match)) {
-      let detail: string | undefined;
-      if (activity === 'PackageCooking') {
-        detail = line.split('Cooking package:')[1]?.trim();
-      } else if (activity === 'CookComplete') {
-        detail = line.split('Total cook time')[1]?.trim();
-      } else if (activity === 'PakComplete') {
-        detail = line.split('Created pak file')[1]?.trim();
-      } else if (activity === 'CookError' || activity === 'CookFailed') {
-        detail = line.trim();
-      }
-      return { activity, detail };
-    }
-  }
-  return null;
-}
+// Pattern table + classifier live in server/utils/cookLogPatterns.ts (unit-tested,
+// kept in sync with the Rust CookLogParser). classifyLine is a thin alias here.
+const classifyLine = classifyCookLogLine;
 
 async function readLinesFrom(path: string, fromByte: number): Promise<{ lines: string[]; newByte: number }> {
   if (!existsSync(path)) return { lines: [], newByte: 0 };
