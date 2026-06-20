@@ -49,7 +49,10 @@ def run_verifier_logic(asset_dir):
         "SM_WingArray_Left.usda",
         "SM_WingArray_Right.usda",
         "SM_Blade_Left.usda",
-        "SM_Blade_Right.usda"
+        "SM_Blade_Right.usda",
+        "SM_Limb_Left.usda",
+        "SM_Limb_Right.usda",
+        "SM_Loadout.usda"
     ]
     for pf in part_files:
         pfp = os.path.join(usd_dir, pf)
@@ -77,7 +80,7 @@ def run_verifier_logic(asset_dir):
             content = f.read()
         bindings = content.count("material:binding")
         material_binding_count += bindings
-        mesh_defs = len(re.findall(r'^\s*def\s+Mesh\s+"([^"]+)"', content, re.MULTILINE))
+        mesh_defs = len(re.findall(r'(?:^\s*def\s+(?:Mesh|Cube|Cylinder|Sphere|Capsule|Cone)\s+"([^"]+)")', content, re.MULTILINE))
         if mesh_defs > 0 and bindings == 0:
             missing_bindings = True
             
@@ -100,7 +103,7 @@ def run_verifier_logic(asset_dir):
         pfp = os.path.join(usd_dir, pf)
         with open(pfp, "r") as f:
             content = f.read()
-        wing_feather_count += len(re.findall(r'^\s*def\s+Mesh\s+"([^"]+)"', content, re.MULTILINE))
+        wing_feather_count += len(re.findall(r'^\s*def\s+(?:Mesh|Cube|Cylinder|Sphere|Capsule|Cone)\s+"([^"]+)"', content, re.MULTILINE))
         
     if wing_feather_count < 48:
         return {"status": "REFUSED", "refusal_reason": "LOW_FEATHER_COUNT"}
@@ -237,7 +240,10 @@ def main():
         "SM_WingArray_Left.usda",
         "SM_WingArray_Right.usda",
         "SM_Blade_Left.usda",
-        "SM_Blade_Right.usda"
+        "SM_Blade_Right.usda",
+        "SM_Limb_Left.usda",
+        "SM_Limb_Right.usda",
+        "SM_Loadout.usda"
     ]
     all_meshes_exist = all(os.path.exists(os.path.join(asset_dir, "usd", f)) for f in mesh_files)
     add_req("USD_MESH_FILES_EXIST", "Part USD files exist", "True", all_meshes_exist, all_meshes_exist)
@@ -382,18 +388,18 @@ def main():
     )
 
     # Mutation 3: Missing material binding
-    head_path = os.path.join(asset_dir, "usd", "SM_Head.usda")
-    head_backup = backup_file(head_path)
-    def mutate_head_bindings():
-        with open(head_path, "r") as f:
+    blade_path = os.path.join(asset_dir, "usd", "SM_Limb_Left.usda")
+    blade_backup = backup_file(blade_path)
+    def mutate_blade_bindings():
+        with open(blade_path, "r") as f:
             content = f.read()
         mutated = content.replace("material:binding", "material_binding_corrupted")
-        with open(head_path, "w") as f:
+        with open(blade_path, "w") as f:
             f.write(mutated)
     run_falsify_test(
         "MISSING_MATERIAL_BINDING",
-        mutate_head_bindings,
-        lambda: restore_file(head_path, head_backup),
+        mutate_blade_bindings,
+        lambda: restore_file(blade_path, blade_backup),
         "MISSING_MATERIAL_BINDING"
     )
 
@@ -425,10 +431,20 @@ def main():
     left_wing_backup = backup_file(left_wing_path)
     right_wing_backup = backup_file(right_wing_path)
     def mutate_wings_low_feathers():
+        left_content = '#usda 1.0\ndef Xform "SM_WingArray_Left"\n{\n'
+        for i in range(20):
+            left_content += f'    def Mesh "mesh_{i:02d}"\n    {{\n        rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>\n    }}\n'
+        left_content += '}\n'
+        
+        right_content = '#usda 1.0\ndef Xform "SM_WingArray_Right"\n{\n'
+        for i in range(20):
+            right_content += f'    def Mesh "mesh_{i:02d}"\n    {{\n        rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>\n    }}\n'
+        right_content += '}\n'
+        
         with open(left_wing_path, "w") as f:
-            f.write('#usda 1.0\ndef Xform "SM_WingArray_Left"\n{\n def Mesh "mesh_01"\n {\n rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>\n }\n}\n')
+            f.write(left_content)
         with open(right_wing_path, "w") as f:
-            f.write('#usda 1.0\ndef Xform "SM_WingArray_Right"\n{\n def Mesh "mesh_01"\n {\n rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>\n }\n}\n')
+            f.write(right_content)
     run_falsify_test(
         "LOW_FEATHER_COUNT",
         mutate_wings_low_feathers,
