@@ -223,6 +223,12 @@ fn do_html5_cook(
         return Err(clap_noun_verb::NounVerbError::execution_error(msg));
     }
 
+    // Record cook start time before spawning UAT so OCEL event timestamps are accurate.
+    let cook_start_ms = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as u64)
+        .unwrap_or(0);
+
     println!(
         "HTML5 cook: {} → {}",
         uproject.display(),
@@ -233,13 +239,8 @@ fn do_html5_cook(
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
 
     // Parse the UAT cook log to extract rich OCEL lifecycle events.
-    // The log is written to ~/ue4-cook-latest.log by Html5Cook::run().
     let home = std::env::var("HOME").unwrap_or_default();
     let cook_log_path = std::path::PathBuf::from(format!("{home}/ue4-cook-latest.log"));
-    let cook_start_ms = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|d| d.as_millis() as u64)
-        .unwrap_or(0);
     let log_events = if cook_log_path.exists() {
         let evts = rocket_sdk::parse_cook_log(&cook_log_path, cook_start_ms);
         println!("[cook-log] {} OCEL events from UAT log", evts.len());
