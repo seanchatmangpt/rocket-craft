@@ -4,6 +4,26 @@
  * Must be inside <ClientOnly>. Includes capability detection — speech recognition
  * is only available in Chrome/Edge; reports 'unsupported' gracefully in Firefox/Safari.
  */
+import type { RocketIntent } from './useRocketInputBus';
+
+/**
+ * Pure phrase→intent mapping for voice commands. Extracted from the recognition
+ * watcher so the vocabulary is unit-tested without the Web Speech API. Case- and
+ * whitespace-insensitive; first match wins; returns null for unrecognized speech.
+ */
+export function phraseToIntent(text: string): RocketIntent | null {
+  const phrase = text.toLowerCase().trim();
+  if (!phrase) return null;
+  if (phrase.includes('start walkthrough')) return { type: 'StartWalkthrough', source: 'speech' };
+  if (phrase.includes('pause walkthrough')) return { type: 'PauseWalkthrough', source: 'speech' };
+  if (phrase.includes('resume walkthrough')) return { type: 'ResumeWalkthrough', source: 'speech' };
+  if (phrase.includes('open receipt')) return { type: 'OpenReceiptPanel', source: 'speech' };
+  if (phrase.includes('next station')) return { type: 'NextStation', source: 'speech' };
+  if (phrase.includes('previous station')) return { type: 'PreviousStation', source: 'speech' };
+  if (phrase.includes('interact') || phrase.includes('inspect')) return { type: 'Interact', source: 'speech' };
+  return null;
+}
+
 export function useRocketSpeechInput() {
   const { emit } = useRocketInputBus();
 
@@ -19,23 +39,8 @@ export function useRocketSpeechInput() {
   const speech = useSpeechRecognition({ lang: 'en-US', continuous: true, interimResults: false });
 
   watch(speech.result, (text) => {
-    const phrase = text.toLowerCase().trim();
-    if (!phrase) return;
-
-    if (phrase.includes('start walkthrough'))
-      emit({ type: 'StartWalkthrough', source: 'speech' });
-    else if (phrase.includes('pause walkthrough'))
-      emit({ type: 'PauseWalkthrough', source: 'speech' });
-    else if (phrase.includes('resume walkthrough'))
-      emit({ type: 'ResumeWalkthrough', source: 'speech' });
-    else if (phrase.includes('open receipt'))
-      emit({ type: 'OpenReceiptPanel', source: 'speech' });
-    else if (phrase.includes('next station'))
-      emit({ type: 'NextStation', source: 'speech' });
-    else if (phrase.includes('previous station'))
-      emit({ type: 'PreviousStation', source: 'speech' });
-    else if (phrase.includes('interact') || phrase.includes('inspect'))
-      emit({ type: 'Interact', source: 'speech' });
+    const intent = phraseToIntent(text);
+    if (intent) emit(intent);
   });
 
   return { isSupported, isListening: speech.isListening, start: speech.start, stop: speech.stop };
