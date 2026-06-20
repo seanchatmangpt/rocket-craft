@@ -31,7 +31,7 @@ fn do_watch(workspace: Option<String>) -> Result<Value> {
 /// * `workspace` - Optional: restrict watching to a single named workspace
 ///   (one of: tools, nexus-engine, blueprint-rs, unify-rs, infinity-blade-4/mud,
 ///   chicago-tdd-tools, pwa-staff)
-#[verb("watch", "project")]
-fn watch_project(workspace: Option<String>) -> Result<Value> {
+#[verb("watch", "workspace")]
+fn watch_workspace(workspace: Option<String>) -> Result<Value> {
     do_watch(workspace)
 }
