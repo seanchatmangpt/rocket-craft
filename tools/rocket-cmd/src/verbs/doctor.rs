@@ -2,76 +2,84 @@
 
 use clap_noun_verb::Result;
 use clap_noun_verb_macros::verb;
+use rocket_sdk::doctor::{
+    CheckCategory, print_check, print_health_score, print_json_report, print_section,
+    RocketDoctor,
+};
 use serde_json::Value;
 
-fn do_doctor_check() -> Result<Value> {
+fn do_doctor_check(fix: bool, json: bool) -> Result<Value> {
     let root = std::env::current_dir()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
 
-    let report = rocket_sdk::doctor::RocketDoctor::new(root).run_diagnostics();
+    let doctor = RocketDoctor::new(root);
 
-    let checks: Vec<Value> = report
-        .checks
-        .iter()
-        .map(|c| {
-            let status = match c.status {
-                rocket_sdk::doctor::CheckStatus::Pass => "PASS",
-                rocket_sdk::doctor::CheckStatus::Warn => "WARN",
-                rocket_sdk::doctor::CheckStatus::Fail => "FAIL",
-            };
-            println!("[{status}] {}: {}", c.name, c.message);
-            let mut obj = serde_json::json!({
-                "name": c.name,
-                "status": status,
-                "message": c.message,
-            });
-            if let Some(d) = &c.details {
-                obj["details"] = Value::String(d.clone());
-            }
-            obj
-        })
-        .collect();
-
-    let pass_count = report
-        .checks
-        .iter()
-        .filter(|c| c.status == rocket_sdk::doctor::CheckStatus::Pass)
-        .count();
-    let fail_count = report
-        .checks
-        .iter()
-        .filter(|c| c.status == rocket_sdk::doctor::CheckStatus::Fail)
-        .count();
-    let warn_count = report
-        .checks
-        .iter()
-        .filter(|c| c.status == rocket_sdk::doctor::CheckStatus::Warn)
-        .count();
-
-    let overall = if fail_count > 0 {
-        "FAIL"
-    } else if warn_count > 0 {
-        "WARN"
+    let report = if fix {
+        doctor.run_fix_and_recheck()
     } else {
-        "PASS"
+        doctor.run_diagnostics()
     };
-    println!("\n[{overall}] {pass_count} passed, {warn_count} warned, {fail_count} failed");
+
+    if json {
+        print_json_report(&report);
+    } else {
+        // -- Required section
+        print_section("Required");
+        for check in report
+            .checks
+            .iter()
+            .filter(|c| c.category == Some(CheckCategory::Required))
+        {
+            print_check(check);
+        }
+
+        // -- Optional section
+        print_section("Optional");
+        for check in report
+            .checks
+            .iter()
+            .filter(|c| c.category == Some(CheckCategory::Optional))
+        {
+            print_check(check);
+        }
+
+        // Ungrouped checks (no category assigned)
+        let ungrouped: Vec<_> = report
+            .checks
+            .iter()
+            .filter(|c| c.category.is_none())
+            .collect();
+        if !ungrouped.is_empty() {
+            print_section("Other");
+            for check in &ungrouped {
+                print_check(check);
+            }
+        }
+
+        print_health_score(&report);
+    }
+
+    let pass = report.required_pass_count();
+    let total = report.required_total();
+    let all_pass = report.all_required_pass();
 
     Ok(serde_json::json!({
-        "overall": overall,
-        "pass": pass_count,
-        "warn": warn_count,
-        "fail": fail_count,
-        "checks": checks,
+        "overall": if all_pass { "PASS" } else { "FAIL" },
+        "required_pass": pass,
+        "required_total": total,
         "timestamp": report.timestamp.to_rfc3339(),
     }))
 }
 
-/// Diagnose the UE4 and SDK environment for this project
+/// Diagnose the UE4 and SDK environment for this project.
 ///
-/// Checks: UE4_ROOT resolution, RunUAT.sh existence, HTML5 package status,
-/// Python 3, Node.js, and Blender availability.
+/// Checks are grouped into Required (blocking) and Optional sections.
+/// The health score counts only required checks.
+///
+/// Flags:
+///   --fix   Auto-repair fixable failures (rustfmt/clippy, npm ci, .env), then recheck
+///   --json  Emit structured JSON report for CI consumption
 #[verb("check", "doctor")]
-fn doctor_check() -> Result<Value> {
-    do_doctor_check()
+fn doctor_check(fix: bool, json: bool) -> Result<Value> {
+    do_doctor_check(fix, json)
 }
