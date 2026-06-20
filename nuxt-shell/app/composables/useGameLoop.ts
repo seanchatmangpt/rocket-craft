@@ -10,7 +10,7 @@
  * has been mined into a conforming receipt — not when API calls returned 200.
  */
 
-import { blake3 } from '@noble/hashes/blake3.js';
+// canonicalOcelEventHash is auto-imported from app/utils/ocelEventHash.ts (Nuxt).
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -69,16 +69,11 @@ export interface FullLoopReceipt {
   };
 }
 
-// ── BLAKE3 helpers ────────────────────────────────────────────────────────────
-
-function blake3Hex(input: string): string {
-  const bytes = blake3(new TextEncoder().encode(input));
-  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function canonicalize(obj: Record<string, unknown>): string {
-  return JSON.stringify(obj, Object.keys(obj).sort());
-}
+// ── Event hashing ──────────────────────────────────────────────────────────────
+// Uses the shared canonical (recursive) so hashes converge with the server, the
+// browser persistence path, and the Rust CLI. Previously this had its OWN
+// top-level-only array-replacer canonicalize that dropped nested attributes — a
+// 5th divergent implementation that produced hash_convergent=false on replay.
 
 function computeEventHash(
   sessionId: string,
@@ -87,7 +82,7 @@ function computeEventHash(
   prevHash: string | null,
   attributes: Record<string, unknown>,
 ): string {
-  return blake3Hex(canonicalize({ session_id: sessionId, activity, timestamp_ms: timestampMs, prev_hash: prevHash, attributes }));
+  return canonicalOcelEventHash({ session_id: sessionId, activity, timestamp_ms: timestampMs, prev_hash: prevHash, attributes });
 }
 
 // ── Composable ────────────────────────────────────────────────────────────────

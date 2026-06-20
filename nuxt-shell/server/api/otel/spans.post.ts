@@ -27,6 +27,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { blake3 } from '@noble/hashes/blake3.js'
 import { bytesToHex } from '@noble/hashes/utils'
+import { canonicalJSON } from '../../utils/canonicalJson'
 
 // OTLP span structure (only the fields we use)
 interface OtlpSpan {
@@ -68,27 +69,28 @@ function attrsToObject(attrs: OtlpSpan['attributes'] = []): Record<string, unkno
   return out
 }
 
-/** Compute a BLAKE3 event hash matching ChainedOcelEmitter formula */
+/**
+ * Compute the canonical OCEL event hash. MUST match session-seed/session-replay/
+ * Rust: recursive canonicalJSON over EXACTLY {activity, attributes, prev_hash,
+ * session_id, timestamp_ms}. (Previously hashed a different field set —
+ * object_ref/seq/ts_ms — with the attr-dropping array replacer, so OTLP-ingested
+ * events replayed as hash_convergent=false. object_ref/seq are stored as columns
+ * but are NOT part of the canonical hash.)
+ */
 function computeEventHash(params: {
   session_id: string | null
-  object_ref: string
   activity: string
-  ts_ms: number
-  seq: number
+  timestamp_ms: number
   prev_hash: string | null
   attributes: Record<string, unknown>
 }): string {
-  const payload = {
-    activity: params.activity,
-    attributes: params.attributes,
-    object_ref: params.object_ref,
-    prev_hash: params.prev_hash,
-    seq: params.seq,
+  const canonical = canonicalJSON({
     session_id: params.session_id,
-    ts_ms: params.ts_ms,
-  }
-  // canonical JSON: keys sorted alphabetically (same as Rust canonical_json)
-  const canonical = JSON.stringify(payload, Object.keys(payload).sort())
+    activity: params.activity,
+    timestamp_ms: params.timestamp_ms,
+    prev_hash: params.prev_hash,
+    attributes: params.attributes,
+  })
   return bytesToHex(blake3(new TextEncoder().encode(canonical)))
 }
 
@@ -143,19 +145,19 @@ export default defineEventHandler(async (event) => {
 
     const hash = computeEventHash({
       session_id: sessionId,
-      object_ref: objectRef,
       activity,
-      ts_ms: tsMs,
-      seq,
+      timestamp_ms: tsMs,
       prev_hash: prevHash,
       attributes,
     })
 
+    // Column names MUST match ocel_events: timestamp_ms (not ts_ms), object_refs
+    // (array, not object_ref). The previous names don't exist → insert failed.
     const row = {
       session_id: sessionId,
-      object_ref: objectRef,
+      object_refs: [objectRef],
       activity,
-      ts_ms: tsMs,
+      timestamp_ms: tsMs,
       seq,
       prev_hash: prevHash,
       event_hash: hash,
