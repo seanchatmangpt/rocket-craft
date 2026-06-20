@@ -8,6 +8,8 @@ pub mod project;
 pub mod pwa;
 pub mod receipt;
 pub mod registry;
+pub mod status;
 pub mod supabase;
 pub mod wasm;
+pub mod watch;
 pub mod workspace;

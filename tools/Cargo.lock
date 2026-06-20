@@ -2918,6 +2918,7 @@ dependencies = [
  "knhk",
  "libc",
  "mockall",
+ "notify",
  "openssl",
  "p12-keystore",
  "rayon",

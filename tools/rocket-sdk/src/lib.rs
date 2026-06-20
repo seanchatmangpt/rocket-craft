@@ -7,8 +7,10 @@ pub mod error;
 pub mod html5;
 pub mod manifest;
 pub mod setup;
+pub mod status;
 pub mod supabase;
 pub mod wasm;
+pub mod watch;
 pub use html5::{discover_emsdk_python, Html5Cook, Html5PackageVerifier, Html5PackageReport, Html5Setup, WasmVerdict, CookLogEvent, parse_cook_log};
 
 pub use crate::manifest::Manifest;

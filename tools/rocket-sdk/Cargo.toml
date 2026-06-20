@@ -30,6 +30,7 @@ reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 blake3 = "1.5"
 libc = "0.2.186"
+notify = { version = "6", features = ["macos_fsevent"] }
 
 [dev-dependencies]
 un-test-utils = { path = "../un-test-utils" }
