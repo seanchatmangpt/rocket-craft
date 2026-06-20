@@ -251,11 +251,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: nuxt-shell/package-lock.json
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Type-check
         run: npx tsc --noEmit || true
@@ -333,11 +335,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
-          cache-dependency-path: nuxt-shell/package-lock.json
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - uses: supabase/setup-cli@v1
         with:
@@ -348,13 +352,19 @@ jobs:
         timeout-minutes: 5
 
       - name: Apply migrations
-        run: supabase db push --local
+        run: supabase migration up --local
+
+      - name: Export Supabase local keys
+        run: |
+          ANON_KEY=$(supabase status --output json | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).anon_key))")
+          SERVICE_KEY=$(supabase status --output json | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).service_role_key))")
+          echo "SUPABASE_ANON_KEY=$ANON_KEY" >> $GITHUB_ENV
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
 
       - name: Start Nitro dev server (background)
         run: |
           npx nuxt dev --port 3000 &
-          # Wait for server to be ready
-          timeout 60 bash -c 'until curl -sf http://localhost:3000/api/game/pipeline-health; do sleep 2; done'
+          timeout 90 bash -c 'until curl -sf http://localhost:3000/api/game/pipeline-health; do sleep 3; done'
         env:
           SUPABASE_URL: http://localhost:54321
           SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
@@ -362,9 +372,12 @@ jobs:
           ALLOW_SESSION_SEED: "1"
           NODE_ENV: development
 
-      - name: Run headless gameplay loop (9 steps)
+      - name: Run headless gameplay loop (14 steps)
         run: npx vitest run tests/e2e/headless-loop.test.ts
         env:
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
           API_BASE_URL: http://localhost:3000
           ALLOW_SESSION_SEED: "1"
           NODE_ENV: development
