@@ -13,18 +13,23 @@ use serde_json::Value;
 ///
 /// Reads SUPABASE_URL + SUPABASE_ANON_KEY from the environment. Silently no-ops
 /// when Supabase is not configured — offline cooks still write local receipts.
-fn push_report_to_supabase(report: &rocket_sdk::Html5PackageReport) {
+/// Push a verified package report to Supabase.
+///
+/// Returns `Err` ONLY when the proof gate actively rejects the receipt (422/401) —
+/// that is a law violation and must fail the cook. Network/503/offline conditions
+/// are non-fatal (offline cooks still write local receipts).
+fn push_report_to_supabase(report: &rocket_sdk::Html5PackageReport) -> Result<()> {
     let url = std::env::var("SUPABASE_URL").unwrap_or_default();
     let key = std::env::var("SUPABASE_ANON_KEY")
         .or_else(|_| std::env::var("SUPABASE_SERVICE_ROLE_KEY"))
         .unwrap_or_default();
     if url.is_empty() || key.is_empty() {
-        return;
+        return Ok(());
     }
     let svc = rocket_sdk::supabase::SupabaseService::new(url, key);
     let Ok(rt) = tokio::runtime::Runtime::new() else {
         println!("[supabase] warn: could not create tokio runtime");
-        return;
+        return Ok(());
     };
     rt.block_on(async {
         // Open a game_sessions row so OCEL events can be chain-verified.
@@ -49,9 +54,18 @@ fn push_report_to_supabase(report: &rocket_sdk::Html5PackageReport) {
         // Attach session_id before pushing events + receipt.
         let mut owned = report.clone();
         owned.cook_session_id = session_id.clone();
-        match owned.push_to_supabase(&svc).await {
-            Ok(()) => println!("[supabase] cook receipt pushed → game_receipts"),
-            Err(e) => println!("[supabase] warn: push failed (non-fatal) — {e:#}"),
+        if let Err(e) = owned.push_to_supabase(&svc).await {
+            // A proof-gate rejection (422/401) is a LAW violation — fail the cook.
+            // Everything else (503, network, offline) is non-fatal.
+            let chain = format!("{e:#}");
+            if chain.contains("proof gate rejected") {
+                return Err(clap_noun_verb::NounVerbError::execution_error(format!(
+                    "cook receipt REJECTED by proof gate — receipt not admitted: {chain}"
+                )));
+            }
+            println!("[supabase] warn: push failed (non-fatal) — {chain}");
+        } else {
+            println!("[supabase] cook receipt pushed → game_receipts");
         }
 
         // Post-cook: chain-verify + QA cycle (non-fatal — pipeline proof)
@@ -78,7 +92,8 @@ fn push_report_to_supabase(report: &rocket_sdk::Html5PackageReport) {
                 Err(e) => println!("[qa-cycle] warn: {e:#}"),
             }
         }
-    });
+        Ok(())
+    })
 }
 
 fn ue4_root() -> std::path::PathBuf {
@@ -306,7 +321,7 @@ fn do_html5_cook(
             println!("[{}] {}", v, report.summary());
             let rp = report.write_receipt().ok().map(|p| p.display().to_string());
             if let Some(ref p) = rp { println!("[receipt] {p}"); }
-            push_report_to_supabase(&report);
+            push_report_to_supabase(&report)?; // proof-gate rejection is fatal
             (v.to_string(), rp)
         }
         Err(e) => {
@@ -439,8 +454,9 @@ fn do_html5_verify(archive: Option<String>, min_mb: Option<f64>, project: Option
         Err(e) => println!("[receipt] warning: could not write receipt — {e:#}"),
     }
 
-    // Push to Supabase if configured — non-fatal (cook is already done)
-    push_report_to_supabase(&report);
+    // Push to Supabase if configured. Proof-gate rejection (422/401) is fatal;
+    // network/offline conditions remain non-fatal inside the helper.
+    push_report_to_supabase(&report)?;
 
     let wasm_list: Vec<serde_json::Value> = report.wasm_files.iter().map(|f| {
         let (verdict_str, size) = match &f.verdict {
