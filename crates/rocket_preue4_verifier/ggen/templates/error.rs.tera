@@ -1,0 +1,32 @@
+{#- error.rs.tera — GC-MECHBIRTH-002 Manufacturing Template -#}
+//! RefusalReason taxonomy and JidokaEvent.
+//! ⚠️ GENERATED FILE — do NOT edit by hand.
+//! Source of truth: ontology/mechbirth.ttl
+//! Generator:       ggen/templates/error.rs.tera
+//! SPARQL:          ggen/sparql/extract_refusal_reasons.sparql
+
+use thiserror::Error;
+
+/// Bounded taxonomy of all possible refusal reasons.
+/// Generated from ontology — variants below are exhaustive.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum RefusalReason {
+{% for row in results %}
+    /// Ontology source: mb:{{ row.variant }}
+    #[error("{{ row.errorTemplate }}")]
+    {% if row.fields %}{{ row.variant }} { {{ row.fields }} },{% else %}{{ row.variant }},{% endif %}
+{% endfor %}
+}
+
+/// A Jidoka event record produced whenever a defect is detected and surfaced.
+#[derive(Debug, Clone)]
+pub struct JidokaEvent {
+    pub defect_class: String,
+    pub surface: String,
+    pub expected_law: String,
+    pub observed_failure: String,
+    pub residual: String,
+    pub repair_candidate: Option<String>,
+    pub repair_applied: bool,
+    pub receipt: Option<String>,
+}

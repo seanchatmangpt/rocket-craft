@@ -1,0 +1,13 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?loadout ?owner_part_id ?type ?slot ?equippedItem
+WHERE {
+  ?loadout rdf:type ?type .
+  ?type rdfs:subClassOf* mud:Loadout .
+  ?loadout mud:owner_part_id ?owner_part_id .
+  OPTIONAL { ?loadout mud:slot ?slot }
+  OPTIONAL { ?loadout mud:equippedItem ?equippedItem }
+}
+ORDER BY ?owner_part_id ?loadout

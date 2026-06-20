@@ -1,0 +1,4 @@
+// generated_by: ggen
+// OCEL module
+pub const OCEL_OBJECT_TYPES_COUNT: usize = 20;
+pub const OCEL_EVENT_TYPES_COUNT: usize = 15;

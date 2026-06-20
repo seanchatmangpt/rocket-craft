@@ -492,8 +492,8 @@ auto_rig = true
 **Pre-Commit Validation:**
 
 ```bash
-python3 validate-assets.py  # Grep for known-missing asset refs
-python3 check-dependencies.py  # Verify WebSocketNetworking + VaRest plugins exist
+./rocket test      # Run all test suites + native asset validation
+./rocket doctor    # Diagnose environment & verify required UE4 plugins exist
 ```
 
 **Provenance Tracking:**
@@ -614,7 +614,7 @@ tail -f /var/log/rocket-craft/deploy.log
 **Phase 5: Semantic Audits** (~5 min)
 - `./rocket audit` via WASM-loaded knhk plugins
 - `anti-llm-cheat-lsp` scanning
-- Asset validation (`validate-assets.py`, `check-dependencies.py`)
+- Asset and environment validation (`./rocket test` and `./rocket doctor`)
 
 **Total:** ~37 minutes for full CI pipeline.
 
@@ -862,7 +862,7 @@ Add a new crate `unify-mcp` implementing the Model Context Protocol.
 - Maintenance burden (MCP-aware reviewers needed)
 
 ## Timeline
-4 weeks to MVP.
+4 weeks to mathematically guaranteed equilibrium validation.
 ```
 
 ### 3. Breaking Change Policy

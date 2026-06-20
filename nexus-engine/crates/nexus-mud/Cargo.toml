@@ -1,0 +1,19 @@
+[package]
+name = "nexus-mud"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+anyhow = "1"
+blake3 = "1.5"
+chrono = { version = "0.4", features = ["serde"] }
+nexus-types = { path = "../nexus-types" }
+nexus-pmme = { path = "../nexus-pmme" }
+nexus-tps = { path = "../nexus-tps" }
+nexus-gundam = { path = "../nexus-gundam" }
+wasm4pm = { path = "/Users/sac/dev/wasm4pm/wasm4pm", features = ["cloud"] }
+wasm4pm-compat = { path = "/Users/sac/dev/wasm4pm-compat" }
+

@@ -1,7 +1,7 @@
+use mockall::automock;
+use std::fs;
 use std::path::PathBuf;
 use tempfile::TempDir;
-use std::fs;
-use mockall::automock;
 
 /// A trait for executing commands related to Unreal Engine.
 ///
@@ -42,24 +42,33 @@ impl UnrealEnvMock {
         let engine_path = root_path.join("Engine");
         fs::create_dir_all(engine_path.join("Binaries/Win64"))?;
         fs::create_dir_all(engine_path.join("Binaries/DotNET"))?;
-        
+
         // Mock Editor, UBT, and UAT
         #[cfg(windows)]
         {
-            fs::write(engine_path.join("Binaries/DotNET/UnrealBuildTool.exe"), "@echo off\nexit /b 0")?;
-            fs::write(engine_path.join("Binaries/DotNET/AutomationTool.exe"), "@echo off\nexit /b 0")?;
-            fs::write(engine_path.join("Binaries/Win64/UE4Editor.exe"), "@echo off\nexit /b 0")?;
+            fs::write(
+                engine_path.join("Binaries/DotNET/UnrealBuildTool.exe"),
+                "@echo off\nexit /b 0",
+            )?;
+            fs::write(
+                engine_path.join("Binaries/DotNET/AutomationTool.exe"),
+                "@echo off\nexit /b 0",
+            )?;
+            fs::write(
+                engine_path.join("Binaries/Win64/UE4Editor.exe"),
+                "@echo off\nexit /b 0",
+            )?;
         }
         #[cfg(not(windows))]
         {
             let ubt_path = engine_path.join("Binaries/DotNET/UnrealBuildTool");
             let uat_path = engine_path.join("Binaries/DotNET/AutomationTool");
-            
+
             let mac_editor_dir = engine_path.join("Binaries/Mac");
             let linux_editor_dir = engine_path.join("Binaries/Linux");
             fs::create_dir_all(&mac_editor_dir)?;
             fs::create_dir_all(&linux_editor_dir)?;
-            
+
             let mac_editor_path = mac_editor_dir.join("UE4Editor");
             let linux_editor_path = linux_editor_dir.join("UE4Editor");
 
@@ -111,7 +120,10 @@ impl UnrealEnvMock {
     /// Returns an error if the file cannot be written.
     pub fn write_uproject(&self, content: &str) -> anyhow::Result<()> {
         let name = self.project_path.file_name().unwrap().to_str().unwrap();
-        fs::write(self.project_path.join(format!("{}.uproject", name)), content)?;
+        fs::write(
+            self.project_path.join(format!("{}.uproject", name)),
+            content,
+        )?;
         Ok(())
     }
 
@@ -139,5 +151,85 @@ impl UnrealEnvMock {
             std::env::set_var("UNREAL_ENGINE_PATH", &self.engine_path);
             std::env::set_var("PROJECT_PATH", &self.project_path);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── UnrealEnvMock::new ────────────────────────────────────────────────────
+
+    #[test]
+    fn new_creates_engine_and_project_directories() {
+        let env = UnrealEnvMock::new().unwrap();
+        assert!(env.engine_path.exists(), "engine dir must exist");
+        assert!(env.project_path.exists(), "project dir must exist");
+    }
+
+    #[test]
+    fn new_creates_ubt_executable() {
+        let env = UnrealEnvMock::new().unwrap();
+        assert!(env.ubt_path().exists(), "UBT mock must exist at known path");
+    }
+
+    #[test]
+    fn new_creates_uat_executable() {
+        let env = UnrealEnvMock::new().unwrap();
+        assert!(env.uat_path().exists(), "UAT mock must exist at known path");
+    }
+
+    #[test]
+    fn new_creates_uproject_file() {
+        let env = UnrealEnvMock::new().unwrap();
+        let uproject = env.project_path.join("MyProject.uproject");
+        assert!(uproject.exists());
+        let content = std::fs::read_to_string(&uproject).unwrap();
+        assert_eq!(content, "{}");
+    }
+
+    // ── create_plugin ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn create_plugin_creates_uplugin_file() {
+        let env = UnrealEnvMock::new().unwrap();
+        let plugin_path = env.create_plugin("VaRest").unwrap();
+        assert!(plugin_path.join("VaRest.uplugin").exists());
+    }
+
+    #[test]
+    fn create_plugin_creates_source_directory() {
+        let env = UnrealEnvMock::new().unwrap();
+        let plugin_path = env.create_plugin("WS").unwrap();
+        assert!(plugin_path.join("Source").is_dir());
+    }
+
+    // ── write_uproject ────────────────────────────────────────────────────────
+
+    #[test]
+    fn write_uproject_overwrites_content() {
+        let env = UnrealEnvMock::new().unwrap();
+        env.write_uproject(r#"{"EngineAssociation":"4.27"}"#).unwrap();
+        let uproject = env.project_path.join("MyProject.uproject");
+        let content = std::fs::read_to_string(&uproject).unwrap();
+        assert!(content.contains("4.27"));
+    }
+
+    // ── ubt_path / uat_path ───────────────────────────────────────────────────
+
+    #[test]
+    fn ubt_path_under_engine_binaries_dotnet() {
+        let env = UnrealEnvMock::new().unwrap();
+        let p = env.ubt_path();
+        assert!(p.to_str().unwrap().contains("DotNET"));
+        assert!(p.to_str().unwrap().contains("UnrealBuildTool"));
+    }
+
+    #[test]
+    fn uat_path_under_engine_binaries_dotnet() {
+        let env = UnrealEnvMock::new().unwrap();
+        let p = env.uat_path();
+        assert!(p.to_str().unwrap().contains("DotNET"));
+        assert!(p.to_str().unwrap().contains("AutomationTool"));
     }
 }

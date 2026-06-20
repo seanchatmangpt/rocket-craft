@@ -23,7 +23,7 @@ fn make_hud(player_health: u32, player_health_max: u32) -> HudData {
 
 #[test]
 fn hud_color_is_green_at_full_health() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with 100/100 health");
     let hud = make_hud(100, 100);
 
@@ -36,7 +36,7 @@ fn hud_color_is_green_at_full_health() {
 
 #[test]
 fn hud_color_is_red_at_low_health() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with 10/100 health");
     let hud = make_hud(10, 100);
 
@@ -49,7 +49,7 @@ fn hud_color_is_red_at_low_health() {
 
 #[test]
 fn hud_color_depends_on_health_level() {
-    let mut log = log();
+    let log = log();
     log.info("Given a full-health HudData and a low-health HudData");
     let full = make_hud(100, 100);
     let low = make_hud(10, 100);
@@ -65,7 +65,7 @@ fn hud_color_depends_on_health_level() {
 
 #[test]
 fn hud_color_is_yellow_in_middle_range() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with 50/100 health (50% — mid tier)");
     let hud = make_hud(50, 100);
 
@@ -78,7 +78,7 @@ fn hud_color_is_yellow_in_middle_range() {
 
 #[test]
 fn hud_critical_health_below_25_percent() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with 20/100 health (20% — below critical threshold)");
     let critical = make_hud(20, 100);
 
@@ -89,7 +89,7 @@ fn hud_critical_health_below_25_percent() {
 
 #[test]
 fn hud_critical_health_above_25_percent_is_false() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with 80/100 health (above critical threshold)");
     let fine = make_hud(80, 100);
 
@@ -100,7 +100,7 @@ fn hud_critical_health_above_25_percent_is_false() {
 
 #[test]
 fn hud_score_format_is_right_padded_to_10_chars() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with score=42");
     let hud = HudData {
         player_health: 100,
@@ -122,7 +122,7 @@ fn hud_score_format_is_right_padded_to_10_chars() {
 
 #[test]
 fn hud_format_score_large_value() {
-    let mut log = log();
+    let log = log();
     log.info("Given a HudData with a large score");
     let hud = HudData {
         player_health: 100,
@@ -144,7 +144,7 @@ fn hud_format_score_large_value() {
 proptest! {
     #[test]
     fn health_percentage_always_in_range(hp in 0u32..10000, max in 1u32..10000) {
-        let mut log = log();
+        let log = log();
         log.info("Given arbitrary hp and max values where hp <= max");
         let hud = make_hud(hp.min(max), max);
 
@@ -158,7 +158,7 @@ proptest! {
 
     #[test]
     fn critical_health_is_consistent_with_percentage(hp in 0u32..100, max in 1u32..100) {
-        let mut log = log();
+        let log = log();
         log.info("Given a HudData with arbitrary health values");
         let hp_clamped = hp.min(max);
         let hud = make_hud(hp_clamped, max);

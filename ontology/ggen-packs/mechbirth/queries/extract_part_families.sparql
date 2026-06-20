@@ -1,0 +1,25 @@
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+
+# -----------------------------------------------------------------------------
+# SPARQL: extract_part_families.sparql
+# Bounded SELECT: all PartFamily instances with their validation laws.
+# Drives match-arm dispatch in geometry.rs Tera template.
+# -----------------------------------------------------------------------------
+
+SELECT
+  ?label
+  ?law
+  ?refusalVariant
+WHERE {
+  ?family a mb:PartFamily ;
+          rdfs:label ?label .
+
+  OPTIONAL { ?family mb:law ?law . }
+  OPTIONAL {
+    ?family mb:refusalReason ?reason .
+    ?reason mb:variant ?refusalVariant .
+  }
+}
+ORDER BY ?label

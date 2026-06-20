@@ -101,7 +101,11 @@ enum Commands {
 fn example_hello() -> Blueprint {
     let mut b = BlueprintBuilder::new("HelloActor", "Actor");
 
-    b.add_variable_mut("Greeting", VarType::String, Some("Hello from Blueprint-RS!".to_string()));
+    b.add_variable_mut(
+        "Greeting",
+        VarType::String,
+        Some("Hello from Blueprint-RS!".to_string()),
+    );
 
     let ev = b.begin_play_node();
     let ps = b.print_string("Hello from Blueprint-RS!");
@@ -224,10 +228,7 @@ fn write_output(content: &str, path: &Option<PathBuf>) -> Result<(), Box<dyn std
     Ok(())
 }
 
-fn format_blueprint(
-    bp: &Blueprint,
-    format: &str,
-) -> Result<String, Box<dyn std::error::Error>> {
+fn format_blueprint(bp: &Blueprint, format: &str) -> Result<String, Box<dyn std::error::Error>> {
     match format.to_lowercase().as_str() {
         "json" => {
             let s = JsonSerializer::serialize(bp)?;
@@ -298,7 +299,11 @@ fn cmd_inspect(input: &PathBuf, verbose: bool) -> Result<(), Box<dyn std::error:
         println!("  - {} ({} nodes)", g.name, g.nodes.len());
         if verbose {
             for n in &g.nodes {
-                println!("      node: {} [{}]", n.name, n.class.rsplit('.').next().unwrap_or(&n.class));
+                println!(
+                    "      node: {} [{}]",
+                    n.name,
+                    n.class.rsplit('.').next().unwrap_or(&n.class)
+                );
             }
         }
     }
@@ -316,7 +321,8 @@ fn cmd_inspect(input: &PathBuf, verbose: bool) -> Result<(), Box<dyn std::error:
             .map(|c| format!(" [{}]", c))
             .unwrap_or_default();
         println!(
-            "  - {}: {:?}{}{}{}", v.name, v.var_type.category, default, category, exposed
+            "  - {}: {:?}{}{}{}",
+            v.name, v.var_type.category, default, category, exposed
         );
     }
     if !bp.interfaces.is_empty() {
@@ -390,11 +396,10 @@ pub fn process_json_file(
     path: &std::path::Path,
     output_dir: Option<&std::path::Path>,
 ) -> Result<PathBuf, String> {
-    let json = fs::read_to_string(path)
-        .map_err(|e| format!("Cannot read '{}': {}", path.display(), e))?;
+    let json =
+        fs::read_to_string(path).map_err(|e| format!("Cannot read '{}': {}", path.display(), e))?;
 
-    let bp: Blueprint = serde_json::from_str(&json)
-        .map_err(|e| format!("{}", e))?;
+    let bp: Blueprint = serde_json::from_str(&json).map_err(|e| format!("{}", e))?;
 
     let t3d = T3dSerializer::serialize(&bp);
 
@@ -428,14 +433,18 @@ fn cmd_decompile(
     let nodes = blueprint_core::parser::parse_t3d(&t3d)
         .map_err(|e| format!("Failed to parse T3D: {}", e))?;
     if verbose {
-        eprintln!("[bpgen] Parsed '{}' ({} nodes)", input.display(), nodes.len());
+        eprintln!(
+            "[bpgen] Parsed '{}' ({} nodes)",
+            input.display(),
+            nodes.len()
+        );
     }
     let code = blueprint_core::parser::generate_rust_code(&nodes, name, parent)?;
     write_output(&code, output)
 }
 
 fn cmd_watch(
-    dir: &PathBuf,
+    dir: &std::path::Path,
     output_dir: &Option<PathBuf>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     use notify::{EventKind, RecursiveMode, Watcher};
@@ -465,17 +474,10 @@ fn cmd_watch(
                     if path.extension().and_then(|e| e.to_str()) == Some("json") {
                         match process_json_file(&path, output_dir.as_deref()) {
                             Ok(out) => {
-                                println!(
-                                    "[bpgen watch] Regenerated: {}",
-                                    out.display()
-                                );
+                                println!("[bpgen watch] Regenerated: {}", out.display());
                             }
                             Err(msg) => {
-                                eprintln!(
-                                    "[bpgen watch] Error in {}: {}",
-                                    path.display(),
-                                    msg
-                                );
+                                eprintln!("[bpgen watch] Error in {}: {}", path.display(), msg);
                             }
                         }
                     }
@@ -504,9 +506,11 @@ fn main() {
             cmd_example(name, *list, &cli.output, &cli.format, cli.verbose)
         }
         Some(Commands::Watch { dir, output_dir }) => cmd_watch(dir, output_dir),
-        Some(Commands::Decompile { input, name, parent }) => {
-            cmd_decompile(input, &cli.output, name, parent, cli.verbose)
-        }
+        Some(Commands::Decompile {
+            input,
+            name,
+            parent,
+        }) => cmd_decompile(input, &cli.output, name, parent, cli.verbose),
         // Default: no subcommand → print help
         None => {
             use clap::CommandFactory;
@@ -557,7 +561,11 @@ mod tests {
         fs::write(&json_path, minimal_blueprint_json()).expect("failed to write test JSON");
 
         let result = process_json_file(&json_path, None);
-        assert!(result.is_ok(), "process_json_file failed: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "process_json_file failed: {:?}",
+            result.err()
+        );
 
         let t3d_path = result.unwrap();
         assert_eq!(t3d_path, tmp.join("TestActor.t3d"));
@@ -566,7 +574,8 @@ mod tests {
         let content = fs::read_to_string(&t3d_path).expect("failed to read .t3d file");
         assert!(
             content.contains("Begin Object"),
-            "T3D output missing expected content: {}", content
+            "T3D output missing expected content: {}",
+            content
         );
 
         // Clean up
@@ -593,7 +602,11 @@ mod tests {
         fs::write(&json_path, minimal_blueprint_json()).expect("failed to write test JSON");
 
         let result = process_json_file(&json_path, Some(&output_dir));
-        assert!(result.is_ok(), "process_json_file failed: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "process_json_file failed: {:?}",
+            result.err()
+        );
 
         let t3d_path = result.unwrap();
         assert_eq!(t3d_path, output_dir.join("TestActor.t3d"));

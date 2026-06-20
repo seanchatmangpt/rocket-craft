@@ -88,7 +88,7 @@ Introduced formal Behavior-Driven Development (BDD) methodology for WASM packagi
 
 - **Chicago TDD Framework** (`chicago-tdd-tools`): Gherkin-syntax scenario validation for Rust binaries
 - **WebGL2 E2E Orchestrator**: headless Playwright integration for pwa-staff PWA, multi-browser compatibility testing
-- **Combinatorial Testing Engine**: systematic coverage of 10,000+ game state permutations (Gundam Nexus suit combinations + equipment + perks)
+- **Combinatorial Testing Engine** (`combinatorial-engine`): Autonomous state-space exploration tool built on `chicago-tdd-tools`. It auto-discovers all game servers and simulation backends (e.g., *Gundam Nexus* and *Infinity Blade 4 MUD*), executing chess-coordinate-based legal move simulations to traverse 10,000+ gameplay/combat permutations completely unattended, outputting structured JSON reports verifying zero unhandled panics or invalid states.
 - **Test Manufacturing Strategy (TPS/DfLSS)**: Lean Six Sigma discipline applied to test case design, 31% reduction in flaky tests
 
 **Test Coverage Metrics:**
@@ -170,6 +170,16 @@ Rust-native 3D model conversion pipeline (`asset-pipeline`):
 
 ---
 
+### 9. **AutoML DX: Dynamic Balancing & Zero-Boilerplate Auto-Binding**
+
+Delivered **unify-automl**, a complete AutoML and Developer Experience (DX) framework designed to eliminate boilerplate configuration and automate game balancing:
+
+- **Dynamic Discovery & Auto-Binding**: Scans workspace source files (Rust, C++) recursively to auto-detect `@UnifyAutoBind` annotations and `#[derive(AutoBind)]` macros, dynamically registering new game components and network servers without manual wiring.
+- **Game Balance Auto-Optimizer**: Leverages Monte Carlo combat simulation loops to autonomously optimize character stat allocations (health, attack, defense, magic) against target player win-rate curves.
+- **Developer CLI & Scaffolding**: Built-in CLI commands to scaffold local development environments (auto-generating configs and test component stubs) and manage backend server lifecycles (auto-spawning Node/JSON-RPC services and tracking PIDs).
+
+---
+
 ## Platform Coverage & Performance
 
 ### Deployment Across Platforms
@@ -197,7 +207,7 @@ Rust-native 3D model conversion pipeline (`asset-pipeline`):
 
 ### Licensing & IP
 
-- **Engine Core** (`rocket-sdk`, `nexus-engine`, `blueprint-rs`, `unify-rs`): BSD-3-Clause
+- **Engine Core** (`rocket-sdk`, `nexus-engine`, `blueprint-rs`, `unify-rs` including `unify-automl`): BSD-3-Clause
 - **Game Assets** (UE4 projects, Gundam Nexus, IB4): Creative Commons Attribution-ShareAlike 4.0 International (CC-BY-SA 4.0)
 - **CLI & Tools** (`rocket-cmd`, `chicago-tdd-tools`, `asset-pipeline`): Apache-2.0
 - **License Compliance**: knhk WASM audit gates enforce all four licenses at build time
@@ -318,6 +328,19 @@ Laws are registered in `project-manifest.json` and executed by `rocket audit`. F
 ```
 
 SPARQL queries can now ask: "What games use the Parry mechanic and on what platforms?" No hardcoding, no maintenance. First game engine to use RDF as the dependency resolver.
+
+### 6. AutoML-Driven Balance Tuning
+
+**Automated balance tuning and state optimization:** To avoid months of manual playtesting, the `unify-automl` balance engine automates balance verification by running hundreds of Monte Carlo battle simulations per second. It evaluates state spaces and optimizes player/enemy stat ratios to hit exact target win-rates:
+
+```rust
+// Auto-balancer finds the optimal allocation to reach target win rate
+let optimal_stats = optimize_balance(
+    total_points,     // e.g. 8 points to distribute
+    target_win_rate,  // e.g. 0.60 (60% win rate target)
+    sims_per_config   // e.g. 100 battles per permutation
+).expect("Optimization should succeed");
+```
 
 ---
 

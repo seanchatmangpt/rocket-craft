@@ -90,7 +90,7 @@ pub mod context {
     impl WorkspaceManifest {
         /// Parse a `project-manifest.json` from a file path.
         pub fn load(path: &Path) -> Result<Self, serde_json::Error> {
-            let content = std::fs::read_to_string(path).map_err(|e| serde_json::Error::io(e))?;
+            let content = std::fs::read_to_string(path).map_err(serde_json::Error::io)?;
             serde_json::from_str(&content)
         }
 
@@ -400,7 +400,7 @@ pub mod receipt {
                 project_name,
                 target.unwrap_or(""),
                 platform.unwrap_or(""),
-                &data_hash,
+                data_hash,
                 timestamp,
                 success,
             );
@@ -438,7 +438,7 @@ pub mod receipt {
                 self.project_name,
                 self.target.as_deref().unwrap_or(""),
                 self.platform.as_deref().unwrap_or(""),
-                &self.data_hash,
+                self.data_hash,
                 self.timestamp,
                 self.success,
             );
@@ -580,20 +580,16 @@ pub mod classify {
 
     impl RocketClassify for RocketBuildCommand {
         fn noun(&self) -> &'static str {
-            let n = "project";
-            n
+            "project"
         }
         fn verb(&self) -> &'static str {
-            let v = "build";
-            v
+            "build"
         }
         fn description(&self) -> &str {
-            let desc = "Build a project target for a specific platform using RunUAT";
-            desc
+            "Build a project target for a specific platform using RunUAT"
         }
         fn to_args_json(&self) -> String {
-            let args = serde_json::to_string(self).unwrap_or_default();
-            args
+            serde_json::to_string(self).unwrap_or_default()
         }
     }
 
@@ -624,20 +620,16 @@ pub mod classify {
 
     impl RocketClassify for RocketAuditCommand {
         fn noun(&self) -> &'static str {
-            let n = "project";
-            n
+            "project"
         }
         fn verb(&self) -> &'static str {
-            let v = "audit";
-            v
+            "audit"
         }
         fn description(&self) -> &str {
-            let desc = "Audit projects for compliance law violations";
-            desc
+            "Audit projects for compliance law violations"
         }
         fn to_args_json(&self) -> String {
-            let args = serde_json::to_string(self).unwrap_or_default();
-            args
+            serde_json::to_string(self).unwrap_or_default()
         }
     }
 
@@ -651,20 +643,16 @@ pub mod classify {
 
     impl RocketClassify for RocketDoctorCommand {
         fn noun(&self) -> &'static str {
-            let n = "env";
-            n
+            "env"
         }
         fn verb(&self) -> &'static str {
-            let v = "doctor";
-            v
+            "doctor"
         }
         fn description(&self) -> &str {
-            let desc = "Run environment health checks (git, rust, UE4 root, manifest)";
-            desc
+            "Run environment health checks (git, rust, UE4 root, manifest)"
         }
         fn to_args_json(&self) -> String {
-            let args = "{}".to_owned();
-            args
+            "{}".to_owned()
         }
     }
 
@@ -678,20 +666,16 @@ pub mod classify {
 
     impl RocketClassify for RocketSetupCommand {
         fn noun(&self) -> &'static str {
-            let n = "env";
-            n
+            "env"
         }
         fn verb(&self) -> &'static str {
-            let v = "setup";
-            v
+            "setup"
         }
         fn description(&self) -> &str {
-            let desc = "Configure the UE4 root and other environment settings";
-            desc
+            "Configure the UE4 root and other environment settings"
         }
         fn to_args_json(&self) -> String {
-            let args = "{}".to_owned();
-            args
+            "{}".to_owned()
         }
     }
 
@@ -705,20 +689,16 @@ pub mod classify {
 
     impl RocketClassify for RocketInfoCommand {
         fn noun(&self) -> &'static str {
-            let n = "workspace";
-            n
+            "workspace"
         }
         fn verb(&self) -> &'static str {
-            let v = "info";
-            v
+            "info"
         }
         fn description(&self) -> &str {
-            let desc = "Print workspace manifest and project information";
-            desc
+            "Print workspace manifest and project information"
         }
         fn to_args_json(&self) -> String {
-            let args = "{}".to_owned();
-            args
+            "{}".to_owned()
         }
     }
 
@@ -1020,7 +1000,7 @@ pub mod supabase {
                 .iter()
                 .filter(|e| e.project == project)
                 .collect();
-            filtered.sort_by(|a, b| b.score.cmp(&a.score));
+            filtered.sort_by_key(|e| std::cmp::Reverse(e.score));
             filtered.into_iter().take(n).collect()
         }
 
@@ -1031,7 +1011,7 @@ pub mod supabase {
                 .iter()
                 .filter(|e| e.project == project)
                 .collect();
-            filtered.sort_by(|a, b| b.score.cmp(&a.score));
+            filtered.sort_by_key(|e| std::cmp::Reverse(e.score));
             filtered
         }
 

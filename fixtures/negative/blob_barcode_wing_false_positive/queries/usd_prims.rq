@@ -1,0 +1,24 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+        
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+}
+ORDER BY ?prim

@@ -1,55 +1,35 @@
-# Remediation Plan - Rocket-Craft Project
+# Project: Asset Manufacturing LSP (ggen-asset-lsp)
+# Scope: Complete LSP server implementation using lsp-max for USDA/MaterialX diagnostics, visual proof routing, generator code actions, and OCEL integration.
 
-This plan coordinates the resolution of all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project, ensuring full compliance and passing verification.
+## Architecture
+The `ggen-asset-lsp` treats 3D assets (USD, MaterialX, textures, rigs, renders, receipts) as a diagnosable compiler surface. It maps asset pipeline errors and headless render results directly into LSP diagnostics and routes quick-fixes to generator parameter sources.
+
+- **Workspace Path**: `/Users/sac/rocket-craft`
+- **Crate Path**: `crates/ggen-asset-lsp`
+- **Asset Scope**: `generated/mech_assets/reference_fabric_001/`
+- **External Framework**: `/Users/sac/lsp-max`
 
 ## Milestones
+| # | Name | Scope | Dependencies | Status |
+|---|---|---|---|---|
+| 1 | Exploration & Architecture Definition | Inspect lsp-max framework and examples, locate reference assets, define diagnostics mapping rules. | None | DONE |
+| 2 | Crate Setup & Workspace Cargo Setup | Create crates/ggen-asset-lsp, update root Cargo.toml, configure dependencies on lsp-max. | M1 | DONE |
+| 3 | Core LSP Server & Diagnostics | Implement LSP server shell, USD/MaterialX parsing, visual gap report routing. | M2 | DONE |
+| 4 | Code Actions & OCEL Integration | Implement generator code actions, emit OCEL events for validation/repair lifecycles. | M3 | DONE |
+| 5 | E2E Verification | Run review rounds and challenger tests on the core LSP server. | M4 | DONE |
+| 6 | Morphology & Modularity Updates | Implement VIS200 morphology and USD300 modularity diagnostics (fingerprints, part boundaries, transform proofs). | M5 | IN_PROGRESS |
+| 7 | Final Forensic Audit & Handoff | Run the Forensic Auditor to check for integrity violations and prepare the final handoff. | M6 | PLANNED |
 
-### Milestone 1: Technical Exploration and Baseline Assessment
-- **Objective**: Identify all stubs, placeholders, debug macros, overclaiming language, and check baseline compile and test status.
-- **Tasks**:
-  - Spawn an Explorer to locate target files (`pwa_export.rs`, `fixtures.rs`, `pipeline.rs`, `classify.rs`, `unify-core/src/lib.rs`, `unify-rocket/src/lib.rs`, `manifest.rs`, `wasm-patterns/src/actor.rs`, `pattern_integration.rs`, `unify-integration-tests/src/lib.rs`, `hud.rs`, `message_bridge.rs`, `build.rs`, `unify-mcp/src/main.rs`, `commands.rs`, `unify/src/main.rs`).
-  - Read files and collect details on what logic needs to be fully implemented.
-  - Run baseline cargo compilation and tests using a Worker.
-  - Run the `anti-llm-cheat-lsp` compliance scanner to identify starting violations.
-- **Verification**: Exploration report documenting target files, stubs, and initial test/scan status.
+## Interface & Diagnostic Contracts
+### Diagnostics Rules
+- **Missing Payload**: A prim of type `Mesh` or similar that should reference a payload, but lacks a valid reference (e.g. `payload = @mesh.usd@` missing).
+- **Missing Material Binding**: A prim lacking a material binding, or referencing a non-existent material.
+- **Unreceipted USD Prim**: Prims that do not have associated cryptographic receipts.
+- **Visual Gap Routing**: If `visual_gap_report.json` indicates silhouette IOU < threshold, project error on the root Xform/Mesh in USDA.
+- **usdchecker Logs**: Project usdchecker errors onto the matching USDA lines.
 
-### Milestone 2: Complete Stubs and Placeholders (R1)
-- **Objective**: Implement complete, production-ready logic for all files containing `STUB` or placeholders.
-- **Tasks**:
-  - Implement `unify-rs/unify-bp/src/pwa_export.rs`.
-  - Implement `unify-rs/unify-integration-tests/src/fixtures.rs`.
-  - Implement `unify-rs/unify-rdf/src/pipeline.rs`.
-  - Fix any other stubs/placeholders in the workspace.
-- **Verification**: Code review and local workspace compilation.
+### Code Actions
+- Targets the **source** (e.g., `template.usda.tera`, SPARQL queries, or Rust parameter row), NOT the generated USDA.
 
-### Milestone 3: Replace Single-Line and Catch-All Stubs (R2)
-- **Objective**: Replace single-line stubs and catch-alls with robust implementation logic.
-- **Tasks**:
-  - Replace description method in `classify.rs` with descriptive logic.
-  - Implement `namespace`, `noun`, and `verb` functions in `unify-core/src/lib.rs` and `unify-rocket/src/lib.rs`.
-  - Fix `manifest.rs` empty catch-all match arms with proper error handling/logging.
-  - Implement `on_start` and `on_stop` in `wasm-patterns/src/actor.rs`.
-  - Replace dummy helper functions in `wasm-tests/tests/pattern_integration.rs`.
-- **Verification**: Compilation and unit test passes.
-
-### Milestone 4: Harden Assertions & Eliminate Test Shortcuts (R3)
-- **Objective**: Replace substring matches and shortcut assertions with schema-compliant structural validation.
-- **Tasks**:
-  - Refactor assertions in `unify-integration-tests/src/lib.rs`.
-  - Refactor HUD display/substring searches in `wasm-ui/tests/hud.rs` and `wasm-ui/tests/message_bridge.rs`.
-- **Verification**: Test suite runs and passes.
-
-### Milestone 5: Remove Debug Macros and Overclaim Language (R4, R5)
-- **Objective**: Clean up print statements and remove unverified overclaiming status tags.
-- **Tasks**:
-  - Replace `println!` with structured logging/tracing in `unify-ffi/build.rs`, `unify-mcp/src/main.rs`, `unify/src/commands.rs`, and `unify/src/main.rs`.
-  - Remove terms like "zero violations", "solved", "done" from comments/logs if unverified.
-- **Verification**: Compliance scanner (`anti-llm-cheat-lsp`) returns 0 errors/violations.
-
-### Milestone 6: Final Verification & Integration
-- **Objective**: Full verification of all acceptance criteria.
-- **Tasks**:
-  - Compile `unify-rs` and `wasm-threads` workspaces without warnings/errors.
-  - Run `cargo test --workspace` and ensure 100% pass rate.
-  - Run E2E Playwright tests.
-- **Verification**: Audit check pass with zero violations, 100% tests pass.
+### OCEL Events
+- Emit OCEL events (e.g. `validate`, `repair`) whenever validation or repairs are executed.

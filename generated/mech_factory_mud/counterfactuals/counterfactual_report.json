@@ -1,0 +1,50 @@
+[
+  {
+    "case": "COUNTERFACTUAL_WITH_SOCKET",
+    "expected_effect": "ADMITTED",
+    "actual_effect": "ADMITTED",
+    "passed": true
+  },
+  {
+    "case": "COUNTERFACTUAL_WITHOUT_SOCKET",
+    "expected_effect": "REFUSED_MISSING_SOCKET",
+    "actual_effect": "REFUSED_MISSING_SOCKET",
+    "passed": true
+  },
+  {
+    "case": "COUNTERFACTUAL_SKIN_DOES_NOT_HIDE_VENT",
+    "expected_effect": "ADMITTED",
+    "actual_effect": "ADMITTED",
+    "passed": true
+  },
+  {
+    "case": "COUNTERFACTUAL_SKIN_HIDES_VENT",
+    "expected_effect": "REFUSED_SKIN_HIDES_VENT",
+    "actual_effect": "REFUSED_SKIN_HIDES_VENT",
+    "passed": true
+  },
+  {
+    "case": "COUNTERFACTUAL_CLEARANCE_OK",
+    "expected_effect": "ADMITTED",
+    "actual_effect": "ADMITTED",
+    "passed": true
+  },
+  {
+    "case": "COUNTERFACTUAL_CLEARANCE_BLOCKED",
+    "expected_effect": "REFUSED_BLOCKED_CLEARANCE",
+    "actual_effect": "REFUSED_BLOCKED_CLEARANCE",
+    "passed": true
+  },
+  {
+    "case": "COUNTERFACTUAL_ROUTE_CONNECTED",
+    "expected_effect": "ADMITTED",
+    "actual_effect": "ADMITTED",
+    "passed": true
+  },
+  {
+    "case": "COUNTERFACTUAL_ROUTE_BROKEN",
+    "expected_effect": "REFUSED_ROUTE_BROKEN",
+    "actual_effect": "REFUSED_ROUTE_BROKEN",
+    "passed": true
+  }
+]

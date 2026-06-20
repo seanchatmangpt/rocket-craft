@@ -390,3 +390,65 @@ impl WasmPackager {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    fn make_packager(engine: &str, uproject: &str) -> WasmPackager {
+        WasmPackager::new(PathBuf::from(engine), PathBuf::from(uproject))
+    }
+
+    #[test]
+    fn get_project_name_from_uproject_stem() {
+        let p = make_packager("/fake/engine", "/projects/Brm/Brm.uproject");
+        assert_eq!(p.get_project_name(), "Brm");
+    }
+
+    #[test]
+    fn get_project_name_fallback_on_no_stem() {
+        let p = make_packager("/fake/engine", "/");
+        // Root path has no stem — should fall back to "UE4Game"
+        assert_eq!(p.get_project_name(), "UE4Game");
+    }
+
+    #[test]
+    fn get_editor_path_is_under_engine_binaries() {
+        let p = make_packager("/my/engine", "/proj/Game.uproject");
+        let editor = p.get_editor_path();
+        assert!(
+            editor.starts_with("/my/engine/Engine/Binaries"),
+            "editor path must be under Engine/Binaries, got: {}",
+            editor.display()
+        );
+    }
+
+    #[test]
+    fn get_uat_path_prefers_run_uat_sh_when_present() {
+        // When RunUAT.sh exists the path should point at it directly.
+        let dir = tempfile::tempdir().unwrap();
+        let batch = dir.path().join("Engine/Build/BatchFiles");
+        std::fs::create_dir_all(&batch).unwrap();
+        std::fs::write(batch.join("RunUAT.sh"), b"#!/bin/sh").unwrap();
+        let p = WasmPackager::new(dir.path().to_path_buf(), PathBuf::from("Game.uproject"));
+        let uat = p.get_uat_path();
+        #[cfg(not(windows))]
+        assert!(
+            uat.to_string_lossy().ends_with("RunUAT.sh"),
+            "should prefer RunUAT.sh, got: {}",
+            uat.display()
+        );
+    }
+
+    #[test]
+    fn package_options_fields_are_accessible() {
+        let opts = PackageOptions {
+            source_t3d: PathBuf::from("scene.t3d"),
+            destination_dir: PathBuf::from("/out"),
+            map_name: "TestMap".into(),
+        };
+        assert_eq!(opts.map_name, "TestMap");
+        assert_eq!(opts.source_t3d, PathBuf::from("scene.t3d"));
+    }
+}

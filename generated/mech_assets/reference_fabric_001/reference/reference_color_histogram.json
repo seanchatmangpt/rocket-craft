@@ -1,0 +1,26 @@
+{
+    "white": {
+        "count": 414474,
+        "proportion": 0.4235757967199176
+    },
+    "dark/black": {
+        "count": 33745,
+        "proportion": 0.03448603594028484
+    },
+    "cyan": {
+        "count": 8951,
+        "proportion": 0.00914756283009304
+    },
+    "yellow/gold": {
+        "count": 1825,
+        "proportion": 0.0018650767696257173
+    },
+    "red": {
+        "count": 3099,
+        "proportion": 0.003167053648805533
+    },
+    "other": {
+        "count": 516418,
+        "proportion": 0.5277584740912733
+    }
+}

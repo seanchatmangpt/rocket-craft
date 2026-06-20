@@ -1,0 +1,58 @@
+[
+  {
+    "case": "FALSIFY_RECEIPT_PREV_HASH",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "RECEIPT_PREV_HASH_BROKEN",
+    "passed": true
+  },
+  {
+    "case": "FALSIFY_RECEIPT_PAYLOAD_MUTATION",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "RECEIPT_PAYLOAD_MUTATION",
+    "passed": true
+  },
+  {
+    "case": "FALSIFY_RECEIPT_SEQUENCE_GAP",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "RECEIPT_SEQUENCE_GAP",
+    "passed": true
+  },
+  {
+    "case": "FALSIFY_PROJECTION_WITHOUT_SOURCE_RECEIPT",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "PROJECTION_WITHOUT_SOURCE_RECEIPT",
+    "passed": true
+  },
+  {
+    "case": "FALSIFY_OCEL_EVENT_WITHOUT_OBJECT",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "OCEL_EVENT_WITHOUT_OBJECT",
+    "passed": true
+  },
+  {
+    "case": "FALSIFY_OCEL_PART_EVENT_WITHOUT_PART_OBJECT",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "OCEL_PART_EVENT_WITHOUT_PART_OBJECT",
+    "passed": true
+  },
+  {
+    "case": "FALSIFY_ROUTE_UNREACHABLE",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "ROUTE_UNREACHABLE",
+    "passed": true
+  },
+  {
+    "case": "FALSIFY_UE4_HEADER_CSV_MISMATCH",
+    "expected": "REFUSED",
+    "actual": "REFUSED",
+    "refusal_reason": "UE4_HEADER_CSV_MISMATCH",
+    "passed": true
+  }
+]

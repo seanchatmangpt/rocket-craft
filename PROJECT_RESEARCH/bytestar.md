@@ -1,0 +1,553 @@
+# Research Dossier: `bytestar`
+
+**Total Files:** 429 Ontologies (.ttl) | 0 Queries (.rq)
+**Total Volume:** 429 files
+
+## 1. Core Vocabularies (Prefixes)
+- `8tick: <http://bytepqc.org/ontology/8-tick-doctrine#>`
+- `abi: <http://bytestar.org/ontology/identity/abi#>`
+- `admission: <https://bytestar.org/ontology/byteflow-admission#>`
+- `ag: <https://bytestar.org/ontology/autonomous-governance#>`
+- `ai: <https://bytestar.org/ontology/ai#>`
+- `akso: <http://bytestar.org/ontology/v5/marketplace/aml-kyc-sanctions-oracles#>`
+- `amp: <urn:bs:amp:>`
+- `api: <http://bytepqc.org/ontology/api#>`
+- `api: <https://bytestar.org/ontology/v5/api#>`
+- `apvp: <http://bytestar.org/ontologies/automated-performance-validation-pipeline#>`
+- `arch: <http://bytestar.io/ontology/architecture#>`
+- `arch: <https://bytestar.org/ontology/architecture#>`
+- `arch: <https://bytestar.org/ontology/v5/architecture#>`
+- `atp: <https://bytestar.org/ontology/bytecore/automated-theorem-proving#>`
+- `auto: <https://bytestar.org/ontology/v5/autoscaling#>`
+- `ba-abi: <https://bytestar.org/ontology/abi/>`
+- `ba-actor: <https://bytestar.io/ontology/actor/>`
+- `ba-actor: <https://bytestar.org/ontology/actor/>`
+- `ba-arch: <https://bytestar.org/ontology/architecture/>`
+- `ba-asset: <http://bytestar.ai/ontology/crystals/marketplace/asset#>`
+- `ba-audit: <http://bytestar.org/ontology/v5/security/ba-audit-system#>`
+- `ba-bound: <https://bytestar.org/ontology/testing/boundary/>`
+- `ba-causality: <https://bytestar.org/ontology/causality/>`
+- `ba-ci: <https://bytestar.org/ontology/testing/ci/>`
+- `ba-complexity: <https://bytestar.org/ontology/complexity/>`
+- `ba-consensus: <https://bytestar.org/ontology/consensus/>`
+- `ba-core: <https://bytestar.io/ontology/core/>`
+- `ba-core: <https://bytestar.org/ontology/core/>`
+- `ba-crystal: <https://bytestar.org/ontology/crystal/>`
+- `ba-e2e: <https://bytestar.org/ontology/testing/e2e/>`
+- `ba-ethos: <https://bytestar.org/ontology/ethos/>`
+- `ba-exec: <https://bytestar.ai/ontology/v5/execution#>`
+- `ba-exec: <https://bytestar.org/ontology/execution-physics/>`
+- `ba-flow: <https://bytestar.org/ontology/flow/>`
+- `ba-fuzz: <https://bytestar.org/ontology/testing/fuzz/>`
+- `ba-gov: <https://bytestar.org/ontology/bytestar-governance#>`
+- `ba-information: <https://bytestar.org/ontology/information/>`
+- `ba-meta: <https://bytestar.io/ontology/meta/>`
+- `ba-metrics: <https://bytestar.org/ontology/metrics/>`
+- `ba-neg: <https://bytestar.org/ontology/testing/negative/>`
+- `ba-offer: <http://bytestar.ai/ontology/crystals/marketplace/offer#>`
+- `ba-onto: <https://bytestar.ai/ontology/v5/ontology-as-algorithm#>`
+- `ba-opt: <http://bytestar.ai/ontology/optimization-engine#>`
+- `ba-oracle: <https://bytestar.org/ontology/testing/golden-oracle/>`
+- `ba-order: <http://bytestar.ai/ontology/crystals/marketplace/order#>`
+- `ba-parallel: <https://bytestar.org/ontology/parallel/>`
+- `ba-perf: <http://bytestar.ai/ontology/performance-measurement#>`
+- `ba-perf: <https://bytestar.org/ontology/performance/>`
+- `ba-physics: <https://bytestar.org/ontology/physics/>`
+- `ba-pm: <http://bytestar.org/ontology/performance/>`
+- *...and 435 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `8tick:8TickBoundary`
+- `8tick:ExecutionProfile`
+- `8tick:PerformanceInvariant`
+- `8tick:TickConstraint`
+- `8tick:TickCount`
+- `8tick:TimingGuarantee`
+- `8tick:WorstCaseAnalysis`
+- `:ABI`
+- `:ABIFunction`
+- `:ABI_Field`
+- `:AHI`
+- `:AHIExecutor`
+- `:AHIGate`
+- `:AHIGovernor`
+- `:AHIPlanner`
+- `:ANDJoin`
+- `:ANDSplit`
+- `:AOTOptimization`
+- `:AOTTableABI`
+- `:AOT_Fabricator`
+- `:AOT_Table`
+- `:APIAuthentication`
+- `:APIEndpoint`
+- `:APIGateway`
+- `:APIInterface`
+- `:APIProtocol`
+- `:APISpecification`
+- `:APISpecificationShape`
+- `:APISystem`
+- `:APISystemShape`
+- `:AWSPlatform`
+- `:AccessControlRule`
+- `:AccessControlRuleShape`
+- `:ActiveDirectory`
+- `:ActiveSideChannelAttack`
+- `:Actor`
+- `:ActorProductionDeploymentShape`
+- `:Actuator`
+- `:AdaptationModel`
+- `:AdaptiveOptimizationPattern`
+- `:AdaptiveTopology`
+- `:Address`
+- `:Administrator`
+- `:AdmissionGateJob`
+- `:AdmissionLatencyConformanceShape`
+- `:AdmissionRequest`
+- `:AdmissionRequestShape`
+- `:AdmissionTicket`
+- `:AdversarialAgreement`
+- `:AdversaryModel`
+- *...and 5900 more.*
+
+## 3. Extraction Layer (SPARQL)
+- *No queries executed in this project.*
+
+### Projected Variables (SELECT ?var)
+- *No specific projection variables identified.*
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/bytestar/byteactor/BYTEACTOR_CRYSTAL_ONTOLOGY.ttl` (16423 bytes)
+- `/Users/sac/bytestar/byteactor/BYTEFLOW_CRYSTAL_ONTOLOGY.ttl` (13450 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor-crystal-ontology.ttl` (16796 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor-execution.owl.ttl` (3545 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor_c4_complete.ttl` (12858 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor_concurrency_model.ttl` (21947 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor_dflss_project.ttl` (14909 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor_implementation_spec.ttl` (19680 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor_master_ontology.ttl` (23520 bytes)
+- `/Users/sac/bytestar/byteactor/byteactor_performance_requirements.ttl` (17267 bytes)
+- `/Users/sac/bytestar/byteactor/context.backup.20250820_220126/ontology/bytestar-byteactor-integration.owl.ttl` (11549 bytes)
+- `/Users/sac/bytestar/byteactor/context.backup.20250820_220126/ontology/bytestar-byteactor-memory.owl.ttl` (10346 bytes)
+- `/Users/sac/bytestar/byteactor/context.backup.20250820_220126/ontology/bytestar-byteactor-performance.owl.ttl` (11222 bytes)
+- `/Users/sac/bytestar/byteactor/context.backup.20250820_220126/ontology/bytestar-byteactor.owl.ttl` (10456 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/byteactor-index.owl.ttl` (1828 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/byteactor-production-queries.sparql.ttl` (4121 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/byteactor-production-readiness.owl.ttl` (4971 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/byteactor-production-shapes.shacl.ttl` (5622 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/bytestar-byteactor-integration.owl.ttl` (11549 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/bytestar-byteactor-memory.owl.ttl` (10346 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/bytestar-byteactor-performance.owl.ttl` (11222 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/bytestar-byteactor.owl.ttl` (10456 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/core-allocation.ttl` (4340 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/dflss-plan.owl.ttl` (411 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A01-A12.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A13-A24.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A25-A32.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A33-A36.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A37-A40.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A41-A49.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A50-A59.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/implementation/kernels-A60-A64.owl.ttl` (348 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/kernels-registry.owl.ttl` (7918 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/meta-ontology.ttl` (11148 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/observer.ttl` (1959 bytes)
+- `/Users/sac/bytestar/byteactor/context/ontology/testing-canon.owl.ttl` (428 bytes)
+- `/Users/sac/bytestar/byteactor/examples/techniques_v3/ontology/byteactor_v3_core.ttl` (20477 bytes)
+- `/Users/sac/bytestar/byteactor/ontologies/byteactor_complete_blueprint.ttl` (26728 bytes)
+- `/Users/sac/bytestar/bytecore/context/abi/abi-dispatch.owl.ttl` (601 bytes)
+- `/Users/sac/bytestar/bytecore/context/abi/abi-kernel.owl.ttl` (1808 bytes)
+- `/Users/sac/bytestar/bytecore/context/abi/abi-nif-boundary.owl.ttl` (635 bytes)
+- `/Users/sac/bytestar/bytecore/context/abi/abi-pqc.owl.ttl` (626 bytes)
+- `/Users/sac/bytestar/bytecore/context/abi/abi-pulse.owl.ttl` (617 bytes)
+- `/Users/sac/bytestar/bytecore/context/abi/abi-ring-spsc.owl.ttl` (625 bytes)
+- `/Users/sac/bytestar/bytecore/context/abi/abi-tables.owl.ttl` (599 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/automated-theorem-proving.owl.ttl` (16519 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytecore-ethos-integration.owl.ttl` (16955 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytecore-index.owl.ttl` (2193 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytestar-core.owl.ttl` (5769 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytestar-index.owl.ttl` (4633 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytestar.core.owl.ttl` (300 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytestar.kernels.complete.owl.ttl` (21276 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytestar.kernels.owl.ttl` (202 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytestar.patterns.complete.owl.ttl` (12744 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/bytestar.patterns.owl.ttl` (173 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/cxp.shacl.ttl` (214 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/kernel-risk-mappings.ttl` (16473 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/meta-vocabulary.owl.ttl` (10360 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/paradox-kernels.owl.ttl` (7152 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/paradox-shacl.ttl` (8902 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/pqc-verification-framework.owl.ttl` (16307 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/pqc-verification-queries.sparql.ttl` (11569 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/quantum-security-proofs.sparql.ttl` (15127 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/self-organizing-dispatch.owl.ttl` (13092 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/side-channel-verification.owl.ttl` (17585 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/simplicity-amplifier.owl.ttl` (8461 bytes)
+- `/Users/sac/bytestar/bytecore/context/ontology/simultaneous-serial-parallel.owl.ttl` (8519 bytes)
+- `/Users/sac/bytestar/bytecore/context/shapes/admission-gate.shacl.ttl` (832 bytes)
+- `/Users/sac/bytestar/bytecore/context/shapes/bytecore-ethos-integration.shacl.ttl` (18736 bytes)
+- `/Users/sac/bytestar/bytecore/context/shapes/cxp-header.shacl.ttl` (412 bytes)
+- `/Users/sac/bytestar/bytecore/context/shapes/pb-congruence.sparql.ttl` (701 bytes)
+- `/Users/sac/bytestar/bytecore/ontology/failure-first-structures.owl.ttl` (9157 bytes)
+- `/Users/sac/bytestar/bytecore/ontology/failure-kernels.owl.ttl` (3609 bytes)
+- `/Users/sac/bytestar/bytecore/ontology/impossibility-theorems.owl.ttl` (11295 bytes)
+- `/Users/sac/bytestar/bytecore/ontology/non-deterministic-determinism.owl.ttl` (10614 bytes)
+- `/Users/sac/bytestar/bytecore/shapes/admission.shacl.ttl` (8091 bytes)
+- `/Users/sac/bytestar/bytecore/shapes/congruence.sparql.ttl` (7736 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/byteethos-governance.owl.ttl` (4251 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/byteethos-index.owl.ttl` (1473 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/byteethos-ledger.owl.ttl` (3477 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/byteethos-production-queries.sparql.ttl` (2559 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/byteethos-production-readiness.owl.ttl` (4599 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/byteethos-production-shapes.shacl.ttl` (3078 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/consensus-through-disagreement.owl.ttl` (9494 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/dao-governance.owl.ttl` (17465 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/dflss-plan.owl.ttl` (420 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/ethos-framework.owl.ttl` (12953 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/governance-specification.owl.ttl` (2401 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/identity-specification.owl.ttl` (1540 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/ledger-specification.owl.ttl` (1126 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/oracle-network.owl.ttl` (17891 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/risk-classification.owl.ttl` (15875 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/ronr-governance.owl.ttl` (4211 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/ronr-shapes.shacl.ttl` (4181 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/ssi-identity.owl.ttl` (19600 bytes)
+- `/Users/sac/bytestar/byteethos/context/ontology/zk-compliance.owl.ttl` (18191 bytes)
+- `/Users/sac/bytestar/byteethos/mcp_fortune5_examples.ttl` (11624 bytes)
+- `/Users/sac/bytestar/byteethos/shapes/admission-contracts.shacl.ttl` (17762 bytes)
+- `/Users/sac/bytestar/byteethos/shapes/canon-rules.shacl.ttl` (21645 bytes)
+- `/Users/sac/bytestar/byteethos/shapes/governance-contracts.shacl.ttl` (14605 bytes)
+- `/Users/sac/bytestar/byteethos/shapes/risk-validation.shacl.ttl` (28032 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-admission.owl.ttl` (1716 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-index.owl.ttl` (1541 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-integration.owl.ttl` (978 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-orchestration.owl.ttl` (3166 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-performance.owl.ttl` (897 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-planner.owl.ttl` (1475 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-production-queries.sparql.ttl` (2414 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-production-readiness.owl.ttl` (4756 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-production-shapes.shacl.ttl` (3438 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/byteflow-shacl.ttl` (1948 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/congruence.sparql.ttl` (7736 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/dflss-fabrication-shapes.shacl.ttl` (5173 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/dflss-fabrication.owl.ttl` (4374 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/dflss-plan.owl.ttl` (423 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/fabrication-specification.owl.ttl` (1867 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/orchestration-specification.owl.ttl` (1503 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/paradox-admission.owl.ttl` (5422 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/patterns-specification.owl.ttl` (3397 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/pb-congruence.sparql.ttl` (701 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/quantum-entanglement.sparql.ttl` (14616 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/yawl-behaviors.owl.ttl` (3650 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/yawl-byteflow-shapes.shacl.ttl` (5793 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/yawl-congruence.sparql.ttl` (2674 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/yawl-core.owl.ttl` (4785 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/yawl-index.owl.ttl` (537 bytes)
+- `/Users/sac/bytestar/byteflow/context/ontology/yawl-patterns.owl.ttl` (6729 bytes)
+- `/Users/sac/bytestar/byteflow/mcp_fortune5_examples.ttl` (12214 bytes)
+- `/Users/sac/bytestar/bytegen/bytegen-fabrication.owl.ttl` (7302 bytes)
+- `/Users/sac/bytestar/bytegen/bytegen-fullstack-generation.owl.ttl` (7698 bytes)
+- `/Users/sac/bytestar/bytegen/bytegen-industry-canons.owl.ttl` (4998 bytes)
+- `/Users/sac/bytestar/bytegen/docs/ontology/supabase-canon-shapes.ttl` (18615 bytes)
+- `/Users/sac/bytestar/bytegen/docs/ontology/supabase-canon.owl.ttl` (30224 bytes)
+- `/Users/sac/bytestar/bytegen/marketplace-demo/context/marketplace-canonical.ttl` (12029 bytes)
+- `/Users/sac/bytestar/bytegen/mcp_fortune5_examples.ttl` (9937 bytes)
+- `/Users/sac/bytestar/bytegen/tests/fixtures/real-data/large-ontology.ttl` (8336 bytes)
+- `/Users/sac/bytestar/bytegen/tests/fixtures/real-data/malformed.ttl` (1053 bytes)
+- `/Users/sac/bytestar/bytegen/tests/fixtures/real-data/small-ontology.ttl` (3142 bytes)
+- `/Users/sac/bytestar/bytegen/ultrathink_hive_mind.ttl` (13792 bytes)
+- `/Users/sac/bytestar/bytepqc/compliance/ontology/pqc_scheduler_ontology.owl.ttl` (10024 bytes)
+- `/Users/sac/bytestar/bytepqc/compliance/shacl/pqc_scheduler_shapes.ttl` (13627 bytes)
+- `/Users/sac/bytestar/bytepqc/context/ontology/pqc-fabric-index.owl.ttl` (672 bytes)
+- `/Users/sac/bytestar/bytepqc/context/ontology/pqc_dilithium_verify_fabric.owl.ttl` (4564 bytes)
+- `/Users/sac/bytestar/bytepqc/context/ontology/pqc_kernel_registry.owl.ttl` (2519 bytes)
+- `/Users/sac/bytestar/bytepqc/context/ontology/pqc_kyber_kem_fabric.owl.ttl` (4007 bytes)
+- `/Users/sac/bytestar/bytepqc/context/shapes/pqc_artifacts.shacl.ttl` (4326 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/8-tick-doctrine/8_tick_doctrine_ontology.ttl` (6987 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/algorithms/pqc_algorithm_classification.ttl` (9876 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/api/api_generation_ontology.ttl` (12749 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/architecture/optimization.ttl` (15741 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/batch/processing.ttl` (14377 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/build/build_system_ontology.ttl` (15728 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/code-generation/code_generation_ontology.ttl` (14041 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/codegen/templates.ttl` (15388 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/deterministic-patterns/deterministic_patterns_ontology.ttl` (13101 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/documentation/documentation_generation_ontology.ttl` (14483 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/implementation/pqc_implementation_patterns.ttl` (15847 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/impossibility-enforcement/impossibility_enforcement_ontology.ttl` (15020 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/integration/optimizer.ttl` (15433 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/memory/hierarchy.ttl` (12031 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/performance/metrics.ttl` (12450 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/primitives/pqc_cryptographic_primitives.ttl` (16937 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/security/pqc_security_parameters.ttl` (12905 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/simd/cpu_instruction_sets.ttl` (9374 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/templates/code_template_ontology.ttl` (9216 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/testing/test_generation_ontology.ttl` (15377 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/threats/pqc_threat_models.ttl` (16236 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/v5-fabrication/v5_fabrication_master_ontology.ttl` (5300 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/validation-framework/validation_framework_ontology.ttl` (15500 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/validation/validation_ontology.ttl` (16969 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/vectorization/patterns.ttl` (9865 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/verifiable-work/verifiable_work_ontology.ttl` (11146 bytes)
+- `/Users/sac/bytestar/bytepqc/ontology/zero-tolerance-gates/zero_tolerance_gates_ontology.ttl` (10402 bytes)
+- `/Users/sac/bytestar/bytepqc/tests/shapes/fortune5_production_shapes.shacl.ttl` (15869 bytes)
+- `/Users/sac/bytestar/cns/sovereign-access-plane/schemas/external-system-canon.ttl` (21892 bytes)
+- `/Users/sac/bytestar/cns/sovereign-access-plane/schemas/validation-shapes.ttl` (26484 bytes)
+- `/Users/sac/bytestar/cns/sovereign-access-plane/tests/fixtures/sample-ecommerce-ontology.ttl` (19679 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-bytecore.owl.ttl` (1576 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-constants.owl.ttl` (1764 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-core.owl.ttl` (5277 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-datastruct.owl.ttl` (1782 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-ethos.owl.ttl` (1190 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-execution.owl.ttl` (1443 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-fabrication.owl.ttl` (2334 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-glossary.owl.ttl` (1908 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-governance.owl.ttl` (1984 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-hardware.owl.ttl` (1388 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-index.owl.ttl` (5758 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-lgc.owl.ttl` (2985 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-market.owl.ttl` (1799 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-marketplace.owl.ttl` (1041 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-messaging.owl.ttl` (2336 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-metrics.owl.ttl` (1800 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-observability.owl.ttl` (988 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-patterns.owl.ttl` (3669 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-pqc.owl.ttl` (1141 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-registry.owl.ttl` (28047 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-report-2026-impact.owl.ttl` (15917 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-report-shapes.ttl` (7511 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-runtime.owl.ttl` (1978 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-security.owl.ttl` (1892 bytes)
+- `/Users/sac/bytestar/context/ontology/bytestar-shapes.ttl` (4225 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/autoscaling-system.ttl` (11122 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-cryptographic-absolutism.owl.ttl` (14182 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-error-dominion.owl.ttl` (16624 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-governance-singularity.owl.ttl` (16391 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-memory-absolutism.owl.ttl` (15452 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-network-physics.owl.ttl` (16475 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-neural-fabric.owl.ttl` (10137 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-parallel-dominion.owl.ttl` (17546 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-performance-physics.owl.ttl` (14949 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-semantic-compression.owl.ttl` (13174 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-8020-temporal-dominance.owl.ttl` (12600 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/dark-canon.owl.ttl` (6482 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/hive-mind-neural.ttl` (9247 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/microservices-architecture.ttl` (12275 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/pattern-implementation.ttl` (11116 bytes)
+- `/Users/sac/bytestar/docs/audit/v5/ontologies/performance-guarantees.ttl` (13180 bytes)
+- `/Users/sac/bytestar/docs/mvp/pqc_ntt_fabric.owl.ttl` (3376 bytes)
+- `/Users/sac/bytestar/docs/mvp/pqc_polymorphic_kernel.owl.ttl` (2623 bytes)
+- `/Users/sac/bytestar/docs/mvp/pqc_precognitive_pipeline.owl.ttl` (3314 bytes)
+- `/Users/sac/bytestar/docs/observability/bytestar-observability-validation.owl.ttl` (15498 bytes)
+- `/Users/sac/bytestar/docs/ontologies/autonomous-governance-fuller.owl.ttl` (29282 bytes)
+- `/Users/sac/bytestar/docs/ontologies/blockchain-dlt-integration.owl.ttl` (40291 bytes)
+- `/Users/sac/bytestar/docs/ontologies/bytegen-fabrication.owl.ttl` (15770 bytes)
+- `/Users/sac/bytestar/docs/ontologies/crystal-lattice-organization.owl.ttl` (22443 bytes)
+- `/Users/sac/bytestar/docs/ontologies/crystal-type-registry.ttl` (13888 bytes)
+- `/Users/sac/bytestar/docs/ontologies/edge-computing-iot.owl.ttl` (39232 bytes)
+- `/Users/sac/bytestar/docs/ontologies/enterprise-integration-framework.owl.ttl` (40927 bytes)
+- `/Users/sac/bytestar/docs/ontologies/ham-admission-matrix.ttl` (11989 bytes)
+- `/Users/sac/bytestar/docs/ontologies/hive-mind-neural-semantic.owl.ttl` (17782 bytes)
+- `/Users/sac/bytestar/docs/ontologies/multi-agent-coordination.owl.ttl` (33734 bytes)
+- `/Users/sac/bytestar/docs/ontologies/performance-guarantees-8tick.owl.ttl` (25588 bytes)
+- `/Users/sac/bytestar/docs/ontologies/post-quantum-cryptographic.owl.ttl` (23213 bytes)
+- `/Users/sac/bytestar/docs/ontologies/quantum-computing-integration.owl.ttl` (35544 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/abi/crystal-abi-specs.ttl` (33390 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/blueprints/ontology-driven-generation-blueprint.owl.ttl` (13599 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/compliance/ba-compliance-automation-engine.ttl` (30187 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/compliance/ba-data-sovereignty.ttl` (31909 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/compliance/ba-differential-privacy-budget.ttl` (29882 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/compliance/ba-privacy-automation.ttl` (32765 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/compliance/ba-privacy-preserving-analytics.ttl` (33142 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/compliance/ba-redaction-proof-validation.ttl` (30513 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/blueprints/core/crystal-blueprint-integration.ttl` (15181 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/blueprints/core/polycrystal-lattice.pcl.ttl` (10789 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/blueprints/execution/fabricated-execution-plan.pb.ttl` (17570 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/blueprints/missions/mission-blueprint.mbp.ttl` (15123 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/blueprints/patterns/workflow-pattern-registry.ttl` (17528 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/build/ba-integrity-chains.ttl` (38213 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/build/ba-nif-security-receipts.ttl` (39628 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/build/ba-shacl-validation.ttl` (36554 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/data/data-privacy-crystal-integration.ttl` (22832 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/data/dataset-crystal.dsc.ttl` (24393 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/data/dp-budget-token.dpb.ttl` (30694 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/data/public-mirror-crystal.pmc.ttl` (29713 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/data/redaction-proof-crystal.redact.rct.ttl` (34508 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/data/view-crystal.view.ttl` (26367 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/identity/abi-specification.ttl` (28087 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/identity/cap.ttl` (24940 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/identity/idc.ttl` (24126 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/identity/orgbind.ttl` (18824 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/identity/revoke.ttl` (21756 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/marketplace/asset.ttl` (30126 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/marketplace/offer.ttl` (36318 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/marketplace/order.ttl` (39360 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/marketplace/px.ttl` (36578 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/marketplace/settle.ttl` (42448 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/marketplace/sla.ttl` (30416 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/crystals/marketplace/usage.ttl` (39153 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/governance/governance-automation-rules.ttl` (31428 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/governance/migration-tooling-specs.ttl` (39199 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/governance/signature-validation-framework.ttl` (36958 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/governance/tip-workflow.ttl` (46197 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/ham/hop-admission-matrix.ttl` (40604 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/marketplace/aml-kyc-sanctions-oracles.ttl` (42129 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/marketplace/comprehensive-audit-trail-system.ttl` (27714 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/marketplace/dispute-resolution-evidence-handling.ttl` (41251 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/marketplace/multi-dimensional-trading-protocols.ttl` (41283 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/marketplace/vector-conservation-settlement.ttl` (32097 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/operations/ba-sre-integration-ontology.ttl` (28784 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/operations/capacity/ba-capacity-planning-ontology.ttl` (31729 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/operations/disaster-recovery/ba-disaster-recovery-ontology.ttl` (32780 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/operations/monitoring/ba-observability-ontology.ttl` (32278 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/operations/upgrades/ba-zero-downtime-upgrades.ttl` (30542 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/config/resource-monitoring-configuration.ttl` (18258 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/framework/performance-benchmark-framework.ttl` (34455 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/integration/performance-validation-integration.ttl` (20693 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/oracles/performance-oracle-generation.ttl` (41924 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/tests/comprehensive-performance-test-suite.ttl` (21961 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/tests/throughput-latency-benchmark-suite.ttl` (36788 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/validation/automated-performance-validation-pipeline.ttl` (38632 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/validation/constant-time-validation-tools.ttl` (32129 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/validation/performance-regression-detection.ttl` (41736 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/performance/validation/resource-bounds-enforcement.ttl` (34293 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase1/ba-deterministic-execution.ttl` (23362 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase1/ba-doctrine-of-8.ttl` (33854 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase1/ba-ontology-as-algorithm.ttl` (17900 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase1/ba-zero-tick-rejection.ttl` (51605 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase2/ba-byteactor-realm.ttl` (54159 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase2/ba-bytecore-hardware.ttl` (35152 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase2/ba-byteethos-governance.ttl` (68163 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase2/ba-byteflow-orchestration.ttl` (46740 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase3/ba-execution-physics.ttl` (58202 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase3/ba-optimization-engine.ttl` (36562 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase3/ba-performance-measurement.ttl` (25989 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase3/ba-resource-allocation.ttl` (29411 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase4/ba-access-control.ttl` (34267 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase4/ba-audit-system.ttl` (34992 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase4/ba-compliance-framework.ttl` (30321 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase4/ba-security-policy.ttl` (42262 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase5/ba-bytegen-fabrication.ttl` (40749 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase5/ba-deployment-pipeline.ttl` (48881 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase5/ba-orchestration-factory.ttl` (47230 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase5/ba-quality-assurance.ttl` (44942 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase6/ba-meta-ontology.ttl` (44637 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase6/ba-ontology-validation.ttl` (41889 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase6/ba-ontology-versioning.ttl` (25177 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/phase6/ba-self-evolution.ttl` (33717 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/quality/quality-orchestration-framework.ttl` (24361 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-constant-time-validator.ttl` (44830 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-hsm-integration-specs.ttl` (29727 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-hsm-tee-integration.ttl` (46773 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-pqc-test-suite.ttl` (44747 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-pqc-validation-framework.ttl` (48937 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-quantum-resistance-validator.ttl` (32817 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-security-oracle-benchmark.ttl` (32882 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-sidechannel-resistance-framework.ttl` (50483 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/security/ba-sidechannel-testing-tools.ttl` (29091 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/testing/framework/boundary-value-testing.ttl` (35157 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/testing/framework/e2e-fixture-bundles.ttl` (33455 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/testing/framework/golden-oracle-generator.ttl` (28414 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/testing/framework/negative-test-rejection-paths.ttl` (35414 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/testing/framework/property-based-fuzz-testing.ttl` (31219 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/testing/framework/test-automation-ci-integration.ttl` (34699 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/validation/master-shacl-shapes.ttl` (37589 bytes)
+- `/Users/sac/bytestar/docs/ontology/v5/validation/quality-metrics-framework.ttl` (28434 bytes)
+- `/Users/sac/bytestar/docs/v5_generated_architecture/scrum-at-scale.owl.ttl` (4593 bytes)
+- `/Users/sac/bytestar/experiments/meta-recursion/src/ontology_meta_evolution.ttl` (12829 bytes)
+- `/Users/sac/bytestar/hive/validation/shacl-validation-report.ttl` (3360 bytes)
+- `/Users/sac/bytestar/hive/workers/antiinfo/dark-matter-2026/ontology/core.ttl` (4741 bytes)
+- `/Users/sac/bytestar/hive/workers/antiinfo/dark-matter-2026/ontology/privacy.ttl` (8387 bytes)
+- `/Users/sac/bytestar/hive/workers/antiinfo/dark-matter-2026/ontology/security.ttl` (5243 bytes)
+- `/Users/sac/bytestar/hive/workers/antiinfo/dark-matter-2026/ontology/shapes.ttl` (13387 bytes)
+- `/Users/sac/bytestar/hive/workers/antiinfo/dark-matter-2026/ontology/telemetry.ttl` (9810 bytes)
+- `/Users/sac/bytestar/lib/validation/shapes/byteactor-execution-shapes.ttl` (3157 bytes)
+- `/Users/sac/bytestar/lib/validation/shapes/bytecore-context-shapes.ttl` (3266 bytes)
+- `/Users/sac/bytestar/lib/validation/shapes/byteethos-governance-shapes.ttl` (3695 bytes)
+- `/Users/sac/bytestar/lib/validation/shapes/byteflow-orchestration-shapes.ttl` (4570 bytes)
+- `/Users/sac/bytestar/model/user.ontology.ttl` (724 bytes)
+- `/Users/sac/bytestar/model/user.shapes.ttl` (1099 bytes)
+- `/Users/sac/bytestar/ontoforge-js/ontology/ecommerce-demo.ttl` (12039 bytes)
+- `/Users/sac/bytestar/ontoforge-js/ontology/production-demo.ttl` (27867 bytes)
+- `/Users/sac/bytestar/ontoforge-js/samples/comprehensive-owl-test.ttl` (8301 bytes)
+- `/Users/sac/bytestar/ontoforge-js/samples/comprehensive-test.ttl` (4822 bytes)
+- `/Users/sac/bytestar/ontoforge-js/samples/invalid.ttl` (81 bytes)
+- `/Users/sac/bytestar/ontoforge-js/samples/ontology.ttl` (810 bytes)
+- `/Users/sac/bytestar/ontoforge-js/samples/test-basic.ttl` (578 bytes)
+- `/Users/sac/bytestar/ontoforge-js/samples/test-ontology.ttl` (2746 bytes)
+- `/Users/sac/bytestar/ontoforge-js/shapes/comprehensive-test.shapes.ttl` (9048 bytes)
+- `/Users/sac/bytestar/ontoforge-js/shapes/nuxt-cert.shapes.ttl` (735 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-e2e-output/ecommerce.ttl` (4395 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-e2e-output/simple-crud.ttl` (596 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-e2e-output/step-by-step.ttl` (441 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-e2e-output/university.ttl` (1755 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-output/edge-case-test.ttl` (511 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-output/invalid-test.ttl` (166 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-output/partial-valid-test.ttl` (458 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-output/pipeline-test/complete-ontology-inference-1756090603728-51dl2glgu.ttl` (5922 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-output/pipeline-test/inferred-triples-inference-1756090603728-51dl2glgu.ttl` (1731 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-output/reserved-words-test.ttl` (497 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-output/test_1756075554782/ecommerce-ontology.ttl` (2089 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-tmp/model-test.ttl` (459 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-tmp/sql-cli-test.ttl` (2055 bytes)
+- `/Users/sac/bytestar/ontoforge-js/test-tmp/sql-gen-test.ttl` (562 bytes)
+- `/Users/sac/bytestar/ontoforge-js/tests/cypress/fixtures/sample-ontology.ttl` (2234 bytes)
+- `/Users/sac/bytestar/ontology/ahi-fabrication-calculus.owl.ttl` (3014 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-architecture.owl.ttl` (5239 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-compliance.owl.ttl` (3546 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-doctrines.owl.ttl` (4641 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-economic-calculus.owl.ttl` (5102 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-fabrication-sequence.owl.ttl` (10089 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-marketplace.owl.ttl` (4114 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-mega-ontology.owl.ttl` (8211 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-metrics.owl.ttl` (4027 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-security.owl.ttl` (3640 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-trojan-gift-nuxt-supabase.owl.ttl` (8577 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-v5-architecture.owl.ttl` (3979 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-v5-core.owl.ttl` (5669 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-v5-execution.owl.ttl` (3908 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-v5-fabrication.owl.ttl` (3854 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-v5-governance.owl.ttl` (4327 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-v5-kernel-registry.owl.ttl` (4087 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-v5-meta.owl.ttl` (3590 bytes)
+- `/Users/sac/bytestar/ontology/bytestar-validation.owl.ttl` (4582 bytes)
+- `/Users/sac/bytestar/ontology/calculus-of-creation.owl.ttl` (2979 bytes)
+- `/Users/sac/bytestar/ontology/dark-8020-principle.owl.ttl` (3435 bytes)
+- `/Users/sac/bytestar/ontology/dark-canon.owl.ttl` (3382 bytes)
+- `/Users/sac/bytestar/ontology/jtbd-core-ontology.ttl` (15117 bytes)
+- `/Users/sac/bytestar/ontology/jtbd-patterns-ontology.ttl` (15558 bytes)
+- `/Users/sac/bytestar/ontology/jtbd-shapes.shacl.ttl` (16633 bytes)
+- `/Users/sac/bytestar/ontology/nuxt-certification.owl.ttl` (6721 bytes)
+- `/Users/sac/bytestar/ontology/sap/sap-access-plane.owl.ttl` (3515 bytes)
+- `/Users/sac/bytestar/ontology/sap/sap-architecture.owl.ttl` (3524 bytes)
+- `/Users/sac/bytestar/ontology/sap/sap-data-plane.owl.ttl` (3965 bytes)
+- `/Users/sac/bytestar/ontology/spr_validation_shapes.shacl.ttl` (7671 bytes)
+- `/Users/sac/bytestar/ontology/v5-abi-definitions.owl.ttl` (7907 bytes)
+- `/Users/sac/bytestar/ontology/v5-dflss-concepts.owl.ttl` (5124 bytes)
+- `/Users/sac/bytestar/ontology/v5-governance-rules.owl.ttl` (5023 bytes)
+- `/Users/sac/bytestar/ontology/v5-hardware-allocation.owl.ttl` (3950 bytes)
+- `/Users/sac/bytestar/ontology/v5-pqc-fabric.owl.ttl` (4112 bytes)
+- `/Users/sac/bytestar/ontology/v5-scrum-at-scale.owl.ttl` (5474 bytes)
+- `/Users/sac/bytestar/ontology/v5-security-properties.owl.ttl` (4061 bytes)
+- `/Users/sac/bytestar/ontology/v5-testing-canons.owl.ttl` (3211 bytes)
+- `/Users/sac/bytestar/ontology/v5-workflow-patterns.owl.ttl` (4157 bytes)
+- `/Users/sac/bytestar/ontology/v6/spr_calculus.owl.ttl` (14958 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/injection-test.ttl` (239 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/large-test-ontology.ttl` (15105 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/malicious-test.ttl` (414 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/ontologies/supabase-canon.owl.ttl` (21655 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/ontologies/supabase-shapes.shacl.ttl` (20735 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/test-ontology.ttl` (1928 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/tests/fixtures/ttl/edge-cases.ttl` (3005 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/tests/fixtures/ttl/test-ontology.ttl` (3089 bytes)
+- `/Users/sac/bytestar/src/fabricators/ttl2js/validation/shacl/core-shapes.ttl` (23625 bytes)
+- `/Users/sac/bytestar/src/semantic-reasoning/ontology/mcp-ontology.owl.ttl` (7439 bytes)
+- `/Users/sac/bytestar/src/validation/shapes/mcp-resource-shapes.ttl` (10701 bytes)
+- `/Users/sac/bytestar/tests/automated-qa-pipeline/temp/perf_test_1779744002920_7j0sqqcwm.ttl` (8468 bytes)
+- `/Users/sac/bytestar/tests/automated-qa-pipeline/temp/perf_test_1779744006736_epwziz1fq.ttl` (8468 bytes)
+- `/Users/sac/bytestar/validation/ontology/coherence-validation.sparql.ttl` (10612 bytes)
+
+</details>

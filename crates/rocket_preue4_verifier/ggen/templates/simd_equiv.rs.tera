@@ -1,0 +1,77 @@
+{#- simd_equiv.rs.tera — GC-MECHBIRTH-002 Manufacturing Template -#}
+//! SIMD/SIMDe Equivalence Layer.
+//! ⚠️ GENERATED FILE — do NOT edit by hand.
+//! Source of truth: ontology/mechbirth.ttl
+//! Generator:       ggen/templates/simd_equiv.rs.tera
+//! SPARQL:          ggen/sparql/extract_transition_kernels.sparql
+//!
+//! Equivalence law: chunked 16-lane arithmetic produces identical output to scalar.
+//! Lane width: 16 u8 lanes = 128-bit register floor (SSE2/NEON).
+//! RESIDUAL GC-MECHBIRTH-003: SIMDe FFI C intrinsic kernel deferred.
+
+use crate::error::RefusalReason;
+
+/// Lane width sourced from mb:SimdLaneWidth mb:value = 16.
+const LANE_WIDTH: usize = 16;
+
+/// Process n elements in LANE_WIDTH-lane chunks.
+/// Returns `Err(InvalidAuthorityClass)` if slice lengths are mismatched.
+pub fn batch_update_damage_simd_equiv(
+    heat: &[u8],
+    stress: &[u8],
+    socket_health: &[u8],
+    damage: &mut [u8],
+) -> Result<(), RefusalReason> {
+    let n = heat.len();
+    if stress.len() != n || socket_health.len() != n || damage.len() != n {
+        return Err(RefusalReason::InvalidAuthorityClass {
+            field: "simd input lengths".into(),
+            class: 0,
+        });
+    }
+
+    let mut i = 0usize;
+    while i + LANE_WIDTH <= n {
+        for j in 0..LANE_WIDTH {
+            damage[i + j] = crate::transitions::scalar_failure_risk(
+                heat[i + j],
+                stress[i + j],
+                socket_health[i + j],
+            );
+        }
+        i += LANE_WIDTH;
+    }
+    while i < n {
+        damage[i] = crate::transitions::scalar_failure_risk(
+            heat[i], stress[i], socket_health[i],
+        );
+        i += 1;
+    }
+    Ok(())
+}
+
+/// Verifies bit-identical output between scalar and SIMD-equivalent paths.
+/// Returns `Err(SimdScalarDivergence { index })` at the first divergent lane.
+pub fn verify_simd_scalar_equivalence(
+    heat: &[u8],
+    stress: &[u8],
+    socket_health: &[u8],
+) -> Result<(), RefusalReason> {
+    let n = heat.len();
+    let mut scalar_out = vec![0u8; n];
+    let mut simd_out   = vec![0u8; n];
+
+    for i in 0..n {
+        scalar_out[i] = crate::transitions::scalar_failure_risk(
+            heat[i], stress[i], socket_health[i],
+        );
+    }
+    batch_update_damage_simd_equiv(heat, stress, socket_health, &mut simd_out)?;
+
+    for i in 0..n {
+        if scalar_out[i] != simd_out[i] {
+            return Err(RefusalReason::SimdScalarDivergence { index: i });
+        }
+    }
+    Ok(())
+}

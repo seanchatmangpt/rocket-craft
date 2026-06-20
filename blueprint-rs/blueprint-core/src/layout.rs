@@ -8,7 +8,7 @@
 //! 2. **Crossing minimisation** — barycenter heuristic within each layer.
 //! 3. **Coordinate assignment** — fixed spacing with vertical centering.
 
-use crate::ast::{BpGraph, Blueprint};
+use crate::ast::{Blueprint, BpGraph};
 use crate::types::{NodePos, PinCategory, PinDirection};
 use std::collections::{HashMap, VecDeque};
 
@@ -89,9 +89,7 @@ pub fn auto_layout_graph_with_config(graph: &mut BpGraph, config: &LayoutConfig)
 
     for (i, node) in graph.nodes.iter().enumerate() {
         for pin in &node.pins {
-            if pin.direction == PinDirection::Output
-                && pin.pin_type.category == PinCategory::Exec
-            {
+            if pin.direction == PinDirection::Output && pin.pin_type.category == PinCategory::Exec {
                 for link in &pin.linked_to {
                     if let Some(&j) = node_indices.get(link.node_name.as_str()) {
                         if i != j {
@@ -188,18 +186,14 @@ pub fn layout_and_build(builder: crate::builder::BlueprintBuilder) -> crate::ast
 ///
 /// Each node's layer is at least `predecessor_layer + 1`, so the layer
 /// corresponds to the length of the longest incoming exec-flow path.
-fn assign_layers(
-    n: usize,
-    successors: &[Vec<usize>],
-    predecessors: &[Vec<usize>],
-) -> Vec<usize> {
+fn assign_layers(n: usize, successors: &[Vec<usize>], predecessors: &[Vec<usize>]) -> Vec<usize> {
     let mut layers = vec![0usize; n];
     let mut in_degree: Vec<usize> = predecessors.iter().map(|p| p.len()).collect();
     let mut queue: VecDeque<usize> = VecDeque::new();
 
     // Seed the queue with all source nodes (no predecessors).
-    for i in 0..n {
-        if in_degree[i] == 0 {
+    for (i, &deg) in in_degree.iter().enumerate().take(n) {
+        if deg == 0 {
             queue.push_back(i);
         }
     }
@@ -245,7 +239,10 @@ pub fn bounding_box(graph: &BpGraph) -> (NodePos, NodePos) {
         max_y = max_y.max(node.pos.y);
     }
 
-    (NodePos { x: min_x, y: min_y }, NodePos { x: max_x, y: max_y })
+    (
+        NodePos { x: min_x, y: min_y },
+        NodePos { x: max_x, y: max_y },
+    )
 }
 
 /// Returns `true` if any two nodes overlap within their estimated bounding
@@ -270,7 +267,7 @@ pub fn has_overlapping_nodes(graph: &BpGraph, config: &LayoutConfig) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ast::{BpGraph, BpNode, Blueprint, Pin};
+    use crate::ast::{Blueprint, BpGraph, BpNode, Pin};
 
     // ------------------------------------------------------------------
     // Helpers
@@ -388,7 +385,10 @@ mod tests {
 
         let y1 = g.node("Node1").unwrap().pos.y;
         let y2 = g.node("Node2").unwrap().pos.y;
-        assert_ne!(y1, y2, "Parallel nodes in the same layer must have different y");
+        assert_ne!(
+            y1, y2,
+            "Parallel nodes in the same layer must have different y"
+        );
     }
 
     // ------------------------------------------------------------------

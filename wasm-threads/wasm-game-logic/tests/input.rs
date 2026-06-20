@@ -10,7 +10,7 @@ fn log() -> Logger {
 
 #[test]
 fn input_move_updates_velocity() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity that has Velocity(0,0)");
     let mut world = World::new();
     let e = world.spawn();
@@ -34,7 +34,7 @@ fn input_move_updates_velocity() {
 
 #[test]
 fn input_move_is_no_op_when_entity_has_no_velocity_component() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity that has no Velocity component");
     let mut world = World::new();
     let e = world.spawn();
@@ -55,7 +55,7 @@ fn input_move_is_no_op_when_entity_has_no_velocity_component() {
 
 #[test]
 fn input_attack_reduces_target_health() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an attacker (damage=25) and a target (HP=100)");
     let mut world = World::new();
     let attacker = world.spawn();
@@ -85,7 +85,7 @@ fn input_attack_reduces_target_health() {
 
 #[test]
 fn input_use_item_1_heals_entity_by_ten() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity at 50 HP (max 100)");
     let mut world = World::new();
     let e = world.spawn();
@@ -108,7 +108,7 @@ fn input_use_item_1_heals_entity_by_ten() {
 
 #[test]
 fn input_use_item_unknown_id_does_nothing() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity at 50 HP (max 100)");
     let mut world = World::new();
     let e = world.spawn();
@@ -131,7 +131,7 @@ fn input_use_item_unknown_id_does_nothing() {
 
 #[test]
 fn input_use_item_1_does_not_exceed_max_health() {
-    let mut log = log();
+    let log = log();
     log.info("Given an entity at full health (100/100)");
     let mut world = World::new();
     let e = world.spawn();
@@ -152,7 +152,7 @@ fn input_use_item_1_does_not_exceed_max_health() {
 
 #[test]
 fn input_attack_with_no_attacker_component_does_not_crash() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an attacker missing an Attack component and a target at 100 HP");
     let mut world = World::new();
     let attacker = world.spawn();

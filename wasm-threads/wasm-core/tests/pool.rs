@@ -10,7 +10,7 @@ fn make_logger() -> Logger {
 
 #[test]
 fn pool_size_matches_requested() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WorkerPool constructed with 4 workers and 'worker.js'");
     let pool = WorkerPool::new(4, "worker.js").unwrap();
 
@@ -22,7 +22,7 @@ fn pool_size_matches_requested() {
 
 #[test]
 fn pool_round_robin_cycles() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WorkerPool with 3 workers");
     let mut pool = WorkerPool::new(3, "worker.js").unwrap();
 
@@ -40,7 +40,7 @@ fn pool_round_robin_cycles() {
 
 #[test]
 fn pool_terminate_all_returns_terminated_workers() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WorkerPool with 2 workers");
     let pool = WorkerPool::new(2, "worker.js").unwrap();
 

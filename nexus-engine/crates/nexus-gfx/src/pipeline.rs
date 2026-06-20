@@ -28,13 +28,26 @@ pub struct RenderPipeline<S> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CullMode { None, Front, Back }
+pub enum CullMode {
+    None,
+    Front,
+    Back,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum BlendMode { Opaque, AlphaBlend, Additive }
+pub enum BlendMode {
+    Opaque,
+    AlphaBlend,
+    Additive,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum DepthCompare { Less, LessEqual, Greater, Always }
+pub enum DepthCompare {
+    Less,
+    LessEqual,
+    Greater,
+    Always,
+}
 
 // ---------------------------------------------------------------------------
 // Errors
@@ -56,9 +69,9 @@ pub enum PipelineError {
 impl From<CullMode> for Option<wgpu::Face> {
     fn from(m: CullMode) -> Self {
         match m {
-            CullMode::None  => None,
+            CullMode::None => None,
             CullMode::Front => Some(wgpu::Face::Front),
-            CullMode::Back  => Some(wgpu::Face::Back),
+            CullMode::Back => Some(wgpu::Face::Back),
         }
     }
 }
@@ -67,9 +80,9 @@ impl From<CullMode> for Option<wgpu::Face> {
 impl From<BlendMode> for Option<wgpu::BlendState> {
     fn from(m: BlendMode) -> Self {
         match m {
-            BlendMode::Opaque     => None,
+            BlendMode::Opaque => None,
             BlendMode::AlphaBlend => Some(wgpu::BlendState::ALPHA_BLENDING),
-            BlendMode::Additive   => Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),
+            BlendMode::Additive => Some(wgpu::BlendState::PREMULTIPLIED_ALPHA_BLENDING),
         }
     }
 }
@@ -78,10 +91,10 @@ impl From<BlendMode> for Option<wgpu::BlendState> {
 impl From<DepthCompare> for wgpu::CompareFunction {
     fn from(d: DepthCompare) -> Self {
         match d {
-            DepthCompare::Less      => wgpu::CompareFunction::Less,
+            DepthCompare::Less => wgpu::CompareFunction::Less,
             DepthCompare::LessEqual => wgpu::CompareFunction::LessEqual,
-            DepthCompare::Greater   => wgpu::CompareFunction::Greater,
-            DepthCompare::Always    => wgpu::CompareFunction::Always,
+            DepthCompare::Greater => wgpu::CompareFunction::Greater,
+            DepthCompare::Always => wgpu::CompareFunction::Always,
         }
     }
 }
@@ -106,8 +119,14 @@ impl RenderPipeline<Uninitialized> {
         }
     }
 
-    pub fn with_blend(mut self, mode: BlendMode) -> Self { self.blend_mode = mode; self }
-    pub fn with_cull(mut self, mode: CullMode) -> Self { self.cull_mode = mode; self }
+    pub fn with_blend(mut self, mode: BlendMode) -> Self {
+        self.blend_mode = mode;
+        self
+    }
+    pub fn with_cull(mut self, mode: CullMode) -> Self {
+        self.cull_mode = mode;
+        self
+    }
 
     /// Compile without a GPU device (type-state transition only).
     ///
@@ -221,7 +240,9 @@ impl RenderPipeline<Uninitialized> {
 // ---------------------------------------------------------------------------
 
 impl RenderPipeline<Compiled> {
-    pub fn label(&self) -> &str { &self.label }
+    pub fn label(&self) -> &str {
+        &self.label
+    }
 
     /// Returns a reference to the wgpu pipeline, if one was compiled via
     /// `compile_with_device`.
@@ -248,17 +269,125 @@ impl PipelineSet {
     pub fn build() -> Self {
         PipelineSet {
             opaque: RenderPipeline::new("opaque", "suit.vert", "suit.frag")
-                .with_cull(CullMode::Back).compile(),
+                .with_cull(CullMode::Back)
+                .compile(),
             transparent: RenderPipeline::new("transparent", "suit.vert", "suit_transparent.frag")
-                .with_blend(BlendMode::AlphaBlend).compile(),
+                .with_blend(BlendMode::AlphaBlend)
+                .compile(),
             beam_effects: RenderPipeline::new("beam", "particle.vert", "beam.frag")
                 .with_blend(BlendMode::Additive)
-                .with_cull(CullMode::None).compile(),
+                .with_cull(CullMode::None)
+                .compile(),
             ui: RenderPipeline::new("ui", "ui.vert", "ui.frag")
                 .with_blend(BlendMode::AlphaBlend)
-                .with_cull(CullMode::None).compile(),
+                .with_cull(CullMode::None)
+                .compile(),
             shadow: RenderPipeline::new("shadow", "shadow.vert", "shadow.frag")
-                .with_cull(CullMode::Front).compile(),
+                .with_cull(CullMode::Front)
+                .compile(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── RenderPipeline typestate: Uninitialized ────────────────────────────────
+
+    #[test]
+    fn new_pipeline_stores_labels_and_defaults() {
+        let p = RenderPipeline::<Uninitialized>::new("main", "vs.wgsl", "fs.wgsl");
+        assert_eq!(p.label, "main");
+        assert_eq!(p.vertex_shader, "vs.wgsl");
+        assert_eq!(p.fragment_shader, "fs.wgsl");
+        assert_eq!(p.cull_mode, CullMode::Back);
+        assert_eq!(p.blend_mode, BlendMode::Opaque);
+        assert!(p.depth_write);
+        assert_eq!(p.depth_compare, DepthCompare::Less);
+    }
+
+    #[test]
+    fn with_blend_alpha_sets_blend_mode() {
+        let p = RenderPipeline::<Uninitialized>::new("ui", "vs.wgsl", "fs.wgsl")
+            .with_blend(BlendMode::AlphaBlend);
+        assert_eq!(p.blend_mode, BlendMode::AlphaBlend);
+    }
+
+    #[test]
+    fn with_cull_none_sets_cull_mode() {
+        let p = RenderPipeline::<Uninitialized>::new("sky", "vs.wgsl", "fs.wgsl")
+            .with_cull(CullMode::None);
+        assert_eq!(p.cull_mode, CullMode::None);
+    }
+
+    // ── compile() — no-gpu typestate transition ────────────────────────────────
+
+    #[test]
+    fn compile_transitions_and_preserves_settings() {
+        let compiled = RenderPipeline::<Uninitialized>::new("beam", "vs.wgsl", "fs.wgsl")
+            .with_blend(BlendMode::Additive)
+            .with_cull(CullMode::Front)
+            .compile();
+        assert_eq!(compiled.label, "beam");
+        assert_eq!(compiled.blend_mode, BlendMode::Additive);
+        assert_eq!(compiled.cull_mode, CullMode::Front);
+    }
+
+    // Cannot call compile on an already-compiled pipeline (type system prevents it)
+    // — this test proves the transition is one-way by verifying the Compiled variant
+    // exposes the same fields correctly.
+    #[test]
+    fn compiled_pipeline_fields_match_configured_values() {
+        let c = RenderPipeline::<Uninitialized>::new("depth", "vs.wgsl", "fs.wgsl")
+            .compile();
+        assert_eq!(c.depth_compare, DepthCompare::Less);
+        assert!(c.depth_write);
+    }
+
+    // ── Enum distinctness ─────────────────────────────────────────────────────
+
+    #[test]
+    fn cull_mode_variants_are_distinct() {
+        assert_ne!(CullMode::None, CullMode::Front);
+        assert_ne!(CullMode::Front, CullMode::Back);
+        assert_ne!(CullMode::None, CullMode::Back);
+    }
+
+    #[test]
+    fn blend_mode_variants_are_distinct() {
+        assert_ne!(BlendMode::Opaque, BlendMode::AlphaBlend);
+        assert_ne!(BlendMode::AlphaBlend, BlendMode::Additive);
+    }
+
+    #[test]
+    fn depth_compare_all_four_variants_distinct() {
+        let variants = [
+            DepthCompare::Less,
+            DepthCompare::LessEqual,
+            DepthCompare::Greater,
+            DepthCompare::Always,
+        ];
+        for i in 0..variants.len() {
+            for j in 0..variants.len() {
+                if i == j {
+                    assert_eq!(variants[i], variants[j]);
+                } else {
+                    assert_ne!(variants[i], variants[j]);
+                }
+            }
+        }
+    }
+
+    // ── Clone / Copy for enums ────────────────────────────────────────────────
+
+    #[test]
+    fn enum_variants_clone_and_copy() {
+        let m = CullMode::Back;
+        let m2 = m; // Copy
+        assert_eq!(m, m2);
+        let b = BlendMode::AlphaBlend;
+        let b2 = b.clone(); // Clone
+        assert_eq!(b, b2);
     }
 }

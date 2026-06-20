@@ -1,0 +1,16 @@
+[package]
+name = "ggen-asset-lsp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lsp-max = { path = "/Users/sac/lsp-max" }
+lsp-types-max = { path = "/Users/sac/lsp-types-max", version = "26.6.5", features = ["proposed"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+anyhow = { workspace = true }
+walkdir = "2"
+chrono = "0.4"
+url = "2"

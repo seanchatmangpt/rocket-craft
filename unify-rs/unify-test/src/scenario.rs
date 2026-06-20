@@ -66,14 +66,12 @@ impl<State: Clone + std::fmt::Debug> Scenario<State> {
     pub fn run(mut self) -> ScenarioResult {
         let name = self.name.clone();
         let total = self.steps.len();
-        let mut steps_run = 0usize;
 
-        for step in self.steps.drain(..) {
+        for (idx, step) in self.steps.drain(..).enumerate() {
             let step_name = step.name.clone();
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 (step.f)(&mut self.state);
             }));
-            steps_run += 1;
             if let Err(e) = result {
                 let msg = if let Some(s) = e.downcast_ref::<String>() {
                     s.clone()
@@ -84,7 +82,7 @@ impl<State: Clone + std::fmt::Debug> Scenario<State> {
                 };
                 return ScenarioResult {
                     name,
-                    steps_run,
+                    steps_run: idx + 1,
                     passed: false,
                     error: Some(msg),
                 };

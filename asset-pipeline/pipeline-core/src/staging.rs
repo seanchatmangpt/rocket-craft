@@ -1,6 +1,6 @@
+use crate::{ConvertedAsset, PipelineError, StagedAsset};
 use std::path::PathBuf;
-use tracing::{info, debug};
-use crate::{ConvertedAsset, StagedAsset, PipelineError};
+use tracing::{debug, info};
 
 /// Default staging path for UE 4.27 projects in this workspace.
 ///
@@ -21,7 +21,9 @@ pub struct Stager {
 }
 
 impl Stager {
-    pub fn new(content_dir: PathBuf) -> Self { Self { content_dir } }
+    pub fn new(content_dir: PathBuf) -> Self {
+        Self { content_dir }
+    }
 
     /// Create a stager targeting the default UE 4.27.0 content path.
     pub fn for_ue4_27() -> Self {
@@ -34,23 +36,28 @@ impl Stager {
     pub fn stage(
         &self,
         asset: ConvertedAsset,
-    ) -> Result<StagedAsset, (PipelineError, ConvertedAsset)> {
+    ) -> Result<StagedAsset, Box<(PipelineError, ConvertedAsset)>> {
         // 1. Create content_dir if needed
         if let Err(e) = std::fs::create_dir_all(&self.content_dir) {
-            return Err((PipelineError::StagingFailed(e), asset));
+            return Err(Box::new((PipelineError::StagingFailed(e), asset)));
         }
 
         let dest = self.content_dir.join(format!("{}.fbx", asset.name()));
 
-        debug!("Staging {} \u{2192} {}", asset.fbx_path.display(), dest.display());
+        debug!("Staging {} → {}", asset.fbx_path.display(), dest.display());
 
         // 2. Copy the FBX
         if let Err(e) = std::fs::copy(&asset.fbx_path, &dest) {
-            return Err((PipelineError::StagingFailed(e), asset));
+            return Err(Box::new((PipelineError::StagingFailed(e), asset)));
         }
 
-        info!("Staged: {} ({:.1} KB)", dest.display(),
-              std::fs::metadata(&dest).map(|m| m.len() as f64 / 1024.0).unwrap_or(0.0));
+        info!(
+            "Staged: {} ({:.1} KB)",
+            dest.display(),
+            std::fs::metadata(&dest)
+                .map(|m| m.len() as f64 / 1024.0)
+                .unwrap_or(0.0)
+        );
 
         let staged = asset.into_staged(dest);
         Ok(staged)
@@ -67,7 +74,10 @@ impl Stager {
             let path = asset.path.clone();
             match self.stage(asset) {
                 Ok(s) => staged.push(s),
-                Err((e, _)) => errors.push((path, e)),
+                Err(boxed_err) => {
+                    let (e, _) = *boxed_err;
+                    errors.push((path, e));
+                }
             }
         }
         (staged, errors)

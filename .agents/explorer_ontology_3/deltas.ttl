@@ -1,0 +1,143 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix eden: <https://ggen.io/ontology/eden-server/> .
+
+eden:deltas a owl:Ontology ;
+    rdfs:label "Eden Manufacturing Server Deltas Ontology" ;
+    rdfs:comment "Ontology defining state change deltas for the Eden Manufacturing Server." ;
+    owl:imports <http://www.w3.org/ns/prov#> .
+
+# --- Base Delta ---
+eden:Delta a owl:Class ;
+    rdfs:label "Delta" ;
+    rdfs:comment "Abstract base class for all state and topology deltas in the replication graph." ;
+    rdfs:subClassOf prov:Entity .
+
+# --- Delta Classes ---
+eden:AuthorityDelta a owl:Class ;
+    rdfs:label "Authority Delta" ;
+    rdfs:comment "Delta representing changes to authority parameters (reliability twin properties) of a component." ;
+    rdfs:subClassOf eden:Delta .
+
+eden:AssemblyDelta a owl:Class ;
+    rdfs:label "Assembly Delta" ;
+    rdfs:comment "Delta representing structural changes in the assembly tree (mounting, unmounting components)." ;
+    rdfs:subClassOf eden:Delta .
+
+eden:ProjectionDelta a owl:Class ;
+    rdfs:label "Projection Delta" ;
+    rdfs:comment "Delta representing projections of the object graph state into external targets (e.g. WASM package, Unreal 4 engine)." ;
+    rdfs:subClassOf eden:Delta .
+
+eden:InterestDelta a owl:Class ;
+    rdfs:label "Interest Delta" ;
+    rdfs:comment "Delta representing subscriber interest registration over specific subtrees of components." ;
+    rdfs:subClassOf eden:Delta .
+
+eden:ReceiptDelta a owl:Class ;
+    rdfs:label "Receipt Delta" ;
+    rdfs:comment "Delta capturing cryptographic verification results, Playwright audit reports, and final acceptance verdicts." ;
+    rdfs:subClassOf eden:Delta .
+
+# --- Properties for AuthorityDelta ---
+eden:targetComponent a owl:ObjectProperty ;
+    rdfs:label "target component" ;
+    rdfs:comment "The assembly component targeted by a state update." ;
+    rdfs:domain eden:AuthorityDelta ;
+    rdfs:range eden:AssemblyComponent .
+
+# --- Properties for AssemblyDelta ---
+eden:targetSocket a owl:ObjectProperty ;
+    rdfs:label "target socket" ;
+    rdfs:comment "The assembly socket where components are mounted or unmounted." ;
+    rdfs:domain eden:AssemblyDelta ;
+    rdfs:range eden:Socket .
+
+eden:installedComponent a owl:ObjectProperty ;
+    rdfs:label "installed component" ;
+    rdfs:comment "The component installed into the target socket." ;
+    rdfs:domain eden:AssemblyDelta ;
+    rdfs:range eden:AssemblyComponent .
+
+eden:removedComponent a owl:ObjectProperty ;
+    rdfs:label "removed component" ;
+    rdfs:comment "The component removed from the target socket." ;
+    rdfs:domain eden:AssemblyDelta ;
+    rdfs:range eden:AssemblyComponent .
+
+# --- Properties for InterestDelta ---
+eden:subscriber a owl:ObjectProperty ;
+    rdfs:label "subscriber" ;
+    rdfs:comment "The agent subscribing to updates." ;
+    rdfs:domain eden:InterestDelta ;
+    rdfs:range prov:Agent .
+
+eden:interestedComponent a owl:ObjectProperty ;
+    rdfs:label "interested component" ;
+    rdfs:comment "The component representing the root of interest for updates." ;
+    rdfs:domain eden:InterestDelta ;
+    rdfs:range eden:AssemblyComponent .
+
+# --- Properties for ReceiptDelta ---
+eden:prompt a owl:DatatypeProperty ;
+    rdfs:label "prompt" ;
+    rdfs:comment "The textual prompt that generated this world state." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:string .
+
+eden:contractHash a owl:DatatypeProperty ;
+    rdfs:label "contract hash" ;
+    rdfs:comment "Cryptographic hash of the contract specifying the world parameters." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:string .
+
+eden:buildLog a owl:DatatypeProperty ;
+    rdfs:label "build log" ;
+    rdfs:comment "Textual log or path to log of the HTML5/WASM/Unreal build process." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:string .
+
+eden:packagePath a owl:DatatypeProperty ;
+    rdfs:label "package path" ;
+    rdfs:comment "Local path or URL of the packaged WASM/HTML5 build." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:string .
+
+eden:baselineScreenshot a owl:DatatypeProperty ;
+    rdfs:label "baseline screenshot" ;
+    rdfs:comment "Reference (URI or path) of the baseline WebGL screenshot before actuation." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:anyURI .
+
+eden:afterScreenshot a owl:DatatypeProperty ;
+    rdfs:label "after screenshot" ;
+    rdfs:comment "Reference (URI or path) of the WebGL screenshot after keyboard/movement input." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:anyURI .
+
+eden:consoleLogs a owl:DatatypeProperty ;
+    rdfs:label "console logs" ;
+    rdfs:comment "Captured console outputs during browser execution." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:string .
+
+eden:inputTrace a owl:DatatypeProperty ;
+    rdfs:label "input trace" ;
+    rdfs:comment "Serialized trace of keyboard/mouse inputs injected during simulation." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:string .
+
+eden:visualDelta a owl:DatatypeProperty ;
+    rdfs:label "visual delta" ;
+    rdfs:comment "Calculated metric of structural/color difference between baseline and after screenshots." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:float .
+
+eden:verdict a owl:DatatypeProperty ;
+    rdfs:label "verdict" ;
+    rdfs:comment "Acceptance decision (true/PASS or false/DEFECT)." ;
+    rdfs:domain eden:ReceiptDelta ;
+    rdfs:range xsd:boolean .

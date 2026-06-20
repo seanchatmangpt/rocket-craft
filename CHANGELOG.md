@@ -26,7 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Summary
 
-A transformational week integrating 96 commits across all 7 major workspaces. Major deliverables include: **Gundam Nexus engine** (10-crate Rust formal model, 152 tests), **blueprint-rs** (UE4 Blueprint AST generation, 100+ nodes, T3D round-trip), **unify-rs** (17-crate semantic/MCP ecosystem), **Infinity Blade 4 MUD backend** (6-crate Rust server), **WASM threading abstractions** (typestate workers, shared memory), **anti-llm-cheat-lsp** (Rust/C/JS/TS detection), and **asset pipeline autonomy**. All CI gates passing. Zero breaking changes to user-facing APIs.
+A transformational week integrating 96 commits across all 7 major workspaces. Major deliverables include: **Gundam Nexus engine** (10-crate Rust formal model, 152 tests), **blueprint-rs** (UE4 Blueprint AST generation, 100+ nodes, T3D round-trip), **unify-rs** (18-crate semantic/MCP/AutoML ecosystem including **unify-automl**), **chicago-tdd-tools** (Classicist BDD framework and the **combinatorial-engine** state space explorer), **Infinity Blade 4 MUD backend** (6-crate Rust server), **WASM threading abstractions** (typestate workers, shared memory), **anti-llm-cheat-lsp** (Rust/C/JS/TS detection), and **asset pipeline autonomy**. All CI gates passing. Zero breaking changes to user-facing APIs.
 
 ---
 
@@ -35,6 +35,20 @@ A transformational week integrating 96 commits across all 7 major workspaces. Ma
 ### nexus-engine, unify-rs, unify-mcp, pwa-staff
 
 #### Added
+
+**combinatorial-engine: BDD State Space Exploration (410a8b9)**
+- New binary in `chicago-tdd-tools` workspace (`combinatorial-engine`)
+- Automatic discovery of games: hooks into *Infinity Blade 4 MUD* and *Gundam Nexus* using `chicago_tdd_tools::discover_games()`
+- Chess-coordinate-based legal move simulation: walks the state space under the game rules, identifying unhandled panics and illegal transitions
+- Generates JSON reports at `combinatorial_report.json` logging visited states, transitions (source, move, target), and errors/panics
+- Verification suite: `aimbot_behavior.rs`, `coordinate_behavior.rs`, `discovery_behavior.rs` (total 7 tests)
+
+**unify-automl: AutoML DX & Self-Tuning Framework (bcfda09)**
+- New workspace crate in `unify-rs`: `unify-automl`
+- Dynamic Discovery & Auto-Binding: Scans files recursively for `@UnifyAutoBind` comments and `#[derive(AutoBind)]` macros, dynamically registering game components and servers
+- Game Balance Auto-Optimizer: Runs Monte Carlo simulation loops in *Infinity Blade 4 MUD* to autonomously find optimal character stat distributions (health, attack, defense, magic) closest to target win-rate curves
+- Scaffolding & Server Lifecycle: Developer commands `init` to bootstrap config and test component stubs, and `start` to spawn backend servers (e.g., `genie_server.js`) tracking PIDs
+- Verification suite: Unit tests in `src/lib.rs` and E2E lifecycle tests in `tests/automl_tests.rs` (total 8 tests)
 
 **unify-mcp: Phase 1 Anti-LLM Scanning (d830905)**
 - New MCP tools for Claude Desktop integration:
@@ -669,8 +683,8 @@ Complete 5-crate WASM worker infrastructure with typestate isolation:
 - **nexus-engine**: 152 tests (10 crates)
 - **ib4-mud**: 17 tests (6 crates)
 - **blueprint-rs**: 45+ tests (4 crates)
-- **unify-rs**: 95+ tests (17 crates)
-- **chicago-tdd-tools**: 40+ tests
+- **unify-rs** (including `unify-automl`): 103 tests (18 crates)
+- **chicago-tdd-tools** (including `combinatorial-engine`): 47 tests
 - **wasm-threads**: 49 tests + 95+ unit tests
 - **asset-pipeline**: 8 tests
 
@@ -783,7 +797,8 @@ cargo build
 - **anti-llm-cheat-lsp Scanner**: `unify-mcp/src/anti_llm_tools.rs` (MCP integration) + original repo TBD
 - **WASM Threading**: `wasm-threads/wasm-core/README.md` (PhD thesis + arch notes)
 - **Asset Pipeline**: `asset-pipeline/README.md` + `pipeline.toml` template
-- **Chicago TDD Integration**: `chicago-tdd-tools/README.md` + test examples in `tests/`
+- **Chicago TDD Integration & Combinatorial Engine**: `chicago-tdd-tools/README.md` + binary at `chicago-tdd-tools/src/bin/combinatorial-engine.rs` + tests in `tests/`
+- **unify-automl DX Framework**: `unify-rs/unify-automl/src/lib.rs` + tests in `unify-rs/unify-automl/tests/`
 
 ---
 

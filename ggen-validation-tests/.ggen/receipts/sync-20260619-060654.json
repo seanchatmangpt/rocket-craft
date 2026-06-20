@@ -1,0 +1,16 @@
+{
+  "operation_id": "ba9e3e9d-7b7d-4c8d-9e80-b41b2d8a67b7",
+  "timestamp": "2026-06-19T06:06:54.437999Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.11",
+    "ggen.toml:d851c547aa653730e11745eae471d28867ad3e1d4ac31e6f7d378e026a795b24",
+    "core.ttl:987e37ce563f2a4346683d2b4023dd2bf3a1dbb25935446c395955a64d9b7bf3",
+    "reflection.ttl:2e512c4efa44e9f234ccebcdb6983c0195f741e422d242d7c3aed96ea99cad59",
+    "blueprints.ttl:bed9eab7012d0a0d8607d973bac5b9b404fdb4598dcefb6cdde004cd0028d793",
+    "subsystems.ttl:d340748d1979538930eb63ed0da8e9f87e299d77227e880d4ff4c2d4c752518f",
+    "typestates.ttl:001f9b87cb966f3ee9ae907622816f41d04c960497c6f1dfc48442c18750551d"
+  ],
+  "output_hashes": [],
+  "signature": "da123ed1f6b0d38b794cb14c0c99442eb6098ec6a47bc2d05ca817ec1f099e2222ab2289db1c4a6f1846cdf46d3532a4217d49c4568feb530aad3ac829764f0e",
+  "previous_receipt_hash": "7570df634bfef375869419ef0d342fadf2306c051bcb999a495227ff3a8f4820"
+}

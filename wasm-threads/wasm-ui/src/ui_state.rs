@@ -125,3 +125,78 @@ impl UiState<Error> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_ui_state_starts_unloaded() {
+        let s = UiState::<Unloaded>::new();
+        assert_eq!(s.frame, 0);
+        assert_eq!(s.player_health_max, 100);
+    }
+
+    #[test]
+    fn start_loading_transitions() {
+        let loading = UiState::<Unloaded>::new().start_loading();
+        // Loading state is accessible; its fields carry over
+        assert_eq!(loading.player_health_max, 100);
+    }
+
+    #[test]
+    fn loading_ready_transition() {
+        let ready = UiState::<Unloaded>::new().start_loading().ready();
+        assert_eq!(ready.frame, 0);
+    }
+
+    #[test]
+    fn loading_fail_transition() {
+        let err = UiState::<Unloaded>::new().start_loading().fail("io error");
+        // Error state carries messages_received
+        assert_eq!(err.messages_received, 0);
+    }
+
+    #[test]
+    fn render_frame_increments_frame() {
+        let mut r = UiState::<Unloaded>::new().start_loading().ready();
+        r.render_frame();
+        r.render_frame();
+        assert_eq!(r.frame, 2);
+    }
+
+    #[test]
+    fn update_from_game_sets_fields_and_counts_message() {
+        let mut r = UiState::<Unloaded>::new().start_loading().ready();
+        r.update_from_game(5, 80, 100, 1000, 3);
+        assert_eq!(r.last_game_tick, 5);
+        assert_eq!(r.player_health, 80);
+        assert_eq!(r.player_score, 1000);
+        assert_eq!(r.entity_count, 3);
+        assert_eq!(r.messages_received, 1);
+    }
+
+    #[test]
+    fn health_percentage_is_correct() {
+        let mut r = UiState::<Unloaded>::new().start_loading().ready();
+        r.update_from_game(0, 50, 100, 0, 0);
+        let pct = r.health_percentage();
+        assert!((pct - 0.5).abs() < 1e-6);
+    }
+
+    #[test]
+    fn health_percentage_zero_max_is_zero() {
+        let mut r = UiState::<Unloaded>::new().start_loading().ready();
+        r.update_from_game(0, 0, 0, 0, 0);
+        assert_eq!(r.health_percentage(), 0.0);
+    }
+
+    #[test]
+    fn error_retry_returns_unloaded() {
+        let restarted = UiState::<Unloaded>::new()
+            .start_loading()
+            .fail("bad")
+            .retry();
+        assert_eq!(restarted.frame, 0);
+    }
+}

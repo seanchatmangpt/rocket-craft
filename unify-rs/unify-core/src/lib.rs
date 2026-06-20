@@ -504,11 +504,14 @@ impl DynamicLaw for NonEmptyNameDynamicLaw {
 
 // ─── Utility: static-to-dynamic adapter ──────────────────────────────────────
 
+/// Type alias for path-validation closure.
+pub type LawValidationFn = Box<dyn Fn(&Path) -> Result<(), LawViolation> + Send + Sync>;
+
 /// Wraps a [`StaticLaw`] value together with a path-validation closure,
 /// exposing it as a [`DynamicLaw`].  Useful for quick registrations in tests.
 pub struct StaticLawAdapter<L: StaticLaw> {
     _law: PhantomData<L>,
-    validate_fn: Box<dyn Fn(&Path) -> Result<(), LawViolation> + Send + Sync>,
+    validate_fn: LawValidationFn,
 }
 
 impl<L: StaticLaw> StaticLawAdapter<L> {

@@ -1,0 +1,24 @@
+{
+  "milestone": "GC-MECH-FACTORY-MUD-003",
+  "timestamp": "2026-06-19T21:38:04.467Z",
+  "status": "VISUAL_DELTA_BELOW_THRESHOLD",
+  "engine_ready_signal_detected": false,
+  "canvas_detected": false,
+  "before_screenshot": "/Users/sac/rocket-craft/scripts/generated/mech_factory_mud/playwright/before.png",
+  "after_screenshot": "/Users/sac/rocket-craft/scripts/generated/mech_factory_mud/playwright/after.png",
+  "before_sha256": "4b1c1de8bae27a24354a39e72d796f990aa36e393100891057964d1122fac565",
+  "after_sha256": "4b1c1de8bae27a24354a39e72d796f990aa36e393100891057964d1122fac565",
+  "pixel_delta_ratio": 0,
+  "pixel_delta_threshold": 0.001,
+  "delta_gate": "FAIL",
+  "console_log_count": 1,
+  "console_error_count": 1,
+  "console_errors": [
+    "[error] Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "verdict": "REFUSED_DELTA_BELOW_THRESHOLD",
+  "residuals": [
+    "VISUAL_DELTA_BELOW_THRESHOLD — engine may not have fully rendered before screenshot"
+  ],
+  "doctrine": "0 fitness, 0 conformance baseline. Standing requires replay."
+}

@@ -47,3 +47,52 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, msg: &str) -> Observation {
+        Observation {
+            file_path: "src/lib.rs".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "mutation_smell".into(),
+            construct: construct.into(), context: String::new(), message: msg.into(),
+        }
+    }
+
+    #[test]
+    fn empty_returns_no_diags() { assert!(evaluate(&[]).is_empty()); }
+
+    #[test]
+    fn std_fs_write_triggers_mut_001() {
+        let d = evaluate(&[obs("std::fs::write", "")]);
+        assert_eq!(d[0].code, "ANTI-LLM-MUT-001");
+        assert!(d[0].blocking);
+    }
+
+    #[test]
+    fn file_create_triggers_mut_001() {
+        let d = evaluate(&[obs("File::create", "")]);
+        assert_eq!(d[0].code, "ANTI-LLM-MUT-001");
+    }
+
+    #[test]
+    fn workspace_edit_construct_triggers_mut_002() {
+        let d = evaluate(&[obs("WorkspaceEdit", "")]);
+        assert_eq!(d[0].code, "ANTI-LLM-MUT-002");
+        assert!(d[0].blocking);
+    }
+
+    #[test]
+    fn workspace_edit_in_message_triggers_mut_002() {
+        let d = evaluate(&[obs("something", "WorkspaceEdit used as receipt binding")]);
+        assert_eq!(d[0].code, "ANTI-LLM-MUT-002");
+    }
+
+    #[test]
+    fn unknown_construct_produces_no_diag() {
+        assert!(evaluate(&[obs("safe_read_op", "")]).is_empty());
+    }
+}

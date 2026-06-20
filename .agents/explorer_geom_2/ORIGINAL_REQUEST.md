@@ -1,0 +1,5 @@
+## 2026-06-20T01:16:43Z
+
+Context: Milestone 1: F1 Geometry & Morphology implementation for FLAGSHIP_UE4_MECH_PLANT_001.
+Content: Investigate the current Turtle ontologies (`ontology/all_merged.ttl`, `generated/mech_assets/reference_fabric_001/graph/`), SPARQL queries, templates, and the offline test `mecha_offline.test.ts`. Detail a concrete implementation strategy to satisfy the F1 Flagship requirements (CTQ-F1-001 through CTQ-F1-013, VJ-CRIT-001 through VJ-CRIT-006) for swept feather panels, angular armor core shell hierarchy, torso/head distinctions, cyan blade rods, destruction states (broken armor, exposed mechanical frame, VFX sockets), heavy animations (idle, walk, deploy), and weapon loadouts.
+Action: Produce an exploration report at `/Users/sac/rocket-craft/.agents/sub_orch_implementation_aaa_ue4_mech_pack_001/explorer_geom_2_report.md` detailing your recommendations and send us a message when done. Do not write or modify codebase source files.

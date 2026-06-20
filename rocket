@@ -1,17 +1,66 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 # rocket - Unified Rocket Craft Management Tool (Rust Wrapper)
+set -euo pipefail
 
-set -e
+# Resolve script directory dynamically
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_PATH="${PROJECT_ROOT}/tools/target/release/rocket-cmd"
 
-PROJECT_ROOT="$(cd "$(dirname "$0")" && pwd)"
-BIN_PATH="$PROJECT_ROOT/tools/target/release/rocket-cmd"
-
-# Build the tool if it doesn't exist
-if [ ! -f "$BIN_PATH" ]; then
-    echo "Building Rocket Craft tools (release)..."
-    cd "$PROJECT_ROOT/tools/rocket-cmd" && cargo build --release > /dev/null
-    cd "$PROJECT_ROOT"
+# Color support check
+if [ -t 1 ] && [ "${NO_COLOR:-}" = "" ]; then
+    BOLD="\033[1m"
+    RED="\033[31m"
+    GREEN="\033[32m"
+    BLUE="\033[34m"
+    RESET="\033[0m"
+else
+    BOLD=""
+    RED=""
+    GREEN=""
+    BLUE=""
+    RESET=""
 fi
 
-# Pass all arguments to the Rust binary
-exec "$BIN_PATH" "$@"
+log_info() { echo -e "${BLUE}${BOLD}[INFO]${RESET} $*"; }
+log_success() { echo -e "${GREEN}${BOLD}[SUCCESS]${RESET} $*"; }
+log_error() { echo -e "${RED}${BOLD}[ERROR]${RESET} $*" >&2; }
+
+_build_rocket() {
+    log_info "Building rocket-cmd (release)..."
+    if ! (cd "${PROJECT_ROOT}/tools" && cargo build -p rocket-cmd --release 2>&1); then
+        log_error "Failed to build rocket-cmd. Check cargo output above."
+        exit 1
+    fi
+    [ -f "${BIN_PATH}" ] || { log_error "Build succeeded but binary missing at ${BIN_PATH}."; exit 1; }
+    log_success "rocket-cmd built."
+}
+
+# --rebuild flag: force a fresh build regardless of binary state
+_FORCE_REBUILD=0
+_ARGS=()
+for _arg in "$@"; do
+    if [ "$_arg" = "--rebuild" ]; then
+        _FORCE_REBUILD=1
+    else
+        _ARGS+=("$_arg")
+    fi
+done
+
+if [ "$_FORCE_REBUILD" = "1" ]; then
+    _build_rocket
+elif [ ! -f "${BIN_PATH}" ]; then
+    log_info "Release binary not found — building automatically..."
+    _build_rocket
+else
+    # Warn (but do not rebuild automatically) when .rs source is newer than the binary.
+    # Auto-rebuild would be slow on every invocation; explicit --rebuild keeps it opt-in.
+    _stale=$(find "${PROJECT_ROOT}/tools" -name "*.rs" -newer "${BIN_PATH}" \
+             -not -path "*/target/*" 2>/dev/null | head -1)
+    if [ -n "$_stale" ]; then
+        log_info "Source changed since last build (e.g. ${_stale##${PROJECT_ROOT}/}). Run './rocket --rebuild <verb>' to rebuild."
+    fi
+fi
+
+# Execute the Rust binary directly, passing all command-line arguments
+exec "${BIN_PATH}" "${_ARGS[@]}"

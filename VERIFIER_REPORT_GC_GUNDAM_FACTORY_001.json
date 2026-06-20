@@ -1,0 +1,143 @@
+{
+  "milestone": "GC-GUNDAM-FACTORY-001",
+  "status": "GUNDAM_FACTORY_WALKTHROUGH_ALIVE_UNDER_SCOPE",
+  "scoped_status": "GUNDAM_FACTORY_WALKTHROUGH_ALIVE_UNDER_SCOPE",
+  "receipt_chain": [
+    {
+      "sequence": 1,
+      "event_type": "Spawn",
+      "surface": "BP_GundamFrame",
+      "input_hash": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f",
+      "output_hash": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "receipt": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 2,
+      "event_type": "FactoryEntrance",
+      "surface": "BP_GundamSocket",
+      "input_hash": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099",
+      "output_hash": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099",
+      "prev_hash": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f",
+      "receipt": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 3,
+      "event_type": "FrameAssembly",
+      "surface": "BP_ArmorPanel",
+      "input_hash": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e",
+      "output_hash": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e",
+      "prev_hash": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099",
+      "receipt": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 4,
+      "event_type": "SocketTopology",
+      "surface": "BP_GundamRig",
+      "input_hash": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5",
+      "output_hash": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5",
+      "prev_hash": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e",
+      "receipt": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 5,
+      "event_type": "ArmorSkinStation",
+      "surface": "BP_MotionFamily",
+      "input_hash": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e",
+      "output_hash": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e",
+      "prev_hash": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5",
+      "receipt": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 6,
+      "event_type": "RigMotionStation",
+      "surface": "BP_SkinLayer",
+      "input_hash": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909",
+      "output_hash": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909",
+      "prev_hash": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e",
+      "receipt": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 7,
+      "event_type": "VerificationGate",
+      "surface": "BP_GundamProjection",
+      "input_hash": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012",
+      "output_hash": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012",
+      "prev_hash": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909",
+      "receipt": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 8,
+      "event_type": "ReceiptTerminal",
+      "surface": "BP_ReceiptOverlay",
+      "input_hash": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1",
+      "output_hash": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1",
+      "prev_hash": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012",
+      "receipt": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 9,
+      "event_type": "ExitOrLoop",
+      "surface": "BP_ExitOverlay",
+      "input_hash": "7b3f9e2fe08a1e5e30e03dbdd49b960ef189eb113f5ffb4460d898b9b7378818",
+      "output_hash": "7b3f9e2fe08a1e5e30e03dbdd49b960ef189eb113f5ffb4460d898b9b7378818",
+      "prev_hash": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1",
+      "receipt": "7b3f9e2fe08a1e5e30e03dbdd49b960ef189eb113f5ffb4460d898b9b7378818",
+      "status": "ADMITTED",
+      "residuals": []
+    },
+    {
+      "sequence": 10,
+      "event_type": "EditorBuild",
+      "surface": "UE4Editor",
+      "input_hash": "6c2d6fd67f8d9a96661152e7514bf68f180a8966e2d73011dd67dee1845d6ffe",
+      "output_hash": "6c2d6fd67f8d9a96661152e7514bf68f180a8966e2d73011dd67dee1845d6ffe",
+      "prev_hash": "7b3f9e2fe08a1e5e30e03dbdd49b960ef189eb113f5ffb4460d898b9b7378818",
+      "receipt": "6c2d6fd67f8d9a96661152e7514bf68f180a8966e2d73011dd67dee1845d6ffe",
+      "status": "VERIFIED",
+      "residuals": []
+    },
+    {
+      "sequence": 11,
+      "event_type": "WasmPackaging",
+      "surface": "Brm.wasm",
+      "input_hash": "6c2d6fd67f8d9a96661152e7514bf68f180a8966e2d73011dd67dee1845d6ffe",
+      "output_hash": "84ea8041fbfd2f9732e87a7f4b3f30111485a4fb4c32fb09f6b601ea3807ad6d",
+      "prev_hash": "6c2d6fd67f8d9a96661152e7514bf68f180a8966e2d73011dd67dee1845d6ffe",
+      "receipt": "84ea8041fbfd2f9732e87a7f4b3f30111485a4fb4c32fb09f6b601ea3807ad6d",
+      "status": "VERIFIED",
+      "residuals": []
+    },
+    {
+      "sequence": 12,
+      "event_type": "PlaywrightVisualProof",
+      "surface": "HTML5 Canvas",
+      "input_hash": "0dd9afdd6e76e9503b020967eb262d107f4dcfdc57a4ab7dd9920a9556ad356a",
+      "output_hash": "864b784e6fbca8d7f1c4adfafd1dd94ed53e0e662a38b45b56000a11daf200bd",
+      "prev_hash": "84ea8041fbfd2f9732e87a7f4b3f30111485a4fb4c32fb09f6b601ea3807ad6d",
+      "receipt": "2e1b4494fa89c913ae8b5c4e54be3b3a7a7577a16c2b5dafc5124626906e5eac",
+      "status": "VERIFIED",
+      "residuals": []
+    }
+  ],
+  "residuals": [
+    "ue4_projection: RESIDUAL — Dynamic walkthrough rendered in browser but authority synchronization done locally via SQLite/WASM",
+    "signing_layer: RESIDUAL — Chain is tamper-evident via BLAKE3/SHA256 signatures; asymmetric cryptographic signing keys are not yet bound to identity cards"
+  ]
+}

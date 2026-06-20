@@ -2,8 +2,8 @@
   "engine_version": "UE4.27-ES3",
   "places": [
     {
-      "id": "room_1",
-      "name": "Control Room",
+      "id": "zone_1",
+      "name": "Primitive Foundry",
       "description": null,
       "parent_place_id": null,
       "bounds": {
@@ -13,28 +13,123 @@
           "z": 0.0
         },
         "half_extents": {
-          "x": 100.0,
-          "y": 100.0,
+          "x": 150.0,
+          "y": 150.0,
           "z": 50.0
         }
       },
       "properties": {}
     },
     {
-      "id": "room_2",
-      "name": "Storage Room",
+      "id": "zone_2",
+      "name": "Part Runner Wall",
       "description": null,
       "parent_place_id": null,
       "bounds": {
         "center": {
-          "x": 200.0,
+          "x": 400.0,
           "y": 0.0,
           "z": 0.0
         },
         "half_extents": {
-          "x": 50.0,
-          "y": 50.0,
-          "z": 30.0
+          "x": 150.0,
+          "y": 150.0,
+          "z": 50.0
+        }
+      },
+      "properties": {}
+    },
+    {
+      "id": "zone_3",
+      "name": "Assembly Gantry",
+      "description": null,
+      "parent_place_id": null,
+      "bounds": {
+        "center": {
+          "x": 800.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "half_extents": {
+          "x": 150.0,
+          "y": 150.0,
+          "z": 50.0
+        }
+      },
+      "properties": {}
+    },
+    {
+      "id": "zone_4",
+      "name": "Fit + Collision Bay",
+      "description": null,
+      "parent_place_id": null,
+      "bounds": {
+        "center": {
+          "x": 1200.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "half_extents": {
+          "x": 150.0,
+          "y": 150.0,
+          "z": 50.0
+        }
+      },
+      "properties": {}
+    },
+    {
+      "id": "zone_5",
+      "name": "Physics Proving Ground",
+      "description": null,
+      "parent_place_id": null,
+      "bounds": {
+        "center": {
+          "x": 1600.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "half_extents": {
+          "x": 150.0,
+          "y": 150.0,
+          "z": 50.0
+        }
+      },
+      "properties": {}
+    },
+    {
+      "id": "zone_6",
+      "name": "Final Reveal Platform",
+      "description": null,
+      "parent_place_id": null,
+      "bounds": {
+        "center": {
+          "x": 2000.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "half_extents": {
+          "x": 150.0,
+          "y": 150.0,
+          "z": 50.0
+        }
+      },
+      "properties": {}
+    },
+    {
+      "id": "zone_extra",
+      "name": "Extra Lab",
+      "description": null,
+      "parent_place_id": null,
+      "bounds": {
+        "center": {
+          "x": 2400.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "half_extents": {
+          "x": 100.0,
+          "y": 100.0,
+          "z": 50.0
         }
       },
       "properties": {}
@@ -47,8 +142,8 @@
       "role": "RoboticWelder",
       "placement": {
         "position": {
-          "x": 20.0,
-          "y": -10.0,
+          "x": 0.0,
+          "y": 0.0,
           "z": 0.0
         },
         "rotation": {
@@ -57,74 +152,73 @@
           "z": 0.0
         }
       },
-      "place_id": "room_1",
+      "place_id": "zone_1",
       "properties": {}
     }
   ],
-  "objects": [
-    {
-      "id": "cnc_1",
-      "name": "CNC Alpha",
-      "class": "CNC_Machine",
-      "placement": {
-        "position": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        },
-        "rotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0
-        }
-      },
-      "place_id": "room_1",
-      "properties": {},
-      "tags": []
-    }
-  ],
+  "objects": [],
   "relationships": [
     {
-      "id": "rel_1",
-      "rel_type": "contains",
-      "source": "room_1",
-      "target": "bot_1",
+      "id": "rel_1_2",
+      "rel_type": "connects",
+      "source": "zone_1",
+      "target": "zone_2",
       "properties": {}
     },
     {
-      "id": "rel_2",
+      "id": "rel_2_3",
       "rel_type": "connects",
-      "source": "room_1",
-      "target": "room_2",
+      "source": "zone_2",
+      "target": "zone_3",
+      "properties": {}
+    },
+    {
+      "id": "rel_3_4",
+      "rel_type": "connects",
+      "source": "zone_3",
+      "target": "zone_4",
+      "properties": {}
+    },
+    {
+      "id": "rel_4_5",
+      "rel_type": "connects",
+      "source": "zone_4",
+      "target": "zone_5",
+      "properties": {}
+    },
+    {
+      "id": "rel_5_6",
+      "rel_type": "connects",
+      "source": "zone_5",
+      "target": "zone_6",
+      "properties": {}
+    },
+    {
+      "id": "rel_6_extra",
+      "rel_type": "connects",
+      "source": "zone_6",
+      "target": "zone_extra",
       "properties": {}
     }
   ],
-  "rules": [
-    {
-      "id": "rule_1",
-      "name": "TempCheck",
-      "description": null,
-      "expression": "room_1.temp < 30",
-      "severity": "error"
-    }
-  ],
+  "rules": [],
   "history": [
     {
-      "id": "evt_evolve_1781734845224",
-      "timestamp_ms": 1781734845224,
+      "id": "evt_evolve_1781849999453",
+      "timestamp_ms": 1781849999453,
       "activity": "Evolve",
       "actor_id": null,
       "details": {
-        "modification_intent": "create place room_2 name \"Storage Room\" at (200.0, 0.0, 0.0) bounds (50.0, 50.0, 30.0)\nupdate actor bot_1 position (20.0, -10.0, 0.0)\ncreate relationship rel_2 connects from room_1 to room_2\n"
+        "modification_intent": "create actor bot_1 name \"Welder Bot\" role RoboticWelder in zone_1\ncreate place zone_extra name \"Extra Lab\" at (2400.0, 0.0, 0.0) bounds (100.0, 100.0, 50.0)\ncreate relationship rel_6_extra connects from zone_6 to zone_extra\n"
       }
     }
   ],
   "processes": [],
   "receipts": [
     {
-      "key": "history_receipt_evt_evolve_1781734845224",
-      "hash": "971974660b5d034222747d61d47cb2ca920e84a1996be5d5565fbaf015d86463",
-      "issued_at": 1781734845224
+      "key": "history_receipt_evt_evolve_1781849999453",
+      "hash": "c7379d6f5a2b155e03880125f6f79f1974642f3281fe2f89d99ef1771afffe3a",
+      "issued_at": 1781849999453
     }
   ]
 }

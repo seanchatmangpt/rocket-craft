@@ -1,0 +1,21 @@
+[project]
+name = "my-ggen-project"
+version = "0.1.0"
+description = "A minimal ggen project demonstrating inference and code generation with validation."
+
+[ontology]
+source = "schema/domain.ttl"
+
+[inference]
+rules = [
+    { name = "standard-normalization", construct = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } ORDER BY ?s ?p ?o" }
+]
+
+[generation]
+require_audit_trail = true
+rules = [
+    { name = "generate-structs", mode = "Overwrite", query = { inline = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?class ?label ?comment WHERE { ?class a rdfs:Class ; rdfs:label ?label . OPTIONAL { ?class rdfs:comment ?comment . } } ORDER BY ?class" }, template = { file = "templates/struct.tera" }, output_file = "output_structs.txt" }
+]
+
+[validation]
+strict_mode = true

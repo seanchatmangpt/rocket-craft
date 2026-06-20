@@ -1,0 +1,20 @@
+{
+  "texture_stack": {
+    "BaseColor": { "path": "T_Mech_BaseColor.png", "channels": 3, "resolution": 2048, "format": "PNG", "compression": "BC1" },
+    "Normal": { "path": "T_Mech_Normal.png", "channels": 3, "resolution": 2048, "format": "PNG", "compression": "BC5" },
+    "Roughness": { "path": "T_Mech_Roughness.png", "channels": 1, "resolution": 2048, "format": "PNG", "compression": "BC4" },
+    "Metallic": { "path": "T_Mech_Metallic.png", "channels": 1, "resolution": 2048, "format": "PNG", "compression": "BC4" },
+    "AO": { "path": "T_Mech_AO.png", "channels": 1, "resolution": 2048, "format": "PNG", "compression": "BC4" },
+    "Emissive": { "path": "T_Mech_Emissive.png", "channels": 3, "resolution": 2048, "format": "PNG", "compression": "BC1" },
+    "WearMask": { "path": "T_Mech_WearMask.png", "channels": 1, "resolution": 2048, "format": "PNG", "compression": "BC4" },
+    "DamageMask": { "path": "T_Mech_DamageMask.png", "channels": 1, "resolution": 2048, "format": "PNG", "compression": "BC4" },
+    "PanelLineMask": { "path": "T_Mech_PanelLineMask.png", "channels": 1, "resolution": 2048, "format": "PNG", "compression": "BC4" },
+    "DecalMask": { "path": "T_Mech_DecalMask.png", "channels": 1, "resolution": 2048, "format": "PNG", "compression": "BC4" }
+  },
+  "compilation_policy": {
+    "target_resolution": "4K/8K upscale readiness",
+    "compression_format": "DXT/BC5",
+    "blank_maps_allowed": false,
+    "missing_channels_allowed": false
+  }
+}

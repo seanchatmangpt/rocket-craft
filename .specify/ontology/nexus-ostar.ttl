@@ -1,0 +1,102 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ostar: <https://specify.network/nexus-ostar/> .
+@prefix w4pm: <https://specify.network/w4pm-core/> .
+
+# ---------------------------------------------------------------------------
+# Nexus Ostar Ontology
+# Domain: Infinity Blade 4 & Gundam Nexus
+# The Chatman Equation: A = \mu(O^*)
+# ---------------------------------------------------------------------------
+
+ostar:TypestateMachine a rdfs:Class ;
+    rdfs:label "Machine<L,P>" ;
+    rdfs:comment "Branchless Rust typestate kernel enforcing exact logic (L) and peer/physical (P) constraints. No MVPs." .
+
+ostar:MachineState a rdfs:Class ;
+    rdfs:label "State Parameter" ;
+    rdfs:comment "A mathematically bounded typestate mapping to O*." .
+
+# --- Core Bounded States (O*) ---
+
+ostar:Idle a ostar:MachineState ;
+    rdfs:label "Idle" ;
+    rdfs:comment "Base equilibrium state. L: Ready, P: Synced." .
+
+ostar:Attack a ostar:MachineState ;
+    rdfs:label "Attack" ;
+    rdfs:comment "Kinetic divergence state. Requires valid frame and network boundaries to project A." .
+
+ostar:Parry a ostar:MachineState ;
+    rdfs:label "Parry" ;
+    rdfs:comment "Defensive interception state. Extremely rigid nanosecond tolerances." .
+
+# --- Typestate Machine Definitions ---
+
+ostar:IB4_CombatMachine a ostar:TypestateMachine ;
+    rdfs:label "Infinity Blade 4 Combat Typestate" ;
+    ostar:hasState ostar:Idle, ostar:Attack, ostar:Parry ;
+    ostar:targetGame "InfinityBlade4" .
+
+ostar:Gundam_NetworkMachine a ostar:TypestateMachine ;
+    rdfs:label "Gundam Nexus Network Typestate" ;
+    ostar:hasState ostar:Idle, ostar:Attack, ostar:Parry ;
+    ostar:targetGame "GundamNexus" .
+
+# --- Mathematical Transition Bounds ---
+
+ostar:TransitionBoundShape
+    a sh:NodeShape ;
+    sh:targetClass ostar:TransitionBound ;
+    rdfs:comment "Strict mathematical boundaries for shifting between states in Machine<L,P>." ;
+    sh:property [
+        sh:path ostar:source ;
+        sh:class ostar:MachineState ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated A=\\mu(O^*): Transition must have exactly one source state." ;
+    ] ;
+    sh:property [
+        sh:path ostar:target ;
+        sh:class ostar:MachineState ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated A=\\mu(O^*): Transition must have exactly one target state." ;
+    ] ;
+    sh:property [
+        sh:path ostar:maxLatencyNs ;
+        sh:datatype xsd:integer ;
+        sh:maxInclusive 20000000 ;
+        sh:message "Network latency (P) must be mathematically bounded to a max of 20,000,000 ns (20ms)." ;
+    ] ;
+    sh:property [
+        sh:path ostar:frameWindowLength ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ;
+        sh:message "Logic (L) transition must complete within bounded frame intervals." ;
+    ] .
+
+# --- Admitted Bounds (Instances) ---
+
+ostar:Bound_Idle_Attack a ostar:TransitionBound ;
+    ostar:source ostar:Idle ;
+    ostar:target ostar:Attack ;
+    ostar:maxLatencyNs 15000000 ;
+    ostar:frameWindowLength 1 ;
+    rdfs:comment "Instantaneous state divergence. Requires <= 15ms P-latency." .
+
+ostar:Bound_Attack_Parry a ostar:TransitionBound ;
+    ostar:source ostar:Attack ;
+    ostar:target ostar:Parry ;
+    ostar:maxLatencyNs 8000000 ;
+    ostar:frameWindowLength 3 ;
+    rdfs:comment "High-tension intercept boundary. IB4 logic requires a 3-frame bounded window and sub-8ms latency." .
+
+ostar:Bound_Parry_Idle a ostar:TransitionBound ;
+    ostar:source ostar:Parry ;
+    ostar:target ostar:Idle ;
+    ostar:maxLatencyNs 20000000 ;
+    ostar:frameWindowLength 12 ;
+    rdfs:comment "Recovery typestate convergence to baseline O*." .

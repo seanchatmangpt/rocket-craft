@@ -1,3 +1,7 @@
+//! # Unify RDF Triple Module
+//!
+//! Provides the core definitions for RDF terms and triples used by the triple store.
+
 /// An RDF term: Named node (IRI), blank node, or literal value.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub enum Term {
@@ -34,6 +38,16 @@ pub struct Triple {
 }
 
 impl Triple {
+    /// Creates a new `Triple` with subject, predicate, and object terms.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unify_rdf::{Triple, Term};
+    ///
+    /// let t = Triple::new("http://example.org/s", "http://example.org/p", "http://example.org/o");
+    /// assert_eq!(t.subject, Term::Named("http://example.org/s".to_string()));
+    /// ```
     pub fn new(s: impl Into<Term>, p: impl Into<Term>, o: impl Into<Term>) -> Self {
         Triple {
             subject: s.into(),

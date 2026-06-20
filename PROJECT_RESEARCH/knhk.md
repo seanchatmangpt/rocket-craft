@@ -1,0 +1,223 @@
+# Research Dossier: `knhk`
+
+**Total Files:** 93 Ontologies (.ttl) | 5 Queries (.rq)
+**Total Volume:** 98 files
+
+## 1. Core Vocabularies (Prefixes)
+- `dc: <http://purl.org/dc/elements/1.1/>`
+- `dcat: <http://www.w3.org/ns/dcat#>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `ex: <http://example.org/>`
+- `ex: <http://example.org/storehouse#>`
+- `ex: <http://example.org/workflow/>`
+- `fibo: <http://www.omg.org/spec/EDMC-FIBO/>`
+- `fibo: <https://spec.edmcouncil.org/fibo/ontology/>`
+- `foaf: <http://xmlns.com/foaf/0.1/>`
+- `ggen: <https://ggen.ai/graph/v1#>`
+- `kgc: <http://kgc.io/>`
+- `kh: <https://chatmangpt.com/kgc/hooks#>`
+- `knhk: <http://knhk.io/>`
+- `knhk: <http://knhk.io/ontology#>`
+- `knhk: <http://knhk.io/ontology/v1#>`
+- `knhk: <http://knhk.org/schema/>`
+- `knhk: <https://knhk.io/covenant#>`
+- `knhk: <https://knhk.org/schema#>`
+- `knhk: <urn:knhk:ontology#>`
+- `knhks: <urn:knhks:>`
+- `mape: <http://bitflow.ai/ontology/autonomic/mape-k/v1#>`
+- `mapek: <http://knhk.ai/ontology/mape-k#>`
+- `ocel: <http://www.liquid-reality.de/def/ocel#>`
+- `org: <http://www.w3.org/ns/org#>`
+- `owl: <http://www.w3.org/2001/XMLSchema#>`
+- `owl: <http://www.w3.org/2002/07/owl#>`
+- `pattern: <http://knhk.ai/ontology/workflow-patterns#>`
+- `pbft: <http://knhk.example/pbft/>`
+- `prov: <http://www.w3.org/ns/prov#>`
+- `q: <http://knhk.ai/shacl/q-invariants#>`
+- `rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>`
+- `rdfs: <http://www.w3.org/2000/01/rdf-schema#>`
+- `schema: <http://schema.org/>`
+- `sh: <http://www.w3.org/ns/shacl#>`
+- `shacl: <http://www.w3.org/ns/shacl#>`
+- `sk: <http://github.com/github/spec-kit#>`
+- `skos: <http://www.w3.org/2004/02/skos/core#>`
+- `swift: <https://www.swift.com/standards/>`
+- `time: <http://www.w3.org/2006/time#>`
+- `vdaalst: <http://bitflow.ai/ontology/vdaalst/patterns#>`
+- `wf: <http://knhk.ai/workflow#>`
+- `wf: <http://knhk.example/workflow/>`
+- `ws: <http://knhk.ai/shacl/workflow-soundness#>`
+- `xsd: <http://www.w3.org/2001/XMLSchema#>`
+- `yawl-exec: <http://bitflow.ai/ontology/yawl/execution/v1#>`
+- `yawl-pattern: <http://bitflow.ai/ontology/yawl/patterns/v1#>`
+- `yawl: <http://bitflow.ai/ontology/yawl/v2#>`
+- `yawl: <http://knhk.example/yawl/>`
+- `yawl: <http://knhk.io/yawl/>`
+- `yawl: <http://www.yawlfoundation.org/yawlschema#>`
+- *...and 2 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:AdaptationPlanGuard`
+- `:AllTasksHaveOutgoingFlow`
+- `:AllTasksReachable`
+- `:AnalysisRuleThresholdGuard`
+- `:AnalyzerRuleGuard`
+- `:AndJoinMultipleIncoming`
+- `:AndSplitMultipleOutgoing`
+- `:ChatmanConstantGuard`
+- `:InputConditionNoIncoming`
+- `:MapekCompletenessGuard`
+- `:MonitorSensorGuard`
+- `:OrJoinMultipleIncoming`
+- `:OrJoinViciousCircleWarning`
+- `:OutputConditionNoOutgoing`
+- `:ParallelSplitGuard`
+- `:PerformanceBaselineGuard`
+- `:RuntimeInvariantGuard`
+- `:SensorMetricValueGuard`
+- `:ShadowDeploymentGuard`
+- `:SpecificationHasInputCondition`
+- `:SpecificationHasOutputCondition`
+- `:SynchronizationGuard`
+- `:ThresholdValueGuard`
+- `:XorSplitFlowsHavePredicates`
+- `:XorSplitMultipleOutgoing`
+- `Trigger`
+- `ex:Fund`
+- `ex:Receipt`
+- `ex:ReceiptShape`
+- `ex:Receiver`
+- `ex:StorehouseUnit`
+- `ex:StorehouseUnitShape`
+- `ex:Transfer`
+- `ggen:ActionShape`
+- `ggen:Hook`
+- `ggen:HookShape`
+- `ggen:KnowledgeHook`
+- `ggen:KnowledgeHookShape`
+- `ggen:SparqlConstructAction`
+- `ggen:SparqlTrigger`
+- `ggen:TriggerShape`
+- `kh:Hook`
+- `kh:KnowledgeHook`
+- `kh:SparqlConstructAction`
+- `kh:SparqlTrigger`
+- `knhk:Action`
+- `knhk:AdvancedBranchingPattern`
+- `knhk:AdvancedControlPattern`
+- `knhk:AskOperation`
+- `knhk:BasicControlFlowPattern`
+- *...and 359 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'SELECT': 5}
+
+### Projected Variables (SELECT ?var)
+This project actively projects the following variables into code/templates:
+> `?audience`, `?breakingChanges`, `?category`, `?changeDescription`, `?changeId`, `?changeType`, `?config`, `?configDefault`, `?configDescription`, `?configName`, `?configRequired`, `?configType`, `?deprecatedFeatures`, `?description`, `?examples`, `?guide`, `?lastUpdated`, `?phase`, `?phaseDescription`, `?phaseId`, `?phaseName`, `?prerequisites`, `?principle`, `?principleId`, `?principleIndex`, `?purpose`, `?rationale`, `?release`, `?releaseDate`, `?sections`, `?status`, `?step`, `?stepDescription`, `?stepId`, `?stepIndex`, `?title`, `?versionNumber`, `?violations`
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/knhk/capabilities/CAP-002-TEST-AUTOMATION/ontology/capability.ttl` (5457 bytes)
+- `/Users/sac/knhk/demos/demo1_simple_workflow/inputs/simple_workflow.ttl` (4536 bytes)
+- `/Users/sac/knhk/demos/demo2_complex_patterns/inputs/all_43_patterns.ttl` (5236 bytes)
+- `/Users/sac/knhk/demos/demo3_mape_k_loop/inputs/workflow_with_issue.ttl` (5006 bytes)
+- `/Users/sac/knhk/demos/demo5_byzantine_fault/inputs/distributed_workflow.ttl` (6701 bytes)
+- `/Users/sac/knhk/examples/approval-workflow.ttl` (2294 bytes)
+- `/Users/sac/knhk/examples/ggen-demo-workflow.ttl` (7069 bytes)
+- `/Users/sac/knhk/ggen-marketplace/genesis-yawl-workflows/examples/exclusive-choice.ttl` (6035 bytes)
+- `/Users/sac/knhk/ggen-marketplace/genesis-yawl-workflows/examples/parallel-split.ttl` (5915 bytes)
+- `/Users/sac/knhk/ggen-marketplace/genesis-yawl-workflows/examples/simple-sequence.ttl` (3357 bytes)
+- `/Users/sac/knhk/ontology/genesis.owl.ttl` (35423 bytes)
+- `/Users/sac/knhk/ontology/ggen-examples/example-crate.ttl` (3152 bytes)
+- `/Users/sac/knhk/ontology/ggen-examples/example-data-model.ttl` (7705 bytes)
+- `/Users/sac/knhk/ontology/kgc-4d.ttl` (8474 bytes)
+- `/Users/sac/knhk/ontology/mape-k-autonomic.ttl` (28764 bytes)
+- `/Users/sac/knhk/ontology/osys.ttl` (2841 bytes)
+- `/Users/sac/knhk/ontology/shacl/q-invariants.ttl` (26115 bytes)
+- `/Users/sac/knhk/ontology/shacl/soundness.ttl` (14010 bytes)
+- `/Users/sac/knhk/ontology/shacl/storehouse-shapes.ttl` (1231 bytes)
+- `/Users/sac/knhk/ontology/shacl/workflow-guards.ttl` (11813 bytes)
+- `/Users/sac/knhk/ontology/shacl/workflow-soundness.ttl` (24050 bytes)
+- `/Users/sac/knhk/ontology/storehouse.ttl` (2014 bytes)
+- `/Users/sac/knhk/ontology/workflows/core/yawl-pattern-permutations.ttl` (17640 bytes)
+- `/Users/sac/knhk/ontology/workflows/examples/autonomic-self-healing-workflow.ttl` (20891 bytes)
+- `/Users/sac/knhk/ontology/workflows/examples/autonomous-work-definition.ttl` (19260 bytes)
+- `/Users/sac/knhk/ontology/workflows/examples/parallel-processing.ttl` (11995 bytes)
+- `/Users/sac/knhk/ontology/workflows/examples/simple-sequence.ttl` (8810 bytes)
+- `/Users/sac/knhk/ontology/workflows/financial/atm_transaction.ttl` (6924 bytes)
+- `/Users/sac/knhk/ontology/workflows/financial/payroll.ttl` (7420 bytes)
+- `/Users/sac/knhk/ontology/workflows/financial/swift_payment.ttl` (9487 bytes)
+- `/Users/sac/knhk/ontology/workflows/reference/cancellation_pattern.ttl` (2997 bytes)
+- `/Users/sac/knhk/ontology/workflows/reference/multi_instance_approval.ttl` (2348 bytes)
+- `/Users/sac/knhk/ontology/workflows/reference/or_join.ttl` (3543 bytes)
+- `/Users/sac/knhk/ontology/workflows/reference/order_processing.ttl` (3501 bytes)
+- `/Users/sac/knhk/ontology/workflows/reference/timer_escalation.ttl` (2670 bytes)
+- `/Users/sac/knhk/ontology/yawl-extended.ttl` (23483 bytes)
+- `/Users/sac/knhk/ontology/yawl-pattern-permutations.ttl` (10523 bytes)
+- `/Users/sac/knhk/ontology/yawl.ttl` (46844 bytes)
+- `/Users/sac/knhk/registry/c1_turtle_is_cause.ttl` (392 bytes)
+- `/Users/sac/knhk/registry/c2_invariants_are_law.ttl` (372 bytes)
+- `/Users/sac/knhk/registry/c3_feedback_loops.ttl` (395 bytes)
+- `/Users/sac/knhk/registry/c4_pattern_matrix.ttl` (390 bytes)
+- `/Users/sac/knhk/registry/c5_chatman_constant.ttl` (600 bytes)
+- `/Users/sac/knhk/registry/c6_observations_drive.ttl` (389 bytes)
+- `/Users/sac/knhk/registry/shapes.ttl` (498 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/code/osys.ttl` (114 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/code/sequence.ttl` (387 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/code/turtle_006.ttl` (901 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/code/turtle_007.ttl` (191 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/code/turtle_008.ttl` (114 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/code/turtle_009.ttl` (476 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/code/workflow.ttl` (184 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/examples/all_43_patterns.ttl` (19777 bytes)
+- `/Users/sac/knhk/rust/docs/yawl/ontology/van_der_aalst_patterns_all_43.ttl` (28005 bytes)
+- `/Users/sac/knhk/rust/genesis-graph/schema/ggen-graph.shapes.ttl` (1293 bytes)
+- `/Users/sac/knhk/rust/genesis-graph/schema/ggen-graph.ttl` (1689 bytes)
+- `/Users/sac/knhk/rust/genesis-graph/schema/public-imports.ttl` (1891 bytes)
+- `/Users/sac/knhk/rust/genesis-integration-tests/tests/fixtures/invalid_workflow_bad_pattern.ttl` (742 bytes)
+- `/Users/sac/knhk/rust/genesis-integration-tests/tests/fixtures/invalid_workflow_unbounded_loop.ttl` (750 bytes)
+- `/Users/sac/knhk/rust/genesis-integration-tests/tests/fixtures/simple_valid_workflow.ttl` (1932 bytes)
+- `/Users/sac/knhk/rust/genesis-integration-tests/tests/fixtures/valid_parallel_workflow.ttl` (2796 bytes)
+- `/Users/sac/knhk/rust/genesis-workflow-engine/book/examples/simple-sequence.ttl` (1558 bytes)
+- `/Users/sac/knhk/rust/genesis-workflow-engine/examples/simple-sequence.ttl` (1558 bytes)
+- `/Users/sac/knhk/rust/genesis-workflow-engine/tests/fixtures/example_workflows.ttl` (8611 bytes)
+- `/Users/sac/knhk/rust/ontology/shacl/soundness.ttl` (29 bytes)
+- `/Users/sac/knhk/spec-kit/memory/documentation.ttl` (13002 bytes)
+- `/Users/sac/knhk/spec-kit/memory/philosophy.ttl` (20730 bytes)
+- `/Users/sac/knhk/spec-kit/ontology/spec-kit-docs-extension.ttl` (22604 bytes)
+- `/Users/sac/knhk/spec-kit/ontology/spec-kit-schema.ttl` (25456 bytes)
+- `/Users/sac/knhk/spec-kit/sparql/changelog-query.rq` (876 bytes)
+- `/Users/sac/knhk/spec-kit/sparql/config-query.rq` (763 bytes)
+- `/Users/sac/knhk/spec-kit/sparql/guide-query.rq` (1111 bytes)
+- `/Users/sac/knhk/spec-kit/sparql/principle-query.rq` (687 bytes)
+- `/Users/sac/knhk/spec-kit/sparql/workflow-query.rq` (647 bytes)
+- `/Users/sac/knhk/spec-kit/tests/integration/fixtures/feature-content.ttl` (1694 bytes)
+- `/Users/sac/knhk/templates/claims-processing/workflow.ttl` (4545 bytes)
+- `/Users/sac/knhk/templates/loan-origination/workflow.ttl` (3852 bytes)
+- `/Users/sac/knhk/templates/payment-processing/workflow.ttl` (7162 bytes)
+- `/Users/sac/knhk/test_workflow.ttl` (1100 bytes)
+- `/Users/sac/knhk/tests/archived/test_rdf.ttl` (115 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_authorization.ttl` (660 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_cardinality.ttl` (685 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_datatype.ttl` (492 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_exactcount.ttl` (626 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_lookups.ttl` (662 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_maxcount.ttl` (703 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_objectcount.ttl` (650 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_objectcount_exact.ttl` (617 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_objectcount_max.ttl` (695 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_reverse.ttl` (663 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_types.ttl` (578 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_unique.ttl` (744 bytes)
+- `/Users/sac/knhk/tests/data/enterprise_validation.ttl` (689 bytes)
+- `/Users/sac/knhk/validation-examples/invalid/missing-resource-bounds.ttl` (3241 bytes)
+- `/Users/sac/knhk/validation-examples/invalid/type-mismatch.ttl` (3170 bytes)
+- `/Users/sac/knhk/validation-examples/invalid/unbounded-recursion.ttl` (2513 bytes)
+- `/Users/sac/knhk/validation-examples/valid/parallel-workflow.ttl` (4275 bytes)
+- `/Users/sac/knhk/validation-examples/valid/simple-workflow.ttl` (6059 bytes)
+
+</details>

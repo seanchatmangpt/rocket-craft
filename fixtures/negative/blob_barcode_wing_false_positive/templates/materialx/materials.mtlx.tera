@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<materialx version="1.38">
+{% for row in results %}
+  <!-- Material: {{ row.materialLocalName }} -->
+  <open_pbr_surface name="{{ row.materialLocalName }}_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="{{ row.color }}" />
+    <input name="roughness" type="float" value="{{ row.roughness }}" />
+    <input name="specular_roughness" type="float" value="{{ row.roughness }}" />
+    <input name="metalness" type="float" value="{{ row.metallic }}" />
+    {% if row.emissive | float > 0.0 %}
+    <input name="emission" type="float" value="{{ row.emissive }}" />
+    <input name="emission_color" type="color3" value="{{ row.color }}" />
+    {% endif %}
+  </open_pbr_surface>
+  <surfacematerial name="{{ row.materialLocalName }}" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="{{ row.materialLocalName }}_shader" />
+  </surfacematerial>
+{% endfor %}
+</materialx>

@@ -1,0 +1,18 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix antillm: <https://ggen.io/ontology/anti_llm/> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+antillm:Repository a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Repository" .
+antillm:Crate a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Crate" .
+antillm:File a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "File" .
+antillm:FileRange a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "FileRange" .
+antillm:Checkpoint a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Checkpoint" .
+antillm:DiagnosticCode a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "DiagnosticCode" .
+antillm:ForbiddenImplication a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "ForbiddenImplication" .
+antillm:Diagnostic a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Diagnostic" .
+antillm:Receipt a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Receipt" .
+antillm:Digest a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Digest" .
+antillm:Lsp318FeatureRow a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Lsp318FeatureRow" .
+antillm:NegativeControlFixture a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "NegativeControlFixture" .

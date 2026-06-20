@@ -1,5 +1,5 @@
-use thiserror::Error;
 use std::path::PathBuf;
+use thiserror::Error;
 
 /// All errors that the asset pipeline can produce.
 ///
@@ -13,7 +13,11 @@ pub enum PipelineError {
 
     /// The file exceeds the configured size limit.
     #[error("file too large: '{path}' is {size_mb:.1}MB, limit is {limit_mb}MB")]
-    FileTooLarge { path: PathBuf, size_mb: f64, limit_mb: u64 },
+    FileTooLarge {
+        path: PathBuf,
+        size_mb: f64,
+        limit_mb: u64,
+    },
 
     /// Two different source files have identical BLAKE3 content hashes.
     #[error("duplicate asset: '{path}' has same content as already-staged '{existing}'")]
@@ -50,9 +54,7 @@ impl PipelineError {
     pub fn is_skippable(&self) -> bool {
         matches!(
             self,
-            Self::UnsupportedFormat { .. }
-            | Self::Duplicate { .. }
-            | Self::FileTooLarge { .. }
+            Self::UnsupportedFormat { .. } | Self::Duplicate { .. } | Self::FileTooLarge { .. }
         )
     }
 }
@@ -81,6 +83,9 @@ mod tests {
             limit_mb: 500,
         };
         let msg = err.to_string();
-        assert_eq!(msg, "file too large: '/tmp/big.obj' is 1024.0MB, limit is 500MB");
+        assert_eq!(
+            msg,
+            "file too large: '/tmp/big.obj' is 1024.0MB, limit is 500MB"
+        );
     }
 }

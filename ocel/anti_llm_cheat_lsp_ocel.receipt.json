@@ -1,6 +1,6 @@
 {
   "boundary": "examples/anti-llm-cheat-lsp/ocel",
   "checkpoint": "OCEL-COMPAT-001",
-  "digest": "54440abfc78f11f2ded3e3d4ef2ce375812c29cf928ad14532ab11eb9b626319",
+  "digest": "3ea62b21ac303cf257ec69349d54e705e40016131bc5373e9d6db9f1f1f99f1b",
   "digest_algorithm": "BLAKE3"
 }

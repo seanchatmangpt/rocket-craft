@@ -1,0 +1,12 @@
+{
+  "damage_zones": [
+    {% for row in results %}
+    {
+      "owner_part_id": "{{ row.owner_part_id | split(pat="#") | last }}",
+      "type": "{{ row.type | split(pat="#") | last }}",
+      "healthThreshold": {{ row.healthThreshold | default(value="100.0") }},
+      "debrisMesh": "{{ row.debrisMesh | default(value="None") | split(pat="#") | last }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}

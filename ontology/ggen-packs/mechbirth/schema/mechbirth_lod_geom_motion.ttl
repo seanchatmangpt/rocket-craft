@@ -1,0 +1,294 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix mb:   <https://ggen.io/ontology/mechbirth/> .
+
+# -----------------------------------------------------------------------------
+# MECHBIRTH EXTENDED PACK ? Semantic LOD / Geometry / Motion Surrogate
+# O* admitted truth for GC-MECHBIRTH-002 Agent 2 surfaces.
+# Source: /ontology/mechbirth.ttl (authority graph)
+# All Rust artifacts are projections: A = mu(O*)
+# -----------------------------------------------------------------------------
+
+mb:MechBirthLodGeomMotion a owl:Ontology ;
+    owl:imports <https://ggen.io/ontology/mechbirth/> ;
+    rdfs:label "MechBirth LOD / Geometry / Motion Extended Pack" ;
+    rdfs:comment "Encodes Semantic LOD, Geometry Surrogate, and Motion Surrogate laws for ggen manufacturing." .
+
+# -----------------------------------------------------------------------------
+# SHARED CONSTANTS (inherited from mb: but restated for SPARQL access)
+# -----------------------------------------------------------------------------
+
+mb:MAX_CLASS a owl:NamedIndividual ;
+    mb:value "15"^^xsd:integer ;
+    mb:rustType "u8" .
+
+# -----------------------------------------------------------------------------
+# LOD CLASS TAXONOMY
+# Laws:
+#   - Crown = 0: requires explicit authority reason field >= 13
+#   - Primary = 1: authority_score in [9,12]
+#   - Secondary = 2: authority_score in [5,8]
+#   - Tertiary = 3: authority_score in [2,4]
+#   - Background = 4: authority_score in [0,1]
+#   - Refused = 255: sentinel ? never admitted
+# -----------------------------------------------------------------------------
+
+mb:LodClass a owl:Class ;
+    rdfs:label "LodClass" ;
+    rdfs:comment "Semantic LOD classification tier. Repr(u8). Ordered: Crown(0) < Primary(1) < ... < Background(4)." .
+
+mb:LodCrown a mb:LodClass ;
+    rdfs:label "Crown" ;
+    mb:discriminant "0"^^xsd:integer ;
+    mb:projectionPriority "255"^^xsd:integer ;
+    mb:authorityRequired "true"^^xsd:boolean ;
+    mb:authorityScoreMin "13"^^xsd:integer ;
+    mb:authorityScoreMax "15"^^xsd:integer ;
+    mb:requiresExplicitReason "true"^^xsd:boolean ;
+    mb:explicitReasonFields "mission_relevance,damage_class,threat_class,process_step_relevance" ;
+    mb:explicitReasonThreshold "13"^^xsd:integer ;
+    mb:comment "CROWN requires at least one explicit authority field >= 13. Interaction probability alone is insufficient." .
+
+mb:LodPrimary a mb:LodClass ;
+    rdfs:label "Primary" ;
+    mb:discriminant "1"^^xsd:integer ;
+    mb:projectionPriority "200"^^xsd:integer ;
+    mb:authorityRequired "true"^^xsd:boolean ;
+    mb:authorityScoreMin "9"^^xsd:integer ;
+    mb:authorityScoreMax "12"^^xsd:integer .
+
+mb:LodSecondary a mb:LodClass ;
+    rdfs:label "Secondary" ;
+    mb:discriminant "2"^^xsd:integer ;
+    mb:projectionPriority "128"^^xsd:integer ;
+    mb:authorityRequired "false"^^xsd:boolean ;
+    mb:authorityScoreMin "5"^^xsd:integer ;
+    mb:authorityScoreMax "8"^^xsd:integer .
+
+mb:LodTertiary a mb:LodClass ;
+    rdfs:label "Tertiary" ;
+    mb:discriminant "3"^^xsd:integer ;
+    mb:projectionPriority "64"^^xsd:integer ;
+    mb:authorityRequired "false"^^xsd:boolean ;
+    mb:authorityScoreMin "2"^^xsd:integer ;
+    mb:authorityScoreMax "4"^^xsd:integer .
+
+mb:LodBackground a mb:LodClass ;
+    rdfs:label "Background" ;
+    mb:discriminant "4"^^xsd:integer ;
+    mb:projectionPriority "16"^^xsd:integer ;
+    mb:authorityRequired "false"^^xsd:boolean ;
+    mb:authorityScoreMin "0"^^xsd:integer ;
+    mb:authorityScoreMax "1"^^xsd:integer .
+
+mb:LodRefused a mb:LodClass ;
+    rdfs:label "Refused" ;
+    mb:discriminant "255"^^xsd:integer ;
+    mb:projectionPriority "0"^^xsd:integer ;
+    mb:authorityRequired "false"^^xsd:boolean .
+
+# -----------------------------------------------------------------------------
+# LOD INPUT FIELDS
+# CF-4 LAW: all input fields must be in [0, MAX_CLASS=15].
+# Values > 15 MUST return LodRefused ? not silently promoted.
+# -----------------------------------------------------------------------------
+
+mb:LodInputField a owl:Class ;
+    rdfs:label "LOD Input Field" ;
+    rdfs:comment "A u8 field on LodInputs. Domain: [0, MAX_CLASS=15]. CF-4: values > 15 refused." .
+
+mb:DistanceClassField a mb:LodInputField ;
+    mb:fieldName "distance_class" ;
+    mb:semantics "0=near, 15=far" ;
+    mb:contributesToAuthorityScore "false"^^xsd:boolean ;
+    mb:comment "Distance does NOT contribute to authority score. Near != important." .
+
+mb:MissionRelevanceField a mb:LodInputField ;
+    mb:fieldName "mission_relevance" ;
+    mb:semantics "0=irrelevant, 15=critical" ;
+    mb:contributesToAuthorityScore "true"^^xsd:boolean ;
+    mb:isExplicitAuthorityField "true"^^xsd:boolean .
+
+mb:DamageClassInputField a mb:LodInputField ;
+    mb:fieldName "damage_class" ;
+    mb:contributesToAuthorityScore "true"^^xsd:boolean ;
+    mb:isExplicitAuthorityField "true"^^xsd:boolean .
+
+mb:ThreatClassField a mb:LodInputField ;
+    mb:fieldName "threat_class" ;
+    mb:contributesToAuthorityScore "true"^^xsd:boolean ;
+    mb:isExplicitAuthorityField "true"^^xsd:boolean .
+
+mb:InteractionProbabilityField a mb:LodInputField ;
+    mb:fieldName "interaction_probability" ;
+    mb:contributesToAuthorityScore "true"^^xsd:boolean ;
+    mb:isExplicitAuthorityField "false"^^xsd:boolean ;
+    mb:comment "Contributes to authority_score but is NOT an explicit authority reason for Crown." .
+
+mb:ProcessStepRelevanceField a mb:LodInputField ;
+    mb:fieldName "process_step_relevance" ;
+    mb:semantics "POWL step relevance 0-15" ;
+    mb:contributesToAuthorityScore "true"^^xsd:boolean ;
+    mb:isExplicitAuthorityField "true"^^xsd:boolean .
+
+mb:PredictionRelevanceField a mb:LodInputField ;
+    mb:fieldName "prediction_relevance" ;
+    mb:semantics "Shadow relevance ? pre-warm only" ;
+    mb:contributesToAuthorityScore "false"^^xsd:boolean ;
+    mb:isExplicitAuthorityField "false"^^xsd:boolean ;
+    mb:comment "Prediction relevance NEVER grants authority. Not included in authority_score." .
+
+# -----------------------------------------------------------------------------
+# LOD REFUSAL REASONS (extended)
+# -----------------------------------------------------------------------------
+
+mb:LodRefusedVariant a mb:RefusalReason ;
+    mb:variant "LodRefused" ;
+    mb:fields "detail: String" ;
+    mb:errorTemplate "LOD input refused: {detail}" ;
+    mb:triggeredBy "CF-4: input field value > MAX_CLASS(15)" .
+
+# -----------------------------------------------------------------------------
+# GEOMETRY PART FAMILY TAXONOMY
+# -----------------------------------------------------------------------------
+
+mb:PartFamily a owl:Class ;
+    rdfs:label "Part Family" ;
+    rdfs:comment "Discriminated union of mech component types. Governs validation rules." .
+
+mb:FrameFamily a mb:PartFamily ; rdfs:label "Frame" .
+mb:ShoulderFamily a mb:PartFamily ; rdfs:label "Shoulder" .
+mb:ArmFamily a mb:PartFamily ; rdfs:label "Arm" .
+mb:LegFamily a mb:PartFamily ; rdfs:label "Leg" .
+mb:SocketFamily a mb:PartFamily ; rdfs:label "Socket" .
+
+mb:ArmorPanelFamily a mb:PartFamily ;
+    rdfs:label "ArmorPanel" ;
+    mb:law "If any lod_required_feature has required_for_lod=Crown, clearance_zones must be non-empty." ;
+    mb:refusalReason mb:MotionClearanceViolation .
+
+mb:WeaponMountFamily a mb:PartFamily ;
+    rdfs:label "WeaponMount" ;
+    mb:law "sockets must be non-empty." ;
+    mb:refusalReason mb:MissingSocket .
+
+mb:CoolingVentFamily a mb:PartFamily ; rdfs:label "CoolingVent" .
+
+# -----------------------------------------------------------------------------
+# MOTION FAMILY TAXONOMY
+# -----------------------------------------------------------------------------
+
+mb:MotionFamily a owl:Class ;
+    rdfs:label "Motion Family" ;
+    rdfs:comment "Discriminated union of mech motion types." .
+
+mb:WalkFamily a mb:MotionFamily ;
+    rdfs:label "Walk" ;
+    mb:handlerFn "validate_walk_run" ;
+    mb:cf4GuardRequired "true"^^xsd:boolean ;
+    mb:law "leg_damage_class >= 12 is admitted (degraded). Not refused." .
+
+mb:RunFamily a mb:MotionFamily ;
+    rdfs:label "Run" ;
+    mb:handlerFn "validate_walk_run" ;
+    mb:cf4GuardRequired "true"^^xsd:boolean ;
+    mb:law "leg_damage_class >= 12 ? Err(MotionClearanceViolation). Run refused." .
+
+mb:BraceFamily a mb:MotionFamily ; rdfs:label "Brace" ; mb:handlerFn "zero_effects" .
+mb:RecoverFamily a mb:MotionFamily ; rdfs:label "Recover" ; mb:handlerFn "zero_effects" .
+mb:RepairFamily a mb:MotionFamily ; rdfs:label "Repair" ; mb:handlerFn "zero_effects" .
+mb:CollapseFamily a mb:MotionFamily ; rdfs:label "Collapse" ; mb:handlerFn "zero_effects" .
+
+mb:FireWeaponFamily a mb:MotionFamily ;
+    rdfs:label "FireWeapon" ;
+    mb:handlerFn "validate_fire_weapon" ;
+    mb:cf4GuardRequired "true"^^xsd:boolean .
+
+# -----------------------------------------------------------------------------
+# MOTION PHASE TAXONOMY
+# -----------------------------------------------------------------------------
+
+mb:MotionPhase a owl:Class ;
+    rdfs:label "Motion Phase" .
+
+mb:PlantFeetPhase a mb:MotionPhase ;
+    rdfs:label "PlantFeet" ;
+    mb:cf1Law "Must appear at index BEFORE Fire in phase Vec. CF-1 fix: positional check." .
+
+mb:FirePhase a mb:MotionPhase ;
+    rdfs:label "Fire" ;
+    mb:deltaHeat "2"^^xsd:integer ;
+    mb:requires mb:PlantFeetPhase ;
+    mb:requiresSocket "true"^^xsd:boolean .
+
+mb:VentHeatPhase a mb:MotionPhase ;
+    rdfs:label "VentHeat" ;
+    mb:cf2Law "Must appear at index BEFORE Fire when heat_class >= 12. CF-2 fix: positional check." .
+
+mb:AbsorbRecoilPhase a mb:MotionPhase ;
+    rdfs:label "AbsorbRecoil" ;
+    mb:deltaStress "1"^^xsd:integer .
+
+mb:AcquireTargetPhase a mb:MotionPhase ; rdfs:label "AcquireTarget" .
+mb:RotateTorsoPhase a mb:MotionPhase ; rdfs:label "RotateTorso" .
+mb:LockHipPhase a mb:MotionPhase ; rdfs:label "LockHip" .
+mb:StabilizeShoulderPhase a mb:MotionPhase ; rdfs:label "StabilizeShoulder" .
+mb:ChargeWeaponPhase a mb:MotionPhase ; rdfs:label "ChargeWeapon" .
+mb:RecoverBalancePhase a mb:MotionPhase ; rdfs:label "RecoverBalance" .
+mb:CoolSocketPhase a mb:MotionPhase ; rdfs:label "CoolSocket" .
+mb:ReturnToReadyPhase a mb:MotionPhase ; rdfs:label "ReturnToReady" .
+mb:StridePhase a mb:MotionPhase ; rdfs:label "Stride" .
+mb:BracePhase a mb:MotionPhase ; rdfs:label "Brace" .
+mb:CollapsePhase a mb:MotionPhase ; rdfs:label "Collapse" .
+mb:DiagnoseSocketPhase a mb:MotionPhase ; rdfs:label "DiagnoseSocket" .
+mb:ApplyRepairPhase a mb:MotionPhase ; rdfs:label "ApplyRepair" .
+mb:VerifyRepairPhase a mb:MotionPhase ; rdfs:label "VerifyRepair" .
+
+# -----------------------------------------------------------------------------
+# MOTION PHASE ORDERING LAWS (CF-1, CF-2)
+# -----------------------------------------------------------------------------
+
+mb:PhaseOrderingConstraint a owl:Class ;
+    rdfs:label "Phase Ordering Constraint" ;
+    rdfs:comment "A Petri-net precedence: predecessor must appear at lower Vec index than successor." .
+
+mb:PlantFeetBeforeFire a mb:PhaseOrderingConstraint ;
+    mb:predecessor mb:PlantFeetPhase ;
+    mb:successor mb:FirePhase ;
+    mb:counterfactual "CF-1" ;
+    mb:law "position(PlantFeet) < position(Fire). Containment check alone is insufficient." ;
+    mb:refusalReason mb:MotionClearanceViolation ;
+    mb:heatCondition "none" .
+
+mb:VentHeatBeforeFire a mb:PhaseOrderingConstraint ;
+    mb:predecessor mb:VentHeatPhase ;
+    mb:successor mb:FirePhase ;
+    mb:counterfactual "CF-2" ;
+    mb:law "When heat_class >= 12: position(VentHeat) < position(Fire)." ;
+    mb:heatThreshold "12"^^xsd:integer ;
+    mb:refusalReason mb:MotionClearanceViolation .
+
+# -----------------------------------------------------------------------------
+# CF-4 INPUT BOUNDS LAW
+# -----------------------------------------------------------------------------
+
+mb:InputBoundsLaw a owl:Class ;
+    rdfs:label "Input Bounds Law" ;
+    rdfs:comment "CF-4: All u8 class inputs must be in [0, MAX_CLASS=15]. Values > 15 are refused before any computation." .
+
+mb:LodInputBoundsLaw a mb:InputBoundsLaw ;
+    mb:appliesTo "LodInputs" ;
+    mb:maxValue "15"^^xsd:integer ;
+    mb:counterfactual "CF-4" ;
+    mb:refusalVariant "LodRefused" ;
+    mb:law "Any LodInputs field > 15 returns Err(LodRefused) before authority_score computation." .
+
+mb:MotionInputBoundsLaw a mb:InputBoundsLaw ;
+    mb:appliesTo "MotionTrace" ;
+    mb:checkedFields "heat_class,stress_class,leg_damage_class" ;
+    mb:maxValue "15"^^xsd:integer ;
+    mb:counterfactual "CF-4" ;
+    mb:refusalVariant "MotionClearanceViolation" ;
+    mb:law "Any MotionTrace class field > 15 returns Err(MotionClearanceViolation) before phase validation." .

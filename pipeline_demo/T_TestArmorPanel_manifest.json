@@ -1,0 +1,26 @@
+{
+  "asset_id": "SM_TestArmorPanel",
+  "texture_schema": "OpenPBR",
+  "resolution": "4096x4096",
+  "udim_policy": "none",
+  "textures": [
+    {
+      "slot": "baseColor",
+      "file": "T_TestArmorPanel_BaseColor.exr",
+      "colorspace": "sRGB",
+      "checksum": "sha256-placeholder"
+    },
+    {
+      "slot": "roughness",
+      "file": "T_TestArmorPanel_Roughness.exr",
+      "colorspace": "linear",
+      "checksum": "sha256-placeholder"
+    },
+    {
+      "slot": "normal",
+      "file": "T_TestArmorPanel_Normal.exr",
+      "colorspace": "linear",
+      "checksum": "sha256-placeholder"
+    }
+  ]
+}

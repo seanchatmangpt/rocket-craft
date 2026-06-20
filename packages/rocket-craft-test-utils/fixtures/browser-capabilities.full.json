@@ -1,0 +1,1 @@
+{ "speechRecognition": true, "speechSynthesis": true, "gamepad": true, "fullscreen": true, "serviceWorker": true, "sharedArrayBuffer": true, "webgl2": true }

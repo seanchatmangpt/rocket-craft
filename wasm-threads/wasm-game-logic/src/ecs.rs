@@ -82,6 +82,8 @@ pub struct World {
     attacks: HashMap<Entity, Attack>,
     players: HashMap<Entity, Player>,
     alive: HashSet<Entity>,
+    pub current_time_ms: u64,
+    pub attack_cooldowns: HashMap<Entity, u64>,
 }
 
 impl World {
@@ -94,6 +96,8 @@ impl World {
             attacks: HashMap::new(),
             players: HashMap::new(),
             alive: HashSet::new(),
+            current_time_ms: 0,
+            attack_cooldowns: HashMap::new(),
         }
     }
 
@@ -113,6 +117,7 @@ impl World {
         self.healths.remove(&e);
         self.attacks.remove(&e);
         self.players.remove(&e);
+        self.attack_cooldowns.remove(&e);
     }
 
     pub fn entity_count(&self) -> usize {
@@ -224,5 +229,135 @@ impl World {
 impl Default for World {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Health ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn health_new_sets_current_to_max() {
+        let h = Health::new(100);
+        assert_eq!(h.current, 100);
+        assert_eq!(h.max, 100);
+    }
+
+    #[test]
+    fn health_apply_damage_subtracts() {
+        let mut h = Health::new(100);
+        h.apply_damage(30);
+        assert_eq!(h.current, 70);
+    }
+
+    #[test]
+    fn health_apply_damage_saturates_at_zero() {
+        let mut h = Health::new(50);
+        h.apply_damage(999);
+        assert_eq!(h.current, 0);
+        assert!(h.is_dead());
+    }
+
+    #[test]
+    fn health_heal_clamps_to_max() {
+        let mut h = Health::new(100);
+        h.apply_damage(40);
+        h.heal(200);
+        assert_eq!(h.current, 100);
+    }
+
+    #[test]
+    fn health_percentage_full_is_one() {
+        let h = Health::new(100);
+        assert!((h.percentage() - 1.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn health_percentage_zero_max_is_zero() {
+        let h = Health { current: 0, max: 0 };
+        assert_eq!(h.percentage(), 0.0);
+    }
+
+    // ── World spawn/despawn ───────────────────────────────────────────────────
+
+    #[test]
+    fn world_spawn_increments_entity_count() {
+        let mut w = World::new();
+        let e = w.spawn();
+        assert_eq!(w.entity_count(), 1);
+        assert!(w.is_alive(e));
+    }
+
+    #[test]
+    fn world_spawn_ids_are_unique() {
+        let mut w = World::new();
+        let a = w.spawn();
+        let b = w.spawn();
+        assert_ne!(a, b);
+    }
+
+    #[test]
+    fn world_despawn_removes_entity() {
+        let mut w = World::new();
+        let e = w.spawn();
+        w.despawn(e);
+        assert!(!w.is_alive(e));
+        assert_eq!(w.entity_count(), 0);
+    }
+
+    #[test]
+    fn despawn_removes_components() {
+        let mut w = World::new();
+        let e = w.spawn();
+        w.add_position(e, Position { x: 1.0, y: 2.0 });
+        w.despawn(e);
+        assert!(w.get_position(e).is_none());
+    }
+
+    // ── Component add/get ─────────────────────────────────────────────────────
+
+    #[test]
+    fn add_and_get_position() {
+        let mut w = World::new();
+        let e = w.spawn();
+        w.add_position(e, Position { x: 3.0, y: 4.0 });
+        let pos = w.get_position(e).unwrap();
+        assert!((pos.x - 3.0).abs() < 1e-6);
+        assert!((pos.y - 4.0).abs() < 1e-6);
+    }
+
+    #[test]
+    fn get_position_missing_returns_none() {
+        let w = World::new();
+        let e = Entity(42);
+        assert!(w.get_position(e).is_none());
+    }
+
+    #[test]
+    fn add_and_get_health() {
+        let mut w = World::new();
+        let e = w.spawn();
+        w.add_health(e, Health::new(80));
+        let h = w.get_health(e).unwrap();
+        assert_eq!(h.max, 80);
+    }
+
+    #[test]
+    fn entities_with_position_iterates_all() {
+        let mut w = World::new();
+        let e1 = w.spawn();
+        let e2 = w.spawn();
+        w.add_position(e1, Position { x: 0.0, y: 0.0 });
+        w.add_position(e2, Position { x: 1.0, y: 1.0 });
+        let count = w.entities_with_position().count();
+        assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn world_default_equals_new() {
+        let w: World = Default::default();
+        assert_eq!(w.entity_count(), 0);
     }
 }

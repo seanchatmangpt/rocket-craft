@@ -15,7 +15,7 @@ pub fn get_variable(
     BpNode::new("/Script/BlueprintGraph.K2Node_VariableGet", node_name)
         .with_property(
             "VariableReference",
-            &format!("(MemberName=\"{}\",bSelfContext=True)", vname),
+            format!("(MemberName=\"{}\",bSelfContext=True)", vname),
         )
         .with_pin(output_pin)
 }
@@ -33,7 +33,7 @@ pub fn set_variable(
     BpNode::new("/Script/BlueprintGraph.K2Node_VariableSet", node_name)
         .with_property(
             "VariableReference",
-            &format!("(MemberName=\"{}\",bSelfContext=True)", vname),
+            format!("(MemberName=\"{}\",bSelfContext=True)", vname),
         )
         .with_pin(Pin::exec_input("execute"))
         .with_pin(Pin::exec_output("then"))
@@ -54,7 +54,7 @@ pub fn get_variable_from_object(
     BpNode::new("/Script/BlueprintGraph.K2Node_VariableGet", node_name)
         .with_property(
             "VariableReference",
-            &format!(
+            format!(
                 "(MemberParent=Class'{}',MemberName=\"{}\",bSelfContext=False)",
                 class, vname
             ),
@@ -77,7 +77,7 @@ pub fn set_variable_on_object(
     BpNode::new("/Script/BlueprintGraph.K2Node_VariableSet", node_name)
         .with_property(
             "VariableReference",
-            &format!(
+            format!(
                 "(MemberParent=Class'{}',MemberName=\"{}\",bSelfContext=False)",
                 class, vname
             ),
@@ -96,7 +96,7 @@ const ARRAY_LIB: &str = "Class'/Script/Engine.KismetArrayLibrary'";
 fn array_call_node(node_name: impl Into<String>, function_name: &str) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", node_name).with_property(
         "FunctionReference",
-        &format!(
+        format!(
             "(MemberParent={},MemberName=\"{}\")",
             ARRAY_LIB, function_name
         ),
@@ -124,7 +124,10 @@ pub fn array_set(node_name: impl Into<String>, item_type: PinType) -> BpNode {
 /// Get array length.
 pub fn array_length(node_name: impl Into<String>) -> BpNode {
     array_call_node(node_name, "Array_Length")
-        .with_pin(Pin::data_input("TargetArray", PinType::wildcard().as_array()))
+        .with_pin(Pin::data_input(
+            "TargetArray",
+            PinType::wildcard().as_array(),
+        ))
         .with_pin(Pin::data_output("ReturnValue", PinType::int()))
 }
 
@@ -143,7 +146,10 @@ pub fn array_remove(node_name: impl Into<String>) -> BpNode {
     array_call_node(node_name, "Array_Remove")
         .with_pin(Pin::exec_input("execute"))
         .with_pin(Pin::exec_output("then"))
-        .with_pin(Pin::data_input("TargetArray", PinType::wildcard().as_array()))
+        .with_pin(Pin::data_input(
+            "TargetArray",
+            PinType::wildcard().as_array(),
+        ))
         .with_pin(Pin::data_input("Index", PinType::int()))
 }
 
@@ -152,7 +158,10 @@ pub fn array_clear(node_name: impl Into<String>) -> BpNode {
     array_call_node(node_name, "Array_Clear")
         .with_pin(Pin::exec_input("execute"))
         .with_pin(Pin::exec_output("then"))
-        .with_pin(Pin::data_input("TargetArray", PinType::wildcard().as_array()))
+        .with_pin(Pin::data_input(
+            "TargetArray",
+            PinType::wildcard().as_array(),
+        ))
 }
 
 /// Check if array contains an item.
@@ -185,12 +194,15 @@ pub fn cast_to(
     let class_path = target_class_path.into();
     let cast_output_name = format!("As {}", class_name);
     BpNode::new("/Script/BlueprintGraph.K2Node_DynamicCast", node_name)
-        .with_property("TargetType", &format!("Class'{}'", class_path))
+        .with_property("TargetType", format!("Class'{}'", class_path))
         .with_pin(Pin::exec_input("execute"))
         .with_pin(Pin::data_input("Object", PinType::object("")))
         .with_pin(Pin::exec_output("Cast Success"))
         .with_pin(Pin::exec_output("Cast Failed"))
-        .with_pin(Pin::data_output(cast_output_name, PinType::object(class_path)))
+        .with_pin(Pin::data_output(
+            cast_output_name,
+            PinType::object(class_path),
+        ))
 }
 
 // ======= LITERAL VALUE NODES =======
@@ -239,7 +251,7 @@ pub fn literal_vector(node_name: impl Into<String>, x: f32, y: f32, z: f32) -> B
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::types::{PinCategory, PinDirection, ContainerType};
+    use crate::types::{ContainerType, PinCategory, PinDirection};
 
     #[test]
     fn get_variable_creates_correct_variable_reference_property() {
@@ -292,11 +304,7 @@ mod tests {
 
     #[test]
     fn cast_to_has_object_input_and_cast_success_failed_exec_outputs() {
-        let node = cast_to(
-            "CastToCharacter",
-            "Character",
-            "/Script/Engine.Character",
-        );
+        let node = cast_to("CastToCharacter", "Character", "/Script/Engine.Character");
         assert_eq!(node.class, "/Script/BlueprintGraph.K2Node_DynamicCast");
         let target_type = node
             .properties
@@ -307,11 +315,15 @@ mod tests {
         let obj_pin = node.find_pin("Object").expect("Object pin missing");
         assert_eq!(obj_pin.direction, PinDirection::Input);
 
-        let success = node.find_pin("Cast Success").expect("Cast Success pin missing");
+        let success = node
+            .find_pin("Cast Success")
+            .expect("Cast Success pin missing");
         assert_eq!(success.direction, PinDirection::Output);
         assert_eq!(success.pin_type.category, PinCategory::Exec);
 
-        let failed = node.find_pin("Cast Failed").expect("Cast Failed pin missing");
+        let failed = node
+            .find_pin("Cast Failed")
+            .expect("Cast Failed pin missing");
         assert_eq!(failed.direction, PinDirection::Output);
         assert_eq!(failed.pin_type.category, PinCategory::Exec);
 
@@ -324,17 +336,16 @@ mod tests {
     #[test]
     fn array_get_has_array_and_index_inputs_and_return_value_output() {
         let node = array_get("GetItem", PinType::int());
-        assert_eq!(
-            node.class,
-            "/Script/BlueprintGraph.K2Node_CallFunction"
-        );
+        assert_eq!(node.class, "/Script/BlueprintGraph.K2Node_CallFunction");
         let func_ref = node
             .properties
             .get("FunctionReference")
             .expect("FunctionReference missing");
         assert!(func_ref.contains("Array_Get"));
 
-        let array_pin = node.find_pin("TargetArray").expect("TargetArray pin missing");
+        let array_pin = node
+            .find_pin("TargetArray")
+            .expect("TargetArray pin missing");
         assert_eq!(array_pin.direction, PinDirection::Input);
         assert_eq!(array_pin.pin_type.container, ContainerType::Array);
 
@@ -342,7 +353,9 @@ mod tests {
         assert_eq!(index_pin.direction, PinDirection::Input);
         assert_eq!(index_pin.pin_type.category, PinCategory::Int);
 
-        let ret_pin = node.find_pin("ReturnValue").expect("ReturnValue pin missing");
+        let ret_pin = node
+            .find_pin("ReturnValue")
+            .expect("ReturnValue pin missing");
         assert_eq!(ret_pin.direction, PinDirection::Output);
         assert_eq!(ret_pin.pin_type.category, PinCategory::Int);
     }

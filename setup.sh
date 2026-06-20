@@ -1,20 +1,41 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
 
 # Rocket Craft Setup Proxy Script
 # This script ensures Rust is installed and then proxies to './rocket setup'
 
-# Colors for rich formatting
-BOLD='\033[1m'
-GREEN='\033[0;32m'
-CYAN='\033[0;36m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+set -euo pipefail
 
-echo -e "${BOLD}${CYAN}================================================${NC}"
-echo -e "${BOLD}${CYAN}      Rocket Craft Project Bootstrapper         ${NC}"
-echo -e "${BOLD}${CYAN}================================================${NC}"
+# Dynamic script directory resolution
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Color support check
+if [ -t 1 ] && [ "${NO_COLOR:-}" = "" ]; then
+    BOLD="\033[1m"
+    RED="\033[31m"
+    GREEN="\033[32m"
+    YELLOW="\033[33m"
+    BLUE="\033[34m"
+    CYAN="\033[36m"
+    RESET="\033[0m"
+else
+    BOLD=""
+    RED=""
+    GREEN=""
+    YELLOW=""
+    BLUE=""
+    CYAN=""
+    RESET=""
+fi
+
+log_info() { echo -e "${BLUE}${BOLD}[INFO]${RESET} $*"; }
+log_success() { echo -e "${GREEN}${BOLD}[SUCCESS]${RESET} $*"; }
+log_warn() { echo -e "${YELLOW}${BOLD}[WARN]${RESET} $*"; }
+log_error() { echo -e "${RED}${BOLD}[ERROR]${RESET} $*" >&2; }
+
+echo -e "${BOLD}${CYAN}====================================================${RESET}"
+echo -e "${BOLD}${CYAN}        Rocket Craft Project Bootstrapper           ${RESET}"
+echo -e "${BOLD}${CYAN}====================================================${RESET}"
+log_info "Workspace root: ${SCRIPT_DIR}"
 
 # Function to check if a command exists
 command_exists() {
@@ -23,38 +44,50 @@ command_exists() {
 
 # 1. Check for Rust/Cargo
 if ! command_exists cargo; then
-    echo -e "${YELLOW}Rust/Cargo not found. Attempting to install...${NC}"
+    log_warn "Rust/Cargo not found. Attempting to install automatically..."
     
-    # Try to install rustup
     if command_exists curl; then
+        # Install rustup in non-interactive mode
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
         
-        # Source cargo env for the current session
-        source "$HOME/.cargo/env"
+        # Source cargo env for the current session if it exists
+        CARGO_ENV="$HOME/.cargo/env"
+        if [ -f "${CARGO_ENV}" ]; then
+            # Sourcing inside subshell/script won't persist to user's interactive shell,
+            # but it is required for the rest of this script's execution.
+            # shellcheck disable=SC1090
+            source "${CARGO_ENV}"
+        else
+            log_error "Rust environment file not found at ${CARGO_ENV} after installation."
+            exit 1
+        fi
         
         if command_exists cargo; then
-            echo -e "${GREEN}Rust installed successfully!${NC}"
+            log_success "Rust installed successfully!"
         else
-            echo -e "${RED}Rust installation failed. Please install it manually from https://rustup.rs/${NC}"
+            log_error "Rust installation succeeded but 'cargo' is still not found in PATH."
+            log_error "Please add $HOME/.cargo/bin to your PATH or restart your terminal."
             exit 1
         fi
     else
-        echo -e "${RED}Error: 'curl' is required to install Rust automatically.${NC}"
-        echo -e "${YELLOW}Please install Rust manually from https://rustup.rs/${NC}"
+        log_error "'curl' is required to install Rust automatically."
+        log_warn "Please install Rust manually from https://rustup.rs/ and re-run this script."
         exit 1
     fi
 else
-    echo -e "${GREEN}✓ Rust/Cargo detected.${NC}"
+    log_success "Rust/Cargo detected: $(cargo --version)"
 fi
 
-# 2. Proxy to ./rocket setup
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-if [ -f "$SCRIPT_DIR/rocket" ]; then
-    echo -e "${CYAN}Proxying to ./rocket setup...${NC}"
-    echo ""
-    chmod +x "$SCRIPT_DIR/rocket"
-    exec "$SCRIPT_DIR/rocket" setup
+# 2. Proxy to `./rocket setup`
+ROCKET_SCRIPT="${SCRIPT_DIR}/rocket"
+if [ -f "${ROCKET_SCRIPT}" ]; then
+    log_info "Proxying to ./rocket setup..."
+    echo -e "${BOLD}${CYAN}----------------------------------------------------${RESET}"
+    chmod +x "${ROCKET_SCRIPT}"
+    
+    # We execute rocket setup using exec to replace the current shell process
+    exec "${ROCKET_SCRIPT}" setup
 else
-    echo -e "${RED}Error: 'rocket' script not found in $SCRIPT_DIR${NC}"
+    log_error "'rocket' management script not found in ${SCRIPT_DIR}"
     exit 1
 fi

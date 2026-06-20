@@ -1,0 +1,268 @@
+[project]
+name = "nexus-engine-codegen"
+version = "0.1.0"
+description = "State machine code generation for nexus-engine"
+authors = ["ggen sync"]
+
+[ontology]
+source = ".specify/schema/combined.ttl"
+standard_only = false
+
+[generation]
+output_dir = "."
+
+# Define inference rules (required for DMAIC quality gates)
+[inference]
+rules = [
+    { name = "standard-normalization", construct = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }" }
+]
+
+[[generation.rules]]
+name = "generate-combat-machine"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sm: <https://rocket-craft.io/ontology/state-machine/>
+
+SELECT ?type ?name ?from ?to ?machine_name
+WHERE {
+  BIND("CombatMachine" AS ?machine_name)
+  {
+    ?state a sm:State ;
+           sm:belongsTo sm:CombatMachine ;
+           rdfs:label ?name .
+    BIND("State" AS ?type)
+  }
+  UNION
+  {
+    ?trans a sm:Transition ;
+           sm:belongsToMachine sm:CombatMachine ;
+           rdfs:label ?name ;
+           sm:fromState/rdfs:label ?from ;
+           sm:toState/rdfs:label ?to .
+    BIND("Transition" AS ?type)
+  }
+}
+ORDER BY ?type ?name
+""" }
+template = { file = "templates/machine.rs.tera" }
+output_file = "crates/nexus-combat/src/generated_machine.rs"
+mode = "Overwrite"
+
+[[generation.rules]]
+name = "generate-session-machine"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX sm: <https://rocket-craft.io/ontology/state-machine/>
+
+SELECT ?type ?name ?from ?to ?machine_name
+WHERE {
+  BIND("SessionMachine" AS ?machine_name)
+  {
+    ?state a sm:State ;
+           sm:belongsTo sm:SessionMachine ;
+           rdfs:label ?name .
+    BIND("State" AS ?type)
+  }
+  UNION
+  {
+    ?trans a sm:Transition ;
+           sm:belongsToMachine sm:SessionMachine ;
+           rdfs:label ?name ;
+           sm:fromState/rdfs:label ?from ;
+           sm:toState/rdfs:label ?to .
+    BIND("Transition" AS ?type)
+  }
+}
+ORDER BY ?type ?name
+""" }
+template = { file = "templates/machine.rs.tera" }
+output_file = "crates/nexus-session/src/generated_session.rs"
+mode = "Overwrite"
+
+[[generation.rules]]
+name = "generate-gundam-nexus"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX gn: <https://rocket-craft.io/ontology/gundam-nexus/>
+
+SELECT ?name (GROUP_CONCAT(?type; separator=",") AS ?types)
+WHERE {
+  {
+    ?inst a gn:Planet ;
+          rdfs:label ?name .
+    BIND("Planet" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:PlanetDimension ;
+          rdfs:label ?name .
+    BIND("PlanetDimension" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:MobilityType ;
+          rdfs:label ?name .
+    BIND("MobilityType" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:MechClass ;
+          rdfs:label ?name .
+    BIND("MechClass" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:PreservationDomain ;
+          rdfs:label ?name .
+    BIND("PreservationDomain" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:ExperiencePhase ;
+          rdfs:label ?name .
+    BIND("ExperiencePhase" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:MythologyArchetype ;
+          rdfs:label ?name .
+    BIND("MythologyArchetype" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:CosmicCycle ;
+          rdfs:label ?name .
+    BIND("CosmicCycle" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:Resource ;
+          rdfs:label ?name .
+    BIND("Resource" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:FrameType ;
+          rdfs:label ?name .
+    BIND("FrameType" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:PowerSource ;
+          rdfs:label ?name .
+    BIND("PowerSource" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:ArmorType ;
+          rdfs:label ?name .
+    BIND("ArmorType" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:WeaponType ;
+          rdfs:label ?name .
+    BIND("WeaponType" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:SensorType ;
+          rdfs:label ?name .
+    BIND("SensorType" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:ArkForm ;
+          rdfs:label ?name .
+    BIND("ArkForm" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:ArkPurpose ;
+          rdfs:label ?name .
+    BIND("ArkPurpose" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:CosmologyPhase ;
+          rdfs:label ?name .
+    BIND("CosmologyPhase" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:HistoryType ;
+          rdfs:label ?name .
+    BIND("HistoryType" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:PreservationAspect ;
+          rdfs:label ?name .
+    BIND("PreservationAspect" AS ?type)
+  }
+  UNION
+  {
+    ?inst a gn:MechPrimitive ;
+          rdfs:label ?name .
+    BIND("MechPrimitive" AS ?type)
+  }
+}
+GROUP BY ?name
+ORDER BY ?name
+""" }
+template = { file = "templates/gundam_nexus.rs.tera" }
+output_file = "crates/nexus-gundam/src/mech_primitives.rs"
+mode = "Overwrite"
+
+# Secondary rule: extract canonical lore-grounded specs for mobility defaults.
+# These feed a second SPARQL result set passed to the same template as `mobility_specs`.
+[[generation.rules]]
+name = "generate-mobility-specs"
+query = { inline = """
+PREFIX gn: <https://rocket-craft.io/ontology/gundam-nexus/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?name ?mass_kg ?max_speed_ms ?load_capacity_kg
+       ?leg_count ?wing_span_m ?ground_clearance_m
+       ?thruster_count ?depth_rating_m
+WHERE {
+  ?inst a gn:MobilityType ;
+        rdfs:label ?name .
+  OPTIONAL { ?inst gn:canonicalMass_kg ?mass_kg }
+  OPTIONAL { ?inst gn:canonicalMaxSpeed_ms ?max_speed_ms }
+  OPTIONAL { ?inst gn:canonicalLoadCapacity_kg ?load_capacity_kg }
+  OPTIONAL { ?inst gn:canonicalLegCount ?leg_count }
+  OPTIONAL { ?inst gn:canonicalWingSpan_m ?wing_span_m }
+  OPTIONAL { ?inst gn:canonicalGroundClearance_m ?ground_clearance_m }
+  OPTIONAL { ?inst gn:canonicalThrusterCount ?thruster_count }
+  OPTIONAL { ?inst gn:canonicalDepthRating_m ?depth_rating_m }
+}
+ORDER BY ?name
+""" }
+template = { file = "templates/mobility_defaults.rs.tera" }
+output_file = "crates/nexus-gundam/src/mobility_defaults.rs"
+mode = "Overwrite"
+
+[sync]
+enabled = true
+on_change = "manual"
+validate_after = true
+conflict_mode = "fail"
+
+[rdf]
+formats = ["turtle"]
+default_format = "turtle"
+strict_validation = false
+
+[templates]
+enable_caching = true
+auto_reload = true
+
+[output]
+formatting = "default"
+line_length = 120
+indent = 4

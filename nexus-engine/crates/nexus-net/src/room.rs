@@ -156,9 +156,15 @@ impl GameRoom {
                 };
 
                 if new_hp.is_dead() {
-                    CombatOutcome::PlayerDied { player_id: defender_id }
+                    CombatOutcome::PlayerDied {
+                        player_id: defender_id,
+                    }
                 } else {
-                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth }
+                    CombatOutcome::Hit {
+                        damage: dmg.value(),
+                        new_hp: new_hp.value(),
+                        combo_depth,
+                    }
                 }
             }
             CombatAction::Parry { .. } => {
@@ -184,8 +190,7 @@ impl GameRoom {
                     self.player2.attack
                 };
 
-                let dmg =
-                    Damage::new(attacker_attack.value() * 2.0 + ability_id as f32 * 5.0);
+                let dmg = Damage::new(attacker_attack.value() * 2.0 + ability_id as f32 * 5.0);
 
                 let (new_hp, defender_id) = if is_p1_acting {
                     self.player2.hp = Hp::new((self.player2.hp.value() - dmg.value()).max(0.0));
@@ -198,9 +203,15 @@ impl GameRoom {
                 };
 
                 if new_hp.is_dead() {
-                    CombatOutcome::PlayerDied { player_id: defender_id }
+                    CombatOutcome::PlayerDied {
+                        player_id: defender_id,
+                    }
                 } else {
-                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth: 0 }
+                    CombatOutcome::Hit {
+                        damage: dmg.value(),
+                        new_hp: new_hp.value(),
+                        combo_depth: 0,
+                    }
                 }
             }
             CombatAction::CastMagic { magic_type } => {
@@ -224,9 +235,15 @@ impl GameRoom {
                 };
 
                 if new_hp.is_dead() {
-                    CombatOutcome::PlayerDied { player_id: defender_id }
+                    CombatOutcome::PlayerDied {
+                        player_id: defender_id,
+                    }
                 } else {
-                    CombatOutcome::Hit { damage: dmg.value(), new_hp: new_hp.value(), combo_depth: 0 }
+                    CombatOutcome::Hit {
+                        damage: dmg.value(),
+                        new_hp: new_hp.value(),
+                        combo_depth: 0,
+                    }
                 }
             }
         };
@@ -265,5 +282,139 @@ impl GameRoom {
             turn_number: self.turn_number,
             is_player1_turn: self.is_player1_turn,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use nexus_types::{Damage, Hp};
+    use crate::protocol::{CombatAction, AttackDir};
+
+    fn player(id: u64, name: &str) -> RoomPlayer {
+        RoomPlayer {
+            player_id: id,
+            name: name.into(),
+            suit_id: "default".into(),
+            hp: Hp::new(500.0),
+            max_hp: Hp::new(500.0),
+            attack: Damage::new(30.0),
+            magic: Damage::new(20.0),
+            combo_depth: 0,
+        }
+    }
+
+    fn active_room() -> GameRoom {
+        let mut room = GameRoom::new(1, player(1, "Alice"), player(2, "Bob"));
+        room.state = RoomState::Active;
+        room
+    }
+
+    // ── construction ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_room_is_waiting_for_players() {
+        let room = GameRoom::new(42, player(1, "A"), player(2, "B"));
+        assert_eq!(room.state, RoomState::WaitingForBothPlayers);
+        assert_eq!(room.turn_number, 0);
+        assert!(room.is_player1_turn);
+    }
+
+    // ── apply_action guard: inactive room ─────────────────────────────────────
+
+    #[test]
+    fn action_on_inactive_room_returns_error() {
+        let mut room = GameRoom::new(1, player(1, "A"), player(2, "B"));
+        let err = room.apply_action(1, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap_err();
+        assert!(matches!(err, RoomError::MatchNotActive));
+    }
+
+    // ── apply_action guard: wrong player's turn ───────────────────────────────
+
+    #[test]
+    fn acting_out_of_turn_returns_error() {
+        let mut room = active_room();
+        // player 1's turn; player 2 acts instead
+        let err = room.apply_action(2, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap_err();
+        assert!(matches!(err, RoomError::NotPlayersTurn));
+    }
+
+    // ── apply_action guard: unknown player ───────────────────────────────────
+
+    #[test]
+    fn unknown_player_id_returns_error() {
+        let mut room = active_room();
+        let err = room.apply_action(999, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap_err();
+        assert!(matches!(err, RoomError::PlayerNotFound));
+    }
+
+    // ── attack ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn attack_reduces_defender_hp() {
+        let mut room = active_room();
+        let before = room.player2.hp.value();
+        room.apply_action(1, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap();
+        assert!(room.player2.hp.value() < before, "attack must reduce defender hp");
+    }
+
+    #[test]
+    fn attack_increments_attacker_combo_depth() {
+        let mut room = active_room();
+        room.apply_action(1, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap();
+        assert_eq!(room.player1.combo_depth, 1);
+    }
+
+    #[test]
+    fn attack_advances_turn_counter_and_flips_turn() {
+        let mut room = active_room();
+        room.apply_action(1, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap();
+        assert_eq!(room.turn_number, 1);
+        assert!(!room.is_player1_turn, "turn must flip after action");
+    }
+
+    // ── parry ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn parry_resets_attacker_combo_depth() {
+        let mut room = active_room();
+        room.player1.combo_depth = 3;
+        let outcome = room.apply_action(1, CombatAction::Parry { dir: None }).unwrap();
+        assert_eq!(room.player1.combo_depth, 0);
+        assert!(matches!(outcome, CombatOutcome::Blocked));
+    }
+
+    // ── dodge ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn dodge_returns_dodged_outcome() {
+        let mut room = active_room();
+        let outcome = room.apply_action(1, CombatAction::Dodge).unwrap();
+        assert!(matches!(outcome, CombatOutcome::Dodged));
+    }
+
+    // ── lethal attack sets room state to Ended ────────────────────────────────
+
+    #[test]
+    fn lethal_attack_ends_match() {
+        let mut room = GameRoom::new(1, player(1, "A"), player(2, "B"));
+        room.state = RoomState::Active;
+        // Give player 2 only 1 HP so first attack kills
+        room.player2.hp = Hp::new(1.0);
+        room.apply_action(1, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap();
+        assert_eq!(room.state, RoomState::Ended);
+    }
+
+    // ── snapshot ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn snapshot_reflects_current_state() {
+        let room = active_room();
+        let snap = room.snapshot();
+        assert_eq!(snap.match_id, 1);
+        assert_eq!(snap.player1_hp, 500.0);
+        assert_eq!(snap.player2_hp, 500.0);
+        assert_eq!(snap.turn_number, 0);
+        assert!(snap.is_player1_turn);
     }
 }

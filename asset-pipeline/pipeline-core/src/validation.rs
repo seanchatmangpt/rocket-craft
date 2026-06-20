@@ -70,35 +70,35 @@ impl Validator {
     pub fn validate(
         &mut self,
         asset: DiscoveredAsset,
-    ) -> Result<ValidatedAsset, (PipelineError, DiscoveredAsset)> {
+    ) -> Result<ValidatedAsset, Box<(PipelineError, DiscoveredAsset)>> {
         // ── 1. Size check ──────────────────────────────────────────────────────
         if asset.file_size_bytes > self.config.max_size_bytes {
             let size_mb = asset.file_size_bytes as f64 / (1024.0 * 1024.0);
             let limit_mb = self.config.max_size_bytes / (1024 * 1024);
-            return Err((
+            return Err(Box::new((
                 PipelineError::FileTooLarge {
                     path: asset.path.clone(),
                     size_mb,
                     limit_mb,
                 },
                 asset,
-            ));
+            )));
         }
 
         // ── 2. Duplicate hash check ────────────────────────────────────────────
         if let Some(existing) = self.seen_hashes.get(&asset.hash) {
-            return Err((
+            return Err(Box::new((
                 PipelineError::Duplicate {
                     path: asset.path.clone(),
                     existing: existing.clone(),
                 },
                 asset,
-            ));
+            )));
         }
 
         // ── 3. Magic byte validation ───────────────────────────────────────────
         if let Err(err) = check_magic_bytes(&asset) {
-            return Err((err, asset));
+            return Err(Box::new((err, asset)));
         }
 
         // ── 4. Record & advance state ──────────────────────────────────────────
@@ -344,7 +344,8 @@ pub fn validate_batch(
     for asset in assets {
         match validator.validate(asset) {
             Ok(v) => validated.push(v),
-            Err((err, original)) => {
+            Err(boxed_err) => {
+                let (err, original) = *boxed_err;
                 skipped.push((original.path, err));
             }
         }
@@ -391,7 +392,7 @@ mod tests {
 
         let result = v.validate(asset);
         assert!(result.is_err(), "expected Err for oversized file");
-        let (err, _) = result.unwrap_err();
+        let (err, _) = *result.unwrap_err();
         assert!(
             matches!(err, PipelineError::FileTooLarge { .. }),
             "expected FileTooLarge, got: {err:?}"
@@ -442,7 +443,7 @@ mod tests {
         // Second asset with the same hash must be rejected.
         let result = v.validate(asset2);
         assert!(result.is_err(), "expected Err for duplicate hash");
-        let (err, _) = result.unwrap_err();
+        let (err, _) = *result.unwrap_err();
         assert!(
             matches!(err, PipelineError::Duplicate { .. }),
             "expected Duplicate, got: {err:?}"
@@ -464,7 +465,10 @@ mod tests {
         let asset2 = make_asset(tmp2.path(), [2u8; 32], Format::Obj, 8);
 
         assert!(v.validate(asset1).is_ok(), "first asset should pass");
-        assert!(v.validate(asset2).is_ok(), "second asset with different hash should pass");
+        assert!(
+            v.validate(asset2).is_ok(),
+            "second asset with different hash should pass"
+        );
         assert_eq!(v.validated_count(), 2);
     }
 
@@ -482,8 +486,10 @@ mod tests {
         let good_asset = make_asset(good_tmp.path(), shared_hash, Format::Obj, 8);
         let dup_asset = make_asset(dup_tmp.path(), shared_hash, Format::Obj, 8);
 
-        let (validated, skipped) =
-            validate_batch(vec![good_asset, dup_asset], ValidationConfig::with_max_mb(500));
+        let (validated, skipped) = validate_batch(
+            vec![good_asset, dup_asset],
+            ValidationConfig::with_max_mb(500),
+        );
 
         assert_eq!(validated.len(), 1, "one asset should be valid");
         assert_eq!(skipped.len(), 1, "one asset should be skipped as duplicate");
@@ -501,7 +507,8 @@ mod tests {
         // our check).
         let mut tmp = NamedTempFile::new().unwrap();
         // GLB magic: b"glTF" followed by version + length placeholders.
-        tmp.write_all(b"glTF\x02\x00\x00\x00\x14\x00\x00\x00").unwrap();
+        tmp.write_all(b"glTF\x02\x00\x00\x00\x14\x00\x00\x00")
+            .unwrap();
 
         let config = ValidationConfig::with_max_mb(500);
         let mut v = Validator::new(config);
@@ -529,7 +536,7 @@ mod tests {
 
         let result = v.validate(asset);
         assert!(result.is_err(), "GLB with invalid magic should fail");
-        let (err, _) = result.unwrap_err();
+        let (err, _) = *result.unwrap_err();
         assert!(
             matches!(err, PipelineError::UnsupportedFormat { .. }),
             "expected UnsupportedFormat, got: {err:?}"
@@ -571,7 +578,7 @@ mod tests {
 
         let result = v.validate(asset);
         assert!(result.is_err(), "empty OBJ file should fail magic check");
-        let (err, _) = result.unwrap_err();
+        let (err, _) = *result.unwrap_err();
         assert!(
             matches!(err, PipelineError::UnsupportedFormat { .. }),
             "expected UnsupportedFormat for empty file, got: {err:?}"

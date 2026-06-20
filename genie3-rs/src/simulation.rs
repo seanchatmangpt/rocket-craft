@@ -123,15 +123,16 @@ pub struct SimulationEngine {
     pub config: SimulationConfig,
 }
 
+impl Default for SimulationEngine {
+    fn default() -> Self {
+        Self::new(SimulationConfig::default())
+    }
+}
+
 impl SimulationEngine {
     /// Create a new SimulationEngine with custom configuration.
     pub fn new(config: SimulationConfig) -> Self {
         Self { config }
-    }
-
-    /// Create a new SimulationEngine with default configuration.
-    pub fn default() -> Self {
-        Self::new(SimulationConfig::default())
     }
 
     /// Validates the transition of an actor to a new position.
@@ -436,5 +437,106 @@ impl SimulationEngine {
         next_state.validate_coherence()?;
 
         Ok(next_state)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::types::{Transform, Vector3};
+    use crate::world::{Actor, Object};
+
+    fn make_actor(pos: Vector3) -> Actor {
+        Actor {
+            id: "a1".into(),
+            name: "TestActor".into(),
+            actor_type: "NPC".into(),
+            position: pos,
+            rotation: Default::default(),
+            place_id: None,
+            properties: HashMap::new(),
+        }
+    }
+
+    fn make_object(pos: Vector3, scale: Vector3) -> Object {
+        Object {
+            id: "o1".into(),
+            name: "TestObj".into(),
+            class: "Box".into(),
+            transform: Transform {
+                position: pos,
+                rotation: Default::default(),
+                scale,
+            },
+            place_id: None,
+            properties: HashMap::new(),
+        }
+    }
+
+    // ── SimulationConfig ──────────────────────────────────────────────────────
+
+    #[test]
+    fn default_config_max_speed_is_10() {
+        let cfg = SimulationConfig::default();
+        assert_eq!(cfg.default_max_speed, 10.0);
+    }
+
+    #[test]
+    fn default_config_collisions_enabled() {
+        let cfg = SimulationConfig::default();
+        assert!(cfg.check_actor_collisions);
+        assert!(cfg.check_object_collisions);
+    }
+
+    #[test]
+    fn default_config_strict_containment_off() {
+        assert!(!SimulationConfig::default().enforce_strict_containment);
+    }
+
+    // ── get_actor_bounds ──────────────────────────────────────────────────────
+
+    #[test]
+    fn actor_bounds_at_origin_with_default_extents() {
+        let actor = make_actor(Vector3::new(0.0, 0.0, 0.0));
+        let bounds = get_actor_bounds(&actor);
+        // default half_extents = (0.5, 0.5, 1.0), centered at origin
+        assert!(bounds.contains_point(&Vector3::new(0.0, 0.0, 0.0)));
+        assert!(!bounds.contains_point(&Vector3::new(2.0, 0.0, 0.0)));
+    }
+
+    #[test]
+    fn actor_bounds_moves_with_actor_position() {
+        let actor = make_actor(Vector3::new(10.0, 0.0, 0.0));
+        let bounds = get_actor_bounds(&actor);
+        assert!(bounds.contains_point(&Vector3::new(10.0, 0.0, 0.0)));
+        assert!(!bounds.contains_point(&Vector3::new(0.0, 0.0, 0.0)));
+    }
+
+    // ── get_object_bounds ─────────────────────────────────────────────────────
+
+    #[test]
+    fn object_bounds_scales_with_transform_scale() {
+        let obj = make_object(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let bounds = get_object_bounds(&obj);
+        // half_extents = (1.0 * 2.0, 1.0 * 2.0, 1.0 * 2.0) = (2.0, 2.0, 2.0)
+        // point at (1.5, 0, 0) should be inside
+        assert!(bounds.contains_point(&Vector3::new(1.5, 0.0, 0.0)));
+        // point at (2.5, 0, 0) should be outside
+        assert!(!bounds.contains_point(&Vector3::new(2.5, 0.0, 0.0)));
+    }
+
+    // ── SimulationEngine ──────────────────────────────────────────────────────
+
+    #[test]
+    fn simulation_engine_stores_config() {
+        let cfg = SimulationConfig {
+            default_max_speed: 5.0,
+            check_actor_collisions: false,
+            check_object_collisions: true,
+            enforce_strict_containment: true,
+        };
+        let engine = SimulationEngine::new(cfg.clone());
+        assert_eq!(engine.config.default_max_speed, 5.0);
+        assert!(!engine.config.check_actor_collisions);
     }
 }

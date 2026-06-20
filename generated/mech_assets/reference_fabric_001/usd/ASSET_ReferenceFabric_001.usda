@@ -1,0 +1,92 @@
+#usda 1.0
+(
+    defaultPrim = "ASSET_ReferenceFabric_001"
+    upAxis = "Y"
+    metersPerUnit = 0.01
+)
+
+def Xform "ASSET_ReferenceFabric_001"
+{
+    def Xform "Torso" (
+        prepend references = @./SM_Torso.usda@
+    )
+    {
+    }
+
+    def Xform "Head" (
+        prepend references = @./SM_Head.usda@
+    )
+    {
+    }
+
+    def Xform "Wing_Left" (
+        prepend references = @./SM_WingArray_Left.usda@
+    )
+    {
+    }
+
+    def Xform "Wing_Right" (
+        prepend references = @./SM_WingArray_Right.usda@
+    )
+    {
+    }
+
+    def Xform "Blade_Left" (
+        prepend references = @./SM_Blade_Left.usda@
+    )
+    {
+    }
+
+    def Xform "Blade_Right" (
+        prepend references = @./SM_Blade_Right.usda@
+    )
+    {
+    }
+
+    def Xform "Limb_Left" (
+        prepend references = @./SM_Limb_Left.usda@
+    )
+    {
+    }
+
+    def Xform "Limb_Right" (
+        prepend references = @./SM_Limb_Right.usda@
+    )
+    {
+    }
+
+    def Xform "Loadout" (
+        prepend references = @./SM_Loadout.usda@
+    )
+    {
+    }
+
+    def Scope "Materials"
+    {
+        
+        def Material "M_CyanBlade" (
+            prepend references = @../materialx/M_CyanBlade.mtlx@
+        )
+        {
+        }
+        
+        def Material "M_DarkFrame" (
+            prepend references = @../materialx/M_DarkFrame.mtlx@
+        )
+        {
+        }
+        
+        def Material "M_GoldVisor" (
+            prepend references = @../materialx/M_GoldVisor.mtlx@
+        )
+        {
+        }
+        
+        def Material "M_WhiteArmor" (
+            prepend references = @../materialx/M_WhiteArmor.mtlx@
+        )
+        {
+        }
+        
+    }
+}

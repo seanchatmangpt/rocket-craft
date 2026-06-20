@@ -491,8 +491,7 @@ fn statement_tokens(stmt: &Statement) -> TokenStream2 {
 }
 
 fn event_chain_tokens(event: &EventDef) -> TokenStream2 {
-    let body_calls: Vec<TokenStream2> =
-        event.body.iter().map(statement_tokens).collect();
+    let body_calls: Vec<TokenStream2> = event.body.iter().map(statement_tokens).collect();
 
     let body_closure = quote! {
         |__ev: &mut ::blueprint_core::EventBodyBuilder| {
@@ -667,7 +666,9 @@ impl Parse for BpNodeDef {
                 other => {
                     return Err(syn::Error::new(
                         key.span(),
-                        format!("unexpected key `{other}` in bp_node!; expected class, name, or props"),
+                        format!(
+                            "unexpected key `{other}` in bp_node!; expected class, name, or props"
+                        ),
                     ))
                 }
             }

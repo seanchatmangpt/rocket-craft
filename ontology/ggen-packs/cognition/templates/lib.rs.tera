@@ -1,0 +1,64 @@
+#![no_std]
+
+//! wasm4pm-cognition: Combinatorial Maximalist Cognition Crate
+//! GENERATED CODE: DO NOT EDIT. $A = \mu(O^*)$
+
+use core::marker::PhantomData;
+
+/// Byte-class vectors for authoritative state.
+#[repr(transparent)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub struct CognitionByteClass(pub [u8; 16]);
+
+// === Branchless Typestates ===
+
+{% for state in results %}
+/// State: {{ state.state_name }}
+pub struct {{ state.state_name }}State;
+{% endfor %}
+
+/// A reasoning-native cognition breed.
+pub struct CognitionBreed<State> {
+    byte_class: CognitionByteClass,
+    _state: PhantomData<State>,
+}
+
+impl CognitionBreed<IdleState> {
+    pub const fn new(byte_class: CognitionByteClass) -> Self {
+        Self {
+            byte_class,
+            _state: PhantomData,
+        }
+    }
+
+    pub const fn begin_reasoning(self) -> CognitionBreed<ReasoningState> {
+        CognitionBreed {
+            byte_class: self.byte_class,
+            _state: PhantomData,
+        }
+    }
+}
+
+impl CognitionBreed<ReasoningState> {
+    pub fn process_deterministic(self) -> CognitionBreed<AuditableState> {
+        let mut new_class = self.byte_class.0;
+        for i in 0..16 {
+            new_class[i] = new_class[i].wrapping_add(1);
+        }
+        CognitionBreed {
+            byte_class: CognitionByteClass(new_class),
+            _state: PhantomData,
+        }
+    }
+}
+
+impl CognitionBreed<AuditableState> {
+    pub fn emit_ocel_receipt(&self) -> [u8; 32] {
+        let mut receipt = [0u8; 32];
+        for i in 0..16 {
+            receipt[i] = self.byte_class.0[i];
+            receipt[i + 16] = self.byte_class.0[i] ^ 0xFF;
+        }
+        receipt
+    }
+}

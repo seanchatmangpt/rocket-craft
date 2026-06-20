@@ -1,0 +1,71 @@
+#usda 1.0
+(
+    defaultPrim = "ASSET_ReferenceFabric_001"
+    upAxis = "Y"
+    metersPerUnit = 0.01
+    doc = "Master USD assembly file for Reference Fabric Mech Asset 001"
+)
+
+def Xform "ASSET_ReferenceFabric_001" (
+    kind = "assembly"
+)
+{
+    # ---------------------------------------------------------
+    # Part References (Components)
+    # ---------------------------------------------------------
+    def Xform "Torso" (
+        references = @./SM_Torso.usda@</SM_Torso>
+    )
+    {}
+
+    def Xform "Head" (
+        references = @./SM_Head.usda@</SM_Head>
+    )
+    {}
+
+    def Xform "WingArray_Left" (
+        references = @./SM_WingArray_Left.usda@</SM_WingArray_Left>
+    )
+    {}
+
+    def Xform "WingArray_Right" (
+        references = @./SM_WingArray_Right.usda@</SM_WingArray_Right>
+    )
+    {}
+
+    def Xform "Blade_Left" (
+        references = @./SM_Blade_Left.usda@</SM_Blade_Left>
+    )
+    {}
+
+    def Xform "Blade_Right" (
+        references = @./SM_Blade_Right.usda@</SM_Blade_Right>
+    )
+    {}
+
+    # ---------------------------------------------------------
+    # Materials Scope
+    # ---------------------------------------------------------
+    def Scope "Materials"
+    {
+{% for row in results %}
+        def Material "{{ row.materialLocalName }}"
+        {
+            token outputs:mtlx:surface.connect = </ASSET_ReferenceFabric_001/Materials/{{ row.materialLocalName }}/OpenPBR_Surface.outputs:surface>
+            
+            def Shader "OpenPBR_Surface"
+            {
+                uniform token info:id = "ND_open_pbr_surface_surfaceshader"
+                color3f inputs:base_color = ({{ row.color | replace(from=" ", to=", ") }})
+                float inputs:roughness = {{ row.roughness }}
+                float inputs:metallic = {{ row.metallic }}
+                {% if row.emissive | float > 0.0 %}
+                float inputs:emission = {{ row.emissive }}
+                color3f inputs:emission_color = ({{ row.color | replace(from=" ", to=", ") }})
+                {% endif %}
+                token outputs:surface
+            }
+        }
+{% endfor %}
+    }
+}

@@ -1,0 +1,295 @@
+# Research Dossier: `open-ontologies`
+
+**Total Files:** 164 Ontologies (.ttl) | 6 Queries (.rq)
+**Total Volume:** 170 files
+
+## 1. Core Vocabularies (Prefixes)
+- `aat: <urn:ontostar:aat:live:>`
+- `acl: <http://www.w3.org/ns/auth/acl#>`
+- `ao: <http://purl.org/ontology/ao/core#>`
+- `as: <https://www.w3.org/ns/activitystreams#>`
+- `attest: <urn:ontostar:attestation:>`
+- `bibo: <http://purl.org/ontology/bibo/>`
+- `bio: <http://purl.org/vocab/bio/0.1/>`
+- `bldg: <http://example.org/ontology/ies-building#>`
+- `boroa: <http://example.org/ontology/boro-building-ai#>`
+- `borob: <http://example.org/ontology/boro-building-handcrafted#>`
+- `bos: <https://open-ontologies.org/bible-o-star#>`
+- `building: <http://ies.data.gov.uk/ontology/ies-building1#>`
+- `c8: <urn:ontostar:cell8:>`
+- `cc: <http://web.resource.org/cc/>`
+- `cell8: <urn:cell8:gate:>`
+- `cell8: <urn:ontostar:cell8:shape:>`
+- `cito: <http://purl.org/spar/cito/>`
+- `civic: <http://example.org/civic/dispatch#>`
+- `cli: <https://ggen.io/onto/cli/spec/>`
+- `data: <http://data.gov.uk/testdata#>`
+- `dc11: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/terms/>`
+- `dcat: <http://www.w3.org/ns/dcat#>`
+- `dct: <http://purl.org/dc/terms/>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `dctype: <http://purl.org/dc/dcmitype/>`
+- `doco: <http://purl.org/spar/doco/>`
+- `earl: <http://www.w3.org/ns/earl#>`
+- `event: <http://purl.org/NET/c4dm/event.owl#>`
+- `ex: <http://example.com/>`
+- `ex: <http://example.org/>`
+- `ex: <http://example.org/image/>`
+- `ex: <http://example.org/shapes#>`
+- `ex: <http://example.org/test#>`
+- `ex: <https://w3id.org/naph/example/>`
+- `ex: <https://w3id.org/naph/example/ingest/>`
+- `fibo-be-oac: <https://spec.edmcouncil.org/fibo/ontology/BE/OwnershipAndControl/ControlParties/>`
+- `fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/>`
+- `foaf: <http://xmlns.com/foaf/0.1/>`
+- `frbr: <http://purl.org/vocab/frbr/core#>`
+- `gate: <urn:ontostar:gate:>`
+- `geo1: <http://www.w3.org/2003/01/geo/wgs84_pos#>`
+- `geo: <http://www.opengis.net/ont/geosparql#>`
+- `geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>`
+- `ggen: <https://ggen.io/onto/ggen/>`
+- `ggen: <https://open-ontologies.org/ggen#>`
+- `ghf: <https://open-ontologies.org/profile/github-factory#>`
+- `gr: <http://purl.org/goodrelations/v1#>`
+- `gufo: <http://purl.org/nemo/gufo#>`
+- *...and 56 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:American`
+- `:AmericanHot`
+- `:Americana`
+- `:AnchoviesTopping`
+- `:AnchovyTopping`
+- `:ArtichokeTopping`
+- `:AsparagusTopping`
+- `:Cajun`
+- `:CajunSpiceTopping`
+- `:CaperTopping`
+- `:Capricciosa`
+- `:Caprina`
+- `:CheeseTopping`
+- `:CheeseyPizza`
+- `:CheeseyVegetableTopping`
+- `:ChickenTopping`
+- `:Country`
+- `:DeepPanBase`
+- `:DomainConcept`
+- `:Fiorentina`
+- `:FishTopping`
+- `:Food`
+- `:FourCheesesTopping`
+- `:FourSeasons`
+- `:FruitTopping`
+- `:FruttiDiMare`
+- `:GarlicTopping`
+- `:Giardiniera`
+- `:GoatsCheeseTopping`
+- `:GorgonzolaTopping`
+- `:GreenPepperTopping`
+- `:HamTopping`
+- `:HerbSpiceTopping`
+- `:Hot`
+- `:HotGreenPepperTopping`
+- `:HotSpicedBeefTopping`
+- `:IceCream`
+- `:InterestingPizza`
+- `:JalapenoPepperTopping`
+- `:LaReine`
+- `:LeekTopping`
+- `:Margherita`
+- `:MeatTopping`
+- `:MeatyPizza`
+- `:Medium`
+- `:Mild`
+- `:MixedSeafoodTopping`
+- `:MozzarellaTopping`
+- `:Mushroom`
+- `:MushroomTopping`
+- *...and 1634 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'SELECT': 6}
+
+### Projected Variables (SELECT ?var)
+This project actively projects the following variables into code/templates:
+> `?attribute`, `?budget_ns`, `?byte_size`, `?comment`, `?coveredBy`, `?doc`, `?label`, `?notation`, `?position`, `?repr`, `?requiredSpan`, `?rule`, `?variant`
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/open-ontologies/artifacts/autoreceipt/persona-jtbd-public-alignment.ttl` (12527 bytes)
+- `/Users/sac/open-ontologies/artifacts/autoreceipt/persona-jtbd-shapes.ttl` (324 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/assessment.ttl` (1686 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/characteristics-and-measures.ttl` (804 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/communication.ttl` (1330 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/event-linkages.ttl` (795 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/event-participation.ttl` (1879 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/events.ttl` (782 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/hospital.ttl` (3329 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/identifiers.ttl` (1045 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/invalid-PersonState.ttl` (272 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/movement.ttl` (1930 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/period-of-time.ttl` (703 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/pizza-shapes.ttl` (651 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/relationships.ttl` (597 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/sometimes.ttl` (791 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/types.ttl` (686 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/valid-PersonState.ttl` (431 bytes)
+- `/Users/sac/open-ontologies/benchmark/data/when-and-where.ttl` (948 bytes)
+- `/Users/sac/open-ontologies/benchmark/epc/iris-building.ttl` (106925 bytes)
+- `/Users/sac/open-ontologies/benchmark/generated/boro-building-ai.ttl` (9973 bytes)
+- `/Users/sac/open-ontologies/benchmark/generated/ies-building-extension.ttl` (229037 bytes)
+- `/Users/sac/open-ontologies/benchmark/generated/pizza-ai.ttl` (35950 bytes)
+- `/Users/sac/open-ontologies/benchmark/gvr/iteration1.ttl` (4668 bytes)
+- `/Users/sac/open-ontologies/benchmark/gvr/iteration2.ttl` (9950 bytes)
+- `/Users/sac/open-ontologies/benchmark/mushroom/mushroom-ontology.ttl` (10022 bytes)
+- `/Users/sac/open-ontologies/benchmark/oaei/data/anatomy/human.ttl` (3139435 bytes)
+- `/Users/sac/open-ontologies/benchmark/oaei/data/anatomy/mouse.ttl` (1321538 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/era.ttl` (558440 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/foaf.ttl` (22344 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/goodrelations.ttl` (122344 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/gufo.ttl` (102713 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/movie.ttl` (13033 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/music.ttl` (99044 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/nordstream.ttl` (29031 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/pizza.ttl` (51873 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/saref.ttl` (95814 bytes)
+- `/Users/sac/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/time.ttl` (107037 bytes)
+- `/Users/sac/open-ontologies/benchmark/reference/BirthStateShape.shacl.ttl` (405 bytes)
+- `/Users/sac/open-ontologies/benchmark/reference/PersonState.shacl.ttl` (1596 bytes)
+- `/Users/sac/open-ontologies/benchmark/reference/boro-building-handcrafted.ttl` (29957 bytes)
+- `/Users/sac/open-ontologies/benchmark/reference/ies-core.ttl` (86907 bytes)
+- `/Users/sac/open-ontologies/benchmark/reference/ies-top.ttl` (19648 bytes)
+- `/Users/sac/open-ontologies/benchmark/reference/ies4.ttl` (249173 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_1.ttl` (17735 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_10.ttl` (9549 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_2.ttl` (9205 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_3.ttl` (14595 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_4.ttl` (11677 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_5.ttl` (12797 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_6.ttl` (6144 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_7.ttl` (13555 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_8.ttl` (11374 bytes)
+- `/Users/sac/open-ontologies/benchmark/vision/dataset/img_9.ttl` (6559 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/courier-false-report-record.ttl` (2378 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/dung-gate-record.ttl` (3297 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/east-gate-record.ttl` (2947 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/fish-gate-landing-page.ttl` (2205 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/fountain-gate-record.ttl` (3336 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/horse-gate-record.ttl` (3444 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/inspection-gate-receipt.ttl` (2491 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/mocker-feedback-record.ttl` (2364 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/muster-ledger-record.ttl` (2504 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/old-gate-record.ttl` (3137 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/sheep-gate-record.ttl` (2608 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/usury-ledger-record.ttl` (1927 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/valley-gate-record.ttl` (3546 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/water-gate-pericope.ttl` (4449 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/examples/water-gate-record.ttl` (3158 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/governance/acl.ttl` (3791 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/governance/policy.ttl` (1132 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/journal/provenance.ttl` (6061 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/ontology/bible-o-star.ttl` (11681 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/ontology/nehemiah-52-shapes.ttl` (4928 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/ontology/nehemiah-52.ttl` (21250 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/ontology/source-ledger.ttl` (5824 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/receipts/BIBLE_O_STAR_003_EARL_ASSERTION.ttl` (7272 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/receipts/BIBLE_O_STAR_003_REPO_EARL.ttl` (3413 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/receipts/receipt-chain.ttl` (1916 bytes)
+- `/Users/sac/open-ontologies/bible-o-star/versions/snapshot-002.ttl` (569 bytes)
+- `/Users/sac/open-ontologies/case-studies/heritage-aerial/data/sample-photographs.ttl` (19537 bytes)
+- `/Users/sac/open-ontologies/case-studies/heritage-aerial/deliverables/07-templates/rights-statement-template.ttl` (7303 bytes)
+- `/Users/sac/open-ontologies/case-studies/heritage-aerial/ontology/naph-core.ttl` (14023 bytes)
+- `/Users/sac/open-ontologies/case-studies/heritage-aerial/ontology/naph-shapes.ttl` (6832 bytes)
+- `/Users/sac/open-ontologies/case-studies/heritage-aerial/pipeline/generated-from-csv.ttl` (17276 bytes)
+- `/Users/sac/open-ontologies/case-studies/heritage-aerial/registry/compliance-declaration-template.ttl` (4562 bytes)
+- `/Users/sac/open-ontologies/case-studies/heritage-aerial/registry/registry-shapes.ttl` (4973 bytes)
+- `/Users/sac/open-ontologies/cell8-final-assertion-report.ttl` (3441 bytes)
+- `/Users/sac/open-ontologies/cell8-ggen/queries/byte_law_types.rq` (451 bytes)
+- `/Users/sac/open-ontologies/cell8-ggen/queries/manufacturing_gates.rq` (457 bytes)
+- `/Users/sac/open-ontologies/docs/research/materials/examples/food_dispatch_route.ttl` (1675 bytes)
+- `/Users/sac/open-ontologies/ontology/aat-live-rules.ttl` (12845 bytes)
+- `/Users/sac/open-ontologies/ontology/attestation-shapes.ttl` (2076 bytes)
+- `/Users/sac/open-ontologies/ontology/cell8-conformance-shapes.ttl` (2298 bytes)
+- `/Users/sac/open-ontologies/ontology/cell8-core.ttl` (5438 bytes)
+- `/Users/sac/open-ontologies/ontology/cell8-manufacturing.ttl` (7551 bytes)
+- `/Users/sac/open-ontologies/ontology/cell8-profile.ttl` (8849 bytes)
+- `/Users/sac/open-ontologies/ontology/cell8-shapes.ttl` (9210 bytes)
+- `/Users/sac/open-ontologies/ontology/cli-open-ontologies.ttl` (53268 bytes)
+- `/Users/sac/open-ontologies/ontology/ggen-integration-law.ttl` (12420 bytes)
+- `/Users/sac/open-ontologies/ontology/ghf-core.ttl` (2348 bytes)
+- `/Users/sac/open-ontologies/ontology/ghf-security-policy.ttl` (776 bytes)
+- `/Users/sac/open-ontologies/ontology/ghf-shacl.ttl` (2289 bytes)
+- `/Users/sac/open-ontologies/ontology/mcpp-proof-chain.ttl` (10431 bytes)
+- `/Users/sac/open-ontologies/ontology/ontostar-wasm4pm-integration.ttl` (10282 bytes)
+- `/Users/sac/open-ontologies/ontology/portfolio-os.ttl` (15402 bytes)
+- `/Users/sac/open-ontologies/ontology/powl-process-mining.ttl` (8866 bytes)
+- `/Users/sac/open-ontologies/ontology/profiles/public-role-shapes.ttl` (18441 bytes)
+- `/Users/sac/open-ontologies/ontology/profiles/zoela-edge-functions.ttl` (14039 bytes)
+- `/Users/sac/open-ontologies/ontology/profiles/zoela-expo-app.ttl` (15824 bytes)
+- `/Users/sac/open-ontologies/ontology/profiles/zoela-governance.ttl` (6865 bytes)
+- `/Users/sac/open-ontologies/ontology/profiles/zoela-legacy-coverage.ttl` (15328 bytes)
+- `/Users/sac/open-ontologies/ontology/profiles/zoela-supabase-materialization.ttl` (20396 bytes)
+- `/Users/sac/open-ontologies/ontology/profiles/zoela-supabase-rls.ttl` (10075 bytes)
+- `/Users/sac/open-ontologies/ontology/public-alignment.ttl` (2273 bytes)
+- `/Users/sac/open-ontologies/ontology/public-shapes.ttl` (2082 bytes)
+- `/Users/sac/open-ontologies/ontology/requirements-shapes.ttl` (4839 bytes)
+- `/Users/sac/open-ontologies/ontology/requirements.ttl` (8143 bytes)
+- `/Users/sac/open-ontologies/ontology/revops-manufacturing.ttl` (3857 bytes)
+- `/Users/sac/open-ontologies/ontology/shared-receipt-shapes.ttl` (10937 bytes)
+- `/Users/sac/open-ontologies/ontology/thesis-manufacturing.ttl` (16959 bytes)
+- `/Users/sac/open-ontologies/ontology/thesis-shapes.ttl` (12100 bytes)
+- `/Users/sac/open-ontologies/ontology/truex-ecosystem.ttl` (18460 bytes)
+- `/Users/sac/open-ontologies/ontology/wasm4pm-stubs.ttl` (37645 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/autonomic-policies.ttl` (13901 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/autonomics.ttl` (11268 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/autoreceipt.ttl` (905 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/campus.ttl` (7255 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/care-followup.ttl` (2358 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/care.ttl` (16064 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/categories.ttl` (9265 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/connect-group-capacity.ttl` (15898 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/connect-group-routes.ttl` (26719 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/connect-group-schedules.ttl` (19505 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/connect-groups.ttl` (11036 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/consent.ttl` (14023 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/core.ttl` (16636 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/event.ttl` (8968 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/evidence.ttl` (23681 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/finance.ttl` (3738 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/generations.ttl` (14283 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/household.ttl` (9771 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/kids.ttl` (11404 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/leadership-college.ttl` (12177 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/ministry.ttl` (10551 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/navigation-bundle.ttl` (22530 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/navigation.ttl` (15710 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/need.ttl` (10584 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/notifications.ttl` (15617 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/ocel.ttl` (14918 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/outcomes.ttl` (11991 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/partners.ttl` (12794 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/permissions.ttl` (29179 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/person.ttl` (8264 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/policy.ttl` (19713 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/receipt.ttl` (12151 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/referrals.ttl` (13362 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/resource.ttl` (13186 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/roles.ttl` (18355 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/routes.ttl` (31457 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/sensitivity.ttl` (10998 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/storehouse.ttl` (10025 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/volunteer.ttl` (11674 bytes)
+- `/Users/sac/open-ontologies/ontology/zoela/yth.ttl` (10597 bytes)
+- `/Users/sac/open-ontologies/sparql/cq/coverage-gap-analysis.rq` (349 bytes)
+- `/Users/sac/open-ontologies/sparql/cq/covered-live-rules.rq` (329 bytes)
+- `/Users/sac/open-ontologies/sparql/cq/live-rule-attributes.rq` (312 bytes)
+- `/Users/sac/open-ontologies/sparql/cq/powl-variant-descriptions.rq` (434 bytes)
+- `/Users/sac/open-ontologies/tests/data/sample.ttl` (854 bytes)
+- `/Users/sac/open-ontologies/tests/test_ontology.ttl` (291 bytes)
+
+</details>

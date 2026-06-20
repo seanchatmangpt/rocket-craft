@@ -1,0 +1,526 @@
+# Research Dossier: `ggen-mcp`
+
+**Total Files:** 333 Ontologies (.ttl) | 68 Queries (.rq)
+**Total Volume:** 401 files
+
+## 1. Core Vocabularies (Prefixes)
+- `@prefix mcp: <https://mcp.dev/schema#>`
+- `affiliate: <http://ggen.example.org/affiliate#>`
+- `agi: <https://ggen.dev/agi#>`
+- `agw: <https://ggen.ai/ontology/api-gateway#>`
+- `ai: <https://ggen.io/ontology/ai#>`
+- `am: <https://ggen.ai/ontology/asset-management#>`
+- `ana: <http://example.org/healthcare-analytics#>`
+- `ap: <http://ggen.dev/schema/academic-paper#>`
+- `api: <http://api.example.org/schema#>`
+- `api: <http://example.org/api/>`
+- `api: <http://ggen-mcp.dev/test/api#>`
+- `api: <https://example.org/api/>`
+- `api: <https://ggen.io/ontology/api#>`
+- `attr: <https://ggen.io/examples/attribution#>`
+- `aws: <http://example.com/ontology/aws/>`
+- `bank: <http://ggen.dev/ontology/banking-core#>`
+- `bi: <https://ggen.ai/ontology/bi-reporting#>`
+- `bib: <http://example.com/bibtex#>`
+- `bib: <http://purl.org/net/biblio#>`
+- `bill: <http://example.org/medical-billing#>`
+- `blog: <http://example.com/blog#>`
+- `blog: <https://ggen.io/examples/blog#>`
+- `bpmn: <http://www.omg.org/spec/BPMN/20100524/MODEL#>`
+- `bree: <http://example.org/bree/>`
+- `bree: <http://ggen.org/bree#>`
+- `cas: <http://ggen.ai/ontology/compliance-audit-system#>`
+- `ce: <http://chatman-equation.org/core/>`
+- `chatman: <http://ggen.ai/ontology/chatman#>`
+- `citty: <http://example.org/citty/>`
+- `city: <http://example.org/city/>`
+- `clap: <http://ggen.cli/ontology/clap-noun-verb#>`
+- `clap: <http://ggen.io/ontology/clap-noun-verb#>`
+- `cli: <http://ggen.dev/ontology/cli#>`
+- `cli: <http://ggen.dev/schema/cli#>`
+- `cli: <http://ggen.io/ontology/cli-copilot#>`
+- `cli: <http://ggen.io/ontology/semantic-cli#>`
+- `cli: <https://example.org/cli/>`
+- `cloud: <http://example.org/cloud/aws#>`
+- `cloud: <https://ggen.io/ontology/cloud#>`
+- `cns: <http://cns.io/ontology#>`
+- `cnv: <http://clap-noun-verb.org/ontology#>`
+- `cnv: <http://ggen.dev/schema/clap-noun-verb#>`
+- `cnv: <http://ggen.ruv.io/ontology/clap-noun-verb#>`
+- `cnv: <https://ggen.dev/clap-noun-verb/>`
+- `code: <http://ggen.dev/code#>`
+- `code: <http://ggen.io/code#>`
+- `code: <http://ggen.io/ontology/code#>`
+- `code: <https://ggen.dev/bindings/ggen-core#>`
+- `config: <https://example.com/enterprise-ops/config/>`
+- `content: <https://ggen.io/thesis/content#>`
+- *...and 189 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:Agent`
+- `:Algorithm`
+- `:AlgorithmStep`
+- `:Appendix`
+- `:AuditEvent`
+- `:AuthService`
+- `:AuthenticationMethod`
+- `:Author`
+- `:AuthorEmailShape`
+- `:AuthorNameShape`
+- `:AuthorShape`
+- `:AuthorizationPolicy`
+- `:BackendService`
+- `:BaselIII`
+- `:Bond`
+- `:BondWithDatatypeRestrictions`
+- `:BondWithNumericRestrictions`
+- `:BondWithRestrictions`
+- `:BondWithValueRestrictions`
+- `:CORSPolicy`
+- `:CameraReady`
+- `:CapitalRequirement`
+- `:Case`
+- `:Category`
+- `:CategoryLabelShape`
+- `:CategoryShape`
+- `:Chapter`
+- `:ChecksumShape`
+- `:CircularDependencyShape`
+- `:Citation`
+- `:CodeListing`
+- `:CollateralRequirement`
+- `:ComplianceCheckpoint`
+- `:Concept`
+- `:Conference`
+- `:Configuration`
+- `:Constraint`
+- `:ConstraintType`
+- `:ConstructQuery`
+- `:Counterparty`
+- `:Customer`
+- `:DependencyDepthShape`
+- `:DependencyPackageShape`
+- `:DependencyShape`
+- `:DependencyTypeShape`
+- `:DependencyVersionShape`
+- `:DoddFrank`
+- `:DownloadCountShape`
+- `:EmptyClass`
+- `:Endpoint`
+- *...and 3118 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'SELECT': 63, 'CONSTRUCT': 5}
+
+### Projected Variables (SELECT ?var)
+This project actively projects the following variables into code/templates:
+> `?accountName`, `?accountNumber`, `?accuracy`, `?act_code`, `?action`, `?admitTime`, `?aggregate`, `?alert`, `?amount`, `?argDefault`, `?argHelp`, `?argName`, `?argPosition`, `?argRequired`, `?argType`, `?arrange_code`, `?assert_code`, `?assignee`, `?auth`, `?author`, `?backend`, `?behaviorType`, `?birthDate`, `?cache`, `?capability`, `?certExpiry`, `?check`, `?city`, `?columnDefs`, `?command`, `?commandName`, `?comment`, `?completeness`, `?confidence`, `?constraints`, `?content`, `?conversation`, `?creditTotal`, `?creditorName`, `?currency`, `?currentPoints`, `?customer`, `?customerID`, `?debitTotal`, `?debtorName`, `?dependency`, `?description`, `?dob`, `?docNumber`, `?docType`, `?dueDate`, `?e2eId`, `?economicOrderQuantity`, `?email`, `?emits_event`, `?endpoint`, `?ensures_what`, `?entity`, `?entityName`, `?enumValues`, `?errorBudgetRemaining`, `?eventTimestamp`, `?eventValue`, `?expiresAt`, `?expiryDate`, `?failureThreshold`, `?familyName`, `?file`, `?firstName`, `?fullName`, `?gender`, `?givenName`, `?handler`, `?handler_name`, `?handles_cmd`, `?id`, `?imageCount`, `?instance`, `?interval`, `?invariantLabel`, `?invariant_check`, `?invariant_msg`, `?isEnabled`, `?isolationStrategy`, `?issuer`, `?itemCode`, `?itemName`, `?label`, `?language`, `?lastName`, `?lastRun`, `?line`, `?locationName`, `?maxHistory`, `?member`, `?message`, `?messageId`, `?method`, `?method_name`, `?method_param`, `?method_returns`, `?metric`, `?modality`, `?model`, `?mrn`, `?msgId`, `?mtlsMode`, `?name`, `?opportunityCount`, `?optDefault`, `?optHelp`, `?optLong`, `?optMultiple`, `?optRequired`, `?optShort`, `?optType`, `?order`, `?orderDate`, `?orderNumber`, `?paramAlias`, `?paramDefault`, `?paramDescription`, `?paramName`, `?paramOrder`, `?paramRequired`, `?paramType`, `?paramUri`, `?parameterName`, `?participant`, `?path`, `?patientID`, `?patientId`, `?patientName`, `?pattern`, `?patternType`, `?permission`, `?phone`, `?pipeline`, `?pkg`, `?pmtInfId`, `?pointsEarned`, `?policy_name`, `?price`, `?priority`, `?productId`, `?productName`, `?property`, `?propertyLabel`, `?propertyName`, `?propertyRange`, `?propertyType`, `?property_label`, `?property_type`, `?provider`, `?quantity`, `?quantityAvailable`, `?quantityOnHand`, `?quantityReserved`, `?rateLimitRPS`, `?ratelimit`, `?recommendedOrder`, `?refactoring`, `?reorderPoint`, `?repo_name`, `?repository_name`, `?required`, `?requiresFeature`, `?resource`, `?responseType`, `?rmtInfo`, `?role`, `?route`, `?seriesCount`, `?service`, `?service_name`, `?sessionId`, `?severity`, `?sex`, `?side`, `?slo`, `?smell`, `?source`, `?stageName`, `?startTime`, `?state`, `?status`, `?studyDate`, `?studyDescription`, `?studyUID`, `?symbol`, `?table`, `?tableName`, `?target`, `?task`, `?tenantId`, `?tenantName`, `?test_name`, `?threshold`, `?tierLabel`, `?timeWindow`, `?timeout`, `?timestamp`, `?tool`, `?toolDescription`, `?toolName`, `?topic`, `?total`, `?type`, `?user`, `?userId`, `?validates_target`, `?valueObject`, `?verified`, `?version`, `?visitNumber`, `?voName`, `?vo_name`, `?workflow`
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/ggen-mcp/chicago-tdd-tools/ontology/chatman-equation.ttl` (15645 bytes)
+- `/Users/sac/ggen-mcp/chicago-tdd-tools/ontology/instances/academic-lifecycle.ttl` (12863 bytes)
+- `/Users/sac/ggen-mcp/chicago-tdd-tools/ontology/instances/claims-processing.ttl` (21031 bytes)
+- `/Users/sac/ggen-mcp/fixtures/sparql/graphs/complete_system.ttl` (3150 bytes)
+- `/Users/sac/ggen-mcp/fixtures/sparql/graphs/mcp_tools.ttl` (4729 bytes)
+- `/Users/sac/ggen-mcp/fixtures/sparql/graphs/user_domain.ttl` (4627 bytes)
+- `/Users/sac/ggen-mcp/fixtures/workflows/mcp_tool/01_ontology.ttl` (2953 bytes)
+- `/Users/sac/ggen-mcp/fixtures/workflows/order_processing/01_ontology.ttl` (4774 bytes)
+- `/Users/sac/ggen-mcp/fixtures/workflows/user_registration/01_ontology.ttl` (2196 bytes)
+- `/Users/sac/ggen-mcp/ggen-mcp.ttl` (20689 bytes)
+- `/Users/sac/ggen-mcp/ggen/benches/fixtures/ontologies/large_ontology.ttl` (29909 bytes)
+- `/Users/sac/ggen-mcp/ggen/benches/fixtures/ontologies/medium_ontology.ttl` (10109 bytes)
+- `/Users/sac/ggen-mcp/ggen/benches/fixtures/ontologies/small_ontology.ttl` (1741 bytes)
+- `/Users/sac/ggen-mcp/ggen/benches/fixtures/ontologies/very_large_ontology.ttl` (132709 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/empty_shape.ttl` (311 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/malformed_rdf.ttl` (331 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_camelcase.ttl` (883 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_constraints.ttl` (1206 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_datatypes.ttl` (1213 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_hyphens.ttl` (714 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_multiple_classes.ttl` (1365 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_no_datatypes.ttl` (497 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_numeric_names.ttl` (618 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_with_output_fields.ttl` (1014 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/shape_without_targetclass.ttl` (443 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/simple_bond.ttl` (3433 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ai/tests/fixtures/simple_shape.ttl` (694 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/src/rdf/code_ontology.ttl` (13092 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/src/rdf/schema.ttl` (7811 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/cloud_aws.ttl` (8337 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/ecommerce.ttl` (13307 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/empty.ttl` (188 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/hipaa_legal.ttl` (6217 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/invalid.ttl` (769 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/it_sla.ttl` (6326 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/minimal.ttl` (381 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-core/tests/fixtures/security_mfa.ttl` (6901 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/src/rdf/schema.ttl` (7811 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/tests/fixtures/rdf/empty.ttl` (74 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_stability.ttl` (270 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_syntax.ttl` (176 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_variable_name.ttl` (464 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_version.ttl` (269 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/tests/fixtures/rdf/valid.ttl` (501 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-domain/tests/fixtures/rdf/with_variables.ttl` (704 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-marketplace-v2/config/marketplace.ttl` (5210 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-marketplace-v2/config/state-machines.ttl` (11547 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-marketplace-v2/config/validation-rules.ttl` (12208 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-marketplace/config/marketplace.ttl` (5210 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-marketplace/config/state-machines.ttl` (11547 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-marketplace/config/validation-rules.ttl` (12208 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ontology-core/benches/ontologies/aws_cloud.ttl` (6515 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ontology-core/benches/ontologies/hipaa.ttl` (4513 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ontology-core/benches/ontologies/invalid.ttl` (329 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ontology-core/benches/ontologies/it_sla.ttl` (5084 bytes)
+- `/Users/sac/ggen-mcp/ggen/crates/ggen-ontology-core/benches/ontologies/security.ttl` (5705 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/architecture/rdf-control-plane/configuration/marketplace-config.ttl` (16550 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/architecture/rdf-control-plane/configuration/state-machines.ttl` (19921 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/architecture/rdf-control-plane/configuration/validation-rules.ttl` (20299 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/architecture/rdf-control-plane/ontology/marketplace-ontology.ttl` (31988 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/architecture/rdf-control-plane/queries/sparql-library.rq` (23587 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/ggen-v6-thesis/ontology/thesis-schema.ttl` (7901 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/ggen-v6-thesis/ontology/v6-content.ttl` (26865 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/spec-kit-3t-thesis/examples/minimal_thesis.ttl` (4331 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/spec-kit-3t-thesis/ontology/spec-kit-3t-content.ttl` (76100 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/spec-kit-3t-thesis/ontology/thesis-schema.ttl` (12556 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/spec-kit-3t-thesis/ontology/thesis-shapes.ttl` (11040 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/spec-kit-3t-thesis/thesis-schema-enhanced.ttl` (10631 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/thesis-construct-schema/ontology/content.ttl` (47509 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/archive/academic/thesis-construct-schema/ontology/thesis-schema.ttl` (17391 bytes)
+- `/Users/sac/ggen-mcp/ggen/docs/sync-patterns/ontology/pattern-language.ttl` (68185 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/_validation_rules.ttl` (8349 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/advanced-rust-api-8020/data/api-spec.ttl` (4015 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/advanced-rust-project/data/domain.ttl` (9205 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/advanced-sparql-graph/data/example.ttl` (2137 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/ai-template-creation/ontology/ai-workflows.ttl` (8098 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/api-endpoint/ontology/api-spec.ttl` (3385 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/basic-template-generation/ontology/templates.ttl` (10913 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/bree-semantic-scheduler/bree-jobs-sample.ttl` (11025 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/bree-semantic-scheduler/bree-ontology.ttl` (15461 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/bree-semantic-scheduler/bree-paas-generation.ttl` (12490 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/clap-noun-verb-demo/project-schema.ttl` (9796 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/clap-noun-verb-demo/sample-cli.ttl` (8712 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/cli-noun-verb/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/cli-noun-verb/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/complete-project-generation/ontology/workspace.ttl` (2491 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/comprehensive-rust-showcase/data/api-spec.ttl` (14138 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/comprehensive-rust-showcase/data/database.ttl` (18964 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/comprehensive-rust-showcase/data/domain.ttl` (15612 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/comprehensive-rust-showcase/data/queries.ttl` (16062 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/config-generator/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/config-generator/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/database-schema/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/database-schema/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/demo-project/project.ttl` (2261 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/e2e-demo/rdf/project.ttl` (1280 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/event-horizon/01-simple-feature/rdf-first/auth.ttl` (6119 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/event-horizon/02-data-model/rdf-first/product-catalog.ttl` (7995 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology-v2-factorypaaS/commands.ttl` (14150 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology-v2-factorypaaS/entities.ttl` (17569 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology-v2-factorypaaS/events.ttl` (13942 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology-v2-factorypaaS/factorypaaS.ttl` (7934 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology-v2-factorypaaS/infra.ttl` (15705 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology-v2-factorypaaS/observability.ttl` (16935 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology-v2-factorypaaS/policies.ttl` (12666 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/attribution.ttl` (3660 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/commands.ttl` (2679 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/entities.ttl` (5002 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/events.ttl` (3306 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/infra.ttl` (14006 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/policies.ttl` (2736 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/routing.ttl` (8758 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/saas.ttl` (7488 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/saas_aggregates.ttl` (4518 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/saas_commands.ttl` (3982 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/ontology/saas_events.ttl` (5080 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/factory-paas/templates/otel_sparql_queries.ttl` (9223 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/fastapi-from-rdf/domain.ttl` (12102 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/fortune-5-benchmarks/fortune-5-benchmarks.ttl` (10602 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/graphql-schema/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/graphql-schema/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/grpc-service/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/grpc-service/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level1-simple/ontology.ttl` (760 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level2-small/ontology.ttl` (1936 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level3-medium/ontology/domain.ttl` (2345 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level4-large/ontologies/core.ttl` (1186 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level4-large/ontologies/infrastructure.ttl` (783 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level4-large/ontologies/services.ttl` (822 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/shared/core.ttl` (666 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/shared/services.ttl` (573 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/tenant1/domain.ttl` (440 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/tenant2/domain.ttl` (440 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/microservices-architecture/data/domain.ttl` (9222 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/middleware-stack/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/middleware-stack/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/nextjs-openapi-sqlite-shadcn-vitest/ontology/api-schema.ttl` (4939 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/nextjs-openapi-sqlite-shadcn-vitest/ontology/taskapp-api.ttl` (13469 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/openapi-variants/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/openapi-variants/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/openapi/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/openapi/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/rest-api-advanced/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/rest-api-advanced/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/rust-structs/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/rust-structs/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/simple-project/ontology/projects.ttl` (2607 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/sparql-construct-city/data.ttl` (3597 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/thesis-gen/ontology/thesis-content.ttl` (125518 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/thesis-gen/ontology/thesis-schema.ttl` (17391 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/validation-schemas/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/validation-schemas/ontology/blog-api.ttl` (11406 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/yawl-workflow-platform/ontology/platform-workflows.ttl` (30512 bytes)
+- `/Users/sac/ggen-mcp/ggen/examples/yawl-workflow-platform/ontology/yawl-vocab.ttl` (19226 bytes)
+- `/Users/sac/ggen-mcp/ggen/graphs/schema.ttl` (308 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/ontology.ttl` (19142 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/academic-bibliography-manager/data/bibtex-schema.ttl` (1096 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/academic-peer-review-workflow/data/review-schema.ttl` (1274 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/advanced-rust-project/data/domain.ttl` (9205 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-cli-copilot/rdf/ontology.ttl` (4683 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-cli-copilot/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-cli-copilot/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-context-crafter/rdf/ontology.ttl` (5184 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-context-crafter/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-context-crafter/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-editor/rdf/ontology.ttl` (5599 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-editor/sparql/find_code_smells.rq` (512 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-editor/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-editor/sparql/language_statistics.rq` (391 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-editor/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-editor/sparql/suggest_refactorings.rq` (507 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-memory-forge/rdf/ontology.ttl` (6051 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-memory-forge/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-memory-forge/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-reasoning-mcp/rdf/ontology.ttl` (7153 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-reasoning-mcp/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/agent-reasoning-mcp/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/api-gateway-service-mesh/ontology/api_gateway_service_mesh.ttl` (15897 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/api-gateway-service-mesh/queries/circuit_breakers.rq` (223 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/api-gateway-service-mesh/queries/health_checks.rq` (277 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/api-gateway-service-mesh/queries/list_routes.rq` (554 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/api-gateway-service-mesh/queries/mtls_services.rq` (308 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/asset-management/ontology/asset_management.ttl` (14114 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/banking-core/ontology/banking_core.ttl` (13175 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/business-intelligence-reporting/ontology/bi_reporting.ttl` (17254 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/chatman-cli/rdf/ontology.ttl` (7032 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/chatman-cli/sparql/conversation_patterns.rq` (587 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/chatman-cli/sparql/find_related_topics.rq` (492 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/chatman-cli/sparql/get_conversation_context.rq` (693 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/chatman-cli/sparql/get_user_preferences.rq` (542 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/calculator.ttl` (3588 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/enterprise-ops/ontology/cli.ttl` (1169 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/enterprise-ops/ontology/config/noun.ttl` (4913 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/enterprise-ops/ontology/order/noun.ttl` (4843 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/enterprise-ops/ontology/report/noun.ttl` (4446 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/enterprise-ops/ontology/user/noun.ttl` (8323 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/file-manager.ttl` (4791 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/examples/todo-app.ttl` (4318 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clap-noun-verb/rdf/ontology.ttl` (11047 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/cli-application-template/examples/simple-cli.ttl` (1681 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/cli-application-template/ontology/cli-structure.ttl` (10494 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/cli-application-template/sparql/queries.rq` (9415 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/clinical-trials-management/ontology/clinical-trials.ttl` (9630 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/compliance-audit-system/rdf/ontology.ttl` (16281 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/comprehensive-rust-showcase/data/api-spec.ttl` (14138 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/comprehensive-rust-showcase/data/database.ttl` (18964 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/comprehensive-rust-showcase/data/domain.ttl` (15612 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/comprehensive-rust-showcase/data/queries.ttl` (16062 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/crm-customer-management/ontology/crm.ttl` (14779 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/crm-customer-management/sparql/queries.rq` (11759 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/cryptocurrency-exchange/ontology/cryptocurrency_exchange.ttl` (10507 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/customer-loyalty-rewards/ontology/loyalty-rewards.ttl` (14322 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/customer-loyalty-rewards/sparql/queries.rq` (7396 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/data-pipeline-cli/rdf/ontology.ttl` (17576 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/data-warehouse-etl/ontology/data_warehouse_etl.ttl` (18156 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/data-warehouse-etl/queries/data_quality.rq` (310 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/data-warehouse-etl/queries/etl_pipelines.rq` (374 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/database-schema-generator/examples/blog_schema.ttl` (10649 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/database-schema-generator/ontology/database-schema.ttl` (16171 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/database-schema-generator/sparql/queries.rq` (16022 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/document-management-system/ontology/document_management.ttl` (11741 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/ehr-integration/ontology/ehr.ttl` (9578 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/enterprise-erp-core/ontology/erp.ttl` (15370 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/enterprise-erp-core/sparql/queries.rq` (15962 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/graphql-api-template/ontology/graphql-schema.ttl` (10963 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/graphql-api-template/sparql/queries.rq` (5537 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/healthcare-analytics/ontology/analytics.ttl` (7675 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/healthcare/dicom-medical-imaging/ontology/dicom.ttl` (16992 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/healthcare/dicom-medical-imaging/sparql/queries.rq` (11461 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/healthcare/fhir-patient-management/ontology/fhir-patient.ttl` (16855 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/healthcare/fhir-patient-management/sparql/queries.rq` (15884 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/healthcare/hl7-v2-integration/ontology/hl7-v2.ttl` (17908 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/healthcare/hl7-v2-integration/sparql/queries.rq` (12228 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/human-resources-management/ontology/hr_management.ttl` (13943 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/identity-access-management/ontology/identity_access_management.ttl` (17936 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/identity-access-management/queries/expired_sessions.rq` (228 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/identity-access-management/queries/user_permissions.rq` (266 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/inventory-management/ontology/inventory.ttl` (17978 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/inventory-management/sparql/queries.rq` (11066 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/io.ggen.nextjs.ontology-crud/ontology/task-management.ttl` (24997 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/iso-20022-payments/ontology/iso-20022.ttl` (16742 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/iso-20022-payments/sparql/queries.rq` (11973 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/knowledge-graph-cli/rdf/ontology.ttl` (9406 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/kyc-aml-compliance/ontology/kyc-aml.ttl` (18379 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/kyc-aml-compliance/sparql/queries.rq` (12057 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/laboratory-information-system/ontology/laboratory.ttl` (9180 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/medical-billing/ontology/billing.ttl` (8998 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/microservices-architecture-template/ontology/microservices.ttl` (16134 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/microservices-architecture-template/sparql/queries.rq` (19690 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/microservices-architecture/data/domain.ttl` (9222 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/multi-tenant-saas/ontology/multi-tenant.ttl` (16732 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/multi-tenant-saas/sparql/queries.rq` (8772 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/notification-messaging-hub/rdf/ontology.ttl` (13371 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/observability-platform/ontology/observability_platform.ttl` (15522 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/observability-platform/queries/active_alerts.rq` (309 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/observability-platform/queries/slo_compliance.rq` (365 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/order-management-system/ontology/order-management.ttl` (13746 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/order-management-system/sparql/queries.rq` (8973 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/pharmacy-management/ontology/pharmacy.ttl` (9498 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/product-recommendations/ontology/recommendations.ttl` (19288 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/product-recommendations/sparql/queries.rq` (9257 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/project-management/ontology/project_management.ttl` (13377 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/reasoner-cli/rdf/ontology.ttl` (13621 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/rest-api-template/ontology/rest-api.ttl` (14921 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/rest-api-template/sparql/queries.rq` (10642 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/risk-management/ontology/risk_management.ttl` (11030 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/robo-advisor/ontology/robo_advisor.ttl` (12533 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/schema-forge-cli/rdf/ontology.ttl` (7670 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/sector-api-gateway-8020/ontologies/api_gateway_v1.0.0.ttl` (7850 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/sector-observability-8020/ontologies/observability_v1.0.0.ttl` (6651 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/sector-paper-lifecycle-8020/ontologies/paper_v1.0.0.ttl` (6655 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/sector-rust-microservice-8020/ontologies/microservice_v1.0.0.ttl` (5125 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/sector-support-hooks-8020/ontologies/support_v1.0.0.ttl` (6954 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/semantic-cli/rdf/ontology.ttl` (8320 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/shacl-cli/rdf/ontology.ttl` (19454 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/sparql-cli/rdf/ontology.ttl` (23744 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/supply-chain-management/ontology/supply-chain.ttl` (9363 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/supply-chain-management/sparql/queries.rq` (9486 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/telemedicine-platform/ontology/telemedicine.ttl` (9705 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/trading-platform/ontology/trading.ttl` (18631 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/trading-platform/sparql/queries.rq` (10739 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/workflow-automation-engine/ontology/workflow_automation_engine.ttl` (18819 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/workflow-automation-engine/queries/active_workflows.rq` (307 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/workflow-automation-engine/queries/pending_human_tasks.rq` (334 bytes)
+- `/Users/sac/ggen-mcp/ggen/marketplace/packages/workflow-engine-cli/rdf/ontology.ttl` (17863 bytes)
+- `/Users/sac/ggen-mcp/ggen/ontologies/academic-paper_v1.0.0.ttl` (21326 bytes)
+- `/Users/sac/ggen-mcp/ggen/ontologies/clap-noun-verb.ttl` (20076 bytes)
+- `/Users/sac/ggen-mcp/ggen/ontologies/clap-noun-verb_v3.3.0.ttl` (14708 bytes)
+- `/Users/sac/ggen-mcp/ggen/ontologies/ggen-v6.ttl` (22508 bytes)
+- `/Users/sac/ggen-mcp/ggen/ontologies/meta-ontology.ttl` (16734 bytes)
+- `/Users/sac/ggen-mcp/ggen/playground/thesis-ontology.ttl` (16001 bytes)
+- `/Users/sac/ggen-mcp/ggen/schema/domain.ttl` (480 bytes)
+- `/Users/sac/ggen-mcp/ggen/schema/ggen-ffi-api.ttl` (8767 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/001-ttl-validation-cli/ontology/feature-content.ttl` (14633 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/001-v6-3t-implementation/ontology/spec-schema.ttl` (22893 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/001-v6-3t-implementation/ontology/v6-spec-content.ttl` (36568 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/005-ttl-shacl-validation/ontology/feature-content.ttl` (11925 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/005-ttl-shacl-validation/ontology/plan.ttl` (17309 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/005-ttl-shacl-validation/ontology/tasks.ttl` (12171 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/010-thesis-gen-system/contracts/thesis-schema.ttl` (17391 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/012-grand-unified-kgc-thesis/ontology/agent5-fibo-bpmn-extensions.ttl` (29078 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/012-grand-unified-kgc-thesis/ontology/bruce-lee-fibo-constructs.ttl` (16317 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/012-grand-unified-kgc-thesis/ontology/chapter-8-construct-fibo-bpmn.ttl` (25446 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/012-grand-unified-kgc-thesis/ontology/fibo-subset.ttl` (4943 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/012-grand-unified-kgc-thesis/ontology/kgc-unified-content.ttl` (61426 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/012-grand-unified-kgc-thesis/ontology/thesis-schema.ttl` (10710 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/012-grand-unified-kgc-thesis/ontology/workflow-finance-bridge.ttl` (6239 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/013-ggen-v6-rdf-system/ontology/feature-content.ttl` (20611 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/013-ggen-v6-rdf-system/ontology/mvp-80-20.ttl` (12284 bytes)
+- `/Users/sac/ggen-mcp/ggen/specs/013-ggen-v6-rdf-system/ontology/plan.ttl` (6147 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/api/endpoint/graphs/api.ttl` (385 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/api/endpoint/graphs/shapes/api.shacl.ttl` (390 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/cli/ontology/cli-schema-2026.ttl` (12296 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/cli/subcommand/graphs/cli.ttl` (374 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/cli/subcommand/graphs/shapes/cli.shacl.ttl` (323 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/node-bindings/examples/concrete-ontology.ttl` (5804 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/node-bindings/examples/documentation-instance.ttl` (8768 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/node-bindings/examples/example-usage.ttl` (5835 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/node-bindings/ontology/documentation-ontology.ttl` (8720 bytes)
+- `/Users/sac/ggen-mcp/ggen/templates/node-bindings/ontology/node-ffi-ontology.ttl` (8182 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/data.ttl` (4207 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/data1.ttl` (67 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/data2.ttl` (67 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/entities.ttl` (350 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/ontology.ttl` (830 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/person_data.ttl` (169 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/test-data.ttl` (158 bytes)
+- `/Users/sac/ggen-mcp/ggen/test-data/rdf/types.ttl` (188 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/data/data.ttl` (4207 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/data/data1.ttl` (67 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/data/data2.ttl` (67 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/data/entities.ttl` (350 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/data/person_data.ttl` (169 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/data/test-data.ttl` (158 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/data/types.ttl` (188 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/e2e/fixtures/minimal-project/ontology/schema.ttl` (460 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/fixtures/packs/cli-tool-pack/templates/cli/graphs/cli-ontology.ttl` (374 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/fixtures/packs/database-pack/templates/db/graphs/schema.ttl` (337 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/fixtures/packs/web-api-pack/templates/api/graphs/api-ontology.ttl` (531 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/fixtures/packs/web-api-pack/templates/api/graphs/shapes/endpoint-shape.shacl.ttl` (403 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/fixtures/sample.ttl` (219 bytes)
+- `/Users/sac/ggen-mcp/ggen/tests/fixtures/shapes.ttl` (293 bytes)
+- `/Users/sac/ggen-mcp/ggen/tutorials/minimal-example/schema/domain.ttl` (210 bytes)
+- `/Users/sac/ggen-mcp/ggen/v6/ontology/ggen-v6.ttl` (22508 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/ontology/osys.ttl` (2841 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/test_rdf.ttl` (115 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_authorization.ttl` (660 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_cardinality.ttl` (685 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_datatype.ttl` (492 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_exactcount.ttl` (626 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_lookups.ttl` (662 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_maxcount.ttl` (703 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_objectcount.ttl` (650 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_objectcount_exact.ttl` (617 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_objectcount_max.ttl` (695 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_reverse.ttl` (663 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_types.ttl` (578 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_unique.ttl` (744 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/knhks/tests/data/enterprise_validation.ttl` (689 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/spec-kit/ontology/spec-kit-schema.ttl` (25456 bytes)
+- `/Users/sac/ggen-mcp/ggen/vendors/spec-kit/tests/integration/fixtures/feature-content.ttl` (1694 bytes)
+- `/Users/sac/ggen-mcp/meta/ontology/ggen-mcp.ttl` (3428 bytes)
+- `/Users/sac/ggen-mcp/ontology/mcp-domain.ttl` (41704 bytes)
+- `/Users/sac/ggen-mcp/ontology/shapes.ttl` (11209 bytes)
+- `/Users/sac/ggen-mcp/queries/aggregates.rq` (341 bytes)
+- `/Users/sac/ggen-mcp/queries/application_mod.rq` (279 bytes)
+- `/Users/sac/ggen-mcp/queries/commands.rq` (445 bytes)
+- `/Users/sac/ggen-mcp/queries/domain_mod.rq` (654 bytes)
+- `/Users/sac/ggen-mcp/queries/handlers.rq` (357 bytes)
+- `/Users/sac/ggen-mcp/queries/invariants.rq` (416 bytes)
+- `/Users/sac/ggen-mcp/queries/mcp_tool_params.rq` (926 bytes)
+- `/Users/sac/ggen-mcp/queries/mcp_tools.rq` (1335 bytes)
+- `/Users/sac/ggen-mcp/queries/policies.rq` (345 bytes)
+- `/Users/sac/ggen-mcp/queries/properties.rq` (389 bytes)
+- `/Users/sac/ggen-mcp/queries/repositories.rq` (565 bytes)
+- `/Users/sac/ggen-mcp/queries/services.rq` (324 bytes)
+- `/Users/sac/ggen-mcp/queries/tests.rq` (357 bytes)
+- `/Users/sac/ggen-mcp/queries/value_objects.rq` (522 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ggen/ontologies/user_aggregate.ttl` (2827 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ggen/queries/extract_aggregates.rq` (880 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ggen/queries/extract_value_objects.rq` (539 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ontology/test-api.ttl` (3912 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/pipeline/complete_domain/input/ontology.ttl` (2370 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/pipeline/error_scenarios/input/ontology.ttl` (503 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/pipeline/mcp_tool/input/ontology.ttl` (1189 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/pipeline/simple_aggregate/input/ontology.ttl` (1150 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/queries/test-commands.rq` (669 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/queries/test-entities.rq` (682 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/queries/test-valueobjects.rq` (711 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/invalid/broken_references.ttl` (976 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/invalid/circular_dependencies.ttl` (902 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/invalid/missing_properties.ttl` (1221 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/invalid/syntax_error.ttl` (633 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/invalid/type_mismatches.ttl` (1263 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/valid/complete_domain.ttl` (10128 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/valid/mcp_tools.ttl` (4360 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/valid/order_aggregate.ttl` (6713 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/ttl/valid/user_aggregate.ttl` (9075 bytes)
+- `/Users/sac/ggen-mcp/tests/fixtures/workspace/ontology/domain.ttl` (438 bytes)
+- `/Users/sac/ggen-mcp/workspace/ontology/api-schema.ttl` (6166 bytes)
+- `/Users/sac/ggen-mcp/workspace/ontology/blog-api.ttl` (11406 bytes)
+
+</details>

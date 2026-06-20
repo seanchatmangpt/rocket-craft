@@ -1,3 +1,10 @@
+/**
+ * @file genie_server.js
+ * @description Local HTTP server serving the Genie 26 World Operating Center frontend.
+ * Provides APIs for retrieving the world specification and compile natural language prompts
+ * into Genie DSL layout commands via the unify CLI.
+ */
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -10,14 +17,61 @@ const MAP_PATH = path.join(__dirname, 'map.t3d');
 const LOG_PATH = path.join(__dirname, 'deploy.log');
 const UNIFY_BIN = path.join(__dirname, 'unify-rs', 'target', 'debug', 'unify');
 
-// Ensure a default spec exists
+/**
+ * Ensures a default world specification exists on disk.
+ * If not, compiles a default intent using the unify CLI or falls back to a mock specification.
+ * @returns {void}
+ */
 function initDefaultSpec() {
     if (!fs.existsSync(SPEC_PATH)) {
         console.log("Initializing default world specification...");
         const defaultIntent = [
-            "create place room_1 name \"Control Room\" at (0.0, 0.0, 0.0) bounds (100.0, 100.0, 50.0)",
-            "create actor bot_1 name \"Welder Bot\" role RoboticWelder in room_1",
-            "create object cnc_1 name \"CNC Alpha\" class CNC_Machine in room_1"
+            'create place foundry name "Primitive Foundry" at (0.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place runner_wall name "Part Runner Wall" at (400.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place gantry name "Assembly Gantry" at (800.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place fit_bay name "Fit + Collision Bay" at (1200.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place proving_ground name "Physics Proving Ground" at (1600.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            'create place reveal_platform name "Final Reveal Platform" at (2000.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+            
+            'create actor bot_foundry name "Foundry Supervisor" role SupervisorBot in foundry',
+            'create actor bot_runner_wall name "Logistics Welder" role ForkliftDriver in runner_wall',
+            'create actor bot_gantry name "Gantry Operator" role RoboticWelder in gantry',
+            'create actor bot_fit_bay name "Scanning Tech" role Mechanic in fit_bay',
+            'create actor bot_proving_ground name "Test Pilot" role SupervisorBot in proving_ground',
+            'create actor bot_reveal_platform name "Exhibition Presenter" role SupervisorBot in reveal_platform',
+
+            'create object prop_foundry name "Furnace Console" class ControlTerminal in foundry',
+            'create object prop_runner_wall name "Parts Rack" class CargoPallet in runner_wall',
+            'create object prop_gantry name "Assembly Frame" class CNC_Machine in gantry',
+            'create object prop_fit_bay name "Scanning Arch" class ControlTerminal in fit_bay',
+            'create object prop_proving_ground name "Telemetry Station" class ControlTerminal in proving_ground',
+            'create object prop_reveal_platform name "Floating Receipt Panel" class ControlTerminal in reveal_platform',
+
+            'create relationship rel_foundry_to_runner_wall connects from foundry to runner_wall',
+            'create relationship rel_runner_wall_to_gantry connects from runner_wall to gantry',
+            'create relationship rel_gantry_to_fit_bay connects from gantry to fit_bay',
+            'create relationship rel_fit_bay_to_proving_ground connects from fit_bay to proving_ground',
+            'create relationship rel_proving_ground_to_reveal_platform connects from proving_ground to reveal_platform',
+
+            'create relationship rel_contains_actor_foundry contains from foundry to bot_foundry',
+            'create relationship rel_contains_object_foundry contains from foundry to prop_foundry',
+            'create relationship rel_contains_actor_runner_wall contains from runner_wall to bot_runner_wall',
+            'create relationship rel_contains_object_runner_wall contains from runner_wall to prop_runner_wall',
+            'create relationship rel_contains_actor_gantry contains from gantry to bot_gantry',
+            'create relationship rel_contains_object_gantry contains from gantry to prop_gantry',
+            'create relationship rel_contains_actor_fit_bay contains from fit_bay to bot_fit_bay',
+            'create relationship rel_contains_object_fit_bay contains from fit_bay to prop_fit_bay',
+            'create relationship rel_contains_actor_proving_ground contains from proving_ground to bot_proving_ground',
+            'create relationship rel_contains_object_proving_ground contains from proving_ground to prop_proving_ground',
+            'create relationship rel_contains_actor_reveal_platform contains from reveal_platform to bot_reveal_platform',
+            'create relationship rel_contains_object_reveal_platform contains from reveal_platform to prop_reveal_platform',
+
+            'create rule rule_foundry_heat name HeatCheck expression "foundry.temp<1500" severity error',
+            'create rule rule_runner_wall_stock name StockCheck expression "runner_wall.stock>10" severity warning',
+            'create rule rule_gantry_alignment name AlignCheck expression "gantry.deviation<0.05" severity error',
+            'create rule rule_fit_bay_clearance name ClearanceCheck expression "fit_bay.clearance>1.2" severity warning',
+            'create rule rule_proving_ground_speed name SpeedCheck expression "proving_ground.speed<80" severity error',
+            'create rule rule_reveal_platform_lighting name LightCheck expression "reveal_platform.lux>500" severity warning'
         ].join("\n");
         
         const tempIntentPath = path.join(__dirname, 'default_intent.txt');
@@ -37,11 +91,57 @@ function initDefaultSpec() {
             console.error("Failed to compile default spec via CLI:", e.message);
             // Fallback mock spec if compiler isn't built yet
             const fallbackSpec = {
-                places: [{ id: "room_1", name: "Control Room", bounds: { center: { x: 0, y: 0, z: 0 }, half_extents: { x: 100, y: 100, z: 50 } }, properties: {} }],
-                actors: [{ id: "bot_1", name: "Welder Bot", role: "RoboticWelder", place_id: "room_1", placement: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, properties: {} }],
-                objects: [{ id: "cnc_1", name: "CNC Alpha", class: "CNC_Machine", place_id: "room_1", placement: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, properties: {} }],
-                relationships: [],
-                rules: [],
+                places: [
+                    { id: "foundry", name: "Primitive Foundry", bounds: { center: { x: 0, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "runner_wall", name: "Part Runner Wall", bounds: { center: { x: 400, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "gantry", name: "Assembly Gantry", bounds: { center: { x: 800, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "fit_bay", name: "Fit + Collision Bay", bounds: { center: { x: 1200, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "proving_ground", name: "Physics Proving Ground", bounds: { center: { x: 1600, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} },
+                    { id: "reveal_platform", name: "Final Reveal Platform", bounds: { center: { x: 2000, y: 0, z: 0 }, half_extents: { x: 75, y: 75, z: 25 } }, properties: {} }
+                ],
+                actors: [
+                    { id: "bot_foundry", name: "Foundry Supervisor", role: "SupervisorBot", place_id: "foundry" },
+                    { id: "bot_runner_wall", name: "Logistics Welder", role: "ForkliftDriver", place_id: "runner_wall" },
+                    { id: "bot_gantry", name: "Gantry Operator", role: "RoboticWelder", place_id: "gantry" },
+                    { id: "bot_fit_bay", name: "Scanning Tech", role: "Mechanic", place_id: "fit_bay" },
+                    { id: "bot_proving_ground", name: "Test Pilot", role: "SupervisorBot", place_id: "proving_ground" },
+                    { id: "bot_reveal_platform", name: "Exhibition Presenter", role: "SupervisorBot", place_id: "reveal_platform" }
+                ],
+                objects: [
+                    { id: "prop_foundry", name: "Furnace Console", class: "ControlTerminal", place_id: "foundry" },
+                    { id: "prop_runner_wall", name: "Parts Rack", class: "CargoPallet", place_id: "runner_wall" },
+                    { id: "prop_gantry", name: "Assembly Frame", class: "CNC_Machine", place_id: "gantry" },
+                    { id: "prop_fit_bay", name: "Scanning Arch", class: "ControlTerminal", place_id: "fit_bay" },
+                    { id: "prop_proving_ground", name: "Telemetry Station", class: "ControlTerminal", place_id: "proving_ground" },
+                    { id: "prop_reveal_platform", name: "Floating Receipt Panel", class: "ControlTerminal", place_id: "reveal_platform" }
+                ],
+                relationships: [
+                    { id: "rel_foundry_to_runner_wall", type: "connects", source: "foundry", target: "runner_wall" },
+                    { id: "rel_runner_wall_to_gantry", type: "connects", source: "runner_wall", target: "gantry" },
+                    { id: "rel_gantry_to_fit_bay", type: "connects", source: "gantry", target: "fit_bay" },
+                    { id: "rel_fit_bay_to_proving_ground", type: "connects", source: "fit_bay", target: "proving_ground" },
+                    { id: "rel_proving_ground_to_reveal_platform", type: "connects", source: "proving_ground", target: "reveal_platform" },
+                    { id: "rel_contains_actor_foundry", type: "contains", source: "foundry", target: "bot_foundry" },
+                    { id: "rel_contains_object_foundry", type: "contains", source: "foundry", target: "prop_foundry" },
+                    { id: "rel_contains_actor_runner_wall", type: "contains", source: "runner_wall", target: "bot_runner_wall" },
+                    { id: "rel_contains_object_runner_wall", type: "contains", source: "runner_wall", target: "prop_runner_wall" },
+                    { id: "rel_contains_actor_gantry", type: "contains", source: "gantry", target: "bot_gantry" },
+                    { id: "rel_contains_object_gantry", type: "contains", source: "gantry", target: "prop_gantry" },
+                    { id: "rel_contains_actor_fit_bay", type: "contains", source: "fit_bay", target: "bot_fit_bay" },
+                    { id: "rel_contains_object_fit_bay", type: "contains", source: "fit_bay", target: "prop_fit_bay" },
+                    { id: "rel_contains_actor_proving_ground", type: "contains", source: "proving_ground", target: "bot_proving_ground" },
+                    { id: "rel_contains_object_proving_ground", type: "contains", source: "proving_ground", target: "prop_proving_ground" },
+                    { id: "rel_contains_actor_reveal_platform", type: "contains", source: "reveal_platform", target: "bot_reveal_platform" },
+                    { id: "rel_contains_object_reveal_platform", type: "contains", source: "reveal_platform", target: "prop_reveal_platform" }
+                ],
+                rules: [
+                    { id: "rule_foundry_heat", name: "HeatCheck", expression: "foundry.temp<1500", severity: "Error" },
+                    { id: "rule_runner_wall_stock", name: "StockCheck", expression: "runner_wall.stock>10", severity: "Warning" },
+                    { id: "rule_gantry_alignment", name: "AlignCheck", expression: "gantry.deviation<0.05", severity: "Error" },
+                    { id: "rule_fit_bay_clearance", name: "ClearanceCheck", expression: "fit_bay.clearance>1.2", severity: "Warning" },
+                    { id: "rule_proving_ground_speed", name: "SpeedCheck", expression: "proving_ground.speed<80", severity: "Error" },
+                    { id: "rule_reveal_platform_lighting", name: "LightCheck", expression: "reveal_platform.lux>500", severity: "Warning" }
+                ],
                 history: [{ id: "evt_init", timestamp_ms: Date.now(), activity: "Boot", details: {} }],
                 receipts: [{ key: "history_receipt_evt_init", hash: "0000000000000000000000000000000000000000000000000000000000000000", issued_at: Date.now() }]
             };
@@ -54,7 +154,12 @@ function initDefaultSpec() {
     }
 }
 
-// Serve static files
+/**
+ * Serves static web assets and packaged game builds.
+ * @param {import('http').IncomingMessage} req - The HTTP request object.
+ * @param {import('http').ServerResponse} res - The HTTP response object.
+ * @returns {void}
+ */
 function serveStatic(req, res) {
     let filePath;
     if (req.url.startsWith('/manufactured/')) {
@@ -102,13 +207,23 @@ function serveStatic(req, res) {
                 res.end(`Server Error: ${err.code}`);
             }
         } else {
-            res.writeHead(200, { 'Content-Type': contentType });
+            // COOP/COEP headers required for UE4 HTML5 WASM SharedArrayBuffer in Chromium
+            res.writeHead(200, {
+                'Content-Type': contentType,
+                'Cross-Origin-Opener-Policy': 'same-origin',
+                'Cross-Origin-Embedder-Policy': 'require-corp',
+            });
             res.end(content);
         }
     });
 }
 
-// Semantic Natural Language Layout Compiler
+/**
+ * Natural language intent parser/compiler that maps user prompts to Genie DSL commands.
+ * Identifies if the prompt is raw DSL or needs to generate a fresh layout or update an existing one.
+ * @param {string} prompt - The natural language input prompt.
+ * @returns {{isRaw: boolean, dsl: string, isNewWorld: boolean}} The compiled layout instructions.
+ */
 function compilePromptToIntent(prompt) {
     const trimmed = prompt.trim();
     const lines = trimmed.split('\n').map(l => l.trim()).filter(l => l.length > 0 && !l.startsWith('#'));
@@ -131,6 +246,58 @@ function compilePromptToIntent(prompt) {
     const isNewWorld = lower.includes("create a") || lower.includes("manufacture a") || lower.includes("operations center") || lower.includes("factory") || lower.includes("facility center") || (!lower.includes("add ") && !lower.includes("delete ") && !lower.includes("update "));
 
     if (isNewWorld) {
+        if (lower.includes("factory") || lower.includes("gmf") || lower.includes("facility") || lower.includes("new world")) {
+            const gmfIntent = [
+                'create place foundry name "Primitive Foundry" at (0.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+                'create place runner_wall name "Part Runner Wall" at (400.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+                'create place gantry name "Assembly Gantry" at (800.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+                'create place fit_bay name "Fit + Collision Bay" at (1200.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+                'create place proving_ground name "Physics Proving Ground" at (1600.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+                'create place reveal_platform name "Final Reveal Platform" at (2000.0, 0.0, 0.0) bounds (150.0, 150.0, 50.0)',
+                
+                'create actor bot_foundry name "Foundry Supervisor" role SupervisorBot in foundry',
+                'create actor bot_runner_wall name "Logistics Welder" role ForkliftDriver in runner_wall',
+                'create actor bot_gantry name "Gantry Operator" role RoboticWelder in gantry',
+                'create actor bot_fit_bay name "Scanning Tech" role Mechanic in fit_bay',
+                'create actor bot_proving_ground name "Test Pilot" role SupervisorBot in proving_ground',
+                'create actor bot_reveal_platform name "Exhibition Presenter" role SupervisorBot in reveal_platform',
+
+                'create object prop_foundry name "Furnace Console" class ControlTerminal in foundry',
+                'create object prop_runner_wall name "Parts Rack" class CargoPallet in runner_wall',
+                'create object prop_gantry name "Assembly Frame" class CNC_Machine in gantry',
+                'create object prop_fit_bay name "Scanning Arch" class ControlTerminal in fit_bay',
+                'create object prop_proving_ground name "Telemetry Station" class ControlTerminal in proving_ground',
+                'create object prop_reveal_platform name "Floating Receipt Panel" class ControlTerminal in reveal_platform',
+
+                'create relationship rel_foundry_to_runner_wall connects from foundry to runner_wall',
+                'create relationship rel_runner_wall_to_gantry connects from runner_wall to gantry',
+                'create relationship rel_gantry_to_fit_bay connects from gantry to fit_bay',
+                'create relationship rel_fit_bay_to_proving_ground connects from fit_bay to proving_ground',
+                'create relationship rel_proving_ground_to_reveal_platform connects from proving_ground to reveal_platform',
+
+                'create relationship rel_contains_actor_foundry contains from foundry to bot_foundry',
+                'create relationship rel_contains_object_foundry contains from foundry to prop_foundry',
+                'create relationship rel_contains_actor_runner_wall contains from runner_wall to bot_runner_wall',
+                'create relationship rel_contains_object_runner_wall contains from runner_wall to prop_runner_wall',
+                'create relationship rel_contains_actor_gantry contains from gantry to bot_gantry',
+                'create relationship rel_contains_object_gantry contains from gantry to prop_gantry',
+                'create relationship rel_contains_actor_fit_bay contains from fit_bay to bot_fit_bay',
+                'create relationship rel_contains_object_fit_bay contains from fit_bay to prop_fit_bay',
+                'create relationship rel_contains_actor_proving_ground contains from proving_ground to bot_proving_ground',
+                'create relationship rel_contains_object_proving_ground contains from proving_ground to prop_proving_ground',
+                'create relationship rel_contains_actor_reveal_platform contains from reveal_platform to bot_reveal_platform',
+                'create relationship rel_contains_object_reveal_platform contains from reveal_platform to prop_reveal_platform',
+
+                'create rule rule_foundry_heat name HeatCheck expression "foundry.temp<1500" severity error',
+                'create rule rule_runner_wall_stock name StockCheck expression "runner_wall.stock>10" severity warning',
+                'create rule rule_gantry_alignment name AlignCheck expression "gantry.deviation<0.05" severity error',
+                'create rule rule_fit_bay_clearance name ClearanceCheck expression "fit_bay.clearance>1.2" severity warning',
+                'create rule rule_proving_ground_speed name SpeedCheck expression "proving_ground.speed<80" severity error',
+                'create rule rule_reveal_platform_lighting name LightCheck expression "reveal_platform.lux>500" severity warning'
+            ].join("\n");
+            
+            return { isRaw: false, dsl: gmfIntent, isNewWorld: true };
+        }
         let placesList = [];
         const withMatch = trimmed.match(/with\s+([^.]+)/i);
         if (withMatch) {

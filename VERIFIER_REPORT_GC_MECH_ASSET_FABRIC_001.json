@@ -1,0 +1,150 @@
+{
+  "milestone": "GC-MECH-ASSET-FABRIC-001",
+  "status": "REFUSED",
+  "scoped_status": "REFUSED",
+  "metrics": {
+    "silhouette_iou": 0.33581842910165993,
+    "edge_similarity": 0.09326636791229248,
+    "color_palette_similarity": 0.9241565309374815,
+    "cyan_region_similarity": 0.0,
+    "symmetry_delta": 0.015580467648484309,
+    "wing_span_delta": 237.5,
+    "body_mass_delta": 0.24142296247124057,
+    "usd_prim_count": 8376,
+    "material_binding_count": 8160,
+    "wing_feather_count": 0,
+    "part_graph_similarity": 1.0,
+    "wing_layer_count_delta": 2.0,
+    "feather_panel_curvature_score": 0.0,
+    "feather_overlap_depth_score": 0.0,
+    "core_compactness_delta": 0.35446405837440287,
+    "head_to_torso_ratio_delta": 0.016666666666666607,
+    "blade_length_angle_delta": 195.0,
+    "armor_shell_segmentation_score": 0.23385288181206548,
+    "edge_density_distribution": 0.0,
+    "foreground_component_count": 143,
+    "usd_errors": [
+      "USD305 ERROR: mirrored part lacks mirror transform proof"
+    ],
+    "vis_errors": [
+      "VIS202 ERROR: wing morphology mismatch",
+      "VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates",
+      "VIS204 ERROR: core body massing exceeds compactness bound",
+      "VIS205 ERROR: blade placement/angle mismatch",
+      "VIS207 ERROR: edge-density distribution mismatch",
+      "VIS208 ERROR: candidate passed coarse silhouette but failed morphology gate"
+    ],
+    "thresholds_met": false
+  },
+  "receipt_chain": [
+    {
+      "sequence": 1,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_BaseColor.png",
+      "hash": "b124b0b7673feb87437757152a4396a4037068ceeaf8b2311f9a0b1c8aff71cc",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "receipt": "e7c334178c49e9f6b87a87380208d29e802c7af4d5a5e7a82bde6c9cf1c7d203",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 2,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Roughness.png",
+      "hash": "caa9680c87b842f85b95c832c78d254aeabe03ee9e29eea0a844ce04154e78da",
+      "prev_hash": "e7c334178c49e9f6b87a87380208d29e802c7af4d5a5e7a82bde6c9cf1c7d203",
+      "receipt": "0754bbd2c46cb99de0c98ae8167bf53af06a937c2fc03f8a54129b461dd11d89",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 3,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Normal.png",
+      "hash": "76944f0bc81a92b281cd35587ae86667b41849efc89093db9fa79cc271e8edfd",
+      "prev_hash": "0754bbd2c46cb99de0c98ae8167bf53af06a937c2fc03f8a54129b461dd11d89",
+      "receipt": "91bd718b8ee0df0e925884481db89ce9b8c55d07462fd9f7d1e8e6ed38157e4d",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 4,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_CyanBlade_Emissive.png",
+      "hash": "13661681445fda9b07c4957cbdf54c4a1f3c3fe6f0841dc42ad9841a516f772b",
+      "prev_hash": "91bd718b8ee0df0e925884481db89ce9b8c55d07462fd9f7d1e8e6ed38157e4d",
+      "receipt": "58e87791130888c5644c233db71a8324d24d5a491abaa50c727a5f1890a4b5d6",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 5,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/texture_manifest.json",
+      "hash": "bded4d00e17cb7073b9d332549f152c0b2e95b2c5e36de9140c9d4aa257821a2",
+      "prev_hash": "58e87791130888c5644c233db71a8324d24d5a491abaa50c727a5f1890a4b5d6",
+      "receipt": "c4ca5b3c90a79a1b2becae251080753753733aeff12b792c0f7d5c567973c6ab",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 6,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_front.png",
+      "hash": "a8b1bebafe9a624bfdf4de28be906945358fa63e553298d18cce7f744360740e",
+      "prev_hash": "c4ca5b3c90a79a1b2becae251080753753733aeff12b792c0f7d5c567973c6ab",
+      "receipt": "cecc51ba8a28d020086ceb9b4089f9bf2edf648791cad0ea04c08257ac901b3c",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 7,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_angled.png",
+      "hash": "96d2dd0d1a42e3664360eb73da0cf88ec8133970b3f2dbc1a2c851940dbee247",
+      "prev_hash": "cecc51ba8a28d020086ceb9b4089f9bf2edf648791cad0ea04c08257ac901b3c",
+      "receipt": "d72a48454b9241872a33a857a1fa5dc830b1924e2d87a4664fb047b3d74020cf",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 8,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_silhouette.png",
+      "hash": "dfa89b7ccb579f99dd26f116c5ffffe92d6f168ecab33d933fb5726b3425b7d0",
+      "prev_hash": "d72a48454b9241872a33a857a1fa5dc830b1924e2d87a4664fb047b3d74020cf",
+      "receipt": "808410dd26b6a55ed720a0ee34a87fb2e12c5a86b4b24bd72da3101577c6f41b",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 9,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_edges.png",
+      "hash": "302c467165b793431e8652cb17179c6fe133ea921452e068584d60ddfad84abb",
+      "prev_hash": "808410dd26b6a55ed720a0ee34a87fb2e12c5a86b4b24bd72da3101577c6f41b",
+      "receipt": "643315db37f382000dcabde74cd9878783626e0dc0206f4acc10dd5ae8d6c1d4",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 10,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json",
+      "hash": "55e7038692a25d0d93e519580ad8e288b8d296aa9f066fab0827665e48a1ed67",
+      "prev_hash": "643315db37f382000dcabde74cd9878783626e0dc0206f4acc10dd5ae8d6c1d4",
+      "receipt": "983ac59dd40bcf49b2d696091ee099d0799600aea88f12bca3051cd007a9d957",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 11,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.md",
+      "hash": "ad846bcfbab893e5ea2ae61c92ca12c8f2ac1e946fb60b78868f08f2c89df949",
+      "prev_hash": "983ac59dd40bcf49b2d696091ee099d0799600aea88f12bca3051cd007a9d957",
+      "receipt": "e3db80c04b770196969df300f52bca2b1638367b41e108122188e5e178be7bed",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    },
+    {
+      "sequence": 12,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/ocel/asset_manufacturing.ocel.json",
+      "hash": "393835c1b5e412c69c28c2ca5f598a1adf2bc3181c4ebafdb1ed3e8ba0f54c73",
+      "prev_hash": "e3db80c04b770196969df300f52bca2b1638367b41e108122188e5e178be7bed",
+      "receipt": "752841b9fb83e484c1f15e4cfb3725750f7723f7f46ac15ad9779d03f249c3a6",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T04:27:55Z"
+    }
+  ],
+  "residuals": []
+}

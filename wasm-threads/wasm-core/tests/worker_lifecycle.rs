@@ -10,7 +10,7 @@ fn make_logger() -> Logger {
 
 #[test]
 fn worker_starts_uninitialized_then_runs() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WasmWorker<Uninitialized> with script url 'worker.js' and id 0");
     let w = WasmWorker::<Uninitialized>::new("worker.js", 0);
 
@@ -24,7 +24,7 @@ fn worker_starts_uninitialized_then_runs() {
 
 #[test]
 fn worker_pause_resume_cycle() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a running WasmWorker with id 1");
     let w = WasmWorker::<Uninitialized>::new("worker.js", 1)
         .start()
@@ -40,7 +40,7 @@ fn worker_pause_resume_cycle() {
 
 #[test]
 fn worker_script_url_preserved() {
-    let mut log = make_logger();
+    let log = make_logger();
     let url = "https://example.com/worker.js";
     log.info(&format!("Given a WasmWorker with script url '{url}'"));
     let w = WasmWorker::<Uninitialized>::new(url, 7)
@@ -54,7 +54,7 @@ fn worker_script_url_preserved() {
 
 #[test]
 fn terminated_worker_reports_terminated() {
-    let mut log = make_logger();
+    let log = make_logger();
     log.info("Given a WasmWorker that has been started and terminated");
     let t = WasmWorker::<Uninitialized>::new("w.js", 0)
         .start()

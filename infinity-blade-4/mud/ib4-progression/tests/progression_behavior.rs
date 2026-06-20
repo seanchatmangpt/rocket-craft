@@ -1,8 +1,8 @@
 use ib4_core::{player::PlayerState, types::MagicType};
 use ib4_progression::{
-    xp::{XPSystem, xp_for_level, xp_threshold, MAX_LEVEL},
     bloodline::BloodlineSystem,
     perks::PerkTree,
+    xp::{xp_for_level, xp_threshold, XPSystem, MAX_LEVEL},
 };
 
 #[test]
@@ -79,7 +79,7 @@ fn should_deny_tier2_perk_below_bloodline_5() {
     p.perk_points = 5;
     p.bloodline = 3;
     // First get the prereq
-    let _ = tree_with_point(&mut p, "BloodyResolve");
+    tree_with_point(&mut p, "BloodyResolve");
     let tree = PerkTree::new();
     let result = tree.select_perk(&mut p, "DeadlyPrecision");
     assert!(result.is_err());

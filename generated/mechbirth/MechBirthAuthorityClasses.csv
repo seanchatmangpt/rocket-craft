@@ -1,0 +1,7 @@
+field_name,type,max_class,refused_sentinel,description
+damage_class,u8,15,255,Structural damage level
+heat_class,u8,15,255,Thermal load class
+stress_class,u8,15,255,Mechanical stress class
+grip_class,u8,15,255,Surface grip/traction class
+socket_health_class,u8,15,255,Socket integrity class
+lod_class,u8,4,255,Semantic LOD class (0=Crown)

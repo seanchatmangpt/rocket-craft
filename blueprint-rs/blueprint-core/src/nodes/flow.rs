@@ -49,11 +49,7 @@ pub fn branch_node(name: impl Into<String>) -> BpNode {
 /// - `LoopBody`   — exec output (runs each iteration)
 /// - `Index`      — int output (current loop index)
 /// - `Completed`  — exec output (runs after all iterations)
-pub fn for_loop_node(
-    name: impl Into<String>,
-    first_default: i32,
-    last_default: i32,
-) -> BpNode {
+pub fn for_loop_node(name: impl Into<String>, first_default: i32, last_default: i32) -> BpNode {
     BpNode::new(CLASS_FOR_LOOP, name)
         .with_pin(exec_in("execute"))
         .with_pin(int_in("FirstIndex", first_default))
@@ -297,7 +293,9 @@ mod tests {
     #[test]
     fn for_loop_node_has_first_index_pin() {
         let node = for_loop_node("L", 0, 9);
-        let pin = node.find_pin("FirstIndex").expect("missing 'FirstIndex' pin");
+        let pin = node
+            .find_pin("FirstIndex")
+            .expect("missing 'FirstIndex' pin");
         assert_eq!(pin.direction, PinDirection::Input);
         assert_eq!(pin.default_value.as_deref(), Some("0"));
     }
@@ -335,7 +333,10 @@ mod tests {
     fn for_loop_node_custom_defaults() {
         let node = for_loop_node("L", 5, 20);
         assert_eq!(
-            node.find_pin("FirstIndex").unwrap().default_value.as_deref(),
+            node.find_pin("FirstIndex")
+                .unwrap()
+                .default_value
+                .as_deref(),
             Some("5")
         );
         assert_eq!(
@@ -380,7 +381,9 @@ mod tests {
         let node = sequence_node("Seq", 3);
         for i in 0..3 {
             let name = format!("then_{i}");
-            let pin = node.find_pin(&name).unwrap_or_else(|| panic!("missing '{name}'"));
+            let pin = node
+                .find_pin(&name)
+                .unwrap_or_else(|| panic!("missing '{name}'"));
             assert_eq!(pin.direction, PinDirection::Output);
         }
     }
@@ -442,7 +445,9 @@ mod tests {
     #[test]
     fn do_once_node_has_b_start_closed_bool_input() {
         let node = do_once_node("D");
-        let pin = node.find_pin("bStartClosed").expect("missing 'bStartClosed' pin");
+        let pin = node
+            .find_pin("bStartClosed")
+            .expect("missing 'bStartClosed' pin");
         assert_eq!(pin.direction, PinDirection::Input);
     }
 
@@ -482,7 +487,9 @@ mod tests {
     fn gate_node_has_open_close_toggle_exec_inputs() {
         let node = gate_node("G");
         for name in &["Open", "Close", "Toggle"] {
-            let pin = node.find_pin(name).unwrap_or_else(|| panic!("missing '{name}' pin"));
+            let pin = node
+                .find_pin(name)
+                .unwrap_or_else(|| panic!("missing '{name}' pin"));
             assert_eq!(pin.direction, PinDirection::Input);
         }
     }
@@ -497,7 +504,9 @@ mod tests {
     #[test]
     fn gate_node_has_b_start_closed_bool_input() {
         let node = gate_node("G");
-        let pin = node.find_pin("bStartClosed").expect("missing 'bStartClosed' pin");
+        let pin = node
+            .find_pin("bStartClosed")
+            .expect("missing 'bStartClosed' pin");
         assert_eq!(pin.direction, PinDirection::Input);
     }
 

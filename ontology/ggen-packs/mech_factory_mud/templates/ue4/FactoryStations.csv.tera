@@ -1,0 +1,20 @@
+# generated_by: ggen
+# source_ttl: schema/mech_factory_mud.ttl
+# source_query: queries/all.rq
+# source_template: templates/ue4/FactoryStations.csv.tera
+id,station_id,station_name,route_node_id,ue4_target_surface
+{%- set_global count = 0 -%}
+{%- for row in results -%}
+{%- if row.type == "http://rocket-craft.com/ontology/mud#Station" %}
+{%- set name = row.s | split(pat="#") | last -%}
+{%- set sid = name | lower -%}
+{%- if name == "FrameAssembly" %}{% set sid = "frame_assembly" %}{% endif -%}
+{%- if name == "SocketTopology" %}{% set sid = "socket_topology" %}{% endif -%}
+{%- if name == "ArmorSkinStation" %}{% set sid = "armor_skin" %}{% endif -%}
+{%- if name == "RigMotionStation" %}{% set sid = "rig_motion" %}{% endif -%}
+{%- if name == "VerificationGate" %}{% set sid = "verification_gate" %}{% endif -%}
+{%- if name == "ReceiptTerminal" %}{% set sid = "receipt_terminal" %}{% endif -%}
+{%- set_global count = count + 1 %}
+{{ count }},{{ sid }},{{ name }},{{ name }},FactoryStationMarker
+{%- endif -%}
+{%- endfor %}

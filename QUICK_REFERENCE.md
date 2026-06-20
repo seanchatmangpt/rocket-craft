@@ -385,3 +385,14 @@ Refer to:
 - **INTEGRATION_PLAN.md** — detailed design & API specs
 - **ANTI_LLM_ARCHITECTURE.md** — visual architecture & type conversions
 - **INTEGRATION_CHECKLIST.md** — step-by-step implementation guide
+
+---
+
+## Nexus Engine Typestates & Builders Quick Reference
+
+| Crate / Machine | Typestate States | Builder Type | Runtime State Enum | Runtime Rejection Error |
+|---|---|---|---|---|
+| `nexus-combat` | `Idle`, `Attacking`, `Parrying`, `PerfectParrying`, `Dodging` | `CombatMachineBuilder` | `CombatState` | `CombatTransitionError` |
+| `nexus-session` | `Connecting`, `Authenticated`, `InLobby`, `InMatch`, `Spectating`, `Disconnected` | `PlayerSessionBuilder` | `SessionState` | `SessionTransitionError` |
+| `nexus-net` | `Disconnected`, `Handshaking`, `Connected`, `Authenticated`, `InLobby`, `InMatch` | `ConnectionBuilder` | `ConnectionState` | `ConnectionTransitionError` |
+| `nexus-economy` | `OpenForBids`, `BidAccepted`, `AuctionClosed`, `AuctionCancelled` | `AuctionBuilder` | `AuctionState` | `AuctionTransitionError` |

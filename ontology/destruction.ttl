@@ -1,0 +1,66 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix ds: <https://ggen.io/ontology/destruction/> .
+
+ds:DestructionOntology a owl:Ontology ;
+    rdfs:label "Destruction States Ontology" ;
+    rdfs:comment "Combinatorial Destruction States: armor break states, exposed frame states, damaged material states, detached panel declarations, damage-zone transitions, VFX socket bindings." ;
+    owl:imports <https://ggen.io/ontology/core/> .
+
+# --- BASE DESTRUCTION STATE ---
+
+ds:DestructionState a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Destruction State" ;
+    rdfs:comment "A branchless typestate defining deterministic destruction geometry and VFX triggers." .
+
+# --- 1. ARMOR BREAK STATES ---
+
+ds:ArmorBreakState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Armor Break State" ;
+    rdfs:comment "Admitted topology for fractured or completely broken armor plates." ;
+    core:compilesToZST true .
+
+# --- 2. EXPOSED FRAME STATES ---
+
+ds:ExposedFrameState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Exposed Frame State" ;
+    rdfs:comment "Admitted topology indicating the mechanical frame is exposed due to destroyed armor." ;
+    core:compilesToZST true .
+
+# --- 3. DAMAGED MATERIAL STATES ---
+
+ds:DamagedMaterialState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Damaged Material State" ;
+    rdfs:comment "Admitted material shader typestate switching, e.g., scorched or ablated surfaces." ;
+    core:compilesToZST true .
+
+# --- 4. DETACHED PANEL DECLARATIONS ---
+
+ds:DetachedPanelDeclaration a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Detached Panel Declaration" ;
+    rdfs:comment "Authority declaration that a panel has fully detached from its socket." ;
+    core:compilesToZST true .
+
+# --- 5. DAMAGE-ZONE TRANSITIONS ---
+
+ds:DamageZoneTransition a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Damage Zone Transition" ;
+    rdfs:comment "Branchless transition boundary between varying states of structural integrity." ;
+    core:compilesToZST true .
+
+# --- 6. VFX SOCKET BINDINGS ---
+
+ds:VFXSocketBinding a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "VFX Socket Binding" ;
+    rdfs:comment "Deterministic binding point for peer-projection VFX (e.g., spark emitters, smoke)." ;
+    core:compilesToZST true .

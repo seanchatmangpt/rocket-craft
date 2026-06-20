@@ -7,7 +7,7 @@ mod tests {
     use super::assert::*;
     use super::chains::*;
     use super::fixtures::*;
-    use unify_rdf::pipeline::OntologyPipeline;
+
     use unify_rdf::sparql::{PatternExecutor, SparqlExecutor};
     use unify_rdf::store::TripleStore;
     use unify_rdf::triple::{Term, Triple};

@@ -21,7 +21,7 @@ pub fn render_mermaid(blueprint: &Blueprint) -> String {
 
         // Node definitions with shape based on class
         for node in &graph.nodes {
-            let short_class = node.class.split('.').last().unwrap_or(&node.class);
+            let short_class = node.class.split('.').next_back().unwrap_or(&node.class);
             let safe_name = sanitize_mermaid_id(&node.name);
             let label = mermaid_label(node);
 
@@ -73,7 +73,7 @@ pub fn render_mermaid(blueprint: &Blueprint) -> String {
 
         // Apply styles
         for node in &graph.nodes {
-            let short_class = node.class.split('.').last().unwrap_or(&node.class);
+            let short_class = node.class.split('.').next_back().unwrap_or(&node.class);
             let safe_name = sanitize_mermaid_id(&node.name);
             let class = if short_class.contains("Event") || short_class.contains("CustomEvent") {
                 "event"
@@ -92,11 +92,11 @@ pub fn render_mermaid(blueprint: &Blueprint) -> String {
 }
 
 fn sanitize_mermaid_id(s: &str) -> String {
-    s.replace('-', "_").replace(' ', "_").replace('.', "_")
+    s.replace(['-', ' ', '.'], "_")
 }
 
 fn mermaid_label(node: &BpNode) -> String {
-    let short_class = node.class.split('.').last().unwrap_or(&node.class);
+    let short_class = node.class.split('.').next_back().unwrap_or(&node.class);
     let short_class = short_class.replace("K2Node_", "");
     // Shorten name if it's the generic counter name
     if node.name.starts_with("K2Node_") {
@@ -129,12 +129,8 @@ pub fn render_dot(blueprint: &Blueprint) -> String {
         out.push_str("        style=dashed;\n");
 
         for node in &graph.nodes {
-            let short_class = node.class.split('.').last().unwrap_or(&node.class);
-            let label = format!(
-                "{}\n[{}]",
-                node.name,
-                short_class.replace("K2Node_", "")
-            );
+            let short_class = node.class.split('.').next_back().unwrap_or(&node.class);
+            let label = format!("{}\n[{}]", node.name, short_class.replace("K2Node_", ""));
             let color = dot_color_for_node(node);
             let safe_id = format!("n_{}_{}", graph_idx, sanitize_dot_id(&node.name));
             out.push_str(&format!(
@@ -151,11 +147,7 @@ pub fn render_dot(blueprint: &Blueprint) -> String {
                     && pin.pin_type.category == PinCategory::Exec
                 {
                     for link in &pin.linked_to {
-                        let to_id = format!(
-                            "n_{}_{}",
-                            graph_idx,
-                            sanitize_dot_id(&link.node_name)
-                        );
+                        let to_id = format!("n_{}_{}", graph_idx, sanitize_dot_id(&link.node_name));
                         let edge_label = if pin.name != "then" { &pin.name } else { "" };
                         out.push_str(&format!(
                             "        {} -> {} [label=\"{}\", color=\"#333\"];\n",
@@ -175,12 +167,18 @@ pub fn render_dot(blueprint: &Blueprint) -> String {
 
 fn sanitize_dot_id(s: &str) -> String {
     s.chars()
-        .map(|c| if c.is_alphanumeric() || c == '_' { c } else { '_' })
+        .map(|c| {
+            if c.is_alphanumeric() || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
         .collect()
 }
 
 fn dot_color_for_node(node: &BpNode) -> &'static str {
-    let class = node.class.split('.').last().unwrap_or("");
+    let class = node.class.split('.').next_back().unwrap_or("");
     if class.contains("Event") || class.contains("CustomEvent") {
         "#90EE90"
     } else if class.contains("IfThenElse") {
@@ -262,7 +260,7 @@ pub fn render_ascii(blueprint: &Blueprint) -> String {
 }
 
 fn ascii_node_box(node: &BpNode) -> String {
-    let short_class = node.class.split('.').last().unwrap_or(&node.class);
+    let short_class = node.class.split('.').next_back().unwrap_or(&node.class);
     let short_class = short_class.replace("K2Node_", "");
     format!("[{} ({})]", node.name, short_class)
 }
@@ -275,8 +273,7 @@ fn find_exec_chains(graph: &BpGraph) -> Vec<Vec<String>> {
             n.pins
                 .iter()
                 .filter(|p| {
-                    p.direction == PinDirection::Output
-                        && p.pin_type.category == PinCategory::Exec
+                    p.direction == PinDirection::Output && p.pin_type.category == PinCategory::Exec
                 })
                 .flat_map(|p| p.linked_to.iter().map(|l| l.node_name.as_str()))
         })
@@ -347,9 +344,7 @@ pub fn render_summary(blueprint: &Blueprint) -> String {
         let event_count = graph
             .nodes
             .iter()
-            .filter(|n| {
-                n.class.contains("K2Node_Event") || n.class.contains("K2Node_CustomEvent")
-            })
+            .filter(|n| n.class.contains("K2Node_Event") || n.class.contains("K2Node_CustomEvent"))
             .count();
         out.push_str(&format!(
             "  Graph '{}': {} nodes, {} event(s)\n",
@@ -369,7 +364,7 @@ pub fn render_summary(blueprint: &Blueprint) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ast::{BpNode, Blueprint};
+    use crate::ast::{Blueprint, BpNode};
     #[allow(unused_imports)]
     use crate::types::PinType;
 
@@ -411,21 +406,32 @@ mod tests {
     fn mermaid_empty_blueprint_starts_with_frontmatter() {
         let bp = make_blueprint_empty();
         let out = render_mermaid(&bp);
-        assert!(out.starts_with("---"), "Expected frontmatter start, got: {}", out);
+        assert!(
+            out.starts_with("---"),
+            "Expected frontmatter start, got: {}",
+            out
+        );
     }
 
     #[test]
     fn mermaid_empty_blueprint_contains_flowchart_lr() {
         let bp = make_blueprint_empty();
         let out = render_mermaid(&bp);
-        assert!(out.contains("flowchart LR"), "Expected 'flowchart LR' in output");
+        assert!(
+            out.contains("flowchart LR"),
+            "Expected 'flowchart LR' in output"
+        );
     }
 
     #[test]
     fn mermaid_connected_nodes_produces_arrow() {
         let bp = make_blueprint_with_two_connected_nodes();
         let out = render_mermaid(&bp);
-        assert!(out.contains("-->"), "Expected '-->' edge in mermaid output, got:\n{}", out);
+        assert!(
+            out.contains("-->"),
+            "Expected '-->' edge in mermaid output, got:\n{}",
+            out
+        );
     }
 
     #[test]
@@ -434,7 +440,11 @@ mod tests {
         let event = make_event_node("MyEvent");
         bp.event_graph().add_node(event);
         let out = render_mermaid(&bp);
-        assert!(out.contains("(["), "Expected stadium shape '([' for event node, got:\n{}", out);
+        assert!(
+            out.contains("(["),
+            "Expected stadium shape '([' for event node, got:\n{}",
+            out
+        );
     }
 
     #[test]
@@ -443,7 +453,11 @@ mod tests {
         let event = make_event_node("MyEvent");
         bp.event_graph().add_node(event);
         let out = render_mermaid(&bp);
-        assert!(out.contains("class MyEvent event"), "Expected 'class MyEvent event' in output:\n{}", out);
+        assert!(
+            out.contains("class MyEvent event"),
+            "Expected 'class MyEvent event' in output:\n{}",
+            out
+        );
     }
 
     #[test]
@@ -452,7 +466,11 @@ mod tests {
         let call = make_call_node("MyCall");
         bp.event_graph().add_node(call);
         let out = render_mermaid(&bp);
-        assert!(out.contains("class MyCall default"), "Expected 'class MyCall default' in output:\n{}", out);
+        assert!(
+            out.contains("class MyCall default"),
+            "Expected 'class MyCall default' in output:\n{}",
+            out
+        );
     }
 
     // --- render_dot tests ---
@@ -461,7 +479,10 @@ mod tests {
     fn dot_output_contains_digraph() {
         let bp = make_blueprint_empty();
         let out = render_dot(&bp);
-        assert!(out.contains("digraph G {"), "Expected 'digraph G {{' in DOT output");
+        assert!(
+            out.contains("digraph G {"),
+            "Expected 'digraph G {{' in DOT output"
+        );
     }
 
     #[test]
@@ -470,7 +491,11 @@ mod tests {
         let event = make_event_node("MyEvent");
         bp.event_graph().add_node(event);
         let out = render_dot(&bp);
-        assert!(out.contains("fillcolor="), "Expected 'fillcolor=' in DOT output:\n{}", out);
+        assert!(
+            out.contains("fillcolor="),
+            "Expected 'fillcolor=' in DOT output:\n{}",
+            out
+        );
     }
 
     #[test]
@@ -479,7 +504,11 @@ mod tests {
         let event = make_event_node("MyEvent");
         bp.event_graph().add_node(event);
         let out = render_dot(&bp);
-        assert!(out.contains("#90EE90"), "Expected green fillcolor for event node:\n{}", out);
+        assert!(
+            out.contains("#90EE90"),
+            "Expected green fillcolor for event node:\n{}",
+            out
+        );
     }
 
     // --- render_ascii tests ---
@@ -490,21 +519,33 @@ mod tests {
         let node = make_call_node("MyFunction");
         bp.event_graph().add_node(node);
         let out = render_ascii(&bp);
-        assert!(out.contains("MyFunction"), "Expected node name in ASCII output:\n{}", out);
+        assert!(
+            out.contains("MyFunction"),
+            "Expected node name in ASCII output:\n{}",
+            out
+        );
     }
 
     #[test]
     fn ascii_exec_chain_shows_arrow() {
         let bp = make_blueprint_with_two_connected_nodes();
         let out = render_ascii(&bp);
-        assert!(out.contains("──▶"), "Expected chain arrow '──▶' in ASCII output:\n{}", out);
+        assert!(
+            out.contains("──▶"),
+            "Expected chain arrow '──▶' in ASCII output:\n{}",
+            out
+        );
     }
 
     #[test]
     fn ascii_empty_graph_says_empty() {
         let bp = make_blueprint_empty();
         let out = render_ascii(&bp);
-        assert!(out.contains("empty graph"), "Expected '(empty graph)' in ASCII output:\n{}", out);
+        assert!(
+            out.contains("empty graph"),
+            "Expected '(empty graph)' in ASCII output:\n{}",
+            out
+        );
     }
 
     // --- render_summary tests ---
@@ -515,21 +556,33 @@ mod tests {
         bp.event_graph().add_node(make_event_node("Ev1"));
         bp.event_graph().add_node(make_call_node("Call1"));
         let out = render_summary(&bp);
-        assert!(out.contains("Total nodes: 2"), "Expected 'Total nodes: 2' in summary:\n{}", out);
+        assert!(
+            out.contains("Total nodes: 2"),
+            "Expected 'Total nodes: 2' in summary:\n{}",
+            out
+        );
     }
 
     #[test]
     fn summary_correct_graph_count() {
         let bp = make_blueprint_empty();
         let out = render_summary(&bp);
-        assert!(out.contains("Graphs:      1"), "Expected 'Graphs:      1' in summary:\n{}", out);
+        assert!(
+            out.contains("Graphs:      1"),
+            "Expected 'Graphs:      1' in summary:\n{}",
+            out
+        );
     }
 
     #[test]
     fn summary_contains_blueprint_name() {
         let bp = make_blueprint_empty();
         let out = render_summary(&bp);
-        assert!(out.contains("TestBP"), "Expected blueprint name in summary:\n{}", out);
+        assert!(
+            out.contains("TestBP"),
+            "Expected blueprint name in summary:\n{}",
+            out
+        );
     }
 
     // --- sanitize_mermaid_id tests ---

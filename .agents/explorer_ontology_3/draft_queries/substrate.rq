@@ -1,0 +1,28 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX eden: <https://ggen.io/ontology/eden-server/>
+
+SELECT DISTINCT ?root ?parent ?socket ?child ?childType ?damageClass ?stressClass ?heatClass ?fatigueClass
+WHERE {
+  # Locate the MechRoot
+  ?root a eden:MechRoot .
+
+  # Traverse the assembly tree hierarchy
+  ?root (eden:hasSocket/^eden:plugsInto)* ?parent .
+  ?parent eden:hasSocket ?socket .
+  
+  # Connect child component (optional to handle empty sockets)
+  OPTIONAL {
+    ?child eden:plugsInto ?socket .
+    ?child a ?childType .
+    FILTER(?childType IN (eden:SubAssembly, eden:Part))
+    
+    # Extract reliability twin properties only if a valid child is connected
+    OPTIONAL { ?child eden:damageClass ?damageClass . }
+    OPTIONAL { ?child eden:stressClass ?stressClass . }
+    OPTIONAL { ?child eden:heatClass ?heatClass . }
+    OPTIONAL { ?child eden:fatigueClass ?fatigueClass . }
+  }
+}
+ORDER BY ?root ?parent ?socket ?child

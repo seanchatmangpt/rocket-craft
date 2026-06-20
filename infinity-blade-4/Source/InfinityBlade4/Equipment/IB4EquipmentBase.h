@@ -115,7 +115,16 @@ struct FEquipmentStats
  *   3. ApplyBloodlineMultiplier() is called on NG+ to scale difficulty.
  */
 UCLASS(BlueprintType, Blueprintable)
-class INFINITYBLADE4_API UIB4EquipmentBase : public UObject
+class INFINITYBLADE4_API UIB4ItemData : public UObject
+{
+    GENERATED_BODY()
+
+public:
+    UIB4ItemData();
+};
+
+UCLASS(BlueprintType, Blueprintable)
+class INFINITYBLADE4_API UIB4EquipmentBase : public UIB4ItemData
 {
     GENERATED_BODY()
 

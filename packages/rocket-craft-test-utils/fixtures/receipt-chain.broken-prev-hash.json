@@ -1,0 +1,19 @@
+[
+  {
+    "sequence": 1,
+    "event_type": "Interact",
+    "surface": "game-shell",
+    "receipt": "sha256:aaa111bbb222",
+    "status": "ADMITTED",
+    "residuals": []
+  },
+  {
+    "sequence": 2,
+    "event_type": "StartWalkthrough",
+    "surface": "game-shell",
+    "prev_hash": "sha256:WRONG_HASH_HERE",
+    "receipt": "sha256:ccc333ddd444",
+    "status": "ADMITTED",
+    "residuals": []
+  }
+]

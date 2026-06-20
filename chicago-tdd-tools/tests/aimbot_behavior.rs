@@ -1,11 +1,8 @@
 use anyhow::Result;
 use chicago_tdd_tools::aimbot::explore_state_space;
 use chicago_tdd_tools::coordinate::{
-    GameCoordinateSystem,
-    InfinityBladeCoordinateSystem,
-    GundamCoordinateSystem,
-    GundamSessionSimulation,
-    SessionState,
+    GameCoordinateSystem, GundamCoordinateSystem, GundamSessionSimulation,
+    InfinityBladeCoordinateSystem, SessionState,
 };
 use ib4_mud::session::GameSession;
 use nexus_session::player::PlayerProfile;
@@ -57,23 +54,31 @@ impl GameCoordinateSystem for SimpleGridSystem {
 fn test_explore_state_space_visits_multiple_states_without_errors() {
     let system = SimpleGridSystem;
     let initial = GridState { x: 0, y: 0 };
-    
+
     // Grid from (0,0) to (2,2) has 3 * 3 = 9 states.
     let result = explore_state_space(&system, initial, 100);
-    
+
     assert_eq!(result.visited_states_count, 9);
     assert!(!result.transitions.is_empty());
-    assert!(result.errors.is_empty(), "Expected no errors during exploration, but found: {:?}", result.errors);
+    assert!(
+        result.errors.is_empty(),
+        "Expected no errors during exploration, but found: {:?}",
+        result.errors
+    );
 }
 
 #[test]
 fn test_explore_state_space_with_infinity_blade() {
     let system = InfinityBladeCoordinateSystem;
     let initial = GameSession::new("SirisAimbot");
-    
+
     let result = explore_state_space(&system, initial, 100);
-    
-    assert!(result.visited_states_count >= 20, "Expected at least 20 states, got {}", result.visited_states_count);
+
+    assert!(
+        result.visited_states_count >= 20,
+        "Expected at least 20 states, got {}",
+        result.visited_states_count
+    );
     assert_eq!(result.errors.len(), 0);
 }
 
@@ -86,9 +91,9 @@ fn test_explore_state_space_with_gundam_nexus() {
         inventory: Vec::new(),
     };
     initial.profile.gold = 20;
-    
+
     let result = explore_state_space(&system, initial.clone(), 1000);
-    
+
     assert!(result.visited_states_count > 1);
     // There should be auth:false failures which are expected/handled
     assert!(!result.errors.is_empty());
@@ -119,7 +124,19 @@ fn test_explore_state_space_with_gundam_nexus() {
         }
     }
 
-    assert!(visited_level_2, "Should have visited level 2 state. Visited: {:?}", visited_coords);
-    assert!(visited_gold_depleted, "Should have visited gold depleted state (gold = 0). Visited: {:?}", visited_coords);
-    assert!(visited_non_empty_inventory, "Should have visited non-empty inventory state. Visited: {:?}", visited_coords);
+    assert!(
+        visited_level_2,
+        "Should have visited level 2 state. Visited: {:?}",
+        visited_coords
+    );
+    assert!(
+        visited_gold_depleted,
+        "Should have visited gold depleted state (gold = 0). Visited: {:?}",
+        visited_coords
+    );
+    assert!(
+        visited_non_empty_inventory,
+        "Should have visited non-empty inventory state. Visited: {:?}",
+        visited_coords
+    );
 }

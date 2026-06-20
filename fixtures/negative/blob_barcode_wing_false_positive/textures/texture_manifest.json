@@ -1,0 +1,36 @@
+{
+    "textures": [
+        {
+            "file": "T_WhiteArmor_BaseColor.png",
+            "dimensions": [
+                512,
+                512
+            ],
+            "purpose": "BaseColor"
+        },
+        {
+            "file": "T_WhiteArmor_Roughness.png",
+            "dimensions": [
+                512,
+                512
+            ],
+            "purpose": "Roughness"
+        },
+        {
+            "file": "T_WhiteArmor_Normal.png",
+            "dimensions": [
+                512,
+                512
+            ],
+            "purpose": "Normal"
+        },
+        {
+            "file": "T_CyanBlade_Emissive.png",
+            "dimensions": [
+                512,
+                512
+            ],
+            "purpose": "Emissive"
+        }
+    ]
+}

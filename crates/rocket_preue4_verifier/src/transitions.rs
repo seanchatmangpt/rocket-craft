@@ -1,0 +1,77 @@
+
+//! Branchless Transition Kernels.
+//! ⚠️ GENERATED FILE — do NOT edit by hand.
+//! Source of truth: ontology/mechbirth.ttl
+//! Generator:       ggen/templates/transitions.rs.tera
+//! SPARQL:          ggen/sparql/extract_transition_kernels.sparql
+//!
+//! Kernels generated from ontology:
+//! - TransitionTable: (table-driven)
+//! - scalar_failure_risk: clamp((heat + stress + (MAX_CLASS - socket_health)) / 3, 0, MAX_CLASS)
+
+
+/// Scalar reference transition kernel.
+/// Formula sourced from mb:ScalarFailureRisk mb:formula.
+/// Uses u16 intermediate to prevent u8 overflow on three-operand sum.
+#[inline]
+pub fn scalar_failure_risk(heat: u8, stress: u8, socket_health: u8) -> u8 {
+    let degradation = crate::authority::MAX_CLASS.saturating_sub(socket_health);
+    let sum = (heat as u16) + (stress as u16) + (degradation as u16);
+    ((sum / 3) as u8).min(crate::authority::MAX_CLASS)
+}
+
+/// Table-driven branchless transition.
+/// Dimensions: 16 x 16 x 16 = 4096 entries (sourced from mb:TransitionTable).
+/// Guarantee: bit-identical to scalar_failure_risk for all inputs in [0,15]^3.
+pub struct TransitionTable {
+    /// Contiguous u8 Vec — cache-line friendly, O(1) lookup.
+    table: Vec<u8>,
+}
+
+impl TransitionTable {
+    /// Build the full 4096-entry lookup table.
+    pub fn build() -> Self {
+        let mut table = vec![0u8; 4096];
+        for heat in 0u8..16 {
+            for stress in 0u8..16 {
+                for socket_health in 0u8..16 {
+                    let idx = (heat as usize) * 256
+                        + (stress as usize) * 16
+                        + (socket_health as usize);
+                    table[idx] = scalar_failure_risk(heat, stress, socket_health);
+                }
+            }
+        }
+        Self { table }
+    }
+
+    /// Branchless table lookup. Inputs clamped to [0, 15] — no branch, no bounds panic.
+    #[inline]
+    pub fn lookup(&self, heat: u8, stress: u8, socket_health: u8) -> u8 {
+        let idx = (heat.min(15) as usize) * 256
+            + (stress.min(15) as usize) * 16
+            + (socket_health.min(15) as usize);
+        self.table[idx]
+    }
+}
+
+/// Batch scalar damage update.
+pub fn batch_update_damage_scalar(state: &mut crate::authority::AuthorityState) {
+    let n = state.damage.len();
+    for i in 0..n {
+        state.damage[i] =
+            scalar_failure_risk(state.heat[i], state.stress[i], state.socket_health[i]);
+    }
+}
+
+/// Batch table-driven damage update — semantically identical to scalar variant.
+pub fn batch_update_damage_table(
+    state: &mut crate::authority::AuthorityState,
+    table: &TransitionTable,
+) {
+    let n = state.damage.len();
+    for i in 0..n {
+        state.damage[i] =
+            table.lookup(state.heat[i], state.stress[i], state.socket_health[i]);
+    }
+}

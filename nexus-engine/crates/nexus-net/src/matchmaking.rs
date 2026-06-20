@@ -85,9 +85,10 @@ impl MatchmakingQueue {
     /// returned.  Otherwise `None` is returned and the entry waits.
     pub fn enqueue(&mut self, entry: QueueEntry) -> Option<ActiveMatch> {
         // Find the first queued player within ±200 rating.
-        let match_partner_idx = self.queue.iter().position(|q| {
-            (q.rating as i64 - entry.rating as i64).abs() <= 200
-        });
+        let match_partner_idx = self
+            .queue
+            .iter()
+            .position(|q| (q.rating as i64 - entry.rating as i64).abs() <= 200);
 
         if let Some(idx) = match_partner_idx {
             let partner = self.queue.remove(idx).expect("index was valid");
@@ -145,5 +146,129 @@ impl MatchmakingQueue {
 impl Default for MatchmakingQueue {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use chrono::Utc;
+
+    fn entry(player_id: u64, rating: u32) -> QueueEntry {
+        QueueEntry {
+            player_id,
+            player_name: format!("pilot-{player_id}"),
+            suit_id: "rx78".into(),
+            rating,
+            queued_at: Utc::now(),
+        }
+    }
+
+    // ── enqueue — no match ────────────────────────────────────────────────────
+
+    #[test]
+    fn single_entry_waits_in_queue() {
+        let mut q = MatchmakingQueue::new();
+        let result = q.enqueue(entry(1, 1000));
+        assert!(result.is_none(), "no match when queue is empty");
+        assert_eq!(q.queue_len(), 1);
+    }
+
+    #[test]
+    fn players_outside_200_elo_do_not_match() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        let result = q.enqueue(entry(2, 1201)); // 201 apart
+        assert!(result.is_none());
+        assert_eq!(q.queue_len(), 2);
+    }
+
+    // ── enqueue — match found ─────────────────────────────────────────────────
+
+    #[test]
+    fn players_within_200_elo_produce_active_match() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        let m = q.enqueue(entry(2, 1200)).expect("should match at boundary");
+        assert_eq!(m.player1_id, 1);
+        assert_eq!(m.player2_id, 2);
+        assert_eq!(m.state, MatchPhase::InProgress);
+    }
+
+    #[test]
+    fn match_removes_partner_from_queue() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        q.enqueue(entry(2, 1000)); // matches with 1
+        assert_eq!(q.queue_len(), 0, "matched partner must leave queue");
+    }
+
+    #[test]
+    fn match_is_registered_in_active_matches() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        let m = q.enqueue(entry(2, 1000)).unwrap();
+        assert_eq!(q.active_match_count(), 1);
+        assert!(q.get_match(m.match_id).is_some());
+    }
+
+    #[test]
+    fn match_ids_increment_monotonically() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        let m1 = q.enqueue(entry(2, 1000)).unwrap();
+        q.enqueue(entry(3, 1000));
+        let m2 = q.enqueue(entry(4, 1000)).unwrap();
+        assert!(m2.match_id > m1.match_id);
+    }
+
+    #[test]
+    fn exact_200_elo_gap_still_matches() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 800));
+        let m = q.enqueue(entry(2, 1000)); // exactly 200 apart
+        assert!(m.is_some(), "|800-1000| = 200 is within ±200");
+    }
+
+    // ── dequeue ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn dequeue_removes_player_from_waiting_queue() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        q.enqueue(entry(2, 1500)); // different bracket, no match
+        q.dequeue(1);
+        assert_eq!(q.queue_len(), 1);
+    }
+
+    #[test]
+    fn dequeue_nonexistent_player_is_noop() {
+        let mut q = MatchmakingQueue::new();
+        q.dequeue(99); // no panic
+        assert_eq!(q.queue_len(), 0);
+    }
+
+    // ── complete_match / remove_match ─────────────────────────────────────────
+
+    #[test]
+    fn complete_match_sets_state_to_completed() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        let m = q.enqueue(entry(2, 1000)).unwrap();
+        q.complete_match(m.match_id);
+        assert_eq!(
+            q.get_match(m.match_id).unwrap().state,
+            MatchPhase::Completed
+        );
+    }
+
+    #[test]
+    fn remove_match_deletes_from_registry() {
+        let mut q = MatchmakingQueue::new();
+        q.enqueue(entry(1, 1000));
+        let m = q.enqueue(entry(2, 1000)).unwrap();
+        q.remove_match(m.match_id);
+        assert!(q.get_match(m.match_id).is_none());
+        assert_eq!(q.active_match_count(), 0);
     }
 }

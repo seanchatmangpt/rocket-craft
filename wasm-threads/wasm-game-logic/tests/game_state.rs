@@ -1,5 +1,5 @@
 use chicago_tdd_tools::{Logger, TuiBufferSink};
-use wasm_game_logic::{GameState, Health, Initializing, Player, World};
+use wasm_game_logic::{GameState, Health, Initializing, Player};
 
 fn log() -> Logger {
     let mut l = Logger::new();
@@ -10,7 +10,7 @@ fn log() -> Logger {
 
 #[test]
 fn game_state_start_transitions_to_running() {
-    let mut log = log();
+    let log = log();
     log.info("Given a GameState in the Initializing phase");
     let state = GameState::<Initializing>::new();
 
@@ -23,7 +23,7 @@ fn game_state_start_transitions_to_running() {
 
 #[test]
 fn game_state_tick_increments_on_each_call() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Running GameState with tick=0");
     let mut state = GameState::<Initializing>::new().start();
     assert_eq!(state.tick, 0);
@@ -41,7 +41,7 @@ fn game_state_tick_increments_on_each_call() {
 
 #[test]
 fn game_state_elapsed_ms_accumulates() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Running GameState");
     let mut state = GameState::<Initializing>::new().start();
 
@@ -55,7 +55,7 @@ fn game_state_elapsed_ms_accumulates() {
 
 #[test]
 fn game_state_pause_and_resume_cycle() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Running GameState");
     let state = GameState::<Initializing>::new().start();
 
@@ -72,7 +72,7 @@ fn game_state_pause_and_resume_cycle() {
 
 #[test]
 fn game_state_running_to_game_over() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Running GameState with no ticks");
     let state = GameState::<Initializing>::new().start();
 
@@ -85,7 +85,7 @@ fn game_state_running_to_game_over() {
 
 #[test]
 fn game_state_game_over_restart_produces_fresh_state() {
-    let mut log = log();
+    let log = log();
     log.info("Given a GameOver state");
     let over = GameState::<Initializing>::new().start().game_over();
 
@@ -99,7 +99,7 @@ fn game_state_game_over_restart_produces_fresh_state() {
 
 #[test]
 fn game_over_winner_score_from_surviving_players() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Running GameState with one player entity having score 9999");
     let state = GameState::<Initializing>::new();
     let mut running = state.start();
@@ -122,7 +122,7 @@ fn game_over_winner_score_from_surviving_players() {
 
 #[test]
 fn game_over_winner_score_is_zero_when_no_players() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Running GameState with no player entities");
     let state = GameState::<Initializing>::new().start();
 
@@ -135,7 +135,7 @@ fn game_over_winner_score_is_zero_when_no_players() {
 
 #[test]
 fn game_state_total_ticks_reflects_run_time() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Running GameState");
     let mut state = GameState::<Initializing>::new().start();
 
@@ -155,7 +155,7 @@ fn game_state_total_ticks_reflects_run_time() {
 #[test]
 fn tick_output_changes_with_each_tick() {
     use wasm_game_logic::{GameState, state::Initializing};
-    let mut gs = GameState::<Initializing>::new();
+    let gs = GameState::<Initializing>::new();
     // Use the public API to test the underlying logic, not the wasm32-gated wrapper
     let mut gs = gs.start();
     gs.tick(16);
@@ -182,7 +182,7 @@ fn physics_system_actually_moves_entities() {
 
 #[test]
 fn score_system_increments_on_award() {
-    use wasm_game_logic::{World, Player, ScoreSystem, Entity};
+    use wasm_game_logic::{World, Player, ScoreSystem};
     let mut world = World::new();
     let e = world.spawn();
     world.add_player(e, Player { name: "p".to_string(), score: 0 });

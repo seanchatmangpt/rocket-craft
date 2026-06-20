@@ -1,6 +1,6 @@
-use proptest::prelude::*;
-use nexus_ecs::{world::GameWorld, components::*, systems::*, scheduler::SystemScheduler};
 use hecs::World;
+use nexus_ecs::{components::*, scheduler::SystemScheduler, systems::*, world::GameWorld};
+use proptest::prelude::*;
 
 #[test]
 fn spawn_player_has_all_components() {
@@ -90,7 +90,11 @@ fn projectile_expires_after_lifetime() {
             magic_type: MagicType::BeamSaber,
         },
         Position::default(),
-        Velocity { dx: 1.0, dy: 0.0, dz: 0.0 },
+        Velocity {
+            dx: 1.0,
+            dy: 0.0,
+            dz: 0.0,
+        },
     ));
     assert_eq!(world.len(), 1);
     system_tick_projectiles(&mut world, 0.6); // dt > lifetime
@@ -105,7 +109,11 @@ fn scheduler_runs_full_tick_without_panic() {
     world.spawn_projectile(
         1,
         Position::default(),
-        Velocity { dx: 1.0, dy: 0.0, dz: 0.0 },
+        Velocity {
+            dx: 1.0,
+            dy: 0.0,
+            dz: 0.0,
+        },
         30.0,
         MagicType::Fire,
     );

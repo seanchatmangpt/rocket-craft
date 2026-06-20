@@ -1,17 +1,17 @@
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
+use pipeline_core::{
+    config::PipelineConfig,
+    conversion::BlenderConverter,
+    discovery::{DirectoryWatcher, Scanner},
+    reporting::{AssetStatus, Reporter},
+    staging::Stager,
+    validation::{ValidationConfig, Validator},
+    PipelineEvent,
+};
 use std::path::PathBuf;
 use std::time::Instant;
 use tracing::{error, info, warn};
-use pipeline_core::{
-    config::PipelineConfig,
-    validation::{ValidationConfig, Validator},
-    staging::Stager,
-    reporting::{AssetStatus, Reporter},
-    discovery::{Scanner, DirectoryWatcher},
-    conversion::BlenderConverter,
-    PipelineEvent,
-};
 
 #[derive(Parser)]
 #[command(name = "asset-pipeline")]
@@ -75,15 +75,18 @@ async fn main() -> Result<()> {
     // Load config (may not exist for InitConfig/Status)
     let config = match &cli.command {
         Commands::InitConfig | Commands::Status { .. } => None,
-        _ => Some(PipelineConfig::from_file(&cli.config)
-            .with_context(|| format!("loading config from {}", cli.config.display()))?),
+        _ => Some(
+            PipelineConfig::from_file(&cli.config)
+                .with_context(|| format!("loading config from {}", cli.config.display()))?,
+        ),
     };
 
     // Init tracing
-    let log_level = config.as_ref().map(|c| c.pipeline.log_level.as_str()).unwrap_or("info");
-    tracing_subscriber::fmt()
-        .with_env_filter(log_level)
-        .init();
+    let log_level = config
+        .as_ref()
+        .map(|c| c.pipeline.log_level.as_str())
+        .unwrap_or("info");
+    tracing_subscriber::fmt().with_env_filter(log_level).init();
 
     let script = cli.script;
 
@@ -152,11 +155,20 @@ fn resolve_script(override_path: Option<PathBuf>) -> PathBuf {
     PathBuf::from("asset-pipeline/scripts/blender_convert.py")
 }
 
-async fn run_once(cfg: &PipelineConfig, watch_dir: PathBuf, output_dir: PathBuf, script: Option<PathBuf>) -> Result<()> {
+async fn run_once(
+    cfg: &PipelineConfig,
+    watch_dir: PathBuf,
+    output_dir: PathBuf,
+    script: Option<PathBuf>,
+) -> Result<()> {
     info!("Scanning {}", watch_dir.display());
 
     let scan = Scanner::scan_once(&watch_dir);
-    info!("Found {} assets, {} errors", scan.assets.len(), scan.errors.len());
+    info!(
+        "Found {} assets, {} errors",
+        scan.assets.len(),
+        scan.errors.len()
+    );
     for (path, err) in &scan.errors {
         warn!("Scan error for {}: {err}", path.display());
     }
@@ -164,20 +176,30 @@ async fn run_once(cfg: &PipelineConfig, watch_dir: PathBuf, output_dir: PathBuf,
     process_assets(cfg, scan.assets, watch_dir, output_dir, script).await
 }
 
-async fn run_single_conversion(cfg: &PipelineConfig, input: PathBuf, output_dir: PathBuf, script: Option<PathBuf>) -> Result<()> {
+async fn run_single_conversion(
+    cfg: &PipelineConfig,
+    input: PathBuf,
+    output_dir: PathBuf,
+    script: Option<PathBuf>,
+) -> Result<()> {
     use pipeline_core::discovery;
-    let hash = discovery::content_hash(&input)
-        .context("hashing input file")?;
+    let hash = discovery::content_hash(&input).context("hashing input file")?;
     let meta = std::fs::metadata(&input).context("reading metadata")?;
     let fmt = pipeline_core::Format::from_extension(
-        input.extension().and_then(|e| e.to_str()).unwrap_or("")
-    ).ok_or_else(|| anyhow::anyhow!("unsupported format"))?;
+        input.extension().and_then(|e| e.to_str()).unwrap_or(""),
+    )
+    .ok_or_else(|| anyhow::anyhow!("unsupported format"))?;
 
     let asset = pipeline_core::DiscoveredAsset::new(input, hash, fmt, meta.len());
     process_assets(cfg, vec![asset], PathBuf::from("."), output_dir, script).await
 }
 
-async fn run_watch_mode(cfg: &PipelineConfig, watch_dir: PathBuf, output_dir: PathBuf, script: Option<PathBuf>) -> Result<()> {
+async fn run_watch_mode(
+    cfg: &PipelineConfig,
+    watch_dir: PathBuf,
+    output_dir: PathBuf,
+    script: Option<PathBuf>,
+) -> Result<()> {
     // Broadcast channel for pipeline events
     let (event_tx, mut event_rx) = tokio::sync::broadcast::channel::<PipelineEvent>(128);
 
@@ -196,20 +218,37 @@ async fn run_watch_mode(cfg: &PipelineConfig, watch_dir: PathBuf, output_dir: Pa
                 info!("New file detected: {}", path.display());
                 let hash = match pipeline_core::discovery::content_hash(&path) {
                     Ok(h) => h,
-                    Err(e) => { error!("Hash error for {}: {e}", path.display()); continue; }
+                    Err(e) => {
+                        error!("Hash error for {}: {e}", path.display());
+                        continue;
+                    }
                 };
                 let meta = match std::fs::metadata(&path) {
                     Ok(m) => m,
-                    Err(e) => { error!("Metadata error: {e}"); continue; }
+                    Err(e) => {
+                        error!("Metadata error: {e}");
+                        continue;
+                    }
                 };
                 let fmt = match pipeline_core::Format::from_extension(
-                    path.extension().and_then(|e| e.to_str()).unwrap_or("")
+                    path.extension().and_then(|e| e.to_str()).unwrap_or(""),
                 ) {
                     Some(f) => f,
-                    None => { warn!("Unknown format for {}", path.display()); continue; }
+                    None => {
+                        warn!("Unknown format for {}", path.display());
+                        continue;
+                    }
                 };
                 let asset = pipeline_core::DiscoveredAsset::new(path, hash, fmt, meta.len());
-                if let Err(e) = process_assets(cfg, vec![asset], watch_dir.clone(), output_dir.clone(), script.clone()).await {
+                if let Err(e) = process_assets(
+                    cfg,
+                    vec![asset],
+                    watch_dir.clone(),
+                    output_dir.clone(),
+                    script.clone(),
+                )
+                .await
+                {
                     error!("Pipeline error: {e}");
                 }
             }
@@ -260,10 +299,22 @@ async fn process_assets(
         // Validate
         let validated = match validator.validate(asset) {
             Ok(v) => v,
-            Err((e, _)) => {
-                let status = if e.is_skippable() { AssetStatus::Skipped } else { AssetStatus::ValidationFailed };
+            Err(boxed_err) => {
+                let (e, _) = *boxed_err;
+                let status = if e.is_skippable() {
+                    AssetStatus::Skipped
+                } else {
+                    AssetStatus::ValidationFailed
+                };
                 warn!("Skipping {}: {e}", path.display());
-                Reporter::record_failure(&mut run, path, hash, status, &e, start.elapsed().as_millis() as u64);
+                Reporter::record_failure(
+                    &mut run,
+                    path,
+                    hash,
+                    status,
+                    &e,
+                    start.elapsed().as_millis() as u64,
+                );
                 continue;
             }
         };
@@ -272,7 +323,9 @@ async fn process_assets(
         // path inside BlenderConverter::convert and never actually invokes Blender.
         if converter.is_none() {
             match BlenderConverter::discover(script_path.clone()) {
-                Ok(c) => { converter = Some(c); }
+                Ok(c) => {
+                    converter = Some(c);
+                }
                 Err(e) if validated.source_format.is_fbx() => {
                     // FBX fast-path: synthesise a no-Blender converter struct.
                     // The blender_path/script_path fields are never used for FBX.
@@ -294,9 +347,17 @@ async fn process_assets(
         // Convert
         let converted = match converter.convert(validated, &work_dir).await {
             Ok(c) => c,
-            Err((e, _)) => {
+            Err(boxed_err) => {
+                let (e, _) = *boxed_err;
                 error!("Conversion failed for {}: {e}", path.display());
-                Reporter::record_failure(&mut run, path, hash, AssetStatus::ConversionFailed, &e, start.elapsed().as_millis() as u64);
+                Reporter::record_failure(
+                    &mut run,
+                    path,
+                    hash,
+                    AssetStatus::ConversionFailed,
+                    &e,
+                    start.elapsed().as_millis() as u64,
+                );
                 continue;
             }
         };
@@ -307,11 +368,23 @@ async fn process_assets(
                 info!("\u{2713} {}", staged.content_path.display());
                 Reporter::record_success(&mut run, &staged, start.elapsed().as_millis() as u64);
             }
-            Err((e, _)) => {
+            Err(boxed_err) => {
+                let (e, _) = *boxed_err;
                 error!("Staging failed: {e}");
-                Reporter::record_failure(&mut run, path, hash, AssetStatus::StagingFailed, &e, start.elapsed().as_millis() as u64);
+                Reporter::record_failure(
+                    &mut run,
+                    path,
+                    hash,
+                    AssetStatus::StagingFailed,
+                    &e,
+                    start.elapsed().as_millis() as u64,
+                );
             }
         }
+    }
+
+    if work_dir.exists() {
+        let _ = std::fs::remove_dir_all(&work_dir);
     }
 
     reporter.finish_run(&mut manifest, run)?;

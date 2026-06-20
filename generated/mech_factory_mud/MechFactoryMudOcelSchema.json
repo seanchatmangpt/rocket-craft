@@ -1,0 +1,33 @@
+{
+  "ocel:global-event": {
+    "ocel:activity": [
+      "RouteNodeEntered",
+      "StationVisited",
+      "PartGenerated",
+      "AuthorityUpdated",
+      "SurrogateValidated",
+      "ProjectionRowEmitted",
+      "VerifierGatePassed",
+      "VerifierGateRefused",
+      "ReceiptEmitted",
+      "RepairApplied"
+    ]
+  },
+  "ocel:global-object": {
+    "ocel:type": [
+      "Factory",
+      "Station",
+      "WalkthroughRun",
+      "Mech",
+      "Frame",
+      "Socket",
+      "ArmorPanel",
+      "SkinLayer",
+      "MotionFamily",
+      "GeometryEnvelope",
+      "ProjectionRow",
+      "Receipt",
+      "VerifierGate"
+    ]
+  }
+}

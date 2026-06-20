@@ -1,0 +1,66 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix mud:  <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SOCKETS AND MOUNTS EXTENSION
+# ─────────────────────────────────────────────────────────────────────────────
+# This ontology extension defines specialized socket and mount types required
+# for the Combinatorial Engine, and enforces the "No Geometry Smuggling" rule.
+
+# Sockets are already defined in mech_factory_mud.ttl as:
+# mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true .
+# We declare the specialized socket types here.
+
+mud:WeaponSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Weapon Socket" .
+
+mud:SupportToolSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Support Tool Socket" .
+
+mud:VfxSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "VFX Socket" .
+
+mud:CameraSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Camera Socket" .
+
+mud:LoadoutMount a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Loadout Mount" .
+
+mud:DamageZoneAnchor a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Damage Zone Anchor" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHACL VALIDATION: NO GEOMETRY SMUGGLING
+# ─────────────────────────────────────────────────────────────────────────────
+# "Sockets must not smuggle geometry."
+# We enforce this by ensuring no mud:GeometryPrimitive points to a Socket
+# using mud:belongsToPart.
+
+mud:SocketGeometrySmugglingShape a sh:NodeShape ;
+    sh:targetClass mud:Socket ;
+    sh:property [
+        sh:path [ sh:inversePath mud:belongsToPart ] ;
+        sh:maxCount 0 ;
+        sh:message "Sockets must not smuggle geometry. A mud:GeometryPrimitive must not have mud:belongsToPart pointing to a mud:Socket."
+    ] ;
+    sh:property [
+        sh:path mud:hasGeometry ;
+        sh:maxCount 0 ;
+        sh:message "Sockets must not smuggle geometry. mud:hasGeometry is forbidden on any Socket."
+    ] ;
+    sh:property [
+        sh:path core:mesh ;
+        sh:maxCount 0 ;
+        sh:message "Sockets must not smuggle geometry. core:mesh is forbidden on any Socket."
+    ] .

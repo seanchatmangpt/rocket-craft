@@ -16,8 +16,11 @@ chrono = { version = "0.4", features = ["serde"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 inquire = "0.7"
-rcgen = "0.13"
+rcgen = { version = "0.13", default-features = false, features = ["ring", "pem"] }
+ring = "0.17"
+base64 = "0.22"
 p12-keystore = "0.2"
+openssl = "0.10"
 indicatif = "0.17"
 ignore = "0.4"
 git2 = "0.19"
@@ -26,6 +29,7 @@ unrdf = { path = "../unrdf" }
 reqwest = { version = "0.12", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
 blake3 = "1.5"
+libc = "0.2.186"
 
 [dev-dependencies]
 un-test-utils = { path = "../un-test-utils" }

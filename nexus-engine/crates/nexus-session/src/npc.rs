@@ -232,3 +232,164 @@ impl Npc {
         ((base_value as f32) * self.vendor_markup).round() as u32
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn vendor() -> Npc {
+        let tree = NpcDialogueTree::new(vec![
+            DialogueNode {
+                id: 0,
+                speaker: "Arms Dealer".into(),
+                text: "Welcome, pilot.".into(),
+                responses: vec![
+                    DialogueResponse {
+                        text: "Show me your wares.".into(),
+                        next_node: None,
+                        unlock_requires: None,
+                    },
+                ],
+                triggers_trade: true,
+                triggers_quest: None,
+            },
+        ]);
+        let mut npc = Npc::new(1, "Arms Dealer", NpcType::Merchant, tree);
+        npc.is_vendor = true;
+        npc.vendor_markup = 1.2;
+        npc
+    }
+
+    fn neutral() -> Npc {
+        Npc::new(2, "Guard", NpcType::NeutralDeathless, NpcDialogueTree::empty())
+    }
+
+    // ── idle → greeting ──────────────────────────────────────────────────────
+
+    #[test]
+    fn approach_triggers_greeting() {
+        let mut npc = vendor();
+        let action = npc.transition(NpcEvent::PlayerApproach);
+        assert!(matches!(action, Some(NpcAction::PlayGreeting)));
+        assert_eq!(npc.state, NpcState::Greeting);
+    }
+
+    // ── greeting → dialogue ───────────────────────────────────────────────────
+
+    #[test]
+    fn speak_advances_from_greeting_to_dialogue() {
+        let mut npc = vendor();
+        npc.transition(NpcEvent::PlayerApproach);
+        let action = npc.transition(NpcEvent::PlayerSpeak);
+        assert!(matches!(action, Some(NpcAction::ShowDialogue(0))));
+        assert!(matches!(npc.state, NpcState::InDialogue { node: 0 }));
+    }
+
+    // ── dialogue → trade ──────────────────────────────────────────────────────
+
+    #[test]
+    fn open_trade_from_trade_node_returns_open_shop() {
+        let mut npc = vendor();
+        npc.transition(NpcEvent::PlayerApproach);
+        npc.transition(NpcEvent::PlayerSpeak);
+        let action = npc.transition(NpcEvent::OpenTrade);
+        assert!(matches!(action, Some(NpcAction::OpenShop)));
+        assert_eq!(npc.state, NpcState::Trading);
+    }
+
+    #[test]
+    fn open_trade_on_non_vendor_returns_none() {
+        let mut npc = neutral();
+        npc.state = NpcState::InDialogue { node: 0 };
+        let action = npc.transition(NpcEvent::OpenTrade);
+        assert!(action.is_none(), "non-vendor must not open shop");
+    }
+
+    // ── player leave resets to idle ───────────────────────────────────────────
+
+    #[test]
+    fn leave_from_greeting_returns_to_idle() {
+        let mut npc = vendor();
+        npc.transition(NpcEvent::PlayerApproach);
+        let action = npc.transition(NpcEvent::PlayerLeave);
+        assert!(matches!(action, Some(NpcAction::EndDialogue)));
+        assert_eq!(npc.state, NpcState::Idle);
+    }
+
+    #[test]
+    fn leave_from_dialogue_returns_to_idle() {
+        let mut npc = vendor();
+        npc.transition(NpcEvent::PlayerApproach);
+        npc.transition(NpcEvent::PlayerSpeak);
+        npc.transition(NpcEvent::PlayerLeave);
+        assert_eq!(npc.state, NpcState::Idle);
+    }
+
+    #[test]
+    fn leave_from_trading_returns_to_idle() {
+        let mut npc = vendor();
+        npc.transition(NpcEvent::PlayerApproach);
+        npc.transition(NpcEvent::PlayerSpeak);
+        npc.transition(NpcEvent::OpenTrade);
+        npc.transition(NpcEvent::PlayerLeave);
+        assert_eq!(npc.state, NpcState::Idle);
+    }
+
+    // ── attack makes any NPC hostile ─────────────────────────────────────────
+
+    #[test]
+    fn attacking_idle_npc_makes_it_hostile() {
+        let mut npc = neutral();
+        let action = npc.transition(NpcEvent::PlayerAttack);
+        assert!(matches!(action, Some(NpcAction::BecomeHostile)));
+        assert_eq!(npc.state, NpcState::Hostile);
+    }
+
+    #[test]
+    fn attacking_while_greeting_makes_npc_hostile() {
+        let mut npc = vendor();
+        npc.transition(NpcEvent::PlayerApproach);
+        npc.transition(NpcEvent::PlayerAttack);
+        assert_eq!(npc.state, NpcState::Hostile);
+    }
+
+    // ── attacking a dead NPC has no effect ───────────────────────────────────
+
+    #[test]
+    fn attacking_dead_npc_returns_none() {
+        let mut npc = neutral();
+        npc.state = NpcState::Dead;
+        let action = npc.transition(NpcEvent::PlayerAttack);
+        assert!(action.is_none(), "dead NPCs must not transition on attack");
+        assert_eq!(npc.state, NpcState::Dead);
+    }
+
+    // ── sell_price ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn vendor_sell_price_applies_markup() {
+        let npc = vendor(); // markup = 1.2
+        assert_eq!(npc.sell_price(100), 120);
+    }
+
+    #[test]
+    fn sell_price_rounds_to_nearest_gold() {
+        let npc = vendor(); // markup = 1.2
+        // 10 * 1.2 = 12.0 → 12
+        assert_eq!(npc.sell_price(10), 12);
+        // 5 * 1.2 = 6.0 → 6
+        assert_eq!(npc.sell_price(5), 6);
+    }
+
+    // ── invalid response index ────────────────────────────────────────────────
+
+    #[test]
+    fn out_of_range_response_index_returns_none() {
+        let mut npc = vendor();
+        npc.transition(NpcEvent::PlayerApproach);
+        npc.transition(NpcEvent::PlayerSpeak);
+        // dialogue node 0 has only 1 response (index 0); index 99 is invalid
+        let action = npc.transition(NpcEvent::SelectResponse(99));
+        assert!(action.is_none());
+    }
+}

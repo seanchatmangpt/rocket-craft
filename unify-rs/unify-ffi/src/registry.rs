@@ -48,7 +48,7 @@ impl FfiCommandRegistry {
             Ok(FfiValue::Str(env!("CARGO_PKG_VERSION").to_string()))
         });
 
-        self.register("echo", |input| Ok(input));
+        self.register("echo", Ok);
 
         self.register("ping", |_input| Ok(FfiValue::Str("pong".to_string())));
 

@@ -18,13 +18,19 @@ fn chain_hash(prev: &str, content: &str) -> String {
     blake3_hex(combined.as_bytes())
 }
 
+fn get_manifest_path() -> std::path::PathBuf {
+    std::env::var("ROCKET_MANIFEST_PATH")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|_| std::path::PathBuf::from("project-manifest.json"))
+}
+
 // ─────────────────────────────────────────────
 // Tool handlers (pub so tests can call them)
 // ─────────────────────────────────────────────
 
 /// `rocket/manifest/list` – parse `project-manifest.json` from cwd.
 pub fn handle_manifest_list(_params: serde_json::Value) -> Result<serde_json::Value, String> {
-    let path = std::path::Path::new("project-manifest.json");
+    let path = get_manifest_path();
     let contents = std::fs::read_to_string(path).map_err(|_| "manifest not found".to_string())?;
     let manifest: serde_json::Value =
         serde_json::from_str(&contents).map_err(|e| format!("manifest parse error: {}", e))?;
@@ -54,7 +60,7 @@ pub fn handle_project_audit(params: serde_json::Value) -> Result<serde_json::Val
         .ok_or_else(|| "Missing 'project_name' parameter".to_string())?;
 
     // Load manifest to find the project
-    let path = std::path::Path::new("project-manifest.json");
+    let path = get_manifest_path();
     let contents = std::fs::read_to_string(path).map_err(|_| "manifest not found".to_string())?;
     let manifest: serde_json::Value =
         serde_json::from_str(&contents).map_err(|e| format!("manifest parse error: {}", e))?;
@@ -200,9 +206,9 @@ pub fn handle_leaderboard_top(params: serde_json::Value) -> Result<serde_json::V
 // Resource handlers
 // ─────────────────────────────────────────────
 
-/// `rocket://manifest` – return raw project-manifest.json contents.
+/// rocket://manifest – return raw project-manifest.json contents.
 pub fn handle_resource_manifest(_uri: &str) -> Result<serde_json::Value, String> {
-    let path = std::path::Path::new("project-manifest.json");
+    let path = get_manifest_path();
     let contents = std::fs::read_to_string(path).map_err(|_| "manifest not found".to_string())?;
     Ok(json!({ "text": contents }))
 }
@@ -347,7 +353,7 @@ pub fn register_rocket_resources(registry: &mut ResourceRegistry) {
 
 /// Attach all rocket/* tools and resources to a McpServer via the builder pattern.
 pub fn attach_rocket_tools(server: McpServer) -> McpServer {
-    let server = server
+    server
         .with_tool(
             ToolDescriptor {
                 name: "rocket/manifest/list".into(),
@@ -438,9 +444,7 @@ pub fn attach_rocket_tools(server: McpServer) -> McpServer {
                 description: "Contents of capabilities/CapabilityManifest.md.".into(),
             },
             handle_resource_capabilities,
-        );
-
-    server
+        )
 }
 
 // ─────────────────────────────────────────────
@@ -466,17 +470,20 @@ mod tests {
         FS_LOCK.lock().unwrap_or_else(|e| e.into_inner())
     }
 
-    // Helper: write a temp manifest file and return a guard that removes it.
     struct TempFile(PathBuf);
     impl TempFile {
         fn write(path: &str, content: &str) -> Self {
-            fs::write(path, content).expect("write temp file");
-            TempFile(PathBuf::from(path))
+            let temp_path =
+                std::env::temp_dir().join(format!("project-manifest-test-{}.json", path));
+            fs::write(&temp_path, content).expect("write temp file");
+            std::env::set_var("ROCKET_MANIFEST_PATH", &temp_path);
+            TempFile(temp_path)
         }
     }
     impl Drop for TempFile {
         fn drop(&mut self) {
             let _ = fs::remove_file(&self.0);
+            std::env::remove_var("ROCKET_MANIFEST_PATH");
         }
     }
 
@@ -485,10 +492,12 @@ mod tests {
     #[test]
     fn test_manifest_list_no_file_returns_error() {
         let _lock = fs_lock();
-        // Remove the file so we can verify the "not found" error path.
-        let _ = fs::remove_file("project-manifest.json");
+        let temp_path = std::env::temp_dir().join("project-manifest-nonexistent.json");
+        let _ = fs::remove_file(&temp_path);
+        std::env::set_var("ROCKET_MANIFEST_PATH", &temp_path);
 
         let result = handle_manifest_list(json!({}));
+        std::env::remove_var("ROCKET_MANIFEST_PATH");
         assert!(result.is_err());
         assert!(result.unwrap_err().contains("manifest not found"));
     }

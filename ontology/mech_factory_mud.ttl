@@ -1,0 +1,119 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://ggen.io/ontology/mech_factory_mud/> .
+
+mud:MechFactoryMudOntology a owl:Ontology ;
+    rdfs:label "Mech Factory MUD Digital Twin Ontology" ;
+    rdfs:comment "Headless Rust digital twin of the mech factory walkthrough. Governs Walkthrough Route, Stations, Part Families, and Authority Byte Fields." ;
+    owl:imports <https://ggen.io/ontology/core/> .
+
+# ---------------------------------------------------------
+# Authority Byte Fields
+# ---------------------------------------------------------
+mud:AuthorityByteField a owl:Class ;
+    rdfs:subClassOf core:ByteClass ;
+    rdfs:label "Authority Byte Field" ;
+    rdfs:comment "Dense byte authority state for the digital twin." .
+
+mud:DamageClass a mud:AuthorityByteField ;
+    rdfs:label "damage_class" ;
+    core:compilesToZST true .
+
+mud:HeatClass a mud:AuthorityByteField ;
+    rdfs:label "heat_class" ;
+    core:compilesToZST true .
+
+mud:StressClass a mud:AuthorityByteField ;
+    rdfs:label "stress_class" ;
+    core:compilesToZST true .
+
+mud:GripClass a mud:AuthorityByteField ;
+    rdfs:label "grip_class" ;
+    core:compilesToZST true .
+
+mud:SocketHealthClass a mud:AuthorityByteField ;
+    rdfs:label "socket_health_class" ;
+    core:compilesToZST true .
+
+mud:LodClass a mud:AuthorityByteField ;
+    rdfs:label "lod_class" ;
+    core:compilesToZST true .
+
+mud:WalkthroughStateClass a mud:AuthorityByteField ;
+    rdfs:label "walkthrough_state_class" ;
+    core:compilesToZST true .
+
+mud:StationStateClass a mud:AuthorityByteField ;
+    rdfs:label "station_state_class" ;
+    core:compilesToZST true .
+
+mud:ProjectionStateClass a mud:AuthorityByteField ;
+    rdfs:label "projection_state_class" ;
+    core:compilesToZST true .
+
+mud:ReceiptStateClass a mud:AuthorityByteField ;
+    rdfs:label "receipt_state_class" ;
+    core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Part Families
+# ---------------------------------------------------------
+mud:PartFamily a owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Part Family" ;
+    rdfs:comment "Mechanized part families generated at stations." .
+
+mud:Frame a mud:PartFamily ; rdfs:label "Frame" ; core:isBounded true ; core:compilesToZST true .
+mud:Shoulder a mud:PartFamily ; rdfs:label "Shoulder" ; core:isBounded true ; core:compilesToZST true .
+mud:Arm a mud:PartFamily ; rdfs:label "Arm" ; core:isBounded true ; core:compilesToZST true .
+mud:Leg a mud:PartFamily ; rdfs:label "Leg" ; core:isBounded true ; core:compilesToZST true .
+mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true .
+mud:ArmorPanel a mud:PartFamily ; rdfs:label "ArmorPanel" ; core:isBounded true ; core:compilesToZST true .
+mud:WeaponMount a mud:PartFamily ; rdfs:label "WeaponMount" ; core:isBounded true ; core:compilesToZST true .
+mud:CoolingVent a mud:PartFamily ; rdfs:label "CoolingVent" ; core:isBounded true ; core:compilesToZST true .
+mud:SkinLayer a mud:PartFamily ; rdfs:label "SkinLayer" ; core:isBounded true ; core:compilesToZST true .
+mud:MotionFamily a mud:PartFamily ; rdfs:label "MotionFamily" ; core:isBounded true ; core:compilesToZST true .
+mud:LODVariant a mud:PartFamily ; rdfs:label "LODVariant" ; core:isBounded true ; core:compilesToZST true .
+mud:ReceiptTerminalPart a mud:PartFamily ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Stations
+# ---------------------------------------------------------
+mud:Station a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Factory Station" ;
+    rdfs:comment "Discrete manufacturing or verification station." .
+
+mud:FrameAssembly a mud:Station ; rdfs:label "FrameAssembly" ; core:isBounded true ; core:compilesToZST true .
+mud:SocketTopologyStation a mud:Station ; rdfs:label "SocketTopology" ; core:isBounded true ; core:compilesToZST true .
+mud:ArmorSkinStation a mud:Station ; rdfs:label "ArmorSkinStation" ; core:isBounded true ; core:compilesToZST true .
+mud:RigMotionStation a mud:Station ; rdfs:label "RigMotionStation" ; core:isBounded true ; core:compilesToZST true .
+mud:VerificationGate a mud:Station ; rdfs:label "VerificationGate" ; core:isBounded true ; core:compilesToZST true .
+mud:ReceiptTerminalStation a mud:Station ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Walkthrough Route Nodes
+# ---------------------------------------------------------
+mud:RouteNode a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Walkthrough Route Node" ;
+    rdfs:comment "A node in the deterministic factory walkthrough." .
+
+mud:hasNextNode a owl:ObjectProperty ;
+    rdfs:domain mud:RouteNode ;
+    rdfs:range mud:RouteNode ;
+    rdfs:label "has Next Node" .
+
+mud:Spawn a mud:RouteNode ; rdfs:label "Spawn" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:FactoryEntrance .
+mud:FactoryEntrance a mud:RouteNode ; rdfs:label "FactoryEntrance" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:FrameAssemblyNode .
+mud:FrameAssemblyNode a mud:RouteNode ; rdfs:label "FrameAssembly" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:SocketTopologyNode .
+mud:SocketTopologyNode a mud:RouteNode ; rdfs:label "SocketTopology" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ArmorSkinStationNode .
+mud:ArmorSkinStationNode a mud:RouteNode ; rdfs:label "ArmorSkinStation" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:RigMotionStationNode .
+mud:RigMotionStationNode a mud:RouteNode ; rdfs:label "RigMotionStation" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:VerificationGateNode .
+mud:VerificationGateNode a mud:RouteNode ; rdfs:label "VerificationGate" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ReceiptTerminalNode .
+mud:ReceiptTerminalNode a mud:RouteNode ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ExitOrLoop .
+mud:ExitOrLoop a mud:RouteNode ; rdfs:label "ExitOrLoop" ; core:isBounded true ; core:compilesToZST true .

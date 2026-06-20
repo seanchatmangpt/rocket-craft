@@ -227,21 +227,20 @@ fn detect_risky_patterns(filepath: &str, content: &str, obs: &mut Vec<Observatio
             });
         }
 
-        if trimmed.contains("lazy_static!") || trimmed.contains("once_cell") {
-            if trimmed.contains("env::var") || trimmed.contains("std::env") {
-                obs.push(Observation {
-                    file_path: filepath.to_string(),
-                    start_byte: 0,
-                    end_byte: 0,
-                    line: line_num,
-                    column: 1,
-                    kind: "risky_pattern".to_string(),
-                    construct: "lazy_static_env".to_string(),
-                    context: trimmed.to_string(),
-                    message: "lazy_static/once_cell initialization from env var detected"
-                        .to_string(),
-                });
-            }
+        if (trimmed.contains("lazy_static!") || trimmed.contains("once_cell"))
+            && (trimmed.contains("env::var") || trimmed.contains("std::env"))
+        {
+            obs.push(Observation {
+                file_path: filepath.to_string(),
+                start_byte: 0,
+                end_byte: 0,
+                line: line_num,
+                column: 1,
+                kind: "risky_pattern".to_string(),
+                construct: "lazy_static_env".to_string(),
+                context: trimmed.to_string(),
+                message: "lazy_static/once_cell initialization from env var detected".to_string(),
+            });
         }
 
         if trimmed.starts_with("unsafe ") || trimmed.contains("unsafe {") {
@@ -434,4 +433,99 @@ pub fn parse_rust_source(filepath: &str, content: &str) -> Vec<Observation> {
     let metrics = collect_fn_metrics(content);
     check_fn_thresholds(filepath, &metrics, &mut obs);
     obs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── stub macros ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn todo_macro_produces_rust_stub_obs() {
+        let obs = parse_rust_source("src/lib.rs", "fn foo() { todo!() }\n");
+        assert!(
+            obs.iter().any(|o| o.kind == "rust_stub" && o.construct == "todo!"),
+            "todo! must produce rust_stub observation"
+        );
+    }
+
+    #[test]
+    fn unimplemented_macro_produces_rust_stub_obs() {
+        let obs = parse_rust_source("src/lib.rs", "fn foo() { unimplemented!() }\n");
+        assert!(obs.iter().any(|o| o.kind == "rust_stub" && o.construct == "unimplemented!"));
+    }
+
+    // ── debug macros outside test files ──────────────────────────────────────
+
+    #[test]
+    fn dbg_macro_in_prod_produces_debug_artifact() {
+        let obs = parse_rust_source("src/lib.rs", "fn f() { dbg!(x); }\n");
+        assert!(
+            obs.iter().any(|o| o.kind == "rust_debug_artifact"),
+            "dbg! in non-test file must produce rust_debug_artifact"
+        );
+    }
+
+    #[test]
+    fn dbg_macro_in_test_file_is_allowed() {
+        let obs = parse_rust_source("tests/integration.rs", "fn f() { dbg!(x); }\n");
+        assert!(
+            !obs.iter().any(|o| o.kind == "rust_debug_artifact"),
+            "dbg! inside tests/ must not produce rust_debug_artifact"
+        );
+    }
+
+    // ── allow suppression ─────────────────────────────────────────────────────
+
+    #[test]
+    fn allow_dead_code_attr_produces_suppression_obs() {
+        let obs = parse_rust_source("src/lib.rs", "#[allow(dead_code)]\nstruct S;\n");
+        assert!(obs.iter().any(|o| o.kind == "rust_suppression"));
+    }
+
+    // ── TODO/FIXME comments ───────────────────────────────────────────────────
+
+    #[test]
+    fn todo_comment_produces_rust_todo_comment_obs() {
+        let obs = parse_rust_source("src/lib.rs", "// TODO: finish this\nfn f() {}\n");
+        assert!(obs.iter().any(|o| o.kind == "rust_todo_comment" && o.construct == "TODO"));
+    }
+
+    #[test]
+    fn fixme_comment_is_detected() {
+        let obs = parse_rust_source("src/lib.rs", "// FIXME: broken\nfn f() {}\n");
+        assert!(obs.iter().any(|o| o.kind == "rust_todo_comment" && o.construct == "FIXME"));
+    }
+
+    // ── empty wildcard arm ────────────────────────────────────────────────────
+
+    #[test]
+    fn empty_wildcard_arm_in_prod_is_flagged() {
+        let content = "fn f(x: i32) {\n    match x {\n        1 => {}\n        _ => {}\n    }\n}\n";
+        let obs = parse_rust_source("src/lib.rs", content);
+        assert!(
+            obs.iter().any(|o| o.construct == "empty_wildcard_arm"),
+            "empty `_ => {{}}` in prod must produce a rust_stub observation"
+        );
+    }
+
+    #[test]
+    fn empty_wildcard_arm_in_test_file_is_allowed() {
+        let content = "fn f(x: i32) { match x { 1 => {} _ => {} } }\n";
+        let obs = parse_rust_source("tests/foo.rs", content);
+        assert!(!obs.iter().any(|o| o.construct == "empty_wildcard_arm"));
+    }
+
+    // ── clean file ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn clean_file_produces_no_stub_obs() {
+        let clean = "pub fn add(a: i32, b: i32) -> i32 { a + b }\n";
+        let obs = parse_rust_source("src/lib.rs", clean);
+        assert!(
+            !obs.iter().any(|o| o.kind == "rust_stub"),
+            "clean function must not produce stub observations"
+        );
+    }
 }

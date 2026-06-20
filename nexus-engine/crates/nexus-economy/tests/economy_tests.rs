@@ -1,9 +1,9 @@
-use proptest::prelude::*;
 use nexus_economy::{
     auction::{Auction, OpenForBids},
     ledger::{AccountType, JournalEntry, Ledger},
     marketplace::Marketplace,
 };
+use proptest::prelude::*;
 
 // ── Deterministic tests ───────────────────────────────────────────────────────
 
@@ -80,8 +80,7 @@ fn auction_bid_below_starting_price_rejected() {
     let mut ledger = Ledger::new();
     ledger.award_gold(1, 10_000, "bidder gold").unwrap();
 
-    let mut auction =
-        Auction::<OpenForBids>::new(1, 99, "Nu Gundam".to_string(), 500, None, 24);
+    let mut auction = Auction::<OpenForBids>::new(1, 99, "Nu Gundam".to_string(), 500, None, 24);
     let result = auction.place_bid(1, 400, &mut ledger);
     assert!(result.is_err());
     assert_eq!(ledger.total_balance(), 0);
@@ -92,8 +91,7 @@ fn auction_seller_cannot_bid() {
     let mut ledger = Ledger::new();
     ledger.award_gold(42, 10_000, "seller gold").unwrap();
 
-    let mut auction =
-        Auction::<OpenForBids>::new(1, 42, "Zaku II".to_string(), 100, None, 24);
+    let mut auction = Auction::<OpenForBids>::new(1, 42, "Zaku II".to_string(), 100, None, 24);
     let result = auction.place_bid(42, 200, &mut ledger);
     assert!(result.is_err());
 }
@@ -113,10 +111,7 @@ fn auction_happy_path_conserves_gold() {
     // Total balance still zero after settlement.
     assert_eq!(ledger.total_balance(), 0);
     // Seller received 950 (5 % fee = 50)
-    assert_eq!(
-        ledger.balance_of(AccountType::PlayerWallet(seller_id)),
-        950
-    );
+    assert_eq!(ledger.balance_of(AccountType::PlayerWallet(seller_id)), 950);
     // Bidder spent 1000
     assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 9_000);
     // AuctionHouse received 50 (fee)
@@ -158,7 +153,7 @@ fn auction_outbid_refunds_previous_bidder() {
     assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 9_900);
 
     // Player 2 outbids — player 1 should be refunded automatically.
-    let min_bid = 100 + (100 / 20).max(1); // 105
+    let min_bid = 100 + (100 / 20); // 105
     auction.place_bid(2, min_bid, &mut ledger).unwrap();
     assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 10_000); // refunded
 

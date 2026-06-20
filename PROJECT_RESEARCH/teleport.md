@@ -1,0 +1,339 @@
+# Research Dossier: `teleport`
+
+**Total Files:** 166 Ontologies (.ttl) | 48 Queries (.rq)
+**Total Volume:** 214 files
+
+## 1. Core Vocabularies (Prefixes)
+- `agw: <https://ggen.ai/ontology/api-gateway#>`
+- `am: <https://ggen.ai/ontology/asset-management#>`
+- `ana: <http://example.org/healthcare-analytics#>`
+- `ap: <http://ggen.dev/schema/academic-paper#>`
+- `api: <http://api.example.org/schema#>`
+- `api: <http://example.org/api/>`
+- `bank: <http://ggen.dev/ontology/banking-core#>`
+- `bi: <https://ggen.ai/ontology/bi-reporting#>`
+- `bib: <http://purl.org/net/biblio#>`
+- `bill: <http://example.org/medical-billing#>`
+- `blog: <http://example.com/blog#>`
+- `bpmn: <http://www.omg.org/spec/BPMN/20100524/MODEL#>`
+- `cas: <http://ggen.ai/ontology/compliance-audit-system#>`
+- `chatman: <http://ggen.ai/ontology/chatman#>`
+- `clap: <http://ggen.cli/ontology/clap-noun-verb#>`
+- `clap: <http://ggen.io/ontology/clap-noun-verb#>`
+- `cli: <http://ggen.dev/ontology/cli#>`
+- `cli: <http://ggen.dev/schema/cli#>`
+- `cli: <http://ggen.io/ontology/cli-copilot#>`
+- `cli: <http://ggen.io/ontology/semantic-cli#>`
+- `cnv: <http://clap-noun-verb.org/ontology#>`
+- `cnv: <http://ggen.dev/schema/clap-noun-verb#>`
+- `cnv: <http://ggen.ruv.io/ontology/clap-noun-verb#>`
+- `code: <http://ggen.io/ontology/code#>`
+- `crm: <http://ggen.io/ontology/crm#>`
+- `crypto: <http://ggen.dev/ontology/cryptocurrency-exchange#>`
+- `ct: <http://example.org/clinical-trials#>`
+- `ctx: <http://ggen.io/ontology/context#>`
+- `db: <http://example.org/database/>`
+- `dc: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/terms/>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `dicom-ontology: <http://ggen.io/ontology/dicom#>`
+- `dicom: <http://dicom.nema.org/>`
+- `dms: <https://ggen.ai/ontology/document-management#>`
+- `doap: <http://usefulinc.com/ns/doap#>`
+- `dpipe: <http://ggen.cli/ontology/data-pipeline#>`
+- `dwh: <https://ggen.ai/ontology/data-warehouse#>`
+- `ed: <http://ggen.io/ontology/editor#>`
+- `ehr: <http://example.org/ehr#>`
+- `erp: <http://ggen.io/ontology/erp#>`
+- `ex: <http://example.org/>`
+- `ex: <http://example.org/advanced-rust-project/>`
+- `ex: <http://example.org/comprehensive-rust-showcase/>`
+- `ex: <http://example.org/maturity-matrix/level1#>`
+- `ex: <http://example.org/maturity-matrix/level2#>`
+- `ex: <http://example.org/maturity-matrix/level3#>`
+- `ex: <http://example.org/maturity-matrix/level4/core#>`
+- `ex: <http://example.org/maturity-matrix/level4/infrastructure#>`
+- `ex: <http://example.org/maturity-matrix/level4/services#>`
+- *...and 71 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:AllTasksHaveOutgoingFlow`
+- `:AllTasksReachable`
+- `:AndJoinMultipleIncoming`
+- `:AndSplitMultipleOutgoing`
+- `:Constraint`
+- `:ConstraintType`
+- `:InputConditionNoIncoming`
+- `:OrJoinMultipleIncoming`
+- `:OrJoinViciousCircleWarning`
+- `:OutputConditionNoOutgoing`
+- `:Report`
+- `:ReportFormat`
+- `:SeverityLevel`
+- `:Shape`
+- `:ShapeType`
+- `:SpecificationHasInputCondition`
+- `:SpecificationHasOutputCondition`
+- `:Validation`
+- `:ValidationStatus`
+- `:XorSplitFlowsHavePredicates`
+- `:XorSplitMultipleOutgoing`
+- `agw:AccessLog`
+- `agw:ApiGateway`
+- `agw:ApiKey`
+- `agw:ApiVersion`
+- `agw:AuditLog`
+- `agw:AuthorizationPolicy`
+- `agw:BackendService`
+- `agw:BackwardCompatibility`
+- `agw:BlueGreenDeployment`
+- `agw:CanaryDeployment`
+- `agw:Certificate`
+- `agw:CertificateAuthority`
+- `agw:CircuitBreaker`
+- `agw:ConnectionPool`
+- `agw:ControlPlane`
+- `agw:DataPlane`
+- `agw:DeprecationPolicy`
+- `agw:DestinationRule`
+- `agw:DistributedTracing`
+- `agw:Gateway`
+- `agw:HealthCheck`
+- `agw:HealthEndpoint`
+- `agw:JWTAuthentication`
+- `agw:LivenessProbe`
+- `agw:LoadBalancer`
+- `agw:Metrics`
+- `agw:MutualTLS`
+- `agw:OAuth2`
+- `agw:PeerAuthentication`
+- *...and 2003 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'SELECT': 43, 'CONSTRUCT': 5}
+
+### Projected Variables (SELECT ?var)
+This project actively projects the following variables into code/templates:
+> `?accountName`, `?accountNumber`, `?accuracy`, `?action`, `?admitTime`, `?alert`, `?amount`, `?argDefault`, `?argHelp`, `?argName`, `?argPosition`, `?argRequired`, `?argType`, `?assignee`, `?auth`, `?backend`, `?behaviorType`, `?birthDate`, `?cache`, `?capability`, `?certExpiry`, `?city`, `?columnDefs`, `?command`, `?completeness`, `?confidence`, `?constraints`, `?content`, `?conversation`, `?creditTotal`, `?creditorName`, `?currency`, `?currentPoints`, `?customer`, `?customerID`, `?debitTotal`, `?debtorName`, `?dependency`, `?description`, `?dob`, `?docNumber`, `?docType`, `?dueDate`, `?e2eId`, `?economicOrderQuantity`, `?email`, `?endpoint`, `?enumValues`, `?errorBudgetRemaining`, `?eventTimestamp`, `?eventValue`, `?expiresAt`, `?expiryDate`, `?failureThreshold`, `?familyName`, `?file`, `?firstName`, `?fullName`, `?gender`, `?givenName`, `?handler`, `?imageCount`, `?instance`, `?interval`, `?isolationStrategy`, `?issuer`, `?itemCode`, `?itemName`, `?language`, `?lastName`, `?lastRun`, `?line`, `?locationName`, `?maxHistory`, `?member`, `?message`, `?messageId`, `?method`, `?metric`, `?modality`, `?model`, `?mrn`, `?msgId`, `?mtlsMode`, `?opportunityCount`, `?optDefault`, `?optHelp`, `?optLong`, `?optMultiple`, `?optRequired`, `?optShort`, `?optType`, `?order`, `?orderDate`, `?orderNumber`, `?participant`, `?path`, `?patientID`, `?patientId`, `?patientName`, `?pattern`, `?patternType`, `?permission`, `?phone`, `?pipeline`, `?pmtInfId`, `?pointsEarned`, `?price`, `?priority`, `?productId`, `?productName`, `?provider`, `?quantity`, `?quantityAvailable`, `?quantityOnHand`, `?quantityReserved`, `?rateLimitRPS`, `?ratelimit`, `?recommendedOrder`, `?refactoring`, `?reorderPoint`, `?resource`, `?rmtInfo`, `?role`, `?route`, `?seriesCount`, `?service`, `?sessionId`, `?severity`, `?sex`, `?side`, `?slo`, `?smell`, `?source`, `?stageName`, `?startTime`, `?state`, `?status`, `?studyDate`, `?studyDescription`, `?studyUID`, `?symbol`, `?table`, `?tableName`, `?target`, `?task`, `?tenantId`, `?tenantName`, `?threshold`, `?tierLabel`, `?timeWindow`, `?timeout`, `?timestamp`, `?topic`, `?total`, `?type`, `?user`, `?userId`, `?verified`, `?version`, `?visitNumber`, `?workflow`
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/teleport/ggen/crates/ggen-core/src/rdf/schema.ttl` (7811 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/src/rdf/schema.ttl` (7811 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/tests/fixtures/rdf/empty.ttl` (74 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_stability.ttl` (270 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_syntax.ttl` (176 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_variable_name.ttl` (464 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/tests/fixtures/rdf/invalid_version.ttl` (269 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/tests/fixtures/rdf/valid.ttl` (501 bytes)
+- `/Users/sac/teleport/ggen/crates/ggen-domain/tests/fixtures/rdf/with_variables.ttl` (704 bytes)
+- `/Users/sac/teleport/ggen/examples/advanced-rust-api-8020/data/api-spec.ttl` (4015 bytes)
+- `/Users/sac/teleport/ggen/examples/advanced-rust-project/data/domain.ttl` (9205 bytes)
+- `/Users/sac/teleport/ggen/examples/advanced-sparql-graph/data/example.ttl` (2137 bytes)
+- `/Users/sac/teleport/ggen/examples/clap-noun-verb-demo/project-schema.ttl` (9796 bytes)
+- `/Users/sac/teleport/ggen/examples/clap-noun-verb-demo/sample-cli.ttl` (8712 bytes)
+- `/Users/sac/teleport/ggen/examples/comprehensive-rust-showcase/data/api-spec.ttl` (14138 bytes)
+- `/Users/sac/teleport/ggen/examples/comprehensive-rust-showcase/data/database.ttl` (18964 bytes)
+- `/Users/sac/teleport/ggen/examples/comprehensive-rust-showcase/data/domain.ttl` (15612 bytes)
+- `/Users/sac/teleport/ggen/examples/comprehensive-rust-showcase/data/queries.ttl` (16062 bytes)
+- `/Users/sac/teleport/ggen/examples/demo-project/project.ttl` (2261 bytes)
+- `/Users/sac/teleport/ggen/examples/e2e-demo/rdf/project.ttl` (1280 bytes)
+- `/Users/sac/teleport/ggen/examples/fastapi-from-rdf/domain.ttl` (12102 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level1-simple/ontology.ttl` (760 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level2-small/ontology.ttl` (1936 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level3-medium/ontology/domain.ttl` (2345 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level4-large/ontologies/core.ttl` (1186 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level4-large/ontologies/infrastructure.ttl` (783 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level4-large/ontologies/services.ttl` (822 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/shared/core.ttl` (666 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/shared/services.ttl` (573 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/tenant1/domain.ttl` (440 bytes)
+- `/Users/sac/teleport/ggen/examples/maturity-matrix-showcase/level5-enterprise/ontologies/tenant2/domain.ttl` (440 bytes)
+- `/Users/sac/teleport/ggen/examples/microservices-architecture/data/domain.ttl` (9222 bytes)
+- `/Users/sac/teleport/ggen/graphs/schema.ttl` (308 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/advanced-rust-project/data/domain.ttl` (9205 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-cli-copilot/rdf/ontology.ttl` (4683 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-cli-copilot/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-cli-copilot/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-context-crafter/rdf/ontology.ttl` (5184 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-context-crafter/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-context-crafter/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-editor/rdf/ontology.ttl` (5599 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-editor/sparql/find_code_smells.rq` (512 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-editor/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-editor/sparql/language_statistics.rq` (391 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-editor/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-editor/sparql/suggest_refactorings.rq` (507 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-memory-forge/rdf/ontology.ttl` (6051 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-memory-forge/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-memory-forge/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-reasoning-mcp/rdf/ontology.ttl` (7153 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-reasoning-mcp/sparql/find_dependencies.rq` (215 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/agent-reasoning-mcp/sparql/query_capabilities.rq` (249 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/api-gateway-service-mesh/ontology/api_gateway_service_mesh.ttl` (15897 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/api-gateway-service-mesh/queries/circuit_breakers.rq` (223 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/api-gateway-service-mesh/queries/health_checks.rq` (277 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/api-gateway-service-mesh/queries/list_routes.rq` (554 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/api-gateway-service-mesh/queries/mtls_services.rq` (308 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/asset-management/ontology/asset_management.ttl` (14114 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/banking-core/ontology/banking_core.ttl` (13175 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/business-intelligence-reporting/ontology/bi_reporting.ttl` (17254 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/chatman-cli/rdf/ontology.ttl` (7032 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/chatman-cli/sparql/conversation_patterns.rq` (587 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/chatman-cli/sparql/find_related_topics.rq` (492 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/chatman-cli/sparql/get_conversation_context.rq` (693 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/chatman-cli/sparql/get_user_preferences.rq` (542 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/cli-application-template/examples/simple-cli.ttl` (1681 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/cli-application-template/ontology/cli-structure.ttl` (10494 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/cli-application-template/sparql/queries.rq` (9415 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/clinical-trials-management/ontology/clinical-trials.ttl` (9630 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/compliance-audit-system/rdf/ontology.ttl` (16281 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/comprehensive-rust-showcase/data/api-spec.ttl` (14138 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/comprehensive-rust-showcase/data/database.ttl` (18964 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/comprehensive-rust-showcase/data/domain.ttl` (15612 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/comprehensive-rust-showcase/data/queries.ttl` (16062 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/crm-customer-management/ontology/crm.ttl` (14779 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/crm-customer-management/sparql/queries.rq` (11759 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/cryptocurrency-exchange/ontology/cryptocurrency_exchange.ttl` (10507 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/customer-loyalty-rewards/ontology/loyalty-rewards.ttl` (14322 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/customer-loyalty-rewards/sparql/queries.rq` (7396 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/data-pipeline-cli/rdf/ontology.ttl` (17576 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/data-warehouse-etl/ontology/data_warehouse_etl.ttl` (18156 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/data-warehouse-etl/queries/data_quality.rq` (310 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/data-warehouse-etl/queries/etl_pipelines.rq` (374 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/database-schema-generator/examples/blog_schema.ttl` (10649 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/database-schema-generator/ontology/database-schema.ttl` (16171 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/database-schema-generator/sparql/queries.rq` (16022 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/document-management-system/ontology/document_management.ttl` (11741 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/ehr-integration/ontology/ehr.ttl` (9578 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/enterprise-erp-core/ontology/erp.ttl` (15370 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/enterprise-erp-core/sparql/queries.rq` (15962 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/graphql-api-template/ontology/graphql-schema.ttl` (10963 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/graphql-api-template/sparql/queries.rq` (5537 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/healthcare-analytics/ontology/analytics.ttl` (7675 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/healthcare/dicom-medical-imaging/ontology/dicom.ttl` (16992 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/healthcare/dicom-medical-imaging/sparql/queries.rq` (11461 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/healthcare/fhir-patient-management/ontology/fhir-patient.ttl` (16855 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/healthcare/fhir-patient-management/sparql/queries.rq` (15884 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/healthcare/hl7-v2-integration/ontology/hl7-v2.ttl` (17908 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/healthcare/hl7-v2-integration/sparql/queries.rq` (12228 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/human-resources-management/ontology/hr_management.ttl` (13943 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/identity-access-management/ontology/identity_access_management.ttl` (17936 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/identity-access-management/queries/expired_sessions.rq` (228 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/identity-access-management/queries/user_permissions.rq` (266 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/inventory-management/ontology/inventory.ttl` (17978 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/inventory-management/sparql/queries.rq` (11066 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/io.ggen.nextjs.ontology-crud/ontology/task-management.ttl` (24997 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/iso-20022-payments/ontology/iso-20022.ttl` (16742 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/iso-20022-payments/sparql/queries.rq` (11973 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/knowledge-graph-cli/rdf/ontology.ttl` (9406 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/kyc-aml-compliance/ontology/kyc-aml.ttl` (18379 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/kyc-aml-compliance/sparql/queries.rq` (12057 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/laboratory-information-system/ontology/laboratory.ttl` (9180 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/medical-billing/ontology/billing.ttl` (8998 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/microservices-architecture-template/ontology/microservices.ttl` (16134 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/microservices-architecture-template/sparql/queries.rq` (19690 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/microservices-architecture/data/domain.ttl` (9222 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/multi-tenant-saas/ontology/multi-tenant.ttl` (16732 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/multi-tenant-saas/sparql/queries.rq` (8772 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/notification-messaging-hub/rdf/ontology.ttl` (13371 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/observability-platform/ontology/observability_platform.ttl` (15522 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/observability-platform/queries/active_alerts.rq` (309 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/observability-platform/queries/slo_compliance.rq` (365 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/order-management-system/ontology/order-management.ttl` (13746 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/order-management-system/sparql/queries.rq` (8973 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/pharmacy-management/ontology/pharmacy.ttl` (9498 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/product-recommendations/ontology/recommendations.ttl` (19288 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/product-recommendations/sparql/queries.rq` (9257 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/project-management/ontology/project_management.ttl` (13377 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/reasoner-cli/rdf/ontology.ttl` (13621 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/rest-api-template/ontology/rest-api.ttl` (14921 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/rest-api-template/sparql/queries.rq` (10642 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/risk-management/ontology/risk_management.ttl` (11030 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/robo-advisor/ontology/robo_advisor.ttl` (12533 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/schema-forge-cli/rdf/ontology.ttl` (7670 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/semantic-cli/rdf/ontology.ttl` (8320 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/shacl-cli/rdf/ontology.ttl` (19454 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/sparql-cli/rdf/ontology.ttl` (23744 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/supply-chain-management/ontology/supply-chain.ttl` (9363 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/supply-chain-management/sparql/queries.rq` (9486 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/telemedicine-platform/ontology/telemedicine.ttl` (9705 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/trading-platform/ontology/trading.ttl` (18631 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/trading-platform/sparql/queries.rq` (10739 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/workflow-automation-engine/ontology/workflow_automation_engine.ttl` (18819 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/workflow-automation-engine/queries/active_workflows.rq` (307 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/workflow-automation-engine/queries/pending_human_tasks.rq` (334 bytes)
+- `/Users/sac/teleport/ggen/marketplace/packages/workflow-engine-cli/rdf/ontology.ttl` (17863 bytes)
+- `/Users/sac/teleport/ggen/ontologies/academic-paper_v1.0.0.ttl` (21326 bytes)
+- `/Users/sac/teleport/ggen/ontologies/clap-noun-verb_v3.3.0.ttl` (14708 bytes)
+- `/Users/sac/teleport/ggen/templates/api/endpoint/graphs/api.ttl` (385 bytes)
+- `/Users/sac/teleport/ggen/templates/api/endpoint/graphs/shapes/api.shacl.ttl` (390 bytes)
+- `/Users/sac/teleport/ggen/templates/cli/ontology/cli-schema-2026.ttl` (12296 bytes)
+- `/Users/sac/teleport/ggen/templates/cli/subcommand/graphs/cli.ttl` (374 bytes)
+- `/Users/sac/teleport/ggen/templates/cli/subcommand/graphs/shapes/cli.shacl.ttl` (323 bytes)
+- `/Users/sac/teleport/ggen/tests/data/data.ttl` (4207 bytes)
+- `/Users/sac/teleport/ggen/tests/data/data1.ttl` (67 bytes)
+- `/Users/sac/teleport/ggen/tests/data/data2.ttl` (67 bytes)
+- `/Users/sac/teleport/ggen/tests/data/entities.ttl` (350 bytes)
+- `/Users/sac/teleport/ggen/tests/data/person_data.ttl` (169 bytes)
+- `/Users/sac/teleport/ggen/tests/data/test-data.ttl` (158 bytes)
+- `/Users/sac/teleport/ggen/tests/data/types.ttl` (188 bytes)
+- `/Users/sac/teleport/ggen/tests/fixtures/sample.ttl` (219 bytes)
+- `/Users/sac/teleport/ggen/tests/fixtures/shapes.ttl` (293 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/ontology/osys.ttl` (2841 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/test_rdf.ttl` (115 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_authorization.ttl` (660 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_cardinality.ttl` (685 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_datatype.ttl` (492 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_exactcount.ttl` (626 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_lookups.ttl` (662 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_maxcount.ttl` (703 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_objectcount.ttl` (650 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_objectcount_exact.ttl` (617 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_objectcount_max.ttl` (695 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_reverse.ttl` (663 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_types.ttl` (578 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_unique.ttl` (744 bytes)
+- `/Users/sac/teleport/ggen/vendors/knhks/tests/data/enterprise_validation.ttl` (689 bytes)
+- `/Users/sac/teleport/knhk/ontology/knhk.owl.ttl` (35423 bytes)
+- `/Users/sac/teleport/knhk/ontology/osys.ttl` (2841 bytes)
+- `/Users/sac/teleport/knhk/ontology/shacl/soundness.ttl` (14010 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/financial/atm_transaction.ttl` (6924 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/financial/payroll.ttl` (7420 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/financial/swift_payment.ttl` (9487 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/reference/cancellation_pattern.ttl` (2997 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/reference/multi_instance_approval.ttl` (2348 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/reference/or_join.ttl` (3543 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/reference/order_processing.ttl` (3501 bytes)
+- `/Users/sac/teleport/knhk/ontology/workflows/reference/timer_escalation.ttl` (2670 bytes)
+- `/Users/sac/teleport/knhk/ontology/yawl.ttl` (46844 bytes)
+- `/Users/sac/teleport/knhk/rust/docs/yawl/code/osys.ttl` (114 bytes)
+- `/Users/sac/teleport/knhk/rust/docs/yawl/code/sequence.ttl` (387 bytes)
+- `/Users/sac/teleport/knhk/rust/docs/yawl/code/turtle_006.ttl` (901 bytes)
+- `/Users/sac/teleport/knhk/rust/docs/yawl/code/turtle_007.ttl` (191 bytes)
+- `/Users/sac/teleport/knhk/rust/docs/yawl/code/turtle_008.ttl` (114 bytes)
+- `/Users/sac/teleport/knhk/rust/docs/yawl/code/turtle_009.ttl` (476 bytes)
+- `/Users/sac/teleport/knhk/rust/docs/yawl/code/workflow.ttl` (184 bytes)
+- `/Users/sac/teleport/knhk/rust/knhk-workflow-engine/book/examples/simple-sequence.ttl` (1558 bytes)
+- `/Users/sac/teleport/knhk/rust/knhk-workflow-engine/examples/simple-sequence.ttl` (1558 bytes)
+- `/Users/sac/teleport/knhk/rust/ontology/shacl/soundness.ttl` (29 bytes)
+- `/Users/sac/teleport/knhk/test_workflow.ttl` (1100 bytes)
+- `/Users/sac/teleport/knhk/tests/archived/test_rdf.ttl` (115 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_authorization.ttl` (660 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_cardinality.ttl` (685 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_datatype.ttl` (492 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_exactcount.ttl` (626 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_lookups.ttl` (662 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_maxcount.ttl` (703 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_objectcount.ttl` (650 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_objectcount_exact.ttl` (617 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_objectcount_max.ttl` (695 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_reverse.ttl` (663 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_types.ttl` (578 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_unique.ttl` (744 bytes)
+- `/Users/sac/teleport/knhk/tests/data/enterprise_validation.ttl` (689 bytes)
+
+</details>

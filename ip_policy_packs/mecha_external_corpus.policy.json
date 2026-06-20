@@ -1,0 +1,65 @@
+{
+  "policy_id": "IP_DIST_MECHA_001",
+  "name": "Mecha External Corpus Expressive Distance & Non-Confusion Policy",
+  "version": "1.0.0",
+  "protected_clusters": [
+    {
+      "franchise": "Gundam",
+      "signatures": [
+        "V-fin antenna (especially dual yellow sweeping upward)",
+        "Tricolor scheme (white dominant, blue torso, red abdominal/waist, yellow vents/accents)",
+        "RX-78, Zaku, mobile suit specific nomenclatures",
+        "Anaheim Electronics, Zeon, Federation source identifiers",
+        "Red glowing mono-eye on spherical green/red head"
+      ],
+      "trade_dress_threshold": 0.75
+    },
+    {
+      "franchise": "Evangelion",
+      "signatures": [
+        "Organic/biomechanical limb proportions (excessively long/slender)",
+        "Purple and neon green color blocking (Unit-01)",
+        "Horned singular headpiece (Unit-01)",
+        "Red glowing chest core",
+        "NERV source identifiers or hexagon UI themes"
+      ],
+      "trade_dress_threshold": 0.8
+    },
+    {
+      "franchise": "MechWarrior/BattleTech",
+      "signatures": [
+        "Walking tank morphology without humanoid arms (e.g., Timber Wolf / Mad Cat)",
+        "Chicken-walker reversed knee joints combined with missile box shoulders",
+        "Inner Sphere / Clan source identifiers"
+      ],
+      "trade_dress_threshold": 0.8
+    }
+  ],
+  "prohibited_provenance": [
+    "Scans of physical model kits (Gunpla, Robot Spirits)",
+    "Rips of game assets from official titles",
+    "Concept art traced from official line art",
+    "Generative AI outputs prompted with 'in the style of [Franchise]'"
+  ],
+  "mecha_commons": [
+    "Giant robot humanoid form",
+    "Cockpit affordance",
+    "Thrusters/boosters",
+    "Joint articulation (knees, elbows, shoulders)",
+    "Handheld energy/kinetic weaponry",
+    "Armor plating",
+    "Panel lines"
+  ],
+  "original_axes": [
+    "Process-intelligence visual grammar",
+    "Support roles as first-class heroes",
+    "Receipt-bearing parts",
+    "Logistics-as-combat aesthetics",
+    "Byte-law gameplay authority"
+  ],
+  "admission_rules": {
+    "require_common_genre": true,
+    "require_original_axis": true,
+    "reject_if_cluster_proximity_above": 0.7
+  }
+}

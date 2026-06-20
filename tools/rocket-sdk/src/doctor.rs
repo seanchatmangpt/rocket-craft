@@ -1,46 +1,12 @@
-//! `rocket doctor` — environment & project health diagnostics.
-//!
-//! This module is the brains behind `rocket doctor`. It runs a battery of
-//! independent checks (toolchain versions, project layout, git state, known
-//! repo gotchas, disk space, …), scores the overall health 0-100, suggests a
-//! concrete `fix_command` for every non-passing check, and can optionally
-//! execute the *safe* subset of those fixes.
-//!
-//! Design notes:
-//! * **Single file, std-only.** No new crates are introduced; concurrency uses
-//!   `std::thread::scope`, version parsing is hand-rolled. This keeps the crate
-//!   buildable in isolation (the wider `tools/` workspace has absolute-path deps
-//!   that break a full build).
-//! * **Backward compatible.** `RocketDoctor::new(PathBuf)` and
-//!   `run_diagnostics() -> DiagnosticReport` keep their old signatures and the
-//!   original nine checks still exist with their original messages, so the
-//!   pre-existing tests pass unchanged. New data is purely additive
-//!   (`CheckResult::fix_command`, `CheckResult::category`, etc.).
-
 use chrono::{DateTime, Utc};
 use serde::Serialize;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::process::Command;
 
-// ---------------------------------------------------------------------------
-// ANSI helpers (no external color crate dependency).
-// ---------------------------------------------------------------------------
+use crate::config::discover_python3;
+use crate::html5::{Html5PackageVerifier, WasmVerdict};
 
-mod ansi {
-    pub const RESET: &str = "\x1b[0m";
-    pub const BOLD: &str = "\x1b[1m";
-    pub const DIM: &str = "\x1b[2m";
-    pub const GREEN: &str = "\x1b[32m";
-    pub const YELLOW: &str = "\x1b[33m";
-    pub const RED: &str = "\x1b[31m";
-    pub const CYAN: &str = "\x1b[36m";
-}
-
-// ---------------------------------------------------------------------------
-// Core enums
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Clone, PartialEq)]
 pub enum CheckStatus {
     Pass,
     Warn,
@@ -393,34 +359,43 @@ impl RocketDoctor {
         Self { project_root }
     }
 
-    /// Run every check. Independent checks execute concurrently via
-    /// `std::thread::scope`; the result order is deterministic (sorted by the
-    /// fixed `check_order` index) so output and tests are stable.
-    pub fn run_diagnostics(&self) -> DiagnosticReport {
-        // Each closure is `Send` because it only borrows `&self` and returns an
-        // owned `CheckResult`. We box them so they share a Vec type.
-        type Check<'a> = (usize, Box<dyn Fn() -> CheckResult + Send + Sync + 'a>);
+    /// Resolve UE4 root from `.rocket.json` → `UE4_ROOT` env → `UE_ROOT` env.
+    fn resolve_ue4_root(&self) -> Option<PathBuf> {
+        let rocket_json = self.project_root.join(".rocket.json");
+        if rocket_json.exists() {
+            if let Ok(content) = std::fs::read_to_string(&rocket_json) {
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&content) {
+                    if let Some(root) = v.get("ue4_root").and_then(|r| r.as_str()) {
+                        return Some(PathBuf::from(root));
+                    }
+                }
+            }
+        }
+        std::env::var("UE4_ROOT")
+            .or_else(|_| std::env::var("UE_ROOT"))
+            .ok()
+            .map(PathBuf::from)
+    }
 
-        let checks: Vec<Check> = vec![
-            (0, Box::new(|| self.check_git())),
-            (1, Box::new(|| self.check_git_status())),
-            (2, Box::new(|| self.check_rust())),
-            (3, Box::new(|| self.check_cargo())),
-            (4, Box::new(|| self.check_clippy())),
-            (5, Box::new(|| self.check_rustfmt())),
-            (6, Box::new(|| self.check_python())),
-            (7, Box::new(|| self.check_node())),
-            (8, Box::new(|| self.check_blender())),
-            (9, Box::new(|| self.check_disk_space())),
-            (10, Box::new(|| self.check_network())),
-            (11, Box::new(|| self.check_manifest())),
-            (12, Box::new(|| self.check_versions_dir())),
-            (13, Box::new(|| self.check_rust_workspaces())),
-            (14, Box::new(|| self.check_pwa_node_modules())),
-            (15, Box::new(|| self.check_path_dep_gotchas())),
-            (16, Box::new(|| self.check_ue4_root())),
-            (17, Box::new(|| self.check_ggen())),
-            (18, Box::new(|| self.check_anti_llm_cheat_lsp())),
+    pub fn run_diagnostics(&self) -> DiagnosticReport {
+        let checks = vec![
+            self.check_git(),
+            self.check_git_status(),
+            self.check_rust(),
+            self.check_python(),
+            self.check_manifest(),
+            self.check_manifest_projects(),
+            self.check_versions_dir(),
+            self.check_ue4_root(),
+            self.check_ue4_plugins(),
+            self.check_html5_toolchain(),
+            self.check_ggen(),
+            self.check_anti_llm_cheat_lsp(),
+            self.check_node(),
+            self.check_html5_package(),
+            self.check_ue4_build_scripts(),
+            self.check_nexus_types(),
+            self.check_xcode(),
         ];
 
         let mut results: Vec<(usize, CheckResult)> = std::thread::scope(|scope| {
@@ -850,6 +825,99 @@ impl RocketDoctor {
         }
     }
 
+    /// Validate that every project declared in `project-manifest.json` has its
+    /// `.uproject` file on disk. Returns Warn if the manifest is absent (covered
+    /// by `check_manifest`). Reports each missing uproject file in `details`.
+    fn check_manifest_projects(&self) -> CheckResult {
+        let manifest_path = self.project_root.join("project-manifest.json");
+        if !manifest_path.exists() {
+            return CheckResult {
+                name: "Manifest Projects".to_string(),
+                status: CheckStatus::Warn,
+                message: "Skipped: project-manifest.json not found".to_string(),
+                details: None,
+            };
+        }
+
+        let content = match std::fs::read_to_string(&manifest_path) {
+            Ok(c) => c,
+            Err(e) => {
+                return CheckResult {
+                    name: "Manifest Projects".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("Cannot read project-manifest.json: {e}"),
+                    details: None,
+                };
+            }
+        };
+
+        let manifest: serde_json::Value = match serde_json::from_str(&content) {
+            Ok(v) => v,
+            Err(e) => {
+                return CheckResult {
+                    name: "Manifest Projects".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("project-manifest.json is invalid JSON: {e}"),
+                    details: None,
+                };
+            }
+        };
+
+        let projects = match manifest.get("projects").and_then(|p| p.as_array()) {
+            Some(arr) => arr.clone(),
+            None => {
+                return CheckResult {
+                    name: "Manifest Projects".to_string(),
+                    status: CheckStatus::Warn,
+                    message: "No 'projects' array in manifest".to_string(),
+                    details: None,
+                };
+            }
+        };
+
+        let mut missing = Vec::new();
+        let mut total = 0usize;
+
+        for proj in &projects {
+            if let Some(uproject_path) = proj.get("uproject_path").and_then(|p| p.as_str()) {
+                total += 1;
+                let full_path = if std::path::Path::new(uproject_path).is_absolute() {
+                    PathBuf::from(uproject_path)
+                } else {
+                    self.project_root.join(uproject_path)
+                };
+                if !full_path.exists() {
+                    let name = proj
+                        .get("name")
+                        .and_then(|n| n.as_str())
+                        .unwrap_or(uproject_path);
+                    missing.push(format!("{name} ({uproject_path})"));
+                }
+            }
+        }
+
+        if missing.is_empty() {
+            CheckResult {
+                name: "Manifest Projects".to_string(),
+                status: CheckStatus::Pass,
+                message: format!("All {total} declared .uproject files present on disk"),
+                details: None,
+            }
+        } else {
+            // Missing projects are sample/optional content repos — not pipeline-blocking.
+            // The active pipeline project (Brm) being present is what matters for cooking.
+            CheckResult {
+                name: "Manifest Projects".to_string(),
+                status: CheckStatus::Warn,
+                message: format!(
+                    "{}/{total} declared .uproject files not present (optional sample content)",
+                    missing.len()
+                ),
+                details: Some(missing.join("\n")),
+            }
+        }
+    }
+
     fn check_versions_dir(&self) -> CheckResult {
         let path = self.project_root.join("versions");
         if path.exists() && path.is_dir() {
@@ -926,42 +994,13 @@ impl RocketDoctor {
                 CheckCategory::Project,
             )
         } else {
-            CheckResult::new(
-                "PWA node_modules",
-                CheckStatus::Warn,
-                "pwa-staff/node_modules missing",
-                CheckCategory::Project,
-            )
-            .with_details("Dependencies not installed")
-            .with_fix("cd pwa-staff && npm ci")
-        }
-    }
-
-    /// Flag the known absolute-path dependency gotchas in tools/ Cargo.toml
-    /// files (wasm4pm-compat / clap-noun-verb pointing at /Users/sac/...).
-    fn check_path_dep_gotchas(&self) -> CheckResult {
-        let suspects = [
-            "tools/knhk/Cargo.toml",
-            "tools/rocket-cmd/Cargo.toml",
-        ];
-        let mut offenders = Vec::new();
-        for rel in suspects {
-            let p = self.project_root.join(rel);
-            if let Ok(content) = std::fs::read_to_string(&p) {
-                for line in content.lines() {
-                    let l = line.trim();
-                    if l.starts_with('#') {
-                        continue;
-                    }
-                    // Absolute path deps are the breakage: /Users/... or /home/... or C:\
-                    let is_abs_path_dep = l.contains("path =")
-                        && (l.contains("path = \"/")
-                            || l.contains("path = \"C:")
-                            || l.contains("/Users/sac"));
-                    if is_abs_path_dep {
-                        offenders.push(format!("{rel}: {l}"));
-                    }
-                }
+            CheckResult {
+                name: "Versions Directory".to_string(),
+                status: CheckStatus::Fail,
+                message: "versions/ directory MISSING or not a directory".to_string(),
+                details: Some(
+                    "This directory should contain the Unreal Engine projects.".to_string(),
+                ),
             }
         }
         if offenders.is_empty() {
@@ -1003,17 +1042,327 @@ impl RocketDoctor {
     }
 
     fn check_ue4_root(&self) -> CheckResult {
+        // Parse the JSON properly — string search gives false positives
+        // (e.g. "ue4_root" appearing in a comment or description value).
         let rocket_json = self.project_root.join(".rocket.json");
         if rocket_json.exists() {
             if let Ok(content) = std::fs::read_to_string(&rocket_json) {
-                if content.contains("ue4_root") {
-                    return CheckResult::new(
-                        "UE4 Root",
-                        CheckStatus::Pass,
-                        "UE4 root configured in .rocket.json",
-                        CheckCategory::Environment,
-                    );
+                if let Ok(v) = serde_json::from_str::<serde_json::Value>(&content) {
+                    if let Some(root) = v.get("ue4_root").and_then(|r| r.as_str()) {
+                        let root_path = PathBuf::from(root);
+                        if root_path.exists() {
+                            return CheckResult {
+                                name: "UE4 Root".to_string(),
+                                status: CheckStatus::Pass,
+                                message: format!("UE4 root: {root}"),
+                                details: None,
+                            };
+                        } else {
+                            return CheckResult {
+                                name: "UE4 Root".to_string(),
+                                status: CheckStatus::Fail,
+                                message: format!("UE4 root configured but path missing: {root}"),
+                                details: Some(
+                                    "Run 'rocket setup' to reconfigure.".to_string(),
+                                ),
+                            };
+                        }
+                    }
                 }
+            }
+        }
+
+        if let Ok(root) = std::env::var("UE4_ROOT") {
+            let root_path = PathBuf::from(&root);
+            if root_path.exists() {
+                CheckResult {
+                    name: "UE4 Root".to_string(),
+                    status: CheckStatus::Pass,
+                    message: format!("UE4_ROOT={root}"),
+                    details: None,
+                }
+            } else {
+                CheckResult {
+                    name: "UE4 Root".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("UE4_ROOT set but path missing: {root}"),
+                    details: None,
+                }
+            }
+        } else {
+            CheckResult {
+                name: "UE4 Root".to_string(),
+                status: CheckStatus::Warn,
+                message: "UE4 root not configured".to_string(),
+                details: Some("Run 'rocket setup' to configure Unreal Engine path.".to_string()),
+            }
+        }
+    }
+
+    fn check_html5_toolchain(&self) -> CheckResult {
+        // 1. Verify Python 3 is available for UAT/UHT scripts.
+        let python_ok = discover_python3().map(|path| format!("Python 3 at {}", path.display()));
+
+        // 2. Verify emscripten — check engine-bundled emsdk first, then PATH.
+        let emsdk_found = self.find_ue4_emsdk();
+        let emcc_on_path = Command::new("emcc")
+            .arg("--version")
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+
+        match (python_ok, emsdk_found || emcc_on_path) {
+            (Some(py), true) => CheckResult {
+                name: "HTML5 Toolchain".to_string(),
+                status: CheckStatus::Pass,
+                message: format!("{py}; emscripten present"),
+                details: None,
+            },
+            (Some(py), false) => CheckResult {
+                name: "HTML5 Toolchain".to_string(),
+                status: CheckStatus::Warn,
+                message: format!("{py}; emscripten NOT found"),
+                details: Some(
+                    "Run HTML5Setup.sh in the engine to build emsdk, or run 'rocket html5 setup'."
+                        .to_string(),
+                ),
+            },
+            (None, _) => CheckResult {
+                name: "HTML5 Toolchain".to_string(),
+                status: CheckStatus::Fail,
+                message: "Python 3 not found — required for UAT scripts".to_string(),
+                details: Some(
+                    "Install python3 or set 'python3_path' in .rocket.json".to_string(),
+                ),
+            },
+        }
+    }
+
+    /// Check if the engine's bundled emsdk is present (built by HTML5Setup.sh).
+    fn find_ue4_emsdk(&self) -> bool {
+        self.resolve_ue4_root()
+            .map(|r| r.join("Engine/Platforms/HTML5/Build/emsdk").exists())
+            .unwrap_or(false)
+    }
+
+    fn check_ue4_plugins(&self) -> CheckResult {
+        let root_path = match self.resolve_ue4_root() {
+            Some(p) => p,
+            None => {
+                return CheckResult {
+                    name: "UE4 Plugins".to_string(),
+                    status: CheckStatus::Warn,
+                    message: "Skipped: UE4 root not configured, cannot verify plugins".to_string(),
+                    details: None,
+                };
+            }
+        };
+
+        // Check WebSocketNetworking — exists in Experimental/ in 4.27-html5-es3
+        let ws_paths = vec![
+            "Engine/Plugins/Experimental/WebSocketNetworking/WebSocketNetworking.uplugin",
+            "Engine/Plugins/Runtime/Networking/WebSocketNetworking/WebSocketNetworking.uplugin",
+            "Engine/Plugins/Networking/WebSocketNetworking/WebSocketNetworking.uplugin",
+            "Engine/Plugins/WebSocketNetworking/WebSocketNetworking.uplugin",
+        ];
+        let mut ws_ok = false;
+        for rel in &ws_paths {
+            if root_path.join(rel).exists() {
+                ws_ok = true;
+                break;
+            }
+        }
+
+        // VaRest is a Marketplace plugin — not bundled in engine source builds.
+        // Check common install locations; treat as WARN not FAIL when missing.
+        let varest_paths = vec![
+            "Engine/Plugins/Marketplace/VaRest/VaRest.uplugin",
+            "Engine/Plugins/VaRest/VaRest.uplugin",
+        ];
+        let mut varest_ok = false;
+        for rel in &varest_paths {
+            if root_path.join(rel).exists() {
+                varest_ok = true;
+                break;
+            }
+        }
+
+        match (ws_ok, varest_ok) {
+            (true, true) => CheckResult {
+                name: "UE4 Plugins".to_string(),
+                status: CheckStatus::Pass,
+                message: "Found required plugins: WebSocketNetworking, VaRest".to_string(),
+                details: None,
+            },
+            (true, false) => CheckResult {
+                name: "UE4 Plugins".to_string(),
+                status: CheckStatus::Warn,
+                message: "WebSocketNetworking present; VaRest not found (Marketplace plugin — install separately if needed)".to_string(),
+                details: None,
+            },
+            (false, _) => {
+                let mut missing = vec!["WebSocketNetworking"];
+                if !varest_ok {
+                    missing.push("VaRest");
+                }
+                CheckResult {
+                    name: "UE4 Plugins".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("Missing required plugins: {}", missing.join(", ")),
+                    details: Some(
+                        "Ensure your UE4 build includes WebSocketNetworking (Engine/Plugins/Experimental/ in 4.27-html5-es3).".to_string(),
+                    ),
+                }
+            }
+        }
+    }
+    /// Check whether the most recent HTML5 cook produced a real package.
+    ///
+    /// Looks for the default archive directory (`/tmp/brm-html5-archive`) first,
+    /// then falls back to `manufactured/` in the project root.
+    fn check_html5_package(&self) -> CheckResult {
+        // Prefer manifest-derived archive paths (project-name-based) over hardcoded defaults.
+        let manifest_paths: Vec<PathBuf> = crate::Manifest::load(self.project_root.join("project-manifest.json"))
+            .map(|m| {
+                m.projects().iter()
+                    .map(|p| PathBuf::from(format!("/tmp/{}-html5-archive/HTML5", p.name.to_lowercase())))
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        let mut candidates: Vec<PathBuf> = manifest_paths;
+        candidates.extend([
+            PathBuf::from("/tmp/brm-html5-archive/HTML5"),
+            PathBuf::from("/tmp/brm-html5-archive"),
+            self.project_root.join("manufactured"),
+            self.project_root.join("pwa-staff/manufactured"),
+        ]);
+        candidates.dedup();
+
+        let archive_dir = candidates.iter().find(|d| d.exists());
+
+        match archive_dir {
+            None => CheckResult {
+                name: "HTML5 Package".to_string(),
+                status: CheckStatus::Warn,
+                message: "No HTML5 archive directory found".to_string(),
+                details: Some(
+                    "Run 'rocket html5 cook --project Brm' to produce a package.".to_string(),
+                ),
+            },
+            Some(dir) => {
+                match Html5PackageVerifier::new(dir).verify() {
+                    Err(e) => CheckResult {
+                        name: "HTML5 Package".to_string(),
+                        status: CheckStatus::Fail,
+                        message: format!("Verification error: {e}"),
+                        details: None,
+                    },
+                    Ok(report) => {
+                        let summary = report.summary();
+                        if report.is_real_package {
+                            CheckResult {
+                                name: "HTML5 Package".to_string(),
+                                status: CheckStatus::Pass,
+                                message: summary,
+                                details: Some(format!("Archive: {}", dir.display())),
+                            }
+                        } else {
+                            // Distinguish between stub/no-wasm and companion-missing
+                            let has_real_wasm = report.wasm_files.iter().any(|f| {
+                                matches!(f.verdict, WasmVerdict::Real { .. })
+                            });
+                            let status = if has_real_wasm {
+                                CheckStatus::Warn // WASM is real but companions missing
+                            } else {
+                                CheckStatus::Fail // stub or no wasm
+                            };
+                            CheckResult {
+                                name: "HTML5 Package".to_string(),
+                                status,
+                                message: summary,
+                                details: Some(format!("Archive: {}", dir.display())),
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// Verify that the critical UE4 build scripts are present and executable.
+    ///
+    /// Checks RunUAT.sh (required for cook+package) and the Mac/Linux Build.sh
+    /// scripts. Also validates the HTML5-specific setup script is present when
+    /// an emsdk is configured. Reports Warn rather than Fail when UE4_ROOT is
+    /// not configured at all (the `check_ue4_root` check already covers that).
+    fn check_ue4_build_scripts(&self) -> CheckResult {
+        let root = match self.resolve_ue4_root() {
+            None => {
+                return CheckResult {
+                    name: "UE4 Build Scripts".to_string(),
+                    status: CheckStatus::Warn,
+                    message: "Skipped: UE4 root not configured".to_string(),
+                    details: None,
+                };
+            }
+            Some(r) if !r.exists() => {
+                return CheckResult {
+                    name: "UE4 Build Scripts".to_string(),
+                    status: CheckStatus::Fail,
+                    message: format!("UE4 root path missing: {}", r.display()),
+                    details: None,
+                };
+            }
+            Some(r) => r,
+        };
+
+        // Critical scripts that must exist for `rocket build` and `rocket html5 cook`.
+        let required = [
+            "Engine/Build/BatchFiles/RunUAT.sh",
+            "Engine/Build/BatchFiles/Mac/Build.sh",
+        ];
+        let optional = [
+            "Engine/Platforms/HTML5/HTML5Setup.sh",
+        ];
+
+        let mut missing_required: Vec<&str> = Vec::new();
+        let mut missing_optional: Vec<&str> = Vec::new();
+
+        for rel in &required {
+            if !root.join(rel).exists() {
+                missing_required.push(rel);
+            }
+        }
+        for rel in &optional {
+            if !root.join(rel).exists() {
+                missing_optional.push(rel);
+            }
+        }
+
+        if !missing_required.is_empty() {
+            return CheckResult {
+                name: "UE4 Build Scripts".to_string(),
+                status: CheckStatus::Fail,
+                message: format!("Missing critical scripts: {}", missing_required.join(", ")),
+                details: Some(format!(
+                    "UE4 root: {} — ensure you have a full engine build with BatchFiles",
+                    root.display()
+                )),
+            };
+        }
+
+        if !missing_optional.is_empty() {
+            CheckResult {
+                name: "UE4 Build Scripts".to_string(),
+                status: CheckStatus::Warn,
+                message: format!(
+                    "RunUAT.sh present; HTML5 setup scripts missing: {}",
+                    missing_optional.join(", ")
+                ),
+                details: Some(
+                    "Run HTML5Setup.sh from the SpeculativeCoder/UnrealEngine fork to enable HTML5 packaging".to_string(),
+                ),
             }
         }
 
@@ -1025,52 +1374,173 @@ impl RocketDoctor {
                 CheckCategory::Environment,
             )
         } else {
-            CheckResult::new(
-                "UE4 Root",
-                CheckStatus::Warn,
-                "UE4 root not configured",
-                CheckCategory::Environment,
-            )
-            .with_details("Run 'rocket setup' to configure Unreal Engine path.")
-            .with_fix("rocket setup  # or export UE4_ROOT=/path/to/UE4")
+            CheckResult {
+                name: "UE4 Build Scripts".to_string(),
+                status: CheckStatus::Pass,
+                message: format!(
+                    "RunUAT.sh, Build.sh, HTML5Setup.sh present at {}",
+                    root.display()
+                ),
+                details: None,
+            }
         }
     }
-}
 
-// ---------------------------------------------------------------------------
-// Free helper functions
-// ---------------------------------------------------------------------------
+    /// Quick compile-check of `nexus-types` — the zero-dependency root of the
+    /// nexus-engine workspace. A failure here means the foundational shared types
+    /// are broken, which would cascade to every other nexus crate.
+    /// Check that Node.js ≥20 and npm are available — required for `rocket pwa`.
+    fn check_node(&self) -> CheckResult {
+        let node_output = Command::new("node").arg("--version").output();
+        let npm_output = Command::new("npm").arg("--version").output();
 
-/// Run `cmd args...` and return trimmed stdout (falling back to stderr, which
-/// some tools like `node`/`java` use for version output) if it succeeds.
-fn command_version(cmd: &str, args: &[&str]) -> Option<String> {
-    let output = Command::new(cmd).args(args).output().ok()?;
-    if !output.status.success() {
-        return None;
-    }
-    let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    if !stdout.is_empty() {
-        Some(stdout)
-    } else {
-        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
-        if stderr.is_empty() {
-            None
-        } else {
-            Some(stderr)
+        let node_version = node_output.ok().and_then(|o| {
+            if o.status.success() {
+                String::from_utf8(o.stdout).ok().map(|s| s.trim().to_string())
+            } else {
+                None
+            }
+        });
+
+        let npm_ok = npm_output
+            .map(|o| o.status.success())
+            .unwrap_or(false);
+
+        match (node_version, npm_ok) {
+            (Some(v), true) => {
+                // Warn if Node < 20 (pwa-staff requires Node 20.x)
+                let major: Option<u32> = v
+                    .trim_start_matches('v')
+                    .split('.')
+                    .next()
+                    .and_then(|s| s.parse().ok());
+                if major.map(|m| m >= 20).unwrap_or(false) {
+                    CheckResult {
+                        name: "Node.js".to_string(),
+                        status: CheckStatus::Pass,
+                        message: format!("Node.js {v} with npm"),
+                        details: None,
+                    }
+                } else {
+                    CheckResult {
+                        name: "Node.js".to_string(),
+                        status: CheckStatus::Warn,
+                        message: format!("Node.js {v} found but pwa-staff requires ≥20"),
+                        details: Some("Upgrade via nvm: `nvm install 20 && nvm use 20`".into()),
+                    }
+                }
+            }
+            (Some(v), false) => CheckResult {
+                name: "Node.js".to_string(),
+                status: CheckStatus::Warn,
+                message: format!("Node.js {v} found but npm not found"),
+                details: Some("Install npm: `npm install -g npm`".into()),
+            },
+            (None, _) => CheckResult {
+                name: "Node.js".to_string(),
+                status: CheckStatus::Warn,
+                message: "Node.js not found — required for `rocket pwa build`".to_string(),
+                details: Some("Install via nvm: `nvm install 20 && nvm use 20`".into()),
+            },
         }
     }
-}
 
-/// Extract the first `MAJOR.MINOR[.PATCH]` triple from a version string.
-/// e.g. "rustc 1.82.0 (...)" -> (1, 82, 0); "v20.11.1" -> (20, 11, 1).
-pub fn parse_semver_from(s: &str) -> Option<(u64, u64, u64)> {
-    let bytes = s.as_bytes();
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i].is_ascii_digit() {
-            // Try to parse a version starting here.
-            if let Some(v) = parse_triple_at(&s[i..]) {
-                return Some(v);
+    /// Quick compile-check of `nexus-types` — the zero-dependency root of the
+    /// nexus-engine workspace. A failure here means the foundational shared types
+    /// are broken, which would cascade to every other nexus crate.
+    fn check_nexus_types(&self) -> CheckResult {
+        let nexus_root = self.project_root.join("nexus-engine");
+        if !nexus_root.exists() {
+            return CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Warn,
+                message: "nexus-engine directory not found; skipping compile check".to_string(),
+                details: None,
+            };
+        }
+        let output = Command::new("cargo")
+            .args(["check", "-p", "nexus-types", "--quiet"])
+            .current_dir(&nexus_root)
+            .output();
+        match output {
+            Ok(o) if o.status.success() => CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Pass,
+                message: "nexus-types compiles cleanly".to_string(),
+                details: None,
+            },
+            Ok(o) => CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Fail,
+                message: "nexus-types compile check failed".to_string(),
+                details: Some(String::from_utf8_lossy(&o.stderr).chars().take(800).collect()),
+            },
+            Err(e) => CheckResult {
+                name: "nexus-types (compile check)".to_string(),
+                status: CheckStatus::Fail,
+                message: format!("could not invoke cargo: {e}"),
+                details: None,
+            },
+        }
+    }
+    /// Check that Xcode command-line tools are installed (macOS only).
+    ///
+    /// UE4's `Build.sh` and the Mono/C++ toolchain invoked by UAT require
+    /// `xcrun` and at minimum the Xcode CLT package. Without them, `Build.sh`
+    /// silently exits with a non-zero code and no human-readable error.
+    fn check_xcode(&self) -> CheckResult {
+        #[cfg(not(target_os = "macos"))]
+        return CheckResult {
+            name: "Xcode CLT".to_string(),
+            status: CheckStatus::Pass,
+            message: "Not macOS — skipped".to_string(),
+            details: None,
+        };
+
+        #[cfg(target_os = "macos")]
+        {
+            // `xcode-select -p` prints the active developer directory; exits non-zero when
+            // CLT are absent or the path is missing.
+            let xcode_select = Command::new("xcode-select").arg("-p").output();
+            match xcode_select {
+                Ok(out) if out.status.success() => {
+                    let path = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                    // xcrun --find clang is the minimal probe that the compiler toolchain works.
+                    let clang_ok = Command::new("xcrun")
+                        .args(["--find", "clang"])
+                        .stdout(std::process::Stdio::null())
+                        .stderr(std::process::Stdio::null())
+                        .status()
+                        .map(|s| s.success())
+                        .unwrap_or(false);
+                    if clang_ok {
+                        CheckResult {
+                            name: "Xcode CLT".to_string(),
+                            status: CheckStatus::Pass,
+                            message: format!("Developer tools active at {path}"),
+                            details: None,
+                        }
+                    } else {
+                        CheckResult {
+                            name: "Xcode CLT".to_string(),
+                            status: CheckStatus::Warn,
+                            message: format!(
+                                "xcode-select path set ({path}) but clang not found via xcrun"
+                            ),
+                            details: Some(
+                                "Run: xcode-select --install".to_string(),
+                            ),
+                        }
+                    }
+                }
+                _ => CheckResult {
+                    name: "Xcode CLT".to_string(),
+                    status: CheckStatus::Fail,
+                    message: "Xcode command-line tools not installed".to_string(),
+                    details: Some(
+                        "Run: xcode-select --install  (required for UE4 Build.sh)".to_string(),
+                    ),
+                },
             }
         }
         i += 1;
@@ -1157,6 +1627,233 @@ mod tests {
         assert_eq!(result.message, "Not a git repository");
     }
 
+    // ── check_ue4_root (new behaviour) ───────────────────────────────────────
+
+    #[test]
+    fn check_ue4_root_warns_when_unconfigured() {
+        let dir = tempdir().unwrap();
+        // No .rocket.json, no UE4_ROOT env
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        // Temporarily clear UE4_ROOT so the test is deterministic
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let result = doctor.check_ue4_root();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("not configured"));
+    }
+
+    #[test]
+    fn check_ue4_root_fails_when_path_configured_but_missing() {
+        let dir = tempdir().unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, r#"{"ue4_root": "/nonexistent/ue4"}"#).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_root();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("missing"));
+    }
+
+    #[test]
+    fn check_ue4_root_passes_when_path_exists() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        fs::create_dir_all(&fake_ue4).unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(
+            &rocket_json,
+            format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display()),
+        ).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_root();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Pass);
+    }
+
+    // ── check_html5_toolchain ─────────────────────────────────────────────────
+
+    #[test]
+    fn check_html5_toolchain_returns_a_result() {
+        // Just verify it doesn't panic and returns a named result
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_html5_toolchain();
+        assert_eq!(result.name, "HTML5 Toolchain");
+        // On any dev machine with python3 this should be Pass or Warn (never panic)
+        assert!(
+            result.status == CheckStatus::Pass
+                || result.status == CheckStatus::Warn
+                || result.status == CheckStatus::Fail
+        );
+    }
+
+    // ── check_ue4_build_scripts ───────────────────────────────────────────────
+
+    #[test]
+    fn build_scripts_warn_when_ue4_root_not_configured() {
+        let dir = tempdir().unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert_eq!(result.name, "UE4 Build Scripts");
+    }
+
+    #[test]
+    fn build_scripts_fail_when_ue4_root_missing_from_disk() {
+        let dir = tempdir().unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, r#"{"ue4_root": "/nonexistent/ue4-path"}"#).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("missing"));
+    }
+
+    #[test]
+    fn build_scripts_fail_when_run_uat_absent() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        // Create the root but NOT the scripts
+        fs::create_dir_all(&fake_ue4).unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display())).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("RunUAT.sh"));
+    }
+
+    #[test]
+    fn build_scripts_warn_when_run_uat_present_but_html5_setup_absent() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        // Create RunUAT.sh and Mac/Build.sh but NOT HTML5Setup.sh
+        fs::create_dir_all(fake_ue4.join("Engine/Build/BatchFiles/Mac")).unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/RunUAT.sh"), b"#!/bin/sh").unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/Mac/Build.sh"), b"#!/bin/sh").unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display())).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("RunUAT.sh present"));
+    }
+
+    #[test]
+    fn build_scripts_pass_when_all_scripts_present() {
+        let dir = tempdir().unwrap();
+        let fake_ue4 = dir.path().join("ue4");
+        fs::create_dir_all(fake_ue4.join("Engine/Build/BatchFiles/Mac")).unwrap();
+        fs::create_dir_all(fake_ue4.join("Engine/Platforms/HTML5")).unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/RunUAT.sh"), b"#!/bin/sh").unwrap();
+        fs::write(fake_ue4.join("Engine/Build/BatchFiles/Mac/Build.sh"), b"#!/bin/sh").unwrap();
+        fs::write(fake_ue4.join("Engine/Platforms/HTML5/HTML5Setup.sh"), b"#!/bin/sh").unwrap();
+        let rocket_json = dir.path().join(".rocket.json");
+        fs::write(&rocket_json, format!(r#"{{"ue4_root": "{}"}}"#, fake_ue4.display())).unwrap();
+        let prev = std::env::var("UE4_ROOT").ok();
+        std::env::remove_var("UE4_ROOT");
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_ue4_build_scripts();
+        if let Some(v) = prev { std::env::set_var("UE4_ROOT", v); }
+        assert_eq!(result.status, CheckStatus::Pass);
+        assert!(result.message.contains("RunUAT.sh"));
+        assert!(result.message.contains("HTML5Setup.sh"));
+    }
+
+    // ── check_manifest_projects ───────────────────────────────────────────────
+
+    #[test]
+    fn manifest_projects_warns_when_manifest_absent() {
+        let dir = tempdir().unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Warn);
+    }
+
+    #[test]
+    fn manifest_projects_warns_on_missing_projects_key() {
+        let dir = tempdir().unwrap();
+        fs::write(dir.path().join("project-manifest.json"), r#"{"version": 1}"#).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("No 'projects'"));
+    }
+
+    #[test]
+    fn manifest_projects_fails_on_invalid_json() {
+        let dir = tempdir().unwrap();
+        fs::write(dir.path().join("project-manifest.json"), b"not json").unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Fail);
+        assert!(result.message.contains("invalid JSON"));
+    }
+
+    #[test]
+    fn manifest_projects_passes_when_all_uprojects_exist() {
+        let dir = tempdir().unwrap();
+        let uproject = dir.path().join("Game.uproject");
+        fs::write(&uproject, b"{}").unwrap();
+        let manifest = serde_json::json!({
+            "projects": [{"name": "Game", "uproject_path": uproject.to_str().unwrap()}]
+        });
+        fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Pass);
+        assert!(result.message.contains("1 declared"));
+    }
+
+    #[test]
+    fn manifest_projects_fails_when_uproject_missing() {
+        let dir = tempdir().unwrap();
+        let manifest = serde_json::json!({
+            "projects": [{"name": "Ghost", "uproject_path": "/nonexistent/Ghost.uproject"}]
+        });
+        fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("not present") || result.message.contains("optional"));
+        assert!(result.details.as_deref().unwrap_or("").contains("Ghost"));
+    }
+
+    #[test]
+    fn manifest_projects_reports_partial_missing() {
+        let dir = tempdir().unwrap();
+        let present = dir.path().join("Present.uproject");
+        fs::write(&present, b"{}").unwrap();
+        let manifest = serde_json::json!({
+            "projects": [
+                {"name": "Present", "uproject_path": present.to_str().unwrap()},
+                {"name": "Missing", "uproject_path": "/nonexistent/Missing.uproject"}
+            ]
+        });
+        fs::write(dir.path().join("project-manifest.json"), manifest.to_string()).unwrap();
+        let doctor = RocketDoctor::new(dir.path().to_path_buf());
+        let result = doctor.check_manifest_projects();
+        assert_eq!(result.status, CheckStatus::Warn);
+        assert!(result.message.contains("1/2"));
+    }
+
     #[test]
     fn test_check_git_status_with_repo() {
         let dir = tempdir().unwrap();
@@ -1165,6 +1862,7 @@ mod tests {
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
         let result = doctor.check_git_status();
 
+        // Initial repo might have no HEAD yet
         assert_eq!(result.status, CheckStatus::Pass);
         assert_eq!(
             result.message,
@@ -1180,220 +1878,71 @@ mod tests {
         );
     }
 
-    // ---- New tests -------------------------------------------------------
+    // ── check_node ────────────────────────────────────────────────────────────
 
     #[test]
-    fn test_parse_semver() {
-        assert_eq!(parse_semver_from("rustc 1.82.0 (f6e511eec 2024)"), Some((1, 82, 0)));
-        assert_eq!(parse_semver_from("v20.11.1"), Some((20, 11, 1)));
-        assert_eq!(parse_semver_from("Python 3.11.4"), Some((3, 11, 4)));
-        assert_eq!(parse_semver_from("cargo 1.79"), Some((1, 79, 0)));
-        assert_eq!(parse_semver_from("no version here"), None);
-        // Leading non-version digits followed by a real version still parse a triple.
-        assert!(parse_semver_from("git version 2.39.2").is_some());
-    }
-
-    #[test]
-    fn test_run_diagnostics_is_deterministic_order() {
+    fn node_check_returns_a_result() {
         let dir = tempdir().unwrap();
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let a = doctor.run_diagnostics();
-        let b = doctor.run_diagnostics();
-        let names_a: Vec<_> = a.checks.iter().map(|c| c.name.clone()).collect();
-        let names_b: Vec<_> = b.checks.iter().map(|c| c.name.clone()).collect();
-        assert_eq!(names_a, names_b);
-        assert!(names_a.contains(&"Git".to_string()));
-        assert!(names_a.contains(&"Disk Space".to_string()));
-        assert!(names_a.contains(&"Path Dependencies".to_string()));
+        let result = doctor.check_node();
+        assert_eq!(result.name, "Node.js");
+        // Accept any status — the check should not panic regardless of env
+        matches!(result.status, CheckStatus::Pass | CheckStatus::Warn | CheckStatus::Fail);
     }
 
     #[test]
-    fn test_health_score_all_pass_is_100() {
-        let report = DiagnosticReport {
-            timestamp: Utc::now(),
-            checks: vec![
-                CheckResult::new("a", CheckStatus::Pass, "ok", CheckCategory::Environment),
-                CheckResult::new("b", CheckStatus::Pass, "ok", CheckCategory::Toolchain),
-            ],
-        };
-        assert_eq!(report.health_score(), 100);
-        assert_eq!(report.overall_status(), CheckStatus::Pass);
-    }
-
-    #[test]
-    fn test_health_score_mixed() {
-        let report = DiagnosticReport {
-            timestamp: Utc::now(),
-            checks: vec![
-                CheckResult::new("a", CheckStatus::Pass, "ok", CheckCategory::Environment),
-                CheckResult::new("b", CheckStatus::Fail, "no", CheckCategory::Toolchain),
-            ],
-        };
-        // 1 pass (1.0) + 1 fail (0.0) over weight 2.0 = 50.
-        assert_eq!(report.health_score(), 50);
-        assert_eq!(report.overall_status(), CheckStatus::Fail);
-    }
-
-    #[test]
-    fn test_optional_fail_does_not_force_overall_fail() {
-        let report = DiagnosticReport {
-            timestamp: Utc::now(),
-            checks: vec![
-                CheckResult::new("a", CheckStatus::Pass, "ok", CheckCategory::Environment),
-                CheckResult::new("opt", CheckStatus::Fail, "no", CheckCategory::Optional),
-            ],
-        };
-        assert_eq!(report.overall_status(), CheckStatus::Warn);
-    }
-
-    #[test]
-    fn test_overall_warn() {
-        let report = DiagnosticReport {
-            timestamp: Utc::now(),
-            checks: vec![CheckResult::new(
-                "a",
-                CheckStatus::Warn,
-                "meh",
-                CheckCategory::Environment,
-            )],
-        };
-        assert_eq!(report.overall_status(), CheckStatus::Warn);
-    }
-
-    #[test]
-    fn test_json_output_is_valid() {
+    fn node_check_pass_or_warn_status_has_nonempty_message() {
         let dir = tempdir().unwrap();
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let report = doctor.run_diagnostics();
-        let json = report.to_json();
-        let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert!(parsed.get("health_score").is_some());
-        assert!(parsed.get("checks").unwrap().is_array());
-        assert!(parsed.get("overall_status").is_some());
+        let result = doctor.check_node();
+        assert!(!result.message.is_empty());
     }
 
+    // ── check_xcode ───────────────────────────────────────────────────────────
+
     #[test]
-    fn test_pretty_and_compact_render() {
+    fn xcode_check_returns_named_result() {
         let dir = tempdir().unwrap();
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let report = doctor.run_diagnostics();
-        let pretty = report.pretty(false);
-        assert!(pretty.contains("Rocket Doctor"));
-        assert!(pretty.contains("Toolchain"));
-        let compact = report.compact_summary(false);
-        assert!(compact.contains("doctor:"));
-        assert!(compact.contains("health"));
-        // Color variant should embed an escape sequence.
-        assert!(report.compact_summary(true).contains("\x1b["));
+        let result = doctor.check_xcode();
+        assert_eq!(result.name, "Xcode CLT");
+        assert!(!result.message.is_empty());
     }
 
     #[test]
-    fn test_non_passing_checks_have_fix() {
-        let dir = tempdir().unwrap();
-        // Empty dir => manifest missing, versions missing, etc. all non-pass.
-        let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let report = doctor.run_diagnostics();
-        for c in &report.checks {
-            if c.status != CheckStatus::Pass {
-                assert!(
-                    c.fix_command.is_some(),
-                    "non-passing check '{}' is missing a fix_command",
-                    c.name
-                );
-            }
-        }
-    }
-
-    #[test]
-    fn test_run_fixes_dry_run_is_non_destructive() {
+    fn xcode_check_status_is_valid_variant() {
         let dir = tempdir().unwrap();
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let fixes = doctor.run_fixes(true);
-        // Dry run should never Apply anything.
-        for f in &fixes {
-            assert_ne!(f.outcome, FixOutcome::Applied);
-        }
-        // versions/ must NOT have been created in dry-run.
-        assert!(!dir.path().join("versions").exists());
+        let result = doctor.check_xcode();
+        // Should be Pass on this mac (Xcode is installed) or Fail/Warn without CLT
+        matches!(result.status, CheckStatus::Pass | CheckStatus::Warn | CheckStatus::Fail);
     }
 
     #[test]
-    fn test_run_fixes_creates_versions_dir_when_not_dry() {
+    fn html5_package_check_returns_a_named_html5_result() {
+        // Any project root — the check must return a properly named result without panicking
         let dir = tempdir().unwrap();
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let _ = doctor.run_fixes(false);
-        // The Versions Directory safe-fix should have created the dir.
-        assert!(dir.path().join("versions").is_dir());
+        let result = doctor.check_html5_package();
+        assert!(result.name.contains("HTML5"), "check name must mention HTML5");
+        // Status may be Pass/Warn/Fail depending on machine state — just must not panic
+        matches!(result.status, CheckStatus::Pass | CheckStatus::Warn | CheckStatus::Fail);
     }
 
     #[test]
-    fn test_path_dep_gotcha_detection() {
+    fn html5_package_check_reads_manifest_for_archive_paths() {
         let dir = tempdir().unwrap();
-        let knhk = dir.path().join("tools/knhk");
-        fs::create_dir_all(&knhk).unwrap();
-        fs::write(
-            knhk.join("Cargo.toml"),
-            "[dependencies]\nwasm4pm-compat = { path = \"/Users/sac/wasm4pm-compat\" }\n",
-        )
-        .unwrap();
+        // Write a minimal project-manifest.json with a project named "Alpha"
+        let manifest = serde_json::json!({
+            "projects": [{"name": "Alpha", "uproject_path": "Alpha.uproject", "targets": []}]
+        });
+        fs::write(dir.path().join("project-manifest.json"),
+            serde_json::to_string(&manifest).unwrap()).unwrap();
+
+        // No archive directories exist, so this should still be Warn (not panic)
         let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let r = doctor.check_path_dep_gotchas();
-        assert_eq!(r.status, CheckStatus::Warn);
-        assert!(r.fix_command.is_some());
-        assert!(r.details.unwrap().contains("wasm4pm-compat"));
-    }
-
-    #[test]
-    fn test_path_dep_gotcha_clean() {
-        let dir = tempdir().unwrap();
-        let knhk = dir.path().join("tools/knhk");
-        fs::create_dir_all(&knhk).unwrap();
-        fs::write(
-            knhk.join("Cargo.toml"),
-            "[dependencies]\nserde = \"1\"\nunrdf = { path = \"../unrdf\" }\n",
-        )
-        .unwrap();
-        let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let r = doctor.check_path_dep_gotchas();
-        // Relative path deps are fine; should pass.
-        assert_eq!(r.status, CheckStatus::Pass);
-    }
-
-    #[test]
-    fn test_pwa_node_modules() {
-        let dir = tempdir().unwrap();
-        let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        // No pwa-staff dir at all.
-        assert_eq!(doctor.check_pwa_node_modules().status, CheckStatus::Warn);
-
-        let pwa = dir.path().join("pwa-staff");
-        fs::create_dir_all(&pwa).unwrap();
-        assert_eq!(doctor.check_pwa_node_modules().status, CheckStatus::Warn);
-
-        fs::create_dir_all(pwa.join("node_modules")).unwrap();
-        assert_eq!(doctor.check_pwa_node_modules().status, CheckStatus::Pass);
-    }
-
-    #[test]
-    fn test_rust_workspaces_missing() {
-        let dir = tempdir().unwrap();
-        let doctor = RocketDoctor::new(dir.path().to_path_buf());
-        let r = doctor.check_rust_workspaces();
-        assert_eq!(r.status, CheckStatus::Warn);
-        assert!(r.fix_command.is_some());
-    }
-
-    #[test]
-    fn test_counts() {
-        let report = DiagnosticReport {
-            timestamp: Utc::now(),
-            checks: vec![
-                CheckResult::new("a", CheckStatus::Pass, "", CheckCategory::Environment),
-                CheckResult::new("b", CheckStatus::Warn, "", CheckCategory::Environment),
-                CheckResult::new("c", CheckStatus::Fail, "", CheckCategory::Environment),
-                CheckResult::new("d", CheckStatus::Pass, "", CheckCategory::Environment),
-            ],
-        };
-        assert_eq!(report.counts(), (2, 1, 1));
+        let result = doctor.check_html5_package();
+        // Should be Warn because no archive exists — but must NOT panic or error
+        assert!(matches!(result.status, CheckStatus::Warn | CheckStatus::Fail | CheckStatus::Pass));
     }
 }

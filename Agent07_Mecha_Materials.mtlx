@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<materialx version="1.38" colorspace="lin_rec709">
+
+  <!-- ========================================== -->
+  <!-- 1. Armor (High-Tech Painted Ceramic/Metal) -->
+  <!-- ========================================== -->
+  <!-- REJECT FLAT CLAY: Armor features car-paint style clearcoat over metallic base -->
+  <open_pbr_surface name="M_Armor_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.8, 0.85, 0.85" />
+    <input name="roughness" type="float" value="0.25" />
+    <input name="metalness" type="float" value="0.1" />
+    <input name="coat_weight" type="float" value="1.0" />
+    <input name="coat_roughness" type="float" value="0.05" />
+    <input name="coat_color" type="color3" value="1.0, 1.0, 1.0" />
+    <input name="coat_ior" type="float" value="1.5" />
+  </open_pbr_surface>
+  <surfacematerial name="M_Armor" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="M_Armor_shader" />
+  </surfacematerial>
+
+  <!-- ========================================== -->
+  <!-- 2. Frame (Anodized Dark Structural Metal)  -->
+  <!-- ========================================== -->
+  <!-- REJECT FLAT CLAY: Frame is highly anisotropic machined dark metal -->
+  <open_pbr_surface name="M_Frame_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.05, 0.05, 0.06" />
+    <input name="roughness" type="float" value="0.45" />
+    <input name="metalness" type="float" value="0.95" />
+    <!-- Anisotropic reflection to simulate machined parts -->
+    <input name="anisotropy" type="float" value="0.6" />
+    <input name="anisotropy_rotation" type="float" value="0.0" />
+  </open_pbr_surface>
+  <surfacematerial name="M_Frame" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="M_Frame_shader" />
+  </surfacematerial>
+
+  <!-- ========================================== -->
+  <!-- 3. Emissive Energy (Plasma / Reactor)      -->
+  <!-- ========================================== -->
+  <!-- REJECT FLAT CLAY: Emissive glows brightly but has no diffuse clay response -->
+  <open_pbr_surface name="M_EmissiveEnergy_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.0, 0.0, 0.0" />
+    <input name="emission" type="float" value="100.0" /> <!-- High luminance -->
+    <input name="emission_color" type="color3" value="0.05, 0.75, 1.0" /> <!-- Cyan plasma -->
+  </open_pbr_surface>
+  <surfacematerial name="M_EmissiveEnergy" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="M_EmissiveEnergy_shader" />
+  </surfacematerial>
+
+  <!-- ========================================== -->
+  <!-- 4. Decals (Warning labels, insignias)      -->
+  <!-- ========================================== -->
+  <!-- Surface material for decals which use texture-driven alpha mapping -->
+  <open_pbr_surface name="M_Decal_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.9, 0.7, 0.1" /> <!-- Yellow warning paint -->
+    <input name="roughness" type="float" value="0.5" />
+    <input name="metalness" type="float" value="0.0" />
+  </open_pbr_surface>
+  <!-- Node graph representing a decal mapped onto surface with alpha -->
+  <nodegraph name="NG_DecalMask">
+    <image name="decal_tex" type="color4">
+      <parameter name="file" type="filename" value="textures/decal_diffuse_alpha.png" />
+    </image>
+    <extract name="decal_alpha" type="float">
+      <input name="in" type="color4" nodename="decal_tex" />
+      <parameter name="index" type="integer" value="3" />
+    </extract>
+    <output name="alpha_out" type="float" nodename="decal_alpha" />
+  </nodegraph>
+  <surfacematerial name="M_Decal" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="M_Decal_shader" />
+  </surfacematerial>
+
+  <!-- ========================================== -->
+  <!-- 5. Wear (Exposed underlying metal)         -->
+  <!-- ========================================== -->
+  <!-- Scraped off paint revealing bare titanium/aluminum underneath -->
+  <open_pbr_surface name="M_Wear_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.75, 0.75, 0.75" />
+    <input name="roughness" type="float" value="0.2" />
+    <input name="metalness" type="float" value="1.0" />
+  </open_pbr_surface>
+  <surfacematerial name="M_Wear" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="M_Wear_shader" />
+  </surfacematerial>
+
+  <!-- ========================================== -->
+  <!-- 6. Damage (Scorch marks / Carbon buildup)  -->
+  <!-- ========================================== -->
+  <!-- High roughness, low metalness soot from energy weapons or explosions -->
+  <open_pbr_surface name="M_Damage_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.02, 0.02, 0.02" />
+    <input name="roughness" type="float" value="0.95" />
+    <input name="metalness" type="float" value="0.0" />
+  </open_pbr_surface>
+  <surfacematerial name="M_Damage" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="M_Damage_shader" />
+  </surfacematerial>
+
+  <!-- ========================================== -->
+  <!-- 7. Exposed Mechanical Substructure         -->
+  <!-- ========================================== -->
+  <!-- Oily, grimy, multi-metal components inside the mech joints -->
+  <open_pbr_surface name="M_ExposedSubstructure_shader" type="surfaceshader">
+    <input name="base_color" type="color3" value="0.2, 0.18, 0.15" /> <!-- Grimy brass/steel -->
+    <input name="roughness" type="float" value="0.7" />
+    <input name="metalness" type="float" value="0.85" />
+    <!-- Simulate dirt in crevices via increased specular roughness -->
+    <input name="specular_roughness" type="float" value="0.85" />
+  </open_pbr_surface>
+  <surfacematerial name="M_ExposedSubstructure" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="M_ExposedSubstructure_shader" />
+  </surfacematerial>
+
+  <!-- ========================================== -->
+  <!-- Layering Graph: Armor + Wear + Damage      -->
+  <!-- ========================================== -->
+  <!-- Demonstrates how to composite the discrete materials onto one surface -->
+  <nodegraph name="NG_AdvancedArmorCompositing">
+    <!-- Texture Masks -->
+    <image name="wear_mask" type="float">
+      <parameter name="file" type="filename" value="textures/wear_mask.png" />
+    </image>
+    <image name="damage_mask" type="float">
+      <parameter name="file" type="filename" value="textures/damage_scorch.png" />
+    </image>
+
+    <!-- Base shaders referenced -->
+    <surfacematerial name="mat_armor" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="M_Armor_shader" />
+    </surfacematerial>
+    <surfacematerial name="mat_wear" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="M_Wear_shader" />
+    </surfacematerial>
+    <surfacematerial name="mat_damage" type="material">
+      <input name="surfaceshader" type="surfaceshader" nodename="M_Damage_shader" />
+    </surfacematerial>
+
+    <!-- Layer 1: Expose wear (metal) through armor -->
+    <mix name="mix_wear" type="material">
+      <input name="bg" type="material" nodename="mat_armor" />
+      <input name="fg" type="material" nodename="mat_wear" />
+      <input name="mix" type="float" nodename="wear_mask" />
+    </mix>
+
+    <!-- Layer 2: Add scorch damage over the worn armor -->
+    <mix name="mix_damage" type="material">
+      <input name="bg" type="material" nodename="mix_wear" />
+      <input name="fg" type="material" nodename="mat_damage" />
+      <input name="mix" type="float" nodename="damage_mask" />
+    </mix>
+
+    <output name="out" type="material" nodename="mix_damage" />
+  </nodegraph>
+
+</materialx>

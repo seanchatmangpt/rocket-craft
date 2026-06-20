@@ -1,0 +1,34 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+# --- Ontology Declaration ---
+ue4:SubsystemsOntology a owl:Ontology ;
+    rdfs:label "UE4 Subsystems Ontology" ;
+    rdfs:comment "Ontology representing subsystems topology including rendering, physics, and networking." .
+
+ue4:USubsystem a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "USubsystem" ;
+    rdfs:comment "Base class for auto-instanced and managed lifecycled subsystems." .
+
+ue4:URenderingSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "URenderingSubsystem" ;
+    rdfs:comment "Rendering subsystem interface." .
+
+ue4:UPhysicsSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UPhysicsSubsystem" ;
+    rdfs:comment "Physics subsystem interface." .
+
+ue4:UNetworkingSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UNetworkingSubsystem" ;
+    rdfs:comment "Networking and replication subsystem interface." .
+
+ue4:hasSubsystemLifecycle a rdf:Property ;
+    rdfs:domain ue4:USubsystem ;
+    rdfs:label "hasSubsystemLifecycle" ;
+    rdfs:comment "Lifecycle tracking property for subsystems." .

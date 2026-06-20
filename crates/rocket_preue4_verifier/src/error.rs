@@ -1,0 +1,72 @@
+
+//! RefusalReason taxonomy and JidokaEvent.
+//! ⚠️ GENERATED FILE — do NOT edit by hand.
+//! Source of truth: ontology/mechbirth.ttl
+//! Generator:       ggen/templates/error.rs.tera
+//! SPARQL:          ggen/sparql/extract_refusal_reasons.sparql
+
+use thiserror::Error;
+
+/// Bounded taxonomy of all possible refusal reasons.
+/// Generated from ontology — variants below are exhaustive.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum RefusalReason {
+
+    /// Ontology source: mb:GeometryValidationFailed
+    #[error("geometry validation failed: {detail}")]
+    GeometryValidationFailed { detail: String },
+
+    /// Ontology source: mb:InvalidAuthorityClass
+    #[error("invalid authority class {class} for field {field}")]
+    InvalidAuthorityClass { field: String, class: u8 },
+
+    /// Ontology source: mb:LodDemotedCrownFeature
+    #[error("LOD demoted CROWN feature without authority reason: {feature}")]
+    LodDemotedCrownFeature { feature: String },
+
+    /// Ontology source: mb:MissingPowlStep
+    #[error("POWL step missing from trace: {step}")]
+    MissingPowlStep { step: String },
+
+    /// Ontology source: mb:MissingSocket
+    #[error("missing socket required by {dependent}")]
+    MissingSocket { dependent: String },
+
+    /// Ontology source: mb:MotionClearanceViolation
+    #[error("motion clearance violation: {detail}")]
+    MotionClearanceViolation { detail: String },
+
+    /// Ontology source: mb:OrphanProjectionRow
+    #[error("orphan projection row {row_id} has no source receipt")]
+    OrphanProjectionRow { row_id: String },
+
+    /// Ontology source: mb:PredictionAuthorityMutation
+    #[error("prediction attempted to overwrite admitted authority state")]
+    PredictionAuthorityMutation,
+
+    /// Ontology source: mb:ReceiptChainBroken
+    #[error("receipt chain broken at sequence {sequence}: expected {expected}, got {actual}")]
+    ReceiptChainBroken { sequence: u64, expected: String, actual: String },
+
+    /// Ontology source: mb:SimdScalarDivergence
+    #[error("SIMD output diverges from scalar for input index {index}")]
+    SimdScalarDivergence { index: usize },
+
+    /// Ontology source: mb:SkinOccludesRequiredFeature
+    #[error("skin occludes required feature: {feature}")]
+    SkinOccludesRequiredFeature { feature: String },
+
+}
+
+/// A Jidoka event record produced whenever a defect is detected and surfaced.
+#[derive(Debug, Clone)]
+pub struct JidokaEvent {
+    pub defect_class: String,
+    pub surface: String,
+    pub expected_law: String,
+    pub observed_failure: String,
+    pub residual: String,
+    pub repair_candidate: Option<String>,
+    pub repair_applied: bool,
+    pub receipt: Option<String>,
+}

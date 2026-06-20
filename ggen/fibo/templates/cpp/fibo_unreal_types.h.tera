@@ -1,0 +1,24 @@
+// GENERATED FILE - DO NOT EDIT
+// Pipeline: ggen -> Unreal DataTables (FIBO Standing)
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Engine/DataTable.h"
+#include "FiboUnrealTypes.generated.h"
+
+{% for state in places %}
+#define FIBO_STATE_{{ state.name | upper }} {{ state.mask_value }}
+{% endfor %}
+
+USTRUCT(BlueprintType)
+struct FFiboStateRow : public FTableRowBase
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FIBO|State")
+    uint8 StateMask;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FIBO|State")
+    FString StateName;
+};

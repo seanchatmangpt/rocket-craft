@@ -1,0 +1,380 @@
+{
+  "event_types": [
+    {
+      "attributes": [],
+      "name": "RepositoryScanned"
+    },
+    {
+      "attributes": [],
+      "name": "FileObserved"
+    },
+    {
+      "attributes": [],
+      "name": "DiagnosticEmitted"
+    },
+    {
+      "attributes": [],
+      "name": "ReceiptValidated"
+    },
+    {
+      "attributes": [],
+      "name": "Lsp318FeatureExercised"
+    },
+    {
+      "attributes": [],
+      "name": "NegativeControlExecuted"
+    },
+    {
+      "attributes": [],
+      "name": "FailsetUpdated"
+    }
+  ],
+  "events": [
+    {
+      "activity": "RepositoryScanned",
+      "attributes": [],
+      "id": "ev_repo_scan",
+      "relationships": [
+        {
+          "event_id": "ev_repo_scan",
+          "object_id": "repo_lsp_max",
+          "qualifier": "repository"
+        }
+      ]
+    },
+    {
+      "activity": "FileObserved",
+      "attributes": [],
+      "id": "ev_file_obs",
+      "relationships": [
+        {
+          "event_id": "ev_file_obs",
+          "object_id": "file_server_rs",
+          "qualifier": "observed_file"
+        }
+      ]
+    },
+    {
+      "activity": "DiagnosticEmitted",
+      "attributes": [],
+      "id": "ev_diag_emit",
+      "relationships": [
+        {
+          "event_id": "ev_diag_emit",
+          "object_id": "range_server_rs_1",
+          "qualifier": "range"
+        },
+        {
+          "event_id": "ev_diag_emit",
+          "object_id": "diag_code_ocel_001",
+          "qualifier": "code"
+        },
+        {
+          "event_id": "ev_diag_emit",
+          "object_id": "forbidden_imp_ocel_001",
+          "qualifier": "forbidden_implication"
+        },
+        {
+          "event_id": "ev_diag_emit",
+          "object_id": "cp_ocel_compat_001",
+          "qualifier": "checkpoint"
+        }
+      ]
+    },
+    {
+      "activity": "ReceiptValidated",
+      "attributes": [],
+      "id": "ev_receipt_val",
+      "relationships": [
+        {
+          "event_id": "ev_receipt_val",
+          "object_id": "receipt_ocel_json",
+          "qualifier": "receipt"
+        },
+        {
+          "event_id": "ev_receipt_val",
+          "object_id": "digest_ocel_json",
+          "qualifier": "digest"
+        },
+        {
+          "event_id": "ev_receipt_val",
+          "object_id": "cp_ocel_compat_001",
+          "qualifier": "checkpoint"
+        }
+      ]
+    },
+    {
+      "activity": "Lsp318FeatureExercised",
+      "attributes": [],
+      "id": "ev_lsp318",
+      "relationships": [
+        {
+          "event_id": "ev_lsp318",
+          "object_id": "feature_row_001",
+          "qualifier": "feature_row"
+        }
+      ]
+    },
+    {
+      "activity": "NegativeControlExecuted",
+      "attributes": [],
+      "id": "ev_neg_control",
+      "relationships": [
+        {
+          "event_id": "ev_neg_control",
+          "object_id": "fixture_changelog_laundering",
+          "qualifier": "fixture"
+        }
+      ]
+    },
+    {
+      "activity": "FailsetUpdated",
+      "attributes": [],
+      "id": "ev_failset",
+      "relationships": []
+    }
+  ],
+  "object_types": [
+    {
+      "attributes": [],
+      "name": "Repository"
+    },
+    {
+      "attributes": [],
+      "name": "Crate"
+    },
+    {
+      "attributes": [],
+      "name": "File"
+    },
+    {
+      "attributes": [],
+      "name": "FileRange"
+    },
+    {
+      "attributes": [],
+      "name": "Checkpoint"
+    },
+    {
+      "attributes": [],
+      "name": "DiagnosticCode"
+    },
+    {
+      "attributes": [],
+      "name": "ForbiddenImplication"
+    },
+    {
+      "attributes": [],
+      "name": "Diagnostic"
+    },
+    {
+      "attributes": [],
+      "name": "Receipt"
+    },
+    {
+      "attributes": [],
+      "name": "Digest"
+    },
+    {
+      "attributes": [],
+      "name": "Lsp318FeatureRow"
+    },
+    {
+      "attributes": [],
+      "name": "NegativeControlFixture"
+    }
+  ],
+  "objects": [
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "name",
+            "value": "lsp-max"
+          }
+        },
+        {
+          "type": "String",
+          "value": {
+            "name": "path",
+            "value": "/Users/sac/lsp-max"
+          }
+        }
+      ],
+      "id": "repo_lsp_max",
+      "object_type": "Repository"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "name",
+            "value": "anti-llm-cheat-lsp"
+          }
+        }
+      ],
+      "id": "crate_anti_llm_cheat_lsp",
+      "object_type": "Crate"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "path",
+            "value": "examples/anti-llm-cheat-lsp/src/server.rs"
+          }
+        }
+      ],
+      "id": "file_server_rs",
+      "object_type": "File"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "file",
+            "value": "examples/anti-llm-cheat-lsp/src/server.rs"
+          }
+        },
+        {
+          "type": "Integer",
+          "value": {
+            "name": "line",
+            "value": 42
+          }
+        }
+      ],
+      "id": "range_server_rs_1",
+      "object_type": "FileRange"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "name",
+            "value": "OCEL-COMPAT-001"
+          }
+        },
+        {
+          "type": "String",
+          "value": {
+            "name": "status",
+            "value": "PROCESS_EVIDENCE_COMPLETE"
+          }
+        }
+      ],
+      "id": "cp_ocel_compat_001",
+      "object_type": "Checkpoint"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "code",
+            "value": "ANTI-LLM-OCEL-001"
+          }
+        }
+      ],
+      "id": "diag_code_ocel_001",
+      "object_type": "DiagnosticCode"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "implication",
+            "value": "DiagnosticEmitted => ProcessEvidenceRecorded"
+          }
+        }
+      ],
+      "id": "forbidden_imp_ocel_001",
+      "object_type": "ForbiddenImplication"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "code",
+            "value": "ANTI-LLM-OCEL-001"
+          }
+        },
+        {
+          "type": "String",
+          "value": {
+            "name": "message",
+            "value": "Diagnostic emitted without corresponding OCEL process event"
+          }
+        }
+      ],
+      "id": "diag_instance_1",
+      "object_type": "Diagnostic"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "path",
+            "value": "examples/anti-llm-cheat-lsp/ocel/anti_llm_cheat_lsp_ocel.receipt.json"
+          }
+        }
+      ],
+      "id": "receipt_ocel_json",
+      "object_type": "Receipt"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "algorithm",
+            "value": "BLAKE3"
+          }
+        },
+        {
+          "type": "String",
+          "value": {
+            "name": "value",
+            "value": "temp_val"
+          }
+        }
+      ],
+      "id": "digest_ocel_json",
+      "object_type": "Digest"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "name",
+            "value": "lsp318-feature-row-001"
+          }
+        }
+      ],
+      "id": "feature_row_001",
+      "object_type": "Lsp318FeatureRow"
+    },
+    {
+      "attributes": [
+        {
+          "type": "String",
+          "value": {
+            "name": "name",
+            "value": "fixture-changelog-laundering"
+          }
+        }
+      ],
+      "id": "fixture_changelog_laundering",
+      "object_type": "NegativeControlFixture"
+    }
+  ]
+}

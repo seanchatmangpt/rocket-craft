@@ -1,0 +1,237 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+@prefix gn: <https://ggen.io/ontology/gundam-nexus/> .
+
+<https://rocket-craft.io/ontology/ue4/gundam_scenario#>
+    a owl:Ontology ;
+    rdfs:label "Gundam Player Character Scenario Model" ;
+    rdfs:comment "RDF Triples representing the complete Gundam player character scenario for E2E testing." .
+
+# =========================================================================
+# Class Extensions
+# =========================================================================
+
+gn:AGundam a owl:Class ;
+    rdfs:subClassOf ue4:ACharacter ;
+    rdfs:label "AGundam" ;
+    rdfs:comment "A Gundam player character class represented in the RDF ontology." .
+
+ue4:USkeletalMeshComponent a owl:Class ;
+    rdfs:subClassOf ue4:USceneComponent ;
+    rdfs:label "USkeletalMeshComponent" ;
+    rdfs:comment "A skeletal mesh rendering component used for character animation and display." .
+
+ue4:UBoxComponent a owl:Class ;
+    rdfs:subClassOf ue4:USceneComponent ;
+    rdfs:label "UBoxComponent" ;
+    rdfs:comment "A box collision physics component used for collision and physics bounds." .
+
+ue4:UEdGraphPin a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraphPin" ;
+    rdfs:comment "A connection pin in a Blueprint editor graph node." .
+
+ue4:PinDirection a owl:Class ;
+    rdfs:label "PinDirection" ;
+    rdfs:comment "Direction of data or execution flow through a Blueprint pin (Input or Output)." .
+
+ue4:PinType a owl:Class ;
+    rdfs:label "PinType" ;
+    rdfs:comment "The data or execution type of a Blueprint pin (e.g. Exec, Float, Object)." .
+
+# =========================================================================
+# Property Definitions
+# =========================================================================
+
+ue4:hasBlueprintGraph a owl:ObjectProperty ;
+    rdfs:label "hasBlueprintGraph" ;
+    rdfs:comment "Relates a character or class to its Blueprint execution graph." ;
+    rdfs:domain ue4:UObject ;
+    rdfs:range ue4:UEdGraph .
+
+ue4:hasNode a owl:ObjectProperty ;
+    rdfs:label "hasNode" ;
+    rdfs:comment "Relates a Blueprint graph to a node within that graph." ;
+    rdfs:domain ue4:UEdGraph ;
+    rdfs:range ue4:UEdGraphNode .
+
+ue4:callsFunction a owl:ObjectProperty ;
+    rdfs:label "callsFunction" ;
+    rdfs:comment "Relates an execution node to the reflected C++ function it calls." ;
+    rdfs:domain ue4:UK2Node ;
+    rdfs:range ue4:UFunction .
+
+ue4:execFlowsTo a owl:ObjectProperty ;
+    rdfs:label "execFlowsTo" ;
+    rdfs:comment "Defines high-level execution sequencing flow between Blueprint nodes." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UEdGraphNode .
+
+ue4:hasPin a owl:ObjectProperty ;
+    rdfs:label "hasPin" ;
+    rdfs:comment "Relates a Blueprint node to a connection pin belonging to it." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UEdGraphPin .
+
+ue4:pinDirection a owl:ObjectProperty ;
+    rdfs:label "pinDirection" ;
+    rdfs:comment "Specifies whether a pin is an input or an output." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:PinDirection .
+
+ue4:pinType a owl:ObjectProperty ;
+    rdfs:label "pinType" ;
+    rdfs:comment "Specifies the logical type of a Blueprint pin." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:PinType .
+
+ue4:connectedTo a owl:ObjectProperty ;
+    rdfs:label "connectedTo" ;
+    rdfs:comment "Represents a wire connecting an output pin to an input pin." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UEdGraphPin .
+
+ue4:hasParameter a owl:ObjectProperty ;
+    rdfs:label "hasParameter" ;
+    rdfs:comment "Relates a function to its reflected parameters." ;
+    rdfs:domain ue4:UFunction ;
+    rdfs:range ue4:UProperty .
+
+# =========================================================================
+# Typestate & Subsystem Constants
+# =========================================================================
+
+ue4:Cooked a ue4:CookingTypestate ;
+    rdfs:label "Cooked" ;
+    rdfs:comment "Asset has been successfully cooked for deployment." .
+
+ue4:WasmReady a ue4:WasmPackagingTypestate ;
+    rdfs:label "WasmReady" ;
+    rdfs:comment "The target has been fully packaged into browser-deployable HTML5/WASM format." .
+
+ue4:DirectionInput a ue4:PinDirection ;
+    rdfs:label "Input" ;
+    rdfs:comment "Input direction for data or execution flow." .
+
+ue4:DirectionOutput a ue4:PinDirection ;
+    rdfs:label "Output" ;
+    rdfs:comment "Output direction for data or execution flow." .
+
+ue4:PinTypeExec a ue4:PinType ;
+    rdfs:label "Exec" ;
+    rdfs:comment "Blueprint execution pin type." .
+
+ue4:PinTypeFloat a ue4:PinType ;
+    rdfs:label "Float" ;
+    rdfs:comment "Single-precision floating-point pin type." .
+
+# =========================================================================
+# Reflected C++ Functions
+# =========================================================================
+
+ue4:FuncAddMovementInput a ue4:UFunction ;
+    rdfs:label "AddMovementInput" ;
+    rdfs:comment "Reflected C++ function to add movement along a world-space direction vector." ;
+    ue4:hasParameter ue4:ParamWorldDirection ;
+    ue4:hasParameter ue4:ParamScaleValue .
+
+ue4:ParamWorldDirection a ue4:UProperty ;
+    rdfs:label "WorldDirection" ;
+    rdfs:comment "Parameter representing the direction vector of movement." .
+
+ue4:ParamScaleValue a ue4:UProperty ;
+    rdfs:label "ScaleValue" ;
+    rdfs:comment "Parameter representing the velocity scale multiplier." .
+
+# =========================================================================
+# Scenario Character and Component Instances
+# =========================================================================
+
+gn:GundamPlayerCharacter a gn:AGundam ;
+    rdfs:label "GundamPlayerCharacter" ;
+    rdfs:comment "Primary Gundam character possessed by the player." ;
+    ue4:hasComponent gn:GundamSkeletalMesh ;
+    ue4:hasComponent gn:GundamBoxCollision ;
+    ue4:hasRootComponent gn:GundamBoxCollision ;
+    ue4:hasBlueprintGraph gn:GundamGraph ;
+    ue4:hasCookingState ue4:Cooked ;
+    ue4:hasPackagingState ue4:WasmReady ;
+    ue4:bReplicates true .
+
+gn:GundamSkeletalMesh a ue4:USkeletalMeshComponent ;
+    rdfs:label "GundamSkeletalMesh" ;
+    rdfs:comment "Visual skeletal mesh representing the physical model of the Gundam." ;
+    ue4:owner gn:GundamPlayerCharacter ;
+    ue4:bIsActive true ;
+    ue4:bHidden false .
+
+gn:GundamBoxCollision a ue4:UBoxComponent ;
+    rdfs:label "GundamBoxCollision" ;
+    rdfs:comment "Physics collision bounds for root character interaction." ;
+    ue4:owner gn:GundamPlayerCharacter ;
+    ue4:bIsActive true ;
+    ue4:bHidden false .
+
+# =========================================================================
+# Blueprint Graph, Nodes, and Connection Instances
+# =========================================================================
+
+gn:GundamGraph a ue4:UEdGraph ;
+    rdfs:label "GundamGraph" ;
+    rdfs:comment "Blueprint event graph processing inputs and movement logic." ;
+    ue4:hasNode gn:NodeMoveForwardEvent ;
+    ue4:hasNode gn:NodeCallAddMovementInput .
+
+# Event Node (Move Forward Axis Input)
+gn:NodeMoveForwardEvent a ue4:UK2Node ;
+    rdfs:label "MoveForward Input Event Node" ;
+    rdfs:comment "Triggered every frame with an axis scaling factor when MoveForward input is received." ;
+    ue4:hasPin gn:PinMoveForwardExecOut ;
+    ue4:hasPin gn:PinMoveForwardAxisValue ;
+    ue4:execFlowsTo gn:NodeCallAddMovementInput .
+
+gn:PinMoveForwardExecOut a ue4:UEdGraphPin ;
+    rdfs:label "MoveForward Exec Out" ;
+    rdfs:comment "Output execution signal triggered when input event fires." ;
+    ue4:pinDirection ue4:DirectionOutput ;
+    ue4:pinType ue4:PinTypeExec ;
+    ue4:connectedTo gn:PinCallAddMovementInputExecIn .
+
+gn:PinMoveForwardAxisValue a ue4:UEdGraphPin ;
+    rdfs:label "MoveForward Axis Value Out" ;
+    rdfs:comment "Output scalar value representing forward/backward movement magnitude." ;
+    ue4:pinDirection ue4:DirectionOutput ;
+    ue4:pinType ue4:PinTypeFloat ;
+    ue4:connectedTo gn:PinCallAddMovementInputScale .
+
+# Function Call Node (Calling AddMovementInput)
+gn:NodeCallAddMovementInput a ue4:UK2Node ;
+    rdfs:label "CallAddMovementInput Node" ;
+    rdfs:comment "Node representing execution call to the C++ reflection function FuncAddMovementInput." ;
+    ue4:callsFunction ue4:FuncAddMovementInput ;
+    ue4:hasPin gn:PinCallAddMovementInputExecIn ;
+    ue4:hasPin gn:PinCallAddMovementInputScale .
+
+gn:PinCallAddMovementInputExecIn a ue4:UEdGraphPin ;
+    rdfs:label "CallAddMovementInput Exec In" ;
+    rdfs:comment "Input execution pin to trigger function invocation." ;
+    ue4:pinDirection ue4:DirectionInput ;
+    ue4:pinType ue4:PinTypeExec .
+
+gn:PinCallAddMovementInputScale a ue4:UEdGraphPin ;
+    rdfs:label "CallAddMovementInput Scale Input" ;
+    rdfs:comment "Input data pin for the scale value multiplier passed to AddMovementInput." ;
+    ue4:pinDirection ue4:DirectionInput ;
+    ue4:pinType ue4:PinTypeFloat .
+
+# =========================================================================
+# Subsystem Instances
+# =========================================================================
+
+gn:GundamNetworkingHandler a ue4:UNetworkingSubsystem ;
+    rdfs:label "GundamNetworkingHandler" ;
+    rdfs:comment "Networking subsystem instanced to handle replication of the Gundam player state." ;
+    ue4:hasSubsystemLifecycle ue4:LifecycleActive .

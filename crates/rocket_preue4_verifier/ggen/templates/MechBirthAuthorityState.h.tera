@@ -1,0 +1,74 @@
+{#- MechBirthAuthorityState.h.tera — GC-MECHBIRTH-002 Manufacturing Template -#}
+// MechBirthAuthorityState.h
+// ⚠️ GENERATED FILE — do NOT edit by hand.
+// Source of truth: ontology/mechbirth.ttl
+// Generator:       ggen/templates/MechBirthAuthorityState.h.tera
+// SPARQL:          ggen/sparql/extract_authority_fields.sparql
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "MechBirthAuthorityState.generated.h"
+
+/** Maximum admitted class value. Source: mb:MAX_CLASS mb:value 15 */
+static constexpr uint8 MECHBIRTH_MAX_CLASS = 15;
+
+/** Refusal sentinel. Source: mb:REFUSED_CLASS mb:value 255 */
+static constexpr uint8 MECHBIRTH_REFUSED_CLASS = 255;
+
+/**
+ * SoA Authority State for GC-MECHBIRTH-002.
+ * All fields are parallel TArray<uint8> buffers — identical length at all times.
+ *
+ * Fields generated from extract_authority_fields.sparql:
+{% for row in results -%}
+ *   [{{ row.soaIndex }}] {{ row.fieldName }}: {% if row.semantics %}{{ row.semantics }}{% else %}—{% endif %}
+{% endfor %} */
+USTRUCT(BlueprintType)
+struct MECHBIRTH_API FMechBirthAuthorityState
+{
+    GENERATED_BODY()
+
+{% for row in results %}
+    /** {% if row.semantics %}{{ row.semantics }}{% else %}{{ row.fieldName }}{% endif %} — default: {{ row.defaultValue }} */
+    UPROPERTY(BlueprintReadOnly, Category = "MechBirth|Authority")
+    TArray<uint8> {{ row.fieldName }};
+{% endfor %}
+
+    /** Construct state for Count parts with ontology-specified defaults. */
+    void Init(int32 Count)
+    {
+{% for row in results %}
+        {{ row.fieldName }}.Init({{ row.defaultValue }}, Count);
+{% endfor %}
+    }
+
+    /** Returns true if all SoA buffers have identical length. */
+    bool ValidateLengths() const
+    {
+        const int32 N = damage.Num();
+        return heat.Num() == N
+            && stress.Num() == N
+            && grip.Num() == N
+            && socket_health.Num() == N
+            && lod.Num() == N;
+    }
+
+    /** Scalar failure risk kernel — identical semantics to Rust scalar_failure_risk. */
+    static FORCEINLINE uint8 ScalarFailureRisk(uint8 Heat, uint8 Stress, uint8 SocketHealth)
+    {
+        const uint8 Degradation = FMath::Max(0, MECHBIRTH_MAX_CLASS - SocketHealth);
+        const uint16 Sum = (uint16)Heat + (uint16)Stress + (uint16)Degradation;
+        return FMath::Min((uint8)(Sum / 3), MECHBIRTH_MAX_CLASS);
+    }
+
+    /** Batch update damage[] from heat/stress/socket_health using scalar kernel. */
+    void BatchUpdateDamageScalar()
+    {
+        const int32 N = damage.Num();
+        for (int32 i = 0; i < N; ++i)
+        {
+            damage[i] = ScalarFailureRisk(heat[i], stress[i], socket_health[i]);
+        }
+    }
+};

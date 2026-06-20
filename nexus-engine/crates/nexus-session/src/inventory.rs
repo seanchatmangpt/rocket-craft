@@ -194,3 +194,143 @@ pub enum InventoryError {
     #[error("item not found: {0}")]
     ItemNotFound(String),
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn item(id: u64, name: &str, atk: u32, def: u32) -> Item {
+        Item {
+            id,
+            name: name.into(),
+            attack_bonus: atk,
+            defense_bonus: def,
+            ..Item::default()
+        }
+    }
+
+    // ── capacity / len / is_full / is_empty ───────────────────────────────────
+
+    #[test]
+    fn new_inventory_is_empty() {
+        let inv = Inventory::<5>::new();
+        assert!(inv.is_empty());
+        assert_eq!(inv.len(), 0);
+        assert_eq!(inv.capacity(), 5);
+    }
+
+    #[test]
+    fn capacity_is_the_type_constant() {
+        assert_eq!(Inventory::<10>::new().capacity(), 10);
+        assert_eq!(Inventory::<200>::new().capacity(), 200);
+    }
+
+    #[test]
+    fn is_full_only_after_cap_is_reached() {
+        let mut inv = Inventory::<2>::new();
+        assert!(!inv.is_full());
+        inv.add(item(1, "sword", 10, 0)).unwrap();
+        assert!(!inv.is_full());
+        inv.add(item(2, "shield", 0, 5)).unwrap();
+        assert!(inv.is_full());
+    }
+
+    // ── add ───────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn add_returns_slot_index() {
+        let mut inv = Inventory::<5>::new();
+        assert_eq!(inv.add(item(1, "a", 0, 0)).unwrap(), 0);
+        assert_eq!(inv.add(item(2, "b", 0, 0)).unwrap(), 1);
+    }
+
+    #[test]
+    fn add_over_capacity_returns_full_error() {
+        let mut inv = Inventory::<1>::new();
+        inv.add(item(1, "a", 0, 0)).unwrap();
+        let err = inv.add(item(2, "b", 0, 0)).unwrap_err();
+        assert!(matches!(err, InventoryError::Full { capacity: 1 }));
+    }
+
+    // ── remove ────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn remove_returns_item_and_shifts_remaining() {
+        let mut inv = Inventory::<5>::new();
+        inv.add(item(1, "first", 1, 0)).unwrap();
+        inv.add(item(2, "second", 2, 0)).unwrap();
+        let removed = inv.remove(0).unwrap();
+        assert_eq!(removed.name, "first");
+        assert_eq!(inv.len(), 1);
+        assert_eq!(inv.get(0).unwrap().name, "second");
+    }
+
+    #[test]
+    fn remove_out_of_bounds_returns_invalid_slot() {
+        let mut inv = Inventory::<5>::new();
+        inv.add(item(1, "x", 0, 0)).unwrap();
+        let err = inv.remove(5).unwrap_err();
+        assert!(matches!(err, InventoryError::InvalidSlot(5)));
+    }
+
+    // ── get / iter ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn get_returns_correct_item_or_none() {
+        let mut inv = Inventory::<5>::new();
+        inv.add(item(42, "ring", 3, 0)).unwrap();
+        assert_eq!(inv.get(0).unwrap().id, 42);
+        assert!(inv.get(1).is_none());
+    }
+
+    #[test]
+    fn iter_yields_all_items_in_order() {
+        let mut inv = Inventory::<5>::new();
+        inv.add(item(1, "a", 0, 0)).unwrap();
+        inv.add(item(2, "b", 0, 0)).unwrap();
+        let ids: Vec<u64> = inv.iter().map(|i| i.id).collect();
+        assert_eq!(ids, vec![1, 2]);
+    }
+
+    // ── find_by_name ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn find_by_name_returns_index_and_ref() {
+        let mut inv = Inventory::<5>::new();
+        inv.add(item(99, "Trans-Am Saber", 50, 0)).unwrap();
+        let (idx, found) = inv.find_by_name("Trans-Am Saber").unwrap();
+        assert_eq!(idx, 0);
+        assert_eq!(found.id, 99);
+    }
+
+    #[test]
+    fn find_by_name_missing_returns_none() {
+        let inv = Inventory::<5>::new();
+        assert!(inv.find_by_name("Phantom Gundam").is_none());
+    }
+
+    // ── bonus aggregation ─────────────────────────────────────────────────────
+
+    #[test]
+    fn total_attack_bonus_sums_all_items() {
+        let mut inv = Inventory::<5>::new();
+        inv.add(item(1, "a", 10, 0)).unwrap();
+        inv.add(item(2, "b", 25, 0)).unwrap();
+        assert_eq!(inv.total_attack_bonus(), 35);
+    }
+
+    #[test]
+    fn total_defense_bonus_sums_all_items() {
+        let mut inv = Inventory::<5>::new();
+        inv.add(item(1, "a", 0, 7)).unwrap();
+        inv.add(item(2, "b", 0, 13)).unwrap();
+        assert_eq!(inv.total_defense_bonus(), 20);
+    }
+
+    #[test]
+    fn empty_inventory_bonuses_are_zero() {
+        let inv = Inventory::<5>::new();
+        assert_eq!(inv.total_attack_bonus(), 0);
+        assert_eq!(inv.total_defense_bonus(), 0);
+    }
+}

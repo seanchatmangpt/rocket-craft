@@ -1,0 +1,23 @@
+{
+  "milestone": "GC-MECH-FACTORY-MUD-002",
+  "status": "GGEN_AUTHORED_MUD_VERTICAL_SLICE_VERIFIED_UNDER_SCOPE",
+  "scoped_status": "GGEN_AUTHORED_MUD_VERTICAL_SLICE_VERIFIED_UNDER_SCOPE",
+  "tests_passed": 56,
+  "receipt_chain": [
+    {
+      "sequence": 1,
+      "event_type": "GgenSync",
+      "surface": "latest.json",
+      "input_hash": "a4d3a01ff6c92d54e4efc39d09ae001221b6acfe2d73011dd67dee1845d6ffee",
+      "output_hash": "84ea8041fbfd2f9732e87a7f4b3f30111485a4fb4c32fb09f6b601ea3807ad6d",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "receipt": "2e1b4494fa89c913ae8b5c4e54be3b3a7a7577a16c2b5dafc5124626906e5eac",
+      "status": "VERIFIED",
+      "residuals": []
+    }
+  ],
+  "residuals": [
+    "authority_validation: Incomplete and hardcoded validation bounds in the library's pre-existing authority.rs check.",
+    "silent_mismatch: Bounded selection in root ggen.toml manifest uses mismatching protocol prefixes (https vs http) resulting in silent generation failure if run at the root without the pack manifest argument."
+  ]
+}

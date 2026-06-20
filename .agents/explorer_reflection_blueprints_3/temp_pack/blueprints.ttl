@@ -1,0 +1,25 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/blueprints#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Blueprint Graphs Ontology" ;
+    rdfs:comment "Ontology representing Blueprint execution graphs and node networks." .
+
+ue4:UEdGraph a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraph" ;
+    rdfs:comment "Graph of nodes representing Blueprint logic or configuration graphs." .
+
+ue4:UEdGraphNode a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraphNode" ;
+    rdfs:comment "Base class for all nodes in an editor graph." .
+
+ue4:UK2Node a owl:Class ;
+    rdfs:subClassOf ue4:UEdGraphNode ;
+    rdfs:label "UK2Node" ;
+    rdfs:comment "A node representing Kismet (Blueprint) execution logic." .

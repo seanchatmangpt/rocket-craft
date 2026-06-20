@@ -1,0 +1,37 @@
+# extract_verifier_gates.sparql
+# GC-MECHBIRTH-002: Anti-Cartesian Exhaustion SELECT
+#
+# Extracts all 8 verifier gates (GATE 0–7) with their scope classification.
+# Results drive: verifier.rs.tera → run_pipeline() gate sequence
+#
+# Anti-Cartesian guarantee: ?gate a mb:VerifierGate, ORDER BY gateIndex.
+# Exactly 8 rows returned. LIMIT 16 as exhaustion cap.
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+SELECT
+    ?gateId
+    ?gateIndex
+    ?scopeLabel
+    ?law
+    ?validates
+    ?residual
+    ?alwaysPass
+WHERE {
+    ?gate a mb:VerifierGate ;
+          mb:gateId    ?gateId ;
+          mb:gateIndex ?gateIndex ;
+          mb:scope     ?scopeRes ;
+          mb:law       ?law .
+    ?scopeRes rdfs:label ?scopeLabel .
+    OPTIONAL { ?gate mb:validates  ?validates . }
+    OPTIONAL { ?gate mb:residual   ?residual . }
+    OPTIONAL { ?gate mb:alwaysPass ?alwaysPass . }
+
+    FILTER (xsd:integer(?gateIndex) < 16)
+}
+ORDER BY ?gateIndex
+LIMIT 16

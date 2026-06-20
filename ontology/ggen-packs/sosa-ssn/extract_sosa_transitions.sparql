@@ -1,0 +1,17 @@
+PREFIX sosa: <http://www.w3.org/ns/sosa/>
+PREFIX gen: <http://rocket-craft.com/ggen/>
+
+SELECT ?sensorType ?actuatorType ?procedure ?sensorStructName ?actuatorStructName
+WHERE {
+  ?sensor a sosa:Sensor ;
+          sosa:observes ?property .
+  ?actuator a sosa:Actuator ;
+            sosa:actsOnProperty ?property .
+  ?procedure a sosa:Procedure .
+            
+  BIND(URI(CONCAT(STR(?sensor), "_State")) AS ?sensorType)
+  BIND(URI(CONCAT(STR(?actuator), "_State")) AS ?actuatorType)
+  BIND(STRAFTER(STR(?sensor), "#") AS ?sensorStructName)
+  BIND(STRAFTER(STR(?actuator), "#") AS ?actuatorStructName)
+}
+ORDER BY ?sensorType ?actuatorType ?procedure

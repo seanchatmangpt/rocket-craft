@@ -1,9 +1,9 @@
-use ib4_core::{enemy::EnemyInstance, player::PlayerState};
 use ib4_ai::{
-    roster::{spawn_enemy, arena_sequence},
-    titan::TitanAI,
     godking::{GodKingAI, GodKingEvent},
+    roster::{arena_sequence, spawn_enemy},
+    titan::TitanAI,
 };
+use ib4_core::{enemy::EnemyInstance, player::PlayerState};
 
 fn make_enemy(id: &str) -> EnemyInstance {
     spawn_enemy(id, 0).expect("valid enemy id")

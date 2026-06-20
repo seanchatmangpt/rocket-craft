@@ -145,7 +145,7 @@ impl WorldCoherenceGate {
         }
 
         // Rules check
-        let rule_entity_re = regex::Regex::new(r"\b([a-zA-Z0-9_-]+)\.").unwrap();
+        let rule_entity_re = regex::Regex::new(r"\b([a-zA-Z_][a-zA-Z0-9_-]*)\.").unwrap();
         for rule in &spec.rules {
             for cap in rule_entity_re.captures_iter(&rule.expression) {
                 let potential_id = &cap[1];
@@ -773,4 +773,124 @@ pub fn get_genie_shacl_shapes() -> Vec<ShaclShape> {
             ],
         },
     ]
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::spec::{
+        Actor, Bounds3D, Object, Place, Process, ProcessStep, Relationship, RelationshipType,
+        Rule, RuleSeverity, Vector3, WorldSpec,
+    };
+
+    fn make_place(id: &str) -> Place {
+        Place::new(
+            id,
+            id,
+            Bounds3D::new(Vector3::default(), Vector3::new(10.0, 10.0, 10.0)),
+        )
+    }
+
+    fn spec_with_place() -> WorldSpec {
+        let mut spec = WorldSpec::new();
+        spec.places.push(make_place("zone-1"));
+        spec
+    }
+
+    // ── WorldCoherenceGate::validate ──────────────────────────────────────────
+
+    #[test]
+    fn empty_spec_passes() {
+        let gate = WorldCoherenceGate::new();
+        assert!(gate.validate(&WorldSpec::new()).is_ok());
+    }
+
+    #[test]
+    fn spec_with_actor_in_valid_place_passes() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = spec_with_place();
+        spec.actors.push(Actor::new("a1", "Hero", "Player", "zone-1"));
+        assert!(gate.validate(&spec).is_ok());
+    }
+
+    #[test]
+    fn actor_with_invalid_place_id_fails() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = spec_with_place();
+        spec.actors.push(Actor::new("a1", "Ghost", "NPC", "nonexistent-place"));
+        let errs = gate.validate(&spec).unwrap_err();
+        assert!(errs.iter().any(|e| e.contains("a1") && e.contains("Referential")));
+    }
+
+    #[test]
+    fn duplicate_actor_id_fails() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = spec_with_place();
+        spec.actors.push(Actor::new("a1", "Alice", "Player", "zone-1"));
+        spec.actors.push(Actor::new("a1", "Bob", "Player", "zone-1")); // duplicate
+        let errs = gate.validate(&spec).unwrap_err();
+        assert!(errs.iter().any(|e| e.contains("Duplicate") && e.contains("a1")));
+    }
+
+    #[test]
+    fn duplicate_place_id_fails() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = WorldSpec::new();
+        spec.places.push(make_place("zone-1"));
+        spec.places.push(make_place("zone-1")); // duplicate
+        let errs = gate.validate(&spec).unwrap_err();
+        assert!(errs.iter().any(|e| e.contains("Duplicate") && e.contains("zone-1")));
+    }
+
+    #[test]
+    fn object_with_invalid_place_id_fails() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = spec_with_place();
+        spec.objects.push(Object::new("o1", "Crate", "Box", "missing-place"));
+        let errs = gate.validate(&spec).unwrap_err();
+        assert!(errs.iter().any(|e| e.contains("o1") && e.contains("Referential")));
+    }
+
+    #[test]
+    fn relationship_with_valid_entities_passes() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = spec_with_place();
+        spec.actors.push(Actor::new("a1", "Alice", "Player", "zone-1"));
+        spec.actors.push(Actor::new("a2", "Bob", "NPC", "zone-1"));
+        spec.relationships.push(Relationship::new(
+            "r1",
+            RelationshipType::Controls,
+            "a1",
+            "a2",
+        ));
+        assert!(gate.validate(&spec).is_ok());
+    }
+
+    #[test]
+    fn relationship_with_invalid_source_fails() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = spec_with_place();
+        spec.actors.push(Actor::new("a2", "Bob", "NPC", "zone-1"));
+        spec.relationships.push(Relationship::new(
+            "r1",
+            RelationshipType::Controls,
+            "ghost-source",
+            "a2",
+        ));
+        let errs = gate.validate(&spec).unwrap_err();
+        assert!(errs.iter().any(|e| e.contains("ghost-source")));
+    }
+
+    #[test]
+    fn multiple_errors_collected_not_short_circuited() {
+        let gate = WorldCoherenceGate::new();
+        let mut spec = spec_with_place();
+        // Two actors with bad place IDs — both errors should appear
+        spec.actors.push(Actor::new("a1", "One", "NPC", "bad-place-1"));
+        spec.actors.push(Actor::new("a2", "Two", "NPC", "bad-place-2"));
+        let errs = gate.validate(&spec).unwrap_err();
+        assert!(errs.len() >= 2);
+        assert!(errs.iter().any(|e| e.contains("a1")));
+        assert!(errs.iter().any(|e| e.contains("a2")));
+    }
 }

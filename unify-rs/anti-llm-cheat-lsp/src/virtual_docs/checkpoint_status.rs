@@ -16,3 +16,34 @@ pub fn generate_checkpoint_markdown() -> String {
     out.push_str("| LSP318_COMBINATORIAL_MAXIMALISM | **MATRIX_INCOMPLETE** | spec_extractor_tool | Verify full LSP 3.18 combinatorial coverage. |\n");
     out
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn output_starts_with_header() {
+        let out = generate_checkpoint_markdown();
+        assert!(out.starts_with("# Checkpoint Verification Status"));
+    }
+
+    #[test]
+    fn contains_all_five_checkpoints() {
+        let out = generate_checkpoint_markdown();
+        for cp in ["CP-001", "CP-002", "CP-003", "CP-004", "CP-005"] {
+            assert!(out.contains(cp), "missing {cp}");
+        }
+    }
+
+    #[test]
+    fn contains_lsp318_row() {
+        let out = generate_checkpoint_markdown();
+        assert!(out.contains("LSP318_COMBINATORIAL_MAXIMALISM"));
+    }
+
+    #[test]
+    fn all_checkpoints_are_candidate_status() {
+        let out = generate_checkpoint_markdown();
+        assert!(out.contains("CANDIDATE"));
+    }
+}

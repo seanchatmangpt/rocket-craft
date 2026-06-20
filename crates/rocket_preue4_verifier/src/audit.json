@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-06-19T18:38:52.332964+00:00",
+  "ggen_version": "26.6.11",
+  "inputs": {
+    "manifest_hash": "103dabb89d4c5fcc664a451bed2446c52260756623d34b5d2e5de2b5f7507429",
+    "ontology_hashes": {
+      "/Users/sac/rocket-craft/ontology/mechbirth.ttl": "1d2934fc6a9019a4b72358cae0519ff8f1a521be3216fa8ba639ad2698917cfc"
+    },
+    "template_hashes": {
+      "templates/MechBirthAuthorityState.h.tera": "49d60750fabd6e7db505e03463e32ad21464a3bf85c4a7d0ae099955efe08dd2",
+      "templates/authority_state.rs.tera": "b8b9b7c75a5292aba9676c18b0638462360e0b8542c5336c563a087268a0cb55",
+      "templates/error.rs.tera": "710a786a1031b7b6dc92ee4bf9871aa58b0af65e89508b71dc9e2da22d878f80",
+      "templates/prediction.rs.tera": "d87cef3d08bd4f15ba870d313e82ac2588574e83490848b19c900223808cafe4",
+      "templates/simd_equiv.rs.tera": "214b2981dffa83cff454e0555c999cecde521c34c2dfc703997519bf46b6a583",
+      "templates/transitions.rs.tera": "c235c78b60f380abb01cef06e01ab5a48b4f128d31851e986d633b8dc835482b",
+      "templates/verifier.rs.tera": "36a548c9b1af7de8392f6cd61ce28c7af89f99139a654cc27a578243b5585d2f"
+    },
+    "query_hashes": {}
+  },
+  "pipeline": [
+    {
+      "step_type": "inference",
+      "name": "subclass-closure",
+      "duration_ms": 20,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "authority_state",
+      "duration_ms": 16,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "error_taxonomy",
+      "duration_ms": 6,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "transitions",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "simd_equivalence",
+      "duration_ms": 12,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "prediction_shadow",
+      "duration_ms": 6,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "verifier_pipeline",
+      "duration_ms": 7,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4_authority_header",
+      "duration_ms": 3,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/authority.rs",
+      "content_hash": "d73a4cbe0d9789f461a0d675f56dd08cc7907ba50d78c151b43b1d0119b5636e",
+      "size_bytes": 4926,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/authority.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/error.rs",
+      "content_hash": "0639607d0712a3662e9a77bd79db46ad43f95169500dea581bbe46861adae06d",
+      "size_bytes": 2667,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/error.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/transitions.rs",
+      "content_hash": "b402cd713d6c2e9cdb4dddd16b9a042c39818deaf7f70348fc505f11bee21c92",
+      "size_bytes": 2784,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/transitions.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/simd.rs",
+      "content_hash": "140655faf9d9be2ededff651ac89d77bd45bb677677c68276f2e8f1512b18241",
+      "size_bytes": 2409,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/simd.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/prediction.rs",
+      "content_hash": "822787379de9b6428663e44bda9222eef30f3be175e981d841a412b8eb34176e",
+      "size_bytes": 4321,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/prediction.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/verifier.rs",
+      "content_hash": "28fcfe90942d717f373131ff7f3d69e55aeb36c35def6e932ef39aa1ea64aed7",
+      "size_bytes": 7977,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/rocket_preue4_verifier/src/verifier.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/MechBirthAuthorityState.h",
+      "content_hash": "31f62abc7395ab93213f0c0cfa07fca122e719ce812502b92f838492e67caddf",
+      "size_bytes": 3557,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/MechBirthAuthorityState.h"
+    }
+  ],
+  "validation_passed": true,
+  "total_duration_ms": 0
+}

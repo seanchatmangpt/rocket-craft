@@ -1,0 +1,13 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?texture ?owner_part_id ?type ?resolution ?format
+WHERE {
+  ?texture rdf:type ?type .
+  ?type rdfs:subClassOf* mud:TextureProgram .
+  ?texture mud:owner_part_id ?owner_part_id .
+  OPTIONAL { ?texture mud:resolution ?resolution }
+  OPTIONAL { ?texture mud:format ?format }
+}
+ORDER BY ?owner_part_id ?texture

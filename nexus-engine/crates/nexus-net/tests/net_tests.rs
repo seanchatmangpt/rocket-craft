@@ -14,8 +14,15 @@ use proptest::prelude::*;
 #[test]
 fn roundtrip_client_message_serialization() {
     let msgs: Vec<ClientMessage> = vec![
-        ClientMessage::Authenticate { player_id: 42, token: "token123".to_string() },
-        ClientMessage::CombatAction { action: CombatAction::Attack { dir: AttackDir::Overhead } },
+        ClientMessage::Authenticate {
+            player_id: 42,
+            token: "token123".to_string(),
+        },
+        ClientMessage::CombatAction {
+            action: CombatAction::Attack {
+                dir: AttackDir::Overhead,
+            },
+        },
         ClientMessage::Ping { seq: 999 },
         ClientMessage::SurrenderMatch,
         ClientMessage::JoinLobby,
@@ -35,7 +42,8 @@ fn roundtrip_client_message_serialization() {
         // Re-encode and compare JSON bytes — structural equality check.
         let re_encoded = MessageCodec::encode_client(&decoded).unwrap();
         assert_eq!(
-            encoded, re_encoded,
+            encoded,
+            re_encoded,
             "roundtrip should preserve message: {}",
             String::from_utf8_lossy(&encoded)
         );
@@ -46,11 +54,21 @@ fn roundtrip_client_message_serialization() {
 fn roundtrip_server_message_serialization() {
     let msgs: Vec<ServerMessage> = vec![
         ServerMessage::AuthSuccess { session_id: 12345 },
-        ServerMessage::AuthFailure { reason: "bad token".to_string() },
+        ServerMessage::AuthFailure {
+            reason: "bad token".to_string(),
+        },
         ServerMessage::LobbyJoined { online_count: 42 },
-        ServerMessage::Pong { seq: 1, server_time_ms: 99999 },
-        ServerMessage::Error { code: 404, message: "not found".to_string() },
-        ServerMessage::Disconnect { reason: "server restart".to_string() },
+        ServerMessage::Pong {
+            seq: 1,
+            server_time_ms: 99999,
+        },
+        ServerMessage::Error {
+            code: 404,
+            message: "not found".to_string(),
+        },
+        ServerMessage::Disconnect {
+            reason: "server restart".to_string(),
+        },
         ServerMessage::MatchEnded {
             winner_id: 1,
             reason: nexus_net::protocol::MatchEndReason::Verified,
@@ -62,7 +80,8 @@ fn roundtrip_server_message_serialization() {
         let decoded = MessageCodec::decode_server(&encoded).unwrap();
         let re_encoded = MessageCodec::encode_server(&decoded).unwrap();
         assert_eq!(
-            encoded, re_encoded,
+            encoded,
+            re_encoded,
             "server message roundtrip failed: {}",
             String::from_utf8_lossy(&encoded)
         );
@@ -72,14 +91,24 @@ fn roundtrip_server_message_serialization() {
 #[test]
 fn all_combat_actions_roundtrip() {
     let actions: Vec<CombatAction> = vec![
-        CombatAction::Attack { dir: AttackDir::Overhead },
-        CombatAction::Attack { dir: AttackDir::Left },
-        CombatAction::Attack { dir: AttackDir::Right },
-        CombatAction::Parry { dir: Some(AttackDir::Overhead) },
+        CombatAction::Attack {
+            dir: AttackDir::Overhead,
+        },
+        CombatAction::Attack {
+            dir: AttackDir::Left,
+        },
+        CombatAction::Attack {
+            dir: AttackDir::Right,
+        },
+        CombatAction::Parry {
+            dir: Some(AttackDir::Overhead),
+        },
         CombatAction::Parry { dir: None },
         CombatAction::Dodge,
         CombatAction::UseSpecial { ability_id: 1 },
-        CombatAction::CastMagic { magic_type: MagicType::Ice },
+        CombatAction::CastMagic {
+            magic_type: MagicType::Ice,
+        },
     ];
 
     for action in actions {
@@ -125,7 +154,10 @@ fn matchmaking_pairs_players_within_rating() {
     assert_eq!(queue.queue_len(), 1);
 
     let result2 = queue.enqueue(p2);
-    assert!(result2.is_some(), "second player within 200 rating should match");
+    assert!(
+        result2.is_some(),
+        "second player within 200 rating should match"
+    );
     assert_eq!(queue.queue_len(), 0);
 
     let m = result2.unwrap();
@@ -207,11 +239,27 @@ fn room_tracks_hp_and_win_condition() {
     room.state = RoomState::Active;
 
     // Player 1 attacks player 2
-    let outcome =
-        room.apply_action(1, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap();
-    assert!(matches!(outcome, CombatOutcome::Hit { .. }), "expected Hit, got {:?}", outcome);
-    assert!(room.player2.hp.value() < 100.0, "player2 HP should be reduced");
-    assert!(!room.is_player1_turn, "turn should have switched to player 2");
+    let outcome = room
+        .apply_action(
+            1,
+            CombatAction::Attack {
+                dir: AttackDir::Overhead,
+            },
+        )
+        .unwrap();
+    assert!(
+        matches!(outcome, CombatOutcome::Hit { .. }),
+        "expected Hit, got {:?}",
+        outcome
+    );
+    assert!(
+        room.player2.hp.value() < 100.0,
+        "player2 HP should be reduced"
+    );
+    assert!(
+        !room.is_player1_turn,
+        "turn should have switched to player 2"
+    );
     assert_eq!(room.turn_number, 1);
 }
 
@@ -259,9 +307,19 @@ fn room_ends_when_player_dies() {
     // Player 2's turn first? No — player 1 goes first, but player 1 has 1 HP.
     // Let's swap so player 2 can kill player 1 on the first action.
     room.is_player1_turn = false; // make it player 2's turn
-    let outcome = room.apply_action(2, CombatAction::Attack { dir: AttackDir::Left }).unwrap();
+    let outcome = room
+        .apply_action(
+            2,
+            CombatAction::Attack {
+                dir: AttackDir::Left,
+            },
+        )
+        .unwrap();
     assert!(
-        matches!(outcome, CombatOutcome::PlayerDied { .. } | CombatOutcome::Hit { .. }),
+        matches!(
+            outcome,
+            CombatOutcome::PlayerDied { .. } | CombatOutcome::Hit { .. }
+        ),
         "outcome: {:?}",
         outcome
     );
@@ -290,11 +348,21 @@ async fn room_broadcast_received_by_subscriber() {
 
     // Player 2 attacks player 1 (who has 1 HP) — should kill immediately.
     room.is_player1_turn = false;
-    let _ = room.apply_action(2, CombatAction::Attack { dir: AttackDir::Overhead }).unwrap();
+    let _ = room
+        .apply_action(
+            2,
+            CombatAction::Attack {
+                dir: AttackDir::Overhead,
+            },
+        )
+        .unwrap();
 
     // Subscriber should receive MatchEnded.
     let event = sub.try_recv();
-    assert!(event.is_ok(), "subscriber should have received MatchEnded event");
+    assert!(
+        event.is_ok(),
+        "subscriber should have received MatchEnded event"
+    );
     assert!(
         matches!(event.unwrap(), ServerRoomEvent::MatchEnded { .. }),
         "expected MatchEnded"
@@ -310,7 +378,10 @@ async fn room_broadcast_manual_event() {
 
     room.broadcast(ServerRoomEvent::MatchStarted { match_id: 1 });
     let event = sub.try_recv().unwrap();
-    assert!(matches!(event, ServerRoomEvent::MatchStarted { match_id: 1 }));
+    assert!(matches!(
+        event,
+        ServerRoomEvent::MatchStarted { match_id: 1 }
+    ));
 }
 
 // ── Typestate connection ──────────────────────────────────────────────────────

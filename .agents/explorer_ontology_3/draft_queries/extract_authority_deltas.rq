@@ -1,0 +1,24 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX eden: <https://ggen.io/ontology/eden-server/>
+
+SELECT DISTINCT ?delta ?targetComponent ?damageClass ?stressClass ?heatClass ?fatigueClass ?timestamp ?issuer
+WHERE {
+  ?delta a eden:AuthorityDelta .
+  
+  # Target component of the authority update
+  ?delta eden:targetComponent ?targetComponent .
+  
+  # Extract updated state properties
+  OPTIONAL { ?delta eden:damageClass ?damageClass . }
+  OPTIONAL { ?delta eden:stressClass ?stressClass . }
+  OPTIONAL { ?delta eden:heatClass ?heatClass . }
+  OPTIONAL { ?delta eden:fatigueClass ?fatigueClass . }
+  
+  # Audit metadata
+  OPTIONAL { ?delta prov:generatedAtTime ?timestamp . }
+  OPTIONAL { ?delta prov:wasAssociatedWith ?issuer . }
+}
+ORDER BY DESC(?timestamp) ?delta

@@ -1,0 +1,30 @@
+[project]
+name = "mech_factory_mud"
+version = "0.1.0"
+
+[ontology]
+source = "schema/mech_factory_mud.ttl"
+
+[generation]
+output_dir = "."
+
+[[generation.rules]]
+name = "rust-constants"
+query = { file = "queries/all.rq" }
+template = { file = "templates/rust/constants.rs.tera" }
+output_file = "../../../crates/mech_factory_mud/src/generated_constants.rs"
+mode = "Overwrite"
+
+[[generation.rules]]
+name = "ue4-stations-csv"
+query = { file = "queries/all.rq" }
+template = { file = "templates/ue4/FactoryStations.csv.tera" }
+output_file = "../../../generated/mech_factory_mud/ue4/DataTables/FactoryStations.csv"
+mode = "Overwrite"
+
+[[generation.rules]]
+name = "ue4-route-csv"
+query = { file = "queries/all.rq" }
+template = { file = "templates/ue4/WalkthroughRoute.csv.tera" }
+output_file = "../../../generated/mech_factory_mud/ue4/DataTables/WalkthroughRoute.csv"
+mode = "Overwrite"

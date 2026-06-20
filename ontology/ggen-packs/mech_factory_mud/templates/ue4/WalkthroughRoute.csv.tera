@@ -1,0 +1,14 @@
+# generated_by: ggen
+# source_ttl: schema/mech_factory_mud.ttl
+# source_query: queries/all.rq
+# source_template: templates/ue4/WalkthroughRoute.csv.tera
+order,route_node_id,next_route_node_id,station_id,ue4_marker
+1,spawn,factory_entrance,,SpawnMarker
+2,factory_entrance,frame_assembly,,FactoryEntranceMarker
+3,frame_assembly,socket_topology,frame_assembly,FrameAssemblyMarker
+4,socket_topology,armor_skin,socket_topology,SocketTopologyMarker
+5,armor_skin,rig_motion,armor_skin,ArmorSkinMarker
+6,rig_motion,verification_gate,rig_motion,RigMotionMarker
+7,verification_gate,receipt_terminal,verification_gate,VerificationGateMarker
+8,receipt_terminal,exit_or_loop,receipt_terminal,ReceiptTerminalMarker
+9,exit_or_loop,,,"ExitOrLoopMarker"

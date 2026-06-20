@@ -86,3 +86,105 @@ impl ManifestValidator {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::manifest::UnifyManifest;
+    use crate::sections::{LspConfig, TestConfig};
+
+    fn valid_manifest() -> UnifyManifest {
+        UnifyManifest::default_for("my-project")
+    }
+
+    // ── is_semver_like ────────────────────────────────────────────────────────
+
+    #[test]
+    fn semver_major_minor_patch_valid() {
+        assert!(ManifestValidator::is_semver_like("1.0.0"));
+        assert!(ManifestValidator::is_semver_like("12.3.456"));
+    }
+
+    #[test]
+    fn semver_major_minor_valid() {
+        assert!(ManifestValidator::is_semver_like("1.0"));
+    }
+
+    #[test]
+    fn semver_single_part_invalid() {
+        assert!(!ManifestValidator::is_semver_like("1"));
+    }
+
+    #[test]
+    fn semver_with_prerelease_suffix_valid() {
+        assert!(ManifestValidator::is_semver_like("1.0.0-alpha"));
+    }
+
+    #[test]
+    fn semver_empty_string_invalid() {
+        assert!(!ManifestValidator::is_semver_like(""));
+    }
+
+    // ── validate / is_valid ───────────────────────────────────────────────────
+
+    #[test]
+    fn valid_manifest_has_no_violations() {
+        let m = valid_manifest();
+        assert!(ManifestValidator::is_valid(&m));
+        assert!(ManifestValidator::validate(&m).is_empty());
+    }
+
+    #[test]
+    fn empty_name_produces_violation() {
+        let mut m = valid_manifest();
+        m.name = "".into();
+        let v = ManifestValidator::validate(&m);
+        assert!(v.iter().any(|vi| vi.field == "name"));
+    }
+
+    #[test]
+    fn whitespace_only_name_produces_violation() {
+        let mut m = valid_manifest();
+        m.name = "   ".into();
+        let v = ManifestValidator::validate(&m);
+        assert!(v.iter().any(|vi| vi.field == "name"));
+    }
+
+    #[test]
+    fn bad_version_produces_violation() {
+        let mut m = valid_manifest();
+        m.version = "not-a-version".into();
+        let v = ManifestValidator::validate(&m);
+        assert!(v.iter().any(|vi| vi.field == "version"));
+    }
+
+    #[test]
+    fn coverage_threshold_over_one_produces_violation() {
+        let mut m = valid_manifest();
+        m.test = Some(TestConfig { coverage_threshold: 1.5, ..Default::default() });
+        let v = ManifestValidator::validate(&m);
+        assert!(v.iter().any(|vi| vi.field == "test.coverage_threshold"));
+    }
+
+    #[test]
+    fn coverage_threshold_zero_is_valid() {
+        let mut m = valid_manifest();
+        m.test = Some(TestConfig { coverage_threshold: 0.0, ..Default::default() });
+        assert!(ManifestValidator::is_valid(&m));
+    }
+
+    #[test]
+    fn lsp_conformance_threshold_over_one_produces_violation() {
+        let mut m = valid_manifest();
+        m.lsp = Some(LspConfig { conformance_threshold: 2.0, ..Default::default() });
+        let v = ManifestValidator::validate(&m);
+        assert!(v.iter().any(|vi| vi.field == "lsp.conformance_threshold"));
+    }
+
+    #[test]
+    fn lsp_conformance_threshold_one_is_valid() {
+        let mut m = valid_manifest();
+        m.lsp = Some(LspConfig { conformance_threshold: 1.0, ..Default::default() });
+        assert!(ManifestValidator::is_valid(&m));
+    }
+}

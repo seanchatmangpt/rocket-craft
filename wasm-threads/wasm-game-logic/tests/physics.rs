@@ -11,7 +11,7 @@ fn log() -> Logger {
 
 #[test]
 fn physics_moves_entity_by_velocity() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity at (0,0) and velocity (10,0)");
     let mut world = World::new();
     let e = world.spawn();
@@ -29,7 +29,7 @@ fn physics_moves_entity_by_velocity() {
 
 #[test]
 fn position_depends_on_velocity_not_constant() {
-    let mut log = log();
+    let log = log();
     log.info("Given two entities at the same origin with different velocities");
     let mut world = World::new();
     let e1 = world.spawn();
@@ -50,7 +50,7 @@ fn position_depends_on_velocity_not_constant() {
 
 #[test]
 fn entity_without_velocity_stays_still() {
-    let mut log = log();
+    let log = log();
     log.info("Given a World with an entity at (3,7) and no Velocity component");
     let mut world = World::new();
     let e = world.spawn();
@@ -67,7 +67,7 @@ fn entity_without_velocity_stays_still() {
 
 #[test]
 fn physics_applies_both_axes() {
-    let mut log = log();
+    let log = log();
     log.info("Given an entity at (0,0) with velocity (3,4)");
     let mut world = World::new();
     let e = world.spawn();
@@ -85,7 +85,7 @@ fn physics_applies_both_axes() {
 
 #[test]
 fn physics_handles_negative_velocity() {
-    let mut log = log();
+    let log = log();
     log.info("Given an entity at (10,10) with velocity (-5,-2)");
     let mut world = World::new();
     let e = world.spawn();

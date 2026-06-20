@@ -7,18 +7,23 @@ use crate::parry::{AttackDir, ParryOutcome};
 // ---------------------------------------------------------------------------
 
 /// The unit is waiting; all actions are available.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Idle;
 
 /// An attack has been initiated but not yet rereaddressed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Attacking;
 
 /// A parry is in progress (any-direction).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Parrying;
 
 /// A perfect-parry window is open (direction must match announced).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PerfectParrying;
 
 /// A dodge is in progress.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Dodging;
 
 // ---------------------------------------------------------------------------
@@ -30,12 +35,149 @@ pub struct Dodging;
 /// Only valid state transitions are representable at compile time.
 /// Illegal sequences (e.g. attacking while dodging, resolving a parry
 /// that was never started) are simply not constructible.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_combat::machine::{CombatMachine, Idle};
+/// use nexus_combat::parry::AttackDir;
+///
+/// // Create unit
+/// let unit = CombatMachine::new(100.0);
+/// assert_eq!(unit.hp, 100.0);
+///
+/// // Idle -> Attacking transition
+/// let (attacking, dir) = unit.begin_attack(AttackDir::Overhead);
+/// assert_eq!(dir, AttackDir::Overhead);
+///
+/// // Attacking -> Idle transition on hit
+/// let mut enemy_hp = 50.0;
+/// let idle = attacking.resolve_hit(15.0, &mut enemy_hp);
+/// assert_eq!(enemy_hp, 35.0);
+/// assert_eq!(idle.combo_depth, 1);
+/// ```
+#[derive(Debug, Clone, PartialEq)]
 pub struct CombatMachine<S> {
     pub hp: f32,
     pub max_hp: f32,
     /// Current combo depth (capped at 5 for the standard machine).
     pub combo_depth: u32,
     state: PhantomData<S>,
+}
+
+/// Errors arising from invalid CombatMachine construction.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+pub enum CombatBuildError {
+    /// Health must be positive.
+    #[error("initial health must be specified and non-negative (got {0})")]
+    InvalidHealth(f32),
+
+    /// Max health must be >= current health.
+    #[error("maximum health ({max}) cannot be less than initial health ({hp})")]
+    InvalidMaxHealth {
+        /// The initial health configured.
+        hp: f32,
+        /// The maximum health configured.
+        max: f32,
+    },
+}
+
+/// A builder for [`CombatMachine`] to simplify configuration and validate initial values.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_combat::machine::{CombatMachineBuilder, Idle};
+///
+/// let machine = CombatMachineBuilder::new()
+///     .hp(100.0)
+///     .max_hp(120.0)
+///     .combo_depth(0)
+///     .build()
+///     .unwrap();
+///
+/// assert_eq!(machine.hp, 100.0);
+/// assert_eq!(machine.max_hp, 120.0);
+/// ```
+#[derive(Debug, Clone)]
+pub struct CombatMachineBuilder {
+    hp: Option<f32>,
+    max_hp: Option<f32>,
+    combo_depth: u32,
+}
+
+impl CombatMachineBuilder {
+    /// Create a new builder with default parameters.
+    pub fn new() -> Self {
+        Self {
+            hp: None,
+            max_hp: None,
+            combo_depth: 0,
+        }
+    }
+
+    /// Set the initial HP of the unit.
+    pub fn hp(mut self, hp: f32) -> Self {
+        self.hp = Some(hp);
+        self
+    }
+
+    /// Set the maximum HP of the unit. If not set, defaults to initial HP.
+    pub fn max_hp(mut self, max_hp: f32) -> Self {
+        self.max_hp = Some(max_hp);
+        self
+    }
+
+    /// Set the initial combo depth.
+    pub fn combo_depth(mut self, depth: u32) -> Self {
+        self.combo_depth = depth;
+        self
+    }
+
+    /// Validate the parameters and build a [`CombatMachine`] in [`Idle`] state.
+    pub fn build(self) -> Result<CombatMachine<Idle>, CombatBuildError> {
+        let hp = self.hp.ok_or(CombatBuildError::InvalidHealth(0.0))?;
+        if hp < 0.0 {
+            return Err(CombatBuildError::InvalidHealth(hp));
+        }
+        let max_hp = self.max_hp.unwrap_or(hp);
+        if max_hp < hp {
+            return Err(CombatBuildError::InvalidMaxHealth { hp, max: max_hp });
+        }
+        Ok(CombatMachine {
+            hp,
+            max_hp,
+            combo_depth: self.combo_depth,
+            state: PhantomData,
+        })
+    }
+}
+
+impl Default for CombatMachineBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Represents the dynamic runtime state of a combat unit.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum CombatState {
+    Idle,
+    Attacking,
+    Parrying,
+    PerfectParrying,
+    Dodging,
+}
+
+/// Errors returned when a state transition is invalid.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+#[error(
+    "Illegal combat transition: cannot transition from {current:?} to {target:?}. Reason: {reason}"
+)]
+pub struct CombatTransitionError {
+    pub current: CombatState,
+    pub target: CombatState,
+    pub reason: String,
 }
 
 // ---------------------------------------------------------------------------
@@ -79,7 +221,10 @@ impl CombatMachine<Idle> {
 
     /// `Idle → PerfectParrying` — enters the directional parry window, announcing
     /// the expected incoming direction.
-    pub fn begin_perfect_parry(self, dir: AttackDir) -> (CombatMachine<PerfectParrying>, AttackDir) {
+    pub fn begin_perfect_parry(
+        self,
+        dir: AttackDir,
+    ) -> (CombatMachine<PerfectParrying>, AttackDir) {
         (
             CombatMachine {
                 hp: self.hp,
@@ -148,7 +293,11 @@ impl CombatMachine<Parrying> {
     /// - `Miss`:    full damage.
     ///
     /// HP is clamped to 0 (never negative).
-    pub fn resolve(self, outcome: ParryOutcome, incoming_damage: f32) -> (CombatMachine<Idle>, ParryOutcome) {
+    pub fn resolve(
+        self,
+        outcome: ParryOutcome,
+        incoming_damage: f32,
+    ) -> (CombatMachine<Idle>, ParryOutcome) {
         let new_hp = match outcome {
             ParryOutcome::Perfect => self.hp,
             ParryOutcome::Normal => self.hp - incoming_damage * 0.1,
@@ -243,5 +392,145 @@ pub fn tick_stunned(turns_remaining: u32) -> Option<u32> {
         None
     } else {
         Some(turns_remaining - 1)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use nexus_types::AttackDir;
+
+    // ── builder validation ────────────────────────────────────────────────────
+
+    #[test]
+    fn builder_rejects_negative_hp() {
+        let result = CombatMachineBuilder::new().hp(-1.0).max_hp(100.0).build();
+        assert!(matches!(result, Err(CombatBuildError::InvalidHealth(_))));
+    }
+
+    #[test]
+    fn builder_rejects_max_hp_below_hp() {
+        let result = CombatMachineBuilder::new().hp(100.0).max_hp(50.0).build();
+        assert!(matches!(result, Err(CombatBuildError::InvalidMaxHealth { .. })));
+    }
+
+    #[test]
+    fn builder_defaults_max_hp_to_hp_when_omitted() {
+        let machine = CombatMachineBuilder::new().hp(200.0).build().unwrap();
+        assert_eq!(machine.max_hp, 200.0);
+    }
+
+    #[test]
+    fn builder_succeeds_with_valid_hp() {
+        let m = CombatMachineBuilder::new().hp(100.0).max_hp(100.0).build().unwrap();
+        assert_eq!(m.hp, 100.0);
+        assert_eq!(m.combo_depth, 0);
+    }
+
+    // ── Idle → Attacking → resolve_hit ───────────────────────────────────────
+
+    #[test]
+    fn attack_and_hit_deals_damage_to_target() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let mut target_hp = 200.0_f32;
+        let (attacking, _dir) = machine.begin_attack(AttackDir::Overhead);
+        let idle = attacking.resolve_hit(30.0, &mut target_hp);
+        assert_eq!(target_hp, 170.0);
+        assert_eq!(idle.hp, 100.0, "attacker HP must be unchanged");
+    }
+
+    #[test]
+    fn resolve_hit_increments_combo_depth() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let mut target_hp = 500.0;
+        let (attacking, _) = machine.begin_attack(AttackDir::Left);
+        let idle = attacking.resolve_hit(10.0, &mut target_hp);
+        assert_eq!(idle.combo_depth, 1);
+    }
+
+    #[test]
+    fn combo_depth_caps_at_5() {
+        let machine = CombatMachineBuilder::new().hp(100.0).combo_depth(5).build().unwrap();
+        let mut target_hp = 500.0;
+        let (attacking, _) = machine.begin_attack(AttackDir::Right);
+        let idle = attacking.resolve_hit(10.0, &mut target_hp);
+        assert_eq!(idle.combo_depth, 5, "combo depth must not exceed 5");
+    }
+
+    // ── Idle → Attacking → resolve_blocked ───────────────────────────────────
+
+    #[test]
+    fn blocked_attack_resets_combo_depth() {
+        let machine = CombatMachineBuilder::new().hp(100.0).combo_depth(3).build().unwrap();
+        let (attacking, _) = machine.begin_attack(AttackDir::Overhead);
+        let idle = attacking.resolve_blocked();
+        assert_eq!(idle.combo_depth, 0);
+    }
+
+    // ── Idle → Parrying → resolve ────────────────────────────────────────────
+
+    #[test]
+    fn perfect_parry_takes_no_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let parrying = machine.begin_parry();
+        let (idle, outcome) = parrying.resolve(ParryOutcome::Perfect, 50.0);
+        assert_eq!(idle.hp, 100.0);
+        assert_eq!(outcome, ParryOutcome::Perfect);
+    }
+
+    #[test]
+    fn normal_parry_takes_10pct_chip_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let parrying = machine.begin_parry();
+        let (idle, _) = parrying.resolve(ParryOutcome::Normal, 50.0);
+        // 10% of 50 = 5 chip damage
+        assert!((idle.hp - 95.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn missed_parry_takes_full_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let parrying = machine.begin_parry();
+        let (idle, _) = parrying.resolve(ParryOutcome::Miss, 40.0);
+        assert!((idle.hp - 60.0).abs() < 0.01);
+    }
+
+    #[test]
+    fn parry_hp_clamps_at_zero_on_lethal_miss() {
+        let machine = CombatMachine::<Idle>::new(10.0);
+        let parrying = machine.begin_parry();
+        let (idle, _) = parrying.resolve(ParryOutcome::Miss, 9999.0);
+        assert_eq!(idle.hp, 0.0);
+    }
+
+    // ── Idle → PerfectParrying → resolve ─────────────────────────────────────
+
+    #[test]
+    fn matching_direction_perfect_parry_takes_no_damage() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let (pp, dir) = machine.begin_perfect_parry(AttackDir::Overhead);
+        let (idle, outcome) = pp.resolve(dir, AttackDir::Overhead, 50.0);
+        assert_eq!(outcome, ParryOutcome::Perfect);
+        assert_eq!(idle.hp, 100.0);
+    }
+
+    #[test]
+    fn wrong_direction_perfect_parry_degrades_to_normal() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let (pp, _announced) = machine.begin_perfect_parry(AttackDir::Left);
+        let (idle, outcome) = pp.resolve(AttackDir::Left, AttackDir::Right, 50.0);
+        assert_eq!(outcome, ParryOutcome::Normal);
+        assert!((idle.hp - 95.0).abs() < 0.01, "normal = 10% chip of 50 = 5");
+    }
+
+    // ── Idle → Dodging → resolve ──────────────────────────────────────────────
+
+    #[test]
+    fn dodge_returns_idle() {
+        let machine = CombatMachine::<Idle>::new(100.0);
+        let dodging = machine.begin_dodge();
+        // CombatMachine<Dodging> must have a resolve method → back to Idle
+        let idle = dodging.resolve();
+        assert_eq!(idle.hp, 100.0);
     }
 }

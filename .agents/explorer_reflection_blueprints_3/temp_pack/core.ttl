@@ -1,0 +1,131 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Core C++ Backbone Ontology" ;
+    rdfs:comment "Ontology representing the core C++ class hierarchy and basic spatial relationships in Unreal Engine 4." ;
+    owl:versionInfo "0.1.0" ;
+    owl:imports <https://rocket-craft.io/ontology/ue4/reflection#> ,
+                <https://rocket-craft.io/ontology/ue4/blueprints#> ,
+                <https://rocket-craft.io/ontology/ue4/subsystems#> ,
+                <https://rocket-craft.io/ontology/ue4/typestates#> ,
+                <https://rocket-craft.io/ontology/ue4/gundam_scenario#> .
+
+# =========================================================================
+# Core C++ Classes
+# =========================================================================
+
+ue4:UObject a owl:Class ;
+    rdfs:label "UObject" ;
+    rdfs:comment "The base class for all objects in Unreal Engine, providing core features like reflection, serialization, garbage collection, and metadata." .
+
+ue4:AActor a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "AActor" ;
+    rdfs:comment "The base class for all object actors that can be placed or spawned in an Unreal Engine level or world." .
+
+ue4:APawn a owl:Class ;
+    rdfs:subClassOf ue4:AActor ;
+    rdfs:label "APawn" ;
+    rdfs:comment "A Pawn is an actor that can be possessed by a Controller (PlayerController or AIController) to receive input actuation and interact with the world." .
+
+ue4:ACharacter a owl:Class ;
+    rdfs:subClassOf ue4:APawn ;
+    rdfs:label "ACharacter" ;
+    rdfs:comment "A Character is a specialized Pawn that includes support for basic walking/running/jumping movement, collision handling, and skeletal mesh rendering." .
+
+ue4:UActorComponent a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UActorComponent" ;
+    rdfs:comment "The base class for components that can be attached to actors to add modular gameplay behaviors, rendering properties, or physics logic." .
+
+ue4:USceneComponent a owl:Class ;
+    rdfs:subClassOf ue4:UActorComponent ;
+    rdfs:label "USceneComponent" ;
+    rdfs:comment "A SceneComponent has a transform and supports attachment, representing a component with physical or spatial presence." .
+
+ue4:UWorld a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UWorld" ;
+    rdfs:comment "A representation of a world containing a persistent level, streaming levels, and a collection of spawned actors." .
+
+ue4:ULevel a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "ULevel" ;
+    rdfs:comment "A collection of actors situated in a level that can be loaded/unloaded or hidden/shown dynamically." .
+
+# =========================================================================
+# Core Relationships / Properties
+# =========================================================================
+
+ue4:hasComponent a owl:ObjectProperty ;
+    rdfs:label "hasComponent" ;
+    rdfs:comment "Relates an actor to one of its components." ;
+    rdfs:domain ue4:AActor ;
+    rdfs:range ue4:UActorComponent .
+
+ue4:hasRootComponent a owl:ObjectProperty ;
+    rdfs:label "hasRootComponent" ;
+    rdfs:comment "Relates an actor to its root scene component which defines its transform." ;
+    rdfs:domain ue4:AActor ;
+    rdfs:range ue4:USceneComponent ;
+    rdfs:subPropertyOf ue4:hasComponent .
+
+ue4:isComponentOf a owl:ObjectProperty ;
+    rdfs:label "isComponentOf" ;
+    rdfs:comment "Relates a component to the actor it belongs to." ;
+    rdfs:domain ue4:UActorComponent ;
+    rdfs:range ue4:AActor ;
+    owl:inverseOf ue4:hasComponent .
+
+ue4:owner a owl:ObjectProperty ;
+    rdfs:label "owner" ;
+    rdfs:comment "Alias or inverse relationship relating a component/object to its owner actor." ;
+    rdfs:domain ue4:UActorComponent ;
+    rdfs:range ue4:AActor ;
+    owl:inverseOf ue4:hasComponent .
+
+ue4:hasLevel a owl:ObjectProperty ;
+    rdfs:label "hasLevel" ;
+    rdfs:comment "Relates a world to a level within it." ;
+    rdfs:domain ue4:UWorld ;
+    rdfs:range ue4:ULevel .
+
+ue4:isLevelOf a owl:ObjectProperty ;
+    rdfs:label "isLevelOf" ;
+    rdfs:comment "Relates a level to the world it belongs to." ;
+    rdfs:domain ue4:ULevel ;
+    rdfs:range ue4:UWorld ;
+    owl:inverseOf ue4:hasLevel .
+
+ue4:persistentLevel a owl:ObjectProperty ;
+    rdfs:label "persistentLevel" ;
+    rdfs:comment "Relates a world to its persistent main level." ;
+    rdfs:domain ue4:UWorld ;
+    rdfs:range ue4:ULevel ;
+    rdfs:subPropertyOf ue4:hasLevel .
+
+ue4:hasActor a owl:ObjectProperty ;
+    rdfs:label "hasActor" ;
+    rdfs:comment "Relates a level to an actor present in it." ;
+    rdfs:domain ue4:ULevel ;
+    rdfs:range ue4:AActor .
+
+ue4:bReplicates a owl:DatatypeProperty ;
+    rdfs:label "bReplicates" ;
+    rdfs:comment "Indicates whether this Actor or Component replicates its state over the network." ;
+    rdfs:range xsd:boolean .
+
+ue4:bIsActive a owl:DatatypeProperty ;
+    rdfs:label "bIsActive" ;
+    rdfs:comment "Indicates whether this component is currently active and updating." ;
+    rdfs:range xsd:boolean .
+
+ue4:bHidden a owl:DatatypeProperty ;
+    rdfs:label "bHidden" ;
+    rdfs:comment "Indicates whether this actor or component is hidden in the game/world." ;
+    rdfs:range xsd:boolean .

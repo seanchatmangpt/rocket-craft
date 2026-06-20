@@ -1,0 +1,271 @@
+@prefix core: <http://rocket-craft.com/ontology/core#> .
+@prefix mud: <http://rocket-craft.com/ontology/mud#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+mud:Spawn a mud:RouteNode .
+mud:FactoryEntrance a mud:RouteNode .
+mud:FrameAssembly a mud:RouteNode, mud:Station .
+mud:SocketTopology a mud:RouteNode, mud:Station .
+mud:ArmorSkinStation a mud:RouteNode, mud:Station .
+mud:RigMotionStation a mud:RouteNode, mud:Station .
+mud:VerificationGate a mud:RouteNode, mud:Station .
+mud:ReceiptTerminal a mud:RouteNode, mud:Station .
+mud:ExitOrLoop a mud:RouteNode .
+
+mud:Frame a mud:PartFamily .
+mud:Shoulder a mud:PartFamily .
+mud:Arm a mud:PartFamily .
+mud:Leg a mud:PartFamily .
+mud:Socket a mud:PartFamily .
+mud:ArmorPanel a mud:PartFamily .
+mud:WeaponMount a mud:PartFamily .
+mud:CoolingVent a mud:PartFamily .
+mud:SkinLayer a mud:PartFamily .
+mud:MotionFamily a mud:PartFamily .
+mud:LODVariant a mud:PartFamily .
+mud:ReceiptTerminalPart a mud:PartFamily .
+
+mud:damage_class a mud:AuthorityField .
+mud:heat_class a mud:AuthorityField .
+mud:stress_class a mud:AuthorityField .
+mud:grip_class a mud:AuthorityField .
+mud:socket_health_class a mud:AuthorityField .
+mud:lod_class a mud:AuthorityField .
+mud:walkthrough_state_class a mud:AuthorityField .
+mud:station_state_class a mud:AuthorityField .
+mud:projection_state_class a mud:AuthorityField .
+mud:receipt_state_class a mud:AuthorityField .
+
+mud:REFUSED_MISSING_SOCKET a mud:RefusalReason .
+
+# ---------------------------------------------------------
+# Gap Checker Metamodel
+# ---------------------------------------------------------
+mud:ExpectedFile a owl:Class ;
+    rdfs:label "Expected Generated File" ;
+    rdfs:comment "A file artifact expected to be present in the build output." .
+
+mud:GapCheckRule a owl:Class ;
+    rdfs:label "Gap Check Rule" ;
+    rdfs:comment "An execution check or condition that must pass to ensure no gaps." .
+
+mud:filePath a owl:DatatypeProperty ;
+    rdfs:domain mud:ExpectedFile ;
+    rdfs:range xsd:string ;
+    rdfs:label "File Path" .
+
+mud:fileType a owl:DatatypeProperty ;
+    rdfs:domain mud:ExpectedFile ;
+    rdfs:range xsd:string ;
+    rdfs:label "File Type" .
+
+mud:checkId a owl:DatatypeProperty ;
+    rdfs:domain mud:GapCheckRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "Check ID" .
+
+mud:checkDescription a owl:DatatypeProperty ;
+    rdfs:domain mud:GapCheckRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "Check Description" .
+
+mud:checkType a owl:DatatypeProperty ;
+    rdfs:domain mud:GapCheckRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "Check Type" .
+
+mud:checkCommand a owl:DatatypeProperty ;
+    rdfs:domain mud:GapCheckRule ;
+    rdfs:range xsd:string ;
+    rdfs:label "Command Line String" .
+
+# ---------------------------------------------------------
+# Expected File Instances
+# ---------------------------------------------------------
+# Rust outputs
+mud:GenRustConstantsFile a mud:ExpectedFile ;
+    mud:filePath "crates/mech_factory_mud/src/generated_constants.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "generated_constants.rs" .
+
+mud:GenRustRouteFile a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/rust/route.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "route.rs" .
+
+mud:GenRustStationsFile a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/rust/stations.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "stations.rs" .
+
+mud:GenRustPartsFile a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/rust/parts.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "parts.rs" .
+
+mud:GenRustAuthorityFile a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/rust/authority.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "authority.rs" .
+
+mud:GenRustProjectionFile a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/rust/projection.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "projection.rs" .
+
+mud:GenRustReceiptFile a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/rust/receipt.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "receipt.rs" .
+
+mud:GenRustOcelFile a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/rust/ocel.rs" ;
+    mud:fileType "rust" ;
+    rdfs:label "ocel.rs" .
+
+# UE4 CSV DataTables
+mud:GenUe4DtStationsCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_FactoryStations.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_FactoryStations.csv" .
+
+mud:GenUe4DtRouteCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_WalkthroughRoute.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_WalkthroughRoute.csv" .
+
+mud:GenUe4DtPartsCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_PartFamilies.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_PartFamilies.csv" .
+
+mud:GenUe4DtSocketCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_SocketTopology.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_SocketTopology.csv" .
+
+mud:GenUe4DtSkinCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_SkinLayers.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_SkinLayers.csv" .
+
+mud:GenUe4DtMotionCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_MotionFamilies.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_MotionFamilies.csv" .
+
+mud:GenUe4DtLodCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_SemanticLOD.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_SemanticLOD.csv" .
+
+mud:GenUe4DtProjectionCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/DT_ProjectionCommands.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "DT_ProjectionCommands.csv" .
+
+# Non-DT CSVs
+mud:GenUe4StationsCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/FactoryStations.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "FactoryStations.csv" .
+
+mud:GenUe4RouteCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/WalkthroughRoute.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "WalkthroughRoute.csv" .
+
+mud:GenUe4PartsCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/PartFamilies.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "PartFamilies.csv" .
+
+mud:GenUe4SocketCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/SocketTopology.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "SocketTopology.csv" .
+
+mud:GenUe4SkinCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/SkinLayers.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "SkinLayers.csv" .
+
+mud:GenUe4MotionCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/MotionFamilies.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "MotionFamilies.csv" .
+
+mud:GenUe4LodCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/SemanticLOD.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "SemanticLOD.csv" .
+
+mud:GenUe4ProjectionCsv a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/DataTables/ProjectionCommands.csv" ;
+    mud:fileType "csv" ;
+    rdfs:label "ProjectionCommands.csv" .
+
+# UE4 C++ Headers
+mud:GenUe4StepsHeader a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/Headers/MechFactoryMudSteps.h" ;
+    mud:fileType "header" ;
+    rdfs:label "MechFactoryMudSteps.h" .
+
+mud:GenUe4AuthorityHeader a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/Headers/MechFactoryMudAuthority.h" ;
+    mud:fileType "header" ;
+    rdfs:label "MechFactoryMudAuthority.h" .
+
+mud:GenUe4ProjectionHeader a mud:ExpectedFile ;
+    mud:filePath "generated/mech_factory_mud/ue4/Headers/MechFactoryMudProjection.h" ;
+    mud:fileType "header" ;
+    rdfs:label "MechFactoryMudProjection.h" .
+
+# ---------------------------------------------------------
+# Gap Check Rule Instances
+# ---------------------------------------------------------
+mud:CheckRuleGgenSync a mud:GapCheckRule ;
+    mud:checkId "GGEN_SYNC_PASSES" ;
+    mud:checkDescription "Verify that ggen receipt file exists and ggen sync executes successfully" ;
+    mud:checkType "FileExist" ;
+    mud:filePath ".ggen/receipts/latest.json" ;
+    rdfs:label "Ggen Sync check" .
+
+mud:CheckRuleCargoTest a mud:GapCheckRule ;
+    mud:checkId "CRATE_USES_GGEN_GENERATED_CONSTANTS" ;
+    mud:checkDescription "Execute cargo test on the mech_factory_mud crate to verify ZST bounds compile" ;
+    mud:checkType "CommandExecution" ;
+    mud:checkCommand "cargo test -p mech_factory_mud" ;
+    rdfs:label "Cargo Test check" .
+
+mud:CheckRuleFalsify a mud:GapCheckRule ;
+    mud:checkId "FALSIFICATION_CASES_EQ_8_PASS" ;
+    mud:checkDescription "Verify the falsification engine by running all test cases" ;
+    mud:checkType "CommandExecution" ;
+    mud:checkCommand "cargo run -p mech_factory_mud -- falsify --case all" ;
+    rdfs:label "Falsify cases check" .
+
+mud:CheckRuleCounterfactual a mud:GapCheckRule ;
+    mud:checkId "COUNTERFACTUAL_CASES_EQ_8_PASS" ;
+    mud:checkDescription "Verify counterfactual simulations produce predicted refusal rules" ;
+    mud:checkType "CommandExecution" ;
+    mud:checkCommand "cargo run -p mech_factory_mud -- counterfactual --case all" ;
+    rdfs:label "Counterfactual cases check" .
+
+mud:CheckRuleReplay a mud:GapCheckRule ;
+    mud:checkId "REPLAY_PASSES" ;
+    mud:checkDescription "Verify that standard walkthrough sequence replay is valid" ;
+    mud:checkType "CommandExecution" ;
+    mud:checkCommand "cargo run -p mech_factory_mud -- replay" ;
+    rdfs:label "Replay check" .
+
+mud:CheckRuleVerify a mud:GapCheckRule ;
+    mud:checkId "VERIFY_PASSES" ;
+    mud:checkDescription "Verify the integrity checks of generated data and ocel matrices" ;
+    mud:checkType "CommandExecution" ;
+    mud:checkCommand "cargo run -p mech_factory_mud -- verify" ;
+    rdfs:label "Verify check" .
+

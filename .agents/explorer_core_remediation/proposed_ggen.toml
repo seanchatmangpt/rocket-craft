@@ -1,0 +1,129 @@
+[project]
+name = "ue4-ontology"
+version = "0.1.0"
+description = "Ontology pack and validation configuration for UE4 Universal RDF Mapping"
+authors = ["E2E Testing Infrastructure Implementer"]
+license = "MIT"
+
+[ontology]
+source = "core.ttl"
+imports = [
+  "reflection.ttl",
+  "blueprints.ttl",
+  "subsystems.ttl",
+  "typestates.ttl"
+]
+standard_only = false
+
+[inference]
+[[inference.rules]]
+name = "infer-is-component-of"
+construct = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+CONSTRUCT {
+  ?component ue4:isComponentOf ?actor .
+} WHERE {
+  ?actor ue4:hasComponent ?component .
+} ORDER BY ?actor ?component
+"""
+when = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+ASK {
+  ?actor ue4:hasComponent ?component .
+}
+"""
+
+[[inference.rules]]
+name = "infer-is-level-of"
+construct = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+CONSTRUCT {
+  ?level ue4:isLevelOf ?world .
+} WHERE {
+  ?world ue4:hasLevel ?level .
+} ORDER BY ?world ?level
+"""
+when = """
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+ASK {
+  ?world ue4:hasLevel ?level .
+}
+"""
+
+[generation]
+rules = [
+  { name = "readme", query = { inline = "SELECT * WHERE { ?s ?p ?o } ORDER BY ?s LIMIT 1" }, template = { inline = "# UE4 Ontology\n" }, output_file = "README.md", mode = "Overwrite" }
+]
+
+[validation]
+shacl = ["shacl/validation.shacl.ttl"]
+strict_mode = true
+
+[[validation.rules]]
+name = "R1"
+description = "Verify class hierarchy (UObject, AActor, APawn, ACharacter, UActorComponent, UWorld, ULevel existence and subClassOf connections)"
+ask = """
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+
+ASK {
+  ue4:AActor rdfs:subClassOf ue4:UObject .
+  ue4:APawn rdfs:subClassOf ue4:AActor .
+  ue4:ACharacter rdfs:subClassOf ue4:APawn .
+  ue4:UActorComponent rdfs:subClassOf ue4:UObject .
+  ue4:UWorld rdfs:subClassOf ue4:UObject .
+  ue4:ULevel rdfs:subClassOf ue4:UObject .
+}
+"""
+
+[[validation.rules]]
+name = "R2"
+description = "Verify subsystem domains (presence of Rendering, Physics, and Networking subsystem classes/relationships)"
+ask = """
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+
+ASK {
+  ue4:USubsystem rdfs:subClassOf ue4:UObject .
+  ue4:URenderingSubsystem rdfs:subClassOf ue4:USubsystem .
+  ue4:UPhysicsSubsystem rdfs:subClassOf ue4:USubsystem .
+  ue4:UNetworkingSubsystem rdfs:subClassOf ue4:USubsystem .
+}
+"""
+
+[[validation.rules]]
+name = "R3"
+description = "Verify Reflection & Blueprint graphs (presence of reflection metadata classes like UClass, UProperty, UFunction, and Blueprint graph structures/node classes)"
+ask = """
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+
+ASK {
+  ue4:UClass rdfs:subClassOf ue4:UStruct .
+  ue4:UFunction rdfs:subClassOf ue4:UStruct .
+  ue4:UProperty rdfs:subClassOf ue4:UField .
+  
+  ue4:UEdGraph rdfs:subClassOf ue4:UObject .
+  ue4:UEdGraphNode rdfs:subClassOf ue4:UObject .
+  ue4:UK2Node rdfs:subClassOf ue4:UEdGraphNode .
+}
+"""
+
+[[validation.rules]]
+name = "R4"
+description = "Verify Cooking & WASM Typestates (presence of typestate classes/properties representing cooking, linking, WASM/HTML5 packaging states)"
+ask = """
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+
+ASK {
+  ue4:CookingTypestate rdfs:subClassOf ue4:Typestate .
+  ue4:LinkingTypestate rdfs:subClassOf ue4:Typestate .
+  ue4:WasmPackagingTypestate rdfs:subClassOf ue4:Typestate .
+  
+  ue4:hasCookingState a rdf:Property .
+  ue4:hasLinkingState a rdf:Property .
+  ue4:hasPackagingState a rdf:Property .
+}
+"""

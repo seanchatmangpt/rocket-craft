@@ -1,3 +1,14 @@
+//! # Infinity Blade IV MUD CLI Executable
+//!
+//! This executable provides the command-line entrypoint for the Infinity Blade IV MUD.
+//! It processes argument options using `clap` to either start a brand-new adventure
+//! or restore a previously saved state from a JSON file, starting the interactive terminal REPL.
+//!
+//! ## System Integration
+//! As the main driver binary, it configures logging telemetry, initializes standard IO handles,
+//! constructs the runtime `GameSession` via `ib4-mud::session::GameSession`, and handovers control
+//! to the REPL loop located in `ib4-mud::repl::run_repl`.
+
 use clap::{Parser, Subcommand};
 use ib4_mud::repl::run_repl;
 use ib4_mud::session::GameSession;
@@ -27,13 +38,12 @@ enum CliCommand {
 }
 
 fn main() -> anyhow::Result<()> {
+    ib4_mud::telemetry::init_telemetry();
     let cli = Cli::parse();
 
-    let mut session = match cli
-        .command
-        .unwrap_or(CliCommand::New {
-            name: "Siris".to_string(),
-        }) {
+    let mut session = match cli.command.unwrap_or(CliCommand::New {
+        name: "Siris".to_string(),
+    }) {
         CliCommand::New { name } => {
             tracing::info!("Creating new game for {}...", name);
             GameSession::new(&name)

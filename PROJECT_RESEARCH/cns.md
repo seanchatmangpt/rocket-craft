@@ -1,0 +1,552 @@
+# Research Dossier: `cns`
+
+**Total Files:** 421 Ontologies (.ttl) | 6 Queries (.rq)
+**Total Volume:** 427 files
+
+## 1. Core Vocabularies (Prefixes)
+- `actor: <http://tai.cognitive-mesh.org/actor#>`
+- `adv: <http://adversarial-testing.org/ontology#>`
+- `aegis: <http://cns.io/aegis/fabric#>`
+- `ahi: <http://ahi.bitflow.ai/core#>`
+- `ahi: <http://ahi.bitflow.ai/unified#>`
+- `ahi: <http://ahi.legal/ontology/>`
+- `ahi: <http://bitactor.dev/ahi#>`
+- `align: <http://bitstar.dev/ontology/alignment#>`
+- `asset: <https://governor.mil/asset/>`
+- `attention: <http://tai.cognitive-mesh.org/attention#>`
+- `aud: <http://cns.ai/audit#>`
+- `av: <http://cns.ai/ontology/autonomous-vehicle#>`
+- `ba: <http://bitactor.io/ontology#>`
+- `ba: <http://bitactor.org/ontology#>`
+- `ba: <http://bitstar.io/bitactor#>`
+- `ba: <http://chatman.ai/bitactor#>`
+- `ba: <http://cns-litigation.com/bitactor#>`
+- `bar: <http://calbar.ca.gov/ontology#>`
+- `bar: <http://cns-litigation.org/bar#>`
+- `beco: <http://bitbizeco.dev/ontology/v1/business-ecosystem#>`
+- `bench: <http://benchmarking.org/ontology#>`
+- `bf: <http://bitbizeco.dev/bitflow#>`
+- `bf: <http://bitflow.ai/ontology#>`
+- `bf: <http://bitflow.ai/ontology/trading#>`
+- `bf: <http://bitflow.ai/ontology/workflow#>`
+- `bf: <http://bitflow.com/ontology/>`
+- `bf: <http://bitflow.io/ontology#>`
+- `bf: <http://bitstar.io/bitflow#>`
+- `bf: <http://cns-litigation.com/bar-filing#>`
+- `bit: <http://bit-ecosystem.org/ontology#>`
+- `bit: <http://bitstar.com/>`
+- `bit: <http://bitstar.dev/ontology/core#>`
+- `bit: <http://cns.litigation/bit#>`
+- `bit: <http://cns.litigation/bitagent#>`
+- `bit: <https://bit.ecosystem/>`
+- `bit: <https://nuxt.com/bit-systems#>`
+- `bitactor: <http://bitactor.org/ontology#>`
+- `bitactor: <http://cns-litigation.org/bitactor/>`
+- `bitactor: <http://cns.ai/ontology/bitactor#>`
+- `bitactor: <http://cns.bitactor.io/ontology/bitactor#>`
+- `bitactor: <http://cns.io/bitactor#>`
+- `bitagent: <http://cns.ultrathink/bitagent#>`
+- `bitarch: <http://bitbizeco.dev/ontology/v1/architecture#>`
+- `bitflow: <http://bitflow.ai/ontology#>`
+- `bitflow: <http://bitflow.ai/ontology/core#>`
+- `bitmesh: <http://bitmesh.io/ontology/layers#>`
+- `bitstar: <http://bitstar.ai/core#>`
+- `bitstar: <http://bitstar.io/ontology#>`
+- `bitstar: <http://cns.io/ontology/bitstar#>`
+- `bitstar: <https://bitstar.dev/ontology/pathplanning#>`
+- *...and 424 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:AcyclicSyncMergePattern`
+- `:Alert`
+- `:AlertShape`
+- `:AlertThreshold`
+- `:AlignmentRequirement`
+- `:AllocationPolicy`
+- `:AllocationStrategy`
+- `:Analyze`
+- `:Arbitrage`
+- `:ArbitraryCyclesPattern`
+- `:AssemblyQuorumShape`
+- `:AtomicTask`
+- `:AtomicValidation`
+- `:AuditEvent`
+- `:BackupSystem`
+- `:Benchmark`
+- `:BenchmarkResult`
+- `:BenchmarkSuite`
+- `:BinaryProtocol`
+- `:BitFlowPattern`
+- `:BitFlowPatternShape`
+- `:BitRevenueTargetsShape`
+- `:BlockingDiscriminatorPattern`
+- `:BlockingPartialJoinPattern`
+- `:BoundsCheck`
+- `:BusinessEcosystem`
+- `:CPUCore`
+- `:CacheLevel`
+- `:CacheLineSize`
+- `:CancelActivityPattern`
+- `:CancelCasePattern`
+- `:CancelMIActivityPattern`
+- `:CancelRegionPattern`
+- `:CancellationRegion`
+- `:CancellationState`
+- `:CancellingDiscriminatorPattern`
+- `:CancellingPartialJoinMIPattern`
+- `:CancellingPartialJoinPattern`
+- `:Channel`
+- `:ChoiceState`
+- `:CircuitBreaker`
+- `:CodeGenerationSpec`
+- `:CollaborationPatternShape`
+- `:CommunicationInterface`
+- `:CompleteMIActivityPattern`
+- `:ComplexPerson`
+- `:ComplianceStatus`
+- `:Component`
+- `:CompositeTask`
+- `:Condition`
+- *...and 3321 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'SELECT': 5, 'ASK': 1}
+
+### Projected Variables (SELECT ?var)
+This project actively projects the following variables into code/templates:
+> `?actor`, `?claim1`, `?claim2`, `?confidence_score`, `?contradiction_id`, `?detected_timestamp`, `?filing1`, `?filing2`, `?globalScore`, `?improvement`, `?market`, `?module`, `?networkDensity`, `?order`, `?sigmaLevel`, `?statement1`, `?statement2`, `?system`
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/cns/ahi/ahi_ontology.ttl` (575 bytes)
+- `/Users/sac/cns/backup_20250727_122617/autonomous_vehicle_core.ttl` (13546 bytes)
+- `/Users/sac/cns/backup_20250727_122617/autonomous_vehicle_shacl.ttl` (17411 bytes)
+- `/Users/sac/cns/backup_20250727_122617/bitactor_semantic_core.ttl` (10152 bytes)
+- `/Users/sac/cns/backup_20250727_122617/bitactor_semantic_shacl.ttl` (11171 bytes)
+- `/Users/sac/cns/backup_20250727_122617/cns_clinician.ttl` (1143 bytes)
+- `/Users/sac/cns/backup_20250727_122617/cns_quant.ttl` (1200 bytes)
+- `/Users/sac/cns/backup_20250727_122617/cybersecurity_core.ttl` (23949 bytes)
+- `/Users/sac/cns/backup_20250727_122617/cybersecurity_shacl.ttl` (23267 bytes)
+- `/Users/sac/cns/backup_20250727_122617/forex_trading_reality.ttl` (11179 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/communication_protocol.ttl` (1708 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/data_processing.ttl` (1735 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/fault_tolerance.ttl` (1697 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/performance_benchmarks.ttl` (2261 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/performance_management.ttl` (1784 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/realtime_core.ttl` (2174 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/realtime_master.ttl` (1273 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/shacl_constraints.ttl` (3221 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/realtime/system_architecture.ttl` (1732 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/infrastructure.ttl` (1491 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/market_microstructure.ttl` (1511 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/network_protocol.ttl` (1570 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/performance_benchmark.ttl` (1673 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/risk_management.ttl` (1604 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/shacl_constraints.ttl` (2028 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/strategy.ttl` (1534 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/uhft_core.ttl` (6957 bytes)
+- `/Users/sac/cns/backup_20250727_122617/generated/uhft/uhft_master.ttl` (1203 bytes)
+- `/Users/sac/cns/backup_20250727_122617/healthcare_core.ttl` (27453 bytes)
+- `/Users/sac/cns/backup_20250727_122617/healthcare_shacl.ttl` (25134 bytes)
+- `/Users/sac/cns/backup_20250727_122617/industrial_iot_core.ttl` (22228 bytes)
+- `/Users/sac/cns/backup_20250727_122617/industrial_iot_shacl.ttl` (21113 bytes)
+- `/Users/sac/cns/backup_20250727_122617/legal_case.ttl` (6479 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/constraints.shacl.ttl` (607 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/constraints.ttl` (255 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/market_structure.ttl` (270 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/network.ttl` (243 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/performance.ttl` (1041 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/queries.ttl` (243 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/risk.ttl` (510 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/strategy.ttl` (246 bytes)
+- `/Users/sac/cns/backup_20250727_122617/meta_generated/trading/trading_core.ttl` (1351 bytes)
+- `/Users/sac/cns/backup_20250727_122617/news_validator.ttl` (2783 bytes)
+- `/Users/sac/cns/backup_20250727_122617/news_validator_shacl.ttl` (3165 bytes)
+- `/Users/sac/cns/backup_20250727_122617/production_forex_trading.ttl` (8789 bytes)
+- `/Users/sac/cns/backup_20250727_122617/project_litigator.ttl` (1102 bytes)
+- `/Users/sac/cns/backup_20250727_122617/smart_grid_core.ttl` (24040 bytes)
+- `/Users/sac/cns/backup_20250727_122617/smart_grid_shacl.ttl` (22888 bytes)
+- `/Users/sac/cns/bitagent_validation/bitagent-test-suite.yawl.ttl` (18394 bytes)
+- `/Users/sac/cns/bitbizeco/bitbizeco_integration.ttl` (7010 bytes)
+- `/Users/sac/cns/bitbizeco/n_dimensional_causal_graph.ttl` (10769 bytes)
+- `/Users/sac/cns/bitbizeco/tai_canon_v2.ttl` (17295 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/autonomous_vehicle_core.ttl` (13546 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/autonomous_vehicle_shacl.ttl` (17411 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/bitactor_rdf_core.ttl` (10152 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/bitactor_rdf_shacl.ttl` (11171 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/cns_clinician.ttl` (1143 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/cns_quant.ttl` (1200 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/cybersecurity_core.ttl` (23949 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/cybersecurity_shacl.ttl` (23267 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/forex_trading_reality.ttl` (11179 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/healthcare_core.ttl` (27453 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/healthcare_shacl.ttl` (25134 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/industrial_iot_core.ttl` (22228 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/industrial_iot_shacl.ttl` (21113 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/legal_case.ttl` (6479 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/news_validator.ttl` (2783 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/news_validator_shacl.ttl` (3165 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/production_forex_trading.ttl` (8789 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/project_litigator.ttl` (1102 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/smart_grid_core.ttl` (24040 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/smart_grid_shacl.ttl` (22888 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/yawl_comprehensive.ttl` (17652 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/owl/yawl_validation_shacl.ttl` (14643 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/sparql/engine.ttl` (4176 bytes)
+- `/Users/sac/cns/bitcore/core/primitives/rdf-stack/turtle/core.ttl` (4099 bytes)
+- `/Users/sac/cns/bitcore/fortune500/bitcore/weaver/rdf-stack/ontologies/test-ontology.ttl` (10950 bytes)
+- `/Users/sac/cns/bitcore/weaver/weaver.ttl` (5684 bytes)
+- `/Users/sac/cns/bitflow/bitflow-workflow-patterns-complete.ttl` (42535 bytes)
+- `/Users/sac/cns/bitflow/bitflow/benchmarks/memory_management_ontology.ttl` (12715 bytes)
+- `/Users/sac/cns/bitflow/bitflow/benchmarks/ontology/bitflow-workflow-patterns.ttl` (30223 bytes)
+- `/Users/sac/cns/bitflow/bitflow/benchmarks/ontology/pattern-to-yawl-mappings.ttl` (30688 bytes)
+- `/Users/sac/cns/bitflow/core/Makefile.ttl` (11294 bytes)
+- `/Users/sac/cns/bitflow/demo/approval_workflow.ttl` (7511 bytes)
+- `/Users/sac/cns/bitflow/examples/complex_patterns_workflow.ttl` (7623 bytes)
+- `/Users/sac/cns/bitflow/examples/simple_workflow.ttl` (1415 bytes)
+- `/Users/sac/cns/bitflow/financial/bitflow/analysis/pattern_catalog.ttl` (23330 bytes)
+- `/Users/sac/cns/bitflow/financial/bitflow/ontology/workflow_patterns.ttl` (16734 bytes)
+- `/Users/sac/cns/bitflow/financial/bitflow/ontology/yawl_mapping.ttl` (14699 bytes)
+- `/Users/sac/cns/bitflow/ontologies/bitflow_comprehensive_patterns.ttl` (41503 bytes)
+- `/Users/sac/cns/bitflow/ontologies/bitflow_memory_management.ttl` (24609 bytes)
+- `/Users/sac/cns/bitflow/ontologies/bitflow_performance_telemetry.ttl` (23095 bytes)
+- `/Users/sac/cns/bitflow/ontologies/bitflow_validation_reasoning.ttl` (25228 bytes)
+- `/Users/sac/cns/bitflow/ontologies/bitmesh-layers-ontology.ttl` (21206 bytes)
+- `/Users/sac/cns/bitflow/ontologies/bitmesh-performance-constraints.ttl` (18750 bytes)
+- `/Users/sac/cns/bitflow/ontologies/workflow_patterns_43.ttl` (27467 bytes)
+- `/Users/sac/cns/bitflow/ontologies/yawl_v2.ttl` (9719 bytes)
+- `/Users/sac/cns/bitjob/trialbase/workflows/trialbase.ttl` (5017 bytes)
+- `/Users/sac/cns/bitjob/weaver-ontology/bitstar.ttl` (15965 bytes)
+- `/Users/sac/cns/bitjob/weaver-ontology/shapes/bitstar-shapes.ttl` (16433 bytes)
+- `/Users/sac/cns/bitjob/workflows/bitjob-turtle-yawl.ttl` (11995 bytes)
+- `/Users/sac/cns/bitmarket/gahi/gahi_wisdom_synthesis.ttl` (7899 bytes)
+- `/Users/sac/cns/cns-litigation-swarm/jurisdictions/california/bar_complaints.ttl` (2824 bytes)
+- `/Users/sac/cns/cns-litigation-swarm/jurisdictions/federal/civil_rights.ttl` (3853 bytes)
+- `/Users/sac/cns/cns-litigation-swarm/jurisdictions/nevada/employment_classification.ttl` (2933 bytes)
+- `/Users/sac/cns/cns-litigation-swarm/schemas/yawl_workflow_patterns.ttl` (6643 bytes)
+- `/Users/sac/cns/cns-litigation-swarm/telemetry/opentelemetry_config.ttl` (7344 bytes)
+- `/Users/sac/cns/cns-litigation-swarm/workflows/employment_misclassification_detector.ttl` (9479 bytes)
+- `/Users/sac/cns/cns_forge_specifications/directive_1753414932.ttl` (547 bytes)
+- `/Users/sac/cns/cns_forge_specifications/directive_1753414941.ttl` (548 bytes)
+- `/Users/sac/cns/cns_forge_specifications/directive_1753414952.ttl` (507 bytes)
+- `/Users/sac/cns/cns_forge_specifications/directive_1753414961.ttl` (485 bytes)
+- `/Users/sac/cns/cns_forge_specifications/directive_1753415377.ttl` (547 bytes)
+- `/Users/sac/cns/cns_forge_specifications/directive_1753415585.ttl` (485 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/bar-swarm/escalation/complaint-escalation-workflow.ttl` (15708 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/bar-swarm/evidence/evidence-correlation-system.ttl` (17499 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/bar-swarm/jurisdiction/bar-jurisdiction-mapping.ttl` (16419 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/bar-swarm/patterns/misconduct-patterns.ttl` (16541 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/bar-swarm/workflows/bar-swarm.yawl.ttl` (10508 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/patterns/contradiction-patterns.ttl` (16508 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/queries/contradiction-sparql.rq` (16147 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/campaign-state-machine.ttl` (20355 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/event-driven-triggers.ttl` (22045 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/integration-points.ttl` (25209 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/monitor-swarm.yawl.ttl` (10514 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/packet-swarm.yawl.ttl` (13827 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/performance-monitoring.ttl` (24174 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/state-persistence-recovery.ttl` (19298 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/src/trigger-swarm.yawl.ttl` (21334 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/contradiction-swarm/workflows/contradiction-swarm.yawl.ttl` (10113 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/filing-swarm/dependencies/document-dependency-graph.ttl` (13742 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/filing-swarm/filing-swarm.yawl.ttl` (8259 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/filing-swarm/legal-templates/court-filing-templates.ttl` (15773 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/filing-swarm/state-machines/filing-state-machine.ttl` (15390 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/filing-swarm/workflows/bar-filing.yawl.ttl` (15156 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/filing-swarm/workflows/court-filing.yawl.ttl` (11425 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/filing-swarm/zero-tick-messaging.ttl` (12465 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ip-swarm/ontologies/ip-claim-framework.ttl` (14500 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ip-swarm/patterns/employment-ip-patterns.ttl` (12031 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ip-swarm/rules/export-control-compliance.ttl` (20898 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ip-swarm/rules/inventor-rights-patterns.ttl` (17004 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ip-swarm/workflows/ip-swarm.yawl.ttl` (8957 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ontology/legal-copy-blocks.ttl` (16419 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ontology/legal-swarm-base.ttl` (20654 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ultrathink-swarm/cognitive-profile-disc-99-80-40-40.ttl` (22047 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ultrathink-swarm/operation-focus-12-agent-architecture.yawl.ttl` (22781 bytes)
+- `/Users/sac/cns/concurrent-coordination/fortune500-workflows/cns-litigation/ultrathink-swarm/test-suite-comprehensive.yawl.ttl` (19418 bytes)
+- `/Users/sac/cns/docs/bitactor-v2/ontology/BITACTOR_V2_ONTOLOGY.ttl` (20337 bytes)
+- `/Users/sac/cns/docs/dflss-ontology/ontology.ttl` (5829 bytes)
+- `/Users/sac/cns/docs/dflss-ontology/shapes.ttl` (5778 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/priv/ontology/bit_agent_memory_model.ttl` (12015 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/priv/workflows/sparql/meta_validation.ttl` (9697 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/priv/workflows/sparql/recursive_validation.ttl` (15275 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/priv/workflows/sparql/sparql_reasoning_validation.ttl` (7330 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/priv/workflows/test/trinity_validation_master.ttl` (11388 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/reports/final/sparkle_validation_report.ttl` (424 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/reports/trinity/trinity_validation_report.ttl` (317 bytes)
+- `/Users/sac/cns/erlang_bit_agent_swarm/test/bitagent_workflows/turtle_ontology.ttl` (11819 bytes)
+- `/Users/sac/cns/examples/cybersecurity.ttl` (1707 bytes)
+- `/Users/sac/cns/fossilized/expired-links-2025-07-30.ttl` (14366 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/compiled/ahi_unified.ttl` (45931 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/compiled/shacl_validation_report.ttl` (0 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/ontologies/bitflow_core.ttl` (7358 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/ontologies/coordination.ttl` (11620 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/ontologies/execution_trace.ttl` (11124 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/ontologies/legal_domain.ttl` (9138 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/ontologies/market_model.ttl` (10265 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ahi_engine/ontologies/trading_patterns.ttl` (10227 bytes)
+- `/Users/sac/cns/integrations/bitjob-chrome-ext/src/ontology/sean_profile.ttl` (8412 bytes)
+- `/Users/sac/cns/ir/cns-master.ttl` (1841 bytes)
+- `/Users/sac/cns/ir/dspy_dark_cns-master.ttl` (10783 bytes)
+- `/Users/sac/cns/ir/shacl-governance.ttl` (1445 bytes)
+- `/Users/sac/cns/jurisdiction-mapping/california-jurisdiction-comprehensive.ttl` (21401 bytes)
+- `/Users/sac/cns/jurisdiction-mapping/comprehensive-bar-complaint-procedures.ttl` (28192 bytes)
+- `/Users/sac/cns/jurisdiction-mapping/federal-jurisdiction-comprehensive.ttl` (26720 bytes)
+- `/Users/sac/cns/jurisdiction-mapping/nevada-jurisdiction-comprehensive.ttl` (27970 bytes)
+- `/Users/sac/cns/jurisdiction-mapping/timeline-contradiction-validation-system.ttl` (29323 bytes)
+- `/Users/sac/cns/k8s/aegis-fabric-state.ttl` (1912 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/autonomous_vehicle_core.ttl` (13546 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/autonomous_vehicle_shacl.ttl` (17411 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/bitactor_semantic_core.ttl` (10152 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/bitactor_semantic_shacl.ttl` (11171 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/cybersecurity_core.ttl` (23949 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/cybersecurity_shacl.ttl` (23267 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/dfls_erlang_core.ttl` (13982 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/dfls_shacl_validation.ttl` (18523 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/forex_trading_reality.ttl` (11179 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/healthcare_core.ttl` (27453 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/healthcare_shacl.ttl` (25134 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/industrial_iot_core.ttl` (22228 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/industrial_iot_shacl.ttl` (21113 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/news_validator.ttl` (2783 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/news_validator_shacl.ttl` (3165 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/production_forex_trading.ttl` (8789 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/smart_grid_core.ttl` (24040 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/priv/ontologies/smart_grid_shacl.ttl` (22888 bytes)
+- `/Users/sac/cns/legacy/elixir/bitactor_otp/src/bitactor_telemetry.ttl` (1246 bytes)
+- `/Users/sac/cns/legacy/generated/cns_end_to_end_forex_ontology.ttl` (17750 bytes)
+- `/Users/sac/cns/legacy/generated/e2e_test/test_ontology.ttl` (327 bytes)
+- `/Users/sac/cns/legacy/generated/system_runtime_state.ttl` (1739 bytes)
+- `/Users/sac/cns/meta_validation_tests/execution_results/meta_validation_report_02e18232-5c62-4ad2-898a-812e8a3e2bc4.ttl` (8193 bytes)
+- `/Users/sac/cns/meta_validation_tests/execution_results/meta_validation_report_70ed7196-99e0-4cb0-b0f3-7c2f0bab3b00.ttl` (8193 bytes)
+- `/Users/sac/cns/meta_validation_tests/fixed_turtle_ontology.ttl` (15471 bytes)
+- `/Users/sac/cns/meta_validation_tests/self_reference_validator.ttl` (11201 bytes)
+- `/Users/sac/cns/nuxt-unified-layer/ontology/nuxt-core.ttl` (14304 bytes)
+- `/Users/sac/cns/nuxt-unified-layer/ontology/shacl-shapes.ttl` (13927 bytes)
+- `/Users/sac/cns/nuxt-unified-layer/src/bitstore/core/bitstore-ontology.ttl` (16976 bytes)
+- `/Users/sac/cns/ontologies/autonomous_vehicle_core.ttl` (13546 bytes)
+- `/Users/sac/cns/ontologies/autonomous_vehicle_shacl.ttl` (17411 bytes)
+- `/Users/sac/cns/ontologies/bitactor_rdf_core.ttl` (10152 bytes)
+- `/Users/sac/cns/ontologies/bitactor_rdf_shacl.ttl` (11171 bytes)
+- `/Users/sac/cns/ontologies/bitbizeco_v1.ttl` (4357 bytes)
+- `/Users/sac/cns/ontologies/bitstar_master_integration.ttl` (12783 bytes)
+- `/Users/sac/cns/ontologies/bitstar_path_planning.ttl` (9134 bytes)
+- `/Users/sac/cns/ontologies/canonical_mappings.ttl` (774 bytes)
+- `/Users/sac/cns/ontologies/cli_ontology.ttl` (23731 bytes)
+- `/Users/sac/cns/ontologies/cli_shacl_constraints.ttl` (11640 bytes)
+- `/Users/sac/cns/ontologies/cns_clinician.ttl` (1143 bytes)
+- `/Users/sac/cns/ontologies/cns_quant.ttl` (1200 bytes)
+- `/Users/sac/cns/ontologies/cybersecurity_core.ttl` (23949 bytes)
+- `/Users/sac/cns/ontologies/cybersecurity_shacl.ttl` (23267 bytes)
+- `/Users/sac/cns/ontologies/dflss.ttl` (9868 bytes)
+- `/Users/sac/cns/ontologies/dflss_business_process_optimization.ttl` (11269 bytes)
+- `/Users/sac/cns/ontologies/dflss_ecosystem_orchestration.ttl` (12950 bytes)
+- `/Users/sac/cns/ontologies/dflss_innovation_acceleration.ttl` (11692 bytes)
+- `/Users/sac/cns/ontologies/dflss_performance_metrics.ttl` (13135 bytes)
+- `/Users/sac/cns/ontologies/dflss_quality_assurance.ttl` (11519 bytes)
+- `/Users/sac/cns/ontologies/eightspace.ttl` (6479 bytes)
+- `/Users/sac/cns/ontologies/forex_dflss_trading.ttl` (10974 bytes)
+- `/Users/sac/cns/ontologies/forex_planner.ttl` (22861 bytes)
+- `/Users/sac/cns/ontologies/forex_trading_reality.ttl` (11179 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/communication_protocol.ttl` (1708 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/data_processing.ttl` (1735 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/fault_tolerance.ttl` (1697 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/performance_benchmarks.ttl` (2261 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/performance_management.ttl` (1784 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/realtime_core.ttl` (2174 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/realtime_master.ttl` (1273 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/shacl_constraints.ttl` (3221 bytes)
+- `/Users/sac/cns/ontologies/generated/realtime/system_architecture.ttl` (1732 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/infrastructure.ttl` (1491 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/market_microstructure.ttl` (1511 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/network_protocol.ttl` (1570 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/performance_benchmark.ttl` (1673 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/risk_management.ttl` (1604 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/shacl_constraints.ttl` (2028 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/strategy.ttl` (1534 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/uhft_core.ttl` (6957 bytes)
+- `/Users/sac/cns/ontologies/generated/uhft/uhft_master.ttl` (1203 bytes)
+- `/Users/sac/cns/ontologies/governance.ttl` (3458 bytes)
+- `/Users/sac/cns/ontologies/governor_battlespace.ttl` (14915 bytes)
+- `/Users/sac/cns/ontologies/governor_battlespace_shacl.ttl` (14998 bytes)
+- `/Users/sac/cns/ontologies/governor_mission_goals.ttl` (16857 bytes)
+- `/Users/sac/cns/ontologies/governor_realtime_updates.ttl` (16874 bytes)
+- `/Users/sac/cns/ontologies/healthcare_core.ttl` (27453 bytes)
+- `/Users/sac/cns/ontologies/healthcare_shacl.ttl` (25134 bytes)
+- `/Users/sac/cns/ontologies/industrial_iot_core.ttl` (22228 bytes)
+- `/Users/sac/cns/ontologies/industrial_iot_shacl.ttl` (21113 bytes)
+- `/Users/sac/cns/ontologies/legal_case.ttl` (3305 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/constraints.shacl.ttl` (607 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/constraints.ttl` (255 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/market_structure.ttl` (270 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/network.ttl` (243 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/performance.ttl` (1041 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/queries.ttl` (243 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/risk.ttl` (510 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/strategy.ttl` (246 bytes)
+- `/Users/sac/cns/ontologies/meta_generated/trading/trading_core.ttl` (1351 bytes)
+- `/Users/sac/cns/ontologies/news_validator.ttl` (2783 bytes)
+- `/Users/sac/cns/ontologies/news_validator_shacl.ttl` (3165 bytes)
+- `/Users/sac/cns/ontologies/ontology_alignment_mappings.ttl` (13246 bytes)
+- `/Users/sac/cns/ontologies/ortac.ttl` (8703 bytes)
+- `/Users/sac/cns/ontologies/owl_reasoning_rules.ttl` (14053 bytes)
+- `/Users/sac/cns/ontologies/production_forex_trading.ttl` (8789 bytes)
+- `/Users/sac/cns/ontologies/project_litigator.ttl` (1102 bytes)
+- `/Users/sac/cns/ontologies/rorn.ttl` (10443 bytes)
+- `/Users/sac/cns/ontologies/sas.ttl` (1765 bytes)
+- `/Users/sac/cns/ontologies/shacl_composite_validation.ttl` (15166 bytes)
+- `/Users/sac/cns/ontologies/smart_grid_core.ttl` (24040 bytes)
+- `/Users/sac/cns/ontologies/smart_grid_shacl.ttl` (22888 bytes)
+- `/Users/sac/cns/ontologies/sparql_federation_queries.rq` (12182 bytes)
+- `/Users/sac/cns/ontologies/sub/business_ecosystem.ttl` (21556 bytes)
+- `/Users/sac/cns/ontologies/sub/business_ecosystem_shacl.ttl` (16724 bytes)
+- `/Users/sac/cns/ontologies/sub/cli_commands.ttl` (40915 bytes)
+- `/Users/sac/cns/ontologies/sub/cli_commands_shacl.ttl` (24719 bytes)
+- `/Users/sac/cns/ontologies/sub/integrated_system.ttl` (27451 bytes)
+- `/Users/sac/cns/ontologies/sub/otel_instrumentation.ttl` (20647 bytes)
+- `/Users/sac/cns/ontologies/sub/otel_instrumentation_shacl.ttl` (18924 bytes)
+- `/Users/sac/cns/ontologies/sub/pareto_optimization.ttl` (24501 bytes)
+- `/Users/sac/cns/ontologies/sub/pareto_optimization_shacl.ttl` (19267 bytes)
+- `/Users/sac/cns/ontologies/sub/testing_validation.ttl` (31444 bytes)
+- `/Users/sac/cns/ontologies/sub/testing_validation_shacl.ttl` (28975 bytes)
+- `/Users/sac/cns/ontologies/unified_cli.ttl` (9423 bytes)
+- `/Users/sac/cns/ontologies/unified_cli_examples.ttl` (13506 bytes)
+- `/Users/sac/cns/ontologies/workflow_yawl.ttl` (5435 bytes)
+- `/Users/sac/cns/ontologies/yawl_comprehensive.ttl` (17652 bytes)
+- `/Users/sac/cns/ontologies/yawl_validation_shacl.ttl` (14643 bytes)
+- `/Users/sac/cns/owl_compiler_tests/test_data/basic_ontology.ttl` (1273 bytes)
+- `/Users/sac/cns/owl_compiler_tests/test_data/eightfold_ontology.ttl` (1728 bytes)
+- `/Users/sac/cns/owl_compiler_tests/test_data/shacl_ontology.ttl` (1149 bytes)
+- `/Users/sac/cns/permutation_variants/bitactor_ontology_variant_reactive.ttl` (13759 bytes)
+- `/Users/sac/cns/pipeline_output/ontology.ttl` (1505 bytes)
+- `/Users/sac/cns/queries/compliance_check.rq` (239 bytes)
+- `/Users/sac/cns/queries/market_access.rq` (287 bytes)
+- `/Users/sac/cns/src/forex/ontologies/governor_battlespace.ttl` (16925 bytes)
+- `/Users/sac/cns/src/ontology/active-waves.ttl` (9063 bytes)
+- `/Users/sac/cns/src/ontology/aegis_fabric_ontology.ttl` (6970 bytes)
+- `/Users/sac/cns/src/ontology/bitactor_ontology.ttl` (10909 bytes)
+- `/Users/sac/cns/src/ontology/bitstar-ontology.ttl` (26595 bytes)
+- `/Users/sac/cns/src/ontology/bitstar_system_model.ttl` (7765 bytes)
+- `/Users/sac/cns/src/ontology/breakthrough_demo.ttl` (693 bytes)
+- `/Users/sac/cns/src/ontology/chi-hardened-v2.ttl` (17715 bytes)
+- `/Users/sac/cns/src/ontology/chi.ttl` (12334 bytes)
+- `/Users/sac/cns/src/ontology/demo_ttl_model.ttl` (7819 bytes)
+- `/Users/sac/cns/src/ontology/engagement_overview.ttl` (7726 bytes)
+- `/Users/sac/cns/src/ontology/enhanced_system_model.ttl` (7765 bytes)
+- `/Users/sac/cns/src/ontology/filing_sequence_plan.ttl` (10703 bytes)
+- `/Users/sac/cns/src/ontology/forbidden-cuts.ttl` (14115 bytes)
+- `/Users/sac/cns/src/ontology/generated_pipeline_ttl.ttl` (599 bytes)
+- `/Users/sac/cns/src/ontology/jungdisc-ttl-integration.ttl` (14932 bytes)
+- `/Users/sac/cns/src/ontology/jurisdictional_map.ttl` (8613 bytes)
+- `/Users/sac/cns/src/ontology/recent-signals.ttl` (13225 bytes)
+- `/Users/sac/cns/src/ontology/response_flow_dag.ttl` (13054 bytes)
+- `/Users/sac/cns/src/ontology/sample_bitactor.ttl` (2081 bytes)
+- `/Users/sac/cns/src/ontology/status_alignment_matrix.ttl` (10267 bytes)
+- `/Users/sac/cns/src/ontology/test.ttl` (47 bytes)
+- `/Users/sac/cns/src/ontology/test_cybersecurity_ontology.ttl` (2555 bytes)
+- `/Users/sac/cns/src/ontology/test_dark_pattern.ttl` (1180 bytes)
+- `/Users/sac/cns/src/ontology/test_pattern.ttl` (2221 bytes)
+- `/Users/sac/cns/src/ontology/trialbase-nuxt-bit-supa.ttl` (14125 bytes)
+- `/Users/sac/cns/src/ontology/trialbase.ttl` (11434 bytes)
+- `/Users/sac/cns/stress_test_data/large_test.ttl` (305426 bytes)
+- `/Users/sac/cns/stress_test_data/medium_test.ttl` (19657 bytes)
+- `/Users/sac/cns/stress_test_data/small_test.ttl` (348 bytes)
+- `/Users/sac/cns/stress_test_data/small_test_shacl.ttl` (311 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/cognitive/active-waves.ttl` (9063 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/cognitive/forbidden-cuts.ttl` (14115 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/cognitive/recent-signals.ttl` (13225 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/connective/link-graph.ttl` (12218 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/connective/pulse-map.ttl` (4010 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/connective/spiral-logs/recursive-patterns-001.ttl` (9011 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/core/link-graph.ttl` (4582 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/fossilized/expired-links-2025-07-30.ttl` (875 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/fossilized/expired-links-2025-07-31.ttl` (2418 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/schemas/tai-ontology.ttl` (2929 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/schemas/ttl/cognitive-primitives.ttl` (11325 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/schemas/ttl/example-instances.ttl` (15005 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/schemas/ttl/semantic-graph-structures.ttl` (14281 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/schemas/ttl/substrate-relationships.ttl` (11284 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/schemas/ttl/tai-base-ontology.ttl` (6310 bytes)
+- `/Users/sac/cns/tai-v2026.1.1.0z-america-los_angeles/schemas/ttl/temporal-pulse-mapping.ttl` (11575 bytes)
+- `/Users/sac/cns/telemetry/spans_map.ttl` (2495 bytes)
+- `/Users/sac/cns/test_batch_input/trading.ttl` (4277 bytes)
+- `/Users/sac/cns/test_data/comprehensive_dfls_test_ontology.ttl` (18574 bytes)
+- `/Users/sac/cns/test_output/ahi_8020_execution.ttl` (2979 bytes)
+- `/Users/sac/cns/test_output/eight_space_report.ttl` (19358 bytes)
+- `/Users/sac/cns/tests/data_sample.ttl` (422 bytes)
+- `/Users/sac/cns/tools/weaver_v2026/examples/governor_battlespace_example.ttl` (1671 bytes)
+- `/Users/sac/cns/tools/weaver_v2026/examples/minimal_system.ttl` (147 bytes)
+- `/Users/sac/cns/tools/weaver_v2026/examples/minimal_system_evolved.ttl` (145 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_bitactor_rdf_core.ttl` (119552 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_bitflow-workflow-patterns-complete.ttl` (164339 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_bitflow-workflow-patterns.ttl` (149199 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_bitflow_comprehensive_patterns.ttl` (128622 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_forex_trading_reality.ttl` (16693 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_healthcare_core.ttl` (132244 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_large_test.ttl` (653860 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_pattern-to-yawl-mappings.ttl` (149831 bytes)
+- `/Users/sac/cns/turtle-analyzer-ultra/bitstar_dark_enhanced/dark_workflow_patterns_43.ttl` (147747 bytes)
+- `/Users/sac/cns/turtle-analyzer/example.ttl` (2693 bytes)
+- `/Users/sac/cns/turtle-cli-ultra/dark_enhanced/dark_test.ttl` (12710 bytes)
+- `/Users/sac/cns/turtle-cli-ultra/dspy_dark_test.ttl` (553 bytes)
+- `/Users/sac/cns/turtle-cli-ultra/src/turtle_cli_ultra/ontology/cli_8space_ontology.ttl` (26880 bytes)
+- `/Users/sac/cns/turtle-cli-ultra/test.ttl` (61 bytes)
+- `/Users/sac/cns/ultrathink_meta/trinity-test-suite-comprehensive.yawl.ttl` (16961 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/cache.ttl` (260 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/config.ttl` (280 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/core.ttl` (513 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/core_ontology.ttl` (8701 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/dedupe.ttl` (195 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/fsm.ttl` (412 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/identity.ttl` (282 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/logging.ttl` (757 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/metrics.ttl` (311 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/performance.ttl` (4401 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/provenance.ttl` (296 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/resilience.ttl` (331 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/security.ttl` (367 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/serialization.ttl` (315 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/stream.ttl` (268 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/versioning.ttl` (198 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/workflow.ttl` (378 bytes)
+- `/Users/sac/cns/v1/core/spec/ontology/yawl_comprehensive.ttl` (17652 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/cache_shapes.ttl` (215 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/config_shapes.ttl` (147 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/dedupe_shapes.ttl` (144 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/fsm_shapes.ttl` (211 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/identity_shapes.ttl` (152 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/logging_shapes.ttl` (620 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/metrics_shapes.ttl` (262 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/performance_shapes.ttl` (8019 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/provenance_shapes.ttl` (162 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/resilience_shapes.ttl` (297 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/serialization_shapes.ttl` (262 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/shacl-governance.ttl` (1445 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/stream_shapes.ttl` (229 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/versioning_shapes.ttl` (148 bytes)
+- `/Users/sac/cns/v1/core/spec/shacl/yawl_validation_shacl.ttl` (14643 bytes)
+- `/Users/sac/cns/v1/core/spec/sparql/logging_validate.rq` (113 bytes)
+- `/Users/sac/cns/v1/core/spec/sparql/validate_core.rq` (159 bytes)
+- `/Users/sac/cns/v1/core/tests/specs/config_spec.ttl` (129 bytes)
+- `/Users/sac/cns/v1/core/tests/specs/core_spec.ttl` (134 bytes)
+- `/Users/sac/cns/v1/core/tests/specs/logging_spec.ttl` (221 bytes)
+- `/Users/sac/cns/v1/core/tests/specs/resilience_spec.ttl` (169 bytes)
+- `/Users/sac/cns/v1/core/tests/specs/security_spec.ttl` (156 bytes)
+- `/Users/sac/cns/v8/spec/core_ontology.ttl` (8701 bytes)
+- `/Users/sac/cns/workflows/patterns/CNS001_cns_response.yawl.ttl` (9504 bytes)
+- `/Users/sac/cns/workflows/patterns/CNS002_multi_jurisdictional.yawl.ttl` (6559 bytes)
+- `/Users/sac/cns/workflows/patterns/CNS003_bar_inquiry.yawl.ttl` (4856 bytes)
+- `/Users/sac/cns/workflows/patterns/CNS004_court_filing.yawl.ttl` (4839 bytes)
+- `/Users/sac/cns/workflows/patterns/CNS005_emergency_response.yawl.ttl` (4283 bytes)
+- `/Users/sac/cns/workflows/patterns/P001_sequence.yawl.ttl` (3076 bytes)
+- `/Users/sac/cns/workflows/patterns/P002_parallel_split.yawl.ttl` (4882 bytes)
+- `/Users/sac/cns/workflows/patterns/P003_synchronization.yawl.ttl` (4885 bytes)
+- `/Users/sac/cns/workflows/patterns/P004_exclusive_choice.yawl.ttl` (4904 bytes)
+- `/Users/sac/cns/workflows/patterns/P005_simple_merge.yawl.ttl` (4892 bytes)
+- `/Users/sac/cns/workflows/patterns/master_cns_litigation_workflows.yawl.ttl` (4376 bytes)
+
+</details>

@@ -70,10 +70,7 @@ pub mod admission {
 
         fn admit(
             raw: Evidence<Self::Raw, Raw, Self::Witness>,
-        ) -> Result<
-            Admission<Self::Admitted, Self::Witness>,
-            Refusal<Self::Reason, Self::Witness>,
-        >;
+        ) -> Result<Admission<Self::Admitted, Self::Witness>, Refusal<Self::Reason, Self::Witness>>;
     }
 
     pub struct Refusal<R, W> {
@@ -293,5 +290,127 @@ pub mod receipt {
         pub fn is_well_shaped(&self) -> bool {
             !self.subject.is_empty() && !self.witness.is_empty()
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashMap;
+
+    // ── Evidence typestate ────────────────────────────────────────────────────
+
+    #[test]
+    fn evidence_raw_wraps_value() {
+        let e = evidence::Evidence::<i32, state::Raw, witness::Ocel20>::raw(42);
+        assert_eq!(e.value, 42);
+    }
+
+    #[test]
+    fn admission_into_evidence_provides_inner() {
+        let adm = admission::Admission::<String, witness::Ocel20>::new("hello".into());
+        let ev = adm.into_evidence();
+        assert_eq!(ev.into_inner(), "hello");
+    }
+
+    // ── GraduationCandidate ───────────────────────────────────────────────────
+
+    #[test]
+    fn graduation_candidate_new_stores_fields() {
+        let g = engine_bridge::GraduationCandidate::new(
+            engine_bridge::GraduationReason::NeedsDiscovery,
+            "mech-001",
+            "ocel://run-42",
+        );
+        assert_eq!(g.subject, "mech-001");
+        assert_eq!(g.evidence_ref, "ocel://run-42");
+    }
+
+    #[test]
+    fn graduation_candidate_is_grounded_true_when_nonempty_ref() {
+        let g = engine_bridge::GraduationCandidate::new(
+            engine_bridge::GraduationReason::NeedsReceipts,
+            "sub",
+            "ref-001",
+        );
+        assert!(g.is_grounded());
+    }
+
+    #[test]
+    fn graduation_candidate_is_grounded_false_when_empty_ref() {
+        let g = engine_bridge::GraduationCandidate::new(
+            engine_bridge::GraduationReason::NeedsReplay,
+            "sub",
+            "",
+        );
+        assert!(!g.is_grounded());
+    }
+
+    // ── OCEL validate ─────────────────────────────────────────────────────────
+
+    fn make_ocel_valid() -> ocel::OCEL {
+        ocel::OCEL {
+            event_types: vec!["BIRTH".into()],
+            object_types: vec!["mech".into()],
+            events: vec![{
+                let mut e = ocel::OCELEvent::new("e1", "BIRTH");
+                e.relationships.push(ocel::OCELRelationship::new("o1", "case"));
+                e
+            }],
+            objects: vec![ocel::OCELObject::new("o1", "mech")],
+        }
+    }
+
+    #[test]
+    fn validate_passes_when_all_relationships_reference_known_objects() {
+        let ocel = make_ocel_valid();
+        let report = ocel::validate::validate(&ocel, &HashMap::new());
+        assert!(report.valid);
+        assert!(report.errors.is_empty());
+    }
+
+    #[test]
+    fn validate_fails_when_event_references_missing_object() {
+        let mut ocel = make_ocel_valid();
+        ocel.events[0].relationships[0].object_id = "ghost".into();
+        let report = ocel::validate::validate(&ocel, &HashMap::new());
+        assert!(!report.valid);
+        assert!(report.errors[0].code == "E2O_MISSING_TARGET");
+    }
+
+    // ── ReceiptEnvelope ───────────────────────────────────────────────────────
+
+    #[test]
+    fn receipt_envelope_ok_with_valid_parts() {
+        let result = receipt::ReceiptEnvelope::try_from_parts(
+            "subj".into(),
+            "witness",
+            receipt::Digest::new("abc"),
+            receipt::ReplayHint::new("hint"),
+        );
+        let env = match result { Ok(e) => e, Err(_) => panic!("expected Ok") };
+        assert!(env.is_well_shaped());
+    }
+
+    #[test]
+    fn receipt_envelope_fails_on_empty_subject() {
+        let err = match receipt::ReceiptEnvelope::try_from_parts(
+            "".into(),
+            "witness",
+            receipt::Digest::new("h"),
+            receipt::ReplayHint::new("r"),
+        ) { Ok(_) => panic!("expected Err"), Err(e) => e };
+        assert_eq!(err, receipt::ReceiptRefusal::MissingSubject);
+    }
+
+    #[test]
+    fn receipt_envelope_fails_on_empty_witness() {
+        let err = match receipt::ReceiptEnvelope::try_from_parts(
+            "subj".into(),
+            "",
+            receipt::Digest::new("h"),
+            receipt::ReplayHint::new("r"),
+        ) { Ok(_) => panic!("expected Err"), Err(e) => e };
+        assert_eq!(err, receipt::ReceiptRefusal::InvalidWitness);
     }
 }

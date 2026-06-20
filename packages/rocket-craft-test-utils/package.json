@@ -1,0 +1,46 @@
+{
+  "name": "rocket-craft-test-utils",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./assertions": "./src/assertions.ts",
+    "./receipts": "./src/receipts.ts",
+    "./residuals": "./src/residuals.ts",
+    "./commands": "./src/commands.ts",
+    "./visual-delta": "./src/visual-delta.ts",
+    "./fixtures": "./src/fixtures.ts",
+    "./reports": "./src/reports.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "test": "vitest run --project unit",
+    "test:unit": "vitest run --project unit",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.9"
+  },
+  "peerDependencies": {
+    "@nuxt/test-utils": ">=3.0.0",
+    "@playwright/test": ">=1.60.0",
+    "@supabase/supabase-js": ">=2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@nuxt/test-utils": {
+      "optional": true
+    },
+    "@playwright/test": {
+      "optional": true
+    },
+    "@supabase/supabase-js": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0"
+  }
+}

@@ -1,0 +1,4 @@
+---,AssetPath,AssetType,MaterialXFile,TextureManifest,LODPolicy,CollisionPolicy,SkeletalMesh
+SnowWhite_Prelude,"/Game/Mecha/SnowWhite/ASSET_SnowWhite_Prelude.usda",SkeletalMesh,"/Game/Mecha/SnowWhite/M_SnowWhite_Armor.mtlx","/Game/Mecha/SnowWhite/T_SnowWhite_manifest.json",AutoLOD_7,ComplexAsSimple,True
+Mesh_PrimaryBinder,"/Game/Mecha/SnowWhite/Meshes/SM_Wing_Primary.usda",StaticMesh,"","","",ComplexAsSimple,False
+Mesh_FeatherArray,"/Game/Mecha/SnowWhite/Meshes/SM_Wing_Feathers.usda",StaticMesh,"","","",ComplexAsSimple,False

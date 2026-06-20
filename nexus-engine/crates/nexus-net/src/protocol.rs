@@ -13,22 +13,38 @@ use serde::{Deserialize, Serialize};
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ClientMessage {
     // -- Authentication --
-    Authenticate { player_id: u64, token: String },
+    Authenticate {
+        player_id: u64,
+        token: String,
+    },
 
     // -- Lobby --
     JoinLobby,
     LeaveLobby,
-    ChallengeDuel { target_player_id: u64, suit_id: String },
-    AcceptDuel { challenge_id: u64 },
-    DeclineDuel { challenge_id: u64 },
+    ChallengeDuel {
+        target_player_id: u64,
+        suit_id: String,
+    },
+    AcceptDuel {
+        challenge_id: u64,
+    },
+    DeclineDuel {
+        challenge_id: u64,
+    },
 
     // -- In-Match (Duel Arena) --
-    CombatAction { action: CombatAction },
-    EmotePing { emote_id: u8 },
+    CombatAction {
+        action: CombatAction,
+    },
+    EmotePing {
+        emote_id: u8,
+    },
     SurrenderMatch,
 
     // -- Heartbeat --
-    Ping { seq: u32 },
+    Ping {
+        seq: u32,
+    },
 }
 
 // ── Server → Client ──────────────────────────────────────────────────────────
@@ -38,11 +54,17 @@ pub enum ClientMessage {
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ServerMessage {
     // -- Auth response --
-    AuthSuccess { session_id: u64 },
-    AuthFailure { reason: String },
+    AuthSuccess {
+        session_id: u64,
+    },
+    AuthFailure {
+        reason: String,
+    },
 
     // -- Lobby --
-    LobbyJoined { online_count: u32 },
+    LobbyJoined {
+        online_count: u32,
+    },
     DuelChallenge {
         challenge_id: u64,
         challenger_id: u64,
@@ -56,14 +78,30 @@ pub enum ServerMessage {
     },
 
     // -- Match state sync --
-    MatchState { state: MatchStateSnapshot },
-    CombatResult { action: CombatAction, outcome: CombatOutcome },
-    MatchEnded { winner_id: u64, reason: MatchEndReason },
+    MatchState {
+        state: MatchStateSnapshot,
+    },
+    CombatResult {
+        action: CombatAction,
+        outcome: CombatOutcome,
+    },
+    MatchEnded {
+        winner_id: u64,
+        reason: MatchEndReason,
+    },
 
     // -- Server housekeeping --
-    Pong { seq: u32, server_time_ms: u64 },
-    Error { code: u16, message: String },
-    Disconnect { reason: String },
+    Pong {
+        seq: u32,
+        server_time_ms: u64,
+    },
+    Error {
+        code: u16,
+        message: String,
+    },
+    Disconnect {
+        reason: String,
+    },
 }
 
 // ── Shared payload types ──────────────────────────────────────────────────────
@@ -95,21 +133,22 @@ pub enum CombatAction {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum CombatOutcome {
-    Hit { damage: f32, new_hp: f32, combo_depth: u32 },
+    Hit {
+        damage: f32,
+        new_hp: f32,
+        combo_depth: u32,
+    },
     Blocked,
-    PerfectParry { counter_damage: f32 },
+    PerfectParry {
+        counter_damage: f32,
+    },
     Dodged,
-    PlayerDied { player_id: u64 },
+    PlayerDied {
+        player_id: u64,
+    },
 }
 
-/// Directional component of an attack or parry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum AttackDir {
-    Overhead,
-    Left,
-    Right,
-}
+pub use nexus_types::AttackDir;
 
 /// Why a match concluded.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -119,4 +158,131 @@ pub enum MatchEndReason {
     Surrender,
     Timeout,
     Disconnect,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ser<T: serde::Serialize>(v: &T) -> String { serde_json::to_string(v).unwrap() }
+    fn de_action(s: &str) -> CombatAction { serde_json::from_str(s).unwrap() }
+    fn de_outcome(s: &str) -> CombatOutcome { serde_json::from_str(s).unwrap() }
+
+    // ── CombatAction round-trips ───────────────────────────────────────────────
+
+    #[test]
+    fn attack_overhead_round_trips() {
+        let a = CombatAction::Attack { dir: AttackDir::Overhead };
+        let json = ser(&a);
+        assert!(json.contains("\"Overhead\""));
+        assert!(matches!(de_action(&json), CombatAction::Attack { dir: AttackDir::Overhead }));
+    }
+
+    #[test]
+    fn parry_with_direction_round_trips() {
+        let a = CombatAction::Parry { dir: Some(AttackDir::Left) };
+        assert!(matches!(
+            de_action(&ser(&a)),
+            CombatAction::Parry { dir: Some(AttackDir::Left) }
+        ));
+    }
+
+    #[test]
+    fn parry_without_direction_round_trips() {
+        let a = CombatAction::Parry { dir: None };
+        assert!(matches!(de_action(&ser(&a)), CombatAction::Parry { dir: None }));
+    }
+
+    #[test]
+    fn dodge_round_trips() {
+        assert!(matches!(de_action(&ser(&CombatAction::Dodge)), CombatAction::Dodge));
+    }
+
+    #[test]
+    fn use_special_preserves_ability_id() {
+        let a = CombatAction::UseSpecial { ability_id: 3 };
+        assert!(matches!(de_action(&ser(&a)), CombatAction::UseSpecial { ability_id: 3 }));
+    }
+
+    #[test]
+    fn cast_magic_preserves_type() {
+        let a = CombatAction::CastMagic { magic_type: MagicType::Dark };
+        assert!(matches!(
+            de_action(&ser(&a)),
+            CombatAction::CastMagic { magic_type: MagicType::Dark }
+        ));
+    }
+
+    // ── CombatOutcome round-trips ─────────────────────────────────────────────
+
+    #[test]
+    fn hit_preserves_damage_and_combo() {
+        let o = CombatOutcome::Hit { damage: 35.0, new_hp: 65.0, combo_depth: 2 };
+        match de_outcome(&ser(&o)) {
+            CombatOutcome::Hit { damage, new_hp, combo_depth } => {
+                assert!((damage - 35.0).abs() < 0.001);
+                assert!((new_hp - 65.0).abs() < 0.001);
+                assert_eq!(combo_depth, 2);
+            }
+            other => panic!("{other:?}"),
+        }
+    }
+
+    #[test]
+    fn blocked_round_trips() {
+        assert!(matches!(de_outcome(&ser(&CombatOutcome::Blocked)), CombatOutcome::Blocked));
+    }
+
+    #[test]
+    fn player_died_preserves_id() {
+        let o = CombatOutcome::PlayerDied { player_id: 42 };
+        match de_outcome(&ser(&o)) {
+            CombatOutcome::PlayerDied { player_id } => assert_eq!(player_id, 42),
+            other => panic!("{other:?}"),
+        }
+    }
+
+    // ── MatchEndReason ────────────────────────────────────────────────────────
+
+    #[test]
+    fn match_end_reason_variants_are_distinct() {
+        assert_ne!(MatchEndReason::Verified, MatchEndReason::Surrender);
+        assert_ne!(MatchEndReason::Timeout, MatchEndReason::Disconnect);
+    }
+
+    #[test]
+    fn match_state_snapshot_fields_are_accessible() {
+        let snap = MatchStateSnapshot {
+            match_id: 7, player1_hp: 500.0, player2_hp: 250.0,
+            player1_combo: 3, player2_combo: 0,
+            turn_number: 5, is_player1_turn: false,
+        };
+        assert_eq!(snap.match_id, 7);
+        assert_eq!(snap.turn_number, 5);
+        assert!(!snap.is_player1_turn);
+    }
+
+    // ── Task C1: Prevent Authority Stream Inflation ────────────────────────────
+
+    #[test]
+    fn ensure_byte_class_server_authority_stream_not_inflated_by_high_poly() {
+        // Task C1: "Ensure the high-poly client projection doesn't inflate the byte-class server authority stream."
+        // We enforce this by guaranteeing the in-memory size of any ClientMessage
+        // or ServerMessage remains extremely compact. If a developer accidentally
+        // adds a `Vec<f32>` mesh transform array, this size will dramatically increase.
+        let client_size = std::mem::size_of::<ClientMessage>();
+        let server_size = std::mem::size_of::<ServerMessage>();
+
+        assert!(
+            client_size <= 128,
+            "ClientMessage has grown to {} bytes! Do not inflate the authority stream with projection data.",
+            client_size
+        );
+        
+        assert!(
+            server_size <= 256,
+            "ServerMessage has grown to {} bytes! Do not inflate the authority stream with projection data.",
+            server_size
+        );
+    }
 }

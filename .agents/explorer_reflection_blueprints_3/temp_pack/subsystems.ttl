@@ -1,0 +1,35 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/subsystems#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Subsystems Ontology" ;
+    rdfs:comment "Ontology representing subsystems in Unreal Engine 4." .
+
+ue4:USubsystem a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "USubsystem" ;
+    rdfs:comment "Base class for auto-instancing subsystems with managed lifecycles." .
+
+ue4:URenderingSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "URenderingSubsystem" ;
+    rdfs:comment "Subsystem managing rendering-related states and operations." .
+
+ue4:UPhysicsSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UPhysicsSubsystem" ;
+    rdfs:comment "Subsystem managing physics simulations and constraints." .
+
+ue4:UNetworkingSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UNetworkingSubsystem" ;
+    rdfs:comment "Subsystem managing network communication and replication." .
+
+ue4:hasSubsystemLifecycle a owl:ObjectProperty ;
+    rdfs:label "hasSubsystemLifecycle" ;
+    rdfs:comment "Relates a subsystem to its lifecycle phase." ;
+    rdfs:domain ue4:USubsystem .

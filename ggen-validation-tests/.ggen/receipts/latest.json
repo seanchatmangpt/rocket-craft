@@ -1,0 +1,33 @@
+{
+  "operation_id": "5e1b6815-684a-4010-9cae-2ab7b9748439",
+  "timestamp": "2026-06-19T18:19:59.949029Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.11",
+    "ggen.toml:a5127df93ac3d06cb114c76169c2e6ce30dcf36a77704612b4e5f76b4de88bdb",
+    "core.ttl:8cc6ef64df949e6fb48d40a33fade523ae1c7af0095e600a5a1acc4f7ddaa0be",
+    "reflection.ttl:2e512c4efa44e9f234ccebcdb6983c0195f741e422d242d7c3aed96ea99cad59",
+    "blueprints.ttl:bed9eab7012d0a0d8607d973bac5b9b404fdb4598dcefb6cdde004cd0028d793",
+    "subsystems.ttl:717fff176662c4132a63814ffa75d66d1644a0b5362a13f35889cafd06d98985",
+    "typestates.ttl:001f9b87cb966f3ee9ae907622816f41d04c960497c6f1dfc48442c18750551d",
+    "gundam_character.ttl:eccd44d39d4d827c644b970ba92190de24687364ecf89b1e8719359c57cbe44d",
+    "../ontology/gundam_nexus.ttl:a560dcd1d4ac8a191a33007bd710b9559690aa9efb8822c7d28bc020c81a1b9d"
+  ],
+  "output_hashes": [
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.h:a41f4e17330f314eb027d2aa1bb97a6a09cdcc484c365484ed9f3025e1709043",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.rs:2d1bad3d0b4f829733806983cba52f76983b2237b160246e67d83e9f9cf7a5e8",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionRows.csv:bf4fdc61b77ffc7aeb4a30f52a5ae46556d7a6f13d099e710c256756011651d3",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySocketTopology.csv:fb728136a4235ce38a7e3cdc795dd7c3df917efa703c372e4c99f2181e053dd2",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySkinLayers.csv:ee3ba66a54859e9ed96a1e9e0f0588d87b9c2509101a17bf07811d248d14a88c",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryMotionFamilies.csv:d09836ac14b53e2d7353665faee9e7cab492b89c345b1b94f8291a49fdeeffd0",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryLODClasses.csv:e9917393a5ebb25835ceb967f769fbc4b6f275ff22dc88b6ff4c8836b54b0b86",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryAuthorityClasses.csv:e5b20abb29bd42613a1d44bfd2b60e451ebf6dafa18885926950ad05f6630613",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryTransitionTable.csv:07e61110f8d7092ee4df04a4549877e9e25d745983093e0cacb8403ca44f495b",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryPredictionRules.csv:7af38ce6fc7954325d9337cbbbc65c6e2827836d1e56cc149436721f3e2c9630",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryReceiptManifest.json:f517a4362325803ff6bbc6484dc889ca8f8d89eb2d4997adb4f33a11168811fb",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionManifest.json:dfe9cf77f26f55cda2303f427d3bcc21680ef932c4401efc6d2a0c2e57a76dff",
+    "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryOCELSeed.json:983f782fc16bdcb539ac633fe1280f2c6808eaa3289eb88aea1f1cc25a3131ea",
+    "/Users/sac/rocket-craft/ggen-validation-tests/./README.md:f9503915554dbc304a8c20b83b3977b64568da4726c80122831cb49d35e40e08"
+  ],
+  "signature": "05345df2e63e67eedc52ae4fe4305da20714f560ba81db83b06ff390f9bb5a964b907ee99df89344f095d3cac066e9ca2b4dbae3aa4c25cbce81fa26f1a6c700",
+  "previous_receipt_hash": "7a38d30e730624ad74102aa2ba6ee5c3fe9c49d9dd9e8f1015beef5ef6b8f6be"
+}

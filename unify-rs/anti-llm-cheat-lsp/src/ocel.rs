@@ -382,3 +382,73 @@ pub fn write_ocel_outputs(dir: &str) -> Result<(), Box<dyn std::error::Error>> {
 pub fn parse_and_validate_ocel_json(json_str: &str) -> Result<OCEL, String> {
     serde_json::from_str(json_str).map_err(|e| e.to_string())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn generated_log_has_objects_and_events() {
+        let log = generate_anti_llm_ocel_log();
+        assert!(!log.objects.is_empty(), "OCEL log must have objects");
+        assert!(!log.events.is_empty(), "OCEL log must have events");
+    }
+
+    #[test]
+    fn generated_log_events_have_nonempty_activity() {
+        let log = generate_anti_llm_ocel_log();
+        for ev in &log.events {
+            assert!(!ev.activity.is_empty(), "event activity must be non-empty: {:?}", ev.id);
+        }
+    }
+
+    #[test]
+    fn generated_log_serializes_to_json() {
+        let log = generate_anti_llm_ocel_log();
+        let json = serde_json::to_string(&log).expect("OCEL log must serialize to JSON");
+        let parsed: OCEL = serde_json::from_str(&json).expect("serialized log must round-trip");
+        assert_eq!(parsed.objects.len(), log.objects.len());
+        assert_eq!(parsed.events.len(), log.events.len());
+    }
+
+    #[test]
+    fn parse_and_validate_rejects_invalid_json() {
+        let result = parse_and_validate_ocel_json("{ not valid }");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn parse_and_validate_accepts_valid_ocel() {
+        let log = generate_anti_llm_ocel_log();
+        let json = serde_json::to_string(&log).unwrap();
+        let result = parse_and_validate_ocel_json(&json);
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn ocel_object_new_sets_id_and_type() {
+        let obj = OCELObject::new("obj-1".into(), "Repository");
+        assert_eq!(obj.id, "obj-1");
+        assert_eq!(obj.object_type, "Repository");
+        assert!(obj.attributes.is_empty());
+    }
+
+    #[test]
+    fn ocel_object_with_attribute_accumulates() {
+        let obj = OCELObject::new("obj-2".into(), "Crate")
+            .with_attribute(OCELEventAttribute::string("name", "test-crate".into()));
+        assert_eq!(obj.attributes.len(), 1);
+    }
+
+    #[test]
+    fn ocel_event_attribute_string_variant() {
+        let attr = OCELEventAttribute::string("key", "value".into());
+        assert!(matches!(attr, OCELEventAttribute::String { name, value } if name == "key" && value == "value"));
+    }
+
+    #[test]
+    fn ocel_event_attribute_integer_variant() {
+        let attr = OCELEventAttribute::integer("count", 42);
+        assert!(matches!(attr, OCELEventAttribute::Integer { name, value } if name == "count" && value == 42));
+    }
+}

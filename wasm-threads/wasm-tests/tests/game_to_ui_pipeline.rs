@@ -200,7 +200,7 @@ fn bridge_rejects_garbage_json() {
 
 #[test]
 fn ping_serializes_to_game_message() {
-    use wasm_ui::message_bridge::{MessageBridge, UiToGameMessage};
+    use wasm_ui::message_bridge::MessageBridge;
     let bridge = MessageBridge::new();
     let json = bridge.send_ping(42);
     let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();

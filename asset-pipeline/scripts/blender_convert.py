@@ -18,12 +18,21 @@ All human-readable logging goes to STDERR.
 import sys
 import os
 import json
+import hashlib
 import argparse
 
 
 def result_ok(output_path: str) -> None:
     """Print the success sentinel as the final stdout line."""
-    print(json.dumps({"ok": True, "output_path": output_path}), flush=True)
+    size = os.path.getsize(output_path)
+    with open(output_path, "rb") as f:
+        digest = hashlib.sha256(f.read()).hexdigest()
+    print(json.dumps({
+        "ok": True,
+        "output_path": output_path,
+        "output_size_bytes": size,
+        "output_hash": f"sha256:{digest}",
+    }), flush=True)
 
 
 def result_err(error: str) -> None:
@@ -133,11 +142,7 @@ def main():
         result_err(f"Input file not found: {args.input}")
         sys.exit(1)
 
-    try:
-        clear_scene(bpy)
-    except Exception as e:
-        print(f"[blender_convert] Warning: could not fully clear scene: {e}",
-              file=sys.stderr)
+    clear_scene(bpy)
 
     try:
         import_model(bpy, args.format, args.input)

@@ -37,6 +37,25 @@ pub struct InMatch;
 /// The type parameter `S` is a zero-sized marker that encodes the current
 /// protocol state.  Fields are intentionally `pub` so higher-level server code
 /// can read them without boilerplate accessors.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_net::connection::{Connection, Disconnected, Connected};
+///
+/// // Create a default disconnected connection
+/// let conn = Connection::new();
+/// assert!(conn.player_id.is_none());
+///
+/// // Disconnected -> Handshaking -> Connected transition sequence
+/// let handshaking = conn.begin_handshake();
+/// let connected = handshaking.complete();
+///
+/// // Connected -> Authenticated transition
+/// let authenticated = connected.authenticate(101, 9999);
+/// assert_eq!(authenticated.player_id, Some(101));
+/// assert_eq!(authenticated.session_id, Some(9999));
+/// ```
 pub struct Connection<S> {
     /// Populated after successful `Authenticate` flow.
     pub player_id: Option<u64>,
@@ -51,6 +70,122 @@ pub struct Connection<S> {
     /// Active match id when in the `InMatch` state; `None` otherwise.
     pub match_id: Option<u64>,
     _state: PhantomData<S>,
+}
+
+/// A builder for [`Connection`] in the [`Disconnected`] state.
+///
+/// # Examples
+///
+/// ```
+/// use nexus_net::connection::{Connection, ConnectionBuilder, Disconnected};
+///
+/// let conn = ConnectionBuilder::new()
+///     .player_id(7)
+///     .session_id(777)
+///     .latency_ms(15)
+///     .build();
+///
+/// assert_eq!(conn.player_id, Some(7));
+/// assert_eq!(conn.session_id, Some(777));
+/// assert_eq!(conn.latency_ms, 15);
+/// ```
+#[derive(Debug, Clone)]
+pub struct ConnectionBuilder {
+    player_id: Option<u64>,
+    session_id: Option<u64>,
+    latency_ms: u32,
+    messages_sent: u64,
+    messages_received: u64,
+    match_id: Option<u64>,
+}
+
+impl ConnectionBuilder {
+    /// Create a new builder with default parameters.
+    pub fn new() -> Self {
+        Self {
+            player_id: None,
+            session_id: None,
+            latency_ms: 0,
+            messages_sent: 0,
+            messages_received: 0,
+            match_id: None,
+        }
+    }
+
+    /// Set the player ID.
+    pub fn player_id(mut self, player_id: u64) -> Self {
+        self.player_id = Some(player_id);
+        self
+    }
+
+    /// Set the session ID.
+    pub fn session_id(mut self, session_id: u64) -> Self {
+        self.session_id = Some(session_id);
+        self
+    }
+
+    /// Set the initial latency estimate.
+    pub fn latency_ms(mut self, latency_ms: u32) -> Self {
+        self.latency_ms = latency_ms;
+        self
+    }
+
+    /// Set the messages sent count.
+    pub fn messages_sent(mut self, count: u64) -> Self {
+        self.messages_sent = count;
+        self
+    }
+
+    /// Set the messages received count.
+    pub fn messages_received(mut self, count: u64) -> Self {
+        self.messages_received = count;
+        self
+    }
+
+    /// Set the current match ID.
+    pub fn match_id(mut self, match_id: u64) -> Self {
+        self.match_id = Some(match_id);
+        self
+    }
+
+    /// Build the connection in [`Disconnected`] state.
+    pub fn build(self) -> Connection<Disconnected> {
+        Connection {
+            player_id: self.player_id,
+            session_id: self.session_id,
+            latency_ms: self.latency_ms,
+            messages_sent: self.messages_sent,
+            messages_received: self.messages_received,
+            match_id: self.match_id,
+            _state: PhantomData,
+        }
+    }
+}
+
+impl Default for ConnectionBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+/// Represents the dynamic runtime state of a WebSocket connection.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum ConnectionState {
+    Disconnected,
+    Handshaking,
+    Connected,
+    Authenticated,
+    InLobby,
+    InMatch,
+}
+
+/// Errors returned when a connection transition is invalid at runtime.
+#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+#[error("Illegal connection state transition: cannot transition from {current:?} to {target:?}. Reason: {reason}")]
+pub struct ConnectionTransitionError {
+    pub current: ConnectionState,
+    pub target: ConnectionState,
+    pub reason: String,
 }
 
 // ── Internal helper ───────────────────────────────────────────────────────────
@@ -179,7 +314,8 @@ impl Connection<InLobby> {
 impl Connection<InMatch> {
     /// Retrieve the current match id (always `Some` in this state).
     pub fn current_match_id(&self) -> u64 {
-        self.match_id.expect("InMatch connection must have a match_id")
+        self.match_id
+            .expect("InMatch connection must have a match_id")
     }
 
     /// Match ended; return to the lobby so the player can queue again.
@@ -194,5 +330,123 @@ impl Connection<InMatch> {
         let mut b = self.base();
         b.match_id = None;
         Self::from_base(b)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn disconnected() -> Connection<Disconnected> {
+        ConnectionBuilder::new().player_id(1).session_id(100).build()
+    }
+
+    // ── builder ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn builder_sets_player_and_session_id() {
+        let c = ConnectionBuilder::new().player_id(7).session_id(77).build();
+        assert_eq!(c.player_id, Some(7));
+        assert_eq!(c.session_id, Some(77));
+    }
+
+    #[test]
+    fn builder_default_latency_is_zero() {
+        let c = ConnectionBuilder::new().build();
+        assert_eq!(c.latency_ms, 0);
+    }
+
+    #[test]
+    fn builder_latency_ms_is_set() {
+        let c = ConnectionBuilder::new().latency_ms(42).build();
+        assert_eq!(c.latency_ms, 42);
+    }
+
+    // ── Disconnected → Handshaking ────────────────────────────────────────────
+
+    #[test]
+    fn begin_handshake_transitions_to_handshaking() {
+        let c = disconnected();
+        let h = c.begin_handshake();
+        // Handshaking state has a `complete()` method — presence confirms typestate
+        let _ = h.complete();
+    }
+
+    // ── Handshaking → Connected → Authenticated ───────────────────────────────
+
+    #[test]
+    fn handshaking_complete_then_authenticate() {
+        let c = disconnected();
+        let authenticated = c.begin_handshake().complete().authenticate(99, 999);
+        assert_eq!(authenticated.player_id, Some(99));
+        assert_eq!(authenticated.session_id, Some(999));
+    }
+
+    // ── Handshaking → Disconnected (fail) ─────────────────────────────────────
+
+    #[test]
+    fn handshaking_fail_returns_to_disconnected() {
+        let c = disconnected();
+        let back = c.begin_handshake().fail();
+        // Can start handshake again from Disconnected
+        let _ = back.begin_handshake();
+    }
+
+    // ── Authenticated → InLobby ───────────────────────────────────────────────
+
+    #[test]
+    fn authenticated_can_join_lobby() {
+        let c = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby();
+        // InLobby has enter_match — presence confirms typestate
+        let _ = c.enter_match(42);
+    }
+
+    // ── InLobby → InMatch ─────────────────────────────────────────────────────
+
+    #[test]
+    fn in_lobby_enters_match_sets_match_id() {
+        let c = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby()
+            .enter_match(777);
+        assert_eq!(c.current_match_id(), 777);
+    }
+
+    // ── InLobby → Authenticated (leave lobby) ────────────────────────────────
+
+    #[test]
+    fn in_lobby_can_leave_back_to_authenticated() {
+        let auth = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby()
+            .leave_lobby();
+        // Back to Authenticated: can join lobby again
+        let _ = auth.join_lobby();
+    }
+
+    // ── Disconnect from any state ─────────────────────────────────────────────
+
+    #[test]
+    fn authenticated_disconnect_returns_to_disconnected() {
+        let back = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .disconnect();
+        let _ = back.begin_handshake(); // Disconnected state confirmed
+    }
+
+    #[test]
+    fn in_lobby_disconnect_returns_to_disconnected() {
+        let back = disconnected()
+            .begin_handshake().complete()
+            .authenticate(1, 100)
+            .join_lobby()
+            .disconnect();
+        let _ = back.begin_handshake();
     }
 }

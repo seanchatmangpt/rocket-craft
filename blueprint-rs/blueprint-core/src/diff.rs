@@ -24,10 +24,22 @@ pub struct PinChange {
 pub enum PinChangeKind {
     Added,
     Removed,
-    DefaultValueChanged { before: Option<String>, after: Option<String> },
-    ConnectionAdded { to_node: String, to_pin: String },
-    ConnectionRemoved { to_node: String, to_pin: String },
-    TypeChanged { before: String, after: String },
+    DefaultValueChanged {
+        before: Option<String>,
+        after: Option<String>,
+    },
+    ConnectionAdded {
+        to_node: String,
+        to_pin: String,
+    },
+    ConnectionRemoved {
+        to_node: String,
+        to_pin: String,
+    },
+    TypeChanged {
+        before: String,
+        after: String,
+    },
 }
 
 /// All changes to a single node
@@ -77,7 +89,11 @@ impl BlueprintDiff {
     pub fn total_changes(&self) -> usize {
         self.added_graphs.len()
             + self.removed_graphs.len()
-            + self.graph_diffs.iter().map(|g| g.node_diffs.len()).sum::<usize>()
+            + self
+                .graph_diffs
+                .iter()
+                .map(|g| g.node_diffs.len())
+                .sum::<usize>()
             + self.variable_changes.len()
     }
 }
@@ -122,10 +138,16 @@ pub fn diff(before: &Blueprint, after: &Blueprint) -> BlueprintDiff {
     }
 
     // Variable changes
-    let before_vars: HashMap<&str, &BpVariable> =
-        before.variables.iter().map(|v| (v.name.as_str(), v)).collect();
-    let after_vars: HashMap<&str, &BpVariable> =
-        after.variables.iter().map(|v| (v.name.as_str(), v)).collect();
+    let before_vars: HashMap<&str, &BpVariable> = before
+        .variables
+        .iter()
+        .map(|v| (v.name.as_str(), v))
+        .collect();
+    let after_vars: HashMap<&str, &BpVariable> = after
+        .variables
+        .iter()
+        .map(|v| (v.name.as_str(), v))
+        .collect();
 
     for (name, bv) in &before_vars {
         if let Some(av) = after_vars.get(name) {
@@ -158,8 +180,10 @@ pub fn diff(before: &Blueprint, after: &Blueprint) -> BlueprintDiff {
 }
 
 fn diff_graph(before: &BpGraph, after: &BpGraph) -> GraphDiff {
-    let mut graph_diff =
-        GraphDiff { graph_name: before.name.clone(), node_diffs: Vec::new() };
+    let mut graph_diff = GraphDiff {
+        graph_name: before.name.clone(),
+        node_diffs: Vec::new(),
+    };
 
     let before_nodes: HashMap<&str, &BpNode> =
         before.nodes.iter().map(|n| (n.name.as_str(), n)).collect();
@@ -234,8 +258,7 @@ fn diff_node(before: &BpNode, after: &BpNode) -> Option<NodeDiffKind> {
     // Pin changes
     let before_pins: HashMap<&str, &Pin> =
         before.pins.iter().map(|p| (p.name.as_str(), p)).collect();
-    let after_pins: HashMap<&str, &Pin> =
-        after.pins.iter().map(|p| (p.name.as_str(), p)).collect();
+    let after_pins: HashMap<&str, &Pin> = after.pins.iter().map(|p| (p.name.as_str(), p)).collect();
 
     for (pname, bp) in &before_pins {
         if let Some(ap) = after_pins.get(pname) {
@@ -306,7 +329,10 @@ fn diff_node(before: &BpNode, after: &BpNode) -> Option<NodeDiffKind> {
 /// Format a BlueprintDiff as a human-readable string (like git diff but for Blueprints)
 pub fn format_diff(d: &BlueprintDiff) -> String {
     if d.is_empty() {
-        return format!("No changes between '{}' and '{}'.", d.before_name, d.after_name);
+        return format!(
+            "No changes between '{}' and '{}'.",
+            d.before_name, d.after_name
+        );
     }
 
     let mut out = String::new();
@@ -328,17 +354,21 @@ pub fn format_diff(d: &BlueprintDiff) -> String {
                     out.push_str(&format!(
                         "+ Node added: {} ({})\n",
                         nd.node_name,
-                        node.class.split('.').last().unwrap_or("")
+                        node.class.split('.').next_back().unwrap_or("")
                     ));
                 }
                 NodeDiffKind::Removed(node) => {
                     out.push_str(&format!(
                         "- Node removed: {} ({})\n",
                         nd.node_name,
-                        node.class.split('.').last().unwrap_or("")
+                        node.class.split('.').next_back().unwrap_or("")
                     ));
                 }
-                NodeDiffKind::Modified { position_changed, property_changes, pin_changes } => {
+                NodeDiffKind::Modified {
+                    position_changed,
+                    property_changes,
+                    pin_changes,
+                } => {
                     out.push_str(&format!("~ Node modified: {}\n", nd.node_name));
                     if *position_changed {
                         out.push_str("    ~ position changed\n");
@@ -434,7 +464,12 @@ mod tests {
     #[test]
     fn diff_identical_with_nodes_is_empty() {
         let mut bp = make_bp("MyBP");
-        let node = simple_node("EventBeginPlay_0", "/Script/BlueprintGraph.K2Node_Event", 0, 0);
+        let node = simple_node(
+            "EventBeginPlay_0",
+            "/Script/BlueprintGraph.K2Node_Event",
+            0,
+            0,
+        );
         bp.event_graph().add_node(node);
         let d = diff(&bp, &bp);
         assert!(d.is_empty());
@@ -446,7 +481,12 @@ mod tests {
     fn diff_detects_added_node() {
         let before = make_bp("MyBP");
         let mut after = make_bp("MyBP");
-        let node = simple_node("PrintString_0", "/Script/BlueprintGraph.K2Node_CallFunction", 100, 200);
+        let node = simple_node(
+            "PrintString_0",
+            "/Script/BlueprintGraph.K2Node_CallFunction",
+            100,
+            200,
+        );
         after.event_graph().add_node(node);
 
         let d = diff(&before, &after);
@@ -461,7 +501,12 @@ mod tests {
     fn diff_detects_removed_node() {
         let mut before = make_bp("MyBP");
         let after = make_bp("MyBP");
-        let node = simple_node("PrintString_0", "/Script/BlueprintGraph.K2Node_CallFunction", 100, 200);
+        let node = simple_node(
+            "PrintString_0",
+            "/Script/BlueprintGraph.K2Node_CallFunction",
+            100,
+            200,
+        );
         before.event_graph().add_node(node);
 
         let d = diff(&before, &after);
@@ -476,14 +521,20 @@ mod tests {
     fn diff_detects_position_change() {
         let mut before = make_bp("MyBP");
         let mut after = make_bp("MyBP");
-        before.event_graph().add_node(simple_node("Node_0", "/Script/BP.K2Node_Event", 0, 0));
-        after.event_graph().add_node(simple_node("Node_0", "/Script/BP.K2Node_Event", 500, 300));
+        before
+            .event_graph()
+            .add_node(simple_node("Node_0", "/Script/BP.K2Node_Event", 0, 0));
+        after
+            .event_graph()
+            .add_node(simple_node("Node_0", "/Script/BP.K2Node_Event", 500, 300));
 
         let d = diff(&before, &after);
         assert!(!d.is_empty());
         let nd = &d.graph_diffs[0].node_diffs[0];
         match &nd.kind {
-            NodeDiffKind::Modified { position_changed, .. } => assert!(*position_changed),
+            NodeDiffKind::Modified {
+                position_changed, ..
+            } => assert!(*position_changed),
             _ => panic!("expected Modified"),
         }
     }
@@ -493,19 +544,19 @@ mod tests {
         let mut before = make_bp("MyBP");
         let mut after = make_bp("MyBP");
         before.event_graph().add_node(
-            BpNode::new("/Script/BP.K2Node_Event", "Node_0")
-                .with_property("CustomTag", "OldValue"),
+            BpNode::new("/Script/BP.K2Node_Event", "Node_0").with_property("CustomTag", "OldValue"),
         );
         after.event_graph().add_node(
-            BpNode::new("/Script/BP.K2Node_Event", "Node_0")
-                .with_property("CustomTag", "NewValue"),
+            BpNode::new("/Script/BP.K2Node_Event", "Node_0").with_property("CustomTag", "NewValue"),
         );
 
         let d = diff(&before, &after);
         assert!(!d.is_empty());
         let nd = &d.graph_diffs[0].node_diffs[0];
         match &nd.kind {
-            NodeDiffKind::Modified { property_changes, .. } => {
+            NodeDiffKind::Modified {
+                property_changes, ..
+            } => {
                 assert_eq!(property_changes.len(), 1);
                 assert_eq!(property_changes[0].key, "CustomTag");
                 assert_eq!(property_changes[0].before.as_deref(), Some("OldValue"));
@@ -532,14 +583,18 @@ mod tests {
 
         after.event_graph().add_node(node_a);
         after.event_graph().add_node(node_b);
-        after.event_graph().connect("EventNode", "exec_out", "PrintNode", "exec_in");
+        after
+            .event_graph()
+            .connect("EventNode", "exec_out", "PrintNode", "exec_in");
 
         let d = diff(&before, &after);
         assert!(!d.is_empty());
         let graph_diff = &d.graph_diffs[0];
         let connection_added = graph_diff.node_diffs.iter().any(|nd| {
             if let NodeDiffKind::Modified { pin_changes, .. } = &nd.kind {
-                pin_changes.iter().any(|pc| matches!(&pc.kind, PinChangeKind::ConnectionAdded { .. }))
+                pin_changes
+                    .iter()
+                    .any(|pc| matches!(&pc.kind, PinChangeKind::ConnectionAdded { .. }))
             } else {
                 false
             }
@@ -559,7 +614,9 @@ mod tests {
 
         before.event_graph().add_node(node_a.clone());
         before.event_graph().add_node(node_b.clone());
-        before.event_graph().connect("EventNode", "exec_out", "PrintNode", "exec_in");
+        before
+            .event_graph()
+            .connect("EventNode", "exec_out", "PrintNode", "exec_in");
 
         after.event_graph().add_node(node_a);
         after.event_graph().add_node(node_b);
@@ -570,12 +627,17 @@ mod tests {
         let graph_diff = &d.graph_diffs[0];
         let connection_removed = graph_diff.node_diffs.iter().any(|nd| {
             if let NodeDiffKind::Modified { pin_changes, .. } = &nd.kind {
-                pin_changes.iter().any(|pc| matches!(&pc.kind, PinChangeKind::ConnectionRemoved { .. }))
+                pin_changes
+                    .iter()
+                    .any(|pc| matches!(&pc.kind, PinChangeKind::ConnectionRemoved { .. }))
             } else {
                 false
             }
         });
-        assert!(connection_removed, "expected a ConnectionRemoved pin change");
+        assert!(
+            connection_removed,
+            "expected a ConnectionRemoved pin change"
+        );
     }
 
     // ---- variable changes ----
@@ -630,9 +692,18 @@ mod tests {
 
         let d = diff(&before, &after);
         let output = format_diff(&d);
-        assert!(output.contains("--- BeforeBP"), "expected '--- BeforeBP' in output");
-        assert!(output.contains("+++ AfterBP"), "expected '+++ AfterBP' in output");
-        assert!(output.contains("+ Variable added:"), "expected variable added line");
+        assert!(
+            output.contains("--- BeforeBP"),
+            "expected '--- BeforeBP' in output"
+        );
+        assert!(
+            output.contains("+++ AfterBP"),
+            "expected '+++ AfterBP' in output"
+        );
+        assert!(
+            output.contains("+ Variable added:"),
+            "expected variable added line"
+        );
     }
 
     #[test]

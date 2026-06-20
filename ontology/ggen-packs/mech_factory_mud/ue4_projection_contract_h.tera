@@ -1,0 +1,44 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Engine/DataTable.h"
+#include "MechFactoryMudProjection.generated.h"
+
+USTRUCT(BlueprintType)
+struct FMechFactoryMudProjectionRow : public FTableRowBase
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName ProjectionId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName ObjectId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName StationId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName RouteNodeId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName SourceProcessStep;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FString SourceReceipt;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    int32 AuthorityInputs;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    int32 LodClass;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName ProjectionType;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName Ue4TargetSurface;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projection")
+    FName AdmissionStatus;
+};

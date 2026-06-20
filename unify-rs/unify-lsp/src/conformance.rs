@@ -66,3 +66,55 @@ impl ConformanceScore {
         Self::new(0.0, 0.0, 0.0, 0.0)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn perfect_score_f_measure_is_one() {
+        let s = ConformanceScore::perfect();
+        assert!((s.f_measure() - 1.0).abs() < 1e-9);
+    }
+
+    #[test]
+    fn zero_score_f_measure_is_zero() {
+        let s = ConformanceScore::zero();
+        assert_eq!(s.f_measure(), 0.0);
+    }
+
+    #[test]
+    fn f_measure_harmonic_mean() {
+        let s = ConformanceScore::new(1.0, 0.5, 0.0, 0.0);
+        let expected = 2.0 * 1.0 * 0.5 / (1.0 + 0.5);
+        assert!((s.f_measure() - expected).abs() < 1e-9);
+    }
+
+    #[test]
+    fn is_above_threshold_true_when_f_above() {
+        let s = ConformanceScore::perfect();
+        assert!(s.is_above_threshold(0.9));
+    }
+
+    #[test]
+    fn is_above_threshold_false_when_f_below() {
+        let s = ConformanceScore::zero();
+        assert!(!s.is_above_threshold(0.0)); // 0.0 is not strictly above 0.0
+    }
+
+    #[test]
+    fn delta_computes_signed_difference() {
+        let a = ConformanceScore::new(0.9, 0.8, 0.7, 0.6);
+        let b = ConformanceScore::new(0.5, 0.3, 0.2, 0.1);
+        let d = a.delta(&b);
+        assert!((d.fitness_delta - 0.4).abs() < 1e-9);
+        assert!((d.precision_delta - 0.5).abs() < 1e-9);
+    }
+
+    #[test]
+    fn equal_scores_have_zero_delta() {
+        let s = ConformanceScore::new(0.7, 0.7, 0.7, 0.7);
+        let d = s.delta(&s.clone());
+        assert_eq!(d.fitness_delta, 0.0);
+    }
+}

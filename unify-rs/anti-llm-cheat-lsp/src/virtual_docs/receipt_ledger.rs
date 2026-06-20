@@ -55,3 +55,68 @@ pub fn generate_ledger_markdown(receipts_dir: &str) -> String {
     }
     out
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::io::Write;
+
+    fn write_receipt(dir: &std::path::Path, filename: &str, json: &str) {
+        let mut f = fs::File::create(dir.join(filename)).unwrap();
+        f.write_all(json.as_bytes()).unwrap();
+    }
+
+    #[test]
+    fn empty_dir_returns_header_only() {
+        let tmp = tempfile::tempdir().unwrap();
+        let md = generate_ledger_markdown(tmp.path().to_str().unwrap());
+        assert!(md.starts_with("# Receipt Ledger"));
+        // table header row present
+        assert!(md.contains("Digest Algorithm"));
+        // no data rows
+        let rows: Vec<_> = md.lines().filter(|l| l.starts_with("| ") && !l.contains("---") && !l.contains("Receipt Path")).collect();
+        assert!(rows.is_empty());
+    }
+
+    #[test]
+    fn nonexistent_dir_returns_header_only() {
+        let md = generate_ledger_markdown("/tmp/nonexistent_ledger_test_xyz_abc");
+        assert!(md.starts_with("# Receipt Ledger"));
+    }
+
+    #[test]
+    fn valid_receipt_json_appears_in_table() {
+        let tmp = tempfile::tempdir().unwrap();
+        write_receipt(tmp.path(), "r1.json", r#"{
+            "digest": "abc123", "digest_algorithm": "BLAKE3",
+            "boundary": "stage1", "checkpoint": "cp1",
+            "raw_command": "cargo test", "status": "PASS"
+        }"#);
+        let md = generate_ledger_markdown(tmp.path().to_str().unwrap());
+        assert!(md.contains("abc123"));
+        assert!(md.contains("BLAKE3"));
+        assert!(md.contains("PASS"));
+        assert!(md.contains("r1.json"));
+    }
+
+    #[test]
+    fn missing_fields_fall_back_to_unknown() {
+        let tmp = tempfile::tempdir().unwrap();
+        write_receipt(tmp.path(), "r2.json", r#"{}"#);
+        let md = generate_ledger_markdown(tmp.path().to_str().unwrap());
+        // each missing field → "unknown"
+        let unknowns: usize = md.matches("unknown").count();
+        assert!(unknowns >= 5, "expected at least 5 'unknown' placeholders, got {unknowns}");
+    }
+
+    #[test]
+    fn non_json_files_are_ignored() {
+        let tmp = tempfile::tempdir().unwrap();
+        let mut f = fs::File::create(tmp.path().join("notes.txt")).unwrap();
+        f.write_all(b"not json").unwrap();
+        let md = generate_ledger_markdown(tmp.path().to_str().unwrap());
+        let rows: Vec<_> = md.lines().filter(|l| l.starts_with("| ") && !l.contains("---") && !l.contains("Receipt Path")).collect();
+        assert!(rows.is_empty());
+    }
+}

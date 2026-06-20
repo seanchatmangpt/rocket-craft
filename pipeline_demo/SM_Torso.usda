@@ -1,0 +1,28 @@
+#usda 1.0
+(
+    defaultPrim = "Torso"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "Torso" (
+    kind = "component"
+)
+{
+    kind = "component"
+)
+{
+    def Cube "Chest"
+    {
+        double3 xformOp:scale = (1.5, 1.8, 1.2)
+        color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+        uniform token[] xformOpOrder = ["xformOp:scale"]
+    }
+    def Sphere "Sensor"
+    {
+        double radius = 0.4
+        double3 xformOp:translate = (0, 0, 1.2)
+        color3f[] primvars:displayColor = [(0.1, 0.8, 0.6)]
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+    }
+}

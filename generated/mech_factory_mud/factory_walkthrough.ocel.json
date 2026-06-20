@@ -1,0 +1,55 @@
+{
+  "objects": {
+    "factory:main": "Factory",
+    "walkthrough_run:factory_walkthrough": "WalkthroughRun",
+    "station:factory_entrance": "Station",
+    "station:frame_assembly": "Station",
+    "station:socket_topology": "Station",
+    "station:armor_skin": "Station",
+    "station:rig_motion": "Station",
+    "station:verification_gate": "Station",
+    "station:receipt_terminal": "Station",
+    "mech:prototype_001": "Mech",
+    "frame:prototype_001": "Frame",
+    "socket:left_shoulder": "Socket",
+    "socket:right_shoulder": "Socket",
+    "armor_panel:torso_front": "ArmorPanel",
+    "skin_layer:thermal_zone": "SkinLayer",
+    "motion_family:factory_walkthrough": "MotionFamily",
+    "projection_manifest:factory_walkthrough": "ProjectionManifest",
+    "receipt_chain:factory_walkthrough": "ReceiptChain",
+    "receipt_chain:refused_missing_socket": "ReceiptChain",
+    "walkthrough_run:refused_missing_socket": "WalkthroughRun"
+  },
+  "events": [
+    {
+      "ocel:eid": "e1",
+      "ocel:activity": "EnterFactory",
+      "ocel:omap": [
+        "factory:main"
+      ]
+    },
+    {
+      "ocel:eid": "e2",
+      "ocel:activity": "VisitFrameAssembly",
+      "ocel:omap": [
+        "factory:main",
+        "station:frame_assembly",
+        "mech:prototype_001",
+        "frame:prototype_001",
+        "receipt_chain:factory_walkthrough"
+      ]
+    },
+    {
+      "ocel:eid": "e3",
+      "ocel:activity": "GenerateFrame",
+      "ocel:omap": [
+        "factory:main",
+        "station:frame_assembly",
+        "mech:prototype_001",
+        "frame:prototype_001",
+        "receipt_chain:factory_walkthrough"
+      ]
+    }
+  ]
+}

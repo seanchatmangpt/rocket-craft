@@ -5,19 +5,16 @@
 /// to satisfy the requirement and to guard against any future side-effects
 /// (e.g., save files written by `Command::Save`).
 use chicago_tdd_tools::TestEnvironment;
-use ib4_integration_tests::{new_session, Command, AttackDir};
-use ib4_core::types::{MagicType, Stat};
-use proptest::prelude::*;
 use ib4_ai::roster::spawn_enemy;
 use ib4_combat::{
     damage::calc_player_damage,
-    parry::{ParryResolver, ParryIntent, ParryOutcome},
     magic::resolve_magic,
+    parry::{ParryIntent, ParryOutcome, ParryResolver},
 };
-use ib4_progression::{
-    perks::PerkTree,
-    xp::XPSystem,
-};
+use ib4_core::types::{MagicType, Stat};
+use ib4_integration_tests::{new_session, AttackDir, Command};
+use ib4_progression::{perks::PerkTree, xp::XPSystem};
+use proptest::prelude::*;
 
 // ── Test 1: Enemy spawn produces correct tier ──────────────────────────────
 
@@ -28,7 +25,11 @@ fn enemy_spawn_produces_correct_hp_for_bloodline() {
     // Bloodline 0: LightTitan base HP = 150; scale = 1.0 + 0 * 0.15 = 1.0
     let enemy = spawn_enemy("LightTitan", 0).expect("should spawn LightTitan");
     assert_eq!(enemy.id, "LightTitan");
-    assert!((enemy.base_hp - 150.0).abs() < 0.01, "BL0 HP should be 150, got {}", enemy.base_hp);
+    assert!(
+        (enemy.base_hp - 150.0).abs() < 0.01,
+        "BL0 HP should be 150, got {}",
+        enemy.base_hp
+    );
     assert_eq!(enemy.phase, 1, "Freshly spawned enemy starts at phase 1");
 
     // Bloodline 5: scale = 1.0 + 5 * 0.15 = 1.75 → HP = 262.5
@@ -37,7 +38,8 @@ fn enemy_spawn_produces_correct_hp_for_bloodline() {
     assert!(
         (enemy_bl5.base_hp - expected_hp).abs() < 0.01,
         "BL5 LightTitan HP should be {}, got {}",
-        expected_hp, enemy_bl5.base_hp
+        expected_hp,
+        enemy_bl5.base_hp
     );
 }
 
@@ -55,14 +57,20 @@ fn session_spawn_next_enemy_uses_roster() {
 
     // Attack when not in combat triggers spawn_next_enemy which calls roster::spawn_enemy
     let out = s.dispatch(Command::Attack(AttackDir::Overhead));
-    assert!(s.current_enemy.is_some(), "Enemy should be spawned after first attack");
+    assert!(
+        s.current_enemy.is_some(),
+        "Enemy should be spawned after first attack"
+    );
     assert!(s.is_in_combat(), "Should be in combat after spawning");
 
     let enemy = s.current_enemy.as_ref().unwrap();
     // LightTitan is first in the default queue
     assert_eq!(enemy.id, "LightTitan", "First enemy should be LightTitan");
     // HP should be roster-scaled (bloodline 0 → exactly 150)
-    assert!((enemy.base_hp - 150.0).abs() < 0.01, "HP should match roster value");
+    assert!(
+        (enemy.base_hp - 150.0).abs() < 0.01,
+        "HP should match roster value"
+    );
     let _ = out;
 }
 
@@ -84,7 +92,8 @@ fn calc_player_damage_scales_with_attack_stat() {
     assert!(
         dmg_higher > dmg_base,
         "Higher attack stat should produce more damage: base={}, higher={}",
-        dmg_base, dmg_higher
+        dmg_base,
+        dmg_higher
     );
 }
 
@@ -106,7 +115,8 @@ fn calc_player_damage_crits_when_rng_below_crit_chance() {
     assert!(
         dmg_crit > dmg_no_crit,
         "Crit damage should be higher: crit={}, no_crit={}",
-        dmg_crit, dmg_no_crit
+        dmg_crit,
+        dmg_no_crit
     );
 }
 
@@ -123,7 +133,8 @@ fn calc_player_damage_combo_multiplier_increases_damage() {
     assert!(
         (dmg_2x - dmg_1x * 2.0).abs() < 0.5,
         "2x combo multiplier should double damage: 1x={}, 2x={}",
-        dmg_1x, dmg_2x
+        dmg_1x,
+        dmg_2x
     );
 }
 
@@ -145,7 +156,8 @@ fn titan_check_phase_transition_at_60_percent() {
     assert!(
         (enemy.attack_damage - expected_atk).abs() < 0.01,
         "Phase 2 attack damage should be 1.25x: expected={}, got={}",
-        expected_atk, enemy.attack_damage
+        expected_atk,
+        enemy.attack_damage
     );
 }
 
@@ -188,18 +200,26 @@ fn parry_resolver_directional_correct_direction_is_perfect() {
         AttackDir::Left,
         ParryIntent::DirectionalParry(AttackDir::Left),
     );
-    assert_eq!(outcome, ParryOutcome::PerfectParry, "Matching direction should be PerfectParry");
+    assert_eq!(
+        outcome,
+        ParryOutcome::PerfectParry,
+        "Matching direction should be PerfectParry"
+    );
 }
 
 #[test]
-fn parry_resolver_directional_wrong_direction_is_normal() {
+fn parry_resolver_directional_wrong_direction_is_miss() {
     let _env = TestEnvironment::new().expect("test env");
 
     let outcome = ParryResolver::resolve(
         AttackDir::Left,
         ParryIntent::DirectionalParry(AttackDir::Right),
     );
-    assert_eq!(outcome, ParryOutcome::NormalParry, "Non-matching direction should be NormalParry");
+    assert_eq!(
+        outcome,
+        ParryOutcome::Miss,
+        "Non-matching direction should be Miss"
+    );
 }
 
 #[test]
@@ -207,7 +227,11 @@ fn parry_resolver_any_parry_is_normal() {
     let _env = TestEnvironment::new().expect("test env");
 
     let outcome = ParryResolver::resolve(AttackDir::Overhead, ParryIntent::AnyParry);
-    assert_eq!(outcome, ParryOutcome::NormalParry, "AnyParry intent should produce NormalParry");
+    assert_eq!(
+        outcome,
+        ParryOutcome::NormalParry,
+        "AnyParry intent should produce NormalParry"
+    );
 }
 
 #[test]
@@ -221,7 +245,27 @@ fn session_parry_command_prevents_damage() {
     let hp_before = s.player.health;
     s.announced_attack = Some(AttackDir::Left);
     s.dispatch(Command::Parry); // AnyParry → NormalParry → no damage
-    assert_eq!(s.player.health, hp_before, "Normal parry should prevent all damage");
+    assert_eq!(
+        s.player.health, hp_before,
+        "Normal parry should prevent all damage"
+    );
+}
+
+#[test]
+fn session_wrong_directional_parry_takes_damage() {
+    let _env = TestEnvironment::new().expect("test env");
+
+    let mut s = new_session();
+    s.dispatch(Command::Attack(AttackDir::Overhead)); // spawn enemy
+    assert!(s.current_enemy.is_some());
+
+    let hp_before = s.player.health;
+    s.announced_attack = Some(AttackDir::Left);
+    s.dispatch(Command::PerfectParry(AttackDir::Right)); // wrong direction -> Miss -> takes damage
+    assert!(
+        s.player.health < hp_before,
+        "Wrong direction parry should cause player to take damage"
+    );
 }
 
 #[test]
@@ -246,8 +290,15 @@ fn session_perfect_parry_stuns_enemy() {
         "Perfect parry should stun enemy, preventing a new attack from being announced"
     );
     // After the 1-turn stun is consumed, the enemy is no longer stunned
-    let is_stunned = s.current_enemy.as_ref().map(|e| e.is_stunned).unwrap_or(false);
-    assert!(!is_stunned, "1-turn stun should be consumed within the same dispatch call");
+    let is_stunned = s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.is_stunned)
+        .unwrap_or(false);
+    assert!(
+        !is_stunned,
+        "1-turn stun should be consumed within the same dispatch call"
+    );
 }
 
 // ── Test 5: Magic resolve costs mana and deals damage ─────────────────────
@@ -258,9 +309,17 @@ fn resolve_magic_fire_has_correct_damage_and_mana_cost() {
 
     let (result, mana_cost) = resolve_magic(MagicType::Fire, 0, 1.0, 1.0);
     // magic_stat=0 → magic_bonus = 0 × 10 × 1.0 = 0; damage = 30 + 0 = 30
-    assert!((result.damage - 30.0).abs() < 0.01, "Fire damage should be 30 with stat=0, got {}", result.damage);
+    assert!(
+        (result.damage - 30.0).abs() < 0.01,
+        "Fire damage should be 30 with stat=0, got {}",
+        result.damage
+    );
     assert!(!result.is_heal, "Fire should not be a heal");
-    assert!((mana_cost - 20.0).abs() < 0.01, "Fire mana cost should be 20, got {}", mana_cost);
+    assert!(
+        (mana_cost - 20.0).abs() < 0.01,
+        "Fire mana cost should be 20, got {}",
+        mana_cost
+    );
 }
 
 #[test]
@@ -269,9 +328,16 @@ fn resolve_magic_light_is_a_heal() {
 
     let (result, mana_cost) = resolve_magic(MagicType::Light, 0, 1.0, 1.0);
     assert!(result.is_heal, "Light magic should be a heal");
-    assert!((result.heal_amount - 40.0).abs() < 0.01, "Light heal amount should be 40 with stat=0, got {}", result.heal_amount);
+    assert!(
+        (result.heal_amount - 40.0).abs() < 0.01,
+        "Light heal amount should be 40 with stat=0, got {}",
+        result.heal_amount
+    );
     assert_eq!(result.damage, 0.0, "Light magic should deal 0 damage");
-    assert!((mana_cost - 25.0).abs() < 0.01, "Light mana cost should be 25");
+    assert!(
+        (mana_cost - 25.0).abs() < 0.01,
+        "Light mana cost should be 25"
+    );
 }
 
 #[test]
@@ -281,8 +347,15 @@ fn resolve_magic_magic_stat_scales_damage() {
     let (result_0, _) = resolve_magic(MagicType::Fire, 0, 1.0, 1.0);
     let (result_5, _) = resolve_magic(MagicType::Fire, 5, 1.0, 1.0);
     // stat=5 → bonus = 5 * 10 * 1.0 = 50; damage = 30 + 50 = 80
-    assert!(result_5.damage > result_0.damage, "Higher magic stat should increase damage");
-    assert!((result_5.damage - 80.0).abs() < 0.01, "Expected 80 damage with stat=5, got {}", result_5.damage);
+    assert!(
+        result_5.damage > result_0.damage,
+        "Higher magic stat should increase damage"
+    );
+    assert!(
+        (result_5.damage - 80.0).abs() < 0.01,
+        "Expected 80 damage with stat=5, got {}",
+        result_5.damage
+    );
 }
 
 #[test]
@@ -291,8 +364,15 @@ fn resolve_magic_mana_cost_mult_reduces_cost() {
 
     let (_, cost_full) = resolve_magic(MagicType::Fire, 0, 1.0, 1.0);
     let (_, cost_half) = resolve_magic(MagicType::Fire, 0, 1.0, 0.5);
-    assert!(cost_half < cost_full, "0.5 cost mult should reduce mana cost");
-    assert!((cost_half - 10.0).abs() < 0.01, "Half cost should be 10, got {}", cost_half);
+    assert!(
+        cost_half < cost_full,
+        "0.5 cost mult should reduce mana cost"
+    );
+    assert!(
+        (cost_half - 10.0).abs() < 0.01,
+        "Half cost should be 10, got {}",
+        cost_half
+    );
 }
 
 #[test]
@@ -319,8 +399,14 @@ fn perk_tree_no_perks_gives_default_aggregate() {
 
     let tree = PerkTree::new();
     let agg = tree.compute_aggregate(&[]);
-    assert!((agg.attack_mult - 1.0).abs() < 0.001, "No perks: attack_mult = 1.0");
-    assert!((agg.gold_mult - 1.0).abs() < 0.001, "No perks: gold_mult = 1.0");
+    assert!(
+        (agg.attack_mult - 1.0).abs() < 0.001,
+        "No perks: attack_mult = 1.0"
+    );
+    assert!(
+        (agg.gold_mult - 1.0).abs() < 0.001,
+        "No perks: gold_mult = 1.0"
+    );
     assert!((agg.xp_mult - 1.0).abs() < 0.001, "No perks: xp_mult = 1.0");
     assert_eq!(agg.combo_extra_turns, 0, "No perks: no extra combo turns");
     assert!(!agg.has_parry_bonus, "No perks: no parry bonus");
@@ -374,7 +460,10 @@ fn perk_tree_arcane_channeling_reduces_mana_cost() {
     let _env = TestEnvironment::new().expect("test env");
 
     let tree = PerkTree::new();
-    let agg = tree.compute_aggregate(&["MagicSensitivity".to_string(), "ArcaneChanneling".to_string()]);
+    let agg = tree.compute_aggregate(&[
+        "MagicSensitivity".to_string(),
+        "ArcaneChanneling".to_string(),
+    ]);
     // ArcaneChanneling: -20% mana cost → magic_cost_mult = 1.0 - 0.20 = 0.80
     assert!(
         (agg.magic_cost_mult - 0.80).abs() < 0.001,
@@ -418,12 +507,18 @@ fn xp_system_xp_multiplier_scales_gained_xp() {
     let mut player = ib4_core::player::PlayerState::new("Siris");
     // Add 60 raw XP with 1.5x mult → 90 XP gained; not enough to level at threshold=100
     let events = XPSystem::add_xp(&mut player, 60, 1.5);
-    assert!(events.is_empty(), "60 × 1.5 = 90 XP should not trigger level-up");
+    assert!(
+        events.is_empty(),
+        "60 × 1.5 = 90 XP should not trigger level-up"
+    );
     assert_eq!(player.xp, 90, "Player XP should be 90");
 
     // Add 7 more raw XP with 1.5x → 10.5 → rounded to 11; total 101 → level up
     let events2 = XPSystem::add_xp(&mut player, 7, 1.5);
-    assert!(!events2.is_empty(), "90 + 11 = 101 XP should trigger level-up");
+    assert!(
+        !events2.is_empty(),
+        "90 + 11 = 101 XP should trigger level-up"
+    );
     assert_eq!(events2[0].new_level, 2);
 }
 
@@ -435,7 +530,11 @@ fn xp_system_multiple_level_ups_in_one_call() {
     // Add enough XP to hit levels 2 and 3 in one shot.
     // Level 1 threshold = 100, Level 2 threshold = round(100×2^1.5) = round(282.84) = 283
     let events = XPSystem::add_xp(&mut player, 300, 1.0);
-    assert!(events.len() >= 2, "Should gain at least 2 levels with 300 XP, got {} events", events.len());
+    assert!(
+        events.len() >= 2,
+        "Should gain at least 2 levels with 300 XP, got {} events",
+        events.len()
+    );
     assert!(player.level >= 3, "Player should be at least level 3");
 }
 
@@ -454,7 +553,12 @@ fn session_enemy_defeat_awards_xp_and_triggers_level_up() {
 
     // Kill the enemy (clearing announced_attack to avoid player death)
     let mut rounds = 0;
-    while s.current_enemy.as_ref().map(|e| e.is_alive()).unwrap_or(false) {
+    while s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.is_alive())
+        .unwrap_or(false)
+    {
         s.announced_attack = None;
         s.dispatch(Command::Attack(AttackDir::Overhead));
         rounds += 1;
@@ -462,7 +566,11 @@ fn session_enemy_defeat_awards_xp_and_triggers_level_up() {
     }
 
     // 51 + 50 (LightTitan XP) = 101 ≥ 100 → level up
-    assert!(s.player.level >= 2, "Player should have levelled up after defeat: level={}", s.player.level);
+    assert!(
+        s.player.level >= 2,
+        "Player should have levelled up after defeat: level={}",
+        s.player.level
+    );
     assert!(s.player.xp >= 100, "Player should have XP >= threshold");
 }
 

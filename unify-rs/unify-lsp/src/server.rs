@@ -35,3 +35,45 @@ impl Default for UnifyLspServer {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_creates_server_with_default_conformance() {
+        let server = UnifyLspServer::new();
+        let _ = server.conformance_vector(); // must not panic
+    }
+
+    #[test]
+    fn default_matches_new_structure() {
+        let _a = UnifyLspServer::new();
+        let _b = UnifyLspServer::default();
+        // Both produce snapshot IDs via the same function — verify it's deterministic
+        let id1 = UnifyLspServer::snapshot_id_for("file:///foo.rs", 1);
+        let id2 = UnifyLspServer::snapshot_id_for("file:///foo.rs", 1);
+        assert_eq!(id1.0, id2.0, "same inputs must produce identical snapshot IDs");
+    }
+
+    #[test]
+    fn snapshot_id_encodes_uri_and_version() {
+        let id = UnifyLspServer::snapshot_id_for("file:///src/lib.rs", 42);
+        assert!(id.0.contains("file:///src/lib.rs"), "URI must appear in snapshot id");
+        assert!(id.0.contains("42"), "version must appear in snapshot id");
+    }
+
+    #[test]
+    fn snapshot_id_differs_for_different_versions() {
+        let id1 = UnifyLspServer::snapshot_id_for("file:///a.rs", 1);
+        let id2 = UnifyLspServer::snapshot_id_for("file:///a.rs", 2);
+        assert_ne!(id1.0, id2.0, "different versions must produce different IDs");
+    }
+
+    #[test]
+    fn snapshot_id_differs_for_different_uris() {
+        let id1 = UnifyLspServer::snapshot_id_for("file:///a.rs", 1);
+        let id2 = UnifyLspServer::snapshot_id_for("file:///b.rs", 1);
+        assert_ne!(id1.0, id2.0, "different URIs must produce different IDs");
+    }
+}

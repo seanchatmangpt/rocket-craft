@@ -19,12 +19,13 @@ members = [
     "anti-llm-cheat-lsp",
     "genie-core",
     "unify-automl",
+    "unify-wasm",
     "../genie3-rs",
 ]
 resolver = "2"
 
-[patch.crates-io]
-wasm4pm-compat = { path = "../tools/wasm4pm-compat-stub" }
+# [patch.crates-io]
+# wasm4pm-compat = { path = "../tools/wasm4pm-compat-stub" }
 
 [workspace.dependencies]
 serde       = { version = "1", features = ["derive"] }

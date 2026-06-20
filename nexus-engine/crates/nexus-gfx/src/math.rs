@@ -1,5 +1,4 @@
 use nalgebra as na;
-use serde::{Serialize, Deserialize};
 
 use crate::color::GfxError;
 
@@ -16,11 +15,17 @@ pub type Vec2 = na::Vector2<f32>;
 
 /// Screen-space pixel coordinate
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PixelCoord { pub x: u32, pub y: u32 }
+pub struct PixelCoord {
+    pub x: u32,
+    pub y: u32,
+}
 
 /// Normalized device coordinate: both axes in [-1, 1]
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Ndc { x: f32, y: f32 }
+pub struct Ndc {
+    x: f32,
+    y: f32,
+}
 
 impl Ndc {
     pub fn new(x: f32, y: f32) -> Result<Self, GfxError> {
@@ -30,55 +35,69 @@ impl Ndc {
             Ok(Ndc { x, y })
         }
     }
-    pub fn x(&self) -> f32 { self.x }
-    pub fn y(&self) -> f32 { self.y }
-}
-
-/// Game-space transform: position + rotation + uniform scale
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
-pub struct Transform {
-    pub translation: Vec3,
-    pub rotation: UnitQuat,
-    pub scale: f32,  // uniform scale (mobile suit proportions preserved)
-}
-
-impl Transform {
-    pub fn identity() -> Self {
-        Transform {
-            translation: Vec3::zeros(),
-            rotation: UnitQuat::identity(),
-            scale: 1.0,
-        }
+    pub fn x(&self) -> f32 {
+        self.x
     }
-
-    /// Compute model-to-world matrix M = T * R * S
-    pub fn to_matrix(&self) -> Mat4 {
-        let t = na::Translation3::from(self.translation);
-        let r = self.rotation.to_homogeneous();
-        let s = Mat4::new_scaling(self.scale);
-        t.to_homogeneous() * r * s
-    }
-
-    /// Parent * child composition (child is in parent space)
-    pub fn mul_transform(&self, child: &Transform) -> Transform {
-        Transform {
-            translation: self.rotation * (child.translation * self.scale) + self.translation,
-            rotation: self.rotation * child.rotation,
-            scale: self.scale * child.scale,
-        }
-    }
-
-    /// Linear interpolation between transforms (for animation)
-    pub fn lerp(&self, other: &Transform, t: f32) -> Transform {
-        let t = t.clamp(0.0, 1.0);
-        Transform {
-            translation: self.translation.lerp(&other.translation, t),
-            rotation: self.rotation.slerp(&other.rotation, t),
-            scale: self.scale + (other.scale - self.scale) * t,
-        }
+    pub fn y(&self) -> f32 {
+        self.y
     }
 }
 
-impl Default for Transform {
-    fn default() -> Self { Self::identity() }
+pub use nexus_types::Transform;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Ndc::new ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn ndc_valid_origin() {
+        let n = Ndc::new(0.0, 0.0).unwrap();
+        assert_eq!(n.x(), 0.0);
+        assert_eq!(n.y(), 0.0);
+    }
+
+    #[test]
+    fn ndc_boundary_values_accepted() {
+        Ndc::new(-1.0, -1.0).unwrap();
+        Ndc::new(1.0, 1.0).unwrap();
+        Ndc::new(-1.0, 1.0).unwrap();
+    }
+
+    #[test]
+    fn ndc_out_of_range_rejected() {
+        assert!(Ndc::new(1.1, 0.0).is_err());
+        assert!(Ndc::new(-1.1, 0.0).is_err());
+        assert!(Ndc::new(0.0, 1.1).is_err());
+        assert!(Ndc::new(0.0, -1.1).is_err());
+    }
+
+    #[test]
+    fn pixel_coord_stores_x_and_y() {
+        let p = PixelCoord { x: 1920, y: 1080 };
+        assert_eq!(p.x, 1920);
+        assert_eq!(p.y, 1080);
+    }
+
+    #[test]
+    fn pixel_coord_zero_is_valid() {
+        let p = PixelCoord { x: 0, y: 0 };
+        assert_eq!(p.x, 0);
+        assert_eq!(p.y, 0);
+    }
+
+    #[test]
+    fn vec3_zero_is_additive_identity() {
+        let v = Vec3::zeros();
+        let u = Vec3::new(1.0, 2.0, 3.0);
+        assert_eq!(v + u, u);
+    }
+
+    #[test]
+    fn mat4_identity_preserves_vec4() {
+        let m = Mat4::identity();
+        let v = Vec4::new(1.0, 2.0, 3.0, 1.0);
+        assert_eq!(m * v, v);
+    }
 }

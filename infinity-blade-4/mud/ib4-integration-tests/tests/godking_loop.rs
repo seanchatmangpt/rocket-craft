@@ -1,4 +1,4 @@
-use ib4_integration_tests::{new_session, Command, AttackDir, GameSession};
+use ib4_integration_tests::{new_session, AttackDir, Command, GameSession};
 
 /// Clear the arena queue and place the GodKing as the only enemy, then spawn it.
 /// Note: Command::Explore calls cmd_look(), not spawn. The spawn happens on Attack
@@ -35,13 +35,23 @@ fn should_block_normal_attacks_with_godking_shield() {
         e.shield_active = true;
     }
 
-    let hp_before = s.current_enemy.as_ref().map(|e| e.current_hp).unwrap_or(0.0);
+    let hp_before = s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.current_hp)
+        .unwrap_or(0.0);
     s.announced_attack = None;
     s.dispatch(Command::Attack(AttackDir::Overhead));
-    let hp_after = s.current_enemy.as_ref().map(|e| e.current_hp).unwrap_or(0.0);
+    let hp_after = s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.current_hp)
+        .unwrap_or(0.0);
 
-    assert_eq!(hp_before, hp_after,
-        "Normal attack should deal 0 damage through hard-light shield");
+    assert_eq!(
+        hp_before, hp_after,
+        "Normal attack should deal 0 damage through hard-light shield"
+    );
 }
 
 #[test]
@@ -65,11 +75,21 @@ fn should_break_godking_shield_after_3_perfect_parries() {
         s.dispatch(Command::PerfectParry(dir));
     }
 
-    let shield_active = s.current_enemy.as_ref().map(|e| e.shield_active).unwrap_or(false);
-    assert!(!shield_active, "Shield should be broken after 3 perfect parries");
+    let shield_active = s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.shield_active)
+        .unwrap_or(false);
+    assert!(
+        !shield_active,
+        "Shield should be broken after 3 perfect parries"
+    );
 
     let phase = s.current_enemy.as_ref().map(|e| e.phase).unwrap_or(1);
-    assert_eq!(phase, 2, "GodKing should advance to Phase 2 after shield breaks");
+    assert_eq!(
+        phase, 2,
+        "GodKing should advance to Phase 2 after shield breaks"
+    );
 }
 
 #[test]

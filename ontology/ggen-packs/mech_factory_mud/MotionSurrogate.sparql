@@ -1,0 +1,11 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?surrogateId ?inspectPrecedence ?repairPrecedence ?fireWeaponPrecedence
+WHERE {
+  ?surrogateId rdf:type mud:MotionSurrogate ;
+               mud:inspectPrecedence ?inspectPrecedence ;
+               mud:repairPrecedence ?repairPrecedence ;
+               mud:fireWeaponPrecedence ?fireWeaponPrecedence .
+}
+ORDER BY ?surrogateId

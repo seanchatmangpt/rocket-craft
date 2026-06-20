@@ -35,3 +35,39 @@ pub fn generate_implications_markdown() -> String {
 
     out
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn starts_with_correct_header() {
+        let out = generate_implications_markdown();
+        assert!(out.starts_with("# Forbidden Implications Reference"));
+    }
+
+    #[test]
+    fn contains_all_21_diagnostic_codes() {
+        let out = generate_implications_markdown();
+        let expected = [
+            "ANTI-LLM-SURFACE-001", "ANTI-LLM-SURFACE-003", "ANTI-LLM-SURFACE-005",
+            "ANTI-LLM-AUTH-002", "ANTI-LLM-AUTH-004",
+            "ANTI-LLM-RECEIPT-001", "ANTI-LLM-RECEIPT-002", "ANTI-LLM-RECEIPT-003",
+            "ANTI-LLM-ROUTE-001", "ANTI-LLM-ROUTE-008",
+            "ANTI-LLM-MUT-001", "ANTI-LLM-MUT-002",
+            "ANTI-LLM-TEST-001", "ANTI-LLM-TEST-003",
+            "ANTI-LLM-STRANGE-001", "ANTI-LLM-STRANGE-002", "ANTI-LLM-STRANGE-003",
+            "ANTI-LLM-STRANGE-007", "ANTI-LLM-VERSION-001",
+            "ANTI-LLM-CLAIM-004", "ANTI-LLM-LSP318-COMB-001",
+        ];
+        for code in expected {
+            assert!(out.contains(code), "missing code {code}");
+        }
+    }
+
+    #[test]
+    fn contains_table_header() {
+        let out = generate_implications_markdown();
+        assert!(out.contains("| Diagnostic Code | Forbidden Implication |"));
+    }
+}

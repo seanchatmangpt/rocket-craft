@@ -1,0 +1,26 @@
+error[E0308]: mismatched types
+ --> tests/fail/mech_no_mobility.rs:8:21
+  |
+8 |         .with_frame(GundamFrame)
+  |          ---------- ^^^^^^^^^^^ expected `Frame`, found `GundamFrame`
+  |          |
+  |          arguments to this method are incorrect
+  |
+note: method defined here
+ --> src/builder.rs
+  |
+  |     pub fn with_frame(mut self, frame: Frame) -> Self {
+  |            ^^^^^^^^^^
+
+error[E0599]: no method named `build` found for struct `MechBuilder<Unset>` in the current scope
+ --> tests/fail/mech_no_mobility.rs:9:10
+  |
+7 |       let _mech = MechBuilder::new()
+  |  _________________-
+8 | |         .with_frame(GundamFrame)
+9 | |         .build();
+  | |         -^^^^^ method not found in `MechBuilder<Unset>`
+  | |_________|
+  |
+  |
+  = note: the method was found for `MechBuilder<Set<Mob>>`

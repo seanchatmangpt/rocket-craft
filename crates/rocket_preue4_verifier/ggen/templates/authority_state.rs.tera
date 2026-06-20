@@ -1,0 +1,90 @@
+{#- authority_state.rs.tera — GC-MECHBIRTH-002 Manufacturing Template -#}
+//! Authority Byte Fields — SoA layout.
+//! ⚠️ GENERATED FILE — do NOT edit by hand.
+//! Source of truth: ontology/mechbirth.ttl
+//! Generator:       ggen/templates/authority_state.rs.tera
+//! SPARQL:          ggen/sparql/extract_authority_fields.sparql
+
+use crate::error::RefusalReason;
+
+/// Maximum admitted class value for any authority byte field.
+/// Sourced from mb:MAX_CLASS mb:value in ontology.
+pub const MAX_CLASS: u8 = 15;
+
+/// Sentinel value indicating refusal — never admitted to live state.
+/// Sourced from mb:REFUSED_CLASS mb:value in ontology.
+pub const REFUSED_CLASS: u8 = 255;
+
+/// SoA authority state. Every field is a parallel `Vec<u8>` of length `count`.
+/// Invariant: all Vecs have identical length at all times.
+///
+/// Fields generated from extract_authority_fields.sparql:
+{% for row in results -%}
+/// - `{{ row.fieldName }}` (soaIndex={{ row.soaIndex }}): {% if row.semantics %}{{ row.semantics }}{% else %}—{% endif %}
+{% endfor %}
+#[derive(Debug, Clone, Default)]
+pub struct AuthorityState {
+{% for row in results %}
+    /// {% if row.semantics %}{{ row.semantics }}{% else %}{{ row.fieldName }}{% endif %}
+
+    pub {{ row.fieldName }}: Vec<u8>,
+{% endfor %}
+}
+
+impl AuthorityState {
+    /// Construct a zero-initialised authority state for `count` parts
+    /// with ontology-specified default values per field.
+    pub fn new(count: usize) -> Self {
+        Self {
+{% for row in results %}
+            {{ row.fieldName }}: vec![{{ row.defaultValue }}u8; count],
+{% endfor %}
+        }
+    }
+
+    /// Returns the number of parts tracked by this state.
+    #[inline]
+    pub fn len(&self) -> usize {
+        self.damage.len()
+    }
+
+    /// Returns `true` when no parts are tracked.
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.damage.is_empty()
+    }
+
+    /// Validates that all SoA buffers have identical length.
+    pub fn validate_lengths(&self) -> Result<(), RefusalReason> {
+        let n = self.damage.len();
+        let ok = self.heat.len() == n
+            && self.stress.len() == n
+            && self.grip.len() == n
+            && self.socket_health.len() == n
+            && self.lod.len() == n;
+        if ok {
+            Ok(())
+        } else {
+            Err(RefusalReason::InvalidAuthorityClass {
+                field: "lengths".into(),
+                class: 0,
+            })
+        }
+    }
+
+    /// Validates that all class values fall within `[0, MAX_CLASS]`.
+    pub fn validate_classes(&self) -> Vec<RefusalReason> {
+        let mut errs = Vec::new();
+{% for row in results %}
+        for (i, &v) in self.{{ row.fieldName }}.iter().enumerate() {
+            if v > MAX_CLASS {
+                errs.push(RefusalReason::InvalidAuthorityClass {
+                    field: format!("{{ row.fieldName }}[{}]", i),
+                    class: v,
+                });
+            }
+        }
+{% endfor %}
+        errs
+    }
+}

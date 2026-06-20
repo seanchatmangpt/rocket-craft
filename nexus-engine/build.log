@@ -1,0 +1,116 @@
+   Compiling proc-macro2 v1.0.106
+   Compiling libc v0.2.186
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.45
+   Compiling autocfg v1.5.1
+   Compiling serde_core v1.0.228
+   Compiling cfg-if v1.0.4
+   Compiling serde v1.0.228
+   Compiling typenum v1.20.1
+   Compiling thiserror v2.0.18
+   Compiling rand_core v0.10.1
+   Compiling getrandom v0.4.3
+   Compiling version_check v0.9.5
+   Compiling rawpointer v0.2.1
+   Compiling core-foundation-sys v0.8.7
+   Compiling zerocopy v0.8.52
+   Compiling getrandom v0.3.4
+   Compiling zmij v1.0.21
+   Compiling rustix v1.1.4
+   Compiling chacha20 v0.10.0
+   Compiling iana-time-zone v0.1.65
+   Compiling generic-array v0.14.7
+   Compiling serde_json v1.0.150
+   Compiling bitflags v2.13.0
+   Compiling num-traits v0.2.19
+   Compiling matrixmultiply v0.3.10
+   Compiling itoa v1.0.18
+   Compiling memchr v2.8.2
+   Compiling parking_lot_core v0.9.12
+   Compiling fastrand v2.4.1
+   Compiling smallvec v1.15.2
+   Compiling scopeguard v1.2.0
+   Compiling once_cell v1.21.4
+   Compiling lock_api v0.4.14
+   Compiling anyhow v1.0.102
+   Compiling fnv v1.0.7
+   Compiling foldhash v0.2.0
+   Compiling quick-error v1.2.3
+   Compiling bit-vec v0.8.0
+   Compiling hashbrown v0.16.1
+error: extern location for foldhash does not exist: /Users/sac/rocket-craft/nexus-engine/target/debug/deps/libfoldhash-98b82d94ee11f841.rmeta
+ --> /Users/sac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/hashbrown-0.16.1/src/hasher.rs:4:5
+  |
+4 |     foldhash::fast::RandomState,
+  |     ^^^^^^^^
+
+error: could not compile `hashbrown` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: failed to run custom build command for `proc-macro2 v1.0.106`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/proc-macro2-ac2029a3c632d161/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `serde_core v1.0.228`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/serde_core-fb94a9f51a96dcf7/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `thiserror v2.0.18`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/thiserror-a3fa08fa2a0b76e9/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `libc v0.2.186`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/libc-43d2f5d534ff7324/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `zmij v1.0.21`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/zmij-0e174ad2845a1853/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `getrandom v0.3.4`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/getrandom-1867e730de7a9ba8/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `zerocopy v0.8.52`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/zerocopy-6f921c87dafdd360/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `generic-array v0.14.7`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/generic-array-1d83cc8a435789a0/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `serde_json v1.0.150`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/serde_json-ecf75edc22926279/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `num-traits v0.2.19`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/num-traits-db572556660e78dc/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `rustix v1.1.4`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/rustix-f0691ec533881c7d/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `matrixmultiply v0.3.10`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/matrixmultiply-158d001e349bdbe1/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `parking_lot_core v0.9.12`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/parking_lot_core-458ef9be35b66c95/build-script-build` (signal: 9, SIGKILL: kill)
+error: failed to run custom build command for `serde v1.0.228`
+
+Caused by:
+  process didn't exit successfully: `/Users/sac/rocket-craft/nexus-engine/target/debug/build/serde-1a87963aa685869a/build-script-build` (exit status: 101)
+  --- stdout
+  cargo:rerun-if-changed=build.rs
+  cargo:rustc-cfg=if_docsrs_then_no_serde_core
+
+  --- stderr
+
+  thread 'main' (1633183) panicked at /Users/sac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/build.rs:27:51:
+  called `Result::unwrap()` on an `Err` value: Os { code: 2, kind: NotFound, message: "No such file or directory" }
+  note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+error: couldn't create a temp dir: No such file or directory (os error 2) at path "/Users/sac/rocket-craft/nexus-engine/target/debug/deps/rmetatS47ly"
+
+error: could not compile `bit-vec` (lib) due to 1 previous error

@@ -1,6 +1,6 @@
+use std::fs;
 use std::path::PathBuf;
 use tempfile::TempDir;
-use std::fs;
 
 /// Manages a temporary file system environment for testing.
 ///
@@ -24,10 +24,10 @@ impl TestEnvironment {
     pub fn new() -> anyhow::Result<Self> {
         let temp_dir = TempDir::new()?;
         let original_dir = std::env::current_dir()?;
-        
+
         // We don't change directory here, because it's global and can affect other tests.
         // Instead, the SUT should be able to accept a base path.
-        
+
         Ok(Self {
             temp_dir,
             original_dir,
@@ -66,5 +66,49 @@ impl TestEnvironment {
     /// Checks if a file exists at the specified relative path.
     pub fn exists(&self, relative_path: &str) -> bool {
         self.path().join(relative_path).exists()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_creates_temp_dir() {
+        let env = TestEnvironment::new().unwrap();
+        assert!(env.path().exists());
+    }
+
+    #[test]
+    fn original_dir_is_nonempty() {
+        let env = TestEnvironment::new().unwrap();
+        assert!(env.original_dir.as_os_str().len() > 0);
+    }
+
+    #[test]
+    fn create_file_and_read_back() {
+        let env = TestEnvironment::new().unwrap();
+        env.create_file("sub/test.txt", "hello").unwrap();
+        let content = env.read_file("sub/test.txt").unwrap();
+        assert_eq!(content, "hello");
+    }
+
+    #[test]
+    fn exists_returns_true_after_create() {
+        let env = TestEnvironment::new().unwrap();
+        env.create_file("check.txt", "x").unwrap();
+        assert!(env.exists("check.txt"));
+    }
+
+    #[test]
+    fn exists_returns_false_for_missing_file() {
+        let env = TestEnvironment::new().unwrap();
+        assert!(!env.exists("nope.txt"));
+    }
+
+    #[test]
+    fn read_file_errors_for_missing_file() {
+        let env = TestEnvironment::new().unwrap();
+        assert!(env.read_file("nope.txt").is_err());
     }
 }

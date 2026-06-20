@@ -77,3 +77,83 @@ pub fn evaluate(obs: &[Observation], config: &AntiLlmConfig) -> Vec<AntiLlmDiagn
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::config::{AntiLlmConfig, SurfaceConfig};
+    use crate::observations::Observation;
+
+    fn obs(file: &str, construct: &str) -> Observation {
+        Observation {
+            file_path: file.into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "surface_smell".into(),
+            construct: construct.into(), context: String::new(), message: String::new(),
+        }
+    }
+
+    fn default_config() -> AntiLlmConfig {
+        AntiLlmConfig::default()
+    }
+
+    fn config_with_non_blocking_prefix(prefix: &str) -> AntiLlmConfig {
+        AntiLlmConfig {
+            surface: SurfaceConfig {
+                non_blocking_path_prefixes: vec![prefix.into()],
+            },
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn empty_obs_produces_no_diags() {
+        assert!(evaluate(&[], &default_config()).is_empty());
+    }
+
+    #[test]
+    fn tower_lsp_in_src_is_blocking() {
+        let o = obs("src/lib.rs", "tower-lsp");
+        let diags = evaluate(&[o], &default_config());
+        assert_eq!(diags[0].code, "ANTI-LLM-SURFACE-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn tower_lsp_in_non_blocking_prefix_is_non_blocking() {
+        let o = obs("docs/changelog.md", "tower-lsp");
+        let cfg = config_with_non_blocking_prefix("docs/");
+        let diags = evaluate(&[o], &cfg);
+        assert_eq!(diags[0].code, "ANTI-LLM-SURFACE-001");
+        assert!(!diags[0].blocking);
+    }
+
+    #[test]
+    fn tower_lsp_underscore_variant_triggers_surface_001() {
+        let o = obs("src/main.rs", "tower_lsp");
+        let diags = evaluate(&[o], &default_config());
+        assert_eq!(diags[0].code, "ANTI-LLM-SURFACE-001");
+    }
+
+    #[test]
+    fn pack_observer_triggers_surface_003() {
+        let o = obs("src/lib.rs", "PackObserver");
+        let diags = evaluate(&[o], &default_config());
+        assert_eq!(diags[0].code, "ANTI-LLM-SURFACE-003");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn initialize_without_caps_triggers_surface_005() {
+        let o = obs("src/lib.rs", "initialize without 3.18 caps");
+        let diags = evaluate(&[o], &default_config());
+        assert_eq!(diags[0].code, "ANTI-LLM-SURFACE-005");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn unknown_construct_produces_no_diag() {
+        let o = obs("src/lib.rs", "some_unrelated_construct");
+        assert!(evaluate(&[o], &default_config()).is_empty());
+    }
+}

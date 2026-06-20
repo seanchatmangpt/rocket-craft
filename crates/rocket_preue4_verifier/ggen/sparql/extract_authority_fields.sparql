@@ -1,0 +1,43 @@
+# extract_authority_fields.sparql
+# GC-MECHBIRTH-002: Anti-Cartesian Exhaustion SELECT
+#
+# Extracts all admitted AuthorityByteField individuals AND the MAX_CLASS/REFUSED_CLASS constants.
+# Results drive: authority_state.rs.tera → AuthorityState SoA struct
+#
+# Row types:
+#   ?rowKind = "constant" → max_class or refused_class row
+#   ?rowKind = "field"    → SoA buffer field row
+#
+# Anti-Cartesian guarantee:
+#   UNION of two disjoint patterns — no cross-product.
+#   FILTER on rdf:type keeps each branch independent.
+#   ORDER BY soaIndex keeps fields in declared order.
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+SELECT
+    ?rowKind
+    ?fieldName
+    ?defaultValue
+    ?nominalValue
+    ?semantics
+    ?soaIndex
+    ?derivedFrom
+WHERE {
+    {
+        # Branch A: SoA field rows
+        ?field a mb:AuthorityByteField ;
+               mb:fieldName    ?fieldName ;
+               mb:defaultValue ?defaultValue ;
+               mb:soaIndex     ?soaIndex .
+        OPTIONAL { ?field mb:semantics   ?semantics . }
+        OPTIONAL { ?field mb:derivedFrom ?derivedFrom . }
+        OPTIONAL { ?field mb:nominalValue ?nominalValue . }
+        BIND("field" AS ?rowKind)
+        FILTER (xsd:integer(?soaIndex) < 64)
+    }
+}
+ORDER BY ?soaIndex

@@ -145,3 +145,186 @@ impl From<LedgerError> for ShopError {
         ShopError::PaymentFailed(e.to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ledger::{AccountType, Ledger};
+
+    fn funded_ledger(player_id: u64, gold: u32) -> Ledger {
+        let mut ledger = Ledger::new();
+        ledger.award_gold(player_id, gold, "test setup").unwrap();
+        ledger
+    }
+
+    fn basic_item(name: &str, price: u32, stock: Option<u32>) -> ShopItem {
+        ShopItem {
+            item_name: name.to_string(),
+            rarity: "SR".to_string(),
+            base_price: price,
+            stock,
+            required_bloodline: 0,
+        }
+    }
+
+    fn gated_item(name: &str, price: u32, bloodline: u32) -> ShopItem {
+        ShopItem {
+            item_name: name.to_string(),
+            rarity: "SSR".to_string(),
+            base_price: price,
+            stock: None,
+            required_bloodline: bloodline,
+        }
+    }
+
+    // ── Shop::new / add_item / price_of ──────────────────────────────────────
+
+    #[test]
+    fn price_of_applies_markup() {
+        let mut shop = Shop::new("Test".to_string(), 1.5);
+        shop.add_item(basic_item("Sword", 100, None));
+        // 100 * 1.5 = 150
+        assert_eq!(shop.price_of("Sword"), Some(150));
+    }
+
+    #[test]
+    fn price_of_rounds_fractional_markup_up() {
+        let mut shop = Shop::new("Test".to_string(), 1.1);
+        shop.add_item(basic_item("Potion", 3, None)); // 3 * 1.1 = 3.3 → ceil → 4
+        assert_eq!(shop.price_of("Potion"), Some(4));
+    }
+
+    #[test]
+    fn price_of_unknown_item_returns_none() {
+        let shop = Shop::new("Test".to_string(), 1.0);
+        assert!(shop.price_of("Ghost").is_none());
+    }
+
+    // ── Shop::buy — happy path ────────────────────────────────────────────────
+
+    #[test]
+    fn buy_deducts_gold_and_returns_item() {
+        let mut shop = Shop::new("Anaheim".to_string(), 1.0);
+        shop.add_item(basic_item("Beam Saber", 200, None));
+        let mut ledger = funded_ledger(1, 500);
+
+        let item = shop.buy("Beam Saber", 1, 0, &mut ledger).unwrap();
+
+        assert_eq!(item.item_name, "Beam Saber");
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 300);
+        assert_eq!(ledger.balance_of(AccountType::ShopRevenue), 200);
+        assert_eq!(ledger.total_balance(), 0, "double-entry invariant");
+    }
+
+    #[test]
+    fn buy_reduces_finite_stock_by_one() {
+        let mut shop = Shop::new("Limited".to_string(), 1.0);
+        shop.add_item(basic_item("Frame", 100, Some(3)));
+        let mut ledger = funded_ledger(1, 1000);
+
+        shop.buy("Frame", 1, 0, &mut ledger).unwrap();
+        shop.buy("Frame", 1, 0, &mut ledger).unwrap();
+
+        assert_eq!(shop.items[0].stock, Some(1));
+    }
+
+    #[test]
+    fn buy_infinite_stock_item_does_not_decrement() {
+        let mut shop = Shop::new("Infinite".to_string(), 1.0);
+        shop.add_item(basic_item("Ammo", 10, None));
+        let mut ledger = funded_ledger(1, 1000);
+
+        for _ in 0..5 {
+            shop.buy("Ammo", 1, 0, &mut ledger).unwrap();
+        }
+        assert_eq!(shop.items[0].stock, None);
+    }
+
+    // ── Shop::buy — error paths ───────────────────────────────────────────────
+
+    #[test]
+    fn buy_unknown_item_returns_not_found() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        let mut ledger = funded_ledger(1, 500);
+        let err = shop.buy("Ghost", 1, 0, &mut ledger).unwrap_err();
+        assert!(matches!(err, ShopError::ItemNotFound(_)));
+    }
+
+    #[test]
+    fn buy_with_insufficient_funds_returns_payment_failed() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        shop.add_item(basic_item("Gundam", 1000, None));
+        let mut ledger = funded_ledger(1, 50);
+        let err = shop.buy("Gundam", 1, 0, &mut ledger).unwrap_err();
+        assert!(matches!(err, ShopError::PaymentFailed(_)));
+        // Ledger unchanged
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 50);
+    }
+
+    #[test]
+    fn buy_out_of_stock_returns_error() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        shop.add_item(basic_item("Rare Frame", 100, Some(0)));
+        let mut ledger = funded_ledger(1, 500);
+        let err = shop.buy("Rare Frame", 1, 0, &mut ledger).unwrap_err();
+        assert!(matches!(err, ShopError::OutOfStock(_)));
+    }
+
+    #[test]
+    fn buy_insufficient_bloodline_returns_error() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        shop.add_item(gated_item("NT-D Unicorn", 500, 5));
+        let mut ledger = funded_ledger(1, 1000);
+        let err = shop.buy("NT-D Unicorn", 1, 3, &mut ledger).unwrap_err();
+        assert!(matches!(err, ShopError::BloodlineRequired { need: 5, have: 3 }));
+        // Ledger unchanged
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 1000);
+    }
+
+    #[test]
+    fn buy_exact_bloodline_threshold_succeeds() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        shop.add_item(gated_item("Delta Plus", 100, 4));
+        let mut ledger = funded_ledger(1, 500);
+        // bloodline == required → allowed
+        assert!(shop.buy("Delta Plus", 1, 4, &mut ledger).is_ok());
+    }
+
+    #[test]
+    fn buy_out_of_stock_does_not_touch_ledger() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        shop.add_item(basic_item("Fin Funnel", 200, Some(0)));
+        let mut ledger = funded_ledger(1, 1000);
+        let _ = shop.buy("Fin Funnel", 1, 0, &mut ledger);
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 1000);
+        assert_eq!(ledger.balance_of(AccountType::ShopRevenue), 0);
+    }
+
+    // ── Shop::sell_item ───────────────────────────────────────────────────────
+
+    #[test]
+    fn sell_item_awards_fifty_percent_of_base_value() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        let mut ledger = Ledger::new();
+        let payout = shop.sell_item("Old Sword", 1, 200, &mut ledger).unwrap();
+        assert_eq!(payout, 100);
+        assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 100);
+    }
+
+    #[test]
+    fn sell_item_truncates_odd_base_value() {
+        // integer division: 101 / 2 = 50 (shop rounds down in its favor)
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        let mut ledger = Ledger::new();
+        let payout = shop.sell_item("Chip", 1, 101, &mut ledger).unwrap();
+        assert_eq!(payout, 50);
+    }
+
+    #[test]
+    fn sell_item_total_balance_invariant() {
+        let mut shop = Shop::new("Test".to_string(), 1.0);
+        let mut ledger = Ledger::new();
+        shop.sell_item("Item", 1, 100, &mut ledger).unwrap();
+        assert_eq!(ledger.total_balance(), 0, "double-entry invariant");
+    }
+}

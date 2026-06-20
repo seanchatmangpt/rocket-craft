@@ -41,7 +41,7 @@ if [[ "$EXT" == "rs" ]]; then
   WORKSPACE="$(find_cargo_workspace "$(dirname "$FILE")" 2>/dev/null || true)"
   if [[ -n "$WORKSPACE" ]]; then
     info "Running cargo check in $WORKSPACE ..."
-    if cargo check --manifest-path "$WORKSPACE/Cargo.toml" 2>&1 | tail -5; then
+    if cargo check --manifest-path "$WORKSPACE/Cargo.toml" --message-format short 2>&1 | grep -E "^error|warning\[|^$" | head -20; then
       pass "cargo check ($WORKSPACE)"
     else
       fail "cargo check ($WORKSPACE)"
@@ -84,7 +84,7 @@ fi
 if [[ "$BASENAME" == "Cargo.toml" ]]; then
   DIR="$(dirname "$FILE")"
   info "Running cargo check after Cargo.toml edit in $DIR ..."
-  if cargo check --manifest-path "$FILE" 2>&1 | tail -5; then
+  if cargo check --manifest-path "$FILE" --message-format short 2>&1 | grep -E "^error|warning\[" | head -20; then
     pass "cargo check ($FILE)"
   else
     fail "cargo check ($FILE)"

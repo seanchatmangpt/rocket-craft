@@ -1,3 +1,8 @@
+//! # Unify Blueprint (unify-bp) Crate
+//!
+//! Provides bridges between the unify schema/TDD ecosystems and the blueprint core representation.
+//! Includes admissions, classification, code generation, PWA template exporting, and cryptographic receipt chain.
+
 pub mod classify;
 pub mod codegen;
 pub mod gate;
@@ -13,7 +18,7 @@ mod tests {
     use crate::gate::BlueprintAdmissionGate;
     use crate::ocel::BlueprintOcelBridge;
     use crate::receipt::BlueprintReceiptChain;
-    use blueprint_core::{Blueprint, BlueprintBuilder};
+    use blueprint_core::Blueprint;
 
     // -----------------------------------------------------------------------
     // Helpers

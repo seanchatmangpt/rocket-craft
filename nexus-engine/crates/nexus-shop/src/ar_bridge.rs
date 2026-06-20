@@ -1,5 +1,5 @@
-use sha2::{Sha256, Digest};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct KitBarcode {
@@ -70,12 +70,32 @@ impl ArBridgeRegistry {
         };
         registry.register_kit("HG-AERIAL-001", "XVX-016_Gundam-Aerial", KitTier::Hg, "WFM");
         registry.register_kit("RG-NU-001", "RX-93_Nu-Gundam", KitTier::Rg, "UC");
-        registry.register_kit("MG-WING-ZERO-001", "XXXG-00W0_Wing-Zero", KitTier::Mg, "WING");
+        registry.register_kit(
+            "MG-WING-ZERO-001",
+            "XXXG-00W0_Wing-Zero",
+            KitTier::Mg,
+            "WING",
+        );
         registry.register_kit("PG-UNICORN-001", "RX-0_Unicorn-Gundam", KitTier::Pg, "UC");
-        registry.register_kit("MG-FREEDOM-001", "ZGMF-X10A_Freedom-Gundam", KitTier::Mg, "SEED");
-        registry.register_kit("PG-FREEDOM-001", "ZGMF-X10A_Freedom-Gundam", KitTier::Pg, "SEED");
+        registry.register_kit(
+            "MG-FREEDOM-001",
+            "ZGMF-X10A_Freedom-Gundam",
+            KitTier::Mg,
+            "SEED",
+        );
+        registry.register_kit(
+            "PG-FREEDOM-001",
+            "ZGMF-X10A_Freedom-Gundam",
+            KitTier::Pg,
+            "SEED",
+        );
         registry.register_kit("RG-ZETA-001", "MSZ-006_Zeta-Gundam", KitTier::Rg, "UC");
-        registry.register_kit("MG-BARBATOS-001", "ASW-G-08_Barbatos-Lupus-Rex", KitTier::Mg, "IBO");
+        registry.register_kit(
+            "MG-BARBATOS-001",
+            "ASW-G-08_Barbatos-Lupus-Rex",
+            KitTier::Mg,
+            "IBO",
+        );
         registry
     }
 
@@ -92,7 +112,9 @@ impl ArBridgeRegistry {
         let nonce = self.generate_nonce(raw_barcode, player_id);
 
         if self.redeemed_nonces.contains(&nonce) {
-            return Err(ArError::AlreadyRedeemed { barcode: raw_barcode.to_string() });
+            return Err(ArError::AlreadyRedeemed {
+                barcode: raw_barcode.to_string(),
+            });
         }
 
         // Format: "GN-{tier}-{kit_id}"  e.g. "GN-HG-HG-AERIAL-001"
@@ -112,7 +134,9 @@ impl ArBridgeRegistry {
             _ => return Err(ArError::UnknownTier(tier_code.to_string())),
         };
 
-        let entry = self.kit_database.iter()
+        let entry = self
+            .kit_database
+            .iter()
             .find(|e| e.kit_id == kit_id && e.tier == tier)
             .ok_or_else(|| ArError::KitNotFound(kit_id.clone()))?;
 
@@ -171,4 +195,131 @@ pub enum ArError {
     UnknownTier(String),
     #[error("kit not found in registry: {0}")]
     KitNotFound(String),
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn registry() -> ArBridgeRegistry {
+        ArBridgeRegistry::new()
+    }
+
+    // ── KitTier ordering ──────────────────────────────────────────────────────
+
+    #[test]
+    fn kit_tier_order_hg_lt_rg_lt_mg_lt_pg() {
+        assert!(KitTier::Hg < KitTier::Rg);
+        assert!(KitTier::Rg < KitTier::Mg);
+        assert!(KitTier::Mg < KitTier::Pg);
+    }
+
+    #[test]
+    fn digital_bonus_credits_scale_with_tier() {
+        assert_eq!(KitTier::Hg.digital_bonus_credits(), 300);
+        assert_eq!(KitTier::Rg.digital_bonus_credits(), 600);
+        assert_eq!(KitTier::Mg.digital_bonus_credits(), 900);
+        assert_eq!(KitTier::Pg.digital_bonus_credits(), 1500);
+    }
+
+    // ── successful redeem ─────────────────────────────────────────────────────
+
+    #[test]
+    fn redeem_hg_aerial_returns_unlock_with_300_credits() {
+        let mut reg = registry();
+        let unlock = reg.redeem("GN-HG-HG-AERIAL-001", 1).unwrap();
+        assert_eq!(unlock.bonus_credits, 300);
+        assert_eq!(unlock.barcode.tier, KitTier::Hg);
+        assert!(unlock.exclusive_colorway.is_none(), "HG has no exclusive colorway");
+    }
+
+    #[test]
+    fn redeem_mg_gives_exclusive_colorway() {
+        let mut reg = registry();
+        let unlock = reg.redeem("GN-MG-MG-WING-ZERO-001", 1).unwrap();
+        assert!(unlock.exclusive_colorway.is_some(), "MG must have exclusive colorway");
+        assert_eq!(unlock.bonus_credits, 900);
+    }
+
+    #[test]
+    fn redeem_pg_gives_exclusive_colorway_and_1500_credits() {
+        let mut reg = registry();
+        let unlock = reg.redeem("GN-PG-PG-UNICORN-001", 1).unwrap();
+        assert_eq!(unlock.bonus_credits, 1500);
+        assert!(unlock.exclusive_colorway.is_some());
+    }
+
+    #[test]
+    fn redeem_sets_digital_suit_id() {
+        let mut reg = registry();
+        let unlock = reg.redeem("GN-HG-HG-AERIAL-001", 1).unwrap();
+        assert!(!unlock.digital_suit_id.is_empty());
+        assert!(unlock.digital_suit_id.contains("Aerial") || unlock.digital_suit_id.contains("XVX"));
+    }
+
+    // ── duplicate redemption ──────────────────────────────────────────────────
+
+    #[test]
+    fn redeeming_same_barcode_same_player_twice_returns_already_redeemed() {
+        let mut reg = registry();
+        reg.redeem("GN-HG-HG-AERIAL-001", 1).unwrap();
+        let result = reg.redeem("GN-HG-HG-AERIAL-001", 1);
+        assert!(matches!(result, Err(ArError::AlreadyRedeemed { .. })));
+    }
+
+    #[test]
+    fn same_barcode_different_player_is_allowed() {
+        let mut reg = registry();
+        reg.redeem("GN-HG-HG-AERIAL-001", 1).unwrap();
+        // different player_id → different nonce → should succeed
+        let result = reg.redeem("GN-HG-HG-AERIAL-001", 2);
+        assert!(result.is_ok(), "different player may redeem same kit: {result:?}");
+    }
+
+    // ── error cases ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn invalid_prefix_returns_invalid_barcode_error() {
+        let mut reg = registry();
+        let result = reg.redeem("BADPREFIX-HG-HG-AERIAL-001", 1);
+        assert!(matches!(result, Err(ArError::InvalidBarcode(_))));
+    }
+
+    #[test]
+    fn unknown_tier_code_returns_error() {
+        let mut reg = registry();
+        let result = reg.redeem("GN-ULTRA-HG-AERIAL-001", 1);
+        assert!(matches!(result, Err(ArError::UnknownTier(_))));
+    }
+
+    #[test]
+    fn unknown_kit_id_returns_kit_not_found() {
+        let mut reg = registry();
+        let result = reg.redeem("GN-HG-NONEXISTENT-999", 1);
+        assert!(matches!(result, Err(ArError::KitNotFound(_))));
+    }
+
+    // ── registry queries ──────────────────────────────────────────────────────
+
+    #[test]
+    fn is_kit_registered_returns_true_for_known_kit() {
+        let reg = registry();
+        assert!(reg.is_kit_registered("HG-AERIAL-001"));
+    }
+
+    #[test]
+    fn is_kit_registered_returns_false_for_unknown_kit() {
+        let reg = registry();
+        assert!(!reg.is_kit_registered("DOES-NOT-EXIST"));
+    }
+
+    #[test]
+    fn redeemed_count_increments_per_player_per_barcode() {
+        let mut reg = registry();
+        assert_eq!(reg.redeemed_count(), 0);
+        reg.redeem("GN-HG-HG-AERIAL-001", 1).unwrap();
+        assert_eq!(reg.redeemed_count(), 1);
+        reg.redeem("GN-RG-RG-NU-001", 1).unwrap();
+        assert_eq!(reg.redeemed_count(), 2);
+    }
 }

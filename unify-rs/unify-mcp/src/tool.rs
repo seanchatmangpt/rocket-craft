@@ -1,3 +1,7 @@
+//! # Unify MCP Tool Module
+//!
+//! Defines tool descriptors, handler callbacks, and registries for model context protocol (MCP) server tools.
+
 /// Descriptor for a single MCP tool.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ToolDescriptor {
@@ -17,6 +21,16 @@ pub struct ToolRegistry {
 }
 
 impl ToolRegistry {
+    /// Create a new empty `ToolRegistry`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unify_mcp::tool::ToolRegistry;
+    ///
+    /// let registry = ToolRegistry::new();
+    /// assert_eq!(registry.list().len(), 0);
+    /// ```
     pub fn new() -> Self {
         Self {
             descriptors: Vec::new(),

@@ -1,0 +1,139 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ocel: <http://w3id.org/ocel/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix w4pm: <https://specify.network/w4pm-core/> .
+
+# ---------------------------------------------------------------------------
+# W4PM Core Ontology & SHACL Shapes
+# A = \mu(O^*) : Bounded Semantic Foundation for Process Evidence
+# ---------------------------------------------------------------------------
+
+# --- 1. OCEL 2.0 Base Constraints ---
+
+w4pm:OcelEventShape
+    a sh:NodeShape ;
+    sh:targetClass ocel:Event ;
+    sh:property [
+        sh:path ocel:activity ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated A=\\mu(O^*): OCEL Event must have exactly one deterministic activity string." ;
+    ] ;
+    sh:property [
+        sh:path ocel:timestamp ;
+        sh:datatype xsd:dateTime ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated A=\\mu(O^*): OCEL Event must possess a monotonic xsd:dateTime timestamp." ;
+    ] ;
+    sh:property [
+        sh:path ocel:hasObject ;
+        sh:class ocel:Object ;
+        sh:message "Violated A=\\mu(O^*): Objects involved in an OCEL Event must be of type ocel:Object." ;
+    ] .
+
+w4pm:OcelObjectShape
+    a sh:NodeShape ;
+    sh:targetClass ocel:Object ;
+    sh:property [
+        sh:path ocel:type ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated A=\\mu(O^*): OCEL Object must have an explicit type classification." ;
+    ] .
+
+# --- 2. BLAKE3 Receipts ---
+
+w4pm:Blake3ReceiptShape
+    a sh:NodeShape ;
+    sh:targetClass w4pm:Blake3Receipt ;
+    rdfs:comment "Cryptographic receipt binding projected artifact A to admitted state O*." ;
+    sh:property [
+        sh:path w4pm:hashValue ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[a-fA-F0-9]{64}$" ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated Bounded Rule: BLAKE3 Receipt must hold exactly one 64-character hex string." ;
+    ] ;
+    sh:property [
+        sh:path prov:wasGeneratedBy ;
+        sh:class ocel:Event ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated Causality: Receipt must deterministically map to one OCEL generation Event." ;
+    ] ;
+    sh:property [
+        sh:path w4pm:artifactBound ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
+        sh:message "Violated Admitted Consequence: Receipt must bind a specific artifact URI." ;
+    ] .
+
+# --- 3. Process Evidence ---
+
+w4pm:ProcessEvidenceShape
+    a sh:NodeShape ;
+    sh:targetClass w4pm:ProcessEvidence ;
+    rdfs:comment "The immutable package of execution trace and artifacts defining Process Intelligence." ;
+    sh:property [
+        sh:path w4pm:containsEvent ;
+        sh:class ocel:Event ;
+        sh:minCount 1 ;
+        sh:message "Process Evidence must encompass at least one verified OCEL Event." ;
+    ] ;
+    sh:property [
+        sh:path w4pm:sealedBy ;
+        sh:class w4pm:Blake3Receipt ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Violated State Boundary: Process Evidence must be sealed by exactly one BLAKE3 Receipt." ;
+    ] ;
+    sh:property [
+        sh:path w4pm:evidenceStatus ;
+        sh:in ( "ADMITTED" "REJECTED" "PENDING" ) ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Process Evidence must reflect a strictly bounded ternary standing state." ;
+    ] .
+
+# --- 4. Affidavit Schema ---
+
+w4pm:AffidavitShape
+    a sh:NodeShape ;
+    sh:targetClass w4pm:Affidavit ;
+    rdfs:comment "Mathematical assertion of truth bounding the evidence, rejecting unauthorized MVPs." ;
+    sh:property [
+        sh:path w4pm:attestsTo ;
+        sh:class w4pm:ProcessEvidence ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Affidavit must rigidly bind to one contiguous Process Evidence package." ;
+    ] ;
+    sh:property [
+        sh:path w4pm:signatoryAuthority ;
+        sh:nodeKind sh:IRI ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Affidavit requires an IRI for the signatory authority governing O* admission." ;
+    ] ;
+    sh:property [
+        sh:path w4pm:cryptographicSignature ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Affidavit must be finalized with a deterministic cryptographic signature." ;
+    ] ;
+    sh:property [
+        sh:path w4pm:affirmedTimestamp ;
+        sh:datatype xsd:dateTime ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "Affidavit must record the exact moment of semantic admission." ;
+    ] .

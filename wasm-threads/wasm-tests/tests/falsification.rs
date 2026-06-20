@@ -16,7 +16,7 @@ fn log() -> Logger {
 /// Bus reads must reflect exactly what was written, not a constant.
 #[test]
 fn anti_cheat_bus_reads_reflect_writes_not_a_constant() {
-    let mut log = log();
+    let log = log();
     log.info("Given a SharedMemoryBus with 16 slots");
     let mut bus = SharedMemoryBus::new(16);
 

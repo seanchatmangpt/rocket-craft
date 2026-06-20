@@ -1,0 +1,2 @@
+---,AssetPath,AssetType,MaterialXFile,TextureManifest,LODPolicy,CollisionPolicy
+SM_TestArmorPanel,"/Game/Mecha/Armor/SM_TestArmorPanel.usda",StaticMesh,"/Game/Mecha/Armor/M_TestArmorPanel.mtlx","/Game/Mecha/Armor/T_TestArmorPanel_manifest.json",AutoLOD_3,ComplexAsSimple

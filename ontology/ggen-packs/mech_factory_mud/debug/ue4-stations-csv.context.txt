@@ -1,0 +1,466 @@
+Context: {
+  "entities": [
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Arm",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorPanel",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorSkinStation",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorSkinStation",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#CoolingVent",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ExitOrLoop",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FactoryEntrance",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Frame",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FrameAssembly",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FrameAssembly",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#LODVariant",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Leg",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#MotionFamily",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#REFUSED_MISSING_SOCKET",
+      "type": "http://rocket-craft.com/ontology/mud#RefusalReason"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminal",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminal",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminalPart",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#RigMotionStation",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#RigMotionStation",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Shoulder",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SkinLayer",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Socket",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SocketTopology",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SocketTopology",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Spawn",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#VerificationGate",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#VerificationGate",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#WeaponMount",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#damage_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#grip_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#heat_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#lod_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#projection_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#receipt_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#socket_health_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#station_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#stress_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#walkthrough_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    }
+  ],
+  "results": [
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Arm",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorPanel",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorSkinStation",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorSkinStation",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#CoolingVent",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ExitOrLoop",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FactoryEntrance",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Frame",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FrameAssembly",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FrameAssembly",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#LODVariant",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Leg",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#MotionFamily",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#REFUSED_MISSING_SOCKET",
+      "type": "http://rocket-craft.com/ontology/mud#RefusalReason"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminal",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminal",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminalPart",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#RigMotionStation",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#RigMotionStation",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Shoulder",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SkinLayer",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Socket",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SocketTopology",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SocketTopology",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Spawn",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#VerificationGate",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#VerificationGate",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#WeaponMount",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#damage_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#grip_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#heat_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#lod_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#projection_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#receipt_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#socket_health_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#station_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#stress_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#walkthrough_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    }
+  ],
+  "s": "http://rocket-craft.com/ontology/mud#Arm",
+  "sparql_results": [
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Arm",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorPanel",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorSkinStation",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ArmorSkinStation",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#CoolingVent",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ExitOrLoop",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FactoryEntrance",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Frame",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FrameAssembly",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#FrameAssembly",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#LODVariant",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Leg",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#MotionFamily",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#REFUSED_MISSING_SOCKET",
+      "type": "http://rocket-craft.com/ontology/mud#RefusalReason"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminal",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminal",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#ReceiptTerminalPart",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#RigMotionStation",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#RigMotionStation",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Shoulder",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SkinLayer",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Socket",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SocketTopology",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#SocketTopology",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#Spawn",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#VerificationGate",
+      "type": "http://rocket-craft.com/ontology/mud#Station"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#VerificationGate",
+      "type": "http://rocket-craft.com/ontology/mud#RouteNode"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#WeaponMount",
+      "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#damage_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#grip_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#heat_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#lod_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#projection_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#receipt_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#socket_health_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#station_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#stress_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    },
+    {
+      "s": "http://rocket-craft.com/ontology/mud#walkthrough_state_class",
+      "type": "http://rocket-craft.com/ontology/mud#AuthorityField"
+    }
+  ],
+  "type": "http://rocket-craft.com/ontology/mud#PartFamily"
+}

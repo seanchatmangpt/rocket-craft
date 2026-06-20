@@ -1,0 +1,13 @@
+error[E0308]: mismatched types
+ --> tests/fail/socket_mismatch.rs:7:28
+  |
+7 |     let _ = socket.connect(mount);
+  |                    ------- ^^^^^ expected `ArmMount`, found `LegMount`
+  |                    |
+  |                    arguments to this method are incorrect
+  |
+note: method defined here
+ --> src/lib.rs
+  |
+  |         pub fn connect(self, _mount: ArmMount) -> Result<(), JidokaHalt> {
+  |                ^^^^^^^

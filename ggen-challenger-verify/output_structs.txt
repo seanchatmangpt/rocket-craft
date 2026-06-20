@@ -1,0 +1,12 @@
+
+// Class: Organization
+// Comment: A business or cooperative group.
+struct Organization {
+    id: String,
+}
+
+// Class: Person
+// Comment: A human being representing a customer or employee.
+struct Person {
+    id: String,
+}

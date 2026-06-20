@@ -309,10 +309,11 @@ impl HistoryEvent {
 }
 
 /// Status of an operational process.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ProcessStatus {
     /// Not yet started.
+    #[default]
     Pending,
     /// Currently running in the simulation or plant.
     Active,
@@ -320,12 +321,6 @@ pub enum ProcessStatus {
     Completed,
     /// Terminated due to errors or failures.
     Failed,
-}
-
-impl Default for ProcessStatus {
-    fn default() -> Self {
-        ProcessStatus::Pending
-    }
 }
 
 /// A single step within a Process workflow.
@@ -419,5 +414,112 @@ impl WorldSpec {
             engine_version: "UE4.27-ES3".to_string(),
             ..Default::default()
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── Vector3 ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn vector3_new_stores_components() {
+        let v = Vector3::new(1.0, 2.0, 3.0);
+        assert_eq!(v.x, 1.0);
+        assert_eq!(v.y, 2.0);
+        assert_eq!(v.z, 3.0);
+    }
+
+    #[test]
+    fn vector3_default_is_origin() {
+        let v = Vector3::default();
+        assert_eq!(v.x, 0.0);
+        assert_eq!(v.y, 0.0);
+        assert_eq!(v.z, 0.0);
+    }
+
+    // ── Bounds3D ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn bounds3d_default_has_large_half_extents() {
+        let b = Bounds3D::default();
+        assert_eq!(b.half_extents.x, 100.0);
+    }
+
+    #[test]
+    fn placement_new_stores_fields() {
+        let p = Placement::new(
+            Vector3::new(1.0, 0.0, 0.0),
+            Vector3::new(0.0, 90.0, 0.0),
+        );
+        assert_eq!(p.position.x, 1.0);
+        assert_eq!(p.rotation.y, 90.0);
+    }
+
+    // ── ProcessStatus ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn process_status_default_is_pending() {
+        assert_eq!(ProcessStatus::default(), ProcessStatus::Pending);
+    }
+
+    // ── ProcessStep ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn process_step_new_defaults() {
+        let step = ProcessStep::new(1, "Assembly", 30.0);
+        assert_eq!(step.step_number, 1);
+        assert_eq!(step.name, "Assembly");
+        assert_eq!(step.duration_seconds, 30.0);
+        assert!(step.inputs.is_empty());
+        assert!(step.outputs.is_empty());
+        assert!(step.assigned_actor.is_none());
+    }
+
+    // ── Process ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn process_new_starts_pending_empty() {
+        let p = Process::new("proc-1", "Welding");
+        assert_eq!(p.id, "proc-1");
+        assert_eq!(p.status, ProcessStatus::Pending);
+        assert!(p.steps.is_empty());
+    }
+
+    // ── Rule ─────────────────────────────────────────────────────────────────
+
+    #[test]
+    fn rule_new_stores_severity() {
+        let r = Rule::new("r1", "MaxActors", "actor_count <= 100", RuleSeverity::Error);
+        assert_eq!(r.severity, RuleSeverity::Error);
+        assert!(r.description.is_none());
+    }
+
+    // ── HistoryEvent ──────────────────────────────────────────────────────────
+
+    #[test]
+    fn history_event_new_stores_fields() {
+        let ev = HistoryEvent::new("ev-1", 1_700_000_000_000, "ACTOR_SPAWNED");
+        assert_eq!(ev.timestamp_ms, 1_700_000_000_000);
+        assert_eq!(ev.activity, "ACTOR_SPAWNED");
+        assert!(ev.actor_id.is_none());
+        assert!(ev.details.is_empty());
+    }
+
+    // ── WorldSpec ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn world_spec_new_has_ue4_engine_version() {
+        let ws = WorldSpec::new();
+        assert!(ws.engine_version.contains("UE4"));
+        assert!(ws.places.is_empty());
+        assert!(ws.actors.is_empty());
+    }
+
+    #[test]
+    fn world_spec_default_is_equivalent_to_new_except_engine_version() {
+        let ws = WorldSpec::new();
+        assert!(!ws.engine_version.is_empty()); // new() sets engine_version
     }
 }

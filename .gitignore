@@ -1,6 +1,7 @@
 engine/
 .claude/
 blueprint-rs/target/
+.ggen/receipts/
 
 Saved/Backup/
 Intermediate/Build/
@@ -84,11 +85,36 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
+# UE4 HTML5 packaged output — never commit these (stub or real, large binaries)
+pwa-staff/manufactured/linux/
+pwa-staff/manufactured/win64/
+pwa-staff/manufactured/mac/
+pwa-staff/manufactured/*.data
+pwa-staff/manufactured/*.wasm
+pwa-staff/manufactured/*.js
+pwa-staff/manufactured/*.html
+unify-rs/genie-core/pwa-staff/manufactured/
+unify-rs/genie-core/versions/*/Saved/StagedBuilds/
+
+# UE4 StagedBuilds output (real packaged games, can be GBs)
+*/Saved/StagedBuilds/
+Saved/StagedBuilds/
+
+# Cloned engine (lives outside repo, but guard in case someone clones inside)
+ue-4.27-html5-es3/
+ue4-4.24.3-html5/
+
+# Build logs from engine compilation
+ue4-build.log
+ue4-uat-*.log
+
 # Android Keystores
 *.keystore
 
-# Supabase
+# Supabase — ignore top-level supabase/ (local dev docker state)
+# but track the nuxt-shell migration source
 supabase/
+!nuxt-shell/supabase/
 *.env
 .env
 .env.*
@@ -109,3 +135,4 @@ test-results/
 .agents/
 # rocket build cache
 .rocket-cache.json
+.agents/clone-ue4-html5.sh

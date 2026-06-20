@@ -1,0 +1,22 @@
+{
+  "archive_dir": "/tmp/brm-html5-archive/HTML5",
+  "companions": {
+    "has_data_or_pak": true,
+    "has_html": true,
+    "has_js": true
+  },
+  "is_real_package": true,
+  "output_hash": "84ea8041fbfd2f9732e87a7f4b3f30111485a4fb4c32fb09f6b601ea3807ad6d",
+  "summary": "REAL package — 175.4 MB WASM, js=true, html=true, data=true",
+  "ui_input_patched": true,
+  "verdict": "PASS",
+  "verified_at_unix_secs": 1781921554,
+  "wasm_files": [
+    {
+      "path": "/tmp/brm-html5-archive/HTML5/Brm.wasm",
+      "size_bytes": 183929485,
+      "verdict": "real"
+    }
+  ],
+  "wasm_mb": 175.4088258743286
+}

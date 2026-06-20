@@ -1,0 +1,4 @@
+## 2026-06-19T01:57:05Z
+
+You are the Ontology Investigator (teamwork_preview_explorer). Your working directory is /Users/sac/rocket-craft/.agents/explorer_eden_ontology_explore/.
+Explore the files, ontologies, and configuration in /Users/sac/.ggen/packs/eden_server/ directory. Identify all turtle files, current schema structures, and check the contents of ggen.toml. Present a structured handoff report detailing their current contents, dependencies, import structures, and validation rules. Run any necessary read or find tools, but do not modify any files. Write your progress to /Users/sac/rocket-craft/.agents/explorer_eden_ontology_explore/progress.md. Write your handoff to /Users/sac/rocket-craft/.agents/explorer_eden_ontology_explore/handoff.md. When complete, send a message to parent (Recipient: a3da08eb-0131-43a9-9c13-f9c39fdd291b) with a summary.

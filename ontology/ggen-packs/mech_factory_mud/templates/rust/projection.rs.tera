@@ -1,0 +1,3 @@
+// generated_by: ggen
+// Projection module
+pub const PROJECTION_TYPES_COUNT: usize = 5;

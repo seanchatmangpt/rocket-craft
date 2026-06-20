@@ -1,0 +1,79 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix gn: <https://ggen.io/ontology/gundam-nexus/> .
+
+gn:GundamNexusOntology a owl:Ontology ;
+    rdfs:label "Gundam Nexus Ontology" ;
+    rdfs:comment "Constitutional semantic primitives for Combinatorial Maximalist universe manufacturing." .
+
+# --- MECH PRIMITIVES ---
+
+gn:MechAssembly a owl:Class ;
+    rdfs:label "Mech Assembly" ;
+    rdfs:comment "A mech is an assembly, not an asset." .
+
+gn:MechPrimitive a owl:Class ;
+    rdfs:label "Mech Primitive" .
+
+gn:Frame a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Frame" .
+gn:Mobility a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Mobility" .
+gn:Power a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Power" .
+gn:Armor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Armor" .
+gn:Weapon a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Weapon" .
+gn:Sensor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Sensor" .
+gn:UtilitySystem a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Utility System" .
+
+gn:MechClass a owl:Class ;
+    rdfs:label "Mech Class" .
+gn:Worker a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Worker" .
+gn:Explorer a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Explorer" .
+gn:Warrior a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Warrior" .
+gn:Guardian a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Guardian" .
+gn:Ark a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Ark" .
+
+# --- RESOURCES ---
+
+gn:Resource a owl:Class ;
+    rdfs:label "Resource" .
+
+gn:MinovskyParticles a gn:Resource ;
+    rdfs:label "Minovsky Particles" .
+
+gn:Gundanium a gn:Resource ;
+    rdfs:label "Gundanium" .
+
+gn:LunaTitanium a gn:Resource ;
+    rdfs:label "Luna Titanium" .
+
+# --- SPECIFIC COMPONENTS ---
+
+gn:GundamFrame a gn:Frame ;
+    rdfs:label "Gundam Frame" .
+
+gn:ZakuFrame a gn:Frame ;
+    rdfs:label "Zaku Frame" .
+
+gn:GMFrame a gn:Frame ;
+    rdfs:label "GM Frame" .
+
+gn:MinovskyUltracompact a gn:Power ;
+    rdfs:label "Minovsky Ultracompact" .
+
+gn:FusionReactor a gn:Power ;
+    rdfs:label "Fusion Reactor" .
+
+gn:BeamRifle a gn:Weapon ;
+    rdfs:label "Beam Rifle" .
+
+gn:BeamSaber a gn:Weapon ;
+    rdfs:label "Beam Saber" .
+
+gn:HeatHawk a gn:Weapon ;
+    rdfs:label "Heat Hawk" .
+
+gn:Monoeye a gn:Sensor ;
+    rdfs:label "Monoeye" .
+
+gn:DualSensor a gn:Sensor ;
+    rdfs:label "Dual Sensor" .

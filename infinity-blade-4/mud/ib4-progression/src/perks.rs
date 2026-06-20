@@ -8,7 +8,7 @@ pub struct PerkDef {
     pub prerequisite: Option<&'static str>,
     pub description: &'static str,
     // Aggregate effect fields
-    pub attack_bonus: f32,          // additive percentage (0.10 = +10%)
+    pub attack_bonus: f32, // additive percentage (0.10 = +10%)
     pub defense_bonus: f32,
     pub magic_bonus: f32,
     pub health_bonus: f32,
@@ -16,21 +16,21 @@ pub struct PerkDef {
     pub gold_find: f32,
     pub crit_chance: f32,
     pub magic_cost_reduction: f32,
-    pub combo_window_bonus: u32,    // extra turns before combo reset
-    pub grants_parry_bonus: bool,   // QIPResonance
+    pub combo_window_bonus: u32,  // extra turns before combo reset
+    pub grants_parry_bonus: bool, // QIPResonance
 }
 
 /// Computed aggregate from all selected perks.
 #[derive(Debug, Clone, Default)]
 pub struct PerkAggregate {
-    pub attack_mult: f32,       // 1.0 + sum of attack_bonus
+    pub attack_mult: f32, // 1.0 + sum of attack_bonus
     pub defense_mult: f32,
     pub magic_mult: f32,
     pub health_mult: f32,
     pub xp_mult: f32,
     pub gold_mult: f32,
     pub crit_bonus: f32,
-    pub magic_cost_mult: f32,   // 1.0 - sum of magic_cost_reduction
+    pub magic_cost_mult: f32, // 1.0 - sum of magic_cost_reduction
     pub combo_extra_turns: u32,
     pub has_parry_bonus: bool,
 }
@@ -400,5 +400,130 @@ impl PerkTree {
 impl Default for PerkTree {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ib4_core::player::PlayerState;
+
+    fn tree() -> PerkTree { PerkTree::new() }
+
+    fn player_with_points(points: u32) -> PlayerState {
+        let mut p = PlayerState::new("Siris");
+        p.perk_points = points;
+        p
+    }
+
+    // ── PerkTree::get_perk ───────────────────────────────────────────────────
+
+    #[test]
+    fn get_known_perk_returns_some() {
+        assert!(tree().get_perk("BloodyResolve").is_some());
+    }
+
+    #[test]
+    fn get_unknown_perk_returns_none() {
+        assert!(tree().get_perk("NonExistentPerk_xyz").is_none());
+    }
+
+    // ── select_perk — error paths ────────────────────────────────────────────
+
+    #[test]
+    fn select_unknown_perk_returns_err() {
+        let mut p = player_with_points(1);
+        assert!(tree().select_perk(&mut p, "ghost-perk").is_err());
+    }
+
+    #[test]
+    fn select_perk_with_no_points_returns_err() {
+        let mut p = player_with_points(0);
+        let err = tree().select_perk(&mut p, "BloodyResolve").unwrap_err();
+        assert!(err.contains("No perk points"), "expected 'No perk points', got: {err}");
+    }
+
+    #[test]
+    fn select_already_owned_perk_returns_err() {
+        let mut p = player_with_points(2);
+        tree().select_perk(&mut p, "BloodyResolve").unwrap();
+        let err = tree().select_perk(&mut p, "BloodyResolve").unwrap_err();
+        assert!(err.contains("already selected"));
+    }
+
+    #[test]
+    fn select_tier2_perk_without_bloodline_5_returns_err() {
+        let t = tree();
+        // Find any tier-2 perk
+        let t2_id = t.all_perks().iter().find(|p| p.tier == 2).map(|p| p.id);
+        if let Some(id) = t2_id {
+            let mut p = player_with_points(5);
+            p.bloodline = 0; // below required 5
+            let err = t.select_perk(&mut p, id).unwrap_err();
+            assert!(
+                err.contains("Bloodline") || err.contains("Requires"),
+                "should fail with bloodline or prereq error: {err}"
+            );
+        }
+    }
+
+    // ── select_perk — happy path ─────────────────────────────────────────────
+
+    #[test]
+    fn select_valid_tier1_perk_succeeds() {
+        let mut p = player_with_points(1);
+        let result = tree().select_perk(&mut p, "BloodyResolve");
+        assert!(result.is_ok(), "tier-1 perk with 1 point must succeed: {result:?}");
+        assert_eq!(p.perk_points, 0, "perk point must be consumed");
+        assert!(p.selected_perks.contains(&"BloodyResolve".to_string()));
+    }
+
+    #[test]
+    fn select_perk_returns_acquisition_message() {
+        let mut p = player_with_points(1);
+        let msg = tree().select_perk(&mut p, "BloodyResolve").unwrap();
+        assert!(!msg.is_empty(), "acquisition message must not be empty");
+    }
+
+    // ── compute_aggregate — no perks ─────────────────────────────────────────
+
+    #[test]
+    fn aggregate_with_no_perks_has_identity_multipliers() {
+        let agg = tree().compute_aggregate(&[]);
+        assert_eq!(agg.attack_mult, 1.0);
+        assert_eq!(agg.defense_mult, 1.0);
+        assert_eq!(agg.xp_mult, 1.0);
+        assert_eq!(agg.magic_cost_mult, 1.0);
+        assert_eq!(agg.crit_bonus, 0.0);
+        assert!(!agg.has_parry_bonus);
+    }
+
+    // ── compute_aggregate — with perks ───────────────────────────────────────
+
+    #[test]
+    fn aggregate_with_selected_perk_increases_relevant_mult() {
+        let mut p = player_with_points(1);
+        tree().select_perk(&mut p, "BloodyResolve").unwrap();
+        let agg = tree().compute_aggregate(&p.selected_perks);
+        // BloodyResolve adds something — at minimum one mult should exceed identity
+        let any_bonus = agg.attack_mult > 1.0
+            || agg.defense_mult > 1.0
+            || agg.health_mult > 1.0
+            || agg.xp_mult > 1.0
+            || agg.crit_bonus > 0.0;
+        assert!(any_bonus, "selecting BloodyResolve must add at least one bonus");
+    }
+
+    #[test]
+    fn magic_cost_mult_never_drops_below_10_percent() {
+        // Select all available perks with magic_cost_reduction
+        let t = tree();
+        let all_ids: Vec<String> = t.all_perks().iter().map(|p| p.id.to_string()).collect();
+        let agg = t.compute_aggregate(&all_ids);
+        assert!(
+            agg.magic_cost_mult >= 0.1,
+            "magic_cost_mult must never drop below 0.1, got {}",
+            agg.magic_cost_mult
+        );
     }
 }

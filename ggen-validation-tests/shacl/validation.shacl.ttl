@@ -1,0 +1,1953 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+# =========================================================================
+# CORE BACKBONE VALIDATION SHAPES
+# =========================================================================
+
+# Rule: Public classes must have an rdfs:label (at least 1)
+ue4:ClassLabelShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Public classes must have at least one rdfs:label." ;
+    ] .
+
+# Rule: Public classes should have an rdfs:comment description (Warning severity)
+ue4:ClassCommentShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class ;
+    sh:nodeKind sh:IRI ;
+    sh:property [
+        sh:path rdfs:comment ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "Public classes should have an rdfs:comment description." ;
+    ] .
+
+# Rule: Namespace sanity (subjects must use resolvable public IRIs, not private/opaque ones)
+ue4:NamespaceSanityShape
+    a sh:NodeShape ;
+    sh:targetClass rdfs:Class , owl:Class , rdf:Property , owl:ObjectProperty , owl:DatatypeProperty ;
+    sh:nodeKind sh:IRI ;
+    sh:pattern "^https?://" ;
+    sh:message "Namespace sanity violation: Subjects must use resolvable public IRIs (starting with http:// or https://), not private/opaque ones like urn:private:." .
+
+# Enforce UFunctionParameter properties
+ue4:UFunctionParameterShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UFunctionParameter ;
+    sh:property [
+        sh:path ue4:parameterOf ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UFunction ;
+        sh:message "A function parameter must belong to exactly one UFunction." ;
+    ] ;
+    sh:property [
+        sh:path ue4:parameterDirection ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:PinDirection ;
+        sh:message "A parameter must have exactly one direction of type PinDirection." ;
+    ] ;
+    sh:property [
+        sh:path ue4:parameterIndex ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 0 ;
+        sh:message "A parameter must have a single non-negative integer parameterIndex." ;
+    ] ;
+    sh:sparql [
+        sh:message "A parameter must have a single non-negative integer parameterIndex." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                $this ue4:parameterIndex ?idx .
+                FILTER (?idx < 0)
+            }
+        """ ;
+    ] .
+
+# Enforce UEdGraphPin properties
+ue4:UEdGraphPinShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:property [
+        sh:path ue4:pinOf ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UEdGraphNode ;
+        sh:message "A pin must belong to exactly one UEdGraphNode." ;
+    ] ;
+    sh:property [
+        sh:path ue4:pinDirection ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:BinaryPinDirection ;
+        sh:message "A pin must have exactly one direction, strictly Input or Output." ;
+    ] ;
+    sh:property [
+        sh:path ue4:pinCategory ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "exec" "bool" "byte" "int" "float" "double" "name" "string" "text" "object" "class" "struct" "interface" "delegate" ) ;
+        sh:message "A pin must have a single data category string, limited to standard categories." ;
+    ] .
+
+# Rule A: Pin Connection Direction Check
+ue4:PinConnectionDirectionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Pin connection direction mismatch: A pin cannot be connected to another pin of the same direction." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other
+            WHERE {
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other .
+                $this ue4:pinDirection ?dir .
+                ?other ue4:pinDirection ?dir .
+            } ORDER BY $this ?other
+        """ ;
+    ] .
+
+# Rule B: Graph Isolation Check
+ue4:PinConnectionGraphShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Graph isolation violation: Connected pins must belong to nodes within the same UEdGraph." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other
+            WHERE {
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other .
+                $this ue4:pinOf/ue4:nodeOf ?graph1 .
+                ?other ue4:pinOf/ue4:nodeOf ?graph2 .
+                FILTER (?graph1 != ?graph2)
+            } ORDER BY $this ?other
+        """ ;
+    ] .
+
+# Rule C: Function Call Parameter Mapping Target Integrity
+ue4:FunctionCallPinMappingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Pin mapping mismatch: Pin maps to a parameter that does not belong to the node's target called function." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?param ?func ?node
+            WHERE {
+                $this ue4:pinOf ?node .
+                ?node (ue4:callsFunction|ue4:calledFunction) ?func .
+                $this ue4:mapsToParameter ?param .
+                FILTER NOT EXISTS {
+                    { ?func ue4:hasParameter ?param }
+                    UNION
+                    { ?param ue4:parameterOf ?func }
+                }
+            } ORDER BY $this ?param
+        """ ;
+    ] .
+
+# Rule D: Pin Parameter Direction Match
+ue4:PinParameterDirectionMatchShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Pin and parameter direction mismatch: Input pins must map to Input/InOut parameters; Output pins must map to Output/InOut/Return parameters." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?param ?pinDir ?paramDir
+            WHERE {
+                $this ue4:mapsToParameter ?param .
+                $this ue4:pinDirection ?pinDir .
+                ?param ue4:parameterDirection ?paramDir .
+                FILTER (
+                    ( ?pinDir = <https://rocket-craft.io/ontology/ue4/Input> && ?paramDir != <https://rocket-craft.io/ontology/ue4/Input> && ?paramDir != <https://rocket-craft.io/ontology/ue4/InOut> ) ||
+                    ( ?pinDir = <https://rocket-craft.io/ontology/ue4/Output> && ?paramDir != <https://rocket-craft.io/ontology/ue4/Output> && ?paramDir != <https://rocket-craft.io/ontology/ue4/InOut> && ?paramDir != <https://rocket-craft.io/ontology/ue4/Return> )
+                )
+            } ORDER BY $this ?param
+        """ ;
+    ] .
+
+# Rule E: Exec vs. Data Pin Separation
+ue4:ExecPinConnectionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Execution pin mismatch: An execution pin ('exec') can only connect to another execution pin." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other
+            WHERE {
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other .
+                $this ue4:pinCategory "exec" .
+                ?other ue4:pinCategory ?cat .
+                FILTER (?cat != "exec")
+            } ORDER BY $this ?other
+        """ ;
+    ] .
+
+# Rule F: Character must have exactly 1 hasCookingState of type CookingTypestate
+ue4:CharacterCookingStateShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "A character must have exactly one cooking state of type CookingTypestate." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this a ?class .
+                ?class rdfs:subClassOf* ue4:ACharacter .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:hasCookingState ?state .
+                        ?state a/rdfs:subClassOf* ue4:CookingTypestate .
+                    }
+                }
+                UNION
+                {
+                    $this ue4:hasCookingState ?state1 .
+                    ?state1 a/rdfs:subClassOf* ue4:CookingTypestate .
+                    $this ue4:hasCookingState ?state2 .
+                    ?state2 a/rdfs:subClassOf* ue4:CookingTypestate .
+                    FILTER (?state1 != ?state2)
+                }
+            }
+        """ ;
+    ] .
+
+# Rule G: World must have exactly 1 hasPackagingState of type WasmPackagingTypestate
+ue4:WorldPackagingStateShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "A world must have exactly one packaging state of type WasmPackagingTypestate." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this a ?class .
+                ?class rdfs:subClassOf* ue4:UWorld .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:hasPackagingState ?state .
+                        ?state a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                    }
+                }
+                UNION
+                {
+                    $this ue4:hasPackagingState ?state1 .
+                    ?state1 a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                    $this ue4:hasPackagingState ?state2 .
+                    ?state2 a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                    FILTER (?state1 != ?state2)
+                }
+            }
+        """ ;
+    ] .
+
+# Rule H: Input execution pins on function call nodes must be connected
+ue4:InputExecPinConnectedShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Input execution pin on a function call node must be connected to an execution pin." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this ue4:pinOf ?node .
+                ?node a/rdfs:subClassOf* ue4:UK2Node .
+                $this ue4:pinDirection ue4:Input .
+                $this ue4:pinCategory "exec" .
+                FILTER NOT EXISTS { $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other }
+            } ORDER BY $this
+        """ ;
+    ] .
+
+# Scene Component Dynamic Rendering parameter shapes
+ue4:SceneComponentRenderingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:USceneComponent ;
+    sh:property [
+        sh:path ue4:interactionDistanceClass ;
+        sh:datatype xsd:float ;
+        sh:message "interactionDistanceClass must be a float." ;
+    ] ;
+    sh:property [
+        sh:path ue4:materialClass ;
+        sh:datatype xsd:string ;
+        sh:message "materialClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:instancingClass ;
+        sh:datatype xsd:string ;
+        sh:message "instancingClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:silhouetteImportanceClass ;
+        sh:datatype xsd:string ;
+        sh:message "silhouetteImportanceClass must be a string." ;
+    ] .
+
+# Variable getter/setter nodes reference a valid property
+ue4:VariableGetNodePropertyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UK2Node_VariableGet ;
+    sh:property [
+        sh:path ue4:referencedProperty ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UProperty ;
+        sh:message "A variable getter or setter node must reference exactly one valid UProperty." ;
+    ] .
+
+ue4:VariableSetNodePropertyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UK2Node_VariableSet ;
+    sh:property [
+        sh:path ue4:referencedProperty ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UProperty ;
+        sh:message "A variable getter or setter node must reference exactly one valid UProperty." ;
+    ] .
+
+# Rule: Input pin connection count limit (at most 1 connection)
+ue4:InputPinConnectionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UEdGraphPin ;
+    sh:sparql [
+        sh:message "Input pin connection count limit: Input pins cannot be connected to more than 1 other pin." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?other1 ?other2
+            WHERE {
+                $this ue4:pinDirection ue4:Input .
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other1 .
+                $this (ue4:connectedTo|^ue4:connectedTo|ue4:linkedTo|^ue4:linkedTo) ?other2 .
+                FILTER (?other1 != ?other2)
+            } ORDER BY $this ?other1 ?other2
+        """ ;
+    ] .
+
+# Rule: Node Parentage (exactly 1 nodeOf pointing to a valid UEdGraph)
+ue4:UEdGraphNodeParentageShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "A node must belong to exactly one UEdGraph: All UEdGraphNode instances must have exactly one nodeOf pointing to a valid UEdGraph." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this a ?class .
+                ?class rdfs:subClassOf* ue4:UEdGraphNode .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:nodeOf ?graph .
+                        ?graph a/rdfs:subClassOf* ue4:UEdGraph .
+                    }
+                }
+                UNION
+                {
+                    $this ue4:nodeOf ?graph1 .
+                    ?graph1 a/rdfs:subClassOf* ue4:UEdGraph .
+                    $this ue4:nodeOf ?graph2 .
+                    ?graph2 a/rdfs:subClassOf* ue4:UEdGraph .
+                    FILTER (?graph1 != ?graph2)
+                }
+            } ORDER BY $this
+        """ ;
+    ] .
+
+# Replicated Rendering property shapes for USkeletalMeshComponent (no RDFS reasoning)
+ue4:USkeletalMeshComponentRenderingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:USkeletalMeshComponent ;
+    sh:property [
+        sh:path ue4:interactionDistanceClass ;
+        sh:datatype xsd:float ;
+        sh:message "interactionDistanceClass must be a float." ;
+    ] ;
+    sh:property [
+        sh:path ue4:materialClass ;
+        sh:datatype xsd:string ;
+        sh:message "materialClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:instancingClass ;
+        sh:datatype xsd:string ;
+        sh:message "instancingClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:silhouetteImportanceClass ;
+        sh:datatype xsd:string ;
+        sh:message "silhouetteImportanceClass must be a string." ;
+    ] .
+
+# Replicated Rendering property shapes for UBoxComponent (no RDFS reasoning)
+ue4:UBoxComponentRenderingShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UBoxComponent ;
+    sh:property [
+        sh:path ue4:interactionDistanceClass ;
+        sh:datatype xsd:float ;
+        sh:message "interactionDistanceClass must be a float." ;
+    ] ;
+    sh:property [
+        sh:path ue4:materialClass ;
+        sh:datatype xsd:string ;
+        sh:message "materialClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:instancingClass ;
+        sh:datatype xsd:string ;
+        sh:message "instancingClass must be a string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:silhouetteImportanceClass ;
+        sh:datatype xsd:string ;
+        sh:message "silhouetteImportanceClass must be a string." ;
+    ] .
+
+# =========================================================================
+# RENDERING SUBSYSTEM TOPOLOGY & WEBGL/RHI FALLBACK SHAPES
+# =========================================================================
+
+# Rule I: Material Instance Parent Verification
+ue4:UMaterialInstanceParentShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialInstance , ue4:UMaterialInstanceConstant , ue4:UMaterialInstanceDynamic ;
+    sh:property [
+        sh:path ue4:parentMaterial ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UMaterialInterface ;
+        sh:message "A material instance must have exactly one parentMaterial of type UMaterialInterface." ;
+    ] .
+
+# Rule J: Material Instance Parent Chain Acyclicity & Rootedness
+ue4:MaterialInstanceAcyclicityShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialInstance , ue4:UMaterialInstanceConstant , ue4:UMaterialInstanceDynamic ;
+    sh:sparql [
+        sh:message "Material inheritance loop detected: A material instance parent chain cannot reference itself." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?next
+            WHERE {
+                $this ue4:parentMaterial+ $this .
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "Root material missing: A material instance parent chain must eventually resolve to a base UMaterial." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                FILTER NOT EXISTS {
+                    $this ue4:parentMaterial+ ?root .
+                    ?root a/rdfs:subClassOf* ue4:UMaterial .
+                }
+            }
+        """ ;
+    ] .
+
+# Rule K: Material Parameter Override Name Matching
+ue4:MaterialInstanceParameterOverrideShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialInstance , ue4:UMaterialInstanceConstant , ue4:UMaterialInstanceDynamic ;
+    sh:sparql [
+        sh:message "Orphan parameter override: Overridden parameter name does not match any parameter defined in the root UMaterial or parent chain." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?paramVal ?paramName
+            WHERE {
+                $this ue4:hasParameterValue ?paramVal .
+                ?paramVal ue4:parameterName ?paramName .
+                FILTER NOT EXISTS {
+                    $this ue4:parentMaterial* ?ancestor .
+                    {
+                        ?ancestor a/rdfs:subClassOf* ue4:UMaterial .
+                        ?ancestor ue4:definesParameter ?paramDef .
+                        ?paramDef rdfs:label ?paramName .
+                    }
+                    UNION
+                    {
+                        ?ancestor a/rdfs:subClassOf* ue4:UMaterial .
+                        ?ancestor ue4:definesParameter ?paramDef .
+                        ?paramDef ue4:parameterName ?paramName .
+                    }
+                }
+            } ORDER BY $this ?paramVal
+        """ ;
+    ] .
+
+# Rule L: Rendering Subsystem RHI Support and Fallback Loops
+ue4:URenderingSubsystemRHIShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URenderingSubsystem ;
+    sh:property [
+        sh:path ue4:primaryRHI ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:ERenderAPI ;
+        sh:message "A rendering subsystem must have exactly one primary RHI of type ERenderAPI." ;
+    ] ;
+    sh:property [
+        sh:path ue4:fallbackRHI ;
+        sh:maxCount 1 ;
+        sh:class ue4:ERenderAPI ;
+        sh:message "A rendering subsystem can have at most one fallback RHI of type ERenderAPI." ;
+    ] ;
+    sh:sparql [
+        sh:message "RHI fallback loop: The primary rendering API and fallback rendering API cannot be the same." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?primary
+            WHERE {
+                $this ue4:primaryRHI ?primary .
+                $this ue4:fallbackRHI ?primary .
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RHI support mismatch: The primary or fallback RHI must be in the list of supported RHIs for the subsystem." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?rhi
+            WHERE {
+                {
+                    $this ue4:primaryRHI ?rhi .
+                    FILTER NOT EXISTS { $this ue4:supportsRHI ?rhi }
+                }
+                UNION
+                {
+                    $this ue4:fallbackRHI ?rhi .
+                    FILTER NOT EXISTS { $this ue4:supportsRHI ?rhi }
+                }
+            } ORDER BY $this ?rhi
+        """ ;
+    ] .
+
+# Rule M: WASM WebGL Fallback Compliance
+ue4:WasmSubsystemWebGLFallbackShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URenderingSubsystem ;
+    sh:sparql [
+        sh:message "WASM WebGL compliance defect: A rendering subsystem operating under a WASM / HTML5 target world must support WebGL 2.0 (OpenGL ES3) or WebGL 1.0." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                ?world ue4:hasSubsystem $this .
+                ?world ue4:hasPackagingState ?state .
+                ?state a/rdfs:subClassOf* ue4:WasmPackagingTypestate .
+                
+                FILTER NOT EXISTS { $this ue4:supportsRHI ue4:RHI_WebGL2 . }
+                FILTER NOT EXISTS { $this ue4:supportsRHI ue4:RHI_OpenGL_ES3 . }
+                FILTER NOT EXISTS { $this ue4:supportsRHI ue4:RHI_WebGL . }
+            }
+        """ ;
+    ] .
+
+# =========================================================================
+# PHYSICS SUBSYSTEM VALIDATION SHAPES
+# =========================================================================
+
+# Simulated Body Mass Shape
+ue4:SimulatedBodyMassShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URigidBody ;
+    sh:sparql [
+        sh:message "Simulated rigid bodies (PhysType_Simulated) must have a declared mass greater than 0.0 kg to prevent calculation instability (NaNs)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                $this ue4:physicsType ue4:PhysType_Simulated .
+                FILTER NOT EXISTS {
+                    $this ue4:massKg ?mass .
+                    FILTER (?mass > 0.0)
+                }
+            } ORDER BY $this
+        """ ;
+    ] .
+
+# Single Physics Subsystem per World
+ue4:WorldPhysicsSubsystemCountShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "Each UWorld must have exactly one registered instance of UPhysicsSubsystem." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this
+            WHERE {
+                $this a ?worldClass .
+                ?worldClass rdfs:subClassOf* ue4:UWorld .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:hasSubsystem ?sub .
+                        ?sub a/rdfs:subClassOf* ue4:UPhysicsSubsystem .
+                    }
+                }
+                UNION
+                {
+                    $this ue4:hasSubsystem ?sub1 .
+                    ?sub1 a/rdfs:subClassOf* ue4:UPhysicsSubsystem .
+                    $this ue4:hasSubsystem ?sub2 .
+                    ?sub2 a/rdfs:subClassOf* ue4:UPhysicsSubsystem .
+                    FILTER (?sub1 != ?sub2)
+                }
+            } ORDER BY $this
+        """ ;
+    ] .
+
+# Gravity without Collision Safety
+ue4:SimulatedGravityCollisionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URigidBody ;
+    sh:sparql [
+        sh:message "Simulated rigid bodies with gravity enabled must have active collision (not NoCollision) to prevent objects falling through the floor." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?comp
+            WHERE {
+                ?comp ue4:hasRigidBody $this .
+                $this ue4:physicsType ue4:PhysType_Simulated .
+                $this ue4:bEnableGravity true .
+                FILTER (
+                    EXISTS { ?comp ue4:collisionEnabled ue4:NoCollision } ||
+                    EXISTS {
+                        ?comp ue4:hasCollisionProfile ?profile .
+                        ?profile ue4:collisionEnabled ue4:NoCollision .
+                    } ||
+                    (
+                        NOT EXISTS { ?comp ue4:collisionEnabled ?anyEnabled } &&
+                        NOT EXISTS { ?comp ue4:hasCollisionProfile ?anyProfile }
+                    )
+                )
+            } ORDER BY $this
+        """ ;
+    ] .
+
+# Reified Response Completeness
+ue4:CollisionChannelResponseShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:CollisionChannelResponse ;
+    sh:property [
+        sh:path ue4:hasResponseChannel ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:ECollisionChannel ;
+        sh:message "A CollisionChannelResponse must map to exactly one ECollisionChannel." ;
+    ] ;
+    sh:property [
+        sh:path ue4:hasResponseValue ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:ECollisionResponse ;
+        sh:message "A CollisionChannelResponse must map to exactly one ECollisionResponse." ;
+    ] .
+
+# =========================================================================
+# NETWORKING SUBSYSTEM VALIDATION SHAPES
+# =========================================================================
+
+# Rule 1a: RPC must belong to Actor or ActorComponent class hierarchy
+ue4:RPCOnReplicatedClassShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URPC ;
+    sh:sparql [
+        sh:message "RPC defined on non-replicated class: RPC functions must belong to UClasses that are subclasses of AActor or UActorComponent." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?class
+            WHERE {
+                ?class ue4:hasFunction $this .
+                FILTER NOT EXISTS {
+                    { ?class rdfs:subClassOf* ue4:AActor }
+                    UNION
+                    { ?class rdfs:subClassOf* ue4:UActorComponent }
+                }
+            } ORDER BY $this ?class
+        """ ;
+    ] .
+
+# Rule 1b: If a class defines RPCs, instances must replicate
+ue4:RPCInstanceReplicationShape
+    a sh:NodeShape ;
+    sh:targetSubjectsOf rdf:type ;
+    sh:sparql [
+        sh:message "Replication mismatch: An Actor or Component instance must replicate (bReplicates true) if its class defines one or more RPCs." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?rpc
+            WHERE {
+                $this a ?class .
+                { ?class rdfs:subClassOf* ue4:AActor }
+                UNION
+                { ?class rdfs:subClassOf* ue4:UActorComponent }
+                ?class rdfs:subClassOf* ?parentClass .
+                ?parentClass ue4:hasFunction ?rpc .
+                ?rpc a/rdfs:subClassOf* ue4:URPC .
+                FILTER NOT EXISTS {
+                    $this ue4:bReplicates true .
+                }
+            } ORDER BY $this ?rpc
+        """ ;
+    ] .
+
+# Rule 2: Validation signature constraints for WithValidation RPCs
+ue4:RPCValidationSignatureShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URPC ;
+    sh:sparql [
+        sh:message "RPC validation function return type mismatch: A validation function for a WithValidation RPC must return a Boolean." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?valFunc ?retProp
+            WHERE {
+                $this ue4:bWithValidation true ;
+                      ue4:validationFunction ?valFunc .
+                ?valFunc ue4:returnProperty ?retProp .
+                FILTER NOT EXISTS {
+                    ?retProp a/rdfs:subClassOf* ue4:UBoolProperty .
+                }
+            } ORDER BY $this ?valFunc
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RPC validation function parameter mismatch: Parameters of the validation function must match those of the RPC in index and type." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?valFunc ?rpcParam ?valParam
+            WHERE {
+                $this ue4:bWithValidation true ;
+                      ue4:validationFunction ?valFunc .
+                
+                # Get parameter of RPC
+                $this ue4:hasParameter ?rpcParam .
+                ?rpcParam ue4:parameterIndex ?idx .
+                
+                # Check if validation parameter has same index and type
+                FILTER NOT EXISTS {
+                    ?valFunc ue4:hasParameter ?valParam .
+                    ?valParam ue4:parameterIndex ?idx .
+                    ?rpcParam ue4:propertyType ?rpcType .
+                    ?valParam ue4:propertyType ?valType .
+                    FILTER (?rpcType = ?valType)
+                }
+            } ORDER BY $this ?valFunc ?rpcParam
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RPC validation function parameter count mismatch: Parameter count of validation function must equal that of the RPC." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?valFunc
+            WHERE {
+                $this ue4:bWithValidation true ;
+                      ue4:validationFunction ?valFunc .
+                
+                # Subquery to count RPC parameters
+                {
+                    SELECT $this (COUNT(?p1) AS ?c1)
+                    WHERE { $this ue4:hasParameter ?p1 . }
+                    GROUP BY $this
+                }
+                # Subquery to count validation parameters
+                {
+                    SELECT ?valFunc (COUNT(?p2) AS ?c2)
+                    WHERE { ?valFunc ue4:hasParameter ?p2 . }
+                    GROUP BY ?valFunc
+                }
+                FILTER (?c1 != ?c2)
+            } ORDER BY $this ?valFunc
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RuleRPCValidationClassScope: RPC validation function class scope violation: The validation function must be a member of the same class (or a base class) as the RPC." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?valFunc ?rpcClass
+            WHERE {
+                $this ue4:bWithValidation true ;
+                      ue4:validationFunction ?valFunc .
+                ?rpcClass ue4:hasFunction $this .
+                FILTER NOT EXISTS {
+                    ?rpcClass rdfs:subClassOf* ?valClass .
+                    ?valClass ue4:hasFunction ?valFunc .
+                }
+            } ORDER BY $this ?valFunc ?rpcClass
+        """ ;
+    ] .
+
+# Rule 3: Component replication requires Actor replication
+ue4:ComponentReplicationOwnerShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UActorComponent ;
+    sh:sparql [
+        sh:message "Component replication mismatch: A component cannot replicate if its owner actor is not replicated." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?actor
+            WHERE {
+                $this ue4:bReplicates true ;
+                      ue4:isComponentOf ?actor .
+                FILTER NOT EXISTS {
+                    ?actor ue4:bReplicates true .
+                }
+            } ORDER BY $this ?actor
+        """ ;
+    ] .
+
+# Rule 4: Replicated actor requires World Networking Subsystem
+ue4:WorldNetworkingSubsystemShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UWorld ;
+    sh:sparql [
+        sh:message "Networking topology violation: A world containing replicated actors must have a UNetworkingSubsystem." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?actor
+            WHERE {
+                $this ue4:hasLevel ?level .
+                ?level ue4:hasActor ?actor .
+                ?actor ue4:bReplicates true .
+                FILTER NOT EXISTS {
+                    $this ue4:hasSubsystem ?subsystem .
+                    ?subsystem a/rdfs:subClassOf* ue4:UNetworkingSubsystem .
+                }
+            } ORDER BY $this ?actor
+        """ ;
+    ] .
+
+# Rule 5a: RepNotify callback function hierarchy check (FReplicationLifetime)
+ue4:RepNotifyValidationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:FReplicationLifetime ;
+    sh:sparql [
+        sh:message "RepNotify function hierarchy mismatch: The RepNotify callback function must belong to the class hierarchy of the replicated property." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?property ?repFunc ?propClass
+            WHERE {
+                $this ue4:replicatedProperty ?property ;
+                      ue4:repNotifyFunction ?repFunc .
+                ?propClass ue4:hasProperty ?property .
+                FILTER NOT EXISTS {
+                    ?propClass rdfs:subClassOf* ?parentClass .
+                    ?parentClass ue4:hasFunction ?repFunc .
+                }
+            } ORDER BY $this ?property ?repFunc
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RepNotify function return type mismatch: RepNotify functions must return void (no returnProperty)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?repFunc ?retProp
+            WHERE {
+                $this ue4:repNotifyFunction ?repFunc .
+                ?repFunc ue4:returnProperty ?retProp .
+            } ORDER BY $this ?repFunc
+        """ ;
+    ] .
+
+# Rule 5b: Direct property RepNotify callback function hierarchy and void check
+ue4:PropertyDirectRepNotifyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UProperty ;
+    sh:sparql [
+        sh:message "RepNotify function hierarchy mismatch (direct Property check): The RepNotify callback function must belong to the class hierarchy of the property." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?repFunc ?propClass
+            WHERE {
+                $this ue4:repNotifyFunction ?repFunc .
+                ?propClass ue4:hasProperty $this .
+                FILTER NOT EXISTS {
+                    ?propClass rdfs:subClassOf* ?parentClass .
+                    ?parentClass ue4:hasFunction ?repFunc .
+                }
+            } ORDER BY $this ?repFunc
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "RepNotify function return type mismatch (direct Property check): RepNotify functions must return void." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?repFunc ?retProp
+            WHERE {
+                $this ue4:repNotifyFunction ?repFunc .
+                ?repFunc ue4:returnProperty ?retProp .
+            } ORDER BY $this ?repFunc
+        """ ;
+    ] .
+
+# =========================================================================
+# ASSET COOKING PIPELINE SHAPES
+# =========================================================================
+
+# Shape 1: Mandatory Cooked Representations for Assets
+ue4:AssetHTML5CookingReadyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UTexture , ue4:UStaticMesh , ue4:USoundWave ;
+    sh:sparql [
+        sh:message "Active asset does not have a successfully cooked representation for target Platform_HTML5." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this
+            WHERE {
+                ?ontology a owl:Ontology .
+                # Identify if $this is a texture, static mesh, or sound wave asset
+                { $this a ue4:UTexture }
+                UNION
+                { $this a ?t1 . ?t1 rdfs:subClassOf+ ue4:UTexture }
+                UNION
+                { $this a ue4:UStaticMesh }
+                UNION
+                { $this a ?t2 . ?t2 rdfs:subClassOf+ ue4:UStaticMesh }
+                UNION
+                { $this a ue4:USoundWave }
+                UNION
+                { $this a ?t3 . ?t3 rdfs:subClassOf+ ue4:USoundWave }
+
+                # Verify absence of a successful HTML5 cook
+                FILTER NOT EXISTS {
+                    ?rep ue4:hasAsset $this ;
+                         ue4:targetPlatform ue4:Platform_HTML5 ;
+                         ue4:hasCookingState ue4:CookState_Cooked .
+                }
+            }
+        """ ;
+    ] .
+
+# Shape 2: WebGL Texture Format Compliance
+ue4:HTML5TextureFormatShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:AssetPlatformRepresentation ;
+    sh:sparql [
+        sh:message "WebGL texture format constraint violation: HTML5 cooked textures must use ASTC or DXT formats." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?format
+            WHERE {
+                $this ue4:targetPlatform ue4:Platform_HTML5 ;
+                      ue4:hasAsset ?asset ;
+                      ue4:hasCompressionProfile ?profile .
+                { ?asset a ue4:UTexture } UNION { ?asset a ?type . ?type rdfs:subClassOf+ ue4:UTexture }
+                ?profile ue4:textureFormat ?format .
+
+                FILTER (?format != ue4:TexFormat_ASTC_4x4 && 
+                        ?format != ue4:TexFormat_ASTC_8x8 && 
+                        ?format != ue4:TexFormat_DXT1 && 
+                        ?format != ue4:TexFormat_DXT5)
+            }
+        """ ;
+    ] .
+
+# Shape 3: WebGL Audio Format Compliance
+ue4:HTML5AudioFormatShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:AssetPlatformRepresentation ;
+    sh:sparql [
+        sh:message "Audio format constraint violation: HTML5 cooked audio must use OggVorbis format, or PCM if size is below 500KB." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?format ?size
+            WHERE {
+                $this ue4:targetPlatform ue4:Platform_HTML5 ;
+                      ue4:hasAsset ?asset ;
+                      ue4:hasCompressionProfile ?profile ;
+                      ue4:bulkDataSize ?size .
+                { ?asset a ue4:USoundWave } UNION { ?asset a ?type . ?type rdfs:subClassOf+ ue4:USoundWave }
+                ?profile ue4:audioFormat ?format .
+
+                FILTER (?format != ue4:AudioFormat_OggVorbis && 
+                        (?format = ue4:AudioFormat_PCM && ?size > 512000))
+            }
+        """ ;
+    ] .
+
+# Shape 4: Level-of-Detail (LOD) Budgets for HTML5 Meshes
+ue4:HTML5MeshLODConstraintShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:AssetPlatformRepresentation ;
+    sh:sparql [
+        sh:message "Mesh polygon budget violation: High-poly HTML5 cooked meshes must have at least 2 LOD channels." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?lodCount ?triCount
+            WHERE {
+                $this ue4:targetPlatform ue4:Platform_HTML5 ;
+                      ue4:hasAsset ?asset ;
+                      ue4:lodCount ?lodCount ;
+                      ue4:triangleCount ?triCount .
+                { ?asset a ue4:UStaticMesh } UNION { ?asset a ?type . ?type rdfs:subClassOf+ ue4:UStaticMesh }
+
+                FILTER (?lodCount < 2 && ?triCount > 20000)
+            }
+        """ ;
+    ] .
+
+# Shape 5: Individual Asset Size Budget
+ue4:HTML5AssetSizeBudgetShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:AssetPlatformRepresentation ;
+    sh:sparql [
+        sh:message "Total cooked asset footprint exceeds maximum 50MB budget for HTML5 deployment." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?totalSize
+            WHERE {
+                $this ue4:targetPlatform ue4:Platform_HTML5 ;
+                      ue4:headerSize ?hSize ;
+                      ue4:exportsSize ?eSize ;
+                      ue4:bulkDataSize ?bSize .
+                BIND (?hSize + ?eSize + ?bSize AS ?totalSize)
+                FILTER (?totalSize > 52428800)
+            }
+        """ ;
+    ] .
+
+# =========================================================================
+# COMPILATION LINKING SHAPES
+# =========================================================================
+
+# Shape 6: WebAssembly Memory Layout Validation
+ue4:WasmMemoryLayoutShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:WasmMemoryLayout ;
+    
+    sh:property [
+        sh:path ue4:wasmStackSize ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 65536 ;
+        sh:message "WASM stack size must be a single positive integer (minimum 65536 bytes)." ;
+    ] ;
+    sh:property [
+        sh:path ue4:wasmInitialMemory ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:message "WASM initial memory must be a single positive integer." ;
+    ] ;
+    sh:property [
+        sh:path ue4:wasmMaximumMemory ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:message "WASM maximum memory must be a single positive integer." ;
+    ] ;
+    sh:property [
+        sh:path ue4:wasmAllowMemoryGrowth ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "WASM allow memory growth must be a single boolean." ;
+    ] ;
+
+    # SPARQL: Initial Memory must be aligned to 64KB page size
+    sh:sparql [
+        sh:message "WASM Initial Memory page alignment violation: Initial Memory must be a multiple of 65536 bytes (WASM page size)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?initialMemory
+            WHERE {
+                $this ue4:wasmInitialMemory ?initialMemory .
+                FILTER (?initialMemory <= 0 || (?initialMemory - (65536 * FLOOR(?initialMemory / 65536))) != 0)
+            }
+        """ ;
+    ] ;
+
+    # SPARQL: Maximum Memory must be aligned to 64KB page size
+    sh:sparql [
+        sh:message "WASM Maximum Memory page alignment violation: Maximum Memory must be a multiple of 65536 bytes (WASM page size)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?maxMemory
+            WHERE {
+                $this ue4:wasmMaximumMemory ?maxMemory .
+                FILTER (?maxMemory <= 0 || (?maxMemory - (65536 * FLOOR(?maxMemory / 65536))) != 0)
+            }
+        """ ;
+    ] ;
+
+    # SPARQL: Stack size < Initial Memory size
+    sh:sparql [
+        sh:message "WASM Memory boundary mismatch: Stack size must be strictly smaller than the Initial Memory size." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?stack ?initialMemory
+            WHERE {
+                $this ue4:wasmStackSize ?stack .
+                $this ue4:wasmInitialMemory ?initialMemory .
+                FILTER (?stack >= ?initialMemory)
+            }
+        """ ;
+    ] ;
+
+    # SPARQL: Initial Memory <= Maximum Memory
+    sh:sparql [
+        sh:message "WASM Heap limit violation: Initial Memory must be less than or equal to Maximum Memory." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?initialMemory ?maxMemory
+            WHERE {
+                $this ue4:wasmInitialMemory ?initialMemory .
+                $this ue4:wasmMaximumMemory ?maxMemory .
+                FILTER (?initialMemory > ?maxMemory)
+            }
+        """ ;
+    ] ;
+
+    # SPARQL: Fixed heap requires matching bounds (AllowMemoryGrowth = false)
+    sh:sparql [
+        sh:message "WASM Fixed Heap constraint violation: When memory growth is disabled, Initial Memory must equal Maximum Memory." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?initialMemory ?maxMemory
+            WHERE {
+                $this ue4:wasmAllowMemoryGrowth false .
+                $this ue4:wasmInitialMemory ?initialMemory .
+                $this ue4:wasmMaximumMemory ?maxMemory .
+                FILTER (?initialMemory != ?maxMemory)
+            }
+        """ ;
+    ] ;
+
+    # SPARQL: WASM32 address space boundaries (maximum 2GB / 2,147,483,648 bytes)
+    sh:sparql [
+        sh:message "WASM32 Maximum Memory limit exceeded: Maximum Memory cannot exceed 2147483648 bytes (2GB address limit in 32-bit WASM)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?maxMemory
+            WHERE {
+                $this ue4:wasmMaximumMemory ?maxMemory .
+                FILTER (?maxMemory > 2147483648)
+            }
+        """ ;
+    ] ;
+
+    # SPARQL: Essential Entry Point Symbol Exports
+    sh:sparql [
+        sh:message "WASM exported symbol list incomplete: The memory layout must export the '_main' symbol to be runnable by the browser harness." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this a ue4:WasmMemoryLayout .
+                FILTER NOT EXISTS {
+                    $this ue4:wasmExportedSymbol "_main" .
+                }
+            }
+        """ ;
+    ] .
+
+# Shape 7: Linking Configuration Integrity Check
+ue4:LinkingConfigurationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:LinkingConfiguration ;
+    
+    sh:property [
+        sh:path ue4:hasMemoryLayout ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:WasmMemoryLayout ;
+        sh:message "A linking configuration must reference exactly one WASM memory layout." ;
+    ] ;
+    sh:property [
+        sh:path ue4:hasOptimizationLevel ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:CompilerOptimizationLevel ;
+        sh:message "A linking configuration must reference exactly one compiler optimization level." ;
+    ] ;
+    sh:property [
+        sh:path ue4:buildMode ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "Debug" "Development" "Shipping" ) ;
+        sh:message "A linking configuration must specify a buildMode ('Debug', 'Development', or 'Shipping')." ;
+    ] ;
+
+    # SPARQL: Shipping build must use optimized compiler flags
+    sh:sparql [
+        sh:message "Shipping build optimization violation: A 'Shipping' build mode must not use -O0 (unoptimized) flag configuration." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?opt
+            WHERE {
+                $this ue4:buildMode "Shipping" .
+                $this ue4:hasOptimizationLevel ?opt .
+                ?opt ue4:optFlag "-O0" .
+            }
+        """ ;
+    ] ;
+
+    # SPARQL: Debug build should avoid high performance optimization (Warning)
+    sh:sparql [
+        sh:message "Debug build optimization warning: A 'Debug' build mode should avoid high optimization levels (prefer -O0 or -O1)." ;
+        sh:severity sh:Warning ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?opt ?flag
+            WHERE {
+                $this ue4:buildMode "Debug" .
+                $this ue4:hasOptimizationLevel ?opt .
+                ?opt ue4:optFlag ?flag .
+                FILTER (?flag != "-O0" && ?flag != "-O1")
+            }
+        """ ;
+    ] .
+
+# Shape 8: Linking Typestate Backing Check
+ue4:LinkingTypestateConfigurationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:LinkingTypestate ;
+    
+    sh:property [
+        sh:path ue4:hasLinkingConfiguration ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:LinkingConfiguration ;
+        sh:message "A linking typestate must refer to exactly one linking configuration." ;
+    ] .
+
+# =========================================================================
+# PACKAGING AND RHI TARGET CONFIG SHAPES
+# =========================================================================
+
+# Shape 9: Packaging Target Constraints Shape
+ue4:PackagingTargetShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:PackagingTarget ;
+    sh:property [
+        sh:path ue4:targetWorld ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:UWorld ;
+        sh:message "A packaging target must specify exactly one targetWorld." ;
+    ] ;
+    sh:property [
+        sh:path ue4:buildConfiguration ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:BuildConfiguration ;
+        sh:message "A packaging target must specify exactly one buildConfiguration." ;
+    ] ;
+    sh:property [
+        sh:path ue4:targetRHIProfile ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:RHIProfile ;
+        sh:message "A packaging target must specify exactly one RHIProfile." ;
+    ] ;
+    sh:property [
+        sh:path ue4:targetPlatformName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:in ( "HTML5" "WASM" ) ;
+        sh:message "A packaging target for WASM packaging must target either 'HTML5' or 'WASM'." ;
+    ] .
+
+# Shape 10: Build Configuration Consistency Shape
+ue4:BuildConfigurationConsistencyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:BuildConfiguration ;
+    sh:sparql [
+        sh:message "Shipping configuration violation: Shipping builds must optimize code, disable logging, and disable debugging symbols." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                $this rdfs:label "Shipping" .
+                { $this ue4:bOptimize false }
+                UNION
+                { $this ue4:bEnableSymbols true }
+                UNION
+                { $this ue4:bDisableLogging false }
+            }
+        """ ;
+    ] .
+
+# Shape 11: Projection Law - Outputs Enforce Shape
+ue4:StaticBakingPathsShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:StaticBakingConfiguration ;
+    sh:property [
+        sh:path ue4:isStaticallyBaked ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:boolean ;
+    ] ;
+    sh:sparql [
+        sh:message "Projection Law violation: Statically baked configurations must declare output paths for C++ headers, DataTables, BOM, walkthroughs, byte-class matrices, and receipts." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this ue4:isStaticallyBaked true .
+                FILTER (
+                    NOT EXISTS { $this ue4:headerOutputPath ?h } ||
+                    NOT EXISTS { $this ue4:dataTableOutputPath ?d } ||
+                    NOT EXISTS { $this ue4:bomOutputPath ?b } ||
+                    NOT EXISTS { $this ue4:walkthroughOutputPath ?w } ||
+                    NOT EXISTS { $this ue4:byteClassMatrixOutputPath ?m } ||
+                    NOT EXISTS { $this ue4:receiptOutputPath ?r }
+                )
+            }
+        """ ;
+    ] .
+
+# Shape 12: Anti-Asset Injection Shape (WebGL/Mesh boundaries)
+ue4:PreventRawAssetGenerationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UObject ;
+    sh:sparql [
+        sh:message "Projection Law violation: RDF ontology cannot define raw pixel, mesh binary, or geometry data. It must only contain semantic references to Unreal-managed assets." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?property
+            WHERE {
+                $this ?property ?value .
+                FILTER (?property IN (
+                    ue4:binaryMeshData,
+                    ue4:rawGltfString,
+                    ue4:texturePixelBytes,
+                    ue4:objFileContent,
+                    ue4:fbxFileContent
+                ))
+            }
+        """ ;
+    ] .
+
+# Shape 13: Static Baking: Prohibition of Dynamic REST (VaRest)
+ue4:StaticBakingNoVaRestShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:PackagingTarget ;
+    sh:sparql [
+        sh:message "Projection Law violation: Statically baked target worlds must not use dynamic VaRest calls for layout or Semantic LOD retrieval." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?node
+            WHERE {
+                $this ue4:hasStaticBaking ?bakeConfig .
+                ?bakeConfig ue4:isStaticallyBaked true .
+                $this ue4:targetWorld ?world .
+                
+                ?node ue4:callsFunction ?func .
+                FILTER (
+                    CONTAINS(STR(?func), "VaRest") || 
+                    CONTAINS(LCASE(STR(?func)), "varest")
+                )
+            }
+        """ ;
+    ] .
+
+# =========================================================================
+# SUBSYSTEM INTEGRATION SHAPES (RENDERING, PHYSICS, NETWORKING)
+# =========================================================================
+
+# --- Rendering: Material Instance Parameter Value Type Safety ---
+ue4:MaterialInstanceParameterValueTypeShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialInstance , ue4:UMaterialInstanceConstant , ue4:UMaterialInstanceDynamic ;
+    sh:sparql [
+        sh:message "Material parameter type mismatch: Overridden parameter value type does not match the parameter definition type in the base material." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?paramVal ?paramName ?paramType
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this ue4:hasParameterValue ?paramVal .
+                ?paramVal ue4:parameterName ?paramName .
+                
+                # Trace parent chain to root UMaterial
+                $this ue4:parentMaterial* ?ancestor .
+                ?ancestor a/rdfs:subClassOf* ue4:UMaterial .
+                ?ancestor ue4:definesParameter ?paramDef .
+                
+                # Match parameter name
+                { ?paramDef rdfs:label ?paramName }
+                UNION
+                { ?paramDef ue4:parameterName ?paramName }
+                
+                ?paramDef a ?paramType .
+                
+                # Filter for type mismatches
+                FILTER (
+                    ( EXISTS { ?paramDef a/rdfs:subClassOf* ue4:UScalarParameter } && 
+                        ( NOT EXISTS { ?paramVal ue4:scalarValue ?v } || EXISTS { ?paramVal ue4:vectorValue ?v2 } || EXISTS { ?paramVal ue4:textureValue ?v3 } ) ) ||
+                    ( EXISTS { ?paramDef a/rdfs:subClassOf* ue4:UVectorParameter } && 
+                        ( NOT EXISTS { ?paramVal ue4:vectorValue ?v } || EXISTS { ?paramVal ue4:scalarValue ?v2 } || EXISTS { ?paramVal ue4:textureValue ?v3 } ) ) ||
+                    ( EXISTS { ?paramDef a/rdfs:subClassOf* ue4:UTextureParameter } && 
+                        ( NOT EXISTS { ?paramVal ue4:textureValue ?v } || EXISTS { ?paramVal ue4:scalarValue ?v2 } || EXISTS { ?paramVal ue4:vectorValue ?v3 } ) )
+                )
+            } ORDER BY $this ?paramVal
+        """ ;
+    ] .
+
+# --- Rendering: Parameter Value Exclusivity ---
+ue4:UMaterialParameterValueExclusionShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterialParameterValue ;
+    sh:sparql [
+        sh:message "Invalid parameter value definition: A UMaterialParameterValue must contain exactly one type of value (scalarValue, vectorValue, or textureValue)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                BIND(IF(EXISTS { $this ue4:scalarValue ?s }, 1, 0) +
+                     IF(EXISTS { $this ue4:vectorValue ?v }, 1, 0) +
+                     IF(EXISTS { $this ue4:textureValue ?t }, 1, 0) AS ?valCount)
+                FILTER (?valCount != 1)
+            }
+        """ ;
+    ] .
+
+# --- Rendering: Shader Class Well-Formedness ---
+ue4:UShaderClassShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UShaderClass ;
+    sh:property [
+        sh:path ue4:shaderFrequency ;
+        sh:minCount 1 ;
+        sh:class ue4:EShaderFrequency ;
+        sh:message "A UShaderClass must have at least one shaderFrequency stage." ;
+    ] .
+
+# --- Rendering: Shader Parameter Well-Formedness ---
+ue4:UShaderParameterShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UShaderParameter ;
+    sh:property [
+        sh:path ue4:shaderParameterName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A UShaderParameter must have exactly one name string." ;
+    ] ;
+    sh:property [
+        sh:path ue4:shaderParameterType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A UShaderParameter must have exactly one type declaration string." ;
+    ] .
+
+# --- Rendering: Base Material Shaders Verification ---
+ue4:UMaterialCompiledShadersShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UMaterial ;
+    sh:sparql [
+        sh:message "Material shader compilation incomplete: A UMaterial must compile to at least one Vertex Shader (SF_Vertex) and one Pixel Shader (SF_Pixel)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this
+            WHERE {
+                ?ontology a owl:Ontology .
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:compilesToShader ?shader .
+                        ?shader ue4:shaderFrequency ue4:SF_Vertex .
+                    }
+                }
+                UNION
+                {
+                    FILTER NOT EXISTS {
+                        $this ue4:compilesToShader ?shader .
+                        ?shader ue4:shaderFrequency ue4:SF_Pixel .
+                    }
+                }
+            }
+        """ ;
+    ] .
+
+# --- Rendering: ERenderAPI Fallback Acyclicity ---
+ue4:ERenderAPIFallbackAcyclicityShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:ERenderAPI ;
+    sh:sparql [
+        sh:message "Render API fallback loop detected: A rendering API cannot fallback to itself through transitively chained transitions." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?next
+            WHERE {
+                $this ue4:fallbackTo+ $this .
+            }
+        """ ;
+    ] .
+
+# --- Rendering: Rendering Subsystem Fallback Reachability ---
+ue4:URenderingSubsystemFallbackReachabilityShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URenderingSubsystem ;
+    sh:sparql [
+        sh:message "Rendering Subsystem fallback path error: The configured fallbackRHI is not reachable from the primaryRHI via the fallbackTo chain." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?primary ?fallback
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this ue4:primaryRHI ?primary .
+                $this ue4:fallbackRHI ?fallback .
+                FILTER NOT EXISTS { ?primary ue4:fallbackTo+ ?fallback }
+            }
+        """ ;
+    ] .
+
+# --- Rendering: Packaging Target RHI Alignment ---
+ue4:PackagingTargetRhiSupportShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:PackagingTarget ;
+    sh:sparql [
+        sh:message "RHI profile mismatch: The target RHI Profile API configured in the PackagingTarget must be supported by the target world's RenderingSubsystem." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?world ?subsystem ?renderAPI
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this ue4:targetWorld ?world .
+                $this ue4:targetRHIProfile ?profile .
+                ?profile ue4:hasRenderAPI ?renderAPI .
+                ?world ue4:hasSubsystem ?subsystem .
+                ?subsystem a/rdfs:subClassOf* ue4:URenderingSubsystem .
+                FILTER NOT EXISTS { ?subsystem ue4:supportsRHI ?renderAPI }
+            }
+        """ ;
+    ] .
+
+# --- Physics: Collision Profile Completeness and Uniqueness ---
+ue4:UCollisionProfileShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UCollisionProfile ;
+    sh:property [
+        sh:path ue4:profileName ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "A collision profile must have exactly one string profileName." ;
+    ] ;
+    sh:property [
+        sh:path ue4:collisionEnabled ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:ECollisionEnabled ;
+        sh:message "A collision profile must have exactly one collisionEnabled configuration." ;
+    ] ;
+    sh:property [
+        sh:path ue4:collisionObjectType ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class ue4:ECollisionChannel ;
+        sh:message "A collision profile must have exactly one collisionObjectType." ;
+    ] .
+
+ue4:CollisionProfileUniqueChannelsShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UCollisionProfile ;
+    sh:sparql [
+        sh:message "Collision profile channel conflict: A collision profile cannot define multiple responses for the same collision channel." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?channel
+            WHERE {
+                $this ue4:hasChannelResponse ?resp1 .
+                $this ue4:hasChannelResponse ?resp2 .
+                ?resp1 ue4:hasResponseChannel ?channel .
+                ?resp2 ue4:hasResponseChannel ?channel .
+                FILTER (?resp1 != ?resp2)
+            } ORDER BY $this ?channel
+        """ ;
+    ] .
+
+# --- Physics: Unique Profile Names within a Subsystem ---
+ue4:PhysicsSubsystemUniqueProfileNamesShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UPhysicsSubsystem ;
+    sh:sparql [
+        sh:message "Duplicate collision profile names registered: Each registered collision profile must have a unique profileName." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?name ?profile1 ?profile2
+            WHERE {
+                $this ue4:registersCollisionProfile ?profile1 .
+                $this ue4:registersCollisionProfile ?profile2 .
+                ?profile1 ue4:profileName ?name .
+                ?profile2 ue4:profileName ?name .
+                FILTER (?profile1 != ?profile2)
+            } ORDER BY $this ?name
+        """ ;
+    ] .
+
+# --- Physics: Unregistered Profile Usage ---
+ue4:ComponentCollisionProfileRegistrationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UPrimitiveComponent ;
+    sh:sparql [
+        sh:message "Unregistered collision profile: The collision profile used by this component is not registered in the world's physics subsystem." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?profile ?world
+            WHERE {
+                ?ontology a owl:Ontology .
+                ?world ue4:hasLevel/ue4:hasActor/ue4:hasComponent $this .
+                $this ue4:hasCollisionProfile ?profile .
+                ?world ue4:hasSubsystem ?physSub .
+                ?physSub a/rdfs:subClassOf* ue4:UPhysicsSubsystem .
+                FILTER NOT EXISTS {
+                    ?physSub ue4:registersCollisionProfile ?profile .
+                }
+            } ORDER BY $this ?profile
+        """ ;
+    ] .
+
+# --- Physics: Physical Parameter Limit Validation ---
+ue4:RigidBodyPhysicalLimitsShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URigidBody ;
+    sh:property [
+        sh:path ue4:linearDamping ;
+        sh:minInclusive 0.0 ;
+        sh:message "Linear damping must be non-negative." ;
+    ] ;
+    sh:property [
+        sh:path ue4:angularDamping ;
+        sh:minInclusive 0.0 ;
+        sh:message "Angular damping must be non-negative." ;
+    ] ;
+    sh:property [
+        sh:path ue4:maxLinearVelocity ;
+        sh:minInclusive 0.0 ;
+        sh:message "Maximum linear velocity must be non-negative." ;
+    ] ;
+    sh:property [
+        sh:path ue4:maxAngularVelocity ;
+        sh:minInclusive 0.0 ;
+        sh:message "Maximum angular velocity must be non-negative." ;
+    ] .
+
+# --- Physics: Symmetric Collision Response Warning ---
+ue4:SymmetricCollisionResponseWarningShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UCollisionProfile ;
+    sh:sparql [
+        sh:severity sh:Warning ;
+        sh:message "Asymmetric collision response warning: Responses between profile object types do not match (Profile1 responds to Type2 differently than Profile2 responds to Type1)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?profile2 ?type1 ?type2 ?respVal1 ?respVal2
+            WHERE {
+                $this ue4:collisionObjectType ?type1 ;
+                      ue4:hasChannelResponse ?resp1 .
+                ?resp1 ue4:hasResponseChannel ?type2 ;
+                       ue4:hasResponseValue ?respVal1 .
+                       
+                ?profile2 a ue4:UCollisionProfile ;
+                          ue4:collisionObjectType ?type2 ;
+                          ue4:hasChannelResponse ?resp2 .
+                ?resp2 ue4:hasResponseChannel ?type1 ;
+                       ue4:hasResponseValue ?respVal2 .
+                       
+                FILTER ($this != ?profile2)
+                FILTER (?respVal1 != ?respVal2)
+            } ORDER BY $this ?profile2
+        """ ;
+    ] .
+
+# --- Networking: RPC Return Type Must Be Void ---
+ue4:RPCReturnTypeVoidShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URPC ;
+    sh:sparql [
+        sh:message "RPC return type violation: RPC functions must return void (no returnProperty)." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            SELECT $this ?retProp
+            WHERE {
+                $this a/rdfs:subClassOf* ue4:URPC .
+                $this ue4:returnProperty ?retProp .
+            }
+        """ ;
+    ] .
+
+# --- Networking: Validation Prohibited on Client/Multicast RPCs ---
+ue4:ClientRPCValidationProhibitedShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URPC ;
+    sh:sparql [
+        sh:message "RPC validation function violation: Client and NetMulticast RPCs cannot specify WithValidation or a validationFunction." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                $this a ?type .
+                FILTER (?type = ue4:UClientRPC || ?type = ue4:UNetMulticastRPC)
+                {
+                    $this ue4:bWithValidation true .
+                }
+                UNION
+                {
+                    $this ue4:validationFunction ?func .
+                }
+            }
+        """ ;
+    ] .
+
+# --- Networking: Server RPCs Must Have Validation ---
+ue4:ServerRPCValidationMandatoryShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UServerRPC ;
+    sh:sparql [
+        sh:message "Server RPC validation missing: Server RPC functions must specify WithValidation and a validationFunction for security compliance." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this a/rdfs:subClassOf* ue4:UServerRPC .
+                FILTER NOT EXISTS {
+                    $this ue4:bWithValidation true ;
+                          ue4:validationFunction ?valFunc .
+                }
+            }
+        """ ;
+    ] .
+
+# --- Networking: Strengthened Component Replication Owner Shape ---
+ue4:StrengthenedComponentReplicationOwnerShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UActorComponent ;
+    sh:sparql [
+        sh:message "Component replication owner violation: Replicated components must belong to a replicated actor, and cannot be orphaned." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?actor
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this a/rdfs:subClassOf* ue4:UActorComponent ;
+                      ue4:bReplicates true .
+                {
+                    $this ue4:isComponentOf ?actor .
+                    FILTER NOT EXISTS { ?actor ue4:bReplicates true }
+                }
+                UNION
+                {
+                    FILTER NOT EXISTS { $this ue4:isComponentOf ?anyActor }
+                }
+            } ORDER BY $this ?actor
+        """ ;
+    ] .
+
+# --- Networking: Replication Condition Consistency Shape ---
+ue4:ReplicationConditionConsistencyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UProperty ;
+    sh:sparql [
+        sh:message "Replication condition inconsistency: Properties must not have replication conditions or lifetimes assigned if they are not explicitly declared as replicating." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?prop
+            WHERE {
+                ?ontology a owl:Ontology .
+                {
+                    # Direct condition check
+                    $this a/rdfs:subClassOf* ue4:UProperty ;
+                          ue4:lifetimeCondition ?cond .
+                    BIND($this AS ?prop)
+                }
+                UNION
+                {
+                    # Lifetime registration check
+                    $this a/rdfs:subClassOf* ue4:FReplicationLifetime ;
+                          ue4:replicatedProperty ?prop .
+                }
+                FILTER NOT EXISTS { ?prop ue4:bReplicated true }
+            }
+        """ ;
+    ] .
+
+# --- Networking: RepNotify Requires Replication ---
+ue4:RepNotifyRequiresReplicationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UProperty ;
+    sh:sparql [
+        sh:message "RepNotify requires replication: RepNotify callback functions can only be declared on properties that are replicated." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?prop
+            WHERE {
+                ?ontology a owl:Ontology .
+                {
+                    # Direct property RepNotify
+                    $this a/rdfs:subClassOf* ue4:UProperty ;
+                          ue4:repNotifyFunction ?func .
+                    BIND($this AS ?prop)
+                }
+                UNION
+                {
+                    # Lifetime registration RepNotify
+                    $this a/rdfs:subClassOf* ue4:FReplicationLifetime ;
+                          ue4:replicatedProperty ?prop ;
+                          ue4:repNotifyFunction ?func .
+                }
+                FILTER NOT EXISTS { ?prop ue4:bReplicated true }
+            }
+        """ ;
+    ] .
+
+# --- Networking: Complete Replicated Property Specification ---
+ue4:CompleteReplicatedPropertySpecificationShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UProperty ;
+    sh:sparql [
+        sh:message "Replicated property specification incomplete: Replicated properties must specify a lifetime condition or corresponding replication lifetime registration." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this a/rdfs:subClassOf* ue4:UProperty ;
+                      ue4:bReplicated true .
+                FILTER NOT EXISTS {
+                    { $this ue4:lifetimeCondition ?anyCond }
+                    UNION
+                    { ?lifetime ue4:replicatedProperty $this }
+                }
+            }
+        """ ;
+    ] .
+
+# --- Networking: RPC Parameter Object Type Safety ---
+ue4:RPCParameterObjectTypeSafetyShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:URPC ;
+    sh:sparql [
+        sh:message "RPC parameter type safety violation: Object parameters passed to RPCs must inherit from AActor or UActorComponent." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX owl: <http://www.w3.org/2002/07/owl#>
+            SELECT $this ?param ?paramType
+            WHERE {
+                ?ontology a owl:Ontology .
+                $this a/rdfs:subClassOf* ue4:URPC ;
+                      ue4:hasParameter ?param .
+                ?param a/rdfs:subClassOf* ue4:UObjectProperty ;
+                       ue4:propertyType ?paramType .
+                FILTER NOT EXISTS {
+                    { ?paramType rdfs:subClassOf* ue4:AActor }
+                    UNION
+                    { ?paramType rdfs:subClassOf* ue4:UActorComponent }
+                }
+            }
+        """ ;
+    ] .
+
+# Rule 27: Kinematic Simulation Disconnect (RuleKinematicSimulationDisconnect)
+ue4:KinematicSimulationDisconnectShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UPrimitiveComponent ;
+    sh:sparql [
+        sh:message "RuleKinematicSimulationDisconnect: Kinematic parameter disconnect: if bSimulatePhysics is true, the associated rigid body's physicsType must be PhysType_Simulated or PhysType_Default." ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this ?body
+            WHERE {
+                $this ue4:bSimulatePhysics true ;
+                      ue4:hasRigidBody ?body .
+                FILTER NOT EXISTS {
+                    ?body ue4:physicsType ?physType .
+                    FILTER (?physType = ue4:PhysType_Simulated || ?physType = ue4:PhysType_Default)
+                }
+            } ORDER BY $this ?body
+        """ ;
+    ] .
+
+# Test Shape to verify SHACL SPARQL execution
+ue4:TestWorldShape
+    a sh:NodeShape ;
+    sh:targetClass ue4:UWorld ;
+    sh:sparql [
+        sh:message "Test SHACL SPARQL Violation" ;
+        sh:select """
+            PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
+            SELECT $this
+            WHERE {
+                $this a ue4:UWorld .
+            }
+        """ ;
+    ] .
+

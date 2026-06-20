@@ -1,0 +1,35 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/reflection#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Reflection Ontology" ;
+    rdfs:comment "Ontology representing reflection and class metadata in Unreal Engine 4." .
+
+ue4:UField a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UField" ;
+    rdfs:comment "Base class for all reflection fields (properties, functions, etc.)." .
+
+ue4:UStruct a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UStruct" ;
+    rdfs:comment "Base class for all structural types containing fields, such as functions and classes." .
+
+ue4:UClass a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UClass" ;
+    rdfs:comment "Reflected metadata representation of a C++ or Blueprint class." .
+
+ue4:UProperty a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UProperty" ;
+    rdfs:comment "Reflected metadata representation of a class member variable." .
+
+ue4:UFunction a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UFunction" ;
+    rdfs:comment "Reflected metadata representation of a callable function." .

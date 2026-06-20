@@ -1,3 +1,4 @@
+pub use nexus_types::{GundamSeries, MagicType};
 use serde::{Deserialize, Serialize};
 
 use crate::session::SessionError;
@@ -15,27 +16,9 @@ pub enum NewtypeRank {
     Coordinator,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum GundamSeries {
-    WitchFromMercury,
-    Seed,
-    Unicorn,
-    UniversalCentury,
-    Wing,
-    DoubleO,
-    IronBloodedOrphans,
-    TurnA,
-    BuildFighters,
-}
+// GundamSeries imported from nexus_types
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum MagicType {
-    Fire,
-    Lightning,
-    Ice,
-    Dark,
-    Light,
-}
+// MagicType imported from nexus_types
 
 // ────────────────────────────────────────────────────────────────────────────
 // PlayerProfile
@@ -161,5 +144,142 @@ impl PlayerProfile {
             20 => "Negative Bloodline",
             _ => "Beyond Reckoning",
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn player() -> PlayerProfile {
+        PlayerProfile::new(1, "Heero".into())
+    }
+
+    // ── new / defaults ────────────────────────────────────────────────────────
+
+    #[test]
+    fn new_player_starts_at_level_1_with_100_gold() {
+        let p = player();
+        assert_eq!(p.level, 1);
+        assert_eq!(p.gold, 100);
+        assert_eq!(p.xp, 0);
+        assert_eq!(p.duel_rating, 1000);
+    }
+
+    #[test]
+    fn new_player_is_alive() {
+        assert!(player().is_alive());
+    }
+
+    // ── apply_xp_gain ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn xp_below_threshold_does_not_level_up() {
+        let mut p = player();
+        // Level 2 requires 100 * 2² = 400 XP
+        let levelled = p.apply_xp_gain(399);
+        assert!(!levelled);
+        assert_eq!(p.level, 1);
+    }
+
+    #[test]
+    fn xp_at_threshold_levels_up() {
+        let mut p = player();
+        let levelled = p.apply_xp_gain(400); // 100 * 2² = 400
+        assert!(levelled);
+        assert_eq!(p.level, 2);
+    }
+
+    #[test]
+    fn level_up_grants_stat_bonuses() {
+        let mut p = player();
+        let before_atk = p.stat_attack;
+        let before_def = p.stat_defense;
+        p.apply_xp_gain(400);
+        assert_eq!(p.stat_attack, before_atk + 2);
+        assert_eq!(p.stat_defense, before_def + 1);
+    }
+
+    #[test]
+    fn xp_is_cumulative_across_calls() {
+        let mut p = player();
+        p.apply_xp_gain(200);
+        p.apply_xp_gain(200);
+        assert_eq!(p.level, 2, "split XP grants must still trigger level-up");
+    }
+
+    // ── spend_gold ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn spend_gold_deducts_from_balance() {
+        let mut p = player();
+        p.spend_gold(50).unwrap();
+        assert_eq!(p.gold, 50);
+    }
+
+    #[test]
+    fn spend_gold_exact_balance_leaves_zero() {
+        let mut p = player();
+        p.spend_gold(100).unwrap();
+        assert_eq!(p.gold, 0);
+    }
+
+    #[test]
+    fn spend_gold_over_balance_returns_error() {
+        let mut p = player();
+        let result = p.spend_gold(101);
+        assert!(matches!(result, Err(SessionError::InsufficientGold { need: 101, have: 100 })));
+        assert_eq!(p.gold, 100, "gold must not be deducted on error");
+    }
+
+    // ── bloodline_label ───────────────────────────────────────────────────────
+
+    #[test]
+    fn bloodline_0_is_first_blood() {
+        assert_eq!(player().bloodline_label(), "First Blood");
+    }
+
+    #[test]
+    fn bloodline_1_is_awakened() {
+        let mut p = player();
+        p.bloodline = 1;
+        assert_eq!(p.bloodline_label(), "Bloodline Awakened");
+    }
+
+    #[test]
+    fn bloodline_10_is_deathless() {
+        let mut p = player();
+        p.bloodline = 10;
+        assert_eq!(p.bloodline_label(), "Deathless");
+    }
+
+    #[test]
+    fn bloodline_20_is_negative_bloodline() {
+        let mut p = player();
+        p.bloodline = 20;
+        assert_eq!(p.bloodline_label(), "Negative Bloodline");
+    }
+
+    #[test]
+    fn bloodline_beyond_20_is_beyond_reckoning() {
+        let mut p = player();
+        p.bloodline = 21;
+        assert_eq!(p.bloodline_label(), "Beyond Reckoning");
+    }
+
+    // ── is_alive ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn player_with_zero_hp_is_not_alive() {
+        let mut p = player();
+        p.hp = 0.0;
+        assert!(!p.is_alive());
+    }
+
+    #[test]
+    fn player_with_positive_hp_is_alive() {
+        let mut p = player();
+        p.hp = 0.001;
+        assert!(p.is_alive());
     }
 }

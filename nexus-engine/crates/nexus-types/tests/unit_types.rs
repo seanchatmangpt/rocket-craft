@@ -1,6 +1,6 @@
-use proptest::prelude::*;
+use nexus_types::math::{Quat, Transform, Vec3};
 use nexus_types::units::*;
-use nexus_types::math::{Transform, Vec3, Quat};
+use proptest::prelude::*;
 
 // ---------------------------------------------------------------------------
 // Property-based tests
@@ -31,7 +31,7 @@ proptest! {
     #[test]
     fn gold_never_negative(v in 0u32..=u32::MAX) {
         let g = Gold::new(v);
-        prop_assert!(g.value() <= u32::MAX);
+        prop_assert_eq!(g.value(), v);
     }
 
     /// Gold saturating addition never wraps to a smaller value.
@@ -138,7 +138,7 @@ fn time_dilation_constants_make_sense() {
 /// Typed IDs of different tags are distinct types (compile-time test via type inference).
 #[test]
 fn typed_id_type_safety() {
-    use nexus_types::ids::{PlayerId, ItemId};
+    use nexus_types::ids::{ItemId, PlayerId};
     let pid = PlayerId::new(42);
     let iid = ItemId::new(42);
     // Both wrap 42 but are distinct types — the following would NOT compile:

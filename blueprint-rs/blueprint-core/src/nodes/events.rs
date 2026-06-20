@@ -1,16 +1,20 @@
 use crate::ast::{BpNode, Pin};
-use crate::types::{PinType, PinDirection, PinCategory, ContainerType};
+use crate::types::{ContainerType, PinCategory, PinDirection, PinType};
 
 // Helper: creates the hidden OutputDelegate pin all events have
 fn delegate_pin() -> Pin {
-    let mut p = Pin::new("OutputDelegate", PinDirection::Output, PinType {
-        category: PinCategory::Delegate,
-        sub_category: None,
-        sub_category_object: None,
-        container: ContainerType::None,
-        is_reference: false,
-        is_const: false,
-    });
+    let mut p = Pin::new(
+        "OutputDelegate",
+        PinDirection::Output,
+        PinType {
+            category: PinCategory::Delegate,
+            sub_category: None,
+            sub_category_object: None,
+            container: ContainerType::None,
+            is_reference: false,
+            is_const: false,
+        },
+    );
     p.is_hidden = true;
     p.is_not_connectable = true;
     p
@@ -19,8 +23,13 @@ fn delegate_pin() -> Pin {
 // Helper: create an actor event node
 fn actor_event(name: &str, member_name: &str) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_Event", name)
-        .with_property("EventReference", &format!(
-            "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"{}\")", member_name))
+        .with_property(
+            "EventReference",
+            format!(
+                "(MemberParent=Class'/Script/Engine.Actor',MemberName=\"{}\")",
+                member_name
+            ),
+        )
         .with_property("bOverrideFunction", "True")
         .with_pin(delegate_pin())
         .with_pin(Pin::exec_output("then"))
@@ -29,8 +38,13 @@ fn actor_event(name: &str, member_name: &str) -> BpNode {
 // Helper: create a pawn event node
 fn pawn_event(name: &str, member_name: &str) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_Event", name)
-        .with_property("EventReference", &format!(
-            "(MemberParent=Class'/Script/Engine.Pawn',MemberName=\"{}\")", member_name))
+        .with_property(
+            "EventReference",
+            format!(
+                "(MemberParent=Class'/Script/Engine.Pawn',MemberName=\"{}\")",
+                member_name
+            ),
+        )
         .with_property("bOverrideFunction", "True")
         .with_pin(delegate_pin())
         .with_pin(Pin::exec_output("then"))
@@ -39,8 +53,13 @@ fn pawn_event(name: &str, member_name: &str) -> BpNode {
 // Helper: create a character event node
 fn character_event(name: &str, member_name: &str) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_Event", name)
-        .with_property("EventReference", &format!(
-            "(MemberParent=Class'/Script/Engine.Character',MemberName=\"{}\")", member_name))
+        .with_property(
+            "EventReference",
+            format!(
+                "(MemberParent=Class'/Script/Engine.Character',MemberName=\"{}\")",
+                member_name
+            ),
+        )
         .with_property("bOverrideFunction", "True")
         .with_pin(delegate_pin())
         .with_pin(Pin::exec_output("then"))
@@ -58,31 +77,33 @@ pub fn begin_play(name: impl Into<String>) -> BpNode {
 /// Includes an EndPlayReason output (byte enum)
 pub fn end_play(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    actor_event(&n, "ReceiveEndPlay")
-        .with_pin(Pin::data_output("EndPlayReason", PinType::byte()))
+    actor_event(&n, "ReceiveEndPlay").with_pin(Pin::data_output("EndPlayReason", PinType::byte()))
 }
 
 /// Called every frame (Tick)
 /// Includes DeltaSeconds (float) output pin
 pub fn tick(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    actor_event(&n, "ReceiveTick")
-        .with_pin(Pin::data_output("DeltaSeconds", PinType::float()))
+    actor_event(&n, "ReceiveTick").with_pin(Pin::data_output("DeltaSeconds", PinType::float()))
 }
 
 /// Called when this actor overlaps another actor (BeginOverlap)
 /// OtherActor output: object pin
 pub fn begin_overlap(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    actor_event(&n, "ReceiveActorBeginOverlap")
-        .with_pin(Pin::data_output("OtherActor", PinType::object("/Script/Engine.Actor")))
+    actor_event(&n, "ReceiveActorBeginOverlap").with_pin(Pin::data_output(
+        "OtherActor",
+        PinType::object("/Script/Engine.Actor"),
+    ))
 }
 
 /// Called when overlap ends (EndOverlap)
 pub fn end_overlap(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    actor_event(&n, "ReceiveActorEndOverlap")
-        .with_pin(Pin::data_output("OtherActor", PinType::object("/Script/Engine.Actor")))
+    actor_event(&n, "ReceiveActorEndOverlap").with_pin(Pin::data_output(
+        "OtherActor",
+        PinType::object("/Script/Engine.Actor"),
+    ))
 }
 
 /// Called when this actor is hit by a line trace or sweep
@@ -125,21 +146,19 @@ pub fn hit(name: impl Into<String>) -> BpNode {
 /// Called when actor is clicked (OnClicked)
 pub fn on_clicked(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    actor_event(&n, "ReceiveActorOnClicked")
-        .with_pin(Pin::data_output(
-            "ButtonPressed",
-            PinType::struct_type("/Script/InputCore.Key"),
-        ))
+    actor_event(&n, "ReceiveActorOnClicked").with_pin(Pin::data_output(
+        "ButtonPressed",
+        PinType::struct_type("/Script/InputCore.Key"),
+    ))
 }
 
 /// Called when actor click is released (OnReleased)
 pub fn on_released(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    actor_event(&n, "ReceiveActorOnReleased")
-        .with_pin(Pin::data_output(
-            "ButtonReleased",
-            PinType::struct_type("/Script/InputCore.Key"),
-        ))
+    actor_event(&n, "ReceiveActorOnReleased").with_pin(Pin::data_output(
+        "ButtonReleased",
+        PinType::struct_type("/Script/InputCore.Key"),
+    ))
 }
 
 /// Called when actor is destroyed
@@ -153,21 +172,19 @@ pub fn destroyed(name: impl Into<String>) -> BpNode {
 /// Called when this pawn is possessed by a controller
 pub fn possessed(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    pawn_event(&n, "ReceivePossessed")
-        .with_pin(Pin::data_output(
-            "NewController",
-            PinType::object("/Script/Engine.Controller"),
-        ))
+    pawn_event(&n, "ReceivePossessed").with_pin(Pin::data_output(
+        "NewController",
+        PinType::object("/Script/Engine.Controller"),
+    ))
 }
 
 /// Called when this pawn is unpossessed
 pub fn unpossessed(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    pawn_event(&n, "ReceiveUnPossessed")
-        .with_pin(Pin::data_output(
-            "OldController",
-            PinType::object("/Script/Engine.Controller"),
-        ))
+    pawn_event(&n, "ReceiveUnPossessed").with_pin(Pin::data_output(
+        "OldController",
+        PinType::object("/Script/Engine.Controller"),
+    ))
 }
 
 // ======= CHARACTER EVENTS =======
@@ -175,11 +192,10 @@ pub fn unpossessed(name: impl Into<String>) -> BpNode {
 /// Called when character lands after falling
 pub fn landed(name: impl Into<String>) -> BpNode {
     let n = name.into();
-    character_event(&n, "ReceiveLanded")
-        .with_pin(Pin::data_output(
-            "Hit",
-            PinType::struct_type("/Script/Engine.HitResult"),
-        ))
+    character_event(&n, "ReceiveLanded").with_pin(Pin::data_output(
+        "Hit",
+        PinType::struct_type("/Script/Engine.HitResult"),
+    ))
 }
 
 // ======= CUSTOM EVENTS =======
@@ -188,7 +204,7 @@ pub fn landed(name: impl Into<String>) -> BpNode {
 /// Custom events use K2Node_CustomEvent class (not K2Node_Event).
 pub fn custom_event(node_name: impl Into<String>, event_name: impl Into<String>) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_CustomEvent", node_name)
-        .with_property("CustomFunctionName", &format!("\"{}\"", event_name.into()))
+        .with_property("CustomFunctionName", format!("\"{}\"", event_name.into()))
         .with_pin(delegate_pin())
         .with_pin(Pin::exec_output("then"))
 }
@@ -201,7 +217,7 @@ pub fn custom_event_with_params(
     params: Vec<(&str, PinType)>,
 ) -> BpNode {
     let mut node = BpNode::new("/Script/BlueprintGraph.K2Node_CustomEvent", node_name)
-        .with_property("CustomFunctionName", &format!("\"{}\"", event_name.into()))
+        .with_property("CustomFunctionName", format!("\"{}\"", event_name.into()))
         .with_pin(delegate_pin());
     for (param_name, param_type) in params {
         node = node.with_pin(Pin::data_output(param_name, param_type));
@@ -216,7 +232,7 @@ pub fn custom_event_with_params(
 /// Pins: execute (exec in), Pressed (exec out), Released (exec out).
 pub fn input_action(name: impl Into<String>, action_name: impl Into<String>) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_InputAction", name)
-        .with_property("InputActionName", &format!("\"{}\"", action_name.into()))
+        .with_property("InputActionName", format!("\"{}\"", action_name.into()))
         .with_pin(Pin::exec_input("execute"))
         .with_pin(Pin::exec_output("Pressed"))
         .with_pin(Pin::exec_output("Released"))
@@ -226,7 +242,7 @@ pub fn input_action(name: impl Into<String>, action_name: impl Into<String>) -> 
 /// Adds AxisValue (float out) pin.
 pub fn input_axis(name: impl Into<String>, axis_name: impl Into<String>) -> BpNode {
     BpNode::new("/Script/BlueprintGraph.K2Node_InputAxisEvent", name)
-        .with_property("InputAxisName", &format!("\"{}\"", axis_name.into()))
+        .with_property("InputAxisName", format!("\"{}\"", axis_name.into()))
         .with_pin(delegate_pin())
         .with_pin(Pin::data_output("AxisValue", PinType::float()))
         .with_pin(Pin::exec_output("then"))
@@ -237,7 +253,7 @@ pub fn input_axis(name: impl Into<String>, axis_name: impl Into<String>) -> BpNo
 pub fn key_event(name: impl Into<String>, key: impl Into<String>, pressed: bool) -> BpNode {
     let event_type = if pressed { "IE_Pressed" } else { "IE_Released" };
     BpNode::new("/Script/BlueprintGraph.K2Node_InputKeyEvent", name)
-        .with_property("InputChord", &format!("(Key=(KeyName=\"{}\"))", key.into()))
+        .with_property("InputChord", format!("(Key=(KeyName=\"{}\"))", key.into()))
         .with_property("bConsumeInput", "True")
         .with_property("bExecuteWhenPaused", "False")
         .with_property("bOverrideParentBinding", "True")
@@ -263,7 +279,9 @@ mod tests {
         assert_eq!(node.properties.get("bOverrideFunction").unwrap(), "True");
 
         // Must have hidden delegate pin
-        let delegate = node.find_pin("OutputDelegate").expect("OutputDelegate pin missing");
+        let delegate = node
+            .find_pin("OutputDelegate")
+            .expect("OutputDelegate pin missing");
         assert!(delegate.is_hidden);
         assert!(delegate.is_not_connectable);
         assert_eq!(delegate.direction, PinDirection::Output);
@@ -296,7 +314,10 @@ mod tests {
             "CustomFunctionName should contain the event name, got: {}",
             func_name
         );
-        assert!(node.find_pin("OutputDelegate").is_some(), "OutputDelegate pin missing");
+        assert!(
+            node.find_pin("OutputDelegate").is_some(),
+            "OutputDelegate pin missing"
+        );
         assert!(node.find_pin("then").is_some(), "then pin missing");
         // Should NOT have EventReference or bOverrideFunction
         assert!(node.properties.get("EventReference").is_none());
@@ -339,10 +360,16 @@ mod tests {
         assert!(node.find_pin("then").is_some());
         // Verify pin ordering: delegate, params, then
         let pin_names: Vec<&str> = node.pins.iter().map(|p| p.name.as_str()).collect();
-        let delegate_pos = pin_names.iter().position(|&n| n == "OutputDelegate").unwrap();
+        let delegate_pos = pin_names
+            .iter()
+            .position(|&n| n == "OutputDelegate")
+            .unwrap();
         let then_pos = pin_names.iter().position(|&n| n == "then").unwrap();
         let damage_pos = pin_names.iter().position(|&n| n == "DamageAmount").unwrap();
-        assert!(delegate_pos < damage_pos, "delegate should come before params");
+        assert!(
+            delegate_pos < damage_pos,
+            "delegate should come before params"
+        );
         assert!(damage_pos < then_pos, "params should come before then");
     }
 
@@ -350,7 +377,11 @@ mod tests {
     fn test_input_action_pins() {
         let node = input_action("JumpAction", "Jump");
         assert_eq!(node.class, "/Script/BlueprintGraph.K2Node_InputAction");
-        assert!(node.properties.get("InputActionName").unwrap().contains("Jump"));
+        assert!(node
+            .properties
+            .get("InputActionName")
+            .unwrap()
+            .contains("Jump"));
         assert!(node.find_pin("execute").is_some());
         assert!(node.find_pin("Pressed").is_some());
         assert!(node.find_pin("Released").is_some());
@@ -360,7 +391,11 @@ mod tests {
     fn test_input_axis_pins() {
         let node = input_axis("MoveForwardAxis", "MoveForward");
         assert_eq!(node.class, "/Script/BlueprintGraph.K2Node_InputAxisEvent");
-        assert!(node.properties.get("InputAxisName").unwrap().contains("MoveForward"));
+        assert!(node
+            .properties
+            .get("InputAxisName")
+            .unwrap()
+            .contains("MoveForward"));
         let axis_pin = node.find_pin("AxisValue").expect("AxisValue pin missing");
         assert_eq!(axis_pin.pin_type.category, PinCategory::Float);
         assert_eq!(axis_pin.direction, PinDirection::Output);
@@ -384,16 +419,28 @@ mod tests {
     #[test]
     fn test_pawn_possessed_has_controller_pin() {
         let node = possessed("PossessedEvent");
-        assert!(node.properties.get("EventReference").unwrap().contains("ReceivePossessed"));
-        assert!(node.properties.get("EventReference").unwrap().contains("/Script/Engine.Pawn"));
-        let pin = node.find_pin("NewController").expect("NewController pin missing");
+        assert!(node
+            .properties
+            .get("EventReference")
+            .unwrap()
+            .contains("ReceivePossessed"));
+        assert!(node
+            .properties
+            .get("EventReference")
+            .unwrap()
+            .contains("/Script/Engine.Pawn"));
+        let pin = node
+            .find_pin("NewController")
+            .expect("NewController pin missing");
         assert_eq!(pin.pin_type.category, PinCategory::Object);
     }
 
     #[test]
     fn test_end_play_has_reason_pin() {
         let node = end_play("EndPlayEvent");
-        let pin = node.find_pin("EndPlayReason").expect("EndPlayReason pin missing");
+        let pin = node
+            .find_pin("EndPlayReason")
+            .expect("EndPlayReason pin missing");
         assert_eq!(pin.pin_type.category, PinCategory::Byte);
         assert_eq!(pin.direction, PinDirection::Output);
     }

@@ -1,11 +1,14 @@
-use ib4_integration_tests::{new_session, Command, AttackDir};
+use ib4_integration_tests::{new_session, AttackDir, Command};
 
 #[test]
 fn should_spawn_enemy_on_first_attack() {
     let mut s = new_session();
     // Attack when not in combat triggers spawn_next_enemy
     let out = s.dispatch(Command::Attack(AttackDir::Overhead));
-    assert!(s.current_enemy.is_some(), "First Attack should spawn an enemy");
+    assert!(
+        s.current_enemy.is_some(),
+        "First Attack should spawn an enemy"
+    );
     assert!(s.is_in_combat(), "Should be in combat after spawning enemy");
     let text = out.join(" ");
     assert!(!text.is_empty(), "Should produce narrative output");
@@ -18,7 +21,10 @@ fn should_produce_look_output_on_explore() {
     // Explore calls cmd_look — no combat yet, shows queue info
     assert!(!out.is_empty(), "Explore should produce output");
     assert!(!s.is_in_combat(), "Explore alone does not start combat");
-    assert!(s.current_enemy.is_none(), "Explore alone does not spawn enemy");
+    assert!(
+        s.current_enemy.is_none(),
+        "Explore alone does not spawn enemy"
+    );
 }
 
 #[test]
@@ -29,7 +35,12 @@ fn should_complete_full_combat_loop_killing_light_titan() {
     assert!(s.current_enemy.is_some());
 
     let mut rounds = 0;
-    while s.current_enemy.as_ref().map(|e| e.is_alive()).unwrap_or(false) {
+    while s
+        .current_enemy
+        .as_ref()
+        .map(|e| e.is_alive())
+        .unwrap_or(false)
+    {
         // Clear pending announced attack before attacking (avoid taking damage and dying early)
         s.announced_attack = None;
         s.dispatch(Command::Attack(AttackDir::Overhead));
@@ -41,7 +52,10 @@ fn should_complete_full_combat_loop_killing_light_titan() {
     assert!(!s.is_in_combat(), "Not in combat after enemy defeated");
     assert!(s.player.xp > 0, "XP awarded on enemy defeat");
     // player starts with 100 gold, gains more on verified
-    assert!(s.player.gold >= 100, "Gold awarded on enemy defeat (starts with 100)");
+    assert!(
+        s.player.gold >= 100,
+        "Gold awarded on enemy defeat (starts with 100)"
+    );
 }
 
 #[test]
@@ -62,13 +76,18 @@ fn should_build_combo_depth_on_consecutive_attacks() {
     s.announced_attack = None;
     let combo_before = s.combo_depth;
     s.dispatch(Command::Attack(AttackDir::Left));
-    assert!(s.combo_depth > combo_before, "Combo depth increases on consecutive attacks");
+    assert!(
+        s.combo_depth > combo_before,
+        "Combo depth increases on consecutive attacks"
+    );
 
     s.announced_attack = None;
     let combo_before2 = s.combo_depth;
     s.dispatch(Command::Attack(AttackDir::Overhead));
-    assert!(s.combo_depth > combo_before2 || s.current_enemy.is_none(),
-        "Combo depth increases further, or enemy died");
+    assert!(
+        s.combo_depth > combo_before2 || s.current_enemy.is_none(),
+        "Combo depth increases further, or enemy died"
+    );
 }
 
 #[test]
@@ -105,9 +124,12 @@ fn should_trigger_phase2_transition_at_60_percent_hp() {
 
     let phase = s.current_enemy.as_ref().map(|e| e.phase).unwrap_or(0);
     // Either enemy transitioned to phase 2, or it died (possible with high damage + low HP)
-    assert!(phase >= 2 || s.current_enemy.is_none(),
+    assert!(
+        phase >= 2 || s.current_enemy.is_none(),
         "Phase 2 should trigger at 59% HP (phase={}, enemy_alive={})",
-        phase, s.current_enemy.is_some());
+        phase,
+        s.current_enemy.is_some()
+    );
 }
 
 #[test]
@@ -124,7 +146,10 @@ fn should_normal_parry_prevent_damage() {
     s.dispatch(Command::Parry);
     let hp_after = s.player.health;
 
-    assert_eq!(hp_before, hp_after, "Normal parry should prevent all damage");
+    assert_eq!(
+        hp_before, hp_after,
+        "Normal parry should prevent all damage"
+    );
 }
 
 #[test]
@@ -139,5 +164,8 @@ fn should_perfect_parry_matching_direction_prevent_damage() {
     s.dispatch(Command::PerfectParry(AttackDir::Left));
     let hp_after = s.player.health;
 
-    assert_eq!(hp_before, hp_after, "Perfect parry should prevent all damage");
+    assert_eq!(
+        hp_before, hp_after,
+        "Perfect parry should prevent all damage"
+    );
 }

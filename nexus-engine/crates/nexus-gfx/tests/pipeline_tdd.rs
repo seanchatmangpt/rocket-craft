@@ -1,8 +1,8 @@
-/// TDD tests for the `nexus-gfx` render pipeline using `chicago-tdd-tools`.
-///
-/// All tests operate on the descriptor / configuration layer only — no GPU
-/// device is required.  The `gpu` feature is intentionally NOT enabled here
-/// so that CI can run these tests without physical or virtual GPU hardware.
+//! TDD tests for the `nexus-gfx` render pipeline using `chicago-tdd-tools`.
+//!
+//! All tests operate on the descriptor / configuration layer only — no GPU
+//! device is required.  The `gpu` feature is intentionally NOT enabled here
+//! so that CI can run these tests without physical or virtual GPU hardware.
 
 use chicago_tdd_tools::TestEnvironment;
 use nexus_gfx::pipeline::{
@@ -17,16 +17,24 @@ use nexus_gfx::pipeline::{
 fn test_pipeline_defaults() {
     let _env = TestEnvironment::new().expect("TestEnvironment::new");
 
-    let pipeline = RenderPipeline::<Uninitialized>::new(
-        "default_test",
-        "vs_source",
-        "fs_source",
-    );
+    let pipeline = RenderPipeline::<Uninitialized>::new("default_test", "vs_source", "fs_source");
 
-    assert_eq!(pipeline.cull_mode, CullMode::Back,  "default cull_mode must be Back");
-    assert!(pipeline.depth_write,                    "default depth_write must be true");
-    assert_eq!(pipeline.blend_mode, BlendMode::Opaque, "default blend_mode must be Opaque");
-    assert_eq!(pipeline.depth_compare, DepthCompare::Less, "default depth_compare must be Less");
+    assert_eq!(
+        pipeline.cull_mode,
+        CullMode::Back,
+        "default cull_mode must be Back"
+    );
+    assert!(pipeline.depth_write, "default depth_write must be true");
+    assert_eq!(
+        pipeline.blend_mode,
+        BlendMode::Opaque,
+        "default blend_mode must be Opaque"
+    );
+    assert_eq!(
+        pipeline.depth_compare,
+        DepthCompare::Less,
+        "default depth_compare must be Less"
+    );
     assert_eq!(pipeline.label, "default_test");
 }
 
@@ -57,12 +65,16 @@ fn test_compile_transitions_typestate_and_preserves_label() {
     let _env = TestEnvironment::new().expect("TestEnvironment::new");
 
     let label = "opaque_suit";
-    let compiled = RenderPipeline::<Uninitialized>::new(label, "suit.vert.wgsl", "suit.frag.wgsl")
-        .compile();
+    let compiled =
+        RenderPipeline::<Uninitialized>::new(label, "suit.vert.wgsl", "suit.frag.wgsl").compile();
 
     // The return type is `RenderPipeline<Compiled>` — if it weren't, `label()`
     // wouldn't be callable (it only exists on Compiled).
-    assert_eq!(compiled.label(), label, "compiled label must match the original");
+    assert_eq!(
+        compiled.label(),
+        label,
+        "compiled label must match the original"
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -75,11 +87,11 @@ fn test_pipeline_set_build_creates_all_five() {
 
     let set = PipelineSet::build();
 
-    assert_eq!(set.opaque.label(),       "opaque");
-    assert_eq!(set.transparent.label(),  "transparent");
+    assert_eq!(set.opaque.label(), "opaque");
+    assert_eq!(set.transparent.label(), "transparent");
     assert_eq!(set.beam_effects.label(), "beam");
-    assert_eq!(set.ui.label(),           "ui");
-    assert_eq!(set.shadow.label(),       "shadow");
+    assert_eq!(set.ui.label(), "ui");
+    assert_eq!(set.shadow.label(), "shadow");
 }
 
 // ---------------------------------------------------------------------------

@@ -1,30 +1,61 @@
+//! # Unify AutoML Crate
+//!
+//! This crate provides the AutoML abstraction layer for the Genie World Manufacturing Platform.
+//! It includes:
+//! - **Discovery Registry**: Scanning directory trees to find components annotated with `@UnifyAutoBind` or `AutoBind` macros.
+//! - **Game Balance Auto-Optimizer**: Simulating battle outcomes via Monte Carlo simulations to find optimal stat allocations.
+//! - **CLI Integration**: Standard CLI dispatch commands for environment setup, discovery scans, optimization, and local server management.
+
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
+pub mod generator;
+pub mod simulator;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. DYNAMIC DISCOVERY REGISTRY
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// The `discovery` module implements dynamic discovery of game components by recursively scanning directories.
+// pub mod generator;
 pub mod discovery {
     use super::*;
 
+    /// A representation of a component found during dynamic discovery.
+    /// Includes its name, path, programming language, and the specific binding tag found.
     #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
     pub struct DiscoveredComponent {
+        /// The name of the discovered component.
         pub name: String,
+        /// The file path to the source file where the component is defined.
         pub file_path: String,
+        /// The programming language of the source file (e.g. Rust, C++).
         pub language: String,
+        /// The binding tag annotation found (e.g. `@UnifyAutoBind: CombatSystem`).
         pub binding_tag: String,
     }
 
+    /// The registry containing all discovered components and active workspace games.
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct ComponentRegistry {
+        /// List of all discovered game components.
         pub components: Vec<DiscoveredComponent>,
+        /// List of all detected workspace games.
         pub workspace_games: Vec<String>,
     }
 
     impl ComponentRegistry {
+        /// Creates a new empty `ComponentRegistry`.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use unify_automl::discovery::ComponentRegistry;
+        /// let registry = ComponentRegistry::new();
+        /// assert_eq!(registry.components.len(), 0);
+        /// ```
         pub fn new() -> Self {
             Self {
                 components: Vec::new(),
@@ -34,12 +65,17 @@ pub mod discovery {
     }
 
     impl Default for ComponentRegistry {
+        /// Returns the default value for a `ComponentRegistry`.
         fn default() -> Self {
             Self::new()
         }
     }
 
     /// Recursively scan a directory for Rust, C++, and C files containing `@UnifyAutoBind` comment tags or `#[derive(AutoBind)]` macros.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if directory traversal or reading fails.
     pub fn scan_directory<P: AsRef<Path>>(dir: P) -> Result<ComponentRegistry> {
         let mut registry = ComponentRegistry::new();
 
@@ -54,6 +90,11 @@ pub mod discovery {
         Ok(registry)
     }
 
+    /// Recursively traverses directories to locate candidate source files for parsing.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any subdirectory cannot be read.
     fn scan_dir_recursive(dir: &Path, components: &mut Vec<DiscoveredComponent>) -> Result<()> {
         if !dir.exists() {
             return Ok(());
@@ -83,6 +124,7 @@ pub mod discovery {
         Ok(())
     }
 
+    /// Parses the content of a single source file to identify AutoML annotations and populate components.
     fn parse_file_content(content: &str, path: &Path, components: &mut Vec<DiscoveredComponent>) {
         let file_path = path.to_string_lossy().into_owned();
         let language = match path.extension().and_then(|e| e.to_str()) {
@@ -127,6 +169,18 @@ pub mod discovery {
         }
     }
 
+    /// Extracts the component name from a `@UnifyAutoBind` tag.
+    ///
+    /// Supporting syntax like `@UnifyAutoBind(MyComp)`, `@UnifyAutoBind: AnotherComp`, or `@UnifyAutoBind CleanName`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use unify_automl::discovery::extract_name_from_tag;
+    ///
+    /// let name = extract_name_from_tag("@UnifyAutoBind(HeroSystem)");
+    /// assert_eq!(name, Some("HeroSystem".to_string()));
+    /// ```
     pub fn extract_name_from_tag(tag: &str) -> Option<String> {
         let after_tag = tag.strip_prefix("@UnifyAutoBind")?.trim();
         let clean = after_tag
@@ -145,147 +199,36 @@ pub mod discovery {
 // 2. GAME BALANCE AUTO-OPTIMIZER
 // ─────────────────────────────────────────────────────────────────────────────
 
-pub mod balancer {
-    use super::*;
-    use chicago_tdd_tools::coordinate::{GameCoordinateSystem, InfinityBladeCoordinateSystem};
-    use ib4_mud::command::Command;
-    use ib4_mud::session::GameSession;
-
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    pub struct StatAllocation {
-        pub health: u32,
-        pub attack: u32,
-        pub defense: u32,
-        pub magic: u32,
-    }
-
-    #[derive(Debug, Clone, Serialize, Deserialize)]
-    pub struct SimulationResult {
-        pub allocation: StatAllocation,
-        pub player_win_rate: f64,
-        pub avg_turns: f64,
-        pub average_player_final_hp: f64,
-    }
-
-    /// Run Monte Carlo simulation battles with a specific stat allocation.
-    pub fn simulate_battles(alloc: &StatAllocation, num_blank_battles: usize) -> SimulationResult {
-        let mut player_wins = 0;
-        let mut total_turns = 0;
-        let mut total_final_hp = 0.0;
-
-        let coords = InfinityBladeCoordinateSystem;
-
-        for _ in 0..num_blank_battles {
-            let mut session = GameSession::new("Siris");
-
-            // Set stats and recalculate
-            session.player.stat_health = alloc.health;
-            session.player.stat_attack = alloc.attack;
-            session.player.stat_defense = alloc.defense;
-            session.player.stat_magic = alloc.magic;
-            session.player.recalculate_stats();
-            session.player.health = session.player.max_health;
-
-            // Trigger explore to enter combat
-            session.dispatch(Command::Explore);
-
-            let mut turns = 0;
-            while session.is_in_combat() && turns < 100 {
-                turns += 1;
-                let legal_moves = coords.get_legal_moves(&session);
-                if legal_moves.is_empty() {
-                    break;
-                }
-
-                // Choose a move: heuristics to prioritize parries or high-value attacks
-                let chosen_move = if session.announced_attack.is_some() {
-                    if legal_moves.contains(&Command::Parry) {
-                        Command::Parry
-                    } else {
-                        legal_moves[0].clone()
-                    }
-                } else {
-                    if let Some(atk_move) =
-                        legal_moves.iter().find(|m| matches!(m, Command::Attack(_)))
-                    {
-                        atk_move.clone()
-                    } else {
-                        legal_moves[0].clone()
-                    }
-                };
-
-                session.dispatch(chosen_move);
-            }
-
-            if session.player.health > 0.0 {
-                player_wins += 1;
-                total_final_hp += session.player.health;
-            }
-            total_turns += turns;
-        }
-
-        SimulationResult {
-            allocation: alloc.clone(),
-            player_win_rate: player_wins as f64 / num_blank_battles as f64,
-            avg_turns: total_turns as f64 / num_blank_battles as f64,
-            average_player_final_hp: if player_wins > 0 {
-                total_final_hp as f64 / player_wins as f64
-            } else {
-                0.0
-            },
-        }
-    }
-
-    /// Optimize stat allocations to reach closest to a target win rate.
-    pub fn optimize_balance(
-        total_points: u32,
-        target_win_rate: f64,
-        sims_per_config: usize,
-    ) -> Result<SimulationResult> {
-        let mut best_result: Option<SimulationResult> = None;
-        let mut min_diff = f64::MAX;
-
-        for h in 0..=total_points {
-            for a in 0..=(total_points - h) {
-                for d in 0..=(total_points - h - a) {
-                    let m = total_points - h - a - d;
-                    let alloc = StatAllocation {
-                        health: h,
-                        attack: a,
-                        defense: d,
-                        magic: m,
-                    };
-
-                    let res = simulate_battles(&alloc, sims_per_config);
-                    let diff = (res.player_win_rate - target_win_rate).abs();
-
-                    if diff < min_diff {
-                        min_diff = diff;
-                        best_result = Some(res);
-                    }
-                }
-            }
-        }
-
-        best_result.context("Failed to find any valid allocation result")
-    }
-}
+/// The `optimizer` module handles combat balancing through Monte Carlo simulations.
+pub mod optimizer;
+pub use optimizer as balancer;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 3. CLI INTEGRATION LAYER
 // ─────────────────────────────────────────────────────────────────────────────
 
+/// The `cli` module provides commands to interface with the AutoML system.
 pub mod cli {
     use super::*;
 
+    /// The standardized output response of a CLI command dispatch.
     #[derive(Debug, Serialize, Deserialize)]
     pub struct CliOutput {
+        /// Indicates if the command succeeded.
         pub success: bool,
+        /// Description of the command outcome.
         pub message: String,
+        /// Accompanying structured JSON data.
         pub data: serde_json::Value,
     }
 
     /// Dispatch developer CLI commands for AutoML.
+    ///
+    /// Supports `discover` and `optimize`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if commands fail or serialization fails.
     pub fn dispatch_command(args: &[String]) -> Result<CliOutput> {
         if args.is_empty() {
             return Ok(CliOutput {
@@ -338,6 +281,12 @@ pub mod cli {
     }
 
     /// Dispatch developer CLI commands for environment and server lifecycle.
+    ///
+    /// Supports `init` and `start`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if files cannot be created or the server cannot start.
     pub fn dispatch_dev_command(args: &[String]) -> Result<CliOutput> {
         if args.is_empty() {
             return Ok(CliOutput {
@@ -436,9 +385,9 @@ pub mod cli {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use balancer::{optimize_balance, simulate_battles, StatAllocation};
     use cli::dispatch_command;
     use discovery::extract_name_from_tag;
+    use optimizer::{optimize_balance, simulate_battles, StatAllocation};
 
     #[test]
     fn test_extract_name_from_tag() {

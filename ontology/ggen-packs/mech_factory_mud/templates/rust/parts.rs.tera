@@ -1,0 +1,3 @@
+// generated_by: ggen
+// Parts module
+pub const PARTS_COUNT: usize = 5;

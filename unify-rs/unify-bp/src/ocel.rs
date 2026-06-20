@@ -101,3 +101,88 @@ impl BlueprintOcelBridge {
         self.events.len()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use blueprint_core::Blueprint;
+
+    fn make_bp(name: &str) -> Blueprint {
+        Blueprint::new(name, "Actor")
+    }
+
+    // ── BlueprintOcelBridge::new ──────────────────────────────────────────────
+
+    #[test]
+    fn new_starts_empty() {
+        let bridge = BlueprintOcelBridge::new();
+        assert_eq!(bridge.event_count(), 0);
+        assert!(bridge.events().is_empty());
+    }
+
+    // ── record_generation ────────────────────────────────────────────────────
+
+    #[test]
+    fn record_generation_sets_activity_and_name() {
+        let mut bridge = BlueprintOcelBridge::new();
+        let bp = make_bp("MyActor");
+        let ev = bridge.record_generation(&bp);
+        assert_eq!(ev.activity, "blueprint:generate");
+        assert_eq!(ev.blueprint_name, "MyActor");
+    }
+
+    #[test]
+    fn record_generation_assigns_monotonic_id() {
+        let mut bridge = BlueprintOcelBridge::new();
+        let bp = make_bp("BP");
+        let ev1 = bridge.record_generation(&bp).id.clone();
+        let ev2 = bridge.record_generation(&bp).id.clone();
+        assert_eq!(ev1, "bp-1");
+        assert_eq!(ev2, "bp-2");
+    }
+
+    // ── record_validation ────────────────────────────────────────────────────
+
+    #[test]
+    fn record_validation_pass_when_zero_errors() {
+        let mut bridge = BlueprintOcelBridge::new();
+        let bp = make_bp("BP");
+        let ev = bridge.record_validation(&bp, 0);
+        assert_eq!(ev.activity, "blueprint:validate:pass");
+    }
+
+    #[test]
+    fn record_validation_fail_encodes_error_count() {
+        let mut bridge = BlueprintOcelBridge::new();
+        let bp = make_bp("BP");
+        let ev = bridge.record_validation(&bp, 3);
+        assert_eq!(ev.activity, "blueprint:validate:fail:3");
+    }
+
+    // ── record_t3d_export ────────────────────────────────────────────────────
+
+    #[test]
+    fn record_t3d_export_sets_correct_activity() {
+        let mut bridge = BlueprintOcelBridge::new();
+        let bp = make_bp("Mesh");
+        let ev = bridge.record_t3d_export(&bp);
+        assert_eq!(ev.activity, "blueprint:export:t3d");
+        assert_eq!(ev.blueprint_name, "Mesh");
+    }
+
+    // ── to_json ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn to_json_empty_produces_empty_array() {
+        let bridge = BlueprintOcelBridge::new();
+        assert_eq!(bridge.to_json().trim(), "[]");
+    }
+
+    #[test]
+    fn to_json_includes_activity_field() {
+        let mut bridge = BlueprintOcelBridge::new();
+        bridge.record_generation(&make_bp("BP"));
+        let json = bridge.to_json();
+        assert!(json.contains("blueprint:generate"));
+    }
+}

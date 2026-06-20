@@ -32,30 +32,6 @@ pub enum ErrorKind {
 }
 
 impl ValidationError {
-    fn type_mismatch(node: &str, pin: &str, from: &str, to: &str) -> Self {
-        ValidationError {
-            kind: ErrorKind::TypeMismatch {
-                from_type: from.to_string(),
-                to_type: to.to_string(),
-            },
-            node_name: node.to_string(),
-            pin_name: Some(pin.to_string()),
-            message: format!(
-                "Type mismatch on '{}::{}': cannot connect {:?} to {:?}",
-                node, pin, from, to
-            ),
-        }
-    }
-
-    fn dangling_exec(node: &str, pin: &str) -> Self {
-        ValidationError {
-            kind: ErrorKind::DanglingExec,
-            node_name: node.to_string(),
-            pin_name: Some(pin.to_string()),
-            message: format!("Exec output pin '{}::{}' has no connections", node, pin),
-        }
-    }
-
     fn duplicate_name(node: &str, graph: &str) -> Self {
         ValidationError {
             kind: ErrorKind::DuplicateNodeName,
@@ -102,11 +78,8 @@ pub fn validate_graph(graph: &BpGraph) -> Vec<ValidationError> {
     }
 
     // Build name -> node map (first occurrence wins for subsequent checks)
-    let node_map: HashMap<&str, &BpNode> = graph
-        .nodes
-        .iter()
-        .map(|n| (n.name.as_str(), n))
-        .collect();
+    let node_map: HashMap<&str, &BpNode> =
+        graph.nodes.iter().map(|n| (n.name.as_str(), n)).collect();
 
     // 2. Check all pin connections
     for node in &graph.nodes {
@@ -218,9 +191,7 @@ fn detect_cycle_dfs<'a>(
 
     // Follow exec output connections only
     for pin in &node.pins {
-        if pin.direction == PinDirection::Output
-            && pin.pin_type.category == PinCategory::Exec
-        {
+        if pin.direction == PinDirection::Output && pin.pin_type.category == PinCategory::Exec {
             for link in &pin.linked_to {
                 if let Some(next_node) = node_map.get(link.node_name.as_str()) {
                     if in_stack.contains(next_node.name.as_str()) {
@@ -232,18 +203,15 @@ fn detect_cycle_dfs<'a>(
                         let cycle: Vec<String> =
                             path[cycle_start..].iter().map(|s| s.to_string()).collect();
                         errors.push(ValidationError {
-                            kind: ErrorKind::ExecCycle { cycle: cycle.clone() },
+                            kind: ErrorKind::ExecCycle {
+                                cycle: cycle.clone(),
+                            },
                             node_name: node.name.clone(),
                             pin_name: Some(pin.name.clone()),
-                            message: format!(
-                                "Exec cycle detected: {}",
-                                cycle.join(" -> ")
-                            ),
+                            message: format!("Exec cycle detected: {}", cycle.join(" -> ")),
                         });
                     } else if !visited.contains(next_node.name.as_str()) {
-                        detect_cycle_dfs(
-                            next_node, node_map, visited, in_stack, path, errors,
-                        );
+                        detect_cycle_dfs(next_node, node_map, visited, in_stack, path, errors);
                     }
                 }
             }
@@ -271,7 +239,11 @@ pub fn format_errors(errors: &[ValidationError]) -> String {
             None => err.node_name.clone(),
         };
         let kind_label = format!("{:?}", err.kind);
-        let label = kind_label.split('{').next().unwrap_or("").trim_end_matches(' ');
+        let label = kind_label
+            .split('{')
+            .next()
+            .unwrap_or("")
+            .trim_end_matches(' ');
         out.push_str(&format!(
             "  {}. [{}] at {}: {}\n",
             i + 1,
@@ -312,8 +284,8 @@ impl ValidatedBlueprint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ast::{BpGraph, BpNode, Blueprint, Pin};
-    use crate::types::{PinDirection, PinType};
+    use crate::ast::{Blueprint, BpGraph, BpNode, Pin};
+    use crate::types::PinType;
 
     // -- helpers ---------------------------------------------------------------
 
@@ -352,7 +324,11 @@ mod tests {
     fn test_valid_empty_blueprint() {
         let bp = Blueprint::new("EmptyBP", "Actor");
         let errors = validate(&bp);
-        assert!(errors.is_empty(), "Empty blueprint should be error-free: {:?}", errors);
+        assert!(
+            errors.is_empty(),
+            "Empty blueprint should be error-free: {:?}",
+            errors
+        );
     }
 
     // -- test 2: valid blueprint with valid connections -----------------------
@@ -386,7 +362,9 @@ mod tests {
         );
         let errors = validate_graph(&graph);
         assert!(
-            errors.iter().any(|e| e.kind == ErrorKind::DuplicateNodeName),
+            errors
+                .iter()
+                .any(|e| e.kind == ErrorKind::DuplicateNodeName),
             "Should detect duplicate node name"
         );
     }
@@ -408,7 +386,11 @@ mod tests {
         let has_broken = errors.iter().any(|e| {
             matches!(&e.kind, ErrorKind::BrokenReference { referenced_node } if referenced_node == "GhostNode")
         });
-        assert!(has_broken, "Should detect broken node reference: {:?}", errors);
+        assert!(
+            has_broken,
+            "Should detect broken node reference: {:?}",
+            errors
+        );
     }
 
     // -- test 5: broken pin reference -----------------------------------------
@@ -421,7 +403,7 @@ mod tests {
         // Link to PrintString but with a fake pin GUID
         source.pins[1].linked_to.push(PinRef {
             node_name: "PrintString".to_string(),
-            pin_id: UeGuid::from_str("DEADBEEFDEADBEEFDEADBEEFDEADBEEF"),
+            pin_id: "DEADBEEFDEADBEEFDEADBEEFDEADBEEF".parse().unwrap(),
         });
 
         let graph = make_graph("EventGraph", vec![source, target]);
@@ -430,7 +412,11 @@ mod tests {
         let has_broken_pin = errors
             .iter()
             .any(|e| matches!(&e.kind, ErrorKind::BrokenPinReference { .. }));
-        assert!(has_broken_pin, "Should detect broken pin reference: {:?}", errors);
+        assert!(
+            has_broken_pin,
+            "Should detect broken pin reference: {:?}",
+            errors
+        );
     }
 
     // -- test 6: type mismatch (exec -> data) ---------------------------------
@@ -498,7 +484,11 @@ mod tests {
         let has_mismatch = errors
             .iter()
             .any(|e| matches!(&e.kind, ErrorKind::TypeMismatch { .. }));
-        assert!(has_mismatch, "Should detect int->string type mismatch: {:?}", errors);
+        assert!(
+            has_mismatch,
+            "Should detect int->string type mismatch: {:?}",
+            errors
+        );
     }
 
     // -- test 8: wildcard connections are allowed -----------------------------
@@ -528,7 +518,10 @@ mod tests {
         let has_mismatch = errors
             .iter()
             .any(|e| matches!(&e.kind, ErrorKind::TypeMismatch { .. }));
-        assert!(!has_mismatch, "Wildcard connections should not be flagged as mismatches");
+        assert!(
+            !has_mismatch,
+            "Wildcard connections should not be flagged as mismatches"
+        );
     }
 
     // -- test 9: exec cycle ---------------------------------------------------
@@ -549,20 +542,28 @@ mod tests {
             node_name: "NodeB".to_string(),
             pin_id: b_exec_id,
         });
-        node_b.find_pin_mut("execute").unwrap().linked_to.push(PinRef {
-            node_name: "NodeA".to_string(),
-            pin_id: a_then_id.clone(),
-        });
+        node_b
+            .find_pin_mut("execute")
+            .unwrap()
+            .linked_to
+            .push(PinRef {
+                node_name: "NodeA".to_string(),
+                pin_id: a_then_id.clone(),
+            });
 
         // B.then -> A.execute  (cycle!)
         node_b.find_pin_mut("then").unwrap().linked_to.push(PinRef {
             node_name: "NodeA".to_string(),
             pin_id: a_exec_id,
         });
-        node_a.find_pin_mut("execute").unwrap().linked_to.push(PinRef {
-            node_name: "NodeB".to_string(),
-            pin_id: b_then_id,
-        });
+        node_a
+            .find_pin_mut("execute")
+            .unwrap()
+            .linked_to
+            .push(PinRef {
+                node_name: "NodeB".to_string(),
+                pin_id: b_then_id,
+            });
 
         let graph = make_graph("EventGraph", vec![node_a, node_b]);
         let errors = validate_graph(&graph);
@@ -591,7 +592,11 @@ mod tests {
         let has_cycle = errors
             .iter()
             .any(|e| matches!(&e.kind, ErrorKind::ExecCycle { .. }));
-        assert!(!has_cycle, "Linear flow should not have a cycle: {:?}", errors);
+        assert!(
+            !has_cycle,
+            "Linear flow should not have a cycle: {:?}",
+            errors
+        );
     }
 
     // -- test 11: is_valid returns true for valid blueprint -------------------
@@ -613,7 +618,10 @@ mod tests {
             pin_id: UeGuid::new(),
         });
         let bp = make_bp(vec![node]);
-        assert!(!is_valid(&bp), "Blueprint with broken reference should be invalid");
+        assert!(
+            !is_valid(&bp),
+            "Blueprint with broken reference should be invalid"
+        );
     }
 
     // -- test 13: format_errors on empty list ---------------------------------
@@ -621,7 +629,10 @@ mod tests {
     #[test]
     fn test_format_errors_valid() {
         let msg = format_errors(&[]);
-        assert!(msg.contains("valid"), "format_errors on no errors should say valid");
+        assert!(
+            msg.contains("valid"),
+            "format_errors on no errors should say valid"
+        );
     }
 
     // -- test 14: format_errors on errors produces non-empty report ----------
@@ -654,7 +665,10 @@ mod tests {
     fn test_validated_blueprint_ok() {
         let bp = Blueprint::new("GoodBP", "Actor");
         let result = ValidatedBlueprint::new(bp);
-        assert!(result.is_ok(), "Clean blueprint should produce ValidatedBlueprint::Ok");
+        assert!(
+            result.is_ok(),
+            "Clean blueprint should produce ValidatedBlueprint::Ok"
+        );
         let vbp = result.unwrap();
         assert_eq!(vbp.inner().name, "GoodBP");
     }
@@ -692,9 +706,6 @@ mod tests {
         bp.function_graph("MyFunc").nodes.push(bad_node);
 
         let errors = validate(&bp);
-        assert!(
-            !errors.is_empty(),
-            "Should find errors across all graphs"
-        );
+        assert!(!errors.is_empty(), "Should find errors across all graphs");
     }
 }

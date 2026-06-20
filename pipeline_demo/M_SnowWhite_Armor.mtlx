@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<materialx version="1.38" colorspace="lin_rec709">
+  <!-- Lookdev target for Snow White Prelude Armor Panels -->
+  <nodegraph name="NG_SnowWhite_Armor">
+    <!-- UDIM Support Enabled for high-res feather/armor texturing -->
+    <image name="tex_basecolor" type="color3">
+      <input name="file" type="filename" value="textures/T_SnowWhite_BaseColor_<UDIM>.exr" />
+    </image>
+    <image name="tex_roughness" type="float">
+      <input name="file" type="filename" value="textures/T_SnowWhite_Roughness_<UDIM>.exr" />
+    </image>
+    <image name="tex_metallic" type="float">
+      <input name="file" type="filename" value="textures/T_SnowWhite_Metallic_<UDIM>.exr" />
+    </image>
+    <image name="tex_normal" type="vector3">
+      <input name="file" type="filename" value="textures/T_SnowWhite_Normal_<UDIM>.exr" />
+    </image>
+    
+    <output name="out_basecolor" type="color3" nodename="tex_basecolor" />
+    <output name="out_roughness" type="float" nodename="tex_roughness" />
+    <output name="out_metallic" type="float" nodename="tex_metallic" />
+    <output name="out_normal" type="vector3" nodename="tex_normal" />
+  </nodegraph>
+
+  <open_pbr_surface name="SRF_SnowWhite_Armor" type="surfaceshader">
+    <input name="base_color" type="color3" nodegraph="NG_SnowWhite_Armor" output="out_basecolor" />
+    <input name="roughness" type="float" nodegraph="NG_SnowWhite_Armor" output="out_roughness" />
+    <input name="metallic" type="float" nodegraph="NG_SnowWhite_Armor" output="out_metallic" />
+    <input name="geometry_normal" type="vector3" nodegraph="NG_SnowWhite_Armor" output="out_normal" />
+    
+    <!-- Emissive support for chest/eye sensors -->
+    <input name="emission_color" type="color3" value="0.0, 0.9, 0.8" />
+    <input name="emission_luminance" type="float" value="0.0" /> <!-- Driven by masking texture in engine -->
+  </open_pbr_surface>
+
+  <surfacematerial name="M_SnowWhite_Primary" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SRF_SnowWhite_Armor" />
+  </surfacematerial>
+</materialx>

@@ -1,0 +1,22 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX eden: <https://ggen.io/ontology/eden-server/>
+
+SELECT DISTINCT ?delta ?targetSocket ?installedComponent ?removedComponent ?timestamp ?actor
+WHERE {
+  ?delta a eden:AssemblyDelta .
+  
+  # Socket target of the physical assembly change
+  ?delta eden:targetSocket ?targetSocket .
+  
+  # Installed and/or removed components
+  OPTIONAL { ?delta eden:installedComponent ?installedComponent . }
+  OPTIONAL { ?delta eden:removedComponent ?removedComponent . }
+  
+  # Audit metadata
+  OPTIONAL { ?delta prov:generatedAtTime ?timestamp . }
+  OPTIONAL { ?delta prov:wasAssociatedWith ?actor . }
+}
+ORDER BY DESC(?timestamp) ?delta

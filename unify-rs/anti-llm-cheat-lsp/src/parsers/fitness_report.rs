@@ -47,3 +47,54 @@ pub fn parse_fitness_report(filepath: &str, content: &str) -> Vec<Observation> {
 
     obs
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn empty_content_returns_no_obs() {
+        assert!(parse_fitness_report("f.json", "not-json").is_empty());
+    }
+
+    #[test]
+    fn fitness_1_admitted_true_no_provenance_triggers_admit_001() {
+        let json = r#"{"fitness":1.0,"admitted":true}"#;
+        let obs = parse_fitness_report("r.json", json);
+        assert!(obs.iter().any(|o| o.construct == "fitness_bare_constant"));
+    }
+
+    #[test]
+    fn fitness_1_admitted_true_with_provenance_is_clean() {
+        let json = r#"{"fitness":1.0,"admitted":true,"provenance":{"run_id":"abc"}}"#;
+        let obs = parse_fitness_report("r.json", json);
+        assert!(obs.iter().all(|o| o.construct != "fitness_bare_constant"));
+    }
+
+    #[test]
+    fn admitted_true_no_run_id_triggers_admit_003() {
+        let json = r#"{"fitness":0.8,"admitted":true}"#;
+        let obs = parse_fitness_report("r.json", json);
+        assert!(obs.iter().any(|o| o.construct == "admitted_no_run_id"));
+    }
+
+    #[test]
+    fn admitted_true_with_top_level_run_id_clears_admit_003() {
+        let json = r#"{"fitness":0.8,"admitted":true,"run_id":"xyz"}"#;
+        let obs = parse_fitness_report("r.json", json);
+        assert!(obs.iter().all(|o| o.construct != "admitted_no_run_id"));
+    }
+
+    #[test]
+    fn not_admitted_produces_no_obs() {
+        let json = r#"{"fitness":1.0,"admitted":false}"#;
+        assert!(parse_fitness_report("r.json", json).is_empty());
+    }
+
+    #[test]
+    fn fitness_1_admitted_no_provenance_but_provenance_run_id_clears_admit_003() {
+        let json = r#"{"fitness":1.0,"admitted":true,"provenance":{"run_id":"abc"}}"#;
+        let obs = parse_fitness_report("r.json", json);
+        assert!(obs.iter().all(|o| o.construct != "admitted_no_run_id"));
+    }
+}

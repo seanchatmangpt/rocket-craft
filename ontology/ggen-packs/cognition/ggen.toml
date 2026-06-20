@@ -1,0 +1,9 @@
+[pack]
+name = "wasm4pm-cognition"
+version = "0.1.0"
+target_dir = "../../../crates/wasm4pm-cognition/src"
+
+[[artifact]]
+template = "templates/lib.rs.tera"
+query = "queries/states.rq"
+output = "lib.rs"

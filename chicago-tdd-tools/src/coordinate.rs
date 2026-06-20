@@ -2,8 +2,8 @@ use anyhow::Result;
 use ib4_core::types::{AttackDir, MagicType};
 use ib4_mud::command::Command;
 use ib4_mud::session::GameSession;
-use nexus_session::player::PlayerProfile;
 use nexus_session::inventory::Item;
+use nexus_session::player::PlayerProfile;
 
 pub trait GameCoordinateSystem {
     type State;
@@ -60,9 +60,21 @@ impl GameCoordinateSystem for InfinityBladeCoordinateSystem {
     fn state_to_coordinate(&self, state: &Self::State) -> String {
         let bloodline = state.player.bloodline;
         let hp_class = get_hp_class(state.player.health, state.player.max_health);
-        let enemy_id = state.current_enemy.as_ref().map(|e| map_enemy_id(&e.id)).unwrap_or("None");
-        let enemy_hp_class = state.current_enemy.as_ref().map(|e| get_hp_class(e.current_hp, e.base_hp)).unwrap_or("None");
-        let enemy_phase = state.current_enemy.as_ref().map(|e| format!("ep{}", e.phase)).unwrap_or_else(|| "ep0".to_string());
+        let enemy_id = state
+            .current_enemy
+            .as_ref()
+            .map(|e| map_enemy_id(&e.id))
+            .unwrap_or("None");
+        let enemy_hp_class = state
+            .current_enemy
+            .as_ref()
+            .map(|e| get_hp_class(e.current_hp, e.base_hp))
+            .unwrap_or("None");
+        let enemy_phase = state
+            .current_enemy
+            .as_ref()
+            .map(|e| format!("ep{}", e.phase))
+            .unwrap_or_else(|| "ep0".to_string());
         let announced_attack = match &state.announced_attack {
             Some(AttackDir::Overhead) => "aO",
             Some(AttackDir::Left) => "aL",
@@ -74,7 +86,14 @@ impl GameCoordinateSystem for InfinityBladeCoordinateSystem {
 
         format!(
             "b{}:{}:{}:{}:{}:{}:{}:{}",
-            bloodline, hp_class, enemy_id, enemy_hp_class, enemy_phase, announced_attack, in_combat, combo
+            bloodline,
+            hp_class,
+            enemy_id,
+            enemy_hp_class,
+            enemy_phase,
+            announced_attack,
+            in_combat,
+            combo
         )
     }
 
@@ -279,10 +298,14 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
                 next.state = SessionState::Disconnected;
             }
             (SessionState::InLobby, GundamMove::EnterMatch(match_id)) => {
-                next.state = SessionState::InMatch { match_id: *match_id };
+                next.state = SessionState::InMatch {
+                    match_id: *match_id,
+                };
             }
             (SessionState::InLobby, GundamMove::Spectate(match_id)) => {
-                next.state = SessionState::Spectating { match_id: *match_id };
+                next.state = SessionState::Spectating {
+                    match_id: *match_id,
+                };
             }
             (SessionState::InLobby, GundamMove::Disconnect) => {
                 next.state = SessionState::Disconnected;
@@ -291,7 +314,8 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
                 next.profile.apply_xp_gain(*amount);
             }
             (SessionState::InLobby, GundamMove::SpendGold(amount)) => {
-                next.profile.spend_gold(*amount)
+                next.profile
+                    .spend_gold(*amount)
                     .map_err(|e| anyhow::anyhow!("Spend gold failed: {}", e))?;
             }
             (SessionState::InLobby, GundamMove::InventoryAdd) => {
@@ -355,5 +379,191 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
             GundamMove::InventoryAdd => "inventory_add".to_string(),
             GundamMove::InventoryRemove(slot) => format!("inventory_remove:{}", slot),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use nexus_session::player::PlayerProfile;
+
+    // ── get_hp_class (private, tested via state_to_coordinate indirectly) ──────
+    // We test the observable behavior through GundamCoordinateSystem::state_to_coordinate.
+
+    fn profile() -> PlayerProfile {
+        PlayerProfile::new(1, "Amuro".into())
+    }
+
+    fn connecting_sim() -> GundamSessionSimulation {
+        GundamSessionSimulation {
+            state: SessionState::Connecting,
+            profile: profile(),
+            inventory: vec![],
+        }
+    }
+
+    fn lobby_sim() -> GundamSessionSimulation {
+        GundamSessionSimulation {
+            state: SessionState::InLobby,
+            profile: profile(),
+            inventory: vec![],
+        }
+    }
+
+    // ── GundamCoordinateSystem::state_to_coordinate ───────────────────────────
+
+    #[test]
+    fn connecting_coordinate_starts_with_sc() {
+        let sys = GundamCoordinateSystem;
+        let coord = sys.state_to_coordinate(&connecting_sim());
+        assert!(coord.starts_with("sC:"), "got: {coord}");
+    }
+
+    #[test]
+    fn lobby_coordinate_starts_with_sl() {
+        let sys = GundamCoordinateSystem;
+        let coord = sys.state_to_coordinate(&lobby_sim());
+        assert!(coord.starts_with("sL:"), "got: {coord}");
+    }
+
+    #[test]
+    fn in_match_coordinate_includes_match_id() {
+        let sys = GundamCoordinateSystem;
+        let sim = GundamSessionSimulation {
+            state: SessionState::InMatch { match_id: 99 },
+            profile: profile(),
+            inventory: vec![],
+        };
+        let coord = sys.state_to_coordinate(&sim);
+        assert!(coord.contains("m99"), "got: {coord}");
+    }
+
+    #[test]
+    fn coordinate_includes_level_and_gold() {
+        let sys = GundamCoordinateSystem;
+        let coord = sys.state_to_coordinate(&lobby_sim());
+        assert!(coord.contains("lv1"), "got: {coord}");
+        assert!(coord.contains("g100"), "PlayerProfile starts with gold=100; got: {coord}");
+    }
+
+    // ── GundamCoordinateSystem::get_legal_moves ───────────────────────────────
+
+    #[test]
+    fn connecting_legal_moves_include_authenticate() {
+        let sys = GundamCoordinateSystem;
+        let moves = sys.get_legal_moves(&connecting_sim());
+        assert!(moves.contains(&GundamMove::Authenticate(true)));
+        assert!(moves.contains(&GundamMove::Authenticate(false)));
+        assert!(moves.contains(&GundamMove::Reject));
+    }
+
+    #[test]
+    fn lobby_legal_moves_include_enter_match_and_spectate() {
+        let sys = GundamCoordinateSystem;
+        let moves = sys.get_legal_moves(&lobby_sim());
+        assert!(moves.contains(&GundamMove::EnterMatch(42)));
+        assert!(moves.contains(&GundamMove::Spectate(42)));
+        assert!(moves.contains(&GundamMove::Disconnect));
+    }
+
+    #[test]
+    fn disconnected_legal_moves_only_reconnect() {
+        let sys = GundamCoordinateSystem;
+        let sim = GundamSessionSimulation {
+            state: SessionState::Disconnected,
+            profile: profile(),
+            inventory: vec![],
+        };
+        let moves = sys.get_legal_moves(&sim);
+        assert_eq!(moves.len(), 1);
+        assert_eq!(moves[0], GundamMove::Reconnect);
+    }
+
+    // ── GundamCoordinateSystem::apply_move ────────────────────────────────────
+
+    #[test]
+    fn authenticate_true_transitions_to_authenticated() {
+        let sys = GundamCoordinateSystem;
+        let next = sys.apply_move(&connecting_sim(), &GundamMove::Authenticate(true)).unwrap();
+        assert_eq!(next.state, SessionState::Authenticated);
+    }
+
+    #[test]
+    fn authenticate_false_returns_error() {
+        let sys = GundamCoordinateSystem;
+        let result = sys.apply_move(&connecting_sim(), &GundamMove::Authenticate(false));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn reject_transitions_to_disconnected() {
+        let sys = GundamCoordinateSystem;
+        let next = sys.apply_move(&connecting_sim(), &GundamMove::Reject).unwrap();
+        assert_eq!(next.state, SessionState::Disconnected);
+    }
+
+    #[test]
+    fn enter_match_from_lobby() {
+        let sys = GundamCoordinateSystem;
+        let next = sys.apply_move(&lobby_sim(), &GundamMove::EnterMatch(42)).unwrap();
+        assert_eq!(next.state, SessionState::InMatch { match_id: 42 });
+    }
+
+    #[test]
+    fn match_complete_returns_to_lobby() {
+        let sys = GundamCoordinateSystem;
+        let in_match = GundamSessionSimulation {
+            state: SessionState::InMatch { match_id: 1 },
+            profile: profile(),
+            inventory: vec![],
+        };
+        let next = sys.apply_move(&in_match, &GundamMove::MatchComplete).unwrap();
+        assert_eq!(next.state, SessionState::InLobby);
+    }
+
+    #[test]
+    fn invalid_move_for_state_returns_error() {
+        let sys = GundamCoordinateSystem;
+        // MatchComplete is invalid in Connecting state
+        let result = sys.apply_move(&connecting_sim(), &GundamMove::MatchComplete);
+        assert!(result.is_err());
+    }
+
+    // ── GundamCoordinateSystem::move_to_notation ──────────────────────────────
+
+    #[test]
+    fn notation_for_authenticate_true() {
+        let sys = GundamCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&GundamMove::Authenticate(true)), "auth:true");
+    }
+
+    #[test]
+    fn notation_for_enter_match() {
+        let sys = GundamCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&GundamMove::EnterMatch(7)), "enter_match:7");
+    }
+
+    #[test]
+    fn notation_for_inventory_remove() {
+        let sys = GundamCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&GundamMove::InventoryRemove(2)), "inventory_remove:2");
+    }
+
+    #[test]
+    fn notation_for_disconnect() {
+        let sys = GundamCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&GundamMove::Disconnect), "disconnect");
+    }
+
+    // ── SessionState enum properties ──────────────────────────────────────────
+
+    #[test]
+    fn session_states_are_distinct() {
+        assert_ne!(SessionState::Connecting, SessionState::Authenticated);
+        assert_ne!(SessionState::InLobby, SessionState::Disconnected);
+        assert_ne!(
+            SessionState::InMatch { match_id: 1 },
+            SessionState::InMatch { match_id: 2 }
+        );
     }
 }

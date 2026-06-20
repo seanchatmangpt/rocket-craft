@@ -1,0 +1,38 @@
+{
+  "name": "rocket-craft-nuxt-shell",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test": "vitest run",
+    "test:unit": "vitest run test/unit/",
+    "test:loop": "MOCK_API=0 vitest run tests/e2e/headless-loop.test.ts --reporter=verbose",
+    "test:loop:mock": "MOCK_API=1 vitest run tests/e2e/headless-loop.test.ts --reporter=verbose",
+    "test:ci": "bash scripts/test-ci.sh",
+    "test:e2e": "playwright test",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@noble/hashes": "^2.2.0",
+    "@nuxt/ui": "^4.9.0",
+    "@supabase/supabase-js": "^2.108.2",
+    "@vueuse/core": "^12.8.2",
+    "nuxt": "^4.4.8",
+    "vue": "^3.5.35",
+    "vue-router": "^5.1.0"
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.2",
+    "@nuxt/test-utils": "^3.23.0",
+    "@playwright/test": "^1.61.0",
+    "@types/node": "^25.9.3",
+    "@vite-pwa/nuxt": "^1.1.1",
+    "@vueuse/nuxt": "^12.8.2",
+    "happy-dom": "^20.10.6",
+    "vitest": "^2.1.9"
+  }
+}

@@ -1,84 +1,72 @@
 {
-  "format_version": "core/v1",
-  "events": [
-    {
-      "id": "rocket.audit.SurvivalGame.0",
-      "seq": 0,
-      "event_type": "rocket.audit.project",
-      "objects": [
-        {
-          "id": "SurvivalGame",
-          "obj_type": "UE4Project",
-          "qualifier": "passed"
-        }
-      ],
-      "payload_commitment": "2a42c40993d9a2163ba6ee0083473117934764c268059918cc090117ec42e312"
-    },
-    {
-      "id": "rocket.audit.RealisticRendering.1",
-      "seq": 1,
-      "event_type": "rocket.audit.project",
-      "objects": [
-        {
-          "id": "RealisticRendering",
-          "obj_type": "UE4Project",
-          "qualifier": "passed"
-        }
-      ],
-      "payload_commitment": "60ef436af4e36191346bf8fa41b7f4ed78a01d3da7e098d75bc439b81a60e44a"
-    },
-    {
-      "id": "rocket.audit.FullSpectrum.2",
-      "seq": 2,
-      "event_type": "rocket.audit.project",
-      "objects": [
-        {
-          "id": "FullSpectrum",
-          "obj_type": "UE4Project",
-          "qualifier": "passed"
-        }
-      ],
-      "payload_commitment": "32456d8ff2b17edf4f233ded331a87351d68402be34f2263dd453f2e4998247b"
-    },
-    {
-      "id": "rocket.audit.Brm.3",
-      "seq": 3,
-      "event_type": "rocket.audit.project",
-      "objects": [
-        {
-          "id": "Brm",
-          "obj_type": "UE4Project",
-          "qualifier": "passed"
-        }
-      ],
-      "payload_commitment": "bd71c908b0c06b9a141873f203df354098c48a2ef3b25925fcfca48f45401e03"
-    },
-    {
-      "id": "rocket.audit.ShooterGame.4",
-      "seq": 4,
-      "event_type": "rocket.audit.project",
-      "objects": [
-        {
-          "id": "ShooterGame",
-          "obj_type": "UE4Project",
-          "qualifier": "passed"
-        }
-      ],
-      "payload_commitment": "1c2c764684bfd566601bcb9396b62a96f999ca7598a5b6db10231190c4acbed1"
-    },
-    {
-      "id": "rocket.audit.InfinityBlade4.5",
-      "seq": 5,
-      "event_type": "rocket.audit.project",
-      "objects": [
-        {
-          "id": "InfinityBlade4",
-          "obj_type": "UE4Project",
-          "qualifier": "passed"
-        }
-      ],
-      "payload_commitment": "a74f66354fbd4c6c03256933872697fa65710bd1ef48cb8eb5789d1742e26faf"
-    }
+  "operation_id": "2c5219d2-8bec-4580-bc5d-7cc6a0b29038",
+  "timestamp": "2026-06-20T04:40:08.186560Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.11",
+    "ggen.toml:1f37a7258b073d4fdf9557c31190c6874a316a7b39095c09c8291fb4eac89927",
+    "ontology/all_merged.ttl:b3cbd7e542de2b4473e51ea9d0be80fa7afa94229a728ea1f9b733b7c157ed19",
+    "ontology/ggen-packs/mech_factory_mud/GeometrySurrogate.sparql:1d18cde7891ab5e1f35b89528f4cb2f1642bef2fc7e7ea1ee9aa6e9189306fb3",
+    "ontology/ggen-packs/mech_factory_mud/GeometrySurrogate.tera:a1bbfced08a8f91e37643a793f11a69459eb4507b8d3d6aeed579e786d8d86a7",
+    "ontology/ggen-packs/mech_factory_mud/MechFactoryMudOcelSchema.sparql:c50c28c7cfacde2d1d095ba6f0556a27512341ee22f66505593001baa2a4db34",
+    "ontology/ggen-packs/mech_factory_mud/MechFactoryMudOcelSchema.json.tera:a87cd5c6fc9d31037d6786b65b5f78e1b8d3ad2ebde3e071ac4d3a0e75b91454",
+    "ontology/ggen-packs/mech_factory_mud/MechFactoryMudReceiptSchema.sparql:c50c28c7cfacde2d1d095ba6f0556a27512341ee22f66505593001baa2a4db34",
+    "ontology/ggen-packs/mech_factory_mud/MechFactoryMudReceiptSchema.json.tera:e611ecd88487a38969d8e2eab39fec668cc8638fe7ca01a0ffc7823090beecc9",
+    "ontology/ggen-packs/mech_factory_mud/MotionSurrogate.sparql:19ef9ec08a60e336e3cc8ba5a51da03c3447ed4da849d03bdb55d694383a2924",
+    "ontology/ggen-packs/mech_factory_mud/MotionSurrogate.tera:eda43bd5e1d6ed19df535deac21b05b23028d0596a8b106530670b93c5bdae5a",
+    "ontology/ggen-packs/mech_factory_mud/SkinSurrogate.sparql:99f886f11ed406254d0e14d8d067f935b4b6cdb1588630266a8903330481c423",
+    "ontology/ggen-packs/mech_factory_mud/SkinSurrogate.tera:750e6414ccae1b985231d67d0aa09e004743ec534a6073564590324d8b651c4e",
+    "ontology/ggen-packs/mech_factory_mud/station_processes.sparql:64b1e45db3ae21a6f6e9f37e084cafbb44b05609531539f68d365f604b603d85",
+    "ontology/ggen-packs/mech_factory_mud/station_processes.rs.tera:6a3bd25c93e777c573dfabead5c76021b8789e98a758a862188255c46b26f9e2",
+    "ontology/ggen-packs/mech_factory_mud/walkthrough_transitions.sparql:5b0163b8af368cb419f88ee3d28f9369ddc73531f516131fc1e9ddfefc36c05d",
+    "ontology/ggen-packs/mech_factory_mud/walkthrough_transitions.rs.tera:565723e5ee7675e612d7b7fcf7f8e5c8c96f17c60fec3242afadbb3e679a264e",
+    "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract.sparql:a82b1976d52fd3ae4b401549a67e9ffe223a060c9144fd80a95f80bd3d98a3ca",
+    "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract_csv.tera:4fdf6f683b7cca3a93fe68de8e0232fa6d5f1be04acd251e6181380bac7fa26e",
+    "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract.sparql:a82b1976d52fd3ae4b401549a67e9ffe223a060c9144fd80a95f80bd3d98a3ca",
+    "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract_h.tera:6b33f80f5d17b43accdea9a411ce5c1c68fb7098d229d064cfb1ef7237c2e479",
+    "generated/mech_assets/reference_fabric_001/queries/materials.rq:6e453ef025113c8ad32ff9afab050e7158f1ab6da8a1c0f8a10f2b296a92a1c9",
+    "generated/mech_assets/reference_fabric_001/templates/usd/asset.usda.tera:a0abc5d3b10399573acb46fad7dc8ef97120f56610bc13119f14667d8693d3e6",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/queries/materials.rq:6e453ef025113c8ad32ff9afab050e7158f1ab6da8a1c0f8a10f2b296a92a1c9",
+    "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera:f47347c2d7594122fcecee4f6ed5401c55b5eb21605c909efa82f990c8b44b29",
+    "generated/mech_assets/reference_fabric_001/queries/materials.rq:6e453ef025113c8ad32ff9afab050e7158f1ab6da8a1c0f8a10f2b296a92a1c9",
+    "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera:f47347c2d7594122fcecee4f6ed5401c55b5eb21605c909efa82f990c8b44b29",
+    "generated/mech_assets/reference_fabric_001/queries/materials.rq:6e453ef025113c8ad32ff9afab050e7158f1ab6da8a1c0f8a10f2b296a92a1c9",
+    "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera:f47347c2d7594122fcecee4f6ed5401c55b5eb21605c909efa82f990c8b44b29",
+    "generated/mech_assets/reference_fabric_001/queries/materials.rq:6e453ef025113c8ad32ff9afab050e7158f1ab6da8a1c0f8a10f2b296a92a1c9",
+    "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera:f47347c2d7594122fcecee4f6ed5401c55b5eb21605c909efa82f990c8b44b29",
+    "generated/mech_assets/reference_fabric_001/queries/texture_programs.rq:b254dce843b4cddf18fe67eee3e378c24ed9df71f911c071e31dc239bbd8299c",
+    "generated/mech_assets/reference_fabric_001/templates/texture_program.rs.tera:92e2ca56cb1ef4420c2a14b4e3b7fe4a3f2ee65c2aaeff020c2adc4860f92529",
+    "generated/mech_assets/reference_fabric_001/queries/verifier_expectations.rq:770cd732e2ce45108350a3580cc24e9fe3ab322343e0eaf59bd8fe453ae81a7f",
+    "generated/mech_assets/reference_fabric_001/templates/visual_gap_report.md.tera:f17a2db01085ab60003f88c76d8fd510eb3a1e682b5b87111f30839cef1ed47f",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037",
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:b2650e9b2734e82c2fbfe2c5d616d7ac654295487dc06e8558b79d908e468037"
   ],
-  "chain_hash": "f432069b2b2d08df12ce5ff399ddf4138b09c0db73c791e96dca86d3949a56a2"
+  "output_hashes": [
+    "./generated/mech_factory_mud/MechFactoryMudOcelSchema.json:1cc738c841b215cc18102ea697640086e8152a2bfd5dcbe7f8180736cddf3af2",
+    "./generated/mech_factory_mud/MechFactoryMudReceiptSchema.json:af23a239dfb05cc00ffdb7d8a63a421ede634af1b4f22f10be75f35861bbfe58",
+    "./generated/mech_assets/reference_fabric_001/usd/ASSET_ReferenceFabric_001.usda:9d2660c718ec521ab9b2e9c0e6662967872cfa6f29e569e7878869d09c03c097",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_Torso.usda:1813c0d2a33b36573011ee5aeb4f1288a82ff6e6fb2b2f23764ac2851e7d66a4",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_Head.usda:55ac85d8ca860df7a6e45f52bd7ad7287d1101f01843251bcef76843972205ea",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Left.usda:7b7b23eb62bd9eb1fdba21dde684060abf894433dfe6f617f476731bf5d8badb",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Right.usda:3ab7f0511bed4023a2e0823f7a5bed1e8f20083a91ff247ceb2c5bdb7a6e3d92",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_Blade_Left.usda:d987957a8d2bf3d61a7c855725daae55f29186dcf370eee67d534024bce448f8",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_Blade_Right.usda:510eb95fba032284756cf2a92307871835396b7e0822089b42061fc9592c6b23",
+    "./generated/mech_assets/reference_fabric_001/materialx/M_WhiteArmor.mtlx:9d771f795bfa50406974842f2b4f10c830f64080a0f824a83d4d2a97b1b2bc31",
+    "./generated/mech_assets/reference_fabric_001/materialx/M_CyanBlade.mtlx:9d771f795bfa50406974842f2b4f10c830f64080a0f824a83d4d2a97b1b2bc31",
+    "./generated/mech_assets/reference_fabric_001/materialx/M_DarkFrame.mtlx:9d771f795bfa50406974842f2b4f10c830f64080a0f824a83d4d2a97b1b2bc31",
+    "./generated/mech_assets/reference_fabric_001/materialx/M_GoldVisor.mtlx:9d771f795bfa50406974842f2b4f10c830f64080a0f824a83d4d2a97b1b2bc31",
+    "./generated/mech_assets/reference_fabric_001/textures/texture_program.rs:958ec130ac630fa0404b4c5d44a7e1d10eac907a8c370c0a8ec26042a866c3f4",
+    "./generated/mech_assets/reference_fabric_001/reports/visual_gap_report.md:b37f0fedc1982323eea71b452c25c6eaf7b7d61f4b937eef1154a55cf378e62a",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_Limb_Left.usda:18f84954f3d31a93af96a9b9ccf4a2ecd4f587da33bbcbc5ec20c50d25fc6518",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_Limb_Right.usda:7a28c2f01a43c7ac61d948f66f9dfb77e155e23ba5cec008bbe6da6d25760cdf",
+    "./generated/mech_assets/reference_fabric_001/usd/SM_Loadout.usda:b210a881a524dbd0f6aa2126d2f761dbb96abdb08adc2ae6707730d921e5685a"
+  ],
+  "signature": "1ebd2fed875a4841b2c3bf4f82210146c4e1e4226421b5f3f94f073685657b8eaa77c27483f655c3d9344d8a0d7606432aed28eb3a4dc07323e1afd2ba19020a",
+  "previous_receipt_hash": "ef459bc15eaa7df92fe91afbb2185697be87952956f31ceb0955c2960c63d615"
 }

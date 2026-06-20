@@ -1,0 +1,12 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?candidate ?owner_part_id ?type ?label
+WHERE {
+  ?candidate rdf:type ?type .
+  ?type rdfs:subClassOf* mud:Candidate .
+  ?candidate mud:owner_part_id ?owner_part_id .
+  OPTIONAL { ?candidate rdfs:label ?label }
+}
+ORDER BY ?owner_part_id ?candidate

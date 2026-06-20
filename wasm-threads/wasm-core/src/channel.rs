@@ -75,3 +75,48 @@ impl std::fmt::Display for ChannelError {
 }
 
 impl std::error::Error for ChannelError {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_channel_has_no_pending() {
+        let ch: WorkerChannel<String> = WorkerChannel::new(1);
+        assert_eq!(ch.pending_count(), 0);
+        assert_eq!(ch.worker_id(), 1);
+    }
+
+    #[test]
+    fn send_enqueues_message() {
+        let mut ch: WorkerChannel<i32> = WorkerChannel::new(0);
+        ch.send(42).unwrap();
+        assert_eq!(ch.pending_count(), 1);
+    }
+
+    #[test]
+    fn receive_dequeues_in_fifo_order() {
+        let mut ch: WorkerChannel<i32> = WorkerChannel::new(0);
+        ch.send(1).unwrap();
+        ch.send(2).unwrap();
+        assert_eq!(ch.receive(), Some(1));
+        assert_eq!(ch.receive(), Some(2));
+        assert_eq!(ch.receive(), None);
+    }
+
+    #[test]
+    fn drain_returns_all_in_fifo_order() {
+        let mut ch: WorkerChannel<i32> = WorkerChannel::new(0);
+        ch.send(10).unwrap();
+        ch.send(20).unwrap();
+        let drained = ch.drain();
+        assert_eq!(drained, vec![10, 20]);
+        assert_eq!(ch.pending_count(), 0);
+    }
+
+    #[test]
+    fn receive_on_empty_returns_none() {
+        let mut ch: WorkerChannel<i32> = WorkerChannel::new(0);
+        assert!(ch.receive().is_none());
+    }
+}

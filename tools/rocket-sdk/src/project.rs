@@ -68,3 +68,26 @@ pub fn cmd_logs(
         "cmd_logs not yet implemented; use `rocket logs` (rocket-cmd binary) directly"
     ))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn cmd_logs_returns_not_implemented_error() {
+        // cmd_logs was intentionally left unimplemented with a clear error message.
+        // Verify it returns Err rather than panicking or returning Ok silently.
+        let result = cmd_logs(None, 100);
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("cmd_logs not yet implemented"));
+    }
+
+    #[test]
+    fn cmd_logs_error_mentions_rocket_cmd_binary() {
+        let result = cmd_logs(Some("build.log".into()), 50);
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("rocket logs"));
+    }
+}

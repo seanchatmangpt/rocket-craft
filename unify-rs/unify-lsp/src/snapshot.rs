@@ -25,3 +25,36 @@ impl SnapshotRecord {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::conformance::ConformanceScore;
+
+    #[test]
+    fn new_snapshot_has_nonzero_timestamp() {
+        let s = SnapshotRecord::new("test", ConformanceScore::perfect());
+        assert!(s.timestamp_ms > 0, "timestamp should be set from system time");
+    }
+
+    #[test]
+    fn label_is_preserved() {
+        let s = SnapshotRecord::new("pipeline-check", ConformanceScore::zero());
+        assert_eq!(s.label, "pipeline-check");
+    }
+
+    #[test]
+    fn conformance_score_is_preserved() {
+        let score = ConformanceScore::perfect();
+        let s = SnapshotRecord::new("x", score.clone());
+        assert_eq!(s.conformance.fitness, score.fitness);
+    }
+
+    #[test]
+    fn snapshot_serializes_to_json() {
+        let s = SnapshotRecord::new("check", ConformanceScore::perfect());
+        let json = serde_json::to_string(&s).expect("should serialize");
+        assert!(json.contains("timestamp_ms"));
+        assert!(json.contains("label"));
+    }
+}

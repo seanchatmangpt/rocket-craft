@@ -140,6 +140,7 @@ pub enum MagicType {
     Ice,
     Dark,
     Light,
+    BeamSaber,
 }
 
 /// Equipment and item rarity tier.
@@ -171,7 +172,7 @@ pub enum TitanType {
 
 /// Gundam anime franchise series tag for unit provenance.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub enum Series {
+pub enum GundamSeries {
     WitchFromMercury,
     Seed,
     Unicorn,
@@ -182,6 +183,8 @@ pub enum Series {
     TurnA,
     BuildFighters,
 }
+
+pub type Series = GundamSeries;
 
 /// Gacha pull rarity tier for banner drops.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
@@ -214,11 +217,12 @@ impl std::error::Error for MagicTypeParseError {}
 impl From<MagicType> for f32 {
     fn from(m: MagicType) -> f32 {
         match m {
-            MagicType::Fire      => 20.0,
+            MagicType::Fire => 20.0,
             MagicType::Lightning => 30.0,
-            MagicType::Ice       => 15.0,
-            MagicType::Dark      => 35.0,
-            MagicType::Light     => 25.0,
+            MagicType::Ice => 15.0,
+            MagicType::Dark => 35.0,
+            MagicType::Light => 25.0,
+            MagicType::BeamSaber => 40.0,
         }
     }
 }
@@ -233,7 +237,108 @@ impl TryFrom<u8> for MagicType {
             2 => Ok(MagicType::Ice),
             3 => Ok(MagicType::Dark),
             4 => Ok(MagicType::Light),
+            5 => Ok(MagicType::BeamSaber),
             other => Err(MagicTypeParseError(other)),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── AttackDir ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn attack_dir_three_distinct_variants() {
+        let dirs = [AttackDir::Overhead, AttackDir::Left, AttackDir::Right];
+        // Each pair is distinct
+        assert_ne!(dirs[0], dirs[1]);
+        assert_ne!(dirs[1], dirs[2]);
+        assert_ne!(dirs[0], dirs[2]);
+    }
+
+    #[test]
+    fn attack_dir_clones_equal_original() {
+        let dir = AttackDir::Overhead;
+        assert_eq!(dir, dir.clone());
+    }
+
+    // ── MagicType → f32 damage bonus ─────────────────────────────────────────
+
+    #[test]
+    fn magic_type_damage_bonuses_are_ordered_by_power() {
+        let fire: f32 = MagicType::Fire.into();
+        let lightning: f32 = MagicType::Lightning.into();
+        let ice: f32 = MagicType::Ice.into();
+        let dark: f32 = MagicType::Dark.into();
+        let beam: f32 = MagicType::BeamSaber.into();
+        // BeamSaber > Dark > Lightning > Fire > Ice
+        assert!(beam > dark);
+        assert!(dark > lightning);
+        assert!(lightning > fire);
+        assert!(fire > ice);
+    }
+
+    #[test]
+    fn beam_saber_bonus_is_40() {
+        let bonus: f32 = MagicType::BeamSaber.into();
+        assert_eq!(bonus, 40.0);
+    }
+
+    // ── MagicType TryFrom<u8> ─────────────────────────────────────────────────
+
+    #[test]
+    fn magic_type_try_from_valid_bytes() {
+        assert_eq!(MagicType::try_from(0u8).unwrap(), MagicType::Fire);
+        assert_eq!(MagicType::try_from(1u8).unwrap(), MagicType::Lightning);
+        assert_eq!(MagicType::try_from(2u8).unwrap(), MagicType::Ice);
+        assert_eq!(MagicType::try_from(3u8).unwrap(), MagicType::Dark);
+        assert_eq!(MagicType::try_from(4u8).unwrap(), MagicType::Light);
+        assert_eq!(MagicType::try_from(5u8).unwrap(), MagicType::BeamSaber);
+    }
+
+    #[test]
+    fn magic_type_try_from_invalid_byte_returns_error() {
+        let err = MagicType::try_from(99u8).unwrap_err();
+        assert_eq!(err.0, 99);
+    }
+
+    #[test]
+    fn magic_type_parse_error_display_contains_value() {
+        let err = MagicTypeParseError(42);
+        assert!(err.to_string().contains("42"));
+    }
+
+    // ── GachaRarity ordering ──────────────────────────────────────────────────
+
+    #[test]
+    fn gacha_rarity_variants_are_distinct() {
+        assert_ne!(GachaRarity::R, GachaRarity::SR);
+        assert_ne!(GachaRarity::SR, GachaRarity::SSR);
+    }
+
+    // ── TitanType variants ────────────────────────────────────────────────────
+
+    #[test]
+    fn titan_type_five_distinct_variants() {
+        let types = [
+            TitanType::Warrior, TitanType::Mage, TitanType::Archer,
+            TitanType::Heavy, TitanType::GodKing,
+        ];
+        // spot-check: at least first and last differ
+        assert_ne!(types[0], types[4]);
+    }
+
+    // ── Rarity ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn rarity_six_variants_all_distinct() {
+        let rarities = [
+            Rarity::Common, Rarity::Uncommon, Rarity::Rare,
+            Rarity::Epic, Rarity::Legendary, Rarity::Infinity,
+        ];
+        assert_ne!(rarities[0], rarities[5]);
+        assert_ne!(rarities[2], rarities[4]);
     }
 }

@@ -1,0 +1,34 @@
+{
+  "asset_id": "ASSET_SnowWhite_Prelude",
+  "texture_schema": "OpenPBR",
+  "resolution": "8192x8192",
+  "udim_policy": "required",
+  "udim_tiles": ["1001", "1002", "1003", "1004", "1011", "1012"],
+  "textures": [
+    {
+      "slot": "baseColor",
+      "file_pattern": "T_SnowWhite_BaseColor_<UDIM>.exr",
+      "colorspace": "sRGB"
+    },
+    {
+      "slot": "roughness",
+      "file_pattern": "T_SnowWhite_Roughness_<UDIM>.exr",
+      "colorspace": "linear"
+    },
+    {
+      "slot": "metallic",
+      "file_pattern": "T_SnowWhite_Metallic_<UDIM>.exr",
+      "colorspace": "linear"
+    },
+    {
+      "slot": "normal",
+      "file_pattern": "T_SnowWhite_Normal_<UDIM>.exr",
+      "colorspace": "linear"
+    },
+    {
+      "slot": "emissionMask",
+      "file_pattern": "T_SnowWhite_EmissionMask_<UDIM>.exr",
+      "colorspace": "linear"
+    }
+  ]
+}

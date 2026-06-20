@@ -1,0 +1,25 @@
+# extract_refusal_reasons.sparql
+# GC-MECHBIRTH-002: Anti-Cartesian Exhaustion SELECT
+#
+# Extracts the complete bounded taxonomy of RefusalReason variants.
+# Results drive: error.rs.tera → RefusalReason enum + thiserror Display impls
+#
+# Anti-Cartesian guarantee: ?reason a mb:RefusalReason is a single-class filter.
+# No optional joins that could produce fan-out. LIMIT 64 is a hard exhaustion cap.
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+
+SELECT
+    ?variant
+    ?fields
+    ?errorTemplate
+WHERE {
+    ?reason a mb:RefusalReason ;
+            mb:variant       ?variant ;
+            mb:errorTemplate ?errorTemplate .
+    OPTIONAL { ?reason mb:fields ?fields . }
+}
+ORDER BY ?variant
+LIMIT 64

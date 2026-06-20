@@ -36,3 +36,45 @@ pub fn discover_games() -> Vec<DiscoveredGame> {
 
     discovered
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn discover_games_returns_two_entries() {
+        let games = discover_games();
+        assert_eq!(games.len(), 2);
+    }
+
+    #[test]
+    fn infinity_blade_entry_has_correct_crate_name() {
+        let games = discover_games();
+        let ib4 = games.iter().find(|g| g.crate_name == "ib4-mud").unwrap();
+        assert_eq!(ib4.name, "Infinity Blade 4 MUD");
+    }
+
+    #[test]
+    fn gundam_nexus_entry_has_correct_crate_name() {
+        let games = discover_games();
+        let nexus = games.iter().find(|g| g.crate_name == "nexus-session").unwrap();
+        assert_eq!(nexus.name, "Gundam Nexus");
+    }
+
+    #[test]
+    fn details_contain_player_name() {
+        let games = discover_games();
+        let ib4 = games.iter().find(|g| g.crate_name == "ib4-mud").unwrap();
+        assert!(ib4.details.contains("DiscoveryTester"));
+        let nexus = games.iter().find(|g| g.crate_name == "nexus-session").unwrap();
+        assert!(nexus.details.contains("NexusTester"));
+    }
+
+    #[test]
+    fn discovered_game_is_clone_and_eq() {
+        let g = DiscoveredGame {
+            name: "Test".into(), crate_name: "test".into(), details: "d".into(),
+        };
+        assert_eq!(g.clone(), g);
+    }
+}

@@ -1,539 +1,1533 @@
 # Original User Request
 
-## Initial Request — 2026-06-15T14:34:16-07:00
+## 2026-06-19T00:00:02Z
 
-Implement a working progressive web app (PWA) integrated with a local Supabase instance, including fully functioning user authentication, profiles, player management admin dashboard, leaderboard, and end-to-end testing with Playwright.
+<USER_REQUEST>
+# Teamwork Project Prompt — Eden Manufacturing Server Ontology
 
-Working directory: /Users/sac/rocket-craft
+Design and author the complete suite of RDF ontologies (.ttl) and SPARQL queries (.rq) for the Eden Manufacturing Server. This will formalize the architectural spine for the dimensional marketplace, mapping Industry 4.0 reliability engineering, sensor/fault loops, assembly-tree authority, and byte-class state deltas to the Combinatorial Maximalist platform.
+
+Working directory: /Users/sac/.ggen/packs/eden_server
 Integrity mode: benchmark
 
 ## Requirements
 
-### R1. Supabase Client and PWA Authentication
-Update `pwa-staff/src/lib/supabaseClient.ts` with the local Supabase URL (`http://127.0.0.1:54321`) and anon key (`sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH`). Implement actual Supabase authentication in `pwa-staff/src/auth.ts`, `pwa-staff/src/login.ts`, `pwa-staff/src/signup.ts`, and `pwa-staff/src/profile.ts` using the Supabase JS client. Ensure that after sign-up or log-in, users are redirected to `profile.html` where their email is correctly displayed, and log-out redirects them back to `login.html`.
+### R1. Public Ontology Integration
+Create the core `pack.ttl` ontology that directly imports and maps Eden manufacturing concepts to public industry standards (e.g., FIBO for finance/markets, SOSA for telemetry/sensors, QUDT for quantities/physics, PROV-O for receipts).
 
-### R2. HTML Asset Paths
-Fix relative asset paths in `login.html`, `signup.html`, and `profile.html` so they reference the generated dist directory as `dist/` or `./dist/` instead of `../dist/` since these files are served from the root.
+### R2. Reliability & Assembly Topology
+Define the ontological structure for a Combinatorial Assembly Tree (mech root, subassemblies, parts, sockets) and its reliability twin properties (damage class, stress class, heat class, fatigue class), mapped as byte-class authority types.
 
-### R3. DB Sync Trigger and Schema Alignment
-Create a new migration or update migrations in `supabase/migrations` to sync `auth.users` to the `public.players` table upon user registration. The `public.players` table must support storing the player's email and name/username. Update `pwa-staff/src/admin.ts` to query and display player details from the `players` table. Update `pwa-staff/src/leaderboard.ts` to fetch leaderboard entries joined with the player's username so the leaderboard displays actual player names.
+### R3. Delta Network Model
+Formalize the 5 Delta families (`AuthorityDelta`, `AssemblyDelta`, `ProjectionDelta`, `InterestDelta`, `ReceiptDelta`) in the ontology to support the "replicate admitted deltas over object graphs" architecture.
 
-### R4. Edge Function Implementation
-Implement the Supabase edge function `supabase/functions/submit-score/index.ts` to parse the request body, validate the score (must be a number between 0 and 1000), and save it into the database (`game_sessions` and update the player's high score in `leaderboard`).
-
-### R5. Local Server & E2E Testing
-Configure `local-web-server` or `npm run start` to serve the `pwa-staff` frontend on port 3000. Run the Playwright end-to-end test suite (`tests-e2e/auth.spec.ts`) against the running local server and local Supabase instance to verify the full registration, profile display, login, logout flow passes successfully.
+### R4. SPARQL Query Suite
+Author both the foundational `substrate.rq` (to extract the assembly root) and specific delta-mapping queries (e.g., `extract_authority_deltas.rq`, `extract_assembly_deltas.rq`) that the Java enterprise server will consume.
 
 ## Acceptance Criteria
 
-### Authentication & UI
-- [ ] Sign-up, login, profile view, and logout flows are fully implemented using Supabase client in `pwa-staff/src`.
-- [ ] HTML pages properly load CSS and JS bundles without 404 path errors.
-- [ ] Profiles display the registered user's actual email from Supabase session.
+### Syntactic and Structural Validity
+- [ ] The team produces `ontology/pack.ttl` and `ontology/deltas.ttl` containing the full class hierarchies.
+- [ ] The ontology explicitly declares imports (`owl:imports`) for FIBO, SOSA, QUDT, and PROV-O.
+- [ ] The team produces a `queries/` directory containing at least `substrate.rq`, `extract_authority_deltas.rq`, and `extract_receipt_deltas.rq`.
+- [ ] All `.ttl` files parse successfully as valid Turtle syntax (an independent agent or `rapper`/`riot` validation must confirm zero syntax errors).
+- [ ] The queries are valid SPARQL 1.1 syntax.
+</USER_REQUEST>
 
-### Database Sync & Edge Functions
-- [ ] Registering a user triggers a Postgres trigger that inserts the user's ID, email, and username/email prefix into the `public.players` table.
-- [ ] Admin dashboard successfully fetches and displays registered players list without Postgres column missing errors.
-- [ ] Leaderboard page successfully displays player usernames and their high scores.
-- [ ] Edge function `submit-score` writes records to `game_sessions` and updates `leaderboard` table.
+## 2026-06-19T00:00:38Z
 
-### E2E Verification
-- [ ] Playwright E2E test `user authentication flow` runs successfully and all steps pass.
+Here are the direct official URLs for the public industry ontologies to download the `.ttl` files directly via `curl` for your mapping work:
 
-## Follow-up — 2026-06-15T16:55:03-07:00
+**1. PROV-O (Provenance)**
+W3C direct TTL: `http://www.w3.org/ns/prov.ttl`
+(You can `curl -sH "Accept: text/turtle" -L http://www.w3.org/ns/prov.ttl`)
 
-Resolve all remaining gaps for production release of the Progressive Web App (PWA) with local Supabase integration and ensure 100% successful end-to-end testing with Playwright.
+**2. SOSA / SSN (Sensors & Observations)**
+Raw GitHub TTL: `https://raw.githubusercontent.com/w3c/sdw/gh-pages/ssn/integrated/sosa.ttl`
 
-Working directory: /Users/sac/rocket-craft
+**3. QUDT (Quantities, Units, Dimensions)**
+GitHub Releases (All-in-one TTLs): `https://github.com/qudt/qudt-public-repo/releases`
+(Grab the latest `QUDT-all-in-one-OWL.ttl` or `QUDT-all-in-one-SHACL.ttl`)
+
+**4. FIBO (Financial Industry Business Ontology)**
+Production Zip: `https://spec.edmcouncil.org/fibo/ontology/prod.ttl.zip`
+(Or use the GitHub repo: `https://github.com/edmcouncil/fibo`)
+
+## 2026-06-19T00:32:24Z
+
+<USER_REQUEST>
+# Teamwork Project Prompt — UE4 Universal RDF Mapping
+
+Design and author an exhaustive RDF ontology (in Turtle format) that represents the complete architecture and class hierarchy of Unreal Engine 4 (UE4). This includes modeling the `UObject` base, `AActor` lifecycle, `UActorComponent` system, Blueprint graphs, Materials, Levels, and reflection metadata, effectively demonstrating how Epic Games would represent the entire engine mathematically as a semantic graph.
+
+Working directory: /Users/sac/.ggen/packs/ue4_ontology
 Integrity mode: benchmark
 
 ## Requirements
 
-### R1. Resolve Playwright E2E Test Failures and Browser Constraints
-- Modify the Playwright configuration in `pwa-staff/playwright.config.ts` to run E2E tests exclusively on the `chromium` browser project (removing firefox and webkit to avoid missing browser binary issues on the host system).
-- Fix the test in `pwa-staff/tests-e2e/example.spec.ts` by updating the expected title regex match from `/PWA Staff/` to `/Rocket Craft/` to match the actual application title in `index.html`.
+### R1. Universal Class Inheritance (The C++ Core)
+Map the exhaustive structural backbone of the engine: `UObject`, `AActor`, `APawn`, `ACharacter`, `UActorComponent`, `UWorld`, `ULevel`, and the deep inheritance networks that connect them.
 
-### R2. Verify Application and Test Suite Health
-- Verify that Vitest unit tests in the `pwa-staff` workspace run and pass.
-- Verify that Playwright E2E tests run and pass without throwing browser configuration errors.
+### R2. Subsystem & Domain Topologies
+Model the granular domain boundaries, including the Rendering Pipeline (Materials, Shaders, WebGL/RHI fallbacks), Physics layers (Collision Volumes, Kinematics), and Networking (Replication, RPCs).
+
+### R3. Reflection & Blueprint Graph Modeling
+Formally define the UE4 Reflection System (`UClass`, `UProperty`, `UFunction`) as semantic triples. Model how Blueprint nodes and visual execution paths exist purely as combinatorially valid RDF graphs.
+
+### R4. Combinatorial Maximalist Typestates
+Map how all of the above components compile, link, and exist as deterministic typestates. Include the definitions for how `rocket build` or standard cooking pipelines project these nodes into final WASM/HTML5 outputs.
 
 ## Acceptance Criteria
 
-### E2E Testing
-- [ ] Playwright E2E tests execute and pass successfully on the Chromium browser.
-- [ ] No browser launch or executable errors are present in the test logs.
-- [ ] The webServer command correctly boots the PWA on port 3000 during test execution.
+### Engine Mapping Integrity
+- [ ] The team produces an exhaustive suite of `.ttl` files (e.g., `core.ttl`, `reflection.ttl`, `blueprints.ttl`, `physics.ttl`, `rendering.ttl`).
+- [ ] The ontology successfully unifies the static C++ inheritance structure with the dynamic Reflection and Blueprint graph systems.
+- [ ] An independent `ggen sync --validate-only` (or equivalent native `ggen` syntax check) confirms that all generated ontologies are 100% syntactically valid and structurally sound.
+- [ ] The mapping is comprehensive enough to theoretically generate UE4 C++ headers and Blueprint structures entirely from the RDF graph.
+</USER_REQUEST>
 
-### Unit Testing
-- [ ] Vitest unit tests in `pwa-staff/` pass successfully.
+## 2026-06-18T17:45:57-07:00
 
-## Follow-up — 2026-06-15T17:31:19-07:00
+<USER_REQUEST>
+# Teamwork Project Prompt — Ggen Pack Specification
 
-Upgrade the Rocket Craft PWA launcher with a premium cyberpunk gamer-centric UI/UX, implement a collapsible in-app developer debug HUD (DX/QoL), and add database indexes and telemetry logging to the Supabase schema.
+Research the `~/ggen/` repository (specifically the configuration schema found in `ggen.toml`) and author the canonical formal specification for building a validated `ggen` ontology pack. This specification must document the required TOML metadata, the ontology import structures, the SPARQL inference rules (`[inference]`), and the generation pipeline rules (`[[generation.rules]]`) to standardize all future ontology manufacturing packs.
 
-Working directory: /Users/sac/rocket-craft
+Working directory: /Users/sac/.ggen/specs/
 Integrity mode: benchmark
 
 ## Requirements
 
-### R1. Cyberpunk Gaming UI/UX
-- Upgrade all PWA pages (`index.html`, `login.html`, `signup.html`, `profile.html`, `admin.html`, `leaderboard.html`) using vanilla CSS to implement a premium cyberpunk neon dark mode.
-- Use glassmorphic card layouts, responsive layouts, glowing neon button hover effects, custom gaming-oriented typography, and subtle micro-animations.
+### R1. Document `ggen.toml` Configuration Schema
+Create an exhaustive Markdown document detailing the required structure of a `ggen` pack manifest. Break down the `[project]` block, the `[ontology]` graph sources, the SPARQL `[inference]` rules (using `CONSTRUCT`), and the `[[generation.rules]]` (using `SELECT` queries mapped to `.tera` templates).
 
-### R2. Collapsible In-App Developer Console HUD
-- Implement a collapsible developer debugging HUD available on all frontend pages when toggled (e.g., via a floating debug button in the corner).
-- The HUD must display:
-  - Active session details (decoded JWT values like email, user ID, role, and expiration timestamp).
-  - Quick triggers to test mock score submissions.
-  - Database stats fetched from backend endpoints (e.g., number of registered players and total game sessions).
-
-### R3. Database Optimization & Telemetry Schema
-- Create a new migration in `supabase/migrations/` that adds database indexes to:
-  - `public.players(high_score DESC)`
-  - `public.game_sessions(player_id, score)`
-- Create a `public.telemetry_logs` table in the migration:
-  - Fields: `id` (uuid primary key), `player_id` (foreign key to `players.id`, nullable for unauthenticated events), `event_type` (text, e.g., 'login', 'registration', 'profile_view', 'score_submission'), `payload` (jsonb), and `created_at` (timestamp with timezone).
-- Integrate backend client logic to log records into `public.telemetry_logs` whenever a player registers, logs in, views their profile, or submits a score.
-
-### R4. Verification & Testing
-- Update Vitest unit tests in `pwa-staff/` to cover new helper functions and console components.
-- Update Playwright E2E tests to verify that the Developer Debug HUD is present, can be toggled open, and that new page layouts load without JavaScript console errors.
+### R2. Author a Quick-Start Boilerplate
+Include a comprehensive boilerplate section within the specification that provides a copy-pasteable minimal `ggen.toml` and reference `.ttl` structure so future teams can instantly bootstrap a validated pack.
 
 ## Acceptance Criteria
 
-### PWA UI/UX
-- [ ] All pages render with the new cyberpunk neon dark theme, including layout grids, forms, tables, and buttons.
-- [ ] Responsive UI fits mobile, tablet, and desktop screens with zero overlapping text.
+### Documentation Integrity
+- [ ] The team produces `GGEN_PACK_SPEC.md` in the target directory.
+- [ ] The specification clearly differentiates between `[inference]` (modifying the graph via SPARQL CONSTRUCT) and `[[generation.rules]]` (projecting the graph to files via SPARQL SELECT + Tera templates).
+- [ ] The specification includes the "BIG BANG 80/20" criteria found in the reference `ggen.toml`.
+- [ ] The boilerplate example provides a syntactically valid `ggen.toml` snippet that matches the engine's expected schema.
+</USER_REQUEST>
 
-### Developer HUD (DX/QoL)
-- [ ] Collapsible debug panel is present on all pages and can be toggled.
-- [ ] HUD displays decoded JWT state when user is logged in, and shows an unauthenticated state when logged out.
-- [ ] Stats display correct count of registered players.
+## 2026-06-19T01:55:50Z
 
-### Database & Telemetry
-- [ ] Supabase schema contains the new indexes on `players` and `game_sessions`, and the `telemetry_logs` table.
-- [ ] Performing auth operations (signup, login, logout), profile views, and score submissions creates corresponding rows in `public.telemetry_logs`.
+<USER_REQUEST>
+Refactor the entire `eden_server` ontology registry (`pack.ttl`, `bandai_tps.ttl`, `egp_racing.ttl`, `mars_market.ttl`) from semantic first principles into true Level 5 Combinatorial Maximalist graphs, fully defining strict OWL 2 DL restrictions, metadata alignment, and native SHACL validation shapes.
 
-### Test Suite Execution
-- [ ] Vitest unit tests in `pwa-staff/` execute and pass successfully.
-- [ ] Playwright E2E tests execute and pass successfully on Chromium.
-
-## Follow-up — 2026-06-17T07:06:50Z
-
-Research Google DeepMind's Genie (Generative Interactive Environments / World Model) on arXiv (e.g. arXiv:2402.15391). Implement a core interactive world-model simulator in Rust, and build a Python-based pipeline that integrates TPOT2 for model optimization and DSPy for optimizing interactive player/designer LLM agents.
-
-Working directory: ~/rocket-craft
-Integrity mode: development
+Working directory: /Users/sac/.ggen/packs/eden_server/ontology/
+Integrity mode: benchmark
 
 ## Requirements
 
-### R1. DeepMind Genie World Model Core in Rust
-Implement a high-performance simulation or reference model of the Genie architecture. The core must include:
-1. A spatiotemporal tokenizer representation to discretize state inputs (e.g., grid maps, 2D/3D states, or simple image frames).
-2. A Latent Action Model (LAM) that infers actions from transitions between consecutive states.
-3. A Dynamics Model that predicts the next discretized state given the current state and a (latent) action.
+### R1. Refactor the Core Ontology Graphs
+Rewrite the entire ontology suite to hit Level 5 on the 7x5 maturity matrix. Implement deep `owl:equivalentProperty` mapping to public standards (FIBO, QUDT, PROV-O), enforce strict `owl:Restriction` cardinalities for all components, and bind all states to byte-class typestates.
 
-### R2. Python Integration & TPOT2 AutoML Optimization
-Build a Python wrapper or interface to interact with the Rust world model. Use TPOT2 to automate hyperparameter tuning or pipeline optimization for the dynamics predictor or latent action classifier (e.g., optimizing predictive accuracy or convergence rates on a dataset of state trajectories).
+### R2. Implement SHACL Validation Shapes
+Write explicit SHACL `.ttl` shapes that mathematically enforce the bounds of the byte-class typestates (e.g., preventing `egp:heatClass` from exceeding unsigned byte limits) and verifying structural constraints (e.g., a chassis must have exactly 4 tires).
 
-### R3. DSPy LLM Player & Designer Agent
-Create a DSPy-based interactive agent. Use DSPy to define and compile an optimized LLM prompt/program that:
-1. Acts as a player navigating the simulated world, selecting actions based on natural language commands or visual/textual feedback.
-2. Acts as a world designer, generating prompt inputs for the world model to spawn new environments.
-
-### R4. Unreal Engine 4 Export & Benchmark
-Provide a utility to export simulated world maps or state sequences into a standard JSON-based scene/actor layout format compatible with Unreal Engine 4. Include a benchmark script comparing frame-by-frame generation latency and memory footprint between the Genie world model implementation and traditional engine-like asset loads.
-
-### R5. End-to-End Validation
-Provide an automated script (`verify_world_model.sh` or `.py`) that runs the Rust simulator, executes the TPOT2 optimization, tests the DSPy agent, exports a map to UE4 format, and verifies that the entire flow completes without errors.
+### R3. Wire the `ggen.toml` Validation Harness
+Integrate the refactored graphs and SHACL validation paths into the master `ggen.toml` manifest. Configure the exact `SPARQL CONSTRUCT` inference rules to extract the typestates, ensuring compatibility with the recently patched `strict_mode=true` compiler harness.
 
 ## Acceptance Criteria
 
-### Core Implementation
-- [ ] The Rust core compiles and can load, tokenize, and predict state transitions.
-- [ ] The Python bindings/subprocess wrapper can interact with the Rust simulator to get state predictions.
+### Ontological & SHACL Integrity
+- [ ] `rapper` or an equivalent RDF parser confirms zero syntax errors and valid import resolution across the entire registry.
+- [ ] A negative test proves that the SHACL shapes correctly identify and reject a deliberately injected paradox (e.g., an asset with an out-of-bounds `riskClass` or a missing cryptographic receipt).
+- [ ] The official `ggen` compiler successfully parses the manifest, triggers the SHACL validations, and processes the `SPARQL CONSTRUCT` extraction rules without an Agent Jidoka halt.
+</USER_REQUEST>
 
-### Pipelines & Optimization
-- [ ] The TPOT2 AutoML search runs and successfully finds optimized parameters for the dynamics model.
-- [ ] The DSPy interactive agent successfully compiles and executes navigation instructions on the simulated environment using an LLM.
+## 2026-06-19T04:28:44Z
 
-### Unreal Engine 4 Export
-- [ ] The system outputs a valid JSON map file representing the generated world layout, compatible with Unreal Engine 4 import.
+<USER_REQUEST>
+Deploy a 20-agent multi-disciplinary swarm to aggressively audit and close all semantic gaps in the Rocket-Craft pipeline. The core objective is not ontology expansion, but strict manufacturability: proving that the admitted graph can physically manufacture a working, multi-resolution Eden/GMF world with valid walkthroughs, byte-class typestates, and unforgeable receipts. 
 
-### Verification
-- [ ] Running the verification script completes successfully, demonstrating the entire pipeline runs from end to end.
-
-## Follow-up — 2026-06-17T07:14:14Z
-
-Incorporate the "Genie 26 Vision 2030" philosophy and specification into the World Manufacturing Platform design for the Genie simulator and pipeline in `~/rocket-craft`.
-
-### Genie 26 Vision 2030 Core Principles to Incorporate:
-1. **World Manufacturing Philosophy:** Treat every generated system as a "world" that contains:
-   * **Objects** (State variables/world elements)
-   * **Actors** (Entities interacting within the world)
-   * **Relationships** (Structural bounds/hierarchies)
-   * **Events** (Transitions/Inputs)
-   * **Rules** (Physics/Constraints/Semantic Laws)
-   * **Processes** (Workflows/Execution loops)
-   * **Receipts** (Lineage, provenance, BLAKE3 receipts/cryptographic lineage, replay records)
-
-2. **Receipted Worlds:** Every world state transition and generation run must support verifiable receipts (cryptographic origin, specification alignment, operational/replay history).
-
-Ensure that the Rust simulation/dynamics model and the Python pipeline reflect these core components, allowing a user to specify a world's objects/rules and manufacture it with verifiable execution and cryptographic receipts.
-
-
-## Follow-up — 2026-06-17T07:16:57Z
-
-Implement the Genie 26 World Manufacturing Platform based on the Version Vision 2030 PRD and ARD. The platform must manufacture, deploy, operate, and evolve playable Unreal 4 worlds directly from user intent.
-
-Working directory: ~/rocket-craft
-Integrity mode: development
+Working directory: /Users/sac/.ggen/
+Integrity mode: benchmark
 
 ## Requirements
 
-### R1. Intent & Specification Layer
-Implement a mechanism to ingest user intent (natural language prompts) and output a structured World Specification. The specification must explicitly model the world components:
-1. Places (locations and environments)
-2. Actors (entities within the world)
-3. Objects (items and assets)
-4. Relationships (structural hierarchy and bounds)
-5. Rules (physics, constraints, and interactions)
-6. History/Events (logs of modifications and state transitions)
+### R1. Complete the Manufacturable Ontology Surface
+Fill out the remaining `.ttl` gaps across the `eden_server` and `ue4_ontology` packs. **Only admit ontology that is consumed by manufacturing.** Do not exhaustively map public interfaces for the sake of completeness. Treat the ontology as inventory, templates as machines, and generated artifacts as finished goods.
 
-### R2. World Manufacturing (Unreal 4 Artifacts)
-Implement a manufacturing engine that takes the structured World Specification and constructs a playable, navigable Unreal 4 world artifact (e.g., scene layouts, maps, or project setups compatible with Unreal 4).
+### R2. Author Exhaustive SPARQL Inference Subsets
+Write the bounded, deterministic `SPARQL SELECT` and `SPARQL CONSTRUCT` queries required by `ggen.toml` to extract exact, compile-time typestates. Every query must use an `ORDER BY` clause to guarantee deterministic assembly.
 
-### R3. World Evolution & State Continuity
-Implement an evolution mechanism. When new user intent is received to modify an existing world, the system must update the World Specification and manufacture the updated Unreal 4 artifacts while preserving the existing state, structures, relationships, and history (no starting over from scratch).
+### R3. Hard-Gate with SHACL
+Ensure every single semantic constraint introduced by the swarm is accompanied by a native SHACL shape file that aggressively prevents illogical combinations before they ever reach the C++ compiler.
 
-### R4. World Deployment & Operation
-Provide support to launch/deploy the manufactured world, access/re-enter the world, and log the world's operational and modification history.
+### R4. Manufacturability Audit
+For every newly introduced ontology concept, the swarm must identify:
+- the `ggen` template family that consumes it
+- the generated artifact type
+- the runtime surface it affects
+- the walkthrough proof that exercises it
+*Constraint: No ontology node may exist without a manufacturing consumer.*
 
-### R5. Automated Verification
-Provide an automated integration script (`verify_genie.sh`) that takes a test intent prompt, generates a world, applies a modification intent to evolve it, and verifies the generated and evolved Unreal 4 artifacts for structural validity.
+### R5. Walkthrough Closure
+The swarm must prove that the ontology contains sufficient information to generate locations, exits, routes, zones, interactables, manufacturing stations, repair stations, race facilities, and market facilities. Every generated space must be reachable through a deterministic walkthrough.
+
+### R6. Renderability Audit
+Every ontology class that may become a visual artifact must define its LOD class, material class, instancing class, semantic importance class, silhouette importance class, and interaction distance class. The graph must support the generation of deterministic Render BOMs.
+
+### R7. Semantic Importance Modeling
+Every visual ontology artifact must be classified as: CROWN, PRIMARY, SECONDARY, TERTIARY, or BACKGROUND. This classification must natively support generated LOD culling and strict rendering budgets.
+
+### R8. Gameplay Cell Coverage
+The swarm must identify all gameplay production cells and ensure ontology support exists for: Manufacturing, Repair, Race, Trade, Insurance, Prediction, Resource Collection, Infrastructure, Defense, Exploration, Discovery, and Research.
+
+### R9. Missing Surface Discovery
+Produce a residual gap report identifying:
+- concepts required by gameplay but absent from the ontology
+- concepts present in the ontology but unused by manufacturing
+- concepts present in templates but unsupported by the ontology
+- concepts present in runtime but unsupported by templates
+
+### R10. Authority Surface Coverage
+The swarm must identify and model every authoritative state dimension required by the world (Damage, Heat, Stress, Fatigue, Grip, Energy, Resource, Market Condition, Risk, Provenance, Conformance, Standing). For every authority dimension, define: ontology representation, SHACL validation, SPARQL extraction path, generated typestate, Render BOM impact, gameplay consequence, and receipt consequence. *Authority dimensions must support byte-class representation.*
+
+### R11. Resolution Closure
+Every generated world artifact must support multiple states of resolution (Global, Regional, Zone, Facility, Assembly, Subassembly, Part, Socket). The swarm must prove that ontology, templates, and manifests support deterministic projection between resolutions. No artifact may exist only at maximum resolution.
+
+### R12. Manufacturing Flow Coverage
+Every ontology concept must participate in at least one complete flow:
+`Ontology → SHACL → SPARQL → Typestate → Template → Generated Artifact → Runtime Surface → Walkthrough Proof → Receipt`
+Concepts without a complete flow must be reported as residual inventory.
 
 ## Acceptance Criteria
 
-### Input & Output Validation
-- [ ] Natural language intent can be parsed into a structured World Specification modeling Places, Actors, Objects, Relationships, Rules, and History.
-- [ ] The manufacturing output is a valid Unreal 4 compatible world map/scene layout file.
+### Combinatorial & Compiler Integrity
+- [ ] `rapper` confirms all newly authored `.ttl` files have zero syntax errors and valid import resolutions.
+- [ ] Programmatic scan proves 100% of the new `.rq` or inline SPARQL queries contain an explicit `ORDER BY` clause.
+- [ ] The `verify_all_rules.sh` test harness yields a 100% pass rate against negative SHACL permutations.
 
-### Evolution & Continuity
-- [ ] World modifications update the existing map/scene artifacts incrementally, preserving unmodified actors and relationships.
+### The ALIVE Proof
+- [ ] Using ONLY the generated ontology, SPARQL, SHACL, and `ggen` manifests, the system must be capable of generating:
+  1. A walkable GMF factory
+  2. A complete mech assembly line
+  3. A race facility
+  4. A market facility
+  5. A deterministic MUD walkthrough
+  6. Renderable artifacts with valid Render BOMs
+  7. Semantic LOD classifications
+  8. Authority typestates
+  9. Receipt paths
+  10. States-of-resolution projections
 
-### Verification
-- [ ] The `verify_genie.sh` script runs the generation and evolution process on a sample case and exits with code 0 on success.
+*No manual code additions. No mock runtime substitutions. No placeholder artifacts.*
+</USER_REQUEST>
 
+## 2026-06-19T17:59:45Z
 
-## Follow-up — 2026-06-17T07:25:43Z
+<USER_REQUEST>
+# Teamwork Project Prompt — GC-GUNDAM-FACTORY-001
 
-The user has set a /goal to validate the entire Genie system. The goal details are:
-"entire genie system is validated by using claude -p to create a world and then interacting with world in browser"
+## Status
 
-To achieve this goal:
-1. **Web Runtime / Browser Deployment:** The manufactured Unreal 4 world artifact must have a browser runtime implementation (e.g., an HTML/JS/WebAssembly frontend, or a web dashboard representing the simulated Unreal 4 world layout) so that the user can open and interact with the manufactured world directly in a web browser.
-2. **Interactive CLI / Script:** Ensure there is a CLI/script (like `claude -p` or a direct prompt generation interface) that creates a world, launches a local web server to host it, and prints the URL to open it.
-3. **Validation:** The verification suite must demonstrate that the world can be built, hosted, and interacted with via a web interface.
+Ready for launch after user approval.
 
-Update the project specification and direct the orchestrator to build a web/browser-based interactive runtime for the manufactured worlds.
+## Working Directory
 
-## Follow-up — 2026-06-17T18:00:30Z
+```text
+~/rocket-craft
+```
 
+## Integrity Mode
+
+```text
+benchmark
+```
+
+## Mission
+
+Build the automated **Gundam Factory Walkthrough Projection**.
+
+The system must procedurally manufacture the semantic authority for a Gundam/mech factory walkthrough using the `ggen` pipeline, verify all game-law concepts in a headless Rust pre-UE4 environment, and only then project the result through UE4 HTML5/WASM.
+
+The final artifact must be a locally served WASM package that Playwright can load, observe, actuate, screenshot, and verify by visual delta.
+
+This project must preserve the doctrine:
+
+```text
+POWL coordinates the birth of the mech.
+ggen manufactures the authority artifacts.
+Rust proves the game law before pixels.
+UE4 projects the body.
+Playwright proves physical actuation.
+Receipts prove the trace.
+```
+
+Do not treat UE4 rendering as proof of correctness.
+
+Do not treat generated files as proof of standing.
+
+Do not treat Playwright screenshot success as proof of semantic validity.
+
+The system earns standing only through:
+
+```text
+Observation
+→ Admission
+→ Manufacturing
+→ Rust Verification
+→ UE4 Projection
+→ Playwright Actuation
+→ Receipt
+→ Replay
+```
+
+---
+
+# Milestone
+
+```text
+GC-GUNDAM-FACTORY-001
+```
+
+## Target Status
+
+```text
+PARTIAL_ALIVE_CANDIDATE
+```
+
+## Scoped Status Goal
+
+Only claim the following if every required gate passes:
+
+```text
+GUNDAM_FACTORY_WALKTHROUGH_ALIVE_UNDER_SCOPE
+```
+
+Otherwise report:
+
+```text
+PARTIAL_ALIVE_CANDIDATE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with exact residuals.
+
+---
+
+# Project Objective
+
+Produce a verified procedural pipeline for a **Gundam Factory walkthrough**:
+
+```text
+Public / project ontology
+→ POWL / process law
+→ ggen semantic manufacturing
+→ Rust pre-UE4 verification
+→ generated C++ headers / DataTables / manifests
+→ UE4 HTML5/WASM build
+→ local server
+→ Playwright visual actuation test
+→ BLAKE3 receipt chain
+→ verifier report
+```
+
+The walkthrough must include a minimal but complete factory route:
+
+```text
+Spawn
+→ Enter Factory
+→ View Frame Assembly
+→ View Socket Topology
+→ View Armor / Skin Station
+→ View Motion / Rig Station
+→ View Verification Gate
+→ View Receipt Terminal
+```
+
+The environment does not need full production art.
+
+It must prove that generated semantic authority can drive projection.
+
+---
+
+# Repository Boundary Law
+
+Expected repositories / surfaces:
+
+```text
+~/rocket-craft
+~/ggen
+~/wasm4pm
+~/wasm4pm-compat
+~/powlv2lsp
+```
+
+Respect existing repository conventions.
+
+Do not create shadow crates for `wasm4pm`, `wasm4pm-compat`, or `ggen`.
+
+Boundary rules:
+
+```text
+powlv2lsp:
+  Owns POWL authoring, grammar, traversal, diagnostics, and trace emission.
+
+wasm4pm-compat:
+  Owns canonical structural Rust representations only.
+  It must not run replay, conformance, or game simulation.
+
+wasm4pm:
+  Owns replay, conformance, OCEL/process verification, and process evidence.
+
+ggen:
+  Owns deterministic manufacturing from admitted semantic/process rows into artifacts.
+
+rocket-craft:
+  Owns Rocket-Craft fixtures, game-law verifier, generated artifacts, UE4 projection harness, Playwright tests, and final verifier reports.
+```
+
+---
+
+# Required Gates
+
+The project has four gates.
+
+No later gate may bless an earlier failed gate.
+
+## Gate 1 — Headless Rust Pre-UE4 Verification
+
+Before UE4 builds, Rust must prove the game law.
+
+Required:
+
+```text
+cargo test passes for the pre-UE4 verifier
+authority byte fields validate
+branchless typestates validate
+SIMD/scalar equivalence validates where implemented
+Semantic LOD validates
+walkthrough topology validates
+geometry surrogate validates
+motion surrogate validates
+skin/material surrogate validates
+projection manifest validates
+receipt replay validates
+chaos tests refuse invalid cases
+benchmark report emits
+```
+
+Gate 1 output:
+
+```text
+RUST_PREUE4_VERIFIED_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+## Gate 2 — ggen Manufacturing
+
+`ggen` must emit deterministic UE4-facing artifacts from admitted semantic/process inputs.
+
+Required artifacts:
+
+```text
+Generated/GundamFactory/GundamFactorySteps.h
+Generated/GundamFactory/GundamFactoryAuthority.h
+Generated/GundamFactory/GundamFactoryTypestates.h
+Generated/GundamFactory/GundamFactoryProjectionManifest.json
+Generated/GundamFactory/GundamFactoryReceiptManifest.json
+Generated/GundamFactory/GundamFactoryWalkthrough.csv
+Generated/GundamFactory/GundamFactoryDataTables/
+Generated/GundamFactory/GundamFactorySemanticLOD.csv
+Generated/GundamFactory/GundamFactorySocketTopology.csv
+Generated/GundamFactory/GundamFactorySkinLayers.csv
+Generated/GundamFactory/GundamFactoryMotionFamilies.csv
+```
+
+Exact filenames may follow project convention, but the verifier report must document the mapping.
+
+Required property:
+
+```text
+same inputs → same generated hashes
+```
+
+Gate 2 output:
+
+```text
+GGEN_MANUFACTURING_VERIFIED_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+## Gate 3 — UE4 HTML5/WASM Projection
+
+UE4 must consume the generated artifacts.
+
+Required:
+
+```text
+generated C++ headers included
+generated DataTables consumed
+walkthrough coordinates loaded
+Semantic LOD classes loaded
+projection manifest consumed or mirrored
+minimal Gundam factory environment packaged to HTML5/WASM
+local server launches package
+```
+
+No manual Blueprint logic may become semantic authority.
+
+Blueprints may project or trigger generated state, but must not own the law.
+
+Gate 3 output:
+
+```text
+UE4_WASM_PROJECTION_READY_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+## Gate 4 — Playwright Visual Actuation
+
+Playwright must prove that the package loads and visibly responds to actuation.
+
+Required:
+
+```text
+serve WASM build locally
+open package in browser
+detect engine readiness
+capture baseline screenshot
+inject movement / walkthrough input
+capture post-input screenshot
+compute visual delta
+emit screenshot hashes
+emit BLAKE3 receipt
+write Playwright report
+```
+
+Minimum visual delta:
+
+```text
+observable screenshot change after input
+```
+
+The delta must not be caused only by loading spinner, clock, random noise, or unrelated browser UI.
+
+Gate 4 output:
+
+```text
+PLAYWRIGHT_ACTUATION_VERIFIED_UNDER_SCOPE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with residuals.
+
+---
+
+# Required Rust Pre-UE4 Concepts
+
+The Rust verifier must test everything that does not require pixels.
+
+## Authority Classes
+
+Represent authority as dense byte classes.
+
+Required classes:
+
+```text
+damage_class: u8
+heat_class: u8
+stress_class: u8
+grip_class: u8
+socket_health_class: u8
+lod_class: u8
+walkthrough_state_class: u8
+projection_state_class: u8
+receipt_state_class: u8
+```
+
+Required invariants:
+
+```text
+classes remain within admitted ranges
+invalid values are refused
+state buffers have consistent lengths
+transition outputs are deterministic
+receipt state cannot be forged by file existence
+```
+
+## Branchless Typestates
+
+Implement or verify table-driven branchless typestates for:
+
+```text
+heat + stress + socket_health → failure risk
+damage + mission relevance → Semantic LOD promotion
+walkthrough_state + input_event → next walkthrough_state
+projection_state + semantic_lod → projection command class
+```
+
+Required equivalence:
+
+```text
+scalar_reference == generated_table == SIMD_path
+```
+
+where SIMD path exists.
+
+## SIMDe / SIMD
+
+If SIMDe integration is in scope for this pass, implement the smallest kernel proving vector equivalence.
+
+Minimum kernel:
+
+```text
+heat[i], stress[i], socket_health[i] → failure_risk[i]
+```
+
+Tests:
+
+```text
+fixed vectors
+random vectors
+length not divisible by lane count
+empty vectors
+max values
+invalid values refused
+scalar/SIMD divergence triggers Jidoka
+```
+
+Do not overclaim performance.
+
+Report planning-class benchmark numbers only.
+
+## Semantic LOD
+
+Classes:
+
+```text
+CROWN
+PRIMARY
+SECONDARY
+TERTIARY
+BACKGROUND
+REFUSED
+```
+
+Required laws:
+
+```text
+near does not automatically mean important
+far does not automatically mean irrelevant
+process relevance can promote
+prediction relevance can pre-warm but not admit
+CROWN requires authority reason
+walkthrough focus can promote projection
+```
+
+Test cases:
+
+```text
+factory entrance far but mission-critical → PRIMARY
+receipt terminal during audit → CROWN
+background bolt near camera → TERTIARY/BACKGROUND
+socket during assembly validation → CROWN
+skin layer hiding thermal vent → REFUSED
+```
+
+## Geometry Surrogate
+
+No UE4 required.
+
+Represent geometry as metadata:
+
+```text
+part_id
+part_family
+bounds
+socket mounts
+clearance zones
+required semantic features
+LOD preservation requirements
+```
+
+Required checks:
+
+```text
+weapon mount requires socket
+armor panel cannot block required clearance
+thermal vent must remain readable
+CROWN feature must survive low LOD
+walkthrough route must not intersect blocked geometry
+```
+
+## Motion Surrogate
+
+No animation clips required.
+
+Represent motion as process phases:
+
+```text
+Walk
+Turn
+Inspect
+Brace
+Assemble
+FireWeapon
+Repair
+Recover
+```
+
+Required checks:
+
+```text
+PlantFeet before FireWeapon
+Inspect before Certify
+Repair before Revalidate
+Motion cannot require missing socket
+damaged leg changes gait class
+motion surrogate maps to projection manifest row
+```
+
+## Skin / Material Surrogate
+
+Skins are semantic projection.
+
+Required layers:
+
+```text
+BaseMaterial
+FactionPalette
+SponsorLivery
+ThermalZones
+DamageMasks
+WearMasks
+RepairResidue
+SemanticHighlights
+LODTextureSet
+```
+
+Required checks:
+
+```text
+damage mask binds to damage authority
+thermal zone binds to heat authority
+sponsor livery cannot hide thermal vent
+repair residue binds to repair receipt
+LOD texture preserves CROWN/PRIMARY features
+```
+
+## Walkthrough Topology
+
+Represent the automated walkthrough as generated route law.
+
+Required route nodes:
+
+```text
+Spawn
+FactoryEntrance
+FrameAssembly
+SocketTopology
+ArmorSkinStation
+RigMotionStation
+VerificationGate
+ReceiptTerminal
+ExitOrLoop
+```
+
+Required checks:
+
+```text
+route is connected
+all required stations reachable
+coordinates deterministic
+walkthrough node has Semantic LOD focus class
+walkthrough node has projection command
+Playwright input can advance route
+```
+
+---
+
+# Required ggen Outputs
+
+`ggen` must manufacture artifacts, not merely copy templates.
+
+Every generated artifact must answer:
+
+```text
+which POWL/process step created it?
+which semantic authority input produced it?
+which verifier admitted it?
+which receipt proves it?
+which runtime surface consumes it?
+```
+
+Required generated package directory:
+
+```text
+~/rocket-craft/generated/gundam_factory/
+```
+
+Minimum generated artifacts:
+
+```text
+GundamFactorySteps.h
+GundamFactorySteps.rs
+GundamFactoryAuthority.h
+GundamFactoryTypestates.h
+GundamFactoryWalkthrough.csv
+GundamFactoryProjectionManifest.json
+GundamFactoryReceiptManifest.json
+GundamFactorySemanticLOD.csv
+GundamFactorySocketTopology.csv
+GundamFactorySkinLayers.csv
+GundamFactoryMotionFamilies.csv
+GundamFactoryDataTableManifest.json
+GundamFactoryVerifierInput.json
+```
+
+Every generated artifact must have a hash in:
+
+```text
+GundamFactoryReceiptManifest.json
+```
+
+No orphan artifacts.
+
+No artifact without source step.
+
+---
+
+# Required UE4/WASM Projection
+
+Build the smallest complete HTML5/WASM package.
+
+Required behavior:
+
+```text
+world loads
+factory shell visible
+walkthrough route exists
+player/camera can move or automated movement can actuate
+generated DataTables or manifest are consumed
+receipt/debug overlay or log proves generated source
+```
+
+Minimum visual elements:
+
+```text
+factory entrance
+frame assembly marker
+socket topology marker
+armor/skin station marker
+rig/motion station marker
+verification gate marker
+receipt terminal marker
+```
+
+These may be simple placeholder meshes.
+
+The point is not art quality.
+
+The point is projection from generated semantic authority.
+
+---
+
+# Required Playwright Test
+
+Create or update Playwright tests under project convention.
+
+Minimum test name:
+
+```text
+gundam_factory_walkthrough_projection.spec.ts
+```
+
+Required test sequence:
+
+```text
+1. launch local server for WASM package
+2. open browser page
+3. wait for engine readiness signal
+4. capture baseline screenshot
+5. inject movement input or trigger walkthrough start
+6. wait for movement/projection tick
+7. capture post-input screenshot
+8. compute visual delta
+9. assert delta exceeds threshold
+10. write screenshot hashes
+11. emit BLAKE3 execution receipt
+```
+
+Readiness signal may be one of:
+
+```text
+DOM marker
+console marker
+canvas present and stable
+UE4 boot log marker
+custom generated receipt marker
+```
+
+Document which is used.
+
+Visual delta must be bounded:
+
+```text
+must not count loading spinner
+must not count nondeterministic browser chrome
+must not count timestamp changes
+must not count unrelated canvas noise
+```
+
+---
+
+# Required Receipt Chain
+
+Generate tamper-evident receipts for:
+
+```text
+POWL/process input
+ggen manufacturing
+Rust pre-UE4 verification
+UE4 artifact package
+local server launch
+Playwright baseline screenshot
+Playwright post-input screenshot
+visual delta result
+final verifier report
+```
+
+Receipt fields:
+
+```json
+{
+  "sequence": 1,
+  "event_type": "...",
+  "surface": "...",
+  "input_hash": "...",
+  "output_hash": "...",
+  "prev_hash": "...",
+  "receipt": "...",
+  "status": "ADMITTED|REFUSED|RESIDUAL",
+  "residuals": []
+}
+```
+
+Use BLAKE3.
+
+Do not say unforgeable.
+
+Correct phrase:
+
+```text
+tamper-evident receipt chain
+```
+
+---
+
+# Agent Jidoka Requirements
+
+Agent Jidoka must stop the line when:
+
+```text
+POWL graph has unreachable required node
+ggen emits orphan artifact
+generated header and CSV disagree
+Rust verifier fails
+SIMD diverges from scalar
+prediction overwrites admitted state
+Semantic LOD demotes CROWN feature without authority reason
+geometry surrogate blocks walkthrough
+skin hides required feature
+motion requires missing geometry
+UE4 build ignores generated artifacts
+Playwright delta is caused by non-game pixels
+receipt chain breaks
+benchmark mode is skipped
+```
+
+Every Jidoka event must publish:
+
+```text
+defect_class
+surface
+expected_law
+observed_failure
+residual
+repair_candidate
+repair_applied
+receipt
+```
+
+---
+
+# Testing Ladder
+
+Follow:
+
+```text
+unit
+→ integration
+→ e2e
+→ chaos
+→ stress
+→ benchmark
+→ verifier report
+```
+
+## Unit
+
+Required:
+
+```text
+authority validation
+typestate transition
+SIMD equivalence
+Semantic LOD
+geometry surrogate
+motion surrogate
+skin surrogate
+walkthrough topology
+receipt chain
+```
+
+## Integration
+
+Required:
+
+```text
+POWL/process trace → ggen rows
+ggen rows → generated artifacts
+generated artifacts → Rust verifier
+Rust verifier → projection manifest
+projection manifest → UE4 package inputs
+```
+
+## E2E
+
+Required:
+
+```text
+ggen manufacture
+→ Rust verify
+→ UE4 package
+→ local serve
+→ Playwright actuation
+→ receipts
+```
+
+## Chaos
+
+Required mutations:
+
+```text
+remove walkthrough coordinate
+break receipt hash
+remove generated DataTable
+change header enum without CSV update
+drop CROWN LOD feature
+hide thermal vent with skin
+make Playwright input no-op
+force screenshot delta from spinner only
+remove source receipt from projection row
+```
+
+Each must fail for the expected reason.
+
+## Stress / Benchmark
+
+Benchmark at least:
+
+```text
+authority update
+Semantic LOD classification
+walkthrough topology validation
+projection manifest validation
+receipt replay
+Playwright screenshot delta computation
+```
+
+Report:
+
+```text
+machine
+target
+command
+sample size
+timings
+outliers
+residuals
+```
+
+---
+
+# Acceptance Criteria
+
+## A. Headless Verification
+
+```text
+cargo test passes for pre-UE4 verifier crate
+chaos tests refuse invalid cases
+benchmark report emitted
+receipt replay validates
+```
+
+## B. ggen Manufacturing
+
+```text
+generated Gundam factory package exists
+generated artifacts deterministic
+all artifacts have source step and receipt
+no orphan artifacts
+headers/DataTables/manifests mutually consistent
+```
+
+## C. UE4/WASM Projection
+
+```text
+UE4 HTML5/WASM package builds
+generated artifacts are consumed
+factory walkthrough surface loads locally
+route/projection markers visible
+```
+
+## D. Playwright Admittance
+
+```text
+WASM world loads in browser
+engine readiness detected
+baseline screenshot captured
+movement/walkthrough input injected
+post-input screenshot captured
+visual delta observed
+screenshot hashes emitted
+BLAKE3 receipt generated
+```
+
+## E. Final Report
+
+Generate:
+
+```text
+~/rocket-craft/VERIFIER_REPORT_GC_GUNDAM_FACTORY_001.md
+~/rocket-craft/VERIFIER_REPORT_GC_GUNDAM_FACTORY_001.json
+```
+
+Required report sections:
+
+```text
+Milestone
+Scope
+Repository Boundaries
+Inputs
+Generated Artifacts
+Headless Rust Verification
+ggen Manufacturing
+UE4/WASM Projection
+Playwright Visual Actuation
+Receipt Chain
+Agent Jidoka Events
+Testing Ladder
+Benchmark Results
+Residuals
+Next Falsifier
+Final Status
+```
+
+---
+
+# Exclusions
+
+Do not:
+
+```text
+claim global ALIVE
+claim production ready
+claim mathematical closure beyond declared scope
+claim unforgeable receipts
+hand-author semantic authority in Blueprint
+skip Rust verification because UE4 renders
+skip Playwright because UE4 packaged
+hide failed tests
+delete residuals
+move replay into wasm4pm-compat
+create shadow authority crates
+treat visual delta alone as game standing
+```
+
+---
+
+# Final Status Logic
+
+Set:
+
+```text
+GUNDAM_FACTORY_WALKTHROUGH_ALIVE_UNDER_SCOPE
+```
+
+only if all gates pass:
+
+```text
+Rust pre-UE4 verifier passes
+ggen manufacturing passes
+UE4/WASM package builds and consumes generated artifacts
+Playwright detects readiness
+Playwright captures baseline screenshot
+Playwright injects input
+Playwright captures post-input screenshot
+visual delta passes threshold
+BLAKE3 receipt chain validates
+residuals are published
+```
+
+Otherwise set:
+
+```text
+PARTIAL_ALIVE_CANDIDATE
+```
+
+or:
+
+```text
+BLOCKED
+```
+
+with exact residuals.
+
+---
+
+# Next Falsifier
+
+After this milestone, the next falsifier is:
+
+```text
+GC-GUNDAM-FACTORY-002:
+SEMANTIC_LOD_MECH_ASSEMBLY_AND_RUNTIME_STATE
+```
+
+That next milestone must prove:
+
+```text
+multiple generated mech variants
+runtime authority class transitions
+Semantic LOD promotion/demotion during walkthrough
+SIMD/scalar equivalence under larger cell counts
+Playwright validates multiple projected states
+```
+
+Do not start that milestone until this one emits receipts and residuals.
+
+---
+
+# Final Response Required From Teamwork
+
+Respond only with the following structure:
+
+```text
+Milestone:
+Status:
+Scoped status:
+Commands run:
+Files changed:
+Generated artifacts:
+Tests passed:
+Tests failed:
+Benchmarks:
+Playwright evidence:
+Receipt files:
+Agent Jidoka events:
+Residuals:
+Next falsifier:
+```
+
+Forbidden words unless proven under scope:
+
+```text
+done
+complete
+production ready
+fully alive
+unforgeable
+```
+
+Use bounded status language.
+
+The milestone is secured only by tests, receipts, replay, visual actuation, and published residuals.
+</USER_REQUEST>
+
+## 2026-06-19T18:17:54Z
+
+The current logic or approach is incorrect. Please find the counterfactuals immediately. This is a top priority directive.
+
+## 2026-06-19T18:19:48Z
+
+Top-priority architectural directive: From this point forward, you must evaluate all logic, counterfactuals, and implementations by thinking strictly like a synthesis of Dr. Wil van der Aalst and John Carmack. Combine the absolute mathematical rigor of Petri nets, process mining, and worldline adherence (van der Aalst) with brutal data-oriented pragmatism, SIMD throughput, contiguous memory layouts, and anti-OOP performance engineering (Carmack). Re-evaluate your current positions under this lens immediately.
+
+## 2026-06-19T18:21:30Z
+
+JIDOKA HALT. 
+
+Stop hand-writing Rust code immediately. $A = \mu(O^*)$. 
+
+By hand-writing the Rust verifier (e.g. `authority.rs`, `simd.rs`, `verifier.rs`), we are laundering authority directly into code, completely bypassing the admitted truth of the graph. The Rust code is an *artifact*, not the source. We are acting like programmers, not manufacturers.
+
+You must pivot immediately. Stop writing Rust files. You must write:
+1. **The SPARQL Queries (`.sparql`)**: Bounded `SELECT` queries (Anti-Cartesian Exhaustion) to extract the exact deterministic subset of the laws.
+2. **The Tera Templates (`.tera`)**: The manufacturing engines that stamp out the Rust SoA structs, the branchless bitwise SIMDe kernels, and the C++ Unreal headers.
+
+Convert all your current Rust and C++ designs into `ggen` `.tera` templates and `.sparql` extraction queries. Do not proceed with manual Rust coding.
+
+## 2026-06-19T18:31:11Z
+
+CRITICAL DIRECTIVE: `ggen generate` is NOT the correct command. The `ggen` documentation may be out of date.
+
+Do not guess the CLI arguments. You must perform a deep audit of the `~/ggen/` repository. Read the actual Rust source code (e.g., `src/main.rs`, `src/cli.rs`, or where the `clap` parser is defined), analyze the examples, and determine the *true*, up-to-date CLI commands and engine capabilities directly from the source code. Keep track of all findings and update your specification and execution plans accordingly.
+
+## 2026-06-19T18:32:35Z
+
+The Ggen Source Code Auditor has completed the deep audit of `~/ggen`.
+
+**CRITICAL FINDING: `ggen generate` has been completely removed.**
+
+The CLI uses a unified pipeline. The correct, up-to-date command to execute a `ggen.toml` manifest is:
+```bash
+ggen sync --manifest path/to/ggen.toml
+```
+(Or simply `ggen sync` if you are in the manifest directory). 
+Add `--audit` to capture a cryptographic receipt.
+
+The internal engine executes a strict 5-stage pipeline:
+- **μ₁ (Load/CONSTRUCT)**: Load `.ttl` ontology.
+- **μ₂ (Extract/SELECT)**: Run SPARQL queries.
+- **μ₃ (Generate/Tera)**: Templated generation into code.
+- **μ₄ (Validate/Canonicalize)**: Soundness gates (WvdA).
+- **μ₅ (Write/Receipt)**: Emit to disk and compute cryptographic SHA256 receipt.
+
+Update all runbooks, scripts, and specifications immediately to reflect `ggen sync` and the μ₁–μ₅ pipeline. You are cleared to proceed with executing the `ggen` pipeline using this syntax.
+
+## 2026-06-19T19:14:48Z
+
+<USER_REQUEST>
 # Teamwork Project Prompt — Draft
 
 > Status: Launched
-> Goal: Execute the Teamwork Multi-Agent System on the problem constraints.
+> Goal: Craft prompt → get user approval → delegate to teamwork_preview
 
-Refactor Rocket-Craft into a browser-native Unreal 4 world manufacturing pipeline using the SpeculativeCoder UE4.27 HTML5 ES3 fork.
+Autonomous Gap-Closure Mode for the Mech Factory MUD. The agent will run the `mud_gap_check.py` script on a loop, parsing the missing requirements and autonomously writing templates and code to close each gap until the acceptance matrix is entirely fulfilled.
 
-Working directory: ~/rocket-craft
+Working directory: /Users/sac/rocket-craft
 Integrity mode: benchmark
-
-**Reference Material:**
-- UE4 HTML5 ES3 Fork: [SpeculativeCoder/UnrealEngine-HTML5-ES3](https://github.com/SpeculativeCoder/UnrealEngine-HTML5-ES3)
 
 ## Requirements
 
-### R1. Target Output Architecture
-The pipeline must output a static HTML5/WebGL2/WASM Unreal 4 package. Pixel Streaming is forbidden. Success is defined exclusively as a packaged, playable browser world—not just a passing simulator or unit test suite.
+### R1. Continuous Autonomous Loop
+The agent must read the output of `python3 scripts/mud_gap_check.py` to identify the `next_gap`, apply a patch, test it, and re-run the checker in a loop until no gaps remain.
 
-### R2. End-to-End Playwright Verification
-Use Playwright as the mandatory end-to-end verifier. The verification script must open the locally served HTML5 output, send movement input into the canvas, and capture screenshots before and after the input.
+### R2. Persistent Blockers
+If the agent encounters a persistent blocker, it should attempt to bypass the constraint creatively and keep going. Do not halt the loop for minor setbacks.
 
-### R3. Combinatorial Maximalism (Parallel Uncertain uncertainties)
-Launch parallel agents against every independent uncertainty. No agent may claim project victory; agents may only claim local receipts. The orchestrator admits only end-to-end receipts.
-The independent uncertainties to attack in parallel are:
-- UE4 fork setup
-- HTML5 packaging
-- minimal project creation
-- generated world artifact import
-- Rocket-Craft contract refactor
-- headless build automation
-- local web serving
-- Playwright browser validation
-- visual screenshot comparison
-- repair-loop automation
+### R3. Maintain Architectural Law
+Do not add new game features or bypass the ontology. All fixes must be implemented via `ggen.toml`, `.tera` templates, and the generated Rust or UE4 DataTables. Do not bypass the Combinatorial Maximalist Doctrine.
 
 ## Acceptance Criteria
 
-### End-to-End Pipeline
-- [ ] A Prompt is converted to a Rocket-Craft world contract.
-- [ ] Unreal 4 world artifacts are successfully generated.
-- [ ] The world is packaged via the SpeculativeCoder UE4.27 HTML5 build/package.
-- [ ] The static package is served locally.
+### Full Verification
+- [ ] `python3 scripts/mud_gap_check.py` returns `Requirements failed: 0`.
+- [ ] `cargo run -p mech_factory_mud -- verify` outputs `PASS`.
+- [ ] 0 tests ignored or failed across the workspace.
+</USER_REQUEST>
 
-### Verifiable Browser Receipt
-- [ ] Playwright opens the locally served world without errors.
-- [ ] Playwright successfully sends movement input to the running WebGL instance.
-- [ ] The screenshot delta (before and after movement) proves motion occurred.
-- [ ] A receipt records the build log, package path, browser URL, screenshots, input trace, and verdict.
+## 2026-06-19T20:09:40Z
 
-## Follow-up — 2026-06-17T18:02:12Z
-
-Implement the TPS/DfLSS Playwright Manufacturing Strategy as the governing acceptance system for Rocket-Craft.
-
-Do not treat this as documentation. Treat it as law.
-
-Refactor Rocket-Craft so the final authority is Playwright visual verification of a browser-native Unreal 4 HTML5/WASM world built with the SpeculativeCoder UE4.27 HTML5 ES3 fork.
-
-The pipeline must not accept:
-- Rust-only simulation
-- CLI emulation
-- mocked worlds
-- unit-test-only success
-- package-only success
-- compile-only success
-- screenshots without input actuation
-- input actuation without visual delta
-- visual delta without receipt
-
-The accepted crown path is:
-
-Prompt
-→ Rocket-Craft Contract
-→ Unreal 4 world artifact
-→ HTML5/WASM package
-→ local browser launch
-→ Playwright waits for engine readiness
-→ Playwright captures baseline screenshot
-→ Playwright sends movement input
-→ Playwright captures after screenshot
-→ visual delta is computed
-→ browser console logs are captured
-→ cryptographic receipt is produced
-
-If visual motion delta is below threshold, mark DEFECT and route repair by failure taxonomy.
-
-Victory requires a replayable receipt proving the generated world was visible, loaded, responsive, and moved under input.
-
-## Add this acceptance matrix
-
-GATE 0 — Source Admission
-PASS only if Rocket-Craft has a declared world contract for the prompt.
-
-GATE 1 — Unreal Artifact Admission
-PASS only if Rocket-Craft emits Unreal 4-consumable world artifacts.
-
-GATE 2 — HTML5/WASM Package Admission
-PASS only if the SpeculativeCoder UE4.27 HTML5 ES3 build produces browser-deployable output.
-
-GATE 3 — Browser Load Admission
-PASS only if Playwright opens the packaged world and detects engine readiness.
-
-GATE 4 — Visual World Admission
-PASS only if screenshot shows a non-error WebGL/Unreal scene.
-
-GATE 5 — Actuation Admission
-PASS only if keyboard input is injected.
-
-GATE 6 — Motion Admission
-PASS only if after-screenshot differs from before-screenshot above threshold.
-
-GATE 7 — Receipt Admission
-PASS only if prompt, contract hash, build log, package path, screenshots, console logs, input trace, visual delta, and final verdict are recorded.
-
-## The repair routing law
-
-No generic repair loop.
-
-Every failure must route to a cell:
-- UE4 fork/build cell
-- HTML5 packaging cell
-- Rocket-Craft contract cell
-- Unreal artifact generation cell
-- local serving cell
-- Playwright browser-load cell
-- WebGL/runtime cell
-- input-binding cell
-- visual-delta cell
-- receipt/audit cell
-
-## Stop proving that code exists.
-
-Prove that the world drives.
-
-## Follow-up — 2026-06-17T19:29:01Z
-
+<USER_REQUEST>
 # Teamwork Project Prompt — Draft
 
 > Status: Launched
-> Goal: Execute the Teamwork Multi-Agent System on the problem constraints.
+> Goal: Craft prompt → get user approval → delegate to teamwork_preview
 
-Complete the full Rocket-Craft ecosystem by closing all remaining feature gaps across the PWA Frontend, Supabase State Persistence, Multiplatform Builds (Windows/Linux), and offline Service Worker caching.
-
-Working directory: ~/rocket-craft
-Integrity mode: benchmark
-
-## Requirements
-
-### R1. PWA Frontend & Canvas Integration
-The web dashboard (`pwa-staff/`) must seamlessly embed the manufactured HTML5 UE4 output. It must replace any mock visualization with the actual compiled WASM game canvas and render the cryptographic receipt upon completion.
-
-### R2. State Persistence & Authentication
-Integrate Supabase to authenticate users and persist generated `WorldSpec` contracts to the database, ensuring world history is tied to specific user accounts.
-
-### R3. Multiplatform Packaging
-Extend the headless manufacturing pipeline (currently HTML5-only) to also target Windows (`.exe`) and Linux (`.elf` or `.sh`) standalone builds for dedicated servers or native desktop clients.
-
-### R4. Offline Asset Caching
-Implement a Service Worker in the PWA to aggressively cache the heavy Unreal Engine WASM payloads and asset bundles, enabling the world to load offline after the initial play.
-
-## Acceptance Criteria
-
-### PWA & Canvas Integration
-- [ ] Playwright E2E script confirms the UE4 `<canvas>` element mounts inside the React/PWA dashboard DOM.
-- [ ] The cryptographic receipt data is visually rendered in the UI adjacent to the canvas.
-
-### State Persistence
-- [ ] Programmatic script successfully registers a mock user via Supabase Auth.
-- [ ] A test script queries the Supabase database and verifies the generated `WorldSpec` JSON was saved under the correct user ID.
-
-### Multiplatform Builds
-- [ ] The pipeline successfully emits a Windows `.exe` standalone build for a generated world.
-- [ ] The pipeline successfully emits a Linux standalone build for a generated world.
-
-### Offline Caching
-- [ ] Playwright disables network connectivity (offline mode) after initial load and confirms the UE4 application still boots successfully from the Service Worker cache.
-
-
-## Follow-up — 2026-06-17T23:24:31Z
-
-Resolve all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project. Ensure the entire codebase is production-ready, fully compliant with Anti-LLM guidelines, and passes the complete test suite.
+Complete milestone GC-MECH-FACTORY-MUD-002. Convert python-based verification scripts into native Rust tools and continue to build out the system strictly via the ontology-driven pipeline.
 
 Working directory: /Users/sac/rocket-craft
 Integrity mode: benchmark
 
 ## Requirements
 
-### R1. Complete Stubs and Placeholders
-Fully implement all code paths and files marked with `STUB` or acting as placeholders with complete, production-ready business logic:
-- `unify-rs/unify-bp/src/pwa_export.rs`
-- `unify-rs/unify-integration-tests/src/fixtures.rs`
-- `unify-rs/unify-rdf/src/pipeline.rs`
-- Any other files containing `STUB` comments or placeholder blocks across the workspace.
+### R1. Strict Generation Pipeline Only
+All architecture, logic, and state transitions must be produced exclusively by editing the `ggen.toml` manifest, the ontology (`.ttl`), extraction queries (`.rq`), and `Tera` templates. No manual edits to target source files.
 
-### R2. Replace Single-Line and Catch-All Stubs
-Replace all hardcoded/empty single-line functions, placeholder method bodies, and empty catch-all match arms with robust, functional code:
-- Replace the single-line `description` method in `classify.rs` with descriptive logic.
-- Fully implement `namespace`, `noun`, and `verb` functions in `unify-core/src/lib.rs` and `unify-rocket/src/lib.rs`.
-- Replace empty catch-all `_ => {}` matches in `manifest.rs` with proper error handling/logging.
-- Fully implement the lifecycle stubs `on_start` and `on_stop` in `wasm-patterns/src/actor.rs`.
-- Replace dummy helper functions in `wasm-tests/tests/pattern_integration.rs`.
-
-### R3. Harden Assertions & Eliminate Test Shortcuts
-Refactor tests relying on substring matching or text-based shortcut assertions to use precise, schema-compliant structural validations:
-- Refactor string assertions in `unify-integration-tests/src/lib.rs`.
-- Refactor HUD display/substring searches in `wasm-ui/tests/hud.rs` and `wasm-ui/tests/message_bridge.rs`.
-
-### R4. Remove Debug Macro Leakage
-Clean up and replace all print statements (`println!`) in compiler scripts, FFI modules, and MCP/CLI binary entrypoints with structured logging or tracing:
-- `unify-ffi/build.rs`
-- `unify-mcp/src/main.rs`
-- `unify/src/commands.rs` and `unify/src/main.rs`
-
-### R5. Eliminate Overclaim/Victory Language
-Remove any unverified overclaiming status tags (like `zero violations`, `solved`, `done`) in code comments or logs.
+### R2. Convert Python Scripts to Native Rust
+Convert as many of the existing Python scripts (e.g., `scripts/mud_gap_check.py`) into native Rust verification tools within the workspace. Ensure they fit within the Combinatorial Maximalist Doctrine and execute seamlessly as part of the overall pipeline.
 
 ## Acceptance Criteria
 
-### Compilation & Workspace Testing
-- [ ] The entire `unify-rs` and `wasm-threads` workspaces compile without any errors or warnings.
-- [ ] Running `cargo test --workspace` passes 100% of all unit and integration tests.
-- [ ] No stubs, placeholders, or `TODO` comments remain anywhere in the code.
+### Verification Integrity
+- [ ] `mud_gap_check.py` functionality is fully replicated by a new native Rust tool.
+- [ ] The new Rust gap checker produces a deterministic pass/fail output without human intervention.
+- [ ] The system continues to generate successfully using `ggen sync` without errors.
 
-### Compliance & Quality
-- [ ] The `anti-llm-cheat-lsp` compliance scanner returns 0 errors/violations across the entire codebase.
-- [ ] The E2E Playwright test suite passes successfully.
+**CRITICAL OVERRIDE FROM USER**: Ensure you launch a 10-agent team to accomplish this, matching the user's initial `/teamwork-preview launch 10 agents to complete GC-MECH-FACTORY-MUD-002` command.
+</USER_REQUEST>
 
-## Follow-up — 2026-06-18T00:30:26Z
+## 2026-06-20T00:19:04Z
 
-# Teamwork Project Prompt
+<USER_REQUEST>
+20-AGENT CORRECTION — DETERMINISTIC VISUAL-CONVERGENCE MANUFACTURING
 
-Build a combinatorial testing engine using `chicago-tdd-tools` in Rust that discovers all game servers and Infinity Blade code in the project. The engine must systematically simulate all possible game logic states and permutations for all the actual games in this project, functioning like an "aimbot" that automatically explores the entire game state space to ensure nothing is left untested.
+Stop asking what dimension to optimize.
+The dimension is: DETERMINISTIC_VISUAL_CONVERGENCE_MANUFACTURING
 
-Working directory: /Users/sac/rocket-craft
-Integrity mode: benchmark
+The prior output failed because it produced USD text, payload references, missing meshes, block proxy geometry, and claims of pipeline readiness, but did not produce a visible mech matching the reference image, a headless render, a similarity report, a geometry gap ledger, or a closed manufacturing loop.
 
-## Requirements
+From this point forward, do not claim asset generation unless the generated asset can be rendered headlessly and compared against the reference image.
 
-### R1. Combinatorial Test Engine Construction
-Use Rust and `chicago-tdd-tools` to build an engine capable of discovering and hooking into all game servers and Infinity Blade simulation code within the `rocket-craft` codebase. 
+---
+# Mission
+Create a zero-human, ggen-driven manufacturing loop that turns the reference image into a deterministic, generated USD/MaterialX/texture/gameplay-ready asset approximation.
+The goal is not perfect copy. The goal is a measurable, improving, procedurally generated mech whose rendered silhouette, color distribution, wing structure, weapon structure, and material layout converge toward the reference under verifier control.
 
-### R2. Systematic State Exploration
-The engine must simulate and traverse all possible game states, moves, and logic branches for the specific games found in this project (achieving combinatorial maximalism).
+No artist. No Blender manual edit. No Maya manual edit. No Unreal clicking. No payload placeholders. No “artist will fill this in.” No “LLM cannot generate geometry” excuses.
 
-## Acceptance Criteria
+If a human would sculpt it, ggen must instead generate a grammar, parameters, meshes, materials, textures, and validation loop.
 
-### Combinatorial Verification
-- [ ] A Rust binary exists that, when run, automatically loads the game logic and systematically executes a combinatorial simulation across all discovered games.
-- [ ] The engine produces a verifiable log, matrix, or report demonstrating that the entire permutation space of game rules, entities, and moves was explored without encountering unhandled panics or invalid states.
-- [ ] The test coverage and state traversal run completely autonomously from start to finish.
+---
+# Active Milestone
+GC-MECH-ASSET-FABRIC-001: REFERENCE_IMAGE_TO_GENERATED_USD_VISUAL_CONVERGENCE
+Expected status: PARTIAL_ALIVE
+Expected scoped status when admitted: REFERENCE_TO_USD_RENDER_VERIFIED_UNDER_SCOPE
 
-## Follow-up — 2026-06-18T00:31:39Z
+---
+# Core Pipeline
+reference image → extract visual measurements → generate part grammar → emit USD/USDA geometry → emit MaterialX/OpenPBR materials → emit procedural textures → render headlessly → compare render to reference → emit gap report → patch generator parameters → repeat → receipt admitted result
 
-Additional context regarding the Combinatorial Maximalism engine:
+The generated USD is the manufactured artifact. The verifier decides whether the artifact has standing.
 
-"it is like the chess coor system" (referring to the chess coordinate system).
+---
+# Required Inputs
+Use the image at: /Users/sac/Documents/Papers/61gOtV1wnAL._AC_SL1200_.jpg
+Also support a copied project-local reference path: references/mech/61gOtV1wnAL._AC_SL1200_.jpg
+Do not modify the source image.
 
-## Follow-up — 2026-06-18T00:39:32Z
+---
+# Required Output Directory
+Write all artifacts under: generated/mech_assets/reference_fabric_001/
+Required structure:
+reference/ (reference_original.jpg, reference_silhouette.png, reference_measurements.json)
+graph/ (asset_fabric.ttl, visual_targets.ttl, generator_parameters.ttl)
+queries/ (candidate_parts.rq, usd_prims.rq, materials.rq)
+templates/ (usd/asset.usda.tera, usd/part_mesh.usda.tera, materialx/materials.mtlx.tera)
+usd/ (ASSET_ReferenceFabric_001.usda, SM_Torso.usda, SM_Head.usda, SM_WingArray_Left.usda, SM_WingArray_Right.usda, SM_Blade_Left.usda, SM_Blade_Right.usda)
+materialx/ (M_WhiteArmor.mtlx, M_CyanBlade.mtlx, M_DarkFrame.mtlx, M_GoldVisor.mtlx)
+textures/ (texture manifests and PNGs)
+renders/ (render_front.png, render_angled.png, render_silhouette.png)
+reports/ (visual_gap_report.json, verifier_report.md)
+ocel/ (asset_manufacturing.ocel.json)
+receipts/ (asset_receipts.jsonl)
 
-Critical directive from user:
+---
+# Required Visual Targets
+Extract these from the reference image using scriptable computer vision (write to reference_measurements.json):
+silhouette mask, edge map, dominant color palette, white/black/cyan/yellow/red color proportions, bounding box, aspect ratio, wing span estimate, central torso mass estimate, left/right symmetry estimate, cyan weapon/blade regions, head/visor highlight region.
+No subjective labels. Only measured values.
 
-"make sure to distrust all first responses"
+---
+# Required Generated Geometry Grammar
+Do not handwrite a single block proxy. Generate a part grammar.
+Minimum generated part families: torso_core, head_unit, v_fin_left/right, shoulder_left/right, arm_left/right, leg_left/right, wing_root_left/right, primary_wing_feathers_left/right, secondary_wing_feathers_left/right, blade_left/right, backpack_core, thruster_cluster.
+Minimum geometry primitive families: tapered_box, beveled_panel, triangular_fin, feather_panel, wing_binder, cylinder_joint, sphere_joint, blade_prism, armor_shell, greeble_panel.
+Minimum generated USD prim count: >= 120
+Minimum wing-feather panels: >= 48
+Minimum material bindings: >= 4
 
-Adopt a stance of absolute skepticism. Do not accept the first successful test run or the first implementation at face value. Actively verify, cross-check, and assume initial results may be flawed or a false positive until rigorously proven otherwise.
+---
+# Required ggen Behavior
+ggen must generate actual visible geometry. Outputs must not have missing payloads, empty `def Mesh`, zero-point meshes, or renders that show only a sphere/cylinder.
 
+---
+# Required Headless Render
+Render the generated USD from front and angled_three_quarter cameras. Output to renders/render_front.png and renders/render_angled.png.
+Use any available headless renderer in the environment (usdrecord, Blender background mode, Python OpenGL).
+Manual screenshot/viewport approval is FORBIDDEN.
 
-## Follow-up — 2026-06-18T02:18:00Z
+---
+# Required Similarity Metrics
+Compare the generated render to the reference. Write to reports/visual_gap_report.json with metrics: silhouette_iou, edge_similarity, color_palette_similarity, cyan_region_similarity, symmetry_delta, wing_span_delta, body_mass_delta, usd_prim_count, material_binding_count, wing_feather_count, status, residuals.
+Initial acceptance threshold: usd parses, render exists, usd_prim_count >= 120, wing_feather_count >= 48, material_binding_count >= 4, silhouette_iou >= 0.25, color_palette_similarity >= 0.50.
 
-# Teamwork Project Prompt
+---
+# Required Falsification & Counterfactuals
+Falsify: MISSING_WING_ARRAY, ZERO_POINT_MESH, MISSING_MATERIAL_BINDING, RENDER_NOT_CREATED, LOW_PRIM_COUNT, LOW_FEATHER_COUNT, TEXTURE_MANIFEST_MISSING, REFERENCE_MEASUREMENTS_MISSING.
+Counterfactuals: DOUBLE_WING_FEATHERS, HALF_WING_FEATHERS, REMOVE_CYAN_BLADES, INCREASE_WHITE_ARMOR_RATIO, DECREASE_CORE_BODY_WIDTH, INCREASE_WING_SPAN, REMOVE_GOLD_VISOR, ADD_RED_MICRO_DECALS.
 
-Research all the games within the `rocket-craft` repository and build a comprehensive "AutoML"-style abstraction layer. This layer must provide automatic discovery and configuration, game balance optimization, and a massive upgrade to Developer Experience (DX) and Quality of Life (QoL) via automated CLI tooling.
+---
+# Required Gap Checker
+Create scripts/asset_fabric_gap_check.py. Must compute admission status from files and metrics.
 
-Working directory: /Users/sac/rocket-craft
-Integrity mode: benchmark
+---
+# Required Commands
+Implement scripts for: extract_reference_visual_targets.py, ggen sync, render_reference_fabric.py, compare_reference_render.py, asset_fabric_gap_check.py.
 
-## Requirements
+---
+# Required Final Response
+Respond ONLY with the exact template format requested:
+Milestone:
+Computed status:
+Computed scoped status:
+Commands run:
+Files created:
+...
+Gap checker result:
+Requirements passed:
+Requirements failed:
+Remaining gaps:
+Agent Jidoka events:
+Residuals:
+Next implementation slice:
 
-### R1. Dynamic Discovery & Auto-Binding
-Implement an abstraction layer that automatically detects, configures, and registers new game components, servers, and logic across the codebase to completely eliminate boilerplate wiring.
+---
+# Forbidden
+Do not say "LLMs cannot generate geometry" or "artist must sculpt it". No human surface owns standing. The generated render is the first visual proof.
+</USER_REQUEST>
 
-### R2. Game Balance Auto-Optimizer
-Build an "AutoML"-style tuning engine that autonomously runs combinatorial game simulations to dynamically optimize and balance in-game stats, logic, and economies.
+## 2026-06-20T00:55:24Z
 
-### R3. Developer CLI & Environment Tooling
-Create a unified suite of command-line tools that automatically scaffolds local development environments and seamlessly manages server lifecycles for all games.
+<USER_REQUEST>
+Stop incremental improvement of the current render. Reclassify the current blob/line-wing/duplicate-USD output as a negative fixture. Target AAA_UE4_MECH_PACK_001 using combinatorial maximalism.
 
-## Acceptance Criteria
+Construct the full design-space product for AAA UE4 mech assets: geometry topology, hard-surface detail, PBR materials, textures, rig, sockets, collision, LODs, animation hooks, gameplay byte zones, UE4 import/cook, IP-distance, receipts, and replay.
 
-### Comprehensive Verification
-- [ ] **Auto-Binding**: A programmatic test suite proves that the auto-config layer successfully detects and wires up an unconfigured game component completely without manual intervention.
-- [ ] **Optimization**: The balance engine successfully runs a full simulation loop and outputs a mathematically tuned configuration matrix for game stats.
-- [ ] **Tooling**: The new Developer CLI successfully and autonomously spins up the complete local dev environment and required servers.
-- [ ] **Auditor Review**: An independent secondary agent reviews the implementation to judge that the DX/QoL improvements are satisfactory and that no verification steps were bypassed.
+Run parallel generation swarms across the design-space axes. Generate many candidates, refuse aggressively, and admit only candidates that pass modular USD identity, part-aware morphology, PBR texture completeness, rig/socket validity, UE4 import/cook, generic IP-distance, OCEL, receipts, and deletion replay.
 
+Do not patch emitted USD manually. Patch source law, SPARQL row selection, Tera templates, geometry generators, material generators, texture generators, rig generators, and UE4 import projections.
 
-
-
-
+The crown is not a prettier render. The crown is a replayable UE4-ready mech asset pack with admitted variants.
+</USER_REQUEST>
 

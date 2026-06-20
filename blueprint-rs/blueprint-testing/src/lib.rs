@@ -4,8 +4,8 @@
 //! testing of T3D output.
 
 use blueprint_core::ast::{Blueprint, BpNode, Pin};
-use blueprint_core::types::{PinType, PinDirection, PinCategory, ContainerType};
 use blueprint_core::serializer::T3dSerializer;
+use blueprint_core::types::{ContainerType, PinCategory, PinDirection, PinType};
 
 // ============================================================
 // ASSERTION MACROS
@@ -35,7 +35,12 @@ macro_rules! assert_has_node {
             "Expected node '{}' in graph '{}', but it was not found. Nodes present: [{}]",
             node_name,
             graph_name,
-            graph.nodes.iter().map(|n| n.name.as_str()).collect::<Vec<_>>().join(", ")
+            graph
+                .nodes
+                .iter()
+                .map(|n| n.name.as_str())
+                .collect::<Vec<_>>()
+                .join(", ")
         );
     }};
 }
@@ -62,7 +67,12 @@ macro_rules! assert_connected {
             .nodes
             .iter()
             .find(|n| n.name == from_node)
-            .unwrap_or_else(|| panic!("Source node '{}' not found in graph '{}'", from_node, graph_name));
+            .unwrap_or_else(|| {
+                panic!(
+                    "Source node '{}' not found in graph '{}'",
+                    from_node, graph_name
+                )
+            });
 
         let src_pin = src_node
             .pins
@@ -74,7 +84,12 @@ macro_rules! assert_connected {
             .nodes
             .iter()
             .find(|n| n.name == to_node)
-            .unwrap_or_else(|| panic!("Destination node '{}' not found in graph '{}'", to_node, graph_name));
+            .unwrap_or_else(|| {
+                panic!(
+                    "Destination node '{}' not found in graph '{}'",
+                    to_node, graph_name
+                )
+            });
 
         let dest_pin = dest_node
             .pins
@@ -92,9 +107,15 @@ macro_rules! assert_connected {
             connected,
             "Expected pin '{}::{}' to be connected to '{}::{}', but no such connection exists. \
              Existing links from '{}::{}': [{}]",
-            from_node, from_pin, to_node, to_pin,
-            from_node, from_pin,
-            src_pin.linked_to.iter()
+            from_node,
+            from_pin,
+            to_node,
+            to_pin,
+            from_node,
+            from_pin,
+            src_pin
+                .linked_to
+                .iter()
                 .map(|l| format!("{}({})", l.node_name, l.pin_id))
                 .collect::<Vec<_>>()
                 .join(", ")
@@ -139,7 +160,8 @@ macro_rules! assert_t3d_contains {
         assert!(
             t3d.contains(needle),
             "Expected T3D output to contain {:?}, but it did not.\n\nFull T3D output:\n{}",
-            needle, t3d
+            needle,
+            t3d
         );
     }};
 }
@@ -172,7 +194,8 @@ pub fn assert_snapshot(blueprint: &Blueprint, name: &str) {
         let saved = std::fs::read_to_string(&path)
             .unwrap_or_else(|e| panic!("Failed to read snapshot '{}': {}", path.display(), e));
         assert_eq!(
-            current_t3d, saved,
+            current_t3d,
+            saved,
             "Snapshot mismatch for '{}'. \
              Delete {} and re-run tests to update the snapshot.",
             name,
@@ -237,14 +260,18 @@ fn make_begin_play_node(name: &str) -> BpNode {
         )
         .with_property("bOverrideFunction", "True")
         .with_pin({
-            let mut p = Pin::new("OutputDelegate", PinDirection::Output, PinType {
-                category: PinCategory::Delegate,
-                sub_category: None,
-                sub_category_object: None,
-                container: ContainerType::None,
-                is_reference: false,
-                is_const: false,
-            });
+            let mut p = Pin::new(
+                "OutputDelegate",
+                PinDirection::Output,
+                PinType {
+                    category: PinCategory::Delegate,
+                    sub_category: None,
+                    sub_category_object: None,
+                    container: ContainerType::None,
+                    is_reference: false,
+                    is_const: false,
+                },
+            );
             p.is_hidden = true;
             p.is_not_connectable = true;
             p
@@ -287,7 +314,14 @@ mod tests {
     #[test]
     fn test_assert_connected_passes() {
         let bp = blueprint_from_t3d_or_builder("ConnectedBP");
-        assert_connected!(bp, "EventGraph", "BeginPlay", "then", "PrintString", "execute");
+        assert_connected!(
+            bp,
+            "EventGraph",
+            "BeginPlay",
+            "then",
+            "PrintString",
+            "execute"
+        );
     }
 
     // 4. assert_no_validation_errors passes for a clean blueprint
@@ -323,7 +357,11 @@ mod tests {
         let _ = std::fs::remove_file(&snap_path);
 
         save_snapshot(&bp, snap_name).expect("save_snapshot should succeed");
-        assert!(snap_path.exists(), "Snapshot file should have been created at {:?}", snap_path);
+        assert!(
+            snap_path.exists(),
+            "Snapshot file should have been created at {:?}",
+            snap_path
+        );
 
         // Cleanup
         let _ = std::fs::remove_file(&snap_path);
@@ -370,7 +408,10 @@ mod tests {
             .find(|g| g.name == "EventGraph")
             .expect("EventGraph must exist");
         let has_begin_play = event_graph.nodes.iter().any(|n| n.name == "BeginPlay");
-        assert!(has_begin_play, "minimal_blueprint should include a BeginPlay node");
+        assert!(
+            has_begin_play,
+            "minimal_blueprint should include a BeginPlay node"
+        );
 
         // Must produce a valid blueprint
         let errors = validator::validate(&bp);

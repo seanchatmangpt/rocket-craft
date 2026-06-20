@@ -116,8 +116,8 @@ export UE4_ROOT=/path/to/UnrealEngine-4.24
   -project="$(pwd)/4.24-Shooter/ShooterGame/ShooterGame.uproject" \
   -noP4 -platform=Win64 -serverconfig=Development -build -cook -stage
 
-# Validate assets (Python script at monorepo root)
-cd /home/user/rocket-craft && python3 validate-assets.py
+# Validate assets (Rust command at monorepo root)
+cd /home/user/rocket-craft && ./rocket test
 
 # Rebuild C++ (Brm module only, no cook)
 "$UE4_ROOT/Engine/Build/BatchFiles/Linux/Build.sh" \

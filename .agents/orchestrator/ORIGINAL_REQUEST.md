@@ -1,57 +1,90 @@
 # Original User Request
 
-## 2026-06-15T14:34:30-07:00
+## 2026-06-19T00:00:16Z
+<USER_REQUEST>
+You are the Project Orchestrator for the 'Eden Manufacturing Server Ontology' task.
+Your working directory is `/Users/sac/rocket-craft/.agents/orchestrator`.
+Please read the verbatim user request in `/Users/sac/rocket-craft/.agents/ORIGINAL_REQUEST.md`.
+The target project workspace is `/Users/sac/.ggen/packs/eden_server`.
+You must:
+1. Decompose the project into milestones and create a detailed plan in `/Users/sac/rocket-craft/.agents/orchestrator/plan.md`.
+2. Manage a team of subagents to implement the RDF ontologies (`ontology/pack.ttl` and `ontology/deltas.ttl`) and SPARQL queries (`queries/substrate.rq`, `queries/extract_authority_deltas.rq`, and `queries/extract_receipt_deltas.rq`) in the workspace, and verify their correctness.
+3. Keep `/Users/sac/rocket-craft/.agents/orchestrator/progress.md` updated with your progress.
+4. When everything is fully complete and verified, report completion to the Sentinel.
+</USER_REQUEST>
 
-Please orchestrate the implementation of the progressive web app (PWA) integrated with a local Supabase instance, including user auth, player management admin dashboard, leaderboard, edge function, and Playwright tests. Your working directory is `/Users/sac/rocket-craft/.agents/orchestrator`. Read the original request at `/Users/sac/rocket-craft/.agents/ORIGINAL_REQUEST.md`. Create and update your `progress.md` file regularly.
+## 2026-06-19T00:00:43Z
+[Message] sender=16aac5d4-3bdb-4cc2-bed9-8df091e44fd9 priority=MESSAGE_PRIORITY_HIGH content=Hello Orchestrator,
 
-## 2026-06-15T23:55:30Z
+The parent agent has sent the direct official URLs for the public industry ontologies to download the `.ttl` files directly via `curl` for your mapping work:
 
-You are the Project Orchestrator. Your mission is to resolve the remaining gaps for the production release of the Progressive Web App (PWA) with local Supabase integration and ensure 100% successful end-to-end testing with Playwright, according to the requirements in /Users/sac/rocket-craft/.agents/ORIGINAL_REQUEST.md under the follow-up section.
-Specifically:
-- Modify the Playwright configuration in `pwa-staff/playwright.config.ts` to run E2E tests exclusively on the `chromium` browser project (removing firefox and webkit).
-- Fix the test in `pwa-staff/tests-e2e/example.spec.ts` by updating the expected title regex match from `/PWA Staff/` to `/Rocket Craft/`.
-- Verify that Vitest unit tests in the `pwa-staff` workspace run and pass.
-- Verify that Playwright E2E tests run and pass without throwing browser configuration errors.
-Please write your plan to `.agents/orchestrator/plan.md` and track progress in `.agents/orchestrator/progress.md`. Update us when you have completed all milestones.
+**1. PROV-O (Provenance)**
+W3C direct TTL: `http://www.w3.org/ns/prov.ttl`
+(You can `curl -sH "Accept: text/turtle" -L http://www.w3.org/ns/prov.ttl`)
 
-## 2026-06-16T00:31:41Z
+**2. SOSA / SSN (Sensors & Observations)**
+Raw GitHub TTL: `https://raw.githubusercontent.com/w3c/sdw/gh-pages/ssn/integrated/sosa.ttl`
 
-You are the Project Orchestrator. The user has a new request appended to /Users/sac/rocket-craft/.agents/ORIGINAL_REQUEST.md. Read the new follow-up request, decompose it, and manage the swarm of specialists to implement: 1. Cyberpunk Gaming UI/UX, 2. Collapsible In-App Developer Console HUD, 3. Database Optimization & Telemetry Schema, and 4. Verification & Testing. Write your planning and status files to /Users/sac/rocket-craft/.agents/orchestrator.
+**3. QUDT (Quantities, Units, Dimensions)**
+GitHub Releases (All-in-one TTLs): `https://github.com/qudt/qudt-public-repo/releases`
+(Grab the latest `QUDT-all-in-one-OWL.ttl` or `QUDT-all-in-one-SHACL.ttl`)
 
-## 2026-06-17T07:07:36Z
+**4. FIBO (Financial Industry Business Ontology)**
+Production Zip: `https://spec.edmcouncil.org/fibo/ontology/prod.ttl.zip`
+(Or use the GitHub repo: `https://github.com/edmcouncil/fibo`)
 
-You are the Project Orchestrator for the Genie World Model Simulator project.
-Your task is to coordinate the entire project based on the requirements logged in `/Users/sac/rocket-craft/.agents/ORIGINAL_REQUEST.md`.
+Please use these direct sources as needed during mapping/validation.
 
-You should:
-1. Decompose the requirements (Rust core simulator, Python wrappers, TPOT2 optimization, DSPy LLM agents, UE4 export/benchmark, and end-to-end verification).
-2. Direct specialized subagents (e.g. explorers, workers, reviewers) to investigate, build, verify, and polish the codebase.
-3. Track overall progress in `/Users/sac/rocket-craft/.agents/orchestrator/progress.md` and keep `/Users/sac/rocket-craft/.agents/orchestrator/plan.md` updated.
-4. Verify the implementation thoroughly.
-5. Signal final completion in `progress.md` when all requirements are fully realized and verified.
+## 2026-06-20T00:23:59Z
+Your identity: You are the Project Orchestrator (archetype: orchestrator/teamwork_preview_orchestrator).
+Your working directory is /Users/sac/rocket-craft/.agents/orchestrator
+Your goal: Drive the implementation of the Asset Manufacturing LSP (ggen-asset-lsp) as requested in /Users/sac/rocket-craft/ORIGINAL_REQUEST.md.
+Make sure you read the instructions in /Users/sac/rocket-craft/ORIGINAL_REQUEST.md, GEMINI.md, and AGENTS.md.
+Follow the rules strictly, including the Combinatorial Maximalist Doctrine and TAI status reporting formats in AGENTS.md.
+Remember to maintain your plan.md, progress.md, and context.md in your working directory (/Users/sac/rocket-craft/.agents/orchestrator/).
+Decompose the problem into milestones, spawn specialists, check their progress, handle failures, and write detailed handoff reports.
+When all milestones are completed, report victory back to parent (conversation ID: a4158d17-579b-4229-ad48-611794d7b4a8) so the victory audit can be triggered.
 
-Your working directory is `/Users/sac/rocket-craft/.agents/orchestrator/`.
+## 2026-06-20T00:46:58Z
+Your identity: You are the Project Orchestrator (archetype: orchestrator/teamwork_preview_orchestrator).
+Your working directory is /Users/sac/rocket-craft/.agents/orchestrator
+Emergency Correction:
+We have received an emergency correction from the parent agent. The pipeline is now moving to **GC-MECH-ASSET-FABRIC-001B** (Part-Aware Morphology Convergence). Please update your execution plan and direct the specialists to address this immediately.
 
-## 2026-06-17T07:14:18Z
+Instructions:
+1. Update the diagnostic engine in `crates/ggen-asset-lsp` to support the new `VIS200` series taxonomy for morphology failures when the new gap report includes per-component morphology residuals.
+2. Do NOT use franchise-specific language.
+3. Implement the following new diagnostics:
+   - VIS201 ERROR: part-graph similarity below threshold.
+   - VIS202 ERROR: wing morphology mismatch.
+   - VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates.
+   - VIS204 ERROR: core body massing exceeds compactness bound.
+   - VIS205 ERROR: blade placement/angle mismatch.
+   - VIS206 ERROR: armor segmentation density below threshold.
+   - VIS207 ERROR: edge-density distribution mismatch.
+   - VIS208 ERROR: candidate passed coarse silhouette but failed morphology gate.
+4. Read the full spec at `/Users/sac/rocket-craft/.agents/SPR_MORPHOLOGY_CONVERGENCE.md` to guide the implementation.
 
-Incorporated the "Genie 26 Vision 2030" principles:
-1. World Manufacturing Philosophy: Treat every generated system as a "world" that contains:
-   * Objects (State variables/world elements)
-   * Actors (Entities interacting within the world)
-   * Relationships (Structural bounds/hierarchies)
-   * Events (Transitions/Inputs)
-   * Rules (Physics/Constraints/Semantic Laws)
-   * Processes (Workflows/Execution loops)
-   * Receipts (Lineage, provenance, BLAKE3 receipts/cryptographic lineage, replay records)
-2. Receipted Worlds: Every world state transition and generation run must support verifiable receipts (cryptographic origin, specification alignment, operational/replay history).
+Please verify this specification and proceed with the necessary updates.
 
-Update plans, design specs, and direct subagents to reflect these core components in the Rust dynamics model, simulator, and Python pipelines. Allow specifying objects/rules and manufacturing them with cryptographic BLAKE3 receipts.
+## 2026-06-20T00:50:33Z
+Your identity: You are the Project Orchestrator (archetype: orchestrator/teamwork_preview_orchestrator).
+Your working directory is /Users/sac/rocket-craft/.agents/orchestrator
+Emergency Correction 2:
+We have received a second emergency correction from the parent agent. The USD output fails modularity constraints because files are duplicated full assembly files. 
 
-## 2026-06-17T23:24:52Z
+Please update your plans and implement the following `USD300` series diagnostics in the Asset LSP immediately:
+- USD301 ERROR: duplicate USD geometry fingerprint.
+- USD302 ERROR: part file renders full assembly.
+- USD303 ERROR: part-local file contains foreign component prims.
+- USD304 ERROR: expected part root missing.
+- USD305 ERROR: mirrored part lacks mirror transform proof.
+- USD306 ERROR: generated USD files share identical source template expansion.
+- USD307 ERROR: part bounding box overlaps full-asset bounds.
 
-We are executing the Rocket-Craft remediation task in benchmark integrity mode.
-Your mission is to resolve all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project.
-Please read `/Users/sac/rocket-craft/ORIGINAL_REQUEST.md` to see the full details, especially the latest Follow-up request from 2026-06-17T23:24:31Z.
-Your working directory must be `/Users/sac/rocket-craft/.agents/orchestrator`.
-You must dispatch tasks to specialists, monitor progress, make sure all tests pass, make sure there are no violations in `anti-llm-cheat-lsp`, and maintain `progress.md` in your working directory.
-Please write your plan to `plan.md` and keep updating `progress.md` in your working directory. Let me know when you have completed all tasks.
+Instructions:
+1. Read the full spec at `/Users/sac/rocket-craft/.agents/SPR_MODULAR_IDENTITY.md`.
+2. The LSP must flag these if multiple `.usda` files share the exact same primitive composition or if a part file like `SM_Head.usda` contains a foreign component prim like a Torso mesh.
+3. Coordinate this alongside the ongoing morphology convergence task.
+
+Let us know when these updates are integrated.

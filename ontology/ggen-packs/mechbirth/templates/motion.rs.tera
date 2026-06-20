@@ -1,0 +1,141 @@
+// GENERATED FILE - DO NOT EDIT MANUALLY
+// Source: O* = ontology/ggen-packs/mechbirth/schema/mechbirth_lod_geom_motion.ttl
+// Pipeline: ggen -> extract_motion_families.sparql -> motion.rs.tera
+// Synthesis: van der Aalst (Petri-net precedence ordering) + Carmack (branchless SoA SIMD, flat byte operations)
+//
+// GC-MECHBIRTH-002 Motion Surrogate (SIMD SoA Rewrite)
+
+pub const BATCH_SIZE: usize = 64;
+pub const MAX_PHASES: usize = 16;
+
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MotionFamily {
+{% for row in results %}
+    {{ row.label }} = {{ loop.index0 }},
+{% endfor %}
+}
+
+pub const PHASE_EMPTY: u8 = 0;
+pub const PHASE_ACQUIRETARGET: u8 = 1;
+pub const PHASE_ROTATETORSO: u8 = 2;
+pub const PHASE_PLANTFEET: u8 = 3;
+pub const PHASE_LOCKHIP: u8 = 4;
+pub const PHASE_STABILIZESHOULDER: u8 = 5;
+pub const PHASE_CHARGEWEAPON: u8 = 6;
+pub const PHASE_VENTHEAT: u8 = 7;
+pub const PHASE_FIRE: u8 = 8;
+pub const PHASE_ABSORBRECOIL: u8 = 9;
+pub const PHASE_RECOVERBALANCE: u8 = 10;
+pub const PHASE_COOLSOCKET: u8 = 11;
+pub const PHASE_RETURNTOREADY: u8 = 12;
+pub const PHASE_STRIDE: u8 = 13;
+pub const PHASE_BRACE: u8 = 14;
+pub const PHASE_COLLAPSE: u8 = 15;
+pub const PHASE_DIAGNOSESOCKET: u8 = 16;
+pub const PHASE_APPLYREPAIR: u8 = 17;
+pub const PHASE_VERIFYREPAIR: u8 = 18;
+
+#[derive(Clone)]
+pub struct MotionTraceSoA {
+    pub family: [u8; BATCH_SIZE],
+    pub phases: [[u8; MAX_PHASES]; BATCH_SIZE], // Flat array of phases, 0 is EMPTY
+    pub socket_available: [u8; BATCH_SIZE],
+    pub heat_class: [u8; BATCH_SIZE],
+    pub stress_class: [u8; BATCH_SIZE],
+    pub leg_damage_class: [u8; BATCH_SIZE],
+}
+
+#[derive(Clone)]
+pub struct MotionOutputSoA {
+    pub delta_heat: [i8; BATCH_SIZE],
+    pub delta_stress: [i8; BATCH_SIZE],
+    pub refusal_mask: [u8; BATCH_SIZE],
+}
+
+impl MotionOutputSoA {
+    pub fn new() -> Self {
+        Self {
+            delta_heat: [0; BATCH_SIZE],
+            delta_stress: [0; BATCH_SIZE],
+            refusal_mask: [0; BATCH_SIZE],
+        }
+    }
+}
+
+pub fn batch_validate_motion(inputs: &MotionTraceSoA, outputs: &mut MotionOutputSoA) {
+    const MAX_CLASS: u8 = 15;
+
+    // Resolve handler mappings branchlessly via generated LUT ids
+    let mut run_family_id = 255;
+    let mut fire_family_id = 255;
+{% for row in results %}
+{% if row.label == "Run" %}
+    run_family_id = {{ loop.index0 }};
+{% endif %}
+{% if row.handlerFn == "validate_fire_weapon" %}
+    fire_family_id = {{ loop.index0 }};
+{% endif %}
+{% endfor %}
+
+    for i in 0..BATCH_SIZE {
+        let family = inputs.family[i];
+        let heat = inputs.heat_class[i];
+        let stress = inputs.stress_class[i];
+        let leg = inputs.leg_damage_class[i];
+        let socket = inputs.socket_available[i];
+
+        // CF-4 Out of bounds mask
+        let oob = (heat > MAX_CLASS) as u8 | (stress > MAX_CLASS) as u8 | (leg > MAX_CLASS) as u8;
+
+        // Bitwise SIMD phase precedence masks
+        let mut fire_mask: u16 = 0;
+        let mut plant_mask: u16 = 0;
+        let mut vent_mask: u16 = 0;
+        let mut absorb_mask: u16 = 0;
+
+        for j in 0..MAX_PHASES {
+            let p = inputs.phases[i][j];
+            fire_mask |= ((p == PHASE_FIRE) as u16) << j;
+            plant_mask |= ((p == PHASE_PLANTFEET) as u16) << j;
+            vent_mask |= ((p == PHASE_VENTHEAT) as u16) << j;
+            absorb_mask |= ((p == PHASE_ABSORBRECOIL) as u16) << j;
+        }
+
+        let has_fire = (fire_mask != 0) as u8;
+        let has_plant = (plant_mask != 0) as u8;
+        let has_vent = (vent_mask != 0) as u8;
+        let has_absorb = (absorb_mask != 0) as u8;
+
+        let fire_idx = fire_mask.trailing_zeros();
+        let plant_idx = plant_mask.trailing_zeros();
+        let vent_idx = vent_mask.trailing_zeros();
+
+        // CF-1: Fire phase requires PlantFeet BEFORE it
+        let err_no_plant = has_fire & (1 - has_plant);
+        let err_plant_late = has_fire & has_plant & ((plant_idx >= fire_idx) as u8);
+        let err_socket = has_fire & (1 - socket);
+
+        // CF-2: VentHeat before Fire if heat >= 12
+        let high_heat = (heat >= 12) as u8;
+        let err_no_vent = has_fire & high_heat & (1 - has_vent);
+        let err_vent_late = has_fire & high_heat & has_vent & ((vent_idx >= fire_idx) as u8);
+
+        let fire_refusal = err_no_plant | err_plant_late | err_socket | err_no_vent | err_vent_late;
+
+        // Walk/Run validation
+        let is_run = (family == run_family_id) as u8;
+        let err_run_leg = is_run & ((leg >= 12) as u8);
+
+        let is_fire_fam = (family == fire_family_id) as u8;
+
+        let total_refusal = oob | (is_fire_fam & fire_refusal) | (is_run & err_run_leg);
+
+        let delta_heat = (is_fire_fam & has_fire) * 2;
+        let delta_stress = is_fire_fam & has_absorb;
+
+        outputs.delta_heat[i] = delta_heat as i8;
+        outputs.delta_stress[i] = delta_stress as i8;
+        outputs.refusal_mask[i] = total_refusal;
+    }
+}

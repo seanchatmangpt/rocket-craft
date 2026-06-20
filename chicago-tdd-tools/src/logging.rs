@@ -1,7 +1,7 @@
-use std::sync::{Arc, Mutex};
-use std::io::Write;
 use std::fs::File;
+use std::io::Write;
 use std::path::Path;
+use std::sync::{Arc, Mutex};
 
 /// Severity levels for log messages.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -79,7 +79,12 @@ impl TuiBufferSink {
     /// Creates a new `TuiBufferSink` and returns it along with a handle to the shared buffer.
     pub fn new() -> (Self, Arc<Mutex<Vec<String>>>) {
         let buffer = Arc::new(Mutex::new(Vec::new()));
-        (Self { buffer: buffer.clone() }, buffer)
+        (
+            Self {
+                buffer: buffer.clone(),
+            },
+            buffer,
+        )
     }
 }
 
@@ -158,23 +163,23 @@ impl Default for Logger {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::NamedTempFile;
     use std::fs;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_logger_fanning_out() {
         let mut logger = Logger::new();
-        
+
         let (tui_sink, buffer) = TuiBufferSink::new();
         logger.add_sink(Box::new(tui_sink));
-        
+
         let temp_file = NamedTempFile::new().unwrap();
         let file_path = temp_file.path().to_owned();
         let file_sink = FileSink::new(&file_path).unwrap();
         logger.add_sink(Box::new(file_sink));
-        
+
         logger.info("Test message");
-        
+
         // Check TUI buffer
         {
             let buf = buffer.lock().unwrap();
@@ -182,7 +187,7 @@ mod tests {
             assert!(buf[0].contains("INFO"));
             assert!(buf[0].contains("Test message"));
         }
-        
+
         // Check File
         {
             let content = fs::read_to_string(file_path).unwrap();
@@ -196,14 +201,66 @@ mod tests {
         let mut logger = Logger::with_level(LogLevel::Warn);
         let (tui_sink, buffer) = TuiBufferSink::new();
         logger.add_sink(Box::new(tui_sink));
-        
+
         logger.info("Should be ignored");
         logger.warn("Should be recorded");
         logger.error("Should be recorded");
-        
+
         let buf = buffer.lock().unwrap();
         assert_eq!(buf.len(), 2);
         assert!(buf[0].contains("WARN"));
         assert!(buf[1].contains("ERROR"));
+    }
+
+    #[test]
+    fn file_sink_creates_file() {
+        let temp = NamedTempFile::new().unwrap();
+        let path = temp.path().to_owned();
+        let sink = FileSink::new(&path).unwrap();
+        sink.log(LogLevel::Info, "hello from file sink");
+        let content = fs::read_to_string(&path).unwrap();
+        assert!(content.contains("hello from file sink"));
+    }
+
+    #[test]
+    fn file_sink_fails_on_nonexistent_dir() {
+        let result = FileSink::new("/nonexistent/dir/__test_log__.txt");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn tui_buffer_sink_accumulates_messages() {
+        let (sink, buf) = TuiBufferSink::new();
+        sink.log(LogLevel::Info, "alpha");
+        sink.log(LogLevel::Warn, "beta");
+        sink.log(LogLevel::Error, "gamma");
+        let locked = buf.lock().unwrap();
+        assert_eq!(locked.len(), 3);
+        assert!(locked[0].contains("alpha"));
+        assert!(locked[2].contains("gamma"));
+    }
+
+    #[test]
+    fn logger_no_sinks_does_not_panic() {
+        let logger = Logger::new();
+        logger.debug("no-op debug");
+        logger.info("no-op info");
+        logger.warn("no-op warn");
+        logger.error("no-op error");
+    }
+
+    #[test]
+    fn logger_debug_level_passes_all_messages() {
+        let mut logger = Logger::with_level(LogLevel::Debug);
+        let (tui_sink, buffer) = TuiBufferSink::new();
+        logger.add_sink(Box::new(tui_sink));
+
+        logger.debug("d");
+        logger.info("i");
+        logger.warn("w");
+        logger.error("e");
+
+        let buf = buffer.lock().unwrap();
+        assert_eq!(buf.len(), 4);
     }
 }

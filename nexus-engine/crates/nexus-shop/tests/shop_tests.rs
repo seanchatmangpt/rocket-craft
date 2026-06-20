@@ -1,6 +1,6 @@
-use proptest::prelude::*;
-use nexus_shop::{gacha::*, battle_pass::*, ar_bridge::*};
 use chrono::Utc;
+use nexus_shop::{ar_bridge::*, battle_pass::*, gacha::*};
+use proptest::prelude::*;
 
 fn make_test_banner() -> Banner {
     Banner {
@@ -57,7 +57,11 @@ fn hard_pity_at_90_guarantees_ssr() {
 
     // 90th pull must be SSR
     let result = engine.single_pull(&banner, &mut session).unwrap();
-    assert_eq!(result.item.rarity, GachaRarity::SSR, "90th pull must be SSR (hard pity)");
+    assert_eq!(
+        result.item.rarity,
+        GachaRarity::SSR,
+        "90th pull must be SSR (hard pity)"
+    );
     assert_eq!(result.new_pity_count, 90);
 }
 
@@ -83,7 +87,10 @@ fn pity_counter_resets_after_ssr() {
     let mut engine = GachaEngine::new(1);
 
     engine.single_pull(&banner, &mut session).unwrap(); // ensured SSR
-    assert_eq!(session.pulls_since_last_ssr, 0, "pity should reset after SSR");
+    assert_eq!(
+        session.pulls_since_last_ssr, 0,
+        "pity should reset after SSR"
+    );
 }
 
 #[test]

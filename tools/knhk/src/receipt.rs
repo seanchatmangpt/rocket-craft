@@ -26,3 +26,33 @@ impl Receipt {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_stores_fields_correctly() {
+        let r = Receipt::new("path/to/law.wasm".into(), "MyLaw", true, "all good");
+        assert_eq!(r.plugin_path, PathBuf::from("path/to/law.wasm"));
+        assert_eq!(r.law_name, "MyLaw");
+        assert!(r.passed);
+        assert_eq!(r.message, "all good");
+    }
+
+    #[test]
+    fn new_failing_receipt() {
+        let r = Receipt::new("law.wasm".into(), "StrictLaw", false, "violation found");
+        assert!(!r.passed);
+        assert_eq!(r.message, "violation found");
+    }
+
+    #[test]
+    fn timestamp_is_recent() {
+        let before = std::time::SystemTime::now();
+        let r = Receipt::new("l.wasm".into(), "L", true, "ok");
+        let after = std::time::SystemTime::now();
+        assert!(r.timestamp >= before);
+        assert!(r.timestamp <= after);
+    }
+}

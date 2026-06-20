@@ -1,74 +1,80 @@
-# BRIEFING — 2026-06-17T23:25:40Z
+# BRIEFING — 2026-06-20T00:25:00Z
 
 ## Mission
-Resolve all implementation gaps, stubs, placeholders, single-line functions, assertion shortcuts, debug macros, and overclaiming terms in the Rocket-Craft project.
+Drive the implementation of the Asset Manufacturing LSP (ggen-asset-lsp) as requested in /Users/sac/rocket-craft/ORIGINAL_REQUEST.md.
 
 ## 🔒 My Identity
 - Archetype: teamwork_preview_orchestrator
 - Roles: orchestrator, user_liaison, human_reporter, successor
 - Working directory: /Users/sac/rocket-craft/.agents/orchestrator
-- Original parent: parent (id: 6327e89d-e34c-4854-952f-a9c3d3f1ec07)
-- Original parent conversation ID: 6327e89d-e34c-4854-952f-a9c3d3f1ec07
+- Original parent: parent
+- Original parent conversation ID: a4158d17-579b-4229-ad48-611794d7b4a8
 
 ## 🔒 My Workflow
-- **Pattern**: Project Pattern
-- **Scope document**: /Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md
-1. **Decompose**: Decompose the task into milestones (Technical Exploration, Complete Stubs/Placeholders, Replace Single-line/Catch-alls, Harden Assertions, Remove Debug Macros/Overclaims, Final Verification).
+- Pattern: Project
+- Scope document: /Users/sac/rocket-craft/.agents/orchestrator/plan.md
+1. **Decompose**: Decomposed into 5 milestones spanning exploration, setup, server implementation, code actions/OCEL, and verification/audit.
 2. **Dispatch & Execute**:
-   - **Delegate (sub-orchestrator)**: Spawn sub-orchestrators for milestones or run explorer-worker-reviewer cycles.
+   - **Delegate (sub-orchestrator)**: Spawn sub-orchestrator for milestone tasks when complex.
+   - **Direct (iteration loop)**: Iterate: Explorer -> Worker -> Reviewer -> Challenger -> Auditor.
 3. **On failure** (in this order):
-   - Retry: nudge stuck agent or re-send task
-   - Replace: spawn fresh agent with partial progress
-   - Skip: proceed without (only if non-critical)
-   - Redistribute: split stuck agent's remaining work
-   - Redesign: re-partition decomposition
-   - Escalate: report to parent (sub-orchestrators only, last resort)
-4. **Succession**: At 16 spawns, write handoff.md, spawn successor.
-- **Work items**:
-  - Milestone 1: Technical Exploration and Baseline Assessment [pending]
-  - Milestone 2: Complete Stubs and Placeholders (R1) [pending]
-  - Milestone 3: Replace Single-Line and Catch-All Stubs (R2) [pending]
-  - Milestone 4: Harden Assertions & Eliminate Test Shortcuts (R3) [pending]
-  - Milestone 5: Remove Debug Macros and Overclaim Language (R4, R5) [pending]
-  - Milestone 6: Final Verification & Integration [pending]
-- **Current phase**: 1
-- **Current focus**: Technical Exploration and Baseline Assessment
+   - Retry, Replace, Skip, Redistribute, Redesign, Escalate.
+4. **Succession**: Self-succeed at 16 spawns, write handoff.md, spawn successor.
+- Work items:
+  1. Exploration & Architecture Definition [completed]
+  2. Crate Setup & Workspace Cargo Setup [completed]
+  3. Core LSP Server & Diagnostics [completed]
+  4. Code Actions & OCEL Integration [completed]
+  5. E2E Verification [completed]
+  6. Morphology & Modularity Updates (GC-MECH-ASSET-FABRIC-001B & USD_MODULAR_IDENTITY_CHECK) [completed]
+  7. Final Forensic Audit & Victory Handoff [completed]
+- Current phase: 7
+- Current focus: Victory Handoff
 
 ## 🔒 Key Constraints
-- NEVER write, modify, or create source code files directly.
-- NEVER run build/test commands yourself — require workers to do so.
+- Workspace is `/Users/sac/rocket-craft`.
+- Integrity mode: benchmark.
+- Never write, modify, or create source code files directly.
+- Never run build/test commands yourself — require workers to do so.
 - Never reuse a subagent after it has delivered its handoff — always spawn fresh.
-- Succession threshold: 16 spawns.
 
 ## Current Parent
-- Conversation ID: 6327e89d-e34c-4854-952f-a9c3d3f1ec07
-- Updated: 2026-06-17T23:25:40Z
+- Conversation ID: a4158d17-579b-4229-ad48-611794d7b4a8
+- Updated: 2026-06-20T00:25:00Z
 
 ## Key Decisions Made
-- Initialized the Rocket-Craft remediation project.
-- Decided to spawn an Explorer to map out stubs and verify baseline state.
+- Use lsp-max as external crate dependency.
 
 ## Team Roster
 | Agent | Type | Work Item | Status | Conv ID |
-|-------|------|-----------|--------|---------|
-| df135978-48b4-4519-9ebf-9d88830e5ec0 | teamwork_preview_explorer | Technical Exploration | completed | df135978-48b4-4519-9ebf-9d88830e5ec0 |
-| 6469f9db-14b9-489b-92a0-cae939dc947e | teamwork_preview_worker | Remediation Worker | in-progress | 6469f9db-14b9-489b-92a0-cae939dc947e |
+|---|---|---|---|---|
+| Explorer 1 | teamwork_preview_explorer | Explore lsp-max, reference_fabric_001, and source templates | completed | d5f21f84-dd18-48c6-8499-15c856b8319d |
+| Worker 1 | teamwork_preview_worker | Crate initialization and workspace setup | completed | 95bac6ce-52e2-43bf-84ed-14b3d86608ae |
+| Worker 2 | teamwork_preview_worker | Implement core LSP diagnostics, actions, and OCEL | completed | 291e88a0-8b49-48e4-8a4b-e781448f96ec |
+| Reviewer 1 | teamwork_preview_reviewer | Review core LSP implementation (correctness & layout) | completed | bb057ea5-47a6-41df-b199-56b5c2bbf95c |
+| Reviewer 2 | teamwork_preview_reviewer | Review core LSP implementation (correctness & layout) | completed | 845e3b6d-dc56-462a-a6c7-66d06095434d |
+| Challenger 1 | teamwork_preview_challenger | Empirically test LSP compilation and stdio initialization | completed | 2a29b4e2-9c34-457a-bba6-bcf523dc0d41 |
+| Challenger 2 | teamwork_preview_challenger | Empirically test LSP compilation and stdio initialization | completed | cff7ea0e-d46b-4718-a576-9bd8be803246 |
+| Auditor 1 | teamwork_preview_auditor | Forensic audit of LSP server code & layout | completed (verdict: CLEAN) | 48d676f4-7f97-4878-8cac-ab6d348cd434 |
+| Worker 3 | teamwork_preview_worker | Implement VIS200 morphology diagnostics | completed | 5fa4c0e4-f8e4-4093-b452-02bfb8d7f61d |
+| Challenger 3 | teamwork_preview_challenger | Empirically verify VIS200 morphology update | completed | a7fa07cf-c4f8-4de0-98ae-67a46151d2bf |
+| Challenger 4 | teamwork_preview_challenger | Empirically verify VIS200 morphology update | completed | 9c0ffdf9-fa98-43d2-a081-b3d79c3e47ff |
+| Worker 4 | teamwork_preview_worker | Implement USD300 modularity diagnostics | completed | ce81faf6-d8a6-4ee0-9677-75f64cf9afbb |
+| Challenger 5 | teamwork_preview_challenger | Empirically verify VIS200 & USD300 updates | completed | 0881ec24-d44a-48c5-8108-1b2c81972a87 |
+| Challenger 6 | teamwork_preview_challenger | Empirically verify VIS200 & USD300 updates | completed | 001836e2-984e-4921-a729-b2979e43e0ee |
+| Auditor 2 | teamwork_preview_auditor | Final forensic audit of LSP code & layout | completed (verdict: CLEAN) | 515ffae6-c8b0-4da0-b549-e895c3777d74 |
 
 ## Succession Status
 - Succession required: no
-- Spawn count: 2 / 16
-- Pending subagents: 6469f9db-14b9-489b-92a0-cae939dc947e
+- Spawn count: 15 / 16
+- Pending subagents: none
 - Predecessor: none
 - Successor: not yet spawned
 
 ## Active Timers
-- Heartbeat cron: 0c5b7c84-281f-4a8a-86cc-4b95080943b3/task-33
+- Heartbeat cron: task-69
 - Safety timer: none
-- On succession: kill all timers before spawning successor
-- On context truncation: run `manage_task(Action="list")` — re-create if missing
 
 ## Artifact Index
-- /Users/sac/rocket-craft/.agents/orchestrator/progress.md — progress tracker
-- /Users/sac/rocket-craft/.agents/orchestrator/plan.md — execution plan
-- /Users/sac/rocket-craft/.agents/orchestrator/BRIEFING.md — briefing document
-- /Users/sac/rocket-craft/.agents/orchestrator/PROJECT.md — project roadmap and contracts
+- /Users/sac/rocket-craft/.agents/orchestrator/plan.md — Project plan and milestones
+- /Users/sac/rocket-craft/.agents/orchestrator/progress.md — Progress log and liveness heartbeat

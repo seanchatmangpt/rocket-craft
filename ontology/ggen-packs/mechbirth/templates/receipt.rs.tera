@@ -1,0 +1,225 @@
+//! GC-MECHBIRTH-002: Tamper-Evident Receipt Chain
+//! blake3-hashed, sequenced chain of admission events.
+// GENERATED FILE - DO NOT EDIT MANUALLY
+// Source: O* = ontology/mechbirth.ttl
+// Pipeline: ggen -> extract_receipt_payload.sparql -> receipt.rs.tera
+
+use crate::error::RefusalReason;
+use blake3;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum AdmissionStatus {
+    Admitted,
+    Refused,
+    Residual,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReceiptEntry {
+    {% for row in results -%}
+    pub {{ row.fieldName }}: {{ row.fieldType }},
+    {% endfor -%}
+    pub receipt: String,
+}
+
+impl ReceiptEntry {
+    /// Compute the receipt hash from this entry's content.
+    pub fn compute_hash(&self) -> String {
+        let mut hasher = blake3::Hasher::new();
+        {% for row in results %}
+        {% if row.fieldType == "u64" %}
+        hasher.update(self.{{ row.fieldName }}.to_le_bytes().as_slice());
+        {% elif row.fieldType == "String" %}
+        hasher.update(self.{{ row.fieldName }}.as_bytes());
+        {% elif row.fieldType == "Vec<String>" %}
+        for obj in &self.{{ row.fieldName }} {
+            hasher.update(obj.as_bytes());
+        }
+        {% elif row.fieldType == "AdmissionStatus" %}
+        let status_str = match self.{{ row.fieldName }} {
+            AdmissionStatus::Admitted => "ADMITTED",
+            AdmissionStatus::Refused => "REFUSED",
+            AdmissionStatus::Residual => "RESIDUAL",
+        };
+        hasher.update(status_str.as_bytes());
+        {% endif %}
+        {%- endfor %}
+        hasher.finalize().to_hex().to_string()
+    }
+}
+
+/// Chain of tamper-evident receipt entries.
+#[derive(Debug, Default)]
+pub struct ReceiptChain {
+    pub entries: Vec<ReceiptEntry>,
+}
+
+impl ReceiptChain {
+    pub fn append(
+        &mut self,
+        event_type: String,
+        objects: Vec<String>,
+        status: AdmissionStatus,
+        residuals: Vec<String>,
+    ) -> String {
+        let prev_hash = self
+            .entries
+            .last()
+            .map(|e| e.receipt.clone())
+            .unwrap_or_else(|| {
+                "0000000000000000000000000000000000000000000000000000000000000000".into()
+            });
+        let sequence = self.entries.len() as u64 + 1;
+        let mut entry = ReceiptEntry {
+            sequence,
+            event_type,
+            objects,
+            prev_hash,
+            receipt: String::new(),
+            status,
+            residuals,
+        };
+        entry.receipt = entry.compute_hash();
+        let receipt = entry.receipt.clone();
+        self.entries.push(entry);
+        receipt
+    }
+
+    /// Verify the full chain: each entry's prev_hash must equal the prior entry's receipt.
+    pub fn verify(&self) -> Result<(), RefusalReason> {
+        for i in 1..self.entries.len() {
+            let expected = &self.entries[i - 1].receipt;
+            let actual = &self.entries[i].prev_hash;
+            if expected != actual {
+                return Err(RefusalReason::ReceiptChainBroken {
+                    sequence: self.entries[i].sequence,
+                    expected: expected.clone(),
+                    actual: actual.clone(),
+                });
+            }
+        }
+        Ok(())
+    }
+
+    /// Verify recomputed hash for each entry matches stored receipt.
+    pub fn verify_hashes(&self) -> Result<(), RefusalReason> {
+        for entry in &self.entries {
+            let computed = entry.compute_hash();
+            if computed != entry.receipt {
+                return Err(RefusalReason::ReceiptChainBroken {
+                    sequence: entry.sequence,
+                    expected: computed,
+                    actual: entry.receipt.clone(),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_chain() -> ReceiptChain {
+        let mut chain = ReceiptChain::default();
+        chain.append(
+            "SOURCE_ADMISSION".into(),
+            vec!["frame-1".into()],
+            AdmissionStatus::Admitted,
+            vec![],
+        );
+        chain.append(
+            "AUTHORITY_GATE".into(),
+            vec!["frame-1".into()],
+            AdmissionStatus::Admitted,
+            vec![],
+        );
+        chain
+    }
+
+    // ── ReceiptEntry::compute_hash ────────────────────────────────────────────
+
+    #[test]
+    fn hash_is_64_hex_chars() {
+        let chain = make_chain();
+        let h = &chain.entries[0].receipt;
+        assert_eq!(h.len(), 64);
+        assert!(h.chars().all(|c| c.is_ascii_hexdigit()));
+    }
+
+    #[test]
+    fn same_content_produces_same_hash() {
+        let chain1 = make_chain();
+        let chain2 = make_chain();
+        assert_eq!(chain1.entries[0].receipt, chain2.entries[0].receipt);
+    }
+
+    #[test]
+    fn different_event_type_produces_different_hash() {
+        let mut c1 = ReceiptChain::default();
+        let mut c2 = ReceiptChain::default();
+        let r1 = c1.append("TYPE_A".into(), vec![], AdmissionStatus::Admitted, vec![]);
+        let r2 = c2.append("TYPE_B".into(), vec![], AdmissionStatus::Admitted, vec![]);
+        assert_ne!(r1, r2);
+    }
+
+    // ── ReceiptChain::append ──────────────────────────────────────────────────
+
+    #[test]
+    fn first_entry_uses_genesis_prev_hash() {
+        let chain = make_chain();
+        assert!(chain.entries[0].prev_hash.chars().all(|c| c == '0'));
+    }
+
+    #[test]
+    fn second_entry_prev_hash_equals_first_receipt() {
+        let chain = make_chain();
+        assert_eq!(chain.entries[1].prev_hash, chain.entries[0].receipt);
+    }
+
+    #[test]
+    fn sequence_numbers_are_monotonic() {
+        let chain = make_chain();
+        assert_eq!(chain.entries[0].sequence, 1);
+        assert_eq!(chain.entries[1].sequence, 2);
+    }
+
+    // ── ReceiptChain::verify ──────────────────────────────────────────────────
+
+    #[test]
+    fn verify_passes_on_intact_chain() {
+        assert!(make_chain().verify().is_ok());
+    }
+
+    #[test]
+    fn verify_passes_on_empty_chain() {
+        assert!(ReceiptChain::default().verify().is_ok());
+    }
+
+    #[test]
+    fn verify_fails_when_prev_hash_tampered() {
+        let mut chain = make_chain();
+        chain.entries[1].prev_hash = "tampered_hash".into();
+        assert!(matches!(
+            chain.verify().unwrap_err(),
+            RefusalReason::ReceiptChainBroken { sequence: 2, .. }
+        ));
+    }
+
+    // ── ReceiptChain::verify_hashes ───────────────────────────────────────────
+
+    #[test]
+    fn verify_hashes_passes_on_intact_chain() {
+        assert!(make_chain().verify_hashes().is_ok());
+    }
+
+    #[test]
+    fn verify_hashes_fails_when_receipt_tampered() {
+        let mut chain = make_chain();
+        chain.entries[0].receipt = "00000000000000000000000000000000000000000000000000000000deadbeef".into();
+        assert!(chain.verify_hashes().is_err());
+    }
+}

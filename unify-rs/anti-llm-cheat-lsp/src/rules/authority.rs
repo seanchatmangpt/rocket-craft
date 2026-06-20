@@ -48,3 +48,46 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, context: &str) -> Observation {
+        Observation {
+            file_path: "src/lib.rs".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "authority_smell".into(),
+            construct: construct.into(), context: context.into(), message: String::new(),
+        }
+    }
+
+    #[test]
+    fn empty_returns_no_diags() { assert!(evaluate(&[]).is_empty()); }
+
+    #[test]
+    fn clap_construct_triggers_auth_002() {
+        let d = evaluate(&[obs("CLAP", "")]);
+        assert_eq!(d[0].code, "ANTI-LLM-AUTH-002");
+        assert!(d[0].blocking);
+    }
+
+    #[test]
+    fn clap_authority_in_context_triggers_auth_002() {
+        let d = evaluate(&[obs("anything", "CLAP authority check")]);
+        assert_eq!(d[0].code, "ANTI-LLM-AUTH-002");
+    }
+
+    #[test]
+    fn string_command_construct_triggers_auth_004() {
+        let d = evaluate(&[obs("string_command", "")]);
+        assert_eq!(d[0].code, "ANTI-LLM-AUTH-004");
+        assert!(d[0].blocking);
+    }
+
+    #[test]
+    fn unknown_construct_produces_no_diag() {
+        assert!(evaluate(&[obs("real_noun_verb_command", "")]).is_empty());
+    }
+}

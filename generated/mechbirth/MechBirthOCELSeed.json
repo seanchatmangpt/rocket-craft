@@ -1,0 +1,93 @@
+{
+  "ocelVersion": "2.0",
+  "objectTypes": [
+    {"name": "mech", "attributes": [{"name": "mech_id", "type": "string"}]}
+  ],
+  "eventTypes": [
+    {"name": "SelectFrame", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "GenerateSocketTopology", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "GenerateArmorPanels", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "GenerateRig", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "GenerateMotionFamily", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "GenerateSkinLayers", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "PackageProjectionArtifacts", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "EmitReceipt", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]}
+  ],
+  "objects": [
+    {"id": "Mech-001", "type": "mech", "attributes": [{"name": "mech_id", "value": "Mech-001"}], "relationships": []}
+  ],
+  "events": [
+    {
+      "id": "e001",
+      "type": "SelectFrame",
+      "attributes": [
+        {"name": "audit_receipt", "value": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f"},
+        {"name": "prev_hash", "value": "0000000000000000000000000000000000000000000000000000000000000000"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e002",
+      "type": "GenerateSocketTopology",
+      "attributes": [
+        {"name": "audit_receipt", "value": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099"},
+        {"name": "prev_hash", "value": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e003",
+      "type": "GenerateArmorPanels",
+      "attributes": [
+        {"name": "audit_receipt", "value": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e"},
+        {"name": "prev_hash", "value": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e004",
+      "type": "GenerateRig",
+      "attributes": [
+        {"name": "audit_receipt", "value": "2ac9b1a01aa977ac897ba5ce1067f7351b85e75a3f62ff3589961735d9e9885f"},
+        {"name": "prev_hash", "value": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e005",
+      "type": "GenerateMotionFamily",
+      "attributes": [
+        {"name": "audit_receipt", "value": "534dfa6e18e2d4c618f5967405682afd23520abb2e1a0dec5490f44654755e3e"},
+        {"name": "prev_hash", "value": "2ac9b1a01aa977ac897ba5ce1067f7351b85e75a3f62ff3589961735d9e9885f"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e006",
+      "type": "GenerateSkinLayers",
+      "attributes": [
+        {"name": "audit_receipt", "value": "37a3b3064feef9c7396b5a9e48b8a81e75071fb3bb2f9424d902e1cb98a1de18"},
+        {"name": "prev_hash", "value": "534dfa6e18e2d4c618f5967405682afd23520abb2e1a0dec5490f44654755e3e"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e007",
+      "type": "PackageProjectionArtifacts",
+      "attributes": [
+        {"name": "audit_receipt", "value": "4813ec598987e9a8b2f0915457f314541d2937b84e70352a8c92eaf06fabda5c"},
+        {"name": "prev_hash", "value": "37a3b3064feef9c7396b5a9e48b8a81e75071fb3bb2f9424d902e1cb98a1de18"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e008",
+      "type": "EmitReceipt",
+      "attributes": [
+        {"name": "audit_receipt", "value": "b6d06e9cd41edc26f9eae69297bc8ef8e37c2fb8be5d5030605e8d5aa5af75c9"},
+        {"name": "prev_hash", "value": "4813ec598987e9a8b2f0915457f314541d2937b84e70352a8c92eaf06fabda5c"}
+      ],
+      "relationships": [{"objectId": "Mech-001", "qualifier": "case"}]
+    }
+  ]
+}

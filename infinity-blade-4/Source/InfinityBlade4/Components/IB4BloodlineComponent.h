@@ -11,9 +11,6 @@
  * UIB4BloodlineComponent owns the persistent bloodline progression data and
  * exposes hooks for rebirth (death-reset with carried stats) and lineage tree
  * unlocks.
- *
- * Full implementation is deferred to a follow-up changelist; this header
- * provides the type signature required by AIB4PlayerCharacter.
  */
 UCLASS(ClassGroup = "InfinityBlade4", meta = (BlueprintSpawnableComponent))
 class INFINITYBLADE4_API UIB4BloodlineComponent : public UActorComponent
@@ -24,7 +21,37 @@ public:
 
     UIB4BloodlineComponent();
 
-    // TODO: InitiateRebirth()   — strip gear, keep bloodline bonuses
-    // TODO: UnlockLineageNode(FName NodeID)
-    // TODO: GetLineageStats() -> FBloodlineStats
+    /** Returns the current bloodline rebirth cycle count. */
+    UFUNCTION(BlueprintCallable, Category = "Bloodline")
+    int32 GetBloodlineNumber() const { return BloodlineNumber; }
+
+    /** Returns the list of unlocked perks. */
+    UFUNCTION(BlueprintCallable, Category = "Bloodline")
+    const TArray<FName>& GetUnlockedPerks() const { return UnlockedPerks; }
+
+    /** Triggers rebirth: increments bloodline cycle, resets player level/XP, strips gear, and updates stats. */
+    UFUNCTION(BlueprintCallable, Category = "Bloodline")
+    void InitiateRebirth();
+
+    /** Attempts to unlock a perk node by checking prerequisite satisfaction. */
+    UFUNCTION(BlueprintCallable, Category = "Bloodline")
+    bool UnlockLineageNode(FName NodeID);
+
+    /** Computes lineage stats and updates player character's BloodlineStats. */
+    UFUNCTION(BlueprintCallable, Category = "Bloodline")
+    FBloodlineStats GetLineageStats();
+
+protected:
+
+    /** Current bloodline rebirth cycle number. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bloodline")
+    int32 BloodlineNumber;
+
+    /** Array of unlocked perk IDs. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bloodline")
+    TArray<FName> UnlockedPerks;
+
+    /** Current accumulated stats from lineage tree. */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Bloodline")
+    FBloodlineStats CurrentStats;
 };

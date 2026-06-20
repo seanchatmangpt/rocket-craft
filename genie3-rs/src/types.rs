@@ -188,3 +188,158 @@ impl Default for Transform {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const EPS: f32 = 1e-4;
+    fn approx(a: f32, b: f32) -> bool { (a - b).abs() < EPS }
+
+    // ── Vector3 ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn vector3_magnitude_unit_x() {
+        let v = Vector3::new(1.0, 0.0, 0.0);
+        assert!(approx(v.magnitude(), 1.0));
+    }
+
+    #[test]
+    fn vector3_magnitude_3_4_0() {
+        // 3-4-5 triangle: sqrt(9+16) = 5
+        let v = Vector3::new(3.0, 4.0, 0.0);
+        assert!(approx(v.magnitude(), 5.0));
+    }
+
+    #[test]
+    fn vector3_add_is_componentwise() {
+        let a = Vector3::new(1.0, 2.0, 3.0);
+        let b = Vector3::new(4.0, 5.0, 6.0);
+        let c = a.add(&b);
+        assert_eq!(c, Vector3::new(5.0, 7.0, 9.0));
+    }
+
+    #[test]
+    fn vector3_sub_is_componentwise() {
+        let a = Vector3::new(5.0, 7.0, 9.0);
+        let b = Vector3::new(1.0, 2.0, 3.0);
+        let c = a.sub(&b);
+        assert_eq!(c, Vector3::new(4.0, 5.0, 6.0));
+    }
+
+    #[test]
+    fn vector3_scale() {
+        let v = Vector3::new(1.0, 2.0, 3.0);
+        let s = v.scale(2.0);
+        assert_eq!(s, Vector3::new(2.0, 4.0, 6.0));
+    }
+
+    #[test]
+    fn vector3_distance_is_symmetric() {
+        let a = Vector3::new(0.0, 0.0, 0.0);
+        let b = Vector3::new(1.0, 0.0, 0.0);
+        assert!(approx(a.distance(&b), 1.0));
+        assert!(approx(b.distance(&a), 1.0));
+    }
+
+    #[test]
+    fn vector3_normalize_unit_vector() {
+        let v = Vector3::new(3.0, 4.0, 0.0); // mag = 5
+        let n = v.normalize().unwrap();
+        assert!(approx(n.magnitude(), 1.0));
+    }
+
+    #[test]
+    fn vector3_normalize_zero_returns_none() {
+        let v = Vector3::new(0.0, 0.0, 0.0);
+        assert!(v.normalize().is_none());
+    }
+
+    #[test]
+    fn vector3_default_is_origin() {
+        assert_eq!(Vector3::default(), Vector3::new(0.0, 0.0, 0.0));
+    }
+
+    // ── Rotation3D ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn rotation3d_normalize_angle_no_wrap_needed() {
+        assert!(approx(Rotation3D::normalize_angle(90.0), 90.0));
+        assert!(approx(Rotation3D::normalize_angle(-90.0), -90.0));
+    }
+
+    #[test]
+    fn rotation3d_normalize_angle_wraps_above_180() {
+        // 270 degrees should wrap to -90
+        assert!(approx(Rotation3D::normalize_angle(270.0), -90.0));
+    }
+
+    #[test]
+    fn rotation3d_normalize_angle_wraps_below_neg_180() {
+        // -270 degrees should wrap to 90
+        assert!(approx(Rotation3D::normalize_angle(-270.0), 90.0));
+    }
+
+    #[test]
+    fn rotation3d_add_wraps_angles() {
+        let a = Rotation3D::new(170.0, 0.0, 0.0);
+        let b = Rotation3D::new(20.0, 0.0, 0.0); // total 190 → wraps to -170
+        let c = a.add(&b);
+        assert!(approx(c.pitch, -170.0));
+    }
+
+    #[test]
+    fn rotation3d_default_is_zero() {
+        let r = Rotation3D::default();
+        assert!(approx(r.pitch, 0.0) && approx(r.yaw, 0.0) && approx(r.roll, 0.0));
+    }
+
+    // ── Bounds3D ──────────────────────────────────────────────────────────────
+
+    #[test]
+    fn bounds3d_contains_center() {
+        let b = Bounds3D::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(1.0, 1.0, 1.0),
+        );
+        assert!(b.contains_point(&Vector3::new(0.0, 0.0, 0.0)));
+    }
+
+    #[test]
+    fn bounds3d_excludes_outside_point() {
+        let b = Bounds3D::new(
+            Vector3::new(0.0, 0.0, 0.0),
+            Vector3::new(1.0, 1.0, 1.0),
+        );
+        assert!(!b.contains_point(&Vector3::new(2.0, 0.0, 0.0)));
+    }
+
+    #[test]
+    fn bounds3d_intersects_overlapping() {
+        let a = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(2.0, 2.0, 2.0));
+        let b = Bounds3D::new(Vector3::new(1.0, 1.0, 1.0), Vector3::new(2.0, 2.0, 2.0));
+        assert!(a.intersects(&b));
+    }
+
+    #[test]
+    fn bounds3d_no_intersect_when_apart() {
+        let a = Bounds3D::new(Vector3::new(0.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
+        let b = Bounds3D::new(Vector3::new(10.0, 0.0, 0.0), Vector3::new(1.0, 1.0, 1.0));
+        assert!(!a.intersects(&b));
+    }
+
+    // ── Transform ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn transform_default_has_unit_scale() {
+        let t = Transform::default();
+        assert_eq!(t.scale, Vector3::new(1.0, 1.0, 1.0));
+    }
+
+    #[test]
+    fn transform_default_has_zero_position_and_rotation() {
+        let t = Transform::default();
+        assert_eq!(t.position, Vector3::default());
+        assert_eq!(t.rotation, Rotation3D::default());
+    }
+}

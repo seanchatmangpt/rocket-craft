@@ -1,0 +1,495 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sm: <https://rocket-craft.io/ontology/state-machine/> .
+@prefix gn: <https://rocket-craft.io/ontology/gundam-nexus/> .
+
+
+# State Machine Class
+sm:StateMachine a rdfs:Class ;
+    rdfs:label "StateMachine" .
+
+sm:State a rdfs:Class ;
+    rdfs:label "State" .
+
+sm:Transition a rdfs:Class ;
+    rdfs:label "Transition" .
+
+# Properties
+sm:belongsTo a rdf:Property ;
+    rdfs:domain sm:State ;
+    rdfs:range sm:StateMachine .
+
+sm:fromState a rdf:Property ;
+    rdfs:domain sm:Transition ;
+    rdfs:range sm:State .
+
+sm:toState a rdf:Property ;
+    rdfs:domain sm:Transition ;
+    rdfs:range sm:State .
+
+sm:belongsToMachine a rdf:Property ;
+    rdfs:domain sm:Transition ;
+    rdfs:range sm:StateMachine .
+
+# --- Combat Machine states ---
+sm:CombatMachine a sm:StateMachine ;
+    rdfs:label "CombatMachine" .
+
+sm:CombatIdle a sm:State ;
+    rdfs:label "Idle" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatAttacking a sm:State ;
+    rdfs:label "Attacking" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatParrying a sm:State ;
+    rdfs:label "Parrying" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatPerfectParrying a sm:State ;
+    rdfs:label "PerfectParrying" ;
+    sm:belongsTo sm:CombatMachine .
+
+sm:CombatDodging a sm:State ;
+    rdfs:label "Dodging" ;
+    sm:belongsTo sm:CombatMachine .
+
+# --- Combat Machine Transitions ---
+sm:CombatBeginAttack a sm:Transition ;
+    rdfs:label "begin_attack" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatAttacking ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatBeginParry a sm:Transition ;
+    rdfs:label "begin_parry" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatParrying ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatBeginPerfectParry a sm:Transition ;
+    rdfs:label "begin_perfect_parry" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatPerfectParrying ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatBeginDodge a sm:Transition ;
+    rdfs:label "begin_dodge" ;
+    sm:fromState sm:CombatIdle ;
+    sm:toState sm:CombatDodging ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveHit a sm:Transition ;
+    rdfs:label "resolve_hit" ;
+    sm:fromState sm:CombatAttacking ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveBlocked a sm:Transition ;
+    rdfs:label "resolve_blocked" ;
+    sm:fromState sm:CombatAttacking ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveParry a sm:Transition ;
+    rdfs:label "resolve" ;
+    sm:fromState sm:CombatParrying ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolvePerfectParry a sm:Transition ;
+    rdfs:label "resolve" ;
+    sm:fromState sm:CombatPerfectParrying ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+sm:CombatResolveDodge a sm:Transition ;
+    rdfs:label "resolve" ;
+    sm:fromState sm:CombatDodging ;
+    sm:toState sm:CombatIdle ;
+    sm:belongsToMachine sm:CombatMachine .
+
+# --- Session Machine states ---
+sm:SessionMachine a sm:StateMachine ;
+    rdfs:label "SessionMachine" .
+
+sm:SessionConnecting a sm:State ;
+    rdfs:label "Connecting" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionAuthenticated a sm:State ;
+    rdfs:label "Authenticated" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionInLobby a sm:State ;
+    rdfs:label "InLobby" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionInMatch a sm:State ;
+    rdfs:label "InMatch" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionSpectating a sm:State ;
+    rdfs:label "Spectating" ;
+    sm:belongsTo sm:SessionMachine .
+
+sm:SessionDisconnected a sm:State ;
+    rdfs:label "Disconnected" ;
+    sm:belongsTo sm:SessionMachine .
+
+# --- Session Machine Transitions ---
+sm:SessionAuthenticate a sm:Transition ;
+    rdfs:label "authenticate" ;
+    sm:fromState sm:SessionConnecting ;
+    sm:toState sm:SessionAuthenticated ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionReject a sm:Transition ;
+    rdfs:label "reject" ;
+    sm:fromState sm:SessionConnecting ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionEnterLobby a sm:Transition ;
+    rdfs:label "enter_lobby" ;
+    sm:fromState sm:SessionAuthenticated ;
+    sm:toState sm:SessionInLobby ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectAuth a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionAuthenticated ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionEnterMatch a sm:Transition ;
+    rdfs:label "enter_match" ;
+    sm:fromState sm:SessionInLobby ;
+    sm:toState sm:SessionInMatch ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionSpectate a sm:Transition ;
+    rdfs:label "spectate" ;
+    sm:fromState sm:SessionInLobby ;
+    sm:toState sm:SessionSpectating ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectLobby a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionInLobby ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionMatchComplete a sm:Transition ;
+    rdfs:label "match_complete" ;
+    sm:fromState sm:SessionInMatch ;
+    sm:toState sm:SessionInLobby ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectMatch a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionInMatch ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionLeaveSpectate a sm:Transition ;
+    rdfs:label "leave_spectate" ;
+    sm:fromState sm:SessionSpectating ;
+    sm:toState sm:SessionInLobby ;
+    sm:belongsToMachine sm:SessionMachine .
+
+sm:SessionDisconnectSpectating a sm:Transition ;
+    rdfs:label "disconnect" ;
+    sm:fromState sm:SessionSpectating ;
+    sm:toState sm:SessionDisconnected ;
+    sm:belongsToMachine sm:SessionMachine .
+
+# --- Ontological Classes ---
+
+gn:Planet a rdfs:Class ;
+    rdfs:label "Planet" ;
+    rdfs:comment "A sentient planetary mind in the cosmology" .
+
+gn:MobilityType a rdfs:Class ;
+    rdfs:label "MobilityType" ;
+    rdfs:comment "A mobility primitive definition for Mech manufacturing" .
+
+gn:MechClass a rdfs:Class ;
+    rdfs:label "MechClass" ;
+    rdfs:comment "A class categorization for assembled Mechs" .
+
+gn:PreservationDomain a rdfs:Class ;
+    rdfs:label "PreservationDomain" ;
+    rdfs:comment "A historical gaming preservation category" .
+
+gn:ExperiencePhase a rdfs:Class ;
+    rdfs:label "ExperiencePhase" ;
+    rdfs:comment "A phase in the main experience loops" .
+
+gn:PlanetDimension a rdfs:Class ;
+    rdfs:label "PlanetDimension" ;
+    rdfs:comment "A value dimension of planetary intelligence" .
+
+gn:MythologyArchetype a rdfs:Class ;
+    rdfs:label "MythologyArchetype" ;
+    rdfs:comment "An archetype in civilization myths" .
+
+# --- Planetary Instances ---
+
+gn:Earth a gn:Planet ;
+    rdfs:label "Earth" .
+
+gn:Mars a gn:Planet ;
+    rdfs:label "Mars" .
+
+gn:Venus a gn:Planet ;
+    rdfs:label "Venus" .
+
+# --- Planetary Dimensions ---
+
+gn:Faith a gn:PlanetDimension ;
+    rdfs:label "Faith" .
+
+gn:Risk a gn:PlanetDimension ;
+    rdfs:label "Risk" .
+
+gn:Order a gn:PlanetDimension ;
+    rdfs:label "Order" .
+
+gn:Beauty a gn:PlanetDimension ;
+    rdfs:label "Beauty" .
+
+gn:Knowledge a gn:PlanetDimension ;
+    rdfs:label "Knowledge" .
+
+gn:Community a gn:PlanetDimension ;
+    rdfs:label "Community" .
+
+gn:Expansion a gn:PlanetDimension ;
+    rdfs:label "Expansion" .
+
+gn:Ambition a gn:PlanetDimension ;
+    rdfs:label "Ambition" .
+
+# --- Mobility Primitive Instances ---
+
+gn:Walking a gn:MobilityType ;
+    rdfs:label "Walking" .
+
+gn:Flight a gn:MobilityType ;
+    rdfs:label "Flight" .
+
+gn:Hover a gn:MobilityType ;
+    rdfs:label "Hover" .
+
+gn:Aquatic a gn:MobilityType ;
+    rdfs:label "Aquatic" .
+
+gn:Space a gn:MobilityType ;
+    rdfs:label "Space" .
+
+# --- Mech Class Instances ---
+
+gn:Worker a gn:MechClass ;
+    rdfs:label "Worker" .
+
+gn:Explorer a gn:MechClass ;
+    rdfs:label "Explorer" .
+
+gn:Builder a gn:MechClass ;
+    rdfs:label "Builder" .
+
+gn:Miner a gn:MechClass ;
+    rdfs:label "Miner" .
+
+gn:Trader a gn:MechClass ;
+    rdfs:label "Trader" .
+
+gn:Guardian a gn:MechClass ;
+    rdfs:label "Guardian" .
+
+gn:Warrior a gn:MechClass ;
+    rdfs:label "Warrior" .
+
+gn:Ark a gn:MechClass ;
+    rdfs:label "Ark" .
+
+# --- Preservation Domain Instances ---
+
+gn:FlashGames a gn:PreservationDomain ;
+    rdfs:label "FlashGames" .
+
+gn:VirtualWorlds a gn:PreservationDomain ;
+    rdfs:label "VirtualWorlds" .
+
+gn:BrowserMMOs a gn:PreservationDomain ;
+    rdfs:label "BrowserMMOs" .
+
+gn:SocialGames a gn:PreservationDomain ;
+    rdfs:label "SocialGames" .
+
+gn:Arcades a gn:PreservationDomain ;
+    rdfs:label "Arcades" .
+
+# --- Experience Loop Phase Instances ---
+
+gn:Explore a gn:ExperiencePhase ;
+    rdfs:label "Explore" .
+
+gn:Discover a gn:ExperiencePhase ;
+    rdfs:label "Discover" .
+
+gn:Build a gn:ExperiencePhase ;
+    rdfs:label "Build" .
+
+gn:Preserve a gn:ExperiencePhase ;
+    rdfs:label "Preserve" .
+
+gn:Expand a gn:ExperiencePhase ;
+    rdfs:label "Expand" .
+
+gn:CreateHistory a gn:ExperiencePhase ;
+    rdfs:label "CreateHistory" .
+
+gn:BecomeMythology a gn:ExperiencePhase ;
+    rdfs:label "BecomeMythology" .
+
+# --- Mythology Archetype Instances ---
+
+gn:Hero a gn:MythologyArchetype ;
+    rdfs:label "Hero" .
+
+gn:Saint a gn:MythologyArchetype ;
+    rdfs:label "Saint" .
+
+gn:Villain a gn:MythologyArchetype ;
+    rdfs:label "Villain" .
+
+gn:Prophet a gn:MythologyArchetype ;
+    rdfs:label "Prophet" .
+
+gn:BuilderArchetype a gn:MythologyArchetype ;
+    rdfs:label "BuilderArchetype" .
+
+gn:Preserver a gn:MythologyArchetype ;
+    rdfs:label "Preserver" .
+
+gn:Destroyer a gn:MythologyArchetype ;
+    rdfs:label "Destroyer" .
+
+# --- New Ontological Classes ---
+
+gn:CosmicCycle a rdfs:Class ;
+    rdfs:label "CosmicCycle" ;
+    rdfs:comment "A cosmic cycle of planetary history" .
+
+gn:Resource a rdfs:Class ;
+    rdfs:label "Resource" ;
+    rdfs:comment "A resource type" .
+
+gn:FrameType a rdfs:Class ;
+    rdfs:label "FrameType" ;
+    rdfs:comment "A mech frame type" .
+
+gn:PowerSource a rdfs:Class ;
+    rdfs:label "PowerSource" ;
+    rdfs:comment "A mech power source" .
+
+gn:ArmorType a rdfs:Class ;
+    rdfs:label "ArmorType" ;
+    rdfs:comment "A mech armor type" .
+
+gn:WeaponType a rdfs:Class ;
+    rdfs:label "WeaponType" ;
+    rdfs:comment "A mech weapon type" .
+
+gn:SensorType a rdfs:Class ;
+    rdfs:label "SensorType" ;
+    rdfs:comment "A mech sensor type" .
+
+gn:ArkForm a rdfs:Class ;
+    rdfs:label "ArkForm" ;
+    rdfs:comment "A type of preservation ark" .
+
+gn:ArkPurpose a rdfs:Class ;
+    rdfs:label "ArkPurpose" ;
+    rdfs:comment "A purpose of preservation ark" .
+
+# --- New Instances ---
+
+# --- Cosmic Cycle ---
+gn:Growth a gn:CosmicCycle ;
+    rdfs:label "Growth" .
+
+gn:ExpansionCycle a gn:CosmicCycle ;
+    rdfs:label "ExpansionCycle" .
+
+gn:Judgment a gn:CosmicCycle ;
+    rdfs:label "Judgment" .
+
+gn:PreservationCycle a gn:CosmicCycle ;
+    rdfs:label "PreservationCycle" .
+
+gn:Renewal a gn:CosmicCycle ;
+    rdfs:label "Renewal" .
+
+# --- Resource ---
+gn:MinovskyParticles a gn:Resource ;
+    rdfs:label "MinovskyParticles" .
+
+gn:Gundanium a gn:Resource, gn:ArmorType ;
+    rdfs:label "Gundanium" .
+
+gn:LunaTitanium a gn:Resource, gn:ArmorType ;
+    rdfs:label "LunaTitanium" .
+
+# --- Mech Primitives ---
+gn:NanoComposite a gn:ArmorType ;
+    rdfs:label "NanoComposite" .
+
+gn:GundamFrame a gn:FrameType ;
+    rdfs:label "GundamFrame" .
+
+gn:ZakuFrame a gn:FrameType ;
+    rdfs:label "ZakuFrame" .
+
+gn:GMFrame a gn:FrameType ;
+    rdfs:label "GMFrame" .
+
+gn:MinovskyUltracompact a gn:PowerSource ;
+    rdfs:label "MinovskyUltracompact" .
+
+gn:FusionReactor a gn:PowerSource ;
+    rdfs:label "FusionReactor" .
+
+gn:BeamRifle a gn:WeaponType ;
+    rdfs:label "BeamRifle" .
+
+gn:BeamSaber a gn:WeaponType ;
+    rdfs:label "BeamSaber" .
+
+gn:HeatHawk a gn:WeaponType ;
+    rdfs:label "HeatHawk" .
+
+gn:Monoeye a gn:SensorType ;
+    rdfs:label "Monoeye" .
+
+gn:DualSensor a gn:SensorType ;
+    rdfs:label "DualSensor" .
+
+# --- Ark Instances ---
+gn:CityArk a gn:ArkForm ;
+    rdfs:label "CityArk" .
+
+gn:ColonyArk a gn:ArkForm ;
+    rdfs:label "ColonyArk" .
+
+gn:KnowledgePreservation a gn:ArkPurpose ;
+    rdfs:label "KnowledgePreservation" .
+
+# --- Sentinel Planet ---
+gn:Sentinel a gn:Planet ;
+    rdfs:label "Sentinel" .
+

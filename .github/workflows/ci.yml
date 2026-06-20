@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
   chicago-tdd-tools:
-    name: Rust — test chicago-tdd-tools
+    name: Rust — chicago-tdd-tools
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -47,9 +47,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: dtolnay/rust-toolchain@stable
-
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: chicago-tdd-tools
@@ -59,3 +57,331 @@ jobs:
 
       - name: Test
         run: cargo test --all-features
+
+  nexus-engine:
+    name: Rust — nexus-engine
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nexus-engine
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: nexus-engine
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  wasm-threads:
+    name: Rust — wasm-threads
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: wasm-threads
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: wasm-threads
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  unify-rs:
+    name: Rust — unify-rs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: unify-rs
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: unify-rs
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  blueprint-rs:
+    name: Rust — blueprint-rs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blueprint-rs
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: blueprint-rs
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  genie3-rs:
+    name: Rust — genie3-rs
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: genie3-rs
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: genie3-rs
+
+      - name: Build
+        run: cargo build
+
+      - name: Test
+        run: cargo test
+
+  ib4-mud:
+    name: Rust — infinity-blade-4 MUD
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infinity-blade-4/mud
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: infinity-blade-4/mud
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  rocket-simulator:
+    name: Rust — rocket-simulator
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rocket-simulator
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rocket-simulator
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  tools:
+    name: Rust — tools (rocket-sdk + rocket-cmd)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  asset-pipeline:
+    name: Rust — asset-pipeline
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: asset-pipeline
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: asset-pipeline
+
+      - name: Build
+        run: cargo build --workspace
+
+      - name: Test
+        run: cargo test --workspace
+
+  nuxt-shell:
+    name: Nuxt — unit tests + type-check (mock mode)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nuxt-shell
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: nuxt-shell/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Unit tests (no server needed)
+        run: npm run test:unit
+
+      - name: Mock-mode loop contracts (MOCK_API=1, no Supabase needed)
+        run: npm run test:loop:mock
+        env:
+          MOCK_API: "1"
+
+  pm4py-conformance:
+    name: Python — pm4py conformance smoke test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install pm4py
+        run: pip install pm4py
+
+      - name: Generate synthetic OCEL 2.0 fixture
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib
+          # Minimal OCEL 2.0 JSON for smoke-test (no Supabase needed)
+          ocel = {
+            "ocel:global-log": {"ocel:version": "2.0", "ocel:ordering": "timestamp"},
+            "ocel:global-event": {"ocel:activity": "__INVALID__"},
+            "ocel:global-object": {"ocel:type": "session"},
+            "ocel:events": {
+              "e1": {"ocel:activity": "GameSessionStarted", "ocel:timestamp": "2026-06-19T00:00:01Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
+              "e2": {"ocel:activity": "FrameRendered",      "ocel:timestamp": "2026-06-19T00:00:02Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
+              "e3": {"ocel:activity": "InputAdmitted",      "ocel:timestamp": "2026-06-19T00:00:03Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
+            },
+            "ocel:objects": {
+              "s1": {"ocel:type": "session", "ocel:ovmap": {}}
+            },
+            "events": [
+              {"id":"e1","type":"GameSessionStarted","time":"2026-06-19T00:00:01Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
+              {"id":"e2","type":"FrameRendered","time":"2026-06-19T00:00:02Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
+              {"id":"e3","type":"InputAdmitted","time":"2026-06-19T00:00:03Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
+            ],
+            "objectTypes": [{"name":"session","attributes":[]}],
+            "eventTypes": [
+              {"name":"GameSessionStarted","attributes":[]},
+              {"name":"FrameRendered","attributes":[]},
+              {"name":"InputAdmitted","attributes":[]},
+            ],
+          }
+          out = pathlib.Path("/tmp/ci-smoke.ocel.json")
+          out.write_text(json.dumps(ocel))
+          print(f"Wrote {out}")
+          EOF
+
+      - name: Run pm4py conformance (smoke — synthetic session)
+        run: python3 scripts/pm4py_conformance.py /tmp/ci-smoke.ocel.json --session-id ci-smoke --out /tmp/ci-fitness-report.json
+
+      - name: Print fitness report
+        run: cat /tmp/ci-fitness-report.json
+
+  nuxt-shell-headless-loop:
+    name: Nuxt — headless gameplay loop (Supabase local)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: nuxt-shell
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: nuxt-shell/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase
+        run: supabase start
+        timeout-minutes: 5
+
+      - name: Apply migrations
+        run: supabase migration up --local
+
+      - name: Export Supabase local keys
+        run: |
+          ANON_KEY=$(supabase status --output json | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).anon_key))")
+          SERVICE_KEY=$(supabase status --output json | node -e "process.stdin.resume();let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).service_role_key))")
+          echo "SUPABASE_ANON_KEY=$ANON_KEY" >> $GITHUB_ENV
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
+
+      - name: Start Nitro dev server (background)
+        run: |
+          npx nuxt dev --port 3000 &
+          timeout 90 bash -c 'until curl -sf http://localhost:3000/api/game/pipeline-health; do sleep 3; done'
+        env:
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
+          ALLOW_SESSION_SEED: "1"
+          NODE_ENV: development
+
+      - name: Run headless gameplay loop (all steps, MOCK_API=0)
+        run: npm run test:loop
+        env:
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
+          API_BASE_URL: http://localhost:3000
+          MOCK_API: "0"
+          ALLOW_SESSION_SEED: "1"
+          NODE_ENV: development
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop

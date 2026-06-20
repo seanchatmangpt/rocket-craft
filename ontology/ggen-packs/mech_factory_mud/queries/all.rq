@@ -1,0 +1,5 @@
+PREFIX mud: <http://rocket-craft.com/ontology/mud#>
+SELECT ?s ?type WHERE {
+    ?s a ?type .
+    FILTER(?type IN (mud:RouteNode, mud:Station, mud:PartFamily, mud:AuthorityField, mud:RefusalReason))
+} ORDER BY ?s

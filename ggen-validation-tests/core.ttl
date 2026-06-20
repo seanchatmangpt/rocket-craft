@@ -1,0 +1,309 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+@prefix gundam: <https://rocket-craft.io/ontology/ue4/gundam#> .
+
+<https://rocket-craft.io/ontology/ue4/>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Core C++ Backbone Ontology" ;
+    rdfs:comment "Ontology representing the core C++ class hierarchy and basic spatial relationships in Unreal Engine 4." ;
+    owl:versionInfo "0.1.0" ;
+    owl:imports <https://rocket-craft.io/ontology/ue4/reflection#> ,
+                <https://rocket-craft.io/ontology/ue4/blueprints#> ,
+                <https://rocket-craft.io/ontology/ue4/subsystems#> ,
+                <https://rocket-craft.io/ontology/ue4/typestates#> .
+
+# =========================================================================
+# Core C++ Classes
+# =========================================================================
+
+ue4:UObject a owl:Class ;
+    rdfs:label "UObject" ;
+    rdfs:comment "The base class for all objects in Unreal Engine, providing core features like reflection, serialization, garbage collection, and metadata." .
+
+ue4:AActor a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "AActor" ;
+    rdfs:comment "The base class for all object actors that can be placed or spawned in an Unreal Engine level or world." .
+
+ue4:APawn a owl:Class ;
+    rdfs:subClassOf ue4:AActor ;
+    rdfs:label "APawn" ;
+    rdfs:comment "A Pawn is an actor that can be possessed by a Controller (PlayerController or AIController) to receive input actuation and interact with the world." .
+
+ue4:ACharacter a owl:Class ;
+    rdfs:subClassOf ue4:APawn ;
+    rdfs:label "ACharacter" ;
+    rdfs:comment "A Character is a specialized Pawn that includes support for basic walking/running/jumping movement, collision handling, and skeletal mesh rendering." .
+
+ue4:UActorComponent a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UActorComponent" ;
+    rdfs:comment "The base class for components that can be attached to actors to add modular gameplay behaviors, rendering properties, or physics logic." .
+
+ue4:USceneComponent a owl:Class ;
+    rdfs:subClassOf ue4:UActorComponent ;
+    rdfs:label "USceneComponent" ;
+    rdfs:comment "A SceneComponent has a transform and supports attachment, representing a component with physical or spatial presence." .
+
+ue4:UWorld a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UWorld" ;
+    rdfs:comment "A representation of a world containing a persistent level, streaming levels, and a collection of spawned actors." .
+
+ue4:ULevel a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "ULevel" ;
+    rdfs:comment "A collection of actors situated in a level that can be loaded/unloaded or hidden/shown dynamically." .
+
+# =========================================================================
+# Core Relationships / Properties
+# =========================================================================
+
+ue4:hasComponent a owl:ObjectProperty ;
+    rdfs:label "hasComponent" ;
+    rdfs:comment "Relates an actor to one of its components." ;
+    rdfs:domain ue4:AActor ;
+    rdfs:range ue4:UActorComponent .
+
+ue4:hasRootComponent a owl:ObjectProperty ;
+    rdfs:label "hasRootComponent" ;
+    rdfs:comment "Relates an actor to its root scene component which defines its transform." ;
+    rdfs:domain ue4:AActor ;
+    rdfs:range ue4:USceneComponent ;
+    rdfs:subPropertyOf ue4:hasComponent .
+
+ue4:isComponentOf a owl:ObjectProperty ;
+    rdfs:label "isComponentOf" ;
+    rdfs:comment "Relates a component to the actor it belongs to." ;
+    rdfs:domain ue4:UActorComponent ;
+    rdfs:range ue4:AActor ;
+    owl:inverseOf ue4:hasComponent .
+
+ue4:owner a owl:ObjectProperty ;
+    rdfs:label "owner" ;
+    rdfs:comment "Alias or inverse relationship relating a component/object to its owner actor." ;
+    rdfs:domain ue4:UActorComponent ;
+    rdfs:range ue4:AActor ;
+    owl:inverseOf ue4:hasComponent .
+
+ue4:hasLevel a owl:ObjectProperty ;
+    rdfs:label "hasLevel" ;
+    rdfs:comment "Relates a world to a level within it." ;
+    rdfs:domain ue4:UWorld ;
+    rdfs:range ue4:ULevel .
+
+ue4:isLevelOf a owl:ObjectProperty ;
+    rdfs:label "isLevelOf" ;
+    rdfs:comment "Relates a level to the world it belongs to." ;
+    rdfs:domain ue4:ULevel ;
+    rdfs:range ue4:UWorld ;
+    owl:inverseOf ue4:hasLevel .
+
+ue4:persistentLevel a owl:ObjectProperty ;
+    rdfs:label "persistentLevel" ;
+    rdfs:comment "Relates a world to its persistent main level." ;
+    rdfs:domain ue4:UWorld ;
+    rdfs:range ue4:ULevel ;
+    rdfs:subPropertyOf ue4:hasLevel .
+
+ue4:hasActor a owl:ObjectProperty ;
+    rdfs:label "hasActor" ;
+    rdfs:comment "Relates a level to an actor present in it." ;
+    rdfs:domain ue4:ULevel ;
+    rdfs:range ue4:AActor .
+
+ue4:bReplicates a owl:DatatypeProperty ;
+    rdfs:label "bReplicates" ;
+    rdfs:comment "Indicates whether this Actor or Component replicates its state over the network." ;
+    rdfs:range xsd:boolean .
+
+ue4:bIsActive a owl:DatatypeProperty ;
+    rdfs:label "bIsActive" ;
+    rdfs:comment "Indicates whether this component is currently active and updating." ;
+    rdfs:range xsd:boolean .
+
+ue4:bHidden a owl:DatatypeProperty ;
+    rdfs:label "bHidden" ;
+    rdfs:comment "Indicates whether this actor or component is hidden in the game/world." ;
+    rdfs:range xsd:boolean .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+@prefix gundam: <https://rocket-craft.io/ontology/ue4/gundam#> .
+
+<https://rocket-craft.io/ontology/ue4/gundam#>
+    a owl:Ontology ;
+    rdfs:label "Gundam Player Character Scenario Ontology" ;
+    rdfs:comment "Ontology defining the Gundam player character scenario and graph connections." .
+
+# =========================================================================
+# Gundam Classes & Component Classes
+# =========================================================================
+
+gundam:AGundamCharacter a owl:Class ;
+    rdfs:subClassOf ue4:ACharacter ;
+    rdfs:label "AGundamCharacter" ;
+    rdfs:comment "A specialized character subclass representing a Gundam mobile suit." .
+
+ue4:USkeletalMeshComponent a owl:Class ;
+    rdfs:subClassOf ue4:USceneComponent ;
+    rdfs:label "USkeletalMeshComponent" ;
+    rdfs:comment "Skeletal mesh rendering component." .
+
+ue4:UBoxComponent a owl:Class ;
+    rdfs:subClassOf ue4:USceneComponent ;
+    rdfs:label "UBoxComponent" ;
+    rdfs:comment "Box collision physics component." .
+
+# =========================================================================
+# Gundam Character & Components Instances
+# =========================================================================
+
+gundam:MyGundam a gundam:AGundamCharacter ;
+    rdfs:label "MyGundam" ;
+    rdfs:comment "The primary Gundam player character instance." ;
+    ue4:hasComponent gundam:GundamMesh ;
+    ue4:hasComponent gundam:GundamCollision ;
+    ue4:hasGraph gundam:GundamInputGraph ;
+    ue4:bReplicates true ;
+    ue4:hasCookingState gundam:Cooked .
+
+gundam:GundamMesh a ue4:USkeletalMeshComponent ;
+    rdfs:label "GundamMesh" ;
+    rdfs:comment "Skeletal mesh rendering component for the Gundam." ;
+    ue4:owner gundam:MyGundam .
+
+gundam:GundamCollision a ue4:UBoxComponent ;
+    rdfs:label "GundamCollision" ;
+    rdfs:comment "Collision bounding box for physical interaction." ;
+    ue4:owner gundam:MyGundam .
+
+# =========================================================================
+# Subsystem Handler
+# =========================================================================
+
+gundam:GundamNetworkingHandler a ue4:UNetworkingSubsystem ;
+    rdfs:label "GundamNetworkingHandler" ;
+    rdfs:comment "Networking subsystem handler for character replication." .
+
+gundam:GundamPhysicsHandler a ue4:UPhysicsSubsystem ;
+    rdfs:label "GundamPhysicsHandler" ;
+    rdfs:comment "Physics subsystem handler." .
+
+# =========================================================================
+# Typestates
+# =========================================================================
+
+gundam:Cooked a ue4:CookingTypestate ;
+    rdfs:label "Cooked" ;
+    rdfs:comment "Asset cooking state: Cooked." .
+
+gundam:WasmReady a ue4:WasmPackagingTypestate ;
+    rdfs:label "WasmReady" ;
+    rdfs:comment "Wasm packaging state: WasmReady." .
+
+# =========================================================================
+# World & Level Configuration
+# =========================================================================
+
+gundam:GundamWorld a ue4:UWorld ;
+    rdfs:label "GundamWorld" ;
+    rdfs:comment "Persistent world container." ;
+    ue4:hasLevel gundam:GundamLevel ;
+    ue4:hasSubsystem gundam:GundamNetworkingHandler ;
+    ue4:hasSubsystem gundam:GundamPhysicsHandler ;
+    ue4:hasPackagingState gundam:WasmReady .
+
+gundam:GundamLevel a ue4:ULevel ;
+    rdfs:label "GundamLevel" ;
+    rdfs:comment "Persistent level containing the Gundam character." ;
+    ue4:hasActor gundam:MyGundam ;
+    ue4:isLevelOf gundam:GundamWorld .
+
+# =========================================================================
+# C++ Reflection: Function Definitions
+# =========================================================================
+
+ue4:AddMovementInput a ue4:UFunction ;
+    rdfs:label "AddMovementInput" ;
+    rdfs:comment "Adds movement input vector along a world direction." ;
+    ue4:hasParameter ue4:WorldDirectionParam ;
+    ue4:hasParameter ue4:ScaleValueParam .
+
+ue4:WorldDirectionParam a ue4:UFunctionParameter ;
+    rdfs:label "WorldDirectionParam" ;
+    rdfs:comment "The direction vector parameter." ;
+    ue4:parameterOf ue4:AddMovementInput ;
+    ue4:parameterDirection ue4:Input ;
+    ue4:parameterIndex 0 .
+
+ue4:ScaleValueParam a ue4:UFunctionParameter ;
+    rdfs:label "ScaleValueParam" ;
+    rdfs:comment "The scale multiplier parameter." ;
+    ue4:parameterOf ue4:AddMovementInput ;
+    ue4:parameterDirection ue4:Input ;
+    ue4:parameterIndex 1 .
+
+# =========================================================================
+# Blueprint Graph & Node Network
+# =========================================================================
+
+gundam:GundamInputGraph a ue4:UEdGraph ;
+    rdfs:label "GundamInputGraph" ;
+    rdfs:comment "Blueprint graph handling input events for the Gundam character." ;
+    ue4:hasNode gundam:W_KeyPressedNode ;
+    ue4:hasNode gundam:MoveForwardCallNode .
+
+gundam:W_KeyPressedNode a ue4:UK2Node_InputKeyEvent ;
+    rdfs:label "W_KeyPressedNode" ;
+    rdfs:comment "Keyboard input event for W key." ;
+    ue4:nodeOf gundam:GundamInputGraph ;
+    ue4:hasPin gundam:W_KeyPressedPinOut .
+
+gundam:MoveForwardCallNode a ue4:UK2Node_CallFunction ;
+    rdfs:label "MoveForwardCallNode" ;
+    rdfs:comment "Function call node invoking AddMovementInput." ;
+    ue4:nodeOf gundam:GundamInputGraph ;
+    ue4:callsFunction ue4:AddMovementInput ;
+    ue4:hasPin gundam:MoveForwardPinIn ;
+    ue4:hasPin gundam:MoveForwardDirPin ;
+    ue4:hasPin gundam:MoveForwardScalePin .
+
+# Pins for Key Pressed Node
+gundam:W_KeyPressedPinOut a ue4:UEdGraphPin ;
+    rdfs:label "W_KeyPressedPinOut" ;
+    rdfs:comment "Pressed execution flow output." ;
+    ue4:pinOf gundam:W_KeyPressedNode ;
+    ue4:pinDirection ue4:Output ;
+    ue4:pinCategory "exec" ;
+    ue4:connectedTo gundam:MoveForwardPinIn .
+
+# Pins for AddMovementInput Call Node
+gundam:MoveForwardPinIn a ue4:UEdGraphPin ;
+    rdfs:label "MoveForwardPinIn" ;
+    rdfs:comment "Input execution pin to execute function." ;
+    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinDirection ue4:Input ;
+    ue4:pinCategory "exec" ;
+    ue4:connectedTo gundam:W_KeyPressedPinOut .
+
+gundam:MoveForwardDirPin a ue4:UEdGraphPin ;
+    rdfs:label "MoveForwardDirPin" ;
+    rdfs:comment "Input data pin for world direction." ;
+    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinDirection ue4:Input ;
+    ue4:pinCategory "struct" ;
+    ue4:mapsToParameter ue4:WorldDirectionParam .
+
+gundam:MoveForwardScalePin a ue4:UEdGraphPin ;
+    rdfs:label "MoveForwardScalePin" ;
+    rdfs:comment "Input data pin for scale value." ;
+    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinDirection ue4:Input ;
+    ue4:pinCategory "float" ;
+    ue4:mapsToParameter ue4:ScaleValueParam .

@@ -87,3 +87,87 @@ pub fn assert_no_pm_violations(log: &EventLog) {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::fixtures::{Event, OcelEvent, OcelObject, ReceiptChain, Trace};
+    use unify_receipts::receipt::Receipt;
+
+    fn make_chain(count: usize) -> ReceiptChain {
+        let mut c = ReceiptChain::new();
+        for i in 0..count {
+            c.append(Receipt::new(format!("key-{i}"), b"data"));
+        }
+        c
+    }
+
+    fn make_ocel_log() -> OcelLog {
+        OcelLog {
+            objects: vec![OcelObject { id: "obj1".into(), object_type: "Case".into() }],
+            events: vec![OcelEvent {
+                id: "e1".into(),
+                event_type: "start".into(),
+                related_object_ids: vec!["obj1".into()],
+                timestamp: 1000,
+            }],
+        }
+    }
+
+    fn make_event_log(monotone: bool) -> EventLog {
+        EventLog {
+            traces: vec![Trace {
+                case_id: "c1".into(),
+                events: if monotone {
+                    vec![
+                        Event { name: "a".into(), timestamp: 10 },
+                        Event { name: "b".into(), timestamp: 20 },
+                    ]
+                } else {
+                    vec![
+                        Event { name: "a".into(), timestamp: 20 },
+                        Event { name: "b".into(), timestamp: 10 },
+                    ]
+                },
+            }],
+        }
+    }
+
+    #[test]
+    fn assert_chain_valid_passes_on_good_chain() {
+        assert_chain_valid(&make_chain(2));
+    }
+
+    #[test]
+    #[should_panic(expected = "must not be empty")]
+    fn assert_chain_valid_panics_on_empty_chain() {
+        assert_chain_valid(&ReceiptChain::new());
+    }
+
+    #[test]
+    fn assert_receipt_count_passes_when_correct() {
+        assert_receipt_count(&make_chain(3), 3);
+    }
+
+    #[test]
+    #[should_panic(expected = "Expected 2 receipts")]
+    fn assert_receipt_count_panics_on_mismatch() {
+        assert_receipt_count(&make_chain(3), 2);
+    }
+
+    #[test]
+    fn assert_ocel_valid_passes_on_good_log() {
+        assert_ocel_valid(&make_ocel_log());
+    }
+
+    #[test]
+    fn assert_no_pm_violations_passes_on_monotone_log() {
+        assert_no_pm_violations(&make_event_log(true));
+    }
+
+    #[test]
+    #[should_panic]
+    fn assert_no_pm_violations_panics_on_non_monotone() {
+        assert_no_pm_violations(&make_event_log(false));
+    }
+}

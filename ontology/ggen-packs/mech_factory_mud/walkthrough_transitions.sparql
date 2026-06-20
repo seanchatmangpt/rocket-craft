@@ -1,0 +1,10 @@
+PREFIX factory: <http://example.org/factory#>
+
+SELECT ?current_state ?input_event ?next_state
+WHERE {
+  ?transition a factory:WalkthroughTransition ;
+              factory:currentState ?current_state ;
+              factory:inputEvent ?input_event ;
+              factory:nextState ?next_state .
+}
+ORDER BY ?current_state ?input_event

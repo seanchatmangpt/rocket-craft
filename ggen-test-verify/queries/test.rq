@@ -1,0 +1,3 @@
+SELECT ?class WHERE {
+  VALUES ?class { <https://example.com/Person> }
+}

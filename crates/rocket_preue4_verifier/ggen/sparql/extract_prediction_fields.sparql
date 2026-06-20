@@ -1,0 +1,28 @@
+# extract_prediction_fields.sparql
+# GC-MECHBIRTH-002: Anti-Cartesian Exhaustion SELECT
+#
+# Extracts all PredictionField definitions and their invariant laws.
+# Results drive: prediction.rs.tera → PredictionState SoA shadow struct
+#
+# Anti-Cartesian guarantee: single rdf:type filter on mb:PredictionField.
+# No cross-joins. LIMIT 32 is hard exhaustion cap.
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+
+SELECT
+    ?fieldName
+    ?formula
+    ?mirrors
+    ?comment
+WHERE {
+    ?field a mb:PredictionField ;
+           mb:fieldName ?fieldName ;
+           mb:formula   ?formula .
+    OPTIONAL { ?field mb:mirrors ?mirrorsRes .
+               ?mirrorsRes mb:fieldName ?mirrors . }
+    OPTIONAL { ?field mb:comment ?comment . }
+}
+ORDER BY ?fieldName
+LIMIT 32

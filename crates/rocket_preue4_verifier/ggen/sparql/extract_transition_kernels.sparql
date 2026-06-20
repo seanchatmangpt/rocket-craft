@@ -1,0 +1,43 @@
+# extract_transition_kernels.sparql
+# GC-MECHBIRTH-002: Anti-Cartesian Exhaustion SELECT
+#
+# Extracts transition kernel laws: scalar formula, table dimensions, SIMD lane width.
+# Results drive: transitions.rs.tera and simd.rs.tera
+#
+# Anti-Cartesian guarantee: each ?kernel is a distinct individual — no joins that multiply rows.
+
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+SELECT
+    ?kernelLabel
+    ?rustFnName
+    ?rustStructName
+    ?inputs
+    ?output
+    ?formula
+    ?useSaturating
+    ?intermediateType
+    ?dimensions
+    ?totalEntries
+    ?indexFormula
+    ?guarantee
+WHERE {
+    ?kernel a mb:TransitionKernel ;
+            rdfs:label ?kernelLabel .
+    OPTIONAL { ?kernel mb:rustFnName       ?rustFnName . }
+    OPTIONAL { ?kernel mb:rustStructName   ?rustStructName . }
+    OPTIONAL { ?kernel mb:inputs           ?inputs . }
+    OPTIONAL { ?kernel mb:output           ?output . }
+    OPTIONAL { ?kernel mb:formula          ?formula . }
+    OPTIONAL { ?kernel mb:useSaturating    ?useSaturating . }
+    OPTIONAL { ?kernel mb:intermediateType ?intermediateType . }
+    OPTIONAL { ?kernel mb:dimensions       ?dimensions . }
+    OPTIONAL { ?kernel mb:totalEntries     ?totalEntries . }
+    OPTIONAL { ?kernel mb:indexFormula     ?indexFormula . }
+    OPTIONAL { ?kernel mb:guarantee        ?guarantee . }
+}
+ORDER BY ?kernelLabel
+LIMIT 16

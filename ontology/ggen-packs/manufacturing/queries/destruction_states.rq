@@ -1,0 +1,13 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?destruction_state ?owner_part_id ?type ?healthThreshold ?debrisMesh
+WHERE {
+  ?destruction_state rdf:type ?type .
+  ?type rdfs:subClassOf* mud:DestructionState .
+  ?destruction_state mud:owner_part_id ?owner_part_id .
+  OPTIONAL { ?destruction_state mud:healthThreshold ?healthThreshold }
+  OPTIONAL { ?destruction_state mud:debrisMesh ?debrisMesh }
+}
+ORDER BY ?owner_part_id ?destruction_state

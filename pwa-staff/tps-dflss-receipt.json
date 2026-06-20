@@ -1,0 +1,12 @@
+{
+  "stage": "6",
+  "artifact": "Brm HTML5 package — PWA delivery",
+  "wasm_path": "pwa-staff/Brm-HTML5-Shipping.wasm",
+  "wasm_blake3": "3064263559ffa312967b4d97a9565c290307caea50f97b6f99b551a7a766a6d7",
+  "wasm_size_bytes": 1614152,
+  "built_at": "2026-06-19T04:34:36Z",
+  "verdict": "PASS",
+  "tps_suite": "DFLSS",
+  "source": "pwa-staff delivery verification",
+  "notes": "Stage 5 receipt at /Users/sac/ue-4.27-html5-es3/stage5-receipt.json. Fake wasm stubs removed from StagedBuilds path. genie-web retained (referenced by genie_server.js WEB_DIR). ue4-sim fake engine was not present."
+}

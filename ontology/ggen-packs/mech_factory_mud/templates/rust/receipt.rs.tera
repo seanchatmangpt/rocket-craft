@@ -1,0 +1,3 @@
+// generated_by: ggen
+// Receipt module
+pub const RECEIPT_FIELDS_COUNT: usize = 5;

@@ -11,7 +11,7 @@ fn log() -> Logger {
 
 #[test]
 fn ui_state_transitions_from_unloaded_through_loading_to_ready() {
-    let mut log = log();
+    let log = log();
     log.info("Given a UiState in Unloaded phase");
     let s = UiState::<Unloaded>::new();
 
@@ -31,7 +31,7 @@ fn ui_state_transitions_from_unloaded_through_loading_to_ready() {
 
 #[test]
 fn ui_state_full_happy_path() {
-    let mut log = log();
+    let log = log();
     log.info("Given a UiState transitioned through Unloaded -> Loading -> Ready");
     let s = UiState::<Unloaded>::new();
     let s = s.start_loading();
@@ -55,7 +55,7 @@ fn ui_state_full_happy_path() {
 
 #[test]
 fn ui_state_error_can_retry_back_to_unloaded() {
-    let mut log = log();
+    let log = log();
     log.info("Given a UiState in Loading phase");
     let s = UiState::<Unloaded>::new();
     let s = s.start_loading();
@@ -69,7 +69,7 @@ fn ui_state_error_can_retry_back_to_unloaded() {
 
 #[test]
 fn ui_state_messages_received_increments_on_each_update() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Ready UiState");
     let s = UiState::<Unloaded>::new().start_loading().ready();
     let mut s = s;
@@ -85,7 +85,7 @@ fn ui_state_messages_received_increments_on_each_update() {
 
 #[test]
 fn ui_state_health_percentage_computed_from_fields() {
-    let mut log = log();
+    let log = log();
     log.info("Given a Ready UiState updated with 75 hp out of 100 max");
     let mut s = UiState::<Unloaded>::new().start_loading().ready();
     s.update_from_game(1, 75, 100, 0, 0);
@@ -100,7 +100,7 @@ fn ui_state_health_percentage_computed_from_fields() {
 proptest! {
     #[test]
     fn ui_state_frame_count_equals_render_call_count(n in 0usize..50) {
-        let mut log = log();
+        let log = log();
         log.info("Given a Ready UiState");
         let mut s = UiState::<Unloaded>::new().start_loading().ready();
 

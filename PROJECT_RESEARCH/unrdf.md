@@ -1,0 +1,268 @@
+# Research Dossier: `unrdf`
+
+**Total Files:** 133 Ontologies (.ttl) | 10 Queries (.rq)
+**Total Volume:** 143 files
+
+## 1. Core Vocabularies (Prefixes)
+- `ao: <http://purl.org/ontology/ao/core#>`
+- `api: <https://example.org/blog-api/ontology#>`
+- `auth: <urn:unrdf:doc:auth:>`
+- `bio: <http://purl.org/vocab/bio/0.1/>`
+- `bldg: <http://example.org/ontology/ies-building#>`
+- `blog: <https://example.org/blog#>`
+- `boroa: <http://example.org/ontology/boro-building-ai#>`
+- `borob: <http://example.org/ontology/boro-building-handcrafted#>`
+- `bos: <https://businessos.dev/>`
+- `bu: <http://example.disney.com/bu#>`
+- `building: <http://ies.data.gov.uk/ontology/ies-building1#>`
+- `cap: <urn:unrdf:doc:capability:>`
+- `cc: <http://web.resource.org/cc/>`
+- `ce: <http://unrdf.org/chatman-equation#>`
+- `ce: <urn:chatman:equation:>`
+- `chatman-cmp: <http://unrdf.org/chatman/comparison/>`
+- `chatman-eq: <http://unrdf.org/chatman/equation/>`
+- `chatman-event: <http://unrdf.org/chatman/event/>`
+- `chatman-rel: <http://unrdf.org/chatman/relationship/>`
+- `chatman: <http://unrdf.org/chatman/>`
+- `chatman: <urn:chatman:>`
+- `cli: <http://unrdf.dev/cli#>`
+- `cli: <urn:unrdf:cli:>`
+- `cost: <urn:unrdf:doc:cost:>`
+- `data: <http://data.gov.uk/testdata#>`
+- `data: <http://example.org/data/>`
+- `dc11: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/terms/>`
+- `dcat: <http://www.w3.org/ns/dcat#>`
+- `dct: <http://purl.org/dc/terms/>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `dctype: <http://purl.org/dc/dcmitype/>`
+- `disney: <http://example.disney.com/canon#>`
+- `doc: <http://unrdf.dev/cli/doc#>`
+- `doc: <urn:unrdf:doc:>`
+- `event: <http://purl.org/NET/c4dm/event.owl#>`
+- `ex: <http://example.com/>`
+- `ex: <http://example.org/>`
+- `ex: <http://example.org/image/>`
+- `ex: <http://example.org/instances#>`
+- `ex: <http://example.org/pizza#>`
+- `ex: <http://example.org/schema#>`
+- `ex: <http://example.org/stub#>`
+- `ex: <http://example.org/test#>`
+- `ex: <https://w3id.org/naph/example/ingest/>`
+- `ex: <urn:chatman:examples:>`
+- `ex: <urn:unrdf:doc:example:>`
+- `fibo-be: <https://spec.edmcouncil.org/fibo/ontology/BE/>`
+- `fibo-fbc: <https://spec.edmcouncil.org/fibo/ontology/FBC/>`
+- *...and 80 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:American`
+- `:AmericanHot`
+- `:Americana`
+- `:AnchoviesTopping`
+- `:AnchovyTopping`
+- `:ArtichokeTopping`
+- `:AsparagusTopping`
+- `:Cajun`
+- `:CajunSpiceTopping`
+- `:CaperTopping`
+- `:Capricciosa`
+- `:Caprina`
+- `:CheeseTopping`
+- `:CheeseyPizza`
+- `:CheeseyVegetableTopping`
+- `:ChickenTopping`
+- `:Country`
+- `:DeepPanBase`
+- `:DomainConcept`
+- `:Fiorentina`
+- `:FishTopping`
+- `:Food`
+- `:FourCheesesTopping`
+- `:FourSeasons`
+- `:FruitTopping`
+- `:FruttiDiMare`
+- `:GarlicTopping`
+- `:Giardiniera`
+- `:GoatsCheeseTopping`
+- `:GorgonzolaTopping`
+- `:GreenPepperTopping`
+- `:HamTopping`
+- `:HerbSpiceTopping`
+- `:Hot`
+- `:HotGreenPepperTopping`
+- `:HotSpicedBeefTopping`
+- `:IceCream`
+- `:InterestingPizza`
+- `:JalapenoPepperTopping`
+- `:LaReine`
+- `:LeekTopping`
+- `:Margherita`
+- `:MeatTopping`
+- `:MeatyPizza`
+- `:Medium`
+- `:Mild`
+- `:MixedSeafoodTopping`
+- `:MozzarellaTopping`
+- `:Mushroom`
+- `:MushroomTopping`
+- *...and 1602 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'ASK': 2, 'SELECT': 2, 'CONSTRUCT': 6}
+
+### Projected Variables (SELECT ?var)
+This project actively projects the following variables into code/templates:
+> `?amount`, `?currency`, `?initiator`, `?label`, `?recipient`, `?subclass`, `?timestamp`, `?transaction`
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/unrdf/docs/archive/legacy-pre-2030/smoke-test/data.ttl` (652 bytes)
+- `/Users/sac/unrdf/docs/archive/legacy-pre-2030/stubs.ttl` (583 bytes)
+- `/Users/sac/unrdf/docs/ontology/minimal-n3-routing.ttl` (12341 bytes)
+- `/Users/sac/unrdf/docs/schema/documentation-ontology.ttl` (48482 bytes)
+- `/Users/sac/unrdf/docs/schema/examples.ttl` (39497 bytes)
+- `/Users/sac/unrdf/docs/schema/shacl-validation.ttl` (40311 bytes)
+- `/Users/sac/unrdf/examples/hooks/financial/large-transaction.select.rq` (1222 bytes)
+- `/Users/sac/unrdf/examples/hooks/parliamentary/motion-compliance.ask.rq` (875 bytes)
+- `/Users/sac/unrdf/examples/hooks/quality/data-quality.shacl.ttl` (2140 bytes)
+- `/Users/sac/unrdf/examples/openapi/ontology/blog-api.ttl` (2777 bytes)
+- `/Users/sac/unrdf/examples/rdf-kgn/data/sample-data.ttl` (858 bytes)
+- `/Users/sac/unrdf/examples/rdf-kgn/data/sample-ontology.ttl` (1194 bytes)
+- `/Users/sac/unrdf/examples/rdf-kgn/data/sample-shapes.ttl` (1609 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/benchmark_deal.ttl` (5600 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/case-study_deal.ttl` (5610 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/documentation_deal.ttl` (5644 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/mcp-participant-surface_deal.ttl` (5752 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/ontology_deal.ttl` (5589 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/package_deal.ttl` (5578 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/receipt_deal.ttl` (5578 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/release-artifact_deal.ttl` (5676 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/repository_deal.ttl` (5611 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/schema_deal.ttl` (5567 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/semantic-convention_deal.ttl` (5709 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/source-code_deal.ttl` (5621 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/telemetry-mapping_deal.ttl` (5687 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/validation-artifact_deal.ttl` (5709 bytes)
+- `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/workflow-model_deal.ttl` (5654 bytes)
+- `/Users/sac/unrdf/hooks/health-check.ask.rq` (196 bytes)
+- `/Users/sac/unrdf/ontologies/disney-governed-universe.ttl` (14631 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/assessment.ttl` (1686 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/characteristics-and-measures.ttl` (804 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/communication.ttl` (1330 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/event-linkages.ttl` (795 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/event-participation.ttl` (1879 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/events.ttl` (782 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/hospital.ttl` (3329 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/identifiers.ttl` (1045 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/invalid-PersonState.ttl` (272 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/movement.ttl` (1930 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/period-of-time.ttl` (703 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/pizza-shapes.ttl` (651 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/relationships.ttl` (597 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/sometimes.ttl` (791 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/types.ttl` (686 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/valid-PersonState.ttl` (431 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/data/when-and-where.ttl` (948 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/epc/iris-building.ttl` (106926 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/generated/boro-building-ai.ttl` (9973 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/generated/ies-building-extension.ttl` (229037 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/generated/pizza-ai.ttl` (35950 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/gvr/iteration1.ttl` (4668 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/gvr/iteration2.ttl` (9950 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/mushroom/mushroom-ontology.ttl` (10022 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/oaei/data/anatomy/human.ttl` (3139435 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/oaei/data/anatomy/mouse.ttl` (1321538 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/era.ttl` (559401 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/foaf.ttl` (22344 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/goodrelations.ttl` (122345 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/gufo.ttl` (102706 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/movie.ttl` (13033 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/music.ttl` (99045 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/nordstream.ttl` (29032 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/pizza.ttl` (51874 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/saref.ttl` (95899 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/ontoaxiom/data/ontoaxiom/ontologies/time.ttl` (107037 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/reference/BirthStateShape.shacl.ttl` (405 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/reference/PersonState.shacl.ttl` (1596 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/reference/boro-building-handcrafted.ttl` (29957 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/reference/ies-core.ttl` (86908 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/reference/ies-top.ttl` (19649 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/reference/ies4.ttl` (249174 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_1.ttl` (17735 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_10.ttl` (9549 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_2.ttl` (9205 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_3.ttl` (14595 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_4.ttl` (11677 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_5.ttl` (12797 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_6.ttl` (6144 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_7.ttl` (13555 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_8.ttl` (11374 bytes)
+- `/Users/sac/unrdf/open-ontologies/benchmark/vision/dataset/img_9.ttl` (6559 bytes)
+- `/Users/sac/unrdf/open-ontologies/case-studies/heritage-aerial/deliverables/07-templates/rights-statement-template.ttl` (7303 bytes)
+- `/Users/sac/unrdf/open-ontologies/case-studies/heritage-aerial/ontology/naph-core.ttl` (14024 bytes)
+- `/Users/sac/unrdf/open-ontologies/case-studies/heritage-aerial/ontology/naph-shapes.ttl` (6832 bytes)
+- `/Users/sac/unrdf/open-ontologies/case-studies/heritage-aerial/pipeline/generated-from-csv.ttl` (17276 bytes)
+- `/Users/sac/unrdf/open-ontologies/case-studies/heritage-aerial/registry/compliance-declaration-template.ttl` (4562 bytes)
+- `/Users/sac/unrdf/open-ontologies/case-studies/heritage-aerial/registry/registry-shapes.ttl` (4973 bytes)
+- `/Users/sac/unrdf/open-ontologies/tests/data/sample.ttl` (854 bytes)
+- `/Users/sac/unrdf/open-ontologies/tests/test_ontology.ttl` (291 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/data/achievements.ttl` (13360 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/data/lineage.ttl` (12989 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/examples/turtle/ontology.ttl` (2396 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/examples/turtle/shapes.ttl` (727 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/ontology/chatman.ttl` (21648 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/ontology/examples.ttl` (15518 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/ontology/shapes.ttl` (13196 bytes)
+- `/Users/sac/unrdf/packages/chatman-equation/shapes/chatman-shapes.ttl` (11278 bytes)
+- `/Users/sac/unrdf/packages/cli/examples/sync/ontology/schema.ttl` (2841 bytes)
+- `/Users/sac/unrdf/packages/cli/examples/sync/schema.ttl` (7454 bytes)
+- `/Users/sac/unrdf/packages/cli/ontology/cli-vocabulary.ttl` (3945 bytes)
+- `/Users/sac/unrdf/packages/cli/test-data-cli-1766303513888-0bbdg8463e1f/graph1.ttl` (57 bytes)
+- `/Users/sac/unrdf/packages/cli/test-data-cli-1766303513888-0bbdg8463e1f/graph2.ttl` (57 bytes)
+- `/Users/sac/unrdf/packages/cli/test/fixtures/person.ttl` (588 bytes)
+- `/Users/sac/unrdf/packages/core/src/ontologies/unfs-ontology.ttl` (2991 bytes)
+- `/Users/sac/unrdf/packages/core/src/ontologies/unmetric-ontology.ttl` (3179 bytes)
+- `/Users/sac/unrdf/packages/core/src/ontologies/unproj-ontology.ttl` (5266 bytes)
+- `/Users/sac/unrdf/packages/daemon/src/mcp/cli-commands.ttl` (26687 bytes)
+- `/Users/sac/unrdf/packages/kgc-probe/examples/example-output.ttl` (7893 bytes)
+- `/Users/sac/unrdf/packages/kgc-probe/final-test/observations.ttl` (703 bytes)
+- `/Users/sac/unrdf/packages/kgc-probe/src/vocabulary.ttl` (7169 bytes)
+- `/Users/sac/unrdf/packages/kgc-probe/test-output/observations.ttl` (703 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/ontology/powl.ttl` (1913 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/pictl-ontology.ttl` (8428 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/pictl-shapes.ttl` (3905 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/sparql-proofs/conformance-check.rq` (2433 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/sparql-proofs/detect-drift.rq` (4549 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/sparql-proofs/discover-dfg.rq` (2250 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/sparql-proofs/ml-classify.rq` (6113 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/sparql-proofs/ocel-load.rq` (5452 bytes)
+- `/Users/sac/unrdf/packages/wasm4pm/semconv/sparql-proofs/predict-activity.rq` (4637 bytes)
+- `/Users/sac/unrdf/pizza.ttl` (1368 bytes)
+- `/Users/sac/unrdf/playground/ontologies/examples.ttl` (24195 bytes)
+- `/Users/sac/unrdf/playground/ontologies/papers-thesis.ttl` (32199 bytes)
+- `/Users/sac/unrdf/playground/ontologies/playground-shapes.ttl` (1855 bytes)
+- `/Users/sac/unrdf/playground/ontologies/playground.ttl` (2467 bytes)
+- `/Users/sac/unrdf/query.rq` (197 bytes)
+- `/Users/sac/unrdf/schema/domain.ttl` (9123 bytes)
+- `/Users/sac/unrdf/schema/packages-discovered.ttl` (24864 bytes)
+- `/Users/sac/unrdf/schema/project-structure.ttl` (8265 bytes)
+- `/Users/sac/unrdf/schemas/unrdf-packages.ttl` (45331 bytes)
+- `/Users/sac/unrdf/src/ontologies/unfs-ontology.ttl` (2991 bytes)
+- `/Users/sac/unrdf/src/ontologies/unproj-ontology.ttl` (5266 bytes)
+- `/Users/sac/unrdf/test-data/persons.ttl` (467 bytes)
+- `/Users/sac/unrdf/test-data/rules.ttl` (221 bytes)
+- `/Users/sac/unrdf/test-data/shapes.ttl` (591 bytes)
+- `/Users/sac/unrdf/test-governance-cli/ontologies/registry.ttl` (1190 bytes)
+- `/Users/sac/unrdf/test-governance-cli/overlays/bu/invalid.delta.ttl` (743 bytes)
+- `/Users/sac/unrdf/test-governance-cli/overlays/bu/studios.delta.ttl` (1041 bytes)
+- `/Users/sac/unrdf/test-governance-cli/policies/system-policy.ttl` (1548 bytes)
+- `/Users/sac/unrdf/test/fixtures/test-universe.ttl` (1877 bytes)
+- `/Users/sac/unrdf/tools/test-detailed.ttl` (123 bytes)
+- `/Users/sac/unrdf/tools/test-warnings.ttl` (93 bytes)
+
+</details>

@@ -135,3 +135,50 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, context: &str) -> Observation {
+        Observation {
+            file_path: "ggen.toml".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "ggen_smell".into(),
+            construct: construct.into(), context: context.into(),
+            message: format!("{construct} in {context}"),
+        }
+    }
+
+    #[test]
+    fn empty_obs_returns_no_diags() {
+        assert!(evaluate(&[]).is_empty());
+    }
+
+    #[test]
+    fn template_var_mismatch_triggers_tpl_001() {
+        let diags = evaluate(&[obs("ggen_template_var_mismatch", "my.tera")]);
+        assert_eq!(diags[0].code, "GGEN-TPL-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn layer_violation_triggers_yield_001() {
+        let diags = evaluate(&[obs("ggen_layer_violation", "pack_root/out.rs")]);
+        assert_eq!(diags[0].code, "GGEN-YIELD-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn competing_authority_triggers_yield_004() {
+        let diags = evaluate(&[obs("ggen_competing_authority", "other.toml")]);
+        assert_eq!(diags[0].code, "GGEN-YIELD-004");
+    }
+
+    #[test]
+    fn unknown_construct_produces_no_diag() {
+        let diags = evaluate(&[obs("not_a_real_construct", "")]);
+        assert!(diags.is_empty());
+    }
+}

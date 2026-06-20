@@ -1,0 +1,1700 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+@prefix gundam: <https://rocket-craft.io/ontology/ue4/gundam#> .
+
+<https://rocket-craft.io/ontology/ue4/>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Core C++ Backbone Ontology" ;
+    rdfs:comment "Ontology representing the core C++ class hierarchy and basic spatial relationships in Unreal Engine 4." ;
+    owl:versionInfo "0.1.0" ;
+    owl:imports <https://rocket-craft.io/ontology/ue4/reflection#> ,
+                <https://rocket-craft.io/ontology/ue4/blueprints#> ,
+                <https://rocket-craft.io/ontology/ue4/subsystems#> ,
+                <https://rocket-craft.io/ontology/ue4/typestates#> .
+
+# =========================================================================
+# Core C++ Classes
+# =========================================================================
+
+ue4:UObject a owl:Class ;
+    rdfs:label "UObject" ;
+    rdfs:comment "The base class for all objects in Unreal Engine, providing core features like reflection, serialization, garbage collection, and metadata." .
+
+ue4:AActor a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "AActor" ;
+    rdfs:comment "The base class for all object actors that can be placed or spawned in an Unreal Engine level or world." .
+
+ue4:APawn a owl:Class ;
+    rdfs:subClassOf ue4:AActor ;
+    rdfs:label "APawn" ;
+    rdfs:comment "A Pawn is an actor that can be possessed by a Controller (PlayerController or AIController) to receive input actuation and interact with the world." .
+
+ue4:ACharacter a owl:Class ;
+    rdfs:subClassOf ue4:APawn ;
+    rdfs:label "ACharacter" ;
+    rdfs:comment "A Character is a specialized Pawn that includes support for basic walking/running/jumping movement, collision handling, and skeletal mesh rendering." .
+
+ue4:UActorComponent a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UActorComponent" ;
+    rdfs:comment "The base class for components that can be attached to actors to add modular gameplay behaviors, rendering properties, or physics logic." .
+
+ue4:USceneComponent a owl:Class ;
+    rdfs:subClassOf ue4:UActorComponent ;
+    rdfs:label "USceneComponent" ;
+    rdfs:comment "A SceneComponent has a transform and supports attachment, representing a component with physical or spatial presence." .
+
+ue4:UWorld a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UWorld" ;
+    rdfs:comment "A representation of a world containing a persistent level, streaming levels, and a collection of spawned actors." .
+
+ue4:ULevel a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "ULevel" ;
+    rdfs:comment "A collection of actors situated in a level that can be loaded/unloaded or hidden/shown dynamically." .
+
+# =========================================================================
+# Core Relationships / Properties
+# =========================================================================
+
+ue4:hasComponent a owl:ObjectProperty ;
+    rdfs:label "hasComponent" ;
+    rdfs:comment "Relates an actor to one of its components." ;
+    rdfs:domain ue4:AActor ;
+    rdfs:range ue4:UActorComponent .
+
+ue4:hasRootComponent a owl:ObjectProperty ;
+    rdfs:label "hasRootComponent" ;
+    rdfs:comment "Relates an actor to its root scene component which defines its transform." ;
+    rdfs:domain ue4:AActor ;
+    rdfs:range ue4:USceneComponent ;
+    rdfs:subPropertyOf ue4:hasComponent .
+
+ue4:isComponentOf a owl:ObjectProperty ;
+    rdfs:label "isComponentOf" ;
+    rdfs:comment "Relates a component to the actor it belongs to." ;
+    rdfs:domain ue4:UActorComponent ;
+    rdfs:range ue4:AActor ;
+    owl:inverseOf ue4:hasComponent .
+
+ue4:owner a owl:ObjectProperty ;
+    rdfs:label "owner" ;
+    rdfs:comment "Alias or inverse relationship relating a component/object to its owner actor." ;
+    rdfs:domain ue4:UActorComponent ;
+    rdfs:range ue4:AActor ;
+    owl:inverseOf ue4:hasComponent .
+
+ue4:hasLevel a owl:ObjectProperty ;
+    rdfs:label "hasLevel" ;
+    rdfs:comment "Relates a world to a level within it." ;
+    rdfs:domain ue4:UWorld ;
+    rdfs:range ue4:ULevel .
+
+ue4:isLevelOf a owl:ObjectProperty ;
+    rdfs:label "isLevelOf" ;
+    rdfs:comment "Relates a level to the world it belongs to." ;
+    rdfs:domain ue4:ULevel ;
+    rdfs:range ue4:UWorld ;
+    owl:inverseOf ue4:hasLevel .
+
+ue4:persistentLevel a owl:ObjectProperty ;
+    rdfs:label "persistentLevel" ;
+    rdfs:comment "Relates a world to its persistent main level." ;
+    rdfs:domain ue4:UWorld ;
+    rdfs:range ue4:ULevel ;
+    rdfs:subPropertyOf ue4:hasLevel .
+
+ue4:hasActor a owl:ObjectProperty ;
+    rdfs:label "hasActor" ;
+    rdfs:comment "Relates a level to an actor present in it." ;
+    rdfs:domain ue4:ULevel ;
+    rdfs:range ue4:AActor .
+
+ue4:bReplicates a owl:DatatypeProperty ;
+    rdfs:label "bReplicates" ;
+    rdfs:comment "Indicates whether this Actor or Component replicates its state over the network." ;
+    rdfs:range xsd:boolean .
+
+ue4:bIsActive a owl:DatatypeProperty ;
+    rdfs:label "bIsActive" ;
+    rdfs:comment "Indicates whether this component is currently active and updating." ;
+    rdfs:range xsd:boolean .
+
+ue4:bHidden a owl:DatatypeProperty ;
+    rdfs:label "bHidden" ;
+    rdfs:comment "Indicates whether this actor or component is hidden in the game/world." ;
+    rdfs:range xsd:boolean .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+@prefix gundam: <https://rocket-craft.io/ontology/ue4/gundam#> .
+
+<https://rocket-craft.io/ontology/ue4/gundam#>
+    a owl:Ontology ;
+    rdfs:label "Gundam Player Character Scenario Ontology" ;
+    rdfs:comment "Ontology defining the Gundam player character scenario and graph connections." .
+
+# =========================================================================
+# Gundam Classes & Component Classes
+# =========================================================================
+
+gundam:AGundamCharacter a owl:Class ;
+    rdfs:subClassOf ue4:ACharacter ;
+    rdfs:label "AGundamCharacter" ;
+    rdfs:comment "A specialized character subclass representing a Gundam mobile suit." .
+
+ue4:USkeletalMeshComponent a owl:Class ;
+    rdfs:subClassOf ue4:USceneComponent ;
+    rdfs:label "USkeletalMeshComponent" ;
+    rdfs:comment "Skeletal mesh rendering component." .
+
+ue4:UBoxComponent a owl:Class ;
+    rdfs:subClassOf ue4:USceneComponent ;
+    rdfs:label "UBoxComponent" ;
+    rdfs:comment "Box collision physics component." .
+
+# =========================================================================
+# Gundam Character & Components Instances
+# =========================================================================
+
+gundam:MyGundam a gundam:AGundamCharacter ;
+    rdfs:label "MyGundam" ;
+    rdfs:comment "The primary Gundam player character instance." ;
+    ue4:hasComponent gundam:GundamMesh ;
+    ue4:hasComponent gundam:GundamCollision ;
+    ue4:hasGraph gundam:GundamInputGraph ;
+    ue4:bReplicates true ;
+    ue4:hasCookingState gundam:Cooked .
+
+gundam:GundamMesh a ue4:USkeletalMeshComponent ;
+    rdfs:label "GundamMesh" ;
+    rdfs:comment "Skeletal mesh rendering component for the Gundam." ;
+    ue4:owner gundam:MyGundam .
+
+gundam:GundamCollision a ue4:UBoxComponent ;
+    rdfs:label "GundamCollision" ;
+    rdfs:comment "Collision bounding box for physical interaction." ;
+    ue4:owner gundam:MyGundam .
+
+# =========================================================================
+# Subsystem Handler
+# =========================================================================
+
+gundam:GundamNetworkingHandler a ue4:UNetworkingSubsystem ;
+    rdfs:label "GundamNetworkingHandler" ;
+    rdfs:comment "Networking subsystem handler for character replication." .
+
+# =========================================================================
+# Typestates
+# =========================================================================
+
+gundam:Cooked a ue4:CookingTypestate ;
+    rdfs:label "Cooked" ;
+    rdfs:comment "Asset cooking state: Cooked." .
+
+gundam:WasmReady a ue4:WasmPackagingTypestate ;
+    rdfs:label "WasmReady" ;
+    rdfs:comment "Wasm packaging state: WasmReady." .
+
+# =========================================================================
+# World & Level Configuration
+# =========================================================================
+
+gundam:GundamWorld a ue4:UWorld ;
+    rdfs:label "GundamWorld" ;
+    rdfs:comment "Persistent world container." ;
+    ue4:hasLevel gundam:GundamLevel ;
+    ue4:hasPackagingState gundam:WasmReady .
+
+gundam:GundamLevel a ue4:ULevel ;
+    rdfs:label "GundamLevel" ;
+    rdfs:comment "Persistent level containing the Gundam character." ;
+    ue4:hasActor gundam:MyGundam ;
+    ue4:isLevelOf gundam:GundamWorld .
+
+# =========================================================================
+# C++ Reflection: Function Definitions
+# =========================================================================
+
+ue4:AddMovementInput a ue4:UFunction ;
+    rdfs:label "AddMovementInput" ;
+    rdfs:comment "Adds movement input vector along a world direction." ;
+    ue4:hasParameter ue4:WorldDirectionParam ;
+    ue4:hasParameter ue4:ScaleValueParam .
+
+ue4:WorldDirectionParam a ue4:UFunctionParameter ;
+    rdfs:label "WorldDirectionParam" ;
+    rdfs:comment "The direction vector parameter." ;
+    ue4:parameterOf ue4:AddMovementInput ;
+    ue4:parameterDirection ue4:Input ;
+    ue4:parameterIndex 0 .
+
+ue4:ScaleValueParam a ue4:UFunctionParameter ;
+    rdfs:label "ScaleValueParam" ;
+    rdfs:comment "The scale multiplier parameter." ;
+    ue4:parameterOf ue4:AddMovementInput ;
+    ue4:parameterDirection ue4:Input ;
+    ue4:parameterIndex 1 .
+
+# =========================================================================
+# Blueprint Graph & Node Network
+# =========================================================================
+
+gundam:GundamInputGraph a ue4:UEdGraph ;
+    rdfs:label "GundamInputGraph" ;
+    rdfs:comment "Blueprint graph handling input events for the Gundam character." ;
+    ue4:hasNode gundam:W_KeyPressedNode ;
+    ue4:hasNode gundam:MoveForwardCallNode .
+
+gundam:W_KeyPressedNode a ue4:UK2Node_InputKeyEvent ;
+    rdfs:label "W_KeyPressedNode" ;
+    rdfs:comment "Keyboard input event for W key." ;
+    ue4:nodeOf gundam:GundamInputGraph ;
+    ue4:hasPin gundam:W_KeyPressedPinOut .
+
+gundam:MoveForwardCallNode a ue4:UK2Node_CallFunction ;
+    rdfs:label "MoveForwardCallNode" ;
+    rdfs:comment "Function call node invoking AddMovementInput." ;
+    ue4:nodeOf gundam:GundamInputGraph ;
+    ue4:callsFunction ue4:AddMovementInput ;
+    ue4:hasPin gundam:MoveForwardPinIn ;
+    ue4:hasPin gundam:MoveForwardDirPin ;
+    ue4:hasPin gundam:MoveForwardScalePin .
+
+# Pins for Key Pressed Node
+gundam:W_KeyPressedPinOut a ue4:UEdGraphPin ;
+    rdfs:label "W_KeyPressedPinOut" ;
+    rdfs:comment "Pressed execution flow output." ;
+    ue4:pinOf gundam:W_KeyPressedNode ;
+    ue4:pinDirection ue4:Output ;
+    ue4:pinCategory "exec" ;
+    ue4:connectedTo gundam:MoveForwardPinIn .
+
+# Pins for AddMovementInput Call Node
+gundam:MoveForwardPinIn a ue4:UEdGraphPin ;
+    rdfs:label "MoveForwardPinIn" ;
+    rdfs:comment "Input execution pin to execute function." ;
+    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinDirection ue4:Input ;
+    ue4:pinCategory "exec" ;
+    ue4:connectedTo gundam:W_KeyPressedPinOut .
+
+gundam:MoveForwardDirPin a ue4:UEdGraphPin ;
+    rdfs:label "MoveForwardDirPin" ;
+    rdfs:comment "Input data pin for world direction." ;
+    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinDirection ue4:Input ;
+    ue4:pinCategory "struct" ;
+    ue4:mapsToParameter ue4:WorldDirectionParam .
+
+gundam:MoveForwardScalePin a ue4:UEdGraphPin ;
+    rdfs:label "MoveForwardScalePin" ;
+    rdfs:comment "Input data pin for scale value." ;
+    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinDirection ue4:Input ;
+    ue4:pinCategory "float" ;
+    ue4:mapsToParameter ue4:ScaleValueParam .
+
+gundam:MyCollisionComponent a ue4:UBoxComponent ;
+    rdfs:label "MyCollisionComponent" ;
+    ue4:hasRigidBody gundam:MyRigidBody ;
+    ue4:collisionEnabled ue4:NoCollision .
+
+gundam:MyRigidBody a ue4:URigidBody ;
+    rdfs:label "MyRigidBody" ;
+    ue4:physicsType ue4:PhysType_Simulated ;
+    ue4:bEnableGravity true ;
+    ue4:massKg 10.0 .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/blueprints#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Blueprint Graphs Ontology" ;
+    rdfs:comment "Ontology representing Blueprint execution graphs and node networks." .
+
+# =========================================================================
+# Blueprint Core Classes
+# =========================================================================
+
+ue4:UBlueprint a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UBlueprint" ;
+    rdfs:comment "A class that represents a Blueprint asset, containing graphs, variables, and compiled class metadata." .
+
+ue4:UEdGraph a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraph" ;
+    rdfs:comment "Graph of nodes representing Blueprint logic or configuration graphs." .
+
+ue4:UEdGraphNode a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraphNode" ;
+    rdfs:comment "Base class for all nodes in an editor graph." .
+
+ue4:UEdGraphPin a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UEdGraphPin" ;
+    rdfs:comment "Represents a connection pin on a UEdGraphNode." .
+
+ue4:UK2Node a owl:Class ;
+    rdfs:subClassOf ue4:UEdGraphNode ;
+    rdfs:label "UK2Node" ;
+    rdfs:comment "A node representing Kismet (Blueprint) execution logic." .
+
+# =========================================================================
+# Common UK2Node Subclasses
+# =========================================================================
+
+ue4:UK2Node_Event a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Event" ;
+    rdfs:comment "Blueprint node representing an event entry point (e.g. BeginPlay, Tick)." .
+
+ue4:UK2Node_CustomEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Event ;
+    rdfs:label "UK2Node_CustomEvent" ;
+    rdfs:comment "Blueprint node representing a user-defined custom event entry point." .
+
+ue4:UK2Node_CallFunction a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_CallFunction" ;
+    rdfs:comment "Blueprint node that invokes a callable C++ or Blueprint function." .
+
+ue4:UK2Node_CommutativeAssociativeBinaryOperator a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_CallFunction ;
+    rdfs:label "UK2Node_CommutativeAssociativeBinaryOperator" ;
+    rdfs:comment "Blueprint node for commutative math operations (e.g. Addition, Multiplication) supporting variable input counts." .
+
+ue4:UK2Node_Variable a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Variable" ;
+    rdfs:comment "Base Blueprint node for accessing member variables (getters and setters)." .
+
+ue4:UK2Node_VariableGet a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Variable ;
+    rdfs:label "UK2Node_VariableGet" ;
+    rdfs:comment "Blueprint node representing a variable read operation (getter)." .
+
+ue4:UK2Node_VariableSet a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Variable ;
+    rdfs:label "UK2Node_VariableSet" ;
+    rdfs:comment "Blueprint node representing a variable write operation (setter)." .
+
+ue4:UK2Node_ExecutionSequence a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_ExecutionSequence" ;
+    rdfs:comment "Blueprint node that triggers connected output execution pins sequentially." .
+
+ue4:UK2Node_IfThenElse a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_IfThenElse" ;
+    rdfs:comment "Blueprint node representing a conditional branch (If/Then/Else)." .
+
+ue4:UK2Node_DynamicCast a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_DynamicCast" ;
+    rdfs:comment "Blueprint node that attempts to cast an object reference to a specific type." .
+
+ue4:UK2Node_Literal a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Literal" ;
+    rdfs:comment "Blueprint node representing a hardcoded literal value (e.g. Integer, Float, String)." .
+
+ue4:UK2Node_InputKeyEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_InputKeyEvent" ;
+    rdfs:comment "Blueprint node representing keyboard key pressed/released events." .
+
+ue4:UK2Node_InputAction a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_InputAction" ;
+    rdfs:comment "Blueprint node representing a mapped input action execution sequence." .
+
+ue4:UK2Node_InputAxisEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_InputAxisEvent" ;
+    rdfs:comment "Blueprint node representing a continuous axis input event (providing a float AxisValue)." .
+
+ue4:UK2Node_Knot a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Knot" ;
+    rdfs:comment "Blueprint node representing a reroute node." .
+
+ue4:UK2Node_Select a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Select" ;
+    rdfs:comment "Blueprint node representing a select node." .
+
+ue4:UK2Node_MacroInstance a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_MacroInstance" ;
+    rdfs:comment "Blueprint node representing an instance of a macro." .
+
+ue4:UK2Node_Composite a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Composite" ;
+    rdfs:comment "Blueprint node representing a composite/collapsed graph of nodes." .
+
+ue4:UK2Node_Timeline a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_Timeline" ;
+    rdfs:comment "Blueprint node representing a timeline for controlling animations or values over time." .
+
+ue4:UK2Node_SpawnActorFromClass a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_SpawnActorFromClass" ;
+    rdfs:comment "Blueprint node for spawning an actor of a specified class." .
+
+ue4:UK2Node_ConstructObjectFromClass a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_ConstructObjectFromClass" ;
+    rdfs:comment "Blueprint node for constructing an object of a specified class." .
+
+ue4:UK2Node_FunctionEntry a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_FunctionEntry" ;
+    rdfs:comment "Blueprint node representing the entry point of a function." .
+
+ue4:UK2Node_FunctionResult a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_FunctionResult" ;
+    rdfs:comment "Blueprint node representing the return point/results of a function." .
+
+ue4:UK2Node_ComponentBoundEvent a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node_Event ;
+    rdfs:label "UK2Node_ComponentBoundEvent" ;
+    rdfs:comment "Blueprint node representing an event bound to a component delegate." .
+
+ue4:UK2Node_AddDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_AddDelegate" ;
+    rdfs:comment "Blueprint node representing binding/adding a delegate." .
+
+ue4:UK2Node_RemoveDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_RemoveDelegate" ;
+    rdfs:comment "Blueprint node representing unbinding/removing a delegate." .
+
+ue4:UK2Node_ClearDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_ClearDelegate" ;
+    rdfs:comment "Blueprint node representing clearing all bound delegates." .
+
+ue4:UK2Node_AssignDelegate a owl:Class ;
+    rdfs:subClassOf ue4:UK2Node ;
+    rdfs:label "UK2Node_AssignDelegate" ;
+    rdfs:comment "Blueprint node representing assigning/binding a delegate." .
+
+
+# =========================================================================
+# Graph & Node Topology Relationships / Properties
+# =========================================================================
+
+ue4:hasGraph a owl:ObjectProperty ;
+    rdfs:label "hasGraph" ;
+    rdfs:comment "Relates an asset or object (like a Blueprint) to a graph it contains." ;
+    rdfs:domain ue4:UObject ;
+    rdfs:range ue4:UEdGraph .
+
+ue4:hasNode a owl:ObjectProperty ;
+    rdfs:label "hasNode" ;
+    rdfs:comment "Relates a graph to a node contained within it." ;
+    rdfs:domain ue4:UEdGraph ;
+    rdfs:range ue4:UEdGraphNode .
+
+ue4:nodeOf a owl:ObjectProperty ;
+    rdfs:label "nodeOf" ;
+    rdfs:comment "Relates a node to the UEdGraph containing it." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UEdGraph ;
+    owl:inverseOf ue4:hasNode .
+
+ue4:hasPin a owl:ObjectProperty ;
+    rdfs:label "hasPin" ;
+    rdfs:comment "Relates an editor graph node to one of its input or output pins." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UEdGraphPin .
+
+ue4:pinOf a owl:ObjectProperty ;
+    rdfs:label "pinOf" ;
+    rdfs:comment "Relates a connection pin to its parent node." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UEdGraphNode ;
+    owl:inverseOf ue4:hasPin .
+
+ue4:linkedTo a owl:ObjectProperty ;
+    rdfs:label "linkedTo" ;
+    rdfs:comment "Relates a graph pin to another pin it is connected to (usually output pin linked to input pin)." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UEdGraphPin ;
+    rdfs:subPropertyOf ue4:connectedTo .
+
+ue4:connectedTo a owl:ObjectProperty , owl:SymmetricProperty ;
+    rdfs:label "connectedTo" ;
+    rdfs:comment "Represents a connection between two pins in a graph." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UEdGraphPin .
+
+ue4:pinTypeObject a owl:ObjectProperty ;
+    rdfs:label "pinTypeObject" ;
+    rdfs:comment "Relates a pin to a reflected class, struct, or enum that defines its type." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UField .
+
+ue4:pinDirection a owl:ObjectProperty ;
+    rdfs:label "pinDirection" ;
+    rdfs:comment "Specifies if a pin is Input or Output." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:PinDirection .
+
+ue4:pinCategory a owl:DatatypeProperty ;
+    rdfs:label "pinCategory" ;
+    rdfs:comment "The general category of data for the pin (e.g. exec, bool, int, float, object)." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:string .
+
+ue4:pinSubCategory a owl:DatatypeProperty ;
+    rdfs:label "pinSubCategory" ;
+    rdfs:comment "The subcategory representing additional type constraints for the pin." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:string .
+
+ue4:pinSubCategoryObject a owl:ObjectProperty ;
+    rdfs:label "pinSubCategoryObject" ;
+    rdfs:comment "For object or struct pins, references the specific class or struct type." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UStruct .
+
+ue4:defaultValue a owl:DatatypeProperty ;
+    rdfs:label "defaultValue" ;
+    rdfs:comment "The default value expression represented as a string for this pin." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:string .
+
+ue4:bIsReference a owl:DatatypeProperty ;
+    rdfs:label "bIsReference" ;
+    rdfs:comment "Indicates whether the pin represents a reference (e.g., passed-by-ref)." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:boolean .
+
+ue4:bIsConst a owl:DatatypeProperty ;
+    rdfs:label "bIsConst" ;
+    rdfs:comment "Indicates whether the pin value is const-qualified." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range xsd:boolean .
+
+ue4:nodePosX a owl:DatatypeProperty ;
+    rdfs:label "nodePosX" ;
+    rdfs:comment "The 2D x-coordinate position of this node in the graph editor." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range xsd:integer .
+
+ue4:nodePosY a owl:DatatypeProperty ;
+    rdfs:label "nodePosY" ;
+    rdfs:comment "The 2D y-coordinate position of this node in the graph editor." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range xsd:integer .
+
+# =========================================================================
+# Unification / Interoperability Relationships
+# =========================================================================
+
+ue4:calledFunction a owl:ObjectProperty ;
+    rdfs:label "calledFunction" ;
+    rdfs:comment "Relates a function call node (UK2Node_CallFunction) or event node to the reflected C++ or Blueprint UFunction metadata it calls." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UFunction .
+
+ue4:callsFunction a owl:ObjectProperty ;
+    rdfs:label "callsFunction" ;
+    rdfs:comment "Links a function call node (UK2Node) to the reflected UFunction signature." ;
+    rdfs:domain ue4:UK2Node ;
+    rdfs:range ue4:UFunction ;
+    rdfs:subPropertyOf ue4:calledFunction .
+
+ue4:mapsToParameter a owl:ObjectProperty ;
+    rdfs:label "mapsToParameter" ;
+    rdfs:comment "Maps an individual node pin to its target function parameter." ;
+    rdfs:domain ue4:UEdGraphPin ;
+    rdfs:range ue4:UFunctionParameter .
+
+ue4:referencedProperty a owl:ObjectProperty ;
+    rdfs:label "referencedProperty" ;
+    rdfs:comment "Relates a variable access node (UK2Node_Variable) to the reflected C++ or Blueprint UProperty metadata it reads/writes." ;
+    rdfs:domain ue4:UEdGraphNode ;
+    rdfs:range ue4:UProperty .
+
+ue4:targetType a owl:ObjectProperty ;
+    rdfs:label "targetType" ;
+    rdfs:comment "Relates a dynamic cast node (UK2Node_DynamicCast) to the reflected class type metadata it attempts to cast to." ;
+    rdfs:domain ue4:UK2Node_DynamicCast ;
+    rdfs:range ue4:UClass .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/subsystems#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Subsystems Ontology" ;
+    rdfs:comment "Ontology representing subsystems, rendering, physics, and networking topologies in Unreal Engine 4." .
+
+# =========================================================================
+# Subsystem Backbone
+# =========================================================================
+
+ue4:USubsystem a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "USubsystem" ;
+    rdfs:comment "Base class for auto-instancing subsystems with managed lifecycles." .
+
+ue4:URenderingSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "URenderingSubsystem" ;
+    rdfs:comment "Subsystem managing rendering-related states, RHI APIs, materials, shaders, and browser-native fallbacks." .
+
+ue4:UPhysicsSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UPhysicsSubsystem" ;
+    rdfs:comment "Subsystem managing physics simulations and constraints." .
+
+ue4:UNetworkingSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UNetworkingSubsystem" ;
+    rdfs:comment "Subsystem managing network communication and replication." .
+
+ue4:UGameInstance a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UGameInstance" ;
+    rdfs:comment "High-level manager object for an instance of the running game." .
+
+ue4:UWorldSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UWorldSubsystem" ;
+    rdfs:comment "Subsystem that is tied to the lifecycle of a UWorld." .
+
+ue4:UGameInstanceSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UGameInstanceSubsystem" ;
+    rdfs:comment "Subsystem that is tied to the lifecycle of a UGameInstance." .
+
+ue4:UEngineSubsystem a owl:Class ;
+    rdfs:subClassOf ue4:USubsystem ;
+    rdfs:label "UEngineSubsystem" ;
+    rdfs:comment "Subsystem that is tied to the lifecycle of the UEngine." .
+
+ue4:hasSubsystemLifecycle a owl:ObjectProperty ;
+    rdfs:label "hasSubsystemLifecycle" ;
+    rdfs:comment "Relates a subsystem to its lifecycle phase." ;
+    rdfs:domain ue4:USubsystem .
+
+ue4:hasSubsystem a owl:ObjectProperty ;
+    rdfs:label "hasSubsystem" ;
+    rdfs:comment "Relates a UWorld or UGameInstance to a USubsystem active within it." ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( ue4:UWorld ue4:UGameInstance )
+    ] ;
+    rdfs:range ue4:USubsystem .
+
+# =========================================================================
+# Rendering: Materials & Parameters
+# =========================================================================
+
+ue4:UMaterialInterface a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UMaterialInterface" ;
+    rdfs:comment "Base class for all materials, including base materials and material instances." .
+
+ue4:UMaterial a owl:Class ;
+    rdfs:subClassOf ue4:UMaterialInterface ;
+    rdfs:label "UMaterial" ;
+    rdfs:comment "A base material asset that defines the shader graph, logic, and default parameter values." .
+
+ue4:UMaterialInstance a owl:Class ;
+    rdfs:subClassOf ue4:UMaterialInterface ;
+    rdfs:label "UMaterialInstance" ;
+    rdfs:comment "An instance of a material that inherits parameters from a parent material and permits parameter overrides." .
+
+ue4:UMaterialInstanceConstant a owl:Class ;
+    rdfs:subClassOf ue4:UMaterialInstance ;
+    rdfs:label "UMaterialInstanceConstant" ;
+    rdfs:comment "A static material instance configured and cooked for optimized runtime use." .
+
+ue4:UMaterialInstanceDynamic a owl:Class ;
+    rdfs:subClassOf ue4:UMaterialInstance ;
+    rdfs:label "UMaterialInstanceDynamic" ;
+    rdfs:comment "A dynamic material instance that can be modified at runtime via Blueprint execution graphs or C++ API calls." .
+
+ue4:parentMaterial a owl:ObjectProperty ;
+    rdfs:label "parentMaterial" ;
+    rdfs:comment "Relates a UMaterialInstance to the parent UMaterialInterface from which it inherits parameters." ;
+    rdfs:domain ue4:UMaterialInstance ;
+    rdfs:range ue4:UMaterialInterface .
+
+ue4:UMaterialParameter a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UMaterialParameter" ;
+    rdfs:comment "Base class representing a parameter definition within a UMaterial." .
+
+ue4:UScalarParameter a owl:Class ;
+    rdfs:subClassOf ue4:UMaterialParameter ;
+    rdfs:label "UScalarParameter" ;
+    rdfs:comment "A scalar (float) parameter definition in a material." .
+
+ue4:UVectorParameter a owl:Class ;
+    rdfs:subClassOf ue4:UMaterialParameter ;
+    rdfs:label "UVectorParameter" ;
+    rdfs:comment "A vector (4D, color/direction) parameter definition in a material." .
+
+ue4:UTextureParameter a owl:Class ;
+    rdfs:subClassOf ue4:UMaterialParameter ;
+    rdfs:label "UTextureParameter" ;
+    rdfs:comment "A texture resource parameter definition in a material." .
+
+ue4:definesParameter a owl:ObjectProperty ;
+    rdfs:label "definesParameter" ;
+    rdfs:comment "Relates a UMaterial to a parameter definition it exposes." ;
+    rdfs:domain ue4:UMaterial ;
+    rdfs:range ue4:UMaterialParameter .
+
+ue4:UMaterialParameterValue a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UMaterialParameterValue" ;
+    rdfs:comment "An assigned or overridden parameter value within a material instance." .
+
+ue4:hasParameterValue a owl:ObjectProperty ;
+    rdfs:label "hasParameterValue" ;
+    rdfs:comment "Relates a material interface to its parameter values or overridden parameter values." ;
+    rdfs:domain ue4:UMaterialInterface ;
+    rdfs:range ue4:UMaterialParameterValue .
+
+ue4:parameterName a owl:DatatypeProperty ;
+    rdfs:label "parameterName" ;
+    rdfs:comment "The string name of the parameter." ;
+    rdfs:domain ue4:UMaterialParameterValue ;
+    rdfs:range xsd:string .
+
+ue4:scalarValue a owl:DatatypeProperty ;
+    rdfs:label "scalarValue" ;
+    rdfs:comment "The floating-point value assigned to a scalar parameter." ;
+    rdfs:domain ue4:UMaterialParameterValue ;
+    rdfs:range xsd:float .
+
+ue4:vectorValue a owl:DatatypeProperty ;
+    rdfs:label "vectorValue" ;
+    rdfs:comment "The string representation of vector components (e.g. '(R=1.0,G=0.0,B=0.0,A=1.0)')." ;
+    rdfs:domain ue4:UMaterialParameterValue ;
+    rdfs:range xsd:string .
+
+ue4:textureValue a owl:ObjectProperty ;
+    rdfs:label "textureValue" ;
+    rdfs:comment "The texture resource associated with a texture parameter value." ;
+    rdfs:domain ue4:UMaterialParameterValue ;
+    rdfs:range ue4:UTexture .
+
+ue4:UTexture a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UTexture" ;
+    rdfs:comment "Base class representing texture resources used in materials and rendering." .
+
+ue4:assignedMaterial a owl:ObjectProperty ;
+    rdfs:label "assignedMaterial" ;
+    rdfs:comment "An object-level relation mapping a scene component to its assigned material asset." ;
+    rdfs:domain ue4:USceneComponent ;
+    rdfs:range ue4:UMaterialInterface .
+
+# =========================================================================
+# Rendering: Shaders & Compilation Maps
+# =========================================================================
+
+ue4:UShaderClass a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UShaderClass" ;
+    rdfs:comment "Represents an engine shader class (e.g. FShader, FMeshMaterialShader) compiled to target platform rendering APIs." .
+
+ue4:UShaderParameter a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UShaderParameter" ;
+    rdfs:comment "An input parameter binding expected by a shader class." .
+
+ue4:EShaderFrequency a owl:Class ;
+    rdfs:label "EShaderFrequency" ;
+    rdfs:comment "Enum representing shader execution frequency stages (Vertex, Pixel, Compute, Hull, Domain, Geometry)." .
+
+ue4:SF_Vertex a ue4:EShaderFrequency ; rdfs:label "SF_Vertex" ; rdfs:comment "Vertex Shader stage." .
+ue4:SF_Pixel a ue4:EShaderFrequency ; rdfs:label "SF_Pixel" ; rdfs:comment "Pixel/Fragment Shader stage." .
+ue4:SF_Compute a ue4:EShaderFrequency ; rdfs:label "SF_Compute" ; rdfs:comment "Compute Shader stage." .
+ue4:SF_Geometry a ue4:EShaderFrequency ; rdfs:label "SF_Geometry" ; rdfs:comment "Geometry Shader stage." .
+ue4:SF_Hull a ue4:EShaderFrequency ; rdfs:label "SF_Hull" ; rdfs:comment "Hull Shader stage." .
+ue4:SF_Domain a ue4:EShaderFrequency ; rdfs:label "SF_Domain" ; rdfs:comment "Domain Shader stage." .
+
+ue4:shaderFrequency a owl:ObjectProperty ;
+    rdfs:label "shaderFrequency" ;
+    rdfs:comment "Relates a UShaderClass to its target shader frequency stage." ;
+    rdfs:domain ue4:UShaderClass ;
+    rdfs:range ue4:EShaderFrequency .
+
+ue4:hasShaderParameter a owl:ObjectProperty ;
+    rdfs:label "hasShaderParameter" ;
+    rdfs:comment "Relates a UShaderClass to a parameter it binds." ;
+    rdfs:domain ue4:UShaderClass ;
+    rdfs:range ue4:UShaderParameter .
+
+ue4:shaderParameterName a owl:DatatypeProperty ;
+    rdfs:label "shaderParameterName" ;
+    rdfs:comment "The low-level hardware or source binding name of the shader parameter." ;
+    rdfs:domain ue4:UShaderParameter ;
+    rdfs:range xsd:string .
+
+ue4:shaderParameterType a owl:DatatypeProperty ;
+    rdfs:label "shaderParameterType" ;
+    rdfs:comment "The data type declaration of the shader parameter (e.g. 'float', 'vec4', 'sampler2D')." ;
+    rdfs:domain ue4:UShaderParameter ;
+    rdfs:range xsd:string .
+
+ue4:compilesToShader a owl:ObjectProperty ;
+    rdfs:label "compilesToShader" ;
+    rdfs:comment "Relates a UMaterial to the shader classes compiled from its node graph." ;
+    rdfs:domain ue4:UMaterial ;
+    rdfs:range ue4:UShaderClass .
+
+# =========================================================================
+# Rendering: WebGL / RHI Fallbacks
+# =========================================================================
+
+ue4:ERenderAPI a owl:Class ;
+    rdfs:label "ERenderAPI" ;
+    rdfs:comment "Enum representing graphics and hardware interface APIs supported by UE4 RHI." .
+
+ue4:RHI_DirectX11 a ue4:ERenderAPI ;
+    rdfs:label "DirectX11" ;
+    rdfs:comment "Microsoft DirectX 11 RHI for high-end Windows targets." .
+
+ue4:RHI_DirectX12 a ue4:ERenderAPI ;
+    rdfs:label "DirectX12" ;
+    rdfs:comment "Microsoft DirectX 12 RHI with low-level hardware control." .
+
+ue4:RHI_Vulkan a ue4:ERenderAPI ;
+    rdfs:label "Vulkan" ;
+    rdfs:comment "Cross-platform Vulkan RHI." .
+
+ue4:RHI_OpenGL_ES3 a ue4:ERenderAPI ;
+    rdfs:label "OpenGL_ES3" ;
+    rdfs:comment "OpenGL ES 3.0 / WebGL 2 RHI targeting mobile and browser-native platforms." .
+
+ue4:RHI_WebGL2 a ue4:ERenderAPI ;
+    rdfs:label "WebGL2" ;
+    rdfs:comment "WebGL 2.0 browser runtime API (typically backed by ES3 shaders)." .
+
+ue4:RHI_WebGL a ue4:ERenderAPI ;
+    rdfs:label "WebGL" ;
+    rdfs:comment "WebGL 1.0 browser runtime API (usually backed by ES2 shaders, representing mobile/legacy fallbacks)." .
+
+ue4:supportsRHI a owl:ObjectProperty ;
+    rdfs:label "supportsRHI" ;
+    rdfs:comment "Relates the URenderingSubsystem to an ERenderAPI it supports under its active build profile." ;
+    rdfs:domain ue4:URenderingSubsystem ;
+    rdfs:range ue4:ERenderAPI .
+
+ue4:primaryRHI a owl:ObjectProperty ;
+    rdfs:label "primaryRHI" ;
+    rdfs:comment "The preferred or primary rendering API used by the subsystem." ;
+    rdfs:domain ue4:URenderingSubsystem ;
+    rdfs:range ue4:ERenderAPI ;
+    rdfs:subPropertyOf ue4:supportsRHI .
+
+ue4:fallbackRHI a owl:ObjectProperty ;
+    rdfs:label "fallbackRHI" ;
+    rdfs:comment "The secondary fallback rendering API if the primary RHI is not supported by the client browser or hardware." ;
+    rdfs:domain ue4:URenderingSubsystem ;
+    rdfs:range ue4:ERenderAPI ;
+    rdfs:subPropertyOf ue4:supportsRHI .
+
+ue4:fallbackTo a owl:ObjectProperty ;
+    rdfs:label "fallbackTo" ;
+    rdfs:comment "Indicates a directed fallback precedence relation from a higher-priority API to a lower-priority RHI fallback." ;
+    rdfs:domain ue4:ERenderAPI ;
+    rdfs:range ue4:ERenderAPI .
+
+# =========================================================================
+# Physics: Collision Volumes
+# =========================================================================
+
+ue4:ECollisionResponse a owl:Class ;
+    rdfs:label "ECollisionResponse" ;
+    rdfs:comment "Enum representing the response to a collision channel." .
+
+ue4:ECR_Ignore a ue4:ECollisionResponse ; rdfs:label "ECR_Ignore" .
+ue4:ECR_Overlap a ue4:ECollisionResponse ; rdfs:label "ECR_Overlap" .
+ue4:ECR_Block a ue4:ECollisionResponse ; rdfs:label "ECR_Block" .
+
+ue4:ECollisionEnabled a owl:Class ;
+    rdfs:label "ECollisionEnabled" ;
+    rdfs:comment "Enum representing what types of collision are enabled." .
+
+ue4:NoCollision a ue4:ECollisionEnabled ; rdfs:label "NoCollision" .
+ue4:QueryOnly a ue4:ECollisionEnabled ; rdfs:label "QueryOnly" .
+ue4:PhysicsOnly a ue4:ECollisionEnabled ; rdfs:label "PhysicsOnly" .
+ue4:QueryAndPhysics a ue4:ECollisionEnabled ; rdfs:label "QueryAndPhysics" .
+
+ue4:ECollisionChannel a owl:Class ;
+    rdfs:label "ECollisionChannel" ;
+    rdfs:comment "Enum representing the collision channel / type." .
+
+# Standard Engine Channels
+ue4:ECC_WorldStatic a ue4:ECollisionChannel ; rdfs:label "ECC_WorldStatic" .
+ue4:ECC_WorldDynamic a ue4:ECollisionChannel ; rdfs:label "ECC_WorldDynamic" .
+ue4:ECC_Pawn a ue4:ECollisionChannel ; rdfs:label "ECC_Pawn" .
+ue4:ECC_Visibility a ue4:ECollisionChannel ; rdfs:label "ECC_Visibility" .
+ue4:ECC_Camera a ue4:ECollisionChannel ; rdfs:label "ECC_Camera" .
+ue4:ECC_PhysicsBody a ue4:ECollisionChannel ; rdfs:label "ECC_PhysicsBody" .
+ue4:ECC_Vehicle a ue4:ECollisionChannel ; rdfs:label "ECC_Vehicle" .
+ue4:ECC_Destructible a ue4:ECollisionChannel ; rdfs:label "ECC_Destructible" .
+
+# --- Reified Channel Mappings ---
+ue4:CollisionChannelResponse a owl:Class ;
+    rdfs:label "CollisionChannelResponse" ;
+    rdfs:comment "A mapping from a specific collision channel to a collision response." .
+
+ue4:hasResponseChannel a owl:ObjectProperty ;
+    rdfs:label "hasResponseChannel" ;
+    rdfs:comment "Specifies the target collision channel." ;
+    rdfs:domain ue4:CollisionChannelResponse ;
+    rdfs:range ue4:ECollisionChannel .
+
+ue4:hasResponseValue a owl:ObjectProperty ;
+    rdfs:label "hasResponseValue" ;
+    rdfs:comment "Specifies the response value (Block, Overlap, Ignore)." ;
+    rdfs:domain ue4:CollisionChannelResponse ;
+    rdfs:range ue4:ECollisionResponse .
+
+# --- Collision Profile ---
+ue4:UCollisionProfile a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UCollisionProfile" ;
+    rdfs:comment "Configuration profile defining collision responses for various channels." .
+
+ue4:profileName a owl:DatatypeProperty ;
+    rdfs:label "profileName" ;
+    rdfs:comment "The string name of the collision profile." ;
+    rdfs:domain ue4:UCollisionProfile ;
+    rdfs:range xsd:string .
+
+ue4:hasChannelResponse a owl:ObjectProperty ;
+    rdfs:label "hasChannelResponse" ;
+    rdfs:comment "Relates a collision profile to individual channel response configurations." ;
+    rdfs:domain ue4:UCollisionProfile ;
+    rdfs:range ue4:CollisionChannelResponse .
+
+# --- Component Association Properties ---
+ue4:hasCollisionProfile a owl:ObjectProperty ;
+    rdfs:label "hasCollisionProfile" ;
+    rdfs:comment "Associates a scene component with a collision profile." ;
+    rdfs:domain ue4:USceneComponent ;
+    rdfs:range ue4:UCollisionProfile .
+
+ue4:collisionEnabled a owl:ObjectProperty ;
+    rdfs:label "collisionEnabled" ;
+    rdfs:comment "Direct override configuration for whether collision is enabled." ;
+    rdfs:domain ue4:USceneComponent ;
+    rdfs:range ue4:ECollisionEnabled .
+
+ue4:collisionObjectType a owl:ObjectProperty ;
+    rdfs:label "collisionObjectType" ;
+    rdfs:comment "Direct override of the collision channel classification for the scene component." ;
+    rdfs:domain ue4:USceneComponent ;
+    rdfs:range ue4:ECollisionChannel .
+
+# --- Physics Subsystem Linkages ---
+ue4:registersCollisionProfile a owl:ObjectProperty ;
+    rdfs:label "registersCollisionProfile" ;
+    rdfs:comment "Relates the physics subsystem to the profiles registered within it." ;
+    rdfs:domain ue4:UPhysicsSubsystem ;
+    rdfs:range ue4:UCollisionProfile .
+
+# =========================================================================
+# Physics: Kinematics
+# =========================================================================
+
+ue4:EPhysicsType a owl:Class ;
+    rdfs:label "EPhysicsType" ;
+    rdfs:comment "Enum representing the kinematic simulation type." .
+
+ue4:PhysType_Default a ue4:EPhysicsType ; rdfs:label "PhysType_Default" .
+ue4:PhysType_Kinematic a ue4:EPhysicsType ; rdfs:label "PhysType_Kinematic" .
+ue4:PhysType_Simulated a ue4:EPhysicsType ; rdfs:label "PhysType_Simulated" .
+
+ue4:EDOFMode a owl:Class ;
+    rdfs:label "EDOFMode" ;
+    rdfs:comment "Enum representing degrees of freedom constraint modes." .
+
+ue4:DOFMode_None a ue4:EDOFMode ; rdfs:label "DOFMode_None" .
+ue4:DOFMode_XYPlane a ue4:EDOFMode ; rdfs:label "DOFMode_XYPlane" .
+ue4:DOFMode_XZPlane a ue4:EDOFMode ; rdfs:label "DOFMode_XZPlane" .
+ue4:DOFMode_YZPlane a ue4:EDOFMode ; rdfs:label "DOFMode_YZPlane" .
+ue4:DOFMode_SixDOF a ue4:EDOFMode ; rdfs:label "DOFMode_SixDOF" .
+
+# --- Rigid Body Instance ---
+ue4:URigidBody a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "URigidBody" ;
+    rdfs:comment "Represents the dynamic physical state, mass, and velocity constraints of a component." .
+
+ue4:hasRigidBody a owl:ObjectProperty ;
+    rdfs:label "hasRigidBody" ;
+    rdfs:comment "Relates a scene component to its rigid body instance configuration." ;
+    rdfs:domain ue4:USceneComponent ;
+    rdfs:range ue4:URigidBody .
+
+ue4:physicsType a owl:ObjectProperty ;
+    rdfs:label "physicsType" ;
+    rdfs:comment "Determines if the rigid body is simulated, kinematic, or uses parent default." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range ue4:EPhysicsType .
+
+ue4:massKg a owl:DatatypeProperty ;
+    rdfs:label "massKg" ;
+    rdfs:comment "The mass of the object in kilograms." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range xsd:float .
+
+ue4:bEnableGravity a owl:DatatypeProperty ;
+    rdfs:label "bEnableGravity" ;
+    rdfs:comment "Indicates whether this body is affected by scene gravity." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range xsd:boolean .
+
+ue4:linearDamping a owl:DatatypeProperty ;
+    rdfs:label "linearDamping" ;
+    rdfs:comment "Linear velocity resistance factor." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range xsd:float .
+
+ue4:angularDamping a owl:DatatypeProperty ;
+    rdfs:label "angularDamping" ;
+    rdfs:comment "Angular velocity resistance factor." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range xsd:float .
+
+ue4:hasDOFMode a owl:ObjectProperty ;
+    rdfs:label "hasDOFMode" ;
+    rdfs:comment "Restricts linear or angular movement to specific plane sets." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range ue4:EDOFMode .
+
+ue4:maxLinearVelocity a owl:DatatypeProperty ;
+    rdfs:label "maxLinearVelocity" ;
+    rdfs:comment "The maximum linear speed threshold." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range xsd:float .
+
+ue4:maxAngularVelocity a owl:DatatypeProperty ;
+    rdfs:label "maxAngularVelocity" ;
+    rdfs:comment "The maximum angular speed threshold." ;
+    rdfs:domain ue4:URigidBody ;
+    rdfs:range xsd:float .
+
+# --- Subsystem Linkage ---
+ue4:tracksRigidBody a owl:ObjectProperty ;
+    rdfs:label "tracksRigidBody" ;
+    rdfs:comment "Relates the physics subsystem to an active rigid body tracking state." ;
+    rdfs:domain ue4:UPhysicsSubsystem ;
+    rdfs:range ue4:URigidBody .
+
+# =========================================================================
+# Networking: Replication
+# =========================================================================
+
+ue4:ELifetimeCondition a owl:Class ;
+    rdfs:subClassOf ue4:UEnum ;
+    rdfs:label "ELifetimeCondition" ;
+    rdfs:comment "Enumeration specifying replication conditions for properties." .
+
+ue4:COND_None a ue4:ELifetimeCondition ;
+    rdfs:label "COND_None" ;
+    rdfs:comment "Default replication condition: replicate to all connections." .
+
+ue4:COND_InitialOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_InitialOnly" ;
+    rdfs:comment "Replicate only on initial connection/creation." .
+
+ue4:COND_OwnerOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_OwnerOnly" ;
+    rdfs:comment "Replicate only to the owner connection." .
+
+ue4:COND_SkipOwner a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SkipOwner" ;
+    rdfs:comment "Replicate to all connections except the owner." .
+
+ue4:COND_SimulatedOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SimulatedOnly" ;
+    rdfs:comment "Replicate only to simulated proxy connections." .
+
+ue4:COND_AutonomousOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_AutonomousOnly" ;
+    rdfs:comment "Replicate only to autonomous proxy connections." .
+
+ue4:COND_SimulatedOrOwner a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SimulatedOrOwner" ;
+    rdfs:comment "Replicate to simulated proxy or owner connection." .
+
+ue4:COND_Custom a ue4:ELifetimeCondition ;
+    rdfs:label "COND_Custom" ;
+    rdfs:comment "Custom replication condition managed by game logic." .
+
+ue4:COND_ReplayOrOwner a ue4:ELifetimeCondition ;
+    rdfs:label "COND_ReplayOrOwner" ;
+    rdfs:comment "Replicate to owner connection or replay stream." .
+
+ue4:COND_ReplayOnly a ue4:ELifetimeCondition ;
+    rdfs:label "COND_ReplayOnly" ;
+    rdfs:comment "Replicate only to replay streams." .
+
+ue4:COND_SimulatedOnlyNoReplay a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SimulatedOnlyNoReplay" ;
+    rdfs:comment "Replicate to simulated proxies but not replays." .
+
+ue4:COND_SkipOwnerNoReplay a ue4:ELifetimeCondition ;
+    rdfs:label "COND_SkipOwnerNoReplay" ;
+    rdfs:comment "Replicate to everyone except owner, excluding replays." .
+
+ue4:COND_Never a ue4:ELifetimeCondition ;
+    rdfs:label "COND_Never" ;
+    rdfs:comment "Never replicate. Used for active overrides." .
+
+ue4:FReplicationLifetime a owl:Class ;
+    rdfs:label "FReplicationLifetime" ;
+    rdfs:comment "Represents a replication registration lifetime entry for a property." .
+
+ue4:replicatedProperty a owl:ObjectProperty ;
+    rdfs:label "replicatedProperty" ;
+    rdfs:comment "The property that is registered for replication." ;
+    rdfs:domain ue4:FReplicationLifetime ;
+    rdfs:range ue4:UProperty .
+
+ue4:lifetimeCondition a owl:ObjectProperty ;
+    rdfs:label "lifetimeCondition" ;
+    rdfs:comment "The replication condition assigned to this lifetime entry." ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( ue4:FReplicationLifetime ue4:UProperty )
+    ] ;
+    rdfs:range ue4:ELifetimeCondition .
+
+ue4:repNotifyFunction a owl:ObjectProperty ;
+    rdfs:label "repNotifyFunction" ;
+    rdfs:comment "The RepNotify callback function invoked when this property replicates." ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( ue4:FReplicationLifetime ue4:UProperty )
+    ] ;
+    rdfs:range ue4:UFunction .
+
+ue4:bReplicated a owl:DatatypeProperty ;
+    rdfs:label "bReplicated" ;
+    rdfs:comment "Direct declaration if this property is replicated." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range xsd:boolean .
+
+# =========================================================================
+# Networking: Remote Procedure Calls (RPCs)
+# =========================================================================
+
+ue4:URPC a owl:Class ;
+    rdfs:subClassOf ue4:UFunction ;
+    rdfs:label "URPC" ;
+    rdfs:comment "Base class representing a Remote Procedure Call." .
+
+ue4:UServerRPC a owl:Class ;
+    rdfs:subClassOf ue4:URPC ;
+    rdfs:label "UServerRPC" ;
+    rdfs:comment "Remote Procedure Call that is sent by a client and executed on the server." .
+
+ue4:UClientRPC a owl:Class ;
+    rdfs:subClassOf ue4:URPC ;
+    rdfs:label "UClientRPC" ;
+    rdfs:comment "Remote Procedure Call that is sent by the server and executed on the client that owns the Actor." .
+
+ue4:UNetMulticastRPC a owl:Class ;
+    rdfs:subClassOf ue4:URPC ;
+    rdfs:label "UNetMulticastRPC" ;
+    rdfs:comment "Remote Procedure Call that is sent by the server and executed on the server and all connected clients." .
+
+ue4:bReliable a owl:DatatypeProperty ;
+    rdfs:label "bReliable" ;
+    rdfs:comment "Indicates whether the RPC transmission is guaranteed and ordered." ;
+    rdfs:domain ue4:URPC ;
+    rdfs:range xsd:boolean .
+
+ue4:bWithValidation a owl:DatatypeProperty ;
+    rdfs:label "bWithValidation" ;
+    rdfs:comment "Indicates whether the RPC has a validation function that runs before execution." ;
+    rdfs:domain ue4:URPC ;
+    rdfs:range xsd:boolean .
+
+ue4:validationFunction a owl:ObjectProperty ;
+    rdfs:label "validationFunction" ;
+    rdfs:comment "Points to the UFunction containing the validation logic (e.g. SomeFunc_Validate)." ;
+    rdfs:domain ue4:URPC ;
+    rdfs:range ue4:UFunction .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/reflection#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Reflection Ontology" ;
+    rdfs:comment "Ontology representing reflection and class metadata in Unreal Engine 4." .
+
+# =========================================================================
+# Core Reflection Classes
+# =========================================================================
+
+ue4:UObject a owl:Class ;
+    rdfs:label "UObject" ;
+    rdfs:comment "The base class of all Unreal Engine objects." .
+
+ue4:UField a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UField" ;
+    rdfs:comment "Base class for all reflection fields (properties, functions, etc.)." .
+
+ue4:UStruct a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UStruct" ;
+    rdfs:comment "Base class for all structural types containing fields, such as functions and classes." .
+
+ue4:UClass a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UClass" ;
+    rdfs:comment "Reflected metadata representation of a C++ or Blueprint class." .
+
+ue4:UScriptStruct a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UScriptStruct" ;
+    rdfs:comment "Reflected metadata representation of a C++ struct." .
+
+ue4:UFunction a owl:Class ;
+    rdfs:subClassOf ue4:UStruct ;
+    rdfs:label "UFunction" ;
+    rdfs:comment "Reflected metadata representation of a callable function." .
+
+ue4:UEnum a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UEnum" ;
+    rdfs:comment "Reflected metadata representation of an enumeration type." .
+
+ue4:UProperty a owl:Class ;
+    rdfs:subClassOf ue4:UField ;
+    rdfs:label "UProperty" ;
+    rdfs:comment "Reflected metadata representation of a class member variable." .
+
+# =========================================================================
+# Property Hierarchy
+# =========================================================================
+
+ue4:UBoolProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UBoolProperty" ;
+    rdfs:comment "Boolean variable property metadata." .
+
+ue4:UNumericProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UNumericProperty" ;
+    rdfs:comment "Base class for all numeric variable property metadata." .
+
+ue4:UByteProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UByteProperty" ;
+    rdfs:comment "Byte (uint8) variable property metadata." .
+
+ue4:UIntProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UIntProperty" ;
+    rdfs:comment "32-bit signed integer variable property metadata." .
+
+ue4:UInt64Property a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UInt64Property" ;
+    rdfs:comment "64-bit signed integer variable property metadata." .
+
+ue4:UInt8Property a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UInt8Property" ;
+    rdfs:comment "8-bit signed integer variable property metadata." .
+
+ue4:UShortProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UShortProperty" ;
+    rdfs:comment "16-bit signed integer variable property metadata." .
+
+ue4:UUInt16Property a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UUInt16Property" ;
+    rdfs:comment "16-bit unsigned integer variable property metadata." .
+
+ue4:UUInt32Property a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UUInt32Property" ;
+    rdfs:comment "32-bit unsigned integer variable property metadata." .
+
+ue4:UUInt64Property a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UUInt64Property" ;
+    rdfs:comment "64-bit unsigned integer variable property metadata." .
+
+ue4:UFloatProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UFloatProperty" ;
+    rdfs:comment "Single-precision floating point variable property metadata." .
+
+ue4:UDoubleProperty a owl:Class ;
+    rdfs:subClassOf ue4:UNumericProperty ;
+    rdfs:label "UDoubleProperty" ;
+    rdfs:comment "Double-precision floating point variable property metadata." .
+
+ue4:UObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UObjectProperty" ;
+    rdfs:comment "Property representing a reference to an object." .
+
+ue4:UClassProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "UClassProperty" ;
+    rdfs:comment "Property representing a reference to a class type metadata (UClass)." .
+
+ue4:USoftObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "USoftObjectProperty" ;
+    rdfs:comment "Property representing a soft (lazy-loadable) reference to an object." .
+
+ue4:USoftClassProperty a owl:Class ;
+    rdfs:subClassOf ue4:USoftObjectProperty ;
+    rdfs:label "USoftClassProperty" ;
+    rdfs:comment "Property representing a soft reference to a class type metadata." .
+
+ue4:UWeakObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "UWeakObjectProperty" ;
+    rdfs:comment "Property representing a weak reference to an object (does not prevent GC)." .
+
+ue4:ULazyObjectProperty a owl:Class ;
+    rdfs:subClassOf ue4:UObjectProperty ;
+    rdfs:label "ULazyObjectProperty" ;
+    rdfs:comment "Property representing a lazy reference to an object (uses GUID to resolve)." .
+
+ue4:UInterfaceProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UInterfaceProperty" ;
+    rdfs:comment "Property representing a reference to an object implementing a specific interface." .
+
+ue4:UStructProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UStructProperty" ;
+    rdfs:comment "Property representing an inline instance of a script struct." .
+
+ue4:UArrayProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UArrayProperty" ;
+    rdfs:comment "Property representing a dynamic array of elements (TArray)." .
+
+ue4:UMapProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UMapProperty" ;
+    rdfs:comment "Property representing a key-value associative container (TMap)." .
+
+ue4:USetProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "USetProperty" ;
+    rdfs:comment "Property representing a unique elements container (TSet)." .
+
+ue4:UEnumProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UEnumProperty" ;
+    rdfs:comment "Property representing an enumeration value." .
+
+ue4:UStrProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UStrProperty" ;
+    rdfs:comment "Property representing a dynamic string (FString)." .
+
+ue4:UNameProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UNameProperty" ;
+    rdfs:comment "Property representing an asset name (FName)." .
+
+ue4:UTextProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UTextProperty" ;
+    rdfs:comment "Property representing a localized user-facing text (FText)." .
+
+ue4:UDelegateProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UDelegateProperty" ;
+    rdfs:comment "Property representing a single-cast delegate link." .
+
+ue4:UMulticastDelegateProperty a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UMulticastDelegateProperty" ;
+    rdfs:comment "Property representing a multi-cast event delegate link." .
+
+# =========================================================================
+# Reflection Relationships / Properties
+# =========================================================================
+
+ue4:hasField a owl:ObjectProperty ;
+    rdfs:label "hasField" ;
+    rdfs:comment "Relates a struct/scope to a reflected field it defines." ;
+    rdfs:domain ue4:UStruct ;
+    rdfs:range ue4:UField .
+
+ue4:hasProperty a owl:ObjectProperty ;
+    rdfs:label "hasProperty" ;
+    rdfs:comment "Relates a struct/scope to a member variable property it defines." ;
+    rdfs:domain ue4:UStruct ;
+    rdfs:range ue4:UProperty ;
+    rdfs:subPropertyOf ue4:hasField .
+
+ue4:hasFunction a owl:ObjectProperty ;
+    rdfs:label "hasFunction" ;
+    rdfs:comment "Relates a class to a member function it defines." ;
+    rdfs:domain ue4:UClass ;
+    rdfs:range ue4:UFunction ;
+    rdfs:subPropertyOf ue4:hasField .
+
+ue4:superStruct a owl:ObjectProperty ;
+    rdfs:label "superStruct" ;
+    rdfs:comment "Relates a reflected struct to its parent struct metadata (inheritance)." ;
+    rdfs:domain ue4:UStruct ;
+    rdfs:range ue4:UStruct .
+
+ue4:propertyType a owl:ObjectProperty ;
+    rdfs:label "propertyType" ;
+    rdfs:comment "Relates a property to the type metadata defining its elements (e.g. UClass, UScriptStruct, or UEnum)." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range ue4:UField .
+
+ue4:returnProperty a owl:ObjectProperty ;
+    rdfs:label "returnProperty" ;
+    rdfs:comment "Relates a function to its return value property metadata." ;
+    rdfs:domain ue4:UFunction ;
+    rdfs:range ue4:UProperty .
+
+ue4:classFlags a owl:DatatypeProperty ;
+    rdfs:label "classFlags" ;
+    rdfs:comment "EClassFlags bitmask or list of class flags representing class specifiers." ;
+    rdfs:domain ue4:UClass ;
+    rdfs:range xsd:string .
+
+ue4:functionFlags a owl:DatatypeProperty ;
+    rdfs:label "functionFlags" ;
+    rdfs:comment "EFunctionFlags bitmask or list of function flags (e.g. BlueprintCallable)." ;
+    rdfs:domain ue4:UFunction ;
+    rdfs:range xsd:string .
+
+ue4:propertyFlags a owl:DatatypeProperty ;
+    rdfs:label "propertyFlags" ;
+    rdfs:comment "EPropertyFlags bitmask or list of property flags (e.g. CPF_BlueprintVisible)." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range xsd:string .
+
+# =========================================================================
+# Function Parameters & Directions
+# =========================================================================
+
+ue4:UFunctionParameter a owl:Class ;
+    rdfs:subClassOf ue4:UProperty ;
+    rdfs:label "UFunctionParameter" ;
+    rdfs:comment "Represents an individual parameter in a UFunction signature." .
+
+ue4:PinDirection a owl:Class ;
+    rdfs:label "PinDirection" ;
+    rdfs:comment "Specifies the passing direction of a parameter or graph pin." .
+
+ue4:BinaryPinDirection a owl:Class ;
+    rdfs:subClassOf ue4:PinDirection ;
+    rdfs:label "BinaryPinDirection" ;
+    rdfs:comment "Specifies binary pin directions (Input or Output) specifically for graph pins." .
+
+ue4:Input a ue4:PinDirection , ue4:BinaryPinDirection ;
+    rdfs:label "Input" ;
+    rdfs:comment "Represents input direction." .
+
+ue4:Output a ue4:PinDirection , ue4:BinaryPinDirection ;
+    rdfs:label "Output" ;
+    rdfs:comment "Represents output direction." .
+
+ue4:InOut a ue4:PinDirection ;
+    rdfs:label "InOut" ;
+    rdfs:comment "Represents a bidirectional parameter passed by reference." .
+
+ue4:Return a ue4:PinDirection ;
+    rdfs:label "Return" ;
+    rdfs:comment "Represents the return value of a function." .
+
+ue4:hasParameter a owl:ObjectProperty ;
+    rdfs:label "hasParameter" ;
+    rdfs:comment "Relates a UFunction to one of its parameters." ;
+    rdfs:domain ue4:UFunction ;
+    rdfs:range ue4:UFunctionParameter ;
+    rdfs:subPropertyOf ue4:hasProperty .
+
+ue4:parameterOf a owl:ObjectProperty ;
+    rdfs:label "parameterOf" ;
+    rdfs:comment "Relates a parameter to its parent UFunction." ;
+    rdfs:domain ue4:UFunctionParameter ;
+    rdfs:range ue4:UFunction ;
+    owl:inverseOf ue4:hasParameter .
+
+ue4:parameterDirection a owl:ObjectProperty ;
+    rdfs:label "parameterDirection" ;
+    rdfs:comment "Defines the direction of the function parameter." ;
+    rdfs:domain ue4:UFunctionParameter ;
+    rdfs:range ue4:PinDirection .
+
+ue4:parameterIndex a owl:DatatypeProperty ;
+    rdfs:label "parameterIndex" ;
+    rdfs:comment "The 0-based sequence index of the parameter in the function signature." ;
+    rdfs:domain ue4:UFunctionParameter ;
+    rdfs:range xsd:integer .
+
+# =========================================================================
+# Collection Inner Properties
+# =========================================================================
+
+ue4:innerProperty a owl:ObjectProperty ;
+    rdfs:label "innerProperty" ;
+    rdfs:comment "Specifies the inner property type of a dynamic array." ;
+    rdfs:domain ue4:UArrayProperty ;
+    rdfs:range ue4:UProperty .
+
+ue4:keyProperty a owl:ObjectProperty ;
+    rdfs:label "keyProperty" ;
+    rdfs:comment "Specifies the key property type of a map." ;
+    rdfs:domain ue4:UMapProperty ;
+    rdfs:range ue4:UProperty .
+
+ue4:valueProperty a owl:ObjectProperty ;
+    rdfs:label "valueProperty" ;
+    rdfs:comment "Specifies the value property type of a map." ;
+    rdfs:domain ue4:UMapProperty ;
+    rdfs:range ue4:UProperty .
+
+ue4:elementProperty a owl:ObjectProperty ;
+    rdfs:label "elementProperty" ;
+    rdfs:comment "Specifies the element property type of a set." ;
+    rdfs:domain ue4:USetProperty ;
+    rdfs:range ue4:UProperty .
+
+# =========================================================================
+# Delegate Properties
+# =========================================================================
+
+ue4:delegateSignature a owl:ObjectProperty ;
+    rdfs:label "delegateSignature" ;
+    rdfs:comment "Relates a delegate property to its delegate signature function." ;
+    rdfs:domain [
+        a owl:Class ;
+        owl:unionOf ( ue4:UDelegateProperty ue4:UMulticastDelegateProperty )
+    ] ;
+    rdfs:range ue4:UFunction .
+
+# =========================================================================
+# Metadata Support
+# =========================================================================
+
+ue4:UMetaData a owl:Class ;
+    rdfs:subClassOf ue4:UObject ;
+    rdfs:label "UMetaData" ;
+    rdfs:comment "Class representing custom metadata key-value storage in Unreal Engine." .
+
+ue4:hasMetaData a owl:ObjectProperty ;
+    rdfs:label "hasMetaData" ;
+    rdfs:comment "Relates a UObject to its associated metadata storage instance." ;
+    rdfs:domain ue4:UObject ;
+    rdfs:range ue4:UMetaData .
+
+ue4:metaKey a owl:DatatypeProperty ;
+    rdfs:label "metaKey" ;
+    rdfs:comment "The key name for a metadata entry." ;
+    rdfs:domain ue4:UMetaData ;
+    rdfs:range xsd:string .
+
+ue4:metaValue a owl:DatatypeProperty ;
+    rdfs:label "metaValue" ;
+    rdfs:comment "The value for a metadata entry." ;
+    rdfs:domain ue4:UMetaData ;
+    rdfs:range xsd:string .
+
+# =========================================================================
+# Structured Flags
+# =========================================================================
+
+ue4:isBlueprintWritable a owl:DatatypeProperty ;
+    rdfs:label "isBlueprintWritable" ;
+    rdfs:comment "Indicates if the property can be written/modified within Blueprints." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range xsd:boolean .
+
+ue4:isBlueprintReadOnly a owl:DatatypeProperty ;
+    rdfs:label "isBlueprintReadOnly" ;
+    rdfs:comment "Indicates if the property is read-only within Blueprints." ;
+    rdfs:domain ue4:UProperty ;
+    rdfs:range xsd:boolean .
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+<https://rocket-craft.io/ontology/ue4/typestates#>
+    a owl:Ontology ;
+    rdfs:label "Unreal Engine 4 Cooking & WASM Typestates Ontology" ;
+    rdfs:comment "Ontology representing typestates for compilation, cooking, and WASM packaging." .
+
+ue4:Typestate a owl:Class ;
+    rdfs:label "Typestate" ;
+    rdfs:comment "Representational class for build/deployment pipeline typestates." .
+
+ue4:CookingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "CookingTypestate" ;
+    rdfs:comment "State representing the asset cooking process." .
+
+ue4:LinkingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "LinkingTypestate" ;
+    rdfs:comment "State representing compilation linking." .
+
+ue4:WasmPackagingTypestate a owl:Class ;
+    rdfs:subClassOf ue4:Typestate ;
+    rdfs:label "WasmPackagingTypestate" ;
+    rdfs:comment "State representing HTML5/WASM packaging." .
+
+ue4:hasCookingState a rdf:Property ;
+    rdfs:label "hasCookingState" ;
+    rdfs:comment "Relates an asset or project to its cooking status." .
+
+ue4:hasLinkingState a rdf:Property ;
+    rdfs:label "hasLinkingState" ;
+    rdfs:comment "Relates a component/module to its compile linking state." .
+
+ue4:hasPackagingState a rdf:Property ;
+    rdfs:label "hasPackagingState" ;
+    rdfs:comment "Relates a level/world to its final HTML5/WASM packaging state." .

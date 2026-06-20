@@ -1,0 +1,10 @@
+PREFIX mb: <https://ggen.io/ontology/mechbirth/>
+
+SELECT ?fieldName ?fieldType ?hashOrder
+WHERE {
+  ?field a mb:ReceiptPayloadField ;
+         mb:fieldName ?fieldName ;
+         mb:fieldType ?fieldType ;
+         mb:hashOrder ?hashOrder .
+}
+ORDER BY ?hashOrder

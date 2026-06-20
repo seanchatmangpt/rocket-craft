@@ -138,6 +138,11 @@ impl LayoutCompiler {
         )
     }
 
+    #[cfg(test)]
+    pub fn get_class_info_pub(role: &str) -> (String, String) {
+        Self::get_class_info(role)
+    }
+
     fn compile_object(object: &Object, parent_center: Vector3) -> String {
         let rel_pos = object.placement.position;
         let rot = object.placement.rotation;
@@ -183,5 +188,88 @@ impl LayoutCompiler {
             roll = rot.z,
             label = object.name
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::spec::{Actor, Bounds3D, Object, Place, Vector3, WorldSpec};
+
+    fn make_place(id: &str, cx: f32, cy: f32, cz: f32) -> Place {
+        Place::new(
+            id,
+            id,
+            Bounds3D::new(Vector3::new(cx, cy, cz), Vector3::new(10.0, 10.0, 5.0)),
+        )
+    }
+
+    // ── LayoutCompiler::compile structure ─────────────────────────────────────
+
+    #[test]
+    fn empty_spec_produces_begin_end_map() {
+        let out = LayoutCompiler::compile(&WorldSpec::new());
+        assert!(out.starts_with("Begin Map"));
+        assert!(out.contains("End Map"));
+    }
+
+    #[test]
+    fn place_produces_staticmeshactor_named_by_id() {
+        let mut spec = WorldSpec::new();
+        spec.places.push(make_place("zone-1", 0.0, 0.0, 0.0));
+        let out = LayoutCompiler::compile(&spec);
+        assert!(out.contains("Place_zone-1"));
+        assert!(out.contains("StaticMeshActor"));
+        assert!(out.contains("Floor_zone-1")); // ActorLabel uses place name
+    }
+
+    #[test]
+    fn actor_position_is_relative_to_place_center() {
+        let mut spec = WorldSpec::new();
+        spec.places.push(make_place("p1", 100.0, 200.0, 0.0));
+        let mut actor = Actor::new("hero", "Hero", "Player", "p1");
+        actor.placement.position = Vector3::new(5.0, 0.0, 0.0);
+        spec.actors.push(actor);
+        let out = LayoutCompiler::compile(&spec);
+        // abs_x = center.x(100) + rel.x(5) = 105
+        assert!(out.contains("X=105.000000"));
+    }
+
+    #[test]
+    fn actor_without_matching_place_falls_back_to_zero_center() {
+        let mut spec = WorldSpec::new();
+        spec.places.push(make_place("p1", 50.0, 50.0, 0.0));
+        let mut actor = Actor::new("hero", "Hero", "Player", "nonexistent");
+        actor.placement.position = Vector3::new(3.0, 0.0, 0.0);
+        spec.actors.push(actor);
+        let out = LayoutCompiler::compile(&spec);
+        // parent_center defaults to (0,0,0), so abs_x = 3
+        assert!(out.contains("X=3.000000"));
+    }
+
+    #[test]
+    fn object_produces_sphere_static_mesh() {
+        let mut spec = WorldSpec::new();
+        spec.places.push(make_place("p1", 0.0, 0.0, 0.0));
+        spec.objects.push(Object::new("crate-1", "Crate", "Box", "p1"));
+        let out = LayoutCompiler::compile(&spec);
+        assert!(out.contains("Object_crate-1"));
+        assert!(out.contains("Sphere.Sphere"));
+    }
+
+    // ── get_class_info ────────────────────────────────────────────────────────
+
+    #[test]
+    fn simple_role_maps_to_game_blueprint_path() {
+        let (path, name) = LayoutCompiler::get_class_info_pub("Player");
+        assert_eq!(path, "/Game/BP_Player.BP_Player_C");
+        assert_eq!(name, "BP_Player_C");
+    }
+
+    #[test]
+    fn absolute_path_role_passes_through_unchanged() {
+        let (path, name) = LayoutCompiler::get_class_info_pub("/Game/Custom.MyActor_C");
+        assert_eq!(path, "/Game/Custom.MyActor_C");
+        assert_eq!(name, "MyActor_C");
     }
 }

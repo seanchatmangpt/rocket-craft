@@ -7,11 +7,11 @@
 //! 4. Higher magic stat → more magic damage
 
 use chicago_tdd_tools::TestEnvironment;
+use nexus_integration::game_loop::{GameCommand, GameSession, StatType};
 use nexus_net::{
     protocol::{CombatAction, CombatOutcome},
     room::{GameRoom, RoomPlayer, RoomState},
 };
-use nexus_integration::game_loop::{GameSession, GameCommand, StatType};
 use nexus_types::{Damage, Hp, MagicType};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -81,8 +81,14 @@ fn use_special_higher_ability_id_deals_more_damage() {
     // Verify the formula: attack * 2.0 + ability_id * 5.0
     let expected_low = attack * 2.0 + 1.0 * 5.0;
     let expected_high = attack * 2.0 + 5.0 * 5.0;
-    assert_eq!(dmg_low, expected_low, "UseSpecial formula mismatch for ability_id=1");
-    assert_eq!(dmg_high, expected_high, "UseSpecial formula mismatch for ability_id=5");
+    assert_eq!(
+        dmg_low, expected_low,
+        "UseSpecial formula mismatch for ability_id=1"
+    );
+    assert_eq!(
+        dmg_high, expected_high,
+        "UseSpecial formula mismatch for ability_id=5"
+    );
 }
 
 // ── Test 2: CastMagic — different magic types deal different damage ───────────
@@ -99,7 +105,12 @@ fn cast_magic_different_types_deal_different_damage() {
         make_room_player(2, 1000.0, 30.0, magic_stat),
     );
     let outcome_fire = room_fire
-        .apply_action(1, CombatAction::CastMagic { magic_type: MagicType::Fire })
+        .apply_action(
+            1,
+            CombatAction::CastMagic {
+                magic_type: MagicType::Fire,
+            },
+        )
         .expect("fire cast should succeed");
 
     let mut room_dark = active_room(
@@ -107,7 +118,12 @@ fn cast_magic_different_types_deal_different_damage() {
         make_room_player(2, 1000.0, 30.0, magic_stat),
     );
     let outcome_dark = room_dark
-        .apply_action(1, CombatAction::CastMagic { magic_type: MagicType::Dark })
+        .apply_action(
+            1,
+            CombatAction::CastMagic {
+                magic_type: MagicType::Dark,
+            },
+        )
         .expect("dark cast should succeed");
 
     let dmg_fire = extract_damage(&outcome_fire);
@@ -129,8 +145,8 @@ fn cast_magic_different_types_deal_different_damage() {
     // Also verify Lightning (+30), Ice (+15), and Light (+25)
     let magic_values: &[(MagicType, f32, &str)] = &[
         (MagicType::Lightning, 30.0, "Lightning"),
-        (MagicType::Ice,       15.0, "Ice"),
-        (MagicType::Light,     25.0, "Light"),
+        (MagicType::Ice, 15.0, "Ice"),
+        (MagicType::Light, 25.0, "Light"),
     ];
     for &(mt, bonus, label) in magic_values {
         let mut room = active_room(
@@ -166,9 +182,15 @@ fn stat_magic_allocation_increments_magic_by_5() {
         magic_before + 5,
         "allocating Magic stat should increase player.magic by 5"
     );
-    assert_eq!(session.player.stat_points, 0, "stat_points should be consumed");
+    assert_eq!(
+        session.player.stat_points, 0,
+        "stat_points should be consumed"
+    );
     assert!(
-        events.iter().any(|e| matches!(e.kind, nexus_integration::game_loop::EventKind::StatAllocated(StatType::Magic))),
+        events.iter().any(|e| matches!(
+            e.kind,
+            nexus_integration::game_loop::EventKind::StatAllocated(StatType::Magic)
+        )),
         "StatAllocated(Magic) event should be emitted"
     );
 }

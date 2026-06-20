@@ -1,0 +1,543 @@
+# Research Dossier: `chatmangpt`
+
+**Total Files:** 145 Ontologies (.ttl) | 273 Queries (.rq)
+**Total Volume:** 418 files
+
+## 1. Core Vocabularies (Prefixes)
+- `agent: <http://chatmangpt.com/ontology/agent#>`
+- `anom: <https://chatmangpt.com/ontologies/o-star/governance:anomaly-detection:>`
+- `art: <https://chatmangpt.com/ontologies/o-star/artifact:>`
+- `as: <https://www.w3.org/ns/activitystreams#>`
+- `audit: <http://chatmangpt.ai/compliance/audit/>`
+- `audit: <https://chatmangpt.com/ontology/audit/>`
+- `bench: <http://chatmangpt.com/ontology/benchmark#>`
+- `bench: <http://example.org/ontology/benchmark#>`
+- `benchmark: <http://example.com/benchmark/>`
+- `bfo: <http://purl.obolibrary.org/obo/BFO_>`
+- `board: <https://ontology.chatmangpt.com/board#>`
+- `bos: <http://businessos.dev/id/>`
+- `bos: <https://businessos.dev/>`
+- `bos: <https://chatmangpt.com/businessos#>`
+- `bos: <https://chatmangpt.com/ontology/businessos/>`
+- `bos: <https://ontology.businessos.dev/>`
+- `bpmn: <http://www.omg.org/spec/BPMN/20100524/MODEL#>`
+- `canopy: <https://chatmangpt.com/canopy#>`
+- `cap: <https://chatmangpt.com/ontologies/o-star/cap:>`
+- `capability: <https://chatmangpt.com/ontologies/capability/>`
+- `cc: <http://creativecommons.org/ns#>`
+- `cgpt: <https://cgpt.io/ns#>`
+- `cgpt: <https://chatmangpt.com/ns/v2#>`
+- `chatman: <http://chatmangpt.ai/>`
+- `chatman: <http://chatmangpt.ontology/>`
+- `chatman: <http://chatmangpt.org/ontology/>`
+- `chatman: <https://ontology.chatmangpt.com/core#>`
+- `chatman_health: <https://ontology.chatmangpt.com/healthcare#>`
+- `cis: <http://chatmangpt.ai/compliance/control/cis/>`
+- `cm: <https://chatmangpt.com/docs/>`
+- `cmf: <https://codemanufactory.dev/ontology/>`
+- `code: <https://chatmangpt.com/ontology/codegen#>`
+- `comp: <http://chatmangpt.ai/compliance/>`
+- `comp: <https://chatmangpt.com/ontology/compliance/>`
+- `compliance: <http://businessos.dev/compliance/>`
+- `compliance: <https://ontology.chatmangpt.com/compliance#>`
+- `control: <http://chatmangpt.ai/compliance/control/>`
+- `csvw: <http://www.w3.org/ns/csvw#>`
+- `ctag: <http://commontag.org/ns#>`
+- `dc11: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/elements/1.1/>`
+- `dc: <http://purl.org/dc/terms/>`
+- `dc: <http;//purl.org/dc/terms/>`
+- `dcat: <http://www.w3.org/ns/dcat#>`
+- `dct: <http://purl.org/dc/terms/>`
+- `dcterms: <http://purl.org/dc/terms/>`
+- `dcterms_type: <http://purl.org/dc/dcmitype/>`
+- `dctype: <http://purl.org/dc/dcmitype/>`
+- `dctypes: <http://purl.org/dc/dcmitype/>`
+- `demo: <http://chatmangpt.demo/>`
+- *...and 168 more.*
+
+## 2. Domain Taxonomy & Entities
+### Base Classes & Shapes
+- `:Account`
+- `:Action`
+- `:Activity`
+- `:ActivityAssignment`
+- `:ActivityInfluence`
+- `:AdaptationPlanGuard`
+- `:Agent`
+- `:AgentInfluence`
+- `:Agreement`
+- `:AllTasksHaveOutgoingFlow`
+- `:AllTasksReachable`
+- `:Allocation`
+- `:AnalysisRuleThresholdGuard`
+- `:AnalyzerRuleGuard`
+- `:AndJoinMultipleIncoming`
+- `:AndSplitMultipleOutgoing`
+- `:Assertion`
+- `:Asset`
+- `:AssetCollection`
+- `:AssetScope`
+- `:Association`
+- `:Attribution`
+- `:Audience`
+- `:BasicContainer`
+- `:BrokerRole`
+- `:Budget`
+- `:Bundle`
+- `:BusinessOSParty`
+- `:BuyerRole`
+- `:Campaign`
+- `:CampaignBudget`
+- `:CampaignExecution`
+- `:CampaignOpportunity`
+- `:Capability`
+- `:Channel`
+- `:ChatmanConstantGuard`
+- `:ClosureStage`
+- `:Collection`
+- `:Communication`
+- `:ComplianceFramework`
+- `:ComplianceRequirement`
+- `:ComplianceTerm`
+- `:ConfidentialityTerm`
+- `:ConflictTerm`
+- `:Constraint`
+- `:Contact`
+- `:Container`
+- `:Content`
+- `:Contract`
+- `:ContractualTerm`
+- *...and 712 more.*
+
+## 3. Extraction Layer (SPARQL)
+- **Query Types Executed:** {'CONSTRUCT': 70, 'SELECT': 165, 'ASK': 36, 'INSERT': 2}
+
+### Projected Variables (SELECT ?var)
+This project actively projects the following variables into code/templates:
+> `?abstainCount`, `?access_action`, `?access_event`, `?access_location`, `?access_outcome`, `?access_reason`, `?access_timestamp`, `?accessed_by`, `?accuracy`, `?actionItems`, `?activity`, `?admissible`, `?admissionDecision`, `?admissionStatus`, `?affectedEntity`, `?affectedMotion`, `?agent`, `?agent1`, `?agent2`, `?agentId`, `?agentLabel`, `?agent_name`, `?aliases`, `?americanVotes`, `?anomalyCount`, `?anomalyScore`, `?anomalyType`, `?arch_label`, `?argDescription`, `?argName`, `?argRequired`, `?argType`, `?art`, `?artLabel`, `?artifact`, `?artifactLabel`, `?asianVotes`, `?audit_trail_summary`, `?avgDecisionTime`, `?ayeCount`, `?beamFile`, `?bindingQuery`, `?blockedItem`, `?blockedTeam`, `?blockingItem`, `?blockingTeam`, `?bridgingSurface`, `?businessValue`, `?capLabel`, `?capabilities`, `?capability`, `?capabilityCount`, `?capabilityLabel`, `?capabilityName`, `?category`, `?changeType`, `?changedClass`, `?class`, `?commandName`, `?comment`, `?completeness`, `?complexity`, `?compliancePercent`, `?compression`, `?conditionQuery`, `?confidence`, `?confidenceThreshold`, `?consentStatus`, `?consent_given_date`, `?consent_id`, `?consent_scope`, `?consent_status`, `?consistency`, `?constraint`, `?consumerLabel`, `?consumerType`, `?consumerUri`, `?containerPort`, `?contentType`, `?control`, `?controlArea`, `?controlName`, `?cpu`, `?crate`, `?crate_path`, `?createdAt`, `?createdAtTime`, `?creator`, `?creatorEmail`, `?currentLabel`, `?currentStage`, `?current_status`, `?customer_name`, `?datasetLabel`, `?datasetType`, `?datasetUri`, `?dataset_uri`, `?days_until_expiration`, `?deal_id`, `?deal_name`, `?debateEnd`, `?debateStart`, `?debug_symbols`, `?defines`, `?definition`, `?dependedBy`, `?dependency`, `?dependencyLabel`, `?dependsOn`, `?derived_status`, `?description`, `?detectedAt`, `?dimension`, `?domain`, `?domain1`, `?domain1_duplicate_keys`, `?domain1_freshness_hours`, `?domain1_key_count`, `?domain1_null_keys`, `?domain1_row_count`, `?domain2`, `?domain2_duplicate_keys`, `?domain2_freshness_hours`, `?domain2_key_count`, `?domain2_null_keys`, `?domain2_row_count`, `?downstream_dataset`, `?downstream_description`, `?downstream_domain`, `?downstream_level`, `?dueDate`, `?earliest_activity_date`, `?edition`, `?effectClass`, `?effectQuery`, `?effectRequired`, `?element`, `?enabled`, `?endpointPath`, `?entity`, `?entityLabel`, `?enumValues`, `?envName`, `?envValue`, `?epoch_id`, `?epoch_timestamp`, `?escalation`, `?estimatedHours`, `?europeanVotes`, `?event`, `?executionClass`, `?expiration_date`, `?expiryDate`, `?failedControls`, `?failedMotions`, `?failure`, `?failureMode`, `?failureType`, `?family`, `?familyLabel`, `?federation_ready`, `?fieldName`, `?fieldType`, `?finance_acv`, `?finance_contract_value`, `?finance_forecast_next_quarter`, `?finance_margin`, `?finance_payment_schedule`, `?finance_revenue_recognition`, `?finance_risk_level`, `?finance_total_expenses`, `?finance_total_revenue`, `?fixAction`, `?focusNode`, `?forbidden_code_points`, `?foreignKey`, `?framework`, `?generatedAt`, `?generatedAtTime`, `?generatedBy`, `?grantTime`, `?group`, `?hasAtomicity`, `?hasExportRestriction`, `?hasMcpServer`, `?hasPostCondition`, `?hasPreCondition`, `?hasPrivilegeDeclaration`, `?hasStabilization`, `?hasTransparency`, `?hasValidation`, `?hasVerification`, `?healingAction`, `?healthCheck`, `?highPrivilegeCapabilities`, `?hotReloadable`, `?httpMethod`, `?id`, `?impact`, `?index`, `?input`, `?inputSchema`, `?intermediateStates`, `?invariantName`, `?invariantPreserved`, `?invariantType`, `?isAmendable`, `?isDebatable`, `?isLeafConsumer`, `?isLeafSource`, `?isUrgent`, `?is_expired`, `?issue`, `?kind`, `?kindLabel`, `?label`, `?language`, `?lastModifiedAt`, `?lastModifier`, `?lastModifierEmail`, `?lastUpdated`, `?latency`, `?latest_activity_date`, `?layer`, `?level`, `?lifecycleSequence`, `?lineageCompleteness`, `?manager`, `?managerLabel`, `?managerName`, `?maxAttempts`, `?maxDepth`, `?maxIterations`, `?maxMemoryMb`, `?maxQueueDepth`, `?maxSize`, `?measuredAt`, `?memory`, `?messageName`, `?migration`, `?migrationLabel`, `?mode`, `?modification_count`, `?module`, `?moduleName`, `?module_path`, `?motion`, `?motionLabel`, `?motionSubclass`, `?motionText`, `?mover`, `?mutating`, `?name`, `?nayCount`, `?newVersion`, `?nextLabel`, `?nextStage`, `?notation`, `?notes`, `?object_id`, `?objective`, `?objectiveLabel`, `?ontology`, `?operation_name`, `?operation_type`, `?operation_uri`, `?ops_cost_per_employee`, `?ops_total_headcount`, `?ops_utilization_percent`, `?opt_level`, `?organization`, `?organization_id`, `?organization_name`, `?outcome`, `?output`, `?outputSchema`, `?overlap_percent`, `?overlapping_keys`, `?passedControls`, `?passedMotions`, `?path`, `?pathTemplate`, `?pattern`, `?period`, `?permitsPayment`, `?permitsResearch`, `?permitsSecondaryUse`, `?permitsTreatment`, `?person`, `?personLabel`, `?personName`, `?phi_category`, `?pi`, `?piLabel`, `?platform`, `?plugin`, `?pluginName`, `?pmctlTarget`, `?policy`, `?policyId`, `?policyType`, `?port`, `?portfolio`, `?portfolioLabel`, `?powlActivityType`, `?precedence`, `?precedenceOrder`, `?prefLabel`, `?prefix`, `?prerequisiteSteps`, `?previousPercent`, `?previousVersion`, `?primaryKey`, `?priority`, `?privilegeCount`, `?privilegeLevel`, `?process`, `?processLabel`, `?profile`, `?profile_label`, `?project_name`, `?projectorFamily`, `?prompt`, `?proofMethod`, `?proofType`, `?protocol`, `?qualityScore`, `?qualityStatus`, `?quality_summary`, `?query_text`, `?quorumMet`, `?reason`, `?relatedResources`, `?related_documents_count`, `?release`, `?releaseDate`, `?remediationUrl`, `?replicas`, `?reportingPeriod`, `?requestSchema`, `?requestUri`, `?required`, `?requiredThreshold`, `?requiresQuorum`, `?requiresReceipt`, `?requiresSecond`, `?resource`, `?resource_type`, `?responseSchema`, `?responsible`, `?restart`, `?resultMessage`, `?resultSeverity`, `?retention`, `?riskLevel`, `?riskScore`, `?role`, `?rule`, `?ruleId`, `?runtimeProfile`, `?safetyMode`, `?sales_amount`, `?sales_forecast_date`, `?sales_probability`, `?sales_stage`, `?satisfiedCount`, `?scheme`, `?scopeNote`, `?seconder`, `?securityLevel`, `?sequence_hash`, `?service`, `?severity`, `?sharedCapability`, `?shutdown`, `?skippedControls`, `?slo_threshold`, `?snake_name`, `?source`, `?sourceCompound`, `?sourceLabel`, `?sourceTier`, `?sourceType`, `?sourceUri`, `?sourceUrl`, `?stageName`, `?status`, `?statusLabel`, `?status_transitions`, `?stepDescription`, `?stepNumber`, `?stepTitle`, `?storage`, `?strategy`, `?strategyFailureMode`, `?successCriteria`, `?summary`, `?surfaceKind`, `?tag`, `?tags`, `?targetCompound`, `?team`, `?teamCount`, `?teamLabel`, `?template`, `?term`, `?term_type`, `?tier`, `?tier1`, `?tier2`, `?tier_label`, `?timeliness`, `?timeoutMs`, `?timestamp`, `?title`, `?tool`, `?toolDescription`, `?toolId`, `?toolLabel`, `?toolName`, `?toolchain`, `?totalChannels`, `?totalControls`, `?totalMotions`, `?totalVotes`, `?total_dimensions`, `?trace_id`, `?transparencyMechanism`, `?transport`, `?trend`, `?trustScore`, `?ttlSeconds`, `?unique`, `?unverified_count`, `?updates`, `?upstream_dataset`, `?upstream_description`, `?upstream_domain`, `?upstream_level`, `?uptime`, `?uriPattern`, `?user_permitted`, `?validation`, `?validationReport`, `?value`, `?verificationQuery`, `?verified_count`, `?version`, `?versioning`, `?violated_count`, `?violationId`, `?vote`, `?voteTimestamp`, `?voter`, `?votingThreshold`, `?wasmModule`, `?withdrawal_date`, `?workflow`
+
+## 4. File Inventory
+<details>
+<summary>Click to expand all files</summary>
+
+- `/Users/sac/chatmangpt/BusinessOS/bos/queries/healthcare_sparql.rq` (10979 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/data-mesh/contracts/finance/domain-contract.ttl` (31155 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/desktop/backend-go/bos/queries/artifacts.rq` (1396 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/desktop/backend-go/bos/queries/clients.rq` (1252 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/desktop/backend-go/bos/queries/contexts.rq` (1233 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/desktop/backend-go/bos/queries/conversations.rq` (1224 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/desktop/backend-go/bos/queries/projects.rq` (1922 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/desktop/backend-go/bos/queries/tasks.rq` (2048 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/desktop/backend-go/bos/queries/team_members.rq` (1342 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/artifacts/public/sample_earl.ttl` (551 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/artifacts/public/sample_prof.ttl` (513 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/artifacts/public/sample_prov_o.ttl` (240 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/core/test_separation.ttl` (2337 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/a2a/discover_principals.rq` (1547 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/a2a/verify_compatibility.rq` (3046 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/artifacts/missing_backing_artifacts.rq` (373 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/behavioral/calculate_friction.rq` (3040 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/behavioral/publish_trace.rq` (1929 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/breeding/check_coverage_batch.rq` (566 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/breeding/get_terms_in_namespace.rq` (621 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/breeding/is_class_defined.rq` (660 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/breeding/is_entity_defined.rq` (260 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/breeding/is_property_defined.rq` (967 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/build_profiles/find_profile_for_target.rq` (635 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/build_profiles/list_build_profiles.rq` (664 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/capability/compare_agent_capabilities.rq` (2318 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/capability/discover_with_grants.rq` (833 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/capability/what_can_agent_do.rq` (1735 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/compounds/compound_dependency_graph.rq` (1336 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/compounds/compute_public_compound_closure.rq` (3117 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/compounds/validate_invariant_preservation.rq` (1943 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/conflation_check.rq` (953 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/core/01_list_plugins.rq` (558 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/core/governance_hooks_to_json.rq` (658 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/core/missing_provenance.rq` (278 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/core/next_admissible_move.rq` (584 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/core/spec_coverage.rq` (916 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/core/wasm4pm_lifecycle_analysis.rq` (5504 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/exploit-negative/detect-hidden-verification.rq` (3543 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/exploit-negative/detect-opaque-authority.rq` (3337 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/exploit-negative/detect-undeclared-privilege.rq` (3764 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/exploit-negative/detect-unsafe-transitions.rq` (2987 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/governance/anomaly_detection.rq` (588 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/governance/compliance_reporting.rq` (1592 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/governance/motion_submission.rq` (511 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/governance/quorum_detection.rq` (1009 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/governance/semantic_rotation.rq` (627 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/governance/temporal_admissibility.rq` (833 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/governance/vote_aggregation.rq` (1014 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/marketplace/generate_catalog.rq` (596 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/marketplace/installable_plugins_for_strict_enterprise.rq` (483 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/marketplace/plugins_with_mcp.rq` (320 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/marketplace/unpinned_git_sources.rq` (397 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/classify_capability.rq` (624 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/classify_surfaces.rq` (1711 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/discover_admissible_surfaces.rq` (1014 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/discover_prompt_surfaces.rq` (547 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/discover_resource_surfaces.rq` (735 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/discover_tool_surfaces.rq` (1812 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/extract_tool_args.rq` (1433 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/mcp/select_projector_for_surface.rq` (1047 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/multi_modal/validate_n_of_m.rq` (3670 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/next_admissible_move.rq` (36 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/adversarial/circular_dependencies.rq` (465 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/adversarial/fake_work_detection.rq` (533 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/adversarial/mock_pattern_detection.rq` (384 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/adversarial/privilege_escalation.rq` (712 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/adversarial/receipt_chain_faults.rq` (589 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/ocel_lifecycle_consistency.rq` (582 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/ocel_object_type_consistency.rq` (603 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/ocel_object_uniqueness.rq` (967 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/ocel_required_attributes.rq` (639 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/ocel/ocel_temporal_ordering.rq` (652 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/pictl/algorithm_selection.rq` (6447 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/pictl/conformance_checking.rq` (5244 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/pictl/discovery_from_traces.rq` (6152 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/pictl/ocel_to_rdf.rq` (8594 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/pictl/variant_analysis.rq` (5815 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/protocols/discover_a2a_surfaces.rq` (617 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/protocols/discover_cli_surfaces.rq` (832 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/protocols/discover_rest_surfaces.rq` (814 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/releases/release_missing_manifest.rq` (124 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/revops/select-tools-by-group.rq` (296 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/roberts_rules/motion_to_powl_activity.rq` (4651 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/runtimes/discover_atomvm_surfaces.rq` (533 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/runtimes/discover_beam_surfaces.rq` (605 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/runtimes/discover_pmctl_surfaces.rq` (539 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/runtimes/discover_wasm_surfaces.rq` (470 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/safe/art_health.rq` (1628 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/safe/cross_team_dependencies.rq` (1129 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/safe/pi_objectives.rq` (877 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/safe/portfolio_allocation.rq` (855 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/tier_equivalence.rq` (2195 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/tier_status.rq` (2803 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/validation/closure-proof-STRICT.rq` (4757 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/validation/closure-proof.rq` (4724 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/validation/hidden-privilege.rq` (1299 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/validation/no-silent-workflow-entry.rq` (1005 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/validation/no-undeclared-remainder-STRICT.rq` (2256 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/validation/no-undeclared-remainder.rq` (2156 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/queries/verification_model_check.rq` (2572 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/ontology/schemas/codemanufactory-public-o-v2.ttl` (19911 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/scripts/queries/manufacture_powl64.rq` (1303 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/pictl-ontology.ttl` (8428 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/pictl-shapes.ttl` (3905 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/sparql-proofs/conformance-check.rq` (2433 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/sparql-proofs/detect-drift.rq` (4549 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/sparql-proofs/discover-dfg.rq` (2250 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/sparql-proofs/ml-classify.rq` (6113 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/sparql-proofs/ocel-load.rq` (5452 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/extern/ostar/vendors/pictl/semconv/sparql-proofs/predict-activity.rq` (4637 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/fibo-deal-examples.ttl` (21024 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/fibo-deal-integration.ttl` (28604 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/fibo-deal-sparql-queries.rq` (19660 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/revops-code-purchase.ttl` (10220 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/sparql/compliance_audit_trail.rq` (5281 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/sparql/compliance_metrics.rq` (5394 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/sparql/compliance_violations.rq` (2670 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/ontologies/sparql/remediation_steps.rq` (4088 bytes)
+- `/Users/sac/chatmangpt/BusinessOS/shacl/organizational-data-shapes.ttl` (21349 bytes)
+- `/Users/sac/chatmangpt/OSA/ggen/sparql/construct_deps.rq` (533 bytes)
+- `/Users/sac/chatmangpt/OSA/ggen/sparql/construct_modules.rq` (643 bytes)
+- `/Users/sac/chatmangpt/OSA/ggen/sparql/construct_patterns.rq` (634 bytes)
+- `/Users/sac/chatmangpt/OSA/ontology/extract_benchmark_data.rq` (1471 bytes)
+- `/Users/sac/chatmangpt/OSA/ontology/sparql_benchmark_schema.ttl` (6720 bytes)
+- `/Users/sac/chatmangpt/OSA/priv/ontologies/benchmark_schema.ttl` (4728 bytes)
+- `/Users/sac/chatmangpt/OSA/priv/ontologies/wvda_benchmark.ttl` (11962 bytes)
+- `/Users/sac/chatmangpt/OSA/priv/sensors/workspace.ttl` (200103 bytes)
+- `/Users/sac/chatmangpt/PUBLIC-ONTOLOGIES.ttl` (5617 bytes)
+- `/Users/sac/chatmangpt/demo/chatman-equation/artifact/demo_artifacts.ttl` (1308 bytes)
+- `/Users/sac/chatmangpt/docs/compliance/chatman-compliance-ontology.ttl` (24193 bytes)
+- `/Users/sac/chatmangpt/docs/compliance/sparql-queries.rq` (18294 bytes)
+- `/Users/sac/chatmangpt/docs/data-mesh/ontologies/finance-domain.ttl` (10241 bytes)
+- `/Users/sac/chatmangpt/docs/data-mesh/ontologies/hr-domain.ttl` (15548 bytes)
+- `/Users/sac/chatmangpt/docs/data-mesh/ontologies/marketing-domain.ttl` (13953 bytes)
+- `/Users/sac/chatmangpt/docs/data-mesh/ontologies/operations-domain.ttl` (13006 bytes)
+- `/Users/sac/chatmangpt/docs/data-mesh/ontologies/sales-domain.ttl` (14338 bytes)
+- `/Users/sac/chatmangpt/docs/diataxis/explanation/explanation-ontology.ttl` (19083 bytes)
+- `/Users/sac/chatmangpt/docs/diataxis/reference/reference-ontology.ttl` (49824 bytes)
+- `/Users/sac/chatmangpt/docs/ggen/chatmangpt.ttl` (44494 bytes)
+- `/Users/sac/chatmangpt/docs/ontology/phd-defense-2026.ttl` (10669 bytes)
+- `/Users/sac/chatmangpt/docs/phd-defense/phd-ontology.ttl` (23883 bytes)
+- `/Users/sac/chatmangpt/docs/sparql/phd-data-select.rq` (2781 bytes)
+- `/Users/sac/chatmangpt/docs/superpowers/examples/ontology_import_construct_example.rq` (8244 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/agents-active.rq` (1067 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/agents-capabilities.rq` (480 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/compliance-policies.rq` (634 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/compliance-violations.rq` (502 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/healing-failures.rq` (746 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/org-structure.rq` (913 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/process-soundness.rq` (943 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/provenance-chain.rq` (680 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/provenance-construct.rq` (1188 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/signal-quality.rq` (720 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/tool-registry.rq` (671 bytes)
+- `/Users/sac/chatmangpt/generated/sparql/validate-shacl.rq` (964 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-agent-architecture.rq` (372 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-data-models.rq` (763 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-deployment.rq` (1388 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-healing-patterns.rq` (976 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-memory-layers.rq` (653 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-platform-services.rq` (1451 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-signal-theory.rq` (1496 bytes)
+- `/Users/sac/chatmangpt/ggen-docs/queries/extract-soundness-properties.rq` (862 bytes)
+- `/Users/sac/chatmangpt/knhk/examples/approval-workflow.ttl` (2294 bytes)
+- `/Users/sac/chatmangpt/knhk/examples/ggen-demo-workflow.ttl` (7069 bytes)
+- `/Users/sac/chatmangpt/knhk/ggen-marketplace/knhk-yawl-workflows/examples/exclusive-choice.ttl` (6035 bytes)
+- `/Users/sac/chatmangpt/knhk/ggen-marketplace/knhk-yawl-workflows/examples/parallel-split.ttl` (5915 bytes)
+- `/Users/sac/chatmangpt/knhk/ggen-marketplace/knhk-yawl-workflows/examples/simple-sequence.ttl` (3357 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/knhk.owl.ttl` (35423 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/mape-k-autonomic.ttl` (28764 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/osys.ttl` (2841 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/shacl/q-invariants.ttl` (26115 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/shacl/soundness.ttl` (14010 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/shacl/workflow-guards.ttl` (11813 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/shacl/workflow-soundness.ttl` (24050 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/core/yawl-pattern-permutations.ttl` (17640 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/examples/autonomic-self-healing-workflow.ttl` (20891 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/examples/autonomous-work-definition.ttl` (19260 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/examples/parallel-processing.ttl` (11995 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/examples/simple-sequence.ttl` (8810 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/financial/atm_transaction.ttl` (6924 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/financial/payroll.ttl` (7420 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/financial/swift_payment.ttl` (9487 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/reference/cancellation_pattern.ttl` (2997 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/reference/multi_instance_approval.ttl` (2348 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/reference/or_join.ttl` (3543 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/reference/order_processing.ttl` (3501 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/workflows/reference/timer_escalation.ttl` (2670 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/yawl-extended.ttl` (23483 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/yawl-pattern-permutations.ttl` (10523 bytes)
+- `/Users/sac/chatmangpt/knhk/ontology/yawl.ttl` (46844 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/code/osys.ttl` (114 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/code/sequence.ttl` (387 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/code/turtle_006.ttl` (901 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/code/turtle_007.ttl` (191 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/code/turtle_008.ttl` (114 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/code/turtle_009.ttl` (476 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/code/workflow.ttl` (184 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/examples/all_43_patterns.ttl` (19777 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/docs/yawl/ontology/van_der_aalst_patterns_all_43.ttl` (28005 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/knhk-integration-tests/tests/fixtures/invalid_workflow_bad_pattern.ttl` (742 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/knhk-integration-tests/tests/fixtures/invalid_workflow_unbounded_loop.ttl` (750 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/knhk-integration-tests/tests/fixtures/simple_valid_workflow.ttl` (1932 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/knhk-integration-tests/tests/fixtures/valid_parallel_workflow.ttl` (2796 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/knhk-workflow-engine/book/examples/simple-sequence.ttl` (1558 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/knhk-workflow-engine/examples/simple-sequence.ttl` (1558 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/knhk-workflow-engine/tests/fixtures/example_workflows.ttl` (8611 bytes)
+- `/Users/sac/chatmangpt/knhk/rust/ontology/shacl/soundness.ttl` (29 bytes)
+- `/Users/sac/chatmangpt/knhk/test_workflow.ttl` (1100 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/archived/test_rdf.ttl` (115 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_authorization.ttl` (660 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_cardinality.ttl` (685 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_datatype.ttl` (492 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_exactcount.ttl` (626 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_lookups.ttl` (662 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_maxcount.ttl` (703 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_objectcount.ttl` (650 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_objectcount_exact.ttl` (617 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_objectcount_max.ttl` (695 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_reverse.ttl` (663 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_types.ttl` (578 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_unique.ttl` (744 bytes)
+- `/Users/sac/chatmangpt/knhk/tests/data/enterprise_validation.ttl` (689 bytes)
+- `/Users/sac/chatmangpt/knhk/validation-examples/invalid/missing-resource-bounds.ttl` (3241 bytes)
+- `/Users/sac/chatmangpt/knhk/validation-examples/invalid/type-mismatch.ttl` (3170 bytes)
+- `/Users/sac/chatmangpt/knhk/validation-examples/invalid/unbounded-recursion.ttl` (2513 bytes)
+- `/Users/sac/chatmangpt/knhk/validation-examples/valid/parallel-workflow.ttl` (4275 bytes)
+- `/Users/sac/chatmangpt/knhk/validation-examples/valid/simple-workflow.ttl` (6059 bytes)
+- `/Users/sac/chatmangpt/ontologies/HEALTHCARE_SPARQL_QUERIES.rq` (18741 bytes)
+- `/Users/sac/chatmangpt/ontologies/SPARQL_QUERIES.rq` (9587 bytes)
+- `/Users/sac/chatmangpt/ontologies/USAGE_EXAMPLES.ttl` (15167 bytes)
+- `/Users/sac/chatmangpt/ontologies/chatman-agents.ttl` (49043 bytes)
+- `/Users/sac/chatmangpt/ontologies/chatman-compliance.ttl` (32362 bytes)
+- `/Users/sac/chatmangpt/ontologies/chatman-core.ttl` (11502 bytes)
+- `/Users/sac/chatmangpt/ontologies/chatman-healthcare.ttl` (30758 bytes)
+- `/Users/sac/chatmangpt/ontologies/chatman-org.ttl` (29731 bytes)
+- `/Users/sac/chatmangpt/ontologies/chatman-process.ttl` (35348 bytes)
+- `/Users/sac/chatmangpt/ontologies/chatman-signal.ttl` (31261 bytes)
+- `/Users/sac/chatmangpt/ontologies/micro_benchmark_schema.ttl` (9666 bytes)
+- `/Users/sac/chatmangpt/ontologies/shacl/provenance.shacl.ttl` (42334 bytes)
+- `/Users/sac/chatmangpt/ontologies/skos/agent-types.ttl` (24571 bytes)
+- `/Users/sac/chatmangpt/ontologies/skos/failure-modes.ttl` (9325 bytes)
+- `/Users/sac/chatmangpt/ontologies/skos/genre-scheme.ttl` (8615 bytes)
+- `/Users/sac/chatmangpt/ontologies/skos/yawl-patterns.ttl` (18266 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/constructs/artifacts/create_artifact.rq` (2003 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/constructs/artifacts/link_artifact_to_decision.rq` (1292 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/constructs/compliance/create_compliance_record.rq` (2584 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/constructs/org/create_person.rq` (1328 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/constructs/process/create_process_variant.rq` (1559 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/constructs/projects/create_project.rq` (1232 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/constructs/signal/create_signal.rq` (1922 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/dataset_lineage_downstream.rq` (5436 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/dataset_lineage_full.rq` (5073 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/dataset_lineage_upstream.rq` (4934 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/dataset_quality_lineage.rq` (14248 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/domain_join_finance_operations.rq` (4921 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/domain_join_sales_finance.rq` (5919 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/federation_quality_check.rq` (7625 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/fibo_deal_create.rq` (5146 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/fibo_deal_kyc.rq` (6242 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/fibo_deal_lineage.rq` (4742 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/fibo_deal_sox.rq` (8467 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/healthcare/consent_status.rq` (3685 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/healthcare/hipaa_audit_trail.rq` (6259 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/healthcare/phi_access_audit.rq` (3077 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/healthcare/phi_deletion_verification.rq` (4247 bytes)
+- `/Users/sac/chatmangpt/ontologies/sparql/queries/multi_domain_lineage.rq` (5532 bytes)
+- `/Users/sac/chatmangpt/ontologies/unified_benchmark_schema.ttl` (4840 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/core/test_separation.ttl` (2337 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/csvw.ttl` (26702 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/dcat.ttl` (165749 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/jsonld.ttl` (15386 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/ldp.ttl` (10140 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/odrl.ttl` (91012 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/org.ttl` (84162 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/prov-aq.ttl` (11182 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/prov-dc.ttl` (4686 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/prov.ttl` (112777 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/sdm.ttl` (11738 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/sh.ttl` (52899 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/time.ttl` (101486 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/public/tier0/vcard.ttl` (32183 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/a2a/discover_principals.rq` (1547 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/a2a/verify_compatibility.rq` (3046 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/artifacts/missing_backing_artifacts.rq` (373 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/behavioral/calculate_friction.rq` (3040 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/behavioral/publish_trace.rq` (1929 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/breeding/check_coverage_batch.rq` (566 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/breeding/get_terms_in_namespace.rq` (621 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/breeding/is_class_defined.rq` (660 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/breeding/is_entity_defined.rq` (260 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/breeding/is_property_defined.rq` (967 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/build_profiles/find_profile_for_target.rq` (635 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/build_profiles/list_build_profiles.rq` (664 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/capability/compare_agent_capabilities.rq` (2318 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/capability/discover_with_grants.rq` (833 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/capability/what_can_agent_do.rq` (1735 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/compounds/compound_dependency_graph.rq` (1336 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/compounds/compute_public_compound_closure.rq` (3117 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/compounds/validate_invariant_preservation.rq` (1943 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/conflation_check.rq` (953 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/core/01_list_plugins.rq` (558 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/core/governance_hooks_to_json.rq` (658 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/core/missing_provenance.rq` (278 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/core/next_admissible_move.rq` (584 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/core/spec_coverage.rq` (916 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/core/wasm4pm_lifecycle_analysis.rq` (5504 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/exploit-negative/detect-hidden-verification.rq` (3543 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/exploit-negative/detect-opaque-authority.rq` (3337 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/exploit-negative/detect-undeclared-privilege.rq` (3764 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/exploit-negative/detect-unsafe-transitions.rq` (2987 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/governance/anomaly_detection.rq` (588 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/governance/compliance_reporting.rq` (1592 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/governance/motion_submission.rq` (511 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/governance/quorum_detection.rq` (1009 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/governance/semantic_rotation.rq` (627 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/governance/temporal_admissibility.rq` (833 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/governance/vote_aggregation.rq` (1014 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/marketplace/generate_catalog.rq` (596 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/marketplace/installable_plugins_for_strict_enterprise.rq` (483 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/marketplace/plugins_with_mcp.rq` (320 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/marketplace/unpinned_git_sources.rq` (397 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/classify_capability.rq` (624 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/classify_surfaces.rq` (1711 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/discover_admissible_surfaces.rq` (1014 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/discover_prompt_surfaces.rq` (547 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/discover_resource_surfaces.rq` (735 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/discover_tool_surfaces.rq` (1812 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/extract_tool_args.rq` (1433 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/mcp/select_projector_for_surface.rq` (1047 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/multi_modal/validate_n_of_m.rq` (3670 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/next_admissible_move.rq` (36 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/adversarial/circular_dependencies.rq` (465 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/adversarial/fake_work_detection.rq` (533 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/adversarial/mock_pattern_detection.rq` (384 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/adversarial/privilege_escalation.rq` (712 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/adversarial/receipt_chain_faults.rq` (589 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/ocel_lifecycle_consistency.rq` (582 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/ocel_object_type_consistency.rq` (603 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/ocel_object_uniqueness.rq` (967 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/ocel_required_attributes.rq` (639 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/ocel/ocel_temporal_ordering.rq` (652 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/pictl/algorithm_selection.rq` (6447 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/pictl/conformance_checking.rq` (5244 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/pictl/discovery_from_traces.rq` (6152 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/pictl/ocel_to_rdf.rq` (8594 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/pictl/variant_analysis.rq` (5815 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/protocols/discover_a2a_surfaces.rq` (617 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/protocols/discover_cli_surfaces.rq` (832 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/protocols/discover_rest_surfaces.rq` (814 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/releases/release_missing_manifest.rq` (124 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/revops/select-tools-by-group.rq` (296 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/roberts_rules/motion_to_powl_activity.rq` (4651 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/runtimes/discover_atomvm_surfaces.rq` (533 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/runtimes/discover_beam_surfaces.rq` (605 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/runtimes/discover_pmctl_surfaces.rq` (539 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/runtimes/discover_wasm_surfaces.rq` (470 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/safe/art_health.rq` (1628 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/safe/cross_team_dependencies.rq` (1129 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/safe/pi_objectives.rq` (877 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/safe/portfolio_allocation.rq` (855 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/tier_equivalence.rq` (2195 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/tier_status.rq` (2803 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/validation/closure-proof-STRICT.rq` (4757 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/validation/closure-proof.rq` (4724 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/validation/hidden-privilege.rq` (1299 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/validation/no-silent-workflow-entry.rq` (1005 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/validation/no-undeclared-remainder-STRICT.rq` (2256 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/validation/no-undeclared-remainder.rq` (2156 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/queries/verification_model_check.rq` (2572 bytes)
+- `/Users/sac/chatmangpt/ostar/ontology/schemas/codemanufactory-public-o-v2.ttl` (19911 bytes)
+- `/Users/sac/chatmangpt/ostar/queries/manufacture_powl64.rq` (1303 bytes)
+- `/Users/sac/chatmangpt/ostar/scripts/queries/manufacture_powl64.rq` (1303 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/pictl-ontology.ttl` (8428 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/pictl-shapes.ttl` (3905 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/sparql-proofs/conformance-check.rq` (2433 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/sparql-proofs/detect-drift.rq` (4549 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/sparql-proofs/discover-dfg.rq` (2250 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/sparql-proofs/ml-classify.rq` (6113 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/sparql-proofs/ocel-load.rq` (5452 bytes)
+- `/Users/sac/chatmangpt/ostar/vendors/pictl/semconv/sparql-proofs/predict-activity.rq` (4637 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/pictl-ontology.ttl` (8428 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/pictl-shapes.ttl` (3905 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/sparql-proofs/conformance-check.rq` (2433 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/sparql-proofs/detect-drift.rq` (4549 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/sparql-proofs/discover-dfg.rq` (2250 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/sparql-proofs/ml-classify.rq` (6113 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/sparql-proofs/ocel-load.rq` (5452 bytes)
+- `/Users/sac/chatmangpt/pictl/semconv/sparql-proofs/predict-activity.rq` (4637 bytes)
+- `/Users/sac/chatmangpt/rdf-benchmarks/examples/schemas/example_rdf_schema.ttl` (2112 bytes)
+- `/Users/sac/chatmangpt/semconv/test/data/knhk_expected_output_l1.ttl` (2259 bytes)
+- `/Users/sac/chatmangpt/semconv/test/data/knhk_expected_output_l2.ttl` (3027 bytes)
+- `/Users/sac/chatmangpt/semconv/test/data/knhk_input_facts.ttl` (3367 bytes)
+- `/Users/sac/chatmangpt/tests/data/fortune5-test-data-fibo.ttl` (10860 bytes)
+- `/Users/sac/chatmangpt/tests/data/fortune5-test-data-hipaa.ttl` (13459 bytes)
+- `/Users/sac/chatmangpt/tests/shapes/fortune5-compliance-shacl-shapes.ttl` (15743 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/dx.ttl` (184 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/generate.ttl` (2395 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/lexicon.ttl` (740 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/rust.ttl` (1542 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/shapes/lexicon.shacl.ttl` (335 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/shapes/rust.shacl.ttl` (512 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/shapes/unibit.shacl.ttl` (946 bytes)
+- `/Users/sac/chatmangpt/unibit/ontology/unibit.ttl` (1958 bytes)
+- `/Users/sac/chatmangpt/unibit/sparql/crates.rq` (337 bytes)
+- `/Users/sac/chatmangpt/unibit/sparql/lexicon.rq` (179 bytes)
+- `/Users/sac/chatmangpt/unibit/sparql/modules.rq` (366 bytes)
+- `/Users/sac/chatmangpt/unibit/sparql/toolchain.rq` (158 bytes)
+- `/Users/sac/chatmangpt/unibit/sparql/workspace.rq` (240 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/pictl-ontology.ttl` (8428 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/pictl-shapes.ttl` (3905 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/sparql-proofs/conformance-check.rq` (2433 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/sparql-proofs/detect-drift.rq` (4549 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/sparql-proofs/discover-dfg.rq` (2250 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/sparql-proofs/ml-classify.rq` (6113 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/sparql-proofs/ocel-load.rq` (5452 bytes)
+- `/Users/sac/chatmangpt/wasm4pm/semconv/sparql-proofs/predict-activity.rq` (4637 bytes)
+
+</details>

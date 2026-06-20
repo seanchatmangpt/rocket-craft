@@ -1,0 +1,73 @@
+#usda 1.0
+(
+    defaultPrim = "Backpack_Wings"
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "Backpack_Wings" (
+    kind = "component"
+)
+{
+    kind = "component"
+)
+{
+    double3 xformOp:translate = (0, 0.0, -1.5)
+    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+    # Main Feathers / Primary Wing Binders
+    def Xform "LeftPrimaryWing"
+    {
+        double3 xformOp:translate = (-2.0, 2.0, -1.0)
+        double3 xformOp:rotateXYZ = (20, 30, -30)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cube "WingBase"
+        {
+            double3 xformOp:scale = (6.0, 2.0, 0.2)
+            color3f[] primvars:displayColor = [(0.95, 0.95, 0.95)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+    }
+    def Xform "RightPrimaryWing"
+    {
+        double3 xformOp:translate = (2.0, 2.0, -1.0)
+        double3 xformOp:rotateXYZ = (20, -30, 30)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cube "WingBase"
+        {
+            double3 xformOp:scale = (6.0, 2.0, 0.2)
+            color3f[] primvars:displayColor = [(0.95, 0.95, 0.95)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+    }
+
+    # Sub-wings / Drei Zwerg binders
+    def Xform "LeftSubWing"
+    {
+        double3 xformOp:translate = (-3.0, -2.0, -0.5)
+        double3 xformOp:rotateXYZ = (-10, 45, -45)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cube "SubWingBase"
+        {
+            double3 xformOp:scale = (5.0, 1.5, 0.15)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+    }
+    def Xform "RightSubWing"
+    {
+        double3 xformOp:translate = (3.0, -2.0, -0.5)
+        double3 xformOp:rotateXYZ = (-10, -45, 45)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cube "SubWingBase"
+        {
+            double3 xformOp:scale = (5.0, 1.5, 0.15)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+    }
+}

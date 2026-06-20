@@ -402,9 +402,7 @@ fn detect_hardcoded_objects(filepath: &str, content: &str, obs: &mut Vec<Observa
             match ch {
                 '{' => depth += 1,
                 '}' => {
-                    if depth > 0 {
-                        depth -= 1;
-                    }
+                    depth = depth.saturating_sub(1);
                 }
                 _ => { /* handled */ }
             }
@@ -432,5 +430,118 @@ fn detect_hardcoded_objects(filepath: &str, content: &str, obs: &mut Vec<Observa
             }
             obj_keys = 0;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // ── ts-ignore / eslint-disable ────────────────────────────────────────────
+
+    #[test]
+    fn ts_ignore_comment_produces_ts_smell() {
+        let obs = parse_typescript("src/foo.ts", "// @ts-ignore\nconst x = 1;\n");
+        assert!(
+            obs.iter().any(|o| o.kind == "ts_smell" && o.construct == "ts-ignore"),
+            "// @ts-ignore must produce ts_smell/ts-ignore"
+        );
+    }
+
+    // ── as any cast ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn as_any_cast_produces_obs() {
+        let obs = parse_typescript("src/foo.ts", "const x = foo as any;\n");
+        assert!(
+            obs.iter().any(|o| o.construct == "as any"),
+            "` as any` cast must produce an observation with construct 'as any'"
+        );
+    }
+
+    // ── TODO comment ─────────────────────────────────────────────────────────
+
+    #[test]
+    fn todo_comment_in_ts_is_detected() {
+        let obs = parse_typescript("src/foo.ts", "// TODO: fix this\nconst y = 2;\n");
+        // construct is mat.as_str() which will be "TODO"
+        assert!(obs.iter().any(|o| o.construct.contains("TODO")));
+    }
+
+    // ── console.log in prod ───────────────────────────────────────────────────
+
+    #[test]
+    fn console_log_in_prod_ts_is_flagged() {
+        let obs = parse_typescript("src/service.ts", "console.log('debug');\n");
+        assert!(
+            obs.iter().any(|o| o.construct == "console.log"),
+            "console.log in a non-test .ts file must be flagged"
+        );
+    }
+
+    #[test]
+    fn console_log_in_test_file_is_allowed() {
+        let obs = parse_typescript("src/service.spec.ts", "console.log('debug');\n");
+        assert!(
+            !obs.iter().any(|o| o.construct == "console.log"),
+            "console.log in a .spec.ts file must not be flagged"
+        );
+    }
+
+    // ── eval() ───────────────────────────────────────────────────────────────
+
+    #[test]
+    fn eval_call_produces_obs() {
+        let obs = parse_typescript("src/foo.ts", "eval('code');\n");
+        assert!(obs.iter().any(|o| o.construct == "eval"));
+    }
+
+    // ── var declaration (JS only) ─────────────────────────────────────────────
+
+    #[test]
+    fn var_decl_in_js_file_produces_obs() {
+        // var check is gated on is_js (`.js` extension)
+        let obs = parse_typescript("src/foo.js", "var x = 1;\n");
+        assert!(obs.iter().any(|o| o.construct == "var"), "var in .js must be flagged");
+    }
+
+    #[test]
+    fn var_decl_in_ts_file_is_not_flagged() {
+        let obs = parse_typescript("src/foo.ts", "var x = 1;\n");
+        assert!(!obs.iter().any(|o| o.construct == "var"), "var in .ts must not be flagged by js_legacy rule");
+    }
+
+    // ── is_js_test_path ───────────────────────────────────────────────────────
+
+    #[test]
+    fn test_path_detection() {
+        assert!(is_js_test_path("src/foo.test.ts"));
+        assert!(is_js_test_path("src/foo.spec.ts"));
+        assert!(is_js_test_path("__tests__/foo.ts"));
+        assert!(!is_js_test_path("src/service.ts"));
+    }
+
+    // ── byte_offset_to_char_column ────────────────────────────────────────────
+
+    #[test]
+    fn byte_offset_col_first_char_is_one() {
+        assert_eq!(byte_offset_to_char_column("hello", 0), 1);
+    }
+
+    #[test]
+    fn byte_offset_col_mid_string() {
+        assert_eq!(byte_offset_to_char_column("abcde", 2), 3);
+    }
+
+    // ── clean TS ─────────────────────────────────────────────────────────────
+
+    #[test]
+    fn clean_ts_produces_no_smell_obs() {
+        let clean = "export const add = (a: number, b: number): number => a + b;\n";
+        let obs = parse_typescript("src/math.ts", clean);
+        assert!(
+            !obs.iter().any(|o| o.kind == "ts_smell"),
+            "clean TS must produce no ts_smell observations"
+        );
     }
 }

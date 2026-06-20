@@ -10,6 +10,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: { mode: 'on', size: { width: 1280, height: 720 } },
   },
   projects: [
     {
@@ -20,7 +22,7 @@ export default defineConfig({
   webServer: {
     command: 'node ../genie_server.js',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     stdout: 'ignore',
     stderr: 'pipe',
   },

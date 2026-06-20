@@ -12,6 +12,7 @@ thiserror = { workspace = true }
 nalgebra = { workspace = true }
 bytemuck = { version = "1", features = ["derive"] }
 wgpu = { version = "22", optional = true }
+nexus-types = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }

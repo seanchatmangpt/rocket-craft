@@ -1,0 +1,12 @@
+error[E0599]: no method named `build` found for struct `CivilizationBuilder<Unset>` in the current scope
+ --> tests/fail/civ_no_planet.rs:9:10
+  |
+7 |       let _civ = CivilizationBuilder::new()
+  |  ________________-
+8 | |         .with_name("Principality of Zeon")
+9 | |         .build();
+  | |         -^^^^^ method not found in `CivilizationBuilder<Unset>`
+  | |_________|
+  |
+  |
+  = note: the method was found for `CivilizationBuilder<Set<Plan>>`

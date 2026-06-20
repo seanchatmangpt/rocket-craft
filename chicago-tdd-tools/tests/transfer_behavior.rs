@@ -6,8 +6,7 @@ fn should_transfer_funds_between_accounts() {
     let mut receiver = Account::new();
     sender.deposit(100);
 
-    TransferService::transfer(&mut sender, &mut receiver, 40)
-        .expect("Transfer should succeed");
+    TransferService::transfer(&mut sender, &mut receiver, 40).expect("Transfer should succeed");
 
     assert_eq!(sender.balance(), 60);
     assert_eq!(receiver.balance(), 40);

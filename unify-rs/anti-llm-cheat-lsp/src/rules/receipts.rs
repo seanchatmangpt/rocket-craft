@@ -61,3 +61,62 @@ pub fn evaluate(obs: &[Observation]) -> Vec<AntiLlmDiagnostic> {
 
     diags
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::observations::Observation;
+
+    fn obs(construct: &str, message: &str) -> Observation {
+        Observation {
+            file_path: "src/lib.rs".into(), line: 1, column: 0,
+            start_byte: 0, end_byte: 0,
+            kind: "receipt_smell".into(),
+            construct: construct.into(), context: String::new(), message: message.into(),
+        }
+    }
+
+    #[test]
+    fn empty_returns_no_diags() {
+        assert!(evaluate(&[]).is_empty());
+    }
+
+    #[test]
+    fn test_result_ok_triggers_receipt_001() {
+        let diags = evaluate(&[obs("test result: ok", "")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-RECEIPT-001");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn log_message_construct_triggers_receipt_002() {
+        let diags = evaluate(&[obs("LogMessage => Receipt", "")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-RECEIPT-002");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn log_message_in_message_field_triggers_receipt_002() {
+        let diags = evaluate(&[obs("anything", "LogMessage => Receipt")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-RECEIPT-002");
+    }
+
+    #[test]
+    fn missing_digest_triggers_receipt_003() {
+        let diags = evaluate(&[obs("missing digest", "")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-RECEIPT-003");
+        assert!(diags[0].blocking);
+    }
+
+    #[test]
+    fn message_contains_lacks_required_field_triggers_receipt_003() {
+        let diags = evaluate(&[obs("anything", "Receipt file lacks required field 'digest'")]);
+        assert_eq!(diags[0].code, "ANTI-LLM-RECEIPT-003");
+    }
+
+    #[test]
+    fn unknown_construct_produces_no_diag() {
+        let diags = evaluate(&[obs("normal_thing", "all good")]);
+        assert!(diags.is_empty());
+    }
+}

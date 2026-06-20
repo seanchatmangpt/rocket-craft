@@ -1,8 +1,8 @@
+use serde::Deserialize;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tokio::process::Command;
 use tracing::{debug, error, info, warn};
-use serde::Deserialize;
 
 use crate::{ConvertedAsset, PipelineError, ValidatedAsset};
 
@@ -37,7 +37,9 @@ impl BlenderConverter {
                 v.push(PathBuf::from(p));
             }
             // Well-known paths
-            v.push(PathBuf::from("/Applications/Blender.app/Contents/MacOS/blender")); // macOS
+            v.push(PathBuf::from(
+                "/Applications/Blender.app/Contents/MacOS/blender",
+            )); // macOS
             v.push(PathBuf::from("/usr/bin/blender"));
             v.push(PathBuf::from("/usr/local/bin/blender"));
             v.push(PathBuf::from("/snap/bin/blender"));
@@ -98,7 +100,7 @@ impl BlenderConverter {
         &self,
         asset: ValidatedAsset,
         work_dir: &Path,
-    ) -> Result<ConvertedAsset, (PipelineError, ValidatedAsset)> {
+    ) -> Result<ConvertedAsset, Box<(PipelineError, ValidatedAsset)>> {
         // Fast path: already FBX — just copy
         if asset.source_format.is_fbx() {
             let fbx_path = work_dir.join(format!("{}.fbx", asset.name()));
@@ -108,7 +110,7 @@ impl BlenderConverter {
                 fbx_path.display()
             );
             if let Err(e) = std::fs::copy(&asset.path, &fbx_path) {
-                return Err((PipelineError::StagingFailed(e), asset));
+                return Err(Box::new((PipelineError::StagingFailed(e), asset)));
             }
             return Ok(asset.into_converted(fbx_path));
         }
@@ -142,13 +144,13 @@ impl BlenderConverter {
                     "Failed to spawn Blender at {}: {e}",
                     self.blender_path.display()
                 );
-                return Err((
+                return Err(Box::new((
                     PipelineError::BlenderNotFound {
                         blender_bin: self.blender_path.to_string_lossy().to_string(),
                         source: e,
                     },
                     asset,
-                ));
+                )));
             }
         };
 
@@ -169,23 +171,23 @@ impl BlenderConverter {
         if wait_result.is_none() {
             // Timed out — child is still alive, kill it.
             let _ = child.kill().await;
-            return Err((
+            return Err(Box::new((
                 PipelineError::ConversionFailed {
                     path: asset.path.clone(),
                     stderr: format!("timed out after {}s", self.timeout_secs),
                 },
                 asset,
-            ));
+            )));
         }
 
         if let Err(e) = wait_result.unwrap() {
-            return Err((
+            return Err(Box::new((
                 PipelineError::ConversionFailed {
                     path: asset.path.clone(),
                     stderr: format!("process error: {e}"),
                 },
                 asset,
-            ));
+            )));
         }
 
         // Drain the pipes now that the process has exited.
@@ -203,7 +205,8 @@ impl BlenderConverter {
         }
 
         // Parse the last non-empty stdout line as JSON
-        let last_line = stdout.lines().filter(|l| !l.trim().is_empty()).last();
+        #[allow(clippy::filter_next)]
+        let last_line = stdout.lines().filter(|l| !l.trim().is_empty()).next_back();
 
         let blender_result: Option<BlenderResult> =
             last_line.and_then(|l| serde_json::from_str(l).ok());
@@ -224,13 +227,13 @@ impl BlenderConverter {
                     Ok(asset.into_converted(fbx))
                 } else {
                     error!("Blender reported success but output file is missing: {out_path}");
-                    Err((
+                    Err(Box::new((
                         PipelineError::ConversionFailed {
                             path: asset.path.clone(),
                             stderr: format!("output file missing: {out_path}"),
                         },
                         asset,
-                    ))
+                    )))
                 }
             }
             Some(BlenderResult {
@@ -238,14 +241,17 @@ impl BlenderConverter {
                 error: Some(ref err),
                 ..
             }) => {
-                error!("Blender reported failure for {}: {err}", asset.path.display());
-                Err((
+                error!(
+                    "Blender reported failure for {}: {err}",
+                    asset.path.display()
+                );
+                Err(Box::new((
                     PipelineError::ConversionFailed {
                         path: asset.path.clone(),
                         stderr: err.clone(),
                     },
                     asset,
-                ))
+                )))
             }
             _ => {
                 // No parseable JSON result — capture whatever stderr we got
@@ -254,13 +260,13 @@ impl BlenderConverter {
                     "Blender conversion for {} produced no parseable result. stderr: {stderr_snippet}",
                     asset.path.display()
                 );
-                Err((
+                Err(Box::new((
                     PipelineError::ConversionFailed {
                         path: asset.path.clone(),
                         stderr: stderr_snippet,
                     },
                     asset,
-                ))
+                )))
             }
         }
     }
@@ -345,21 +351,17 @@ mod tests {
                     work_tmp.path().join("rocket.fbx"),
                     "fbx_path should be in work_dir"
                 );
-                assert!(
-                    converted.fbx_path.exists(),
-                    "copied FBX must exist on disk"
-                );
+                assert!(converted.fbx_path.exists(), "copied FBX must exist on disk");
                 assert_eq!(
                     converted.path, original_path,
                     "original source path preserved"
                 );
-                assert_eq!(
-                    converted.source_format,
-                    Format::Fbx,
-                    "format preserved"
-                );
+                assert_eq!(converted.source_format, Format::Fbx, "format preserved");
             }
-            Err((e, _)) => panic!("FBX fast-path should not fail: {e}"),
+            Err(boxed_err) => {
+                let (e, _) = *boxed_err;
+                panic!("FBX fast-path should not fail: {e}");
+            }
         }
     }
 
@@ -379,7 +381,7 @@ mod tests {
         let result = converter.convert(asset, work_tmp.path()).await;
 
         assert!(result.is_err(), "should fail without a real Blender binary");
-        let (err, _asset) = result.unwrap_err();
+        let (err, _asset) = *result.unwrap_err();
         assert!(
             matches!(err, PipelineError::BlenderNotFound { .. }),
             "expected BlenderNotFound, got: {err:?}"

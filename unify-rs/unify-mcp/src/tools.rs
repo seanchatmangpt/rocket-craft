@@ -214,11 +214,11 @@ pub fn register_builtin_tools(registry: &mut ToolRegistry) {
                 .iter()
                 .filter(|t| {
                     let s_match = subject_filter
-                        .map_or(true, |f| t["subject"].as_str() == Some(f));
+                        .is_none_or(|f| t["subject"].as_str() == Some(f));
                     let p_match = predicate_filter
-                        .map_or(true, |f| t["predicate"].as_str() == Some(f));
+                        .is_none_or(|f| t["predicate"].as_str() == Some(f));
                     let o_match = object_filter
-                        .map_or(true, |f| t["object"].as_str() == Some(f));
+                        .is_none_or(|f| t["object"].as_str() == Some(f));
                     s_match && p_match && o_match
                 })
                 .cloned()
@@ -450,9 +450,9 @@ fn attach_builtin_tools(server: McpServer) -> McpServer {
             let matching: Vec<serde_json::Value> = raw_triples
                 .iter()
                 .filter(|t| {
-                    subject_filter.map_or(true, |f| t["subject"].as_str() == Some(f))
-                        && predicate_filter.map_or(true, |f| t["predicate"].as_str() == Some(f))
-                        && object_filter.map_or(true, |f| t["object"].as_str() == Some(f))
+                    subject_filter.is_none_or(|f| t["subject"].as_str() == Some(f))
+                        && predicate_filter.is_none_or(|f| t["predicate"].as_str() == Some(f))
+                        && object_filter.is_none_or(|f| t["object"].as_str() == Some(f))
                 })
                 .cloned()
                 .collect();

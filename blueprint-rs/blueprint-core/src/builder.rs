@@ -11,7 +11,7 @@
 //! * **Consuming (`self`)** — used by the `blueprint_macros` proc-macro crate,
 //!   where the DSL expands to a method-chain that ends with `.to_t3d()`.
 
-use crate::ast::{BpNode, Blueprint, Pin};
+use crate::ast::{Blueprint, BpNode, Pin};
 use crate::nodes;
 use crate::serializer::{JsonSerializer, T3dSerializer};
 use crate::types::{NodePos, PinType};
@@ -259,7 +259,12 @@ impl BlueprintBuilder {
     // ------------------------------------------------------------------
 
     /// Add a Blueprint variable (mutable style).
-    pub fn add_variable_mut(&mut self, name: impl Into<std::string::String>, ty: VarType, default: Option<std::string::String>) -> &mut Self {
+    pub fn add_variable_mut(
+        &mut self,
+        name: impl Into<std::string::String>,
+        ty: VarType,
+        default: Option<std::string::String>,
+    ) -> &mut Self {
         use crate::ast::BpVariable;
         let mut var = BpVariable::new(name.into(), ty.to_pin_type());
         if let Some(d) = default {
@@ -376,69 +381,56 @@ impl BlueprintBuilder {
                 }
                 Statement::CallFunction { func, args } => {
                     let name = format!("CallFunction_{idx}");
-                    let mut node = BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_CallFunction",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property(
-                        "FunctionReference",
-                        &format!("(MemberName=\"{func}\")"),
-                    )
-                    .with_pin(Pin::exec_input("execute"))
-                    .with_pin(Pin::exec_output("then"));
+                    let mut node = BpNode::new("/Script/BlueprintGraph.K2Node_CallFunction", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("FunctionReference", format!("(MemberName=\"{func}\")"))
+                        .with_pin(Pin::exec_input("execute"))
+                        .with_pin(Pin::exec_output("then"));
                     for (i, arg) in args.iter().enumerate() {
-                        let mut p = Pin::data_input(&format!("Param{i}"), PinType::wildcard());
+                        let mut p = Pin::data_input(format!("Param{i}"), PinType::wildcard());
                         p.default_value = Some(arg.clone());
                         node = node.with_pin(p);
                     }
                     node
                 }
-                Statement::SetVar { name: var_name, value } => {
+                Statement::SetVar {
+                    name: var_name,
+                    value,
+                } => {
                     let name = format!("VariableSet_{idx}");
                     let mut val_pin = Pin::data_input("NewValue", PinType::wildcard());
                     val_pin.default_value = Some(value);
-                    BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_VariableSet",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property("VariableName", &format!("\"{var_name}\""))
-                    .with_pin(Pin::exec_input("execute"))
-                    .with_pin(Pin::exec_output("then"))
-                    .with_pin(val_pin)
+                    BpNode::new("/Script/BlueprintGraph.K2Node_VariableSet", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("VariableName", format!("\"{var_name}\""))
+                        .with_pin(Pin::exec_input("execute"))
+                        .with_pin(Pin::exec_output("then"))
+                        .with_pin(val_pin)
                 }
                 Statement::GetVar { name: var_name } => {
                     let name = format!("VariableGet_{idx}");
-                    BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_VariableGet",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property("VariableName", &format!("\"{var_name}\""))
-                    .with_pin(Pin::data_output("Value", PinType::wildcard()))
+                    BpNode::new("/Script/BlueprintGraph.K2Node_VariableGet", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("VariableName", format!("\"{var_name}\""))
+                        .with_pin(Pin::data_output("Value", PinType::wildcard()))
                 }
                 Statement::Branch { condition } => {
                     let name = format!("Branch_{idx}");
                     let mut cond_pin = Pin::data_input("Condition", PinType::bool());
                     cond_pin.default_value = Some(condition);
-                    nodes::branch_node(&name)
-                        .at(pos.x, pos.y)
+                    nodes::branch_node(&name).at(pos.x, pos.y)
                 }
                 Statement::ForLoop { var, start, end } => {
                     let name = format!("ForLoop_{idx}");
-                    BpNode::new(
-                        "/Script/BlueprintGraph.K2Node_MacroInstance",
-                        &name,
-                    )
-                    .at(pos.x, pos.y)
-                    .with_property("MacroGraphReference", "(MacroName=\"ForLoop\")")
-                    .with_property("LoopVar", &format!("\"{var}\""))
-                    .with_property("StartIndex", &start.to_string())
-                    .with_property("LastIndex", &(end - 1).to_string())
-                    .with_pin(Pin::exec_input("execute"))
-                    .with_pin(Pin::exec_output("LoopBody"))
-                    .with_pin(Pin::exec_output("Completed"))
+                    BpNode::new("/Script/BlueprintGraph.K2Node_MacroInstance", &name)
+                        .at(pos.x, pos.y)
+                        .with_property("MacroGraphReference", "(MacroName=\"ForLoop\")")
+                        .with_property("LoopVar", format!("\"{var}\""))
+                        .with_property("StartIndex", start.to_string())
+                        .with_property("LastIndex", (end - 1).to_string())
+                        .with_pin(Pin::exec_input("execute"))
+                        .with_pin(Pin::exec_output("LoopBody"))
+                        .with_pin(Pin::exec_output("Completed"))
                 }
             };
             self.blueprint.event_graph().nodes.push(node);
@@ -523,6 +515,14 @@ impl BlueprintBuilder {
         let name = self.unique_name("AddInt");
         let pos = self.next_pos();
         let node = nodes::add_int(&name).at(pos.x, pos.y);
+        self.push_node(node)
+    }
+
+    /// Add an integer subtract node (mutable style).
+    pub fn subtract_int(&mut self) -> NodeHandle {
+        let name = self.unique_name("SubtractInt");
+        let pos = self.next_pos();
+        let node = nodes::subtract_int(&name).at(pos.x, pos.y);
         self.push_node(node)
     }
 
@@ -693,14 +693,23 @@ impl BlueprintBuilder {
             )
             .with_pin(Pin::exec_input("execute"))
             .with_pin(Pin::exec_output("then"))
-            .with_pin(Pin::data_input("DamagedActor", PinType::object("/Script/Engine.Actor")))
+            .with_pin(Pin::data_input(
+                "DamagedActor",
+                PinType::object("/Script/Engine.Actor"),
+            ))
             .with_pin(Pin::data_input("BaseDamage", PinType::float()))
             .with_pin(Pin::data_input(
                 "EventInstigator",
                 PinType::object("/Script/Engine.Controller"),
             ))
-            .with_pin(Pin::data_input("DamageCauser", PinType::object("/Script/Engine.Actor")))
-            .with_pin(Pin::data_input("DamageTypeClass", PinType::class("/Script/Engine.DamageType")))
+            .with_pin(Pin::data_input(
+                "DamageCauser",
+                PinType::object("/Script/Engine.Actor"),
+            ))
+            .with_pin(Pin::data_input(
+                "DamageTypeClass",
+                PinType::class("/Script/Engine.DamageType"),
+            ))
             .with_pin(Pin::data_output("ReturnValue", PinType::float()));
         self.push_node(node)
     }
@@ -728,13 +737,19 @@ impl BlueprintBuilder {
     }
 
     /// Add a MacroInstance (generic macro call) node — mutable style.
-    pub fn macro_instance_node(&mut self, macro_name: impl Into<std::string::String>) -> NodeHandle {
+    pub fn macro_instance_node(
+        &mut self,
+        macro_name: impl Into<std::string::String>,
+    ) -> NodeHandle {
         let macro_name = macro_name.into();
         let name = self.unique_name(&format!("MacroInstance_{macro_name}"));
         let pos = self.next_pos();
         let node = BpNode::new("/Script/BlueprintGraph.K2Node_MacroInstance", &name)
             .at(pos.x, pos.y)
-            .with_property("MacroGraphReference", &format!("(MacroName=\"{macro_name}\")"))
+            .with_property(
+                "MacroGraphReference",
+                format!("(MacroName=\"{macro_name}\")"),
+            )
             .with_pin(Pin::exec_input("execute"))
             .with_pin(Pin::exec_output("then"));
         self.push_node(node)
@@ -784,7 +799,7 @@ impl BlueprintBuilder {
             .with_pin(Pin::exec_output("then"))
             .with_pin(
                 Pin::data_input("Time", PinType::float())
-                    .with_default(&rate.to_string()),
+                    .with_default(rate.to_string()),
             )
             .with_pin(
                 Pin::data_input("bLooping", PinType::bool())
@@ -810,7 +825,7 @@ impl BlueprintBuilder {
                     "NewLocation",
                     PinType::struct_type("/Script/CoreUObject.Vector"),
                 )
-                .with_default(&format!("(X={x},Y={y},Z={z})")),
+                .with_default(format!("(X={x},Y={y},Z={z})")),
             );
         self.push_node(node)
     }
@@ -831,12 +846,8 @@ impl BlueprintBuilder {
                 "WorldDirection",
                 PinType::struct_type("/Script/CoreUObject.Vector"),
             ))
-            .with_pin(
-                Pin::data_input("ScaleValue", PinType::float()).with_default("1.0"),
-            )
-            .with_pin(
-                Pin::data_input("bForce", PinType::bool()).with_default("false"),
-            );
+            .with_pin(Pin::data_input("ScaleValue", PinType::float()).with_default("1.0"))
+            .with_pin(Pin::data_input("bForce", PinType::bool()).with_default("false"));
         self.push_node(node)
     }
 
@@ -870,13 +881,7 @@ impl BlueprintBuilder {
     }
 
     /// Connect an arbitrary pin on `from` to an arbitrary pin on `to`.
-    pub fn connect(
-        &mut self,
-        from: &NodeHandle,
-        from_pin: &str,
-        to: &NodeHandle,
-        to_pin: &str,
-    ) {
+    pub fn connect(&mut self, from: &NodeHandle, from_pin: &str, to: &NodeHandle, to_pin: &str) {
         self.blueprint
             .event_graph()
             .connect(&from.name, from_pin, &to.name, to_pin);
@@ -944,5 +949,115 @@ mod tests {
         let t3d = builder.to_t3d();
         assert!(t3d.contains("ReceiveBeginPlay"));
         assert!(t3d.contains("PrintString"));
+    }
+
+    #[test]
+    fn variable_declared_in_json() {
+        // T3D serializer only emits graph nodes; variables live in the JSON output
+        let bp = BlueprintBuilder::new("PlayerChar", "Character")
+            .variable("Stamina", VarType::Float, Some("100.0".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("Stamina"), "variable name must appear in JSON output");
+    }
+
+    #[test]
+    fn custom_event_appears_in_t3d() {
+        let t3d = BlueprintBuilder::new("MyActor", "Actor")
+            .custom_event("OnDamageTaken", |ev| {
+                ev.print("damage taken");
+            })
+            .to_t3d();
+        assert!(t3d.contains("OnDamageTaken") || t3d.contains("CustomEvent"),
+            "custom event name or CustomEvent node must appear in T3D");
+    }
+
+    #[test]
+    fn end_play_event_appears_in_t3d() {
+        let t3d = BlueprintBuilder::new("MyActor", "Actor")
+            .end_play(|ev| {
+                ev.print("cleaning up");
+            })
+            .to_t3d();
+        assert!(t3d.contains("ReceiveEndPlay") || t3d.contains("EndPlay"),
+            "end play event must appear in T3D");
+    }
+
+    #[test]
+    fn to_json_produces_valid_json() {
+        let bp = BlueprintBuilder::new("TestBP", "Actor")
+            .variable("Hp", VarType::Int, None)
+            .begin_play(|ev| { ev.print("start"); });
+        let json = bp.to_json().expect("should serialize to JSON");
+        let parsed: serde_json::Value = serde_json::from_str(&json).expect("must be valid JSON");
+        assert!(parsed.is_object() || parsed.is_array(),
+            "JSON output must be an object or array");
+    }
+
+    #[test]
+    fn branch_node_appears_in_t3d() {
+        let mut builder = BlueprintBuilder::new("LogicActor", "Actor");
+        let _branch = builder.branch_node();
+        let t3d = builder.to_t3d();
+        assert!(t3d.contains("Branch") || t3d.contains("K2Node_IfThenElse"),
+            "branch node must appear in T3D output");
+    }
+
+    #[test]
+    fn multiple_variables_all_appear_in_json() {
+        // T3D only emits graph nodes; variables appear in JSON output
+        let bp = BlueprintBuilder::new("StatsActor", "Actor")
+            .variable("Health", VarType::Int, Some("100".into()))
+            .variable("Mana", VarType::Int, Some("50".into()))
+            .variable("Stamina", VarType::Float, Some("75.0".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("Health"));
+        assert!(json.contains("Mana"));
+        assert!(json.contains("Stamina"));
+    }
+
+    #[test]
+    fn bool_variable_appears_in_json() {
+        let bp = BlueprintBuilder::new("FlagActor", "Actor")
+            .variable("IsAlive", VarType::Bool, Some("true".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("IsAlive"), "bool variable name must appear in JSON");
+    }
+
+    #[test]
+    fn string_variable_appears_in_json() {
+        let bp = BlueprintBuilder::new("DialogActor", "Actor")
+            .variable("GreetingText", VarType::String, Some("Hello".into()));
+        let json = bp.to_json().expect("JSON serialize should succeed");
+        assert!(json.contains("GreetingText"), "string variable must appear in JSON");
+    }
+
+    #[test]
+    fn call_function_node_appears_in_t3d() {
+        let t3d = BlueprintBuilder::new("AbilityActor", "Actor")
+            .begin_play(|ev| {
+                ev.call("ActivateAbility", vec!["AbilityIndex".into()]);
+            })
+            .to_t3d();
+        assert!(t3d.contains("ActivateAbility"), "function call must appear in T3D");
+    }
+
+    #[test]
+    fn t3d_output_is_non_empty() {
+        // Even an empty blueprint should produce some T3D output (header at minimum)
+        let t3d = BlueprintBuilder::new("WeaponActor", "StaticMeshActor")
+            .to_t3d();
+        assert!(!t3d.is_empty(), "T3D output must not be empty");
+    }
+
+    #[test]
+    fn begin_play_and_tick_both_appear() {
+        let t3d = BlueprintBuilder::new("DualEventActor", "Actor")
+            .begin_play(|ev| { ev.print("begin"); })
+            .tick(|ev| { ev.call("UpdateState", vec![]); })
+            .to_t3d();
+        assert!(t3d.contains("ReceiveBeginPlay") || t3d.contains("BeginPlay"),
+            "begin play must be present");
+        assert!(t3d.contains("ReceiveTick") || t3d.contains("Tick"),
+            "tick must be present");
     }
 }

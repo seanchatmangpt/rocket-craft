@@ -8,6 +8,10 @@ serde = { workspace = true }
 nalgebra = { workspace = true }
 glam = { workspace = true }
 thiserror = { workspace = true }
+sha2 = { workspace = true }
+chrono = { workspace = true }
+serde_json = { workspace = true }
+
 
 [dev-dependencies]
 proptest = { workspace = true }

@@ -295,10 +295,8 @@ fn walk_dirs<F: Fn(&Path) -> bool>(root: &Path, predicate: &F) -> bool {
     };
     for entry in entries.flatten() {
         let path = entry.path();
-        if path.is_dir() {
-            if predicate(&path) || walk_dirs(&path, predicate) {
-                return true;
-            }
+        if path.is_dir() && (predicate(&path) || walk_dirs(&path, predicate)) {
+            return true;
         }
     }
     false
