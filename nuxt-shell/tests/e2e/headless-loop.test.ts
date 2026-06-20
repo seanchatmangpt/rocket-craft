@@ -199,6 +199,56 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
       expect(body.last_receipt.verdict).toBe('PASS');
     }
   });
+
+  it('Step 10: chain-verify confirms chain intact with merkle_root for the seeded session', async () => {
+    if (MOCK || !seededSessionId) return;
+    const { status, body } = await get(`/api/game/chain-verify?session_id=${seededSessionId}`);
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(body.overall).toBe('PASS');
+    expect(body.event_count).toBeGreaterThan(0);
+    // merkle_root must be a 64-char hex string (BLAKE3)
+    expect(typeof body.merkle_root).toBe('string');
+    expect(body.merkle_root).toMatch(/^[0-9a-f]{64}$/);
+    console.log(`[headless-loop] chain-verify: overall=${body.overall} event_count=${body.event_count} merkle_root=${body.merkle_root?.slice(0, 8)}…`);
+  });
+
+  it('Step 11: evidence-pack bundles chain proof with merkle_root and pack_hash', async () => {
+    if (MOCK || !seededSessionId) return;
+    const { status, body } = await post('/api/game/evidence-pack', { session_id: seededSessionId });
+    if (status === 503 || status === 404) return;
+    expect(status).toBe(200);
+    expect(body.chain_proof.intact).toBe(true);
+    // manifest.merkle_root must be 64-char hex
+    expect(typeof body.manifest.merkle_root).toBe('string');
+    expect(body.manifest.merkle_root).toMatch(/^[0-9a-f]{64}$/);
+    // pack_hash covers entire bundle
+    expect(typeof body.pack_hash).toBe('string');
+    expect(body.pack_hash).toMatch(/^[0-9a-f]{64}$/);
+    console.log(`[headless-loop] evidence-pack: pack_hash=${body.pack_hash?.slice(0, 8)}… merkle_root=${body.manifest.merkle_root?.slice(0, 8)}…`);
+  });
+
+  it('Step 12: health-lies returns all_clear=true after a clean seeded session', async () => {
+    if (MOCK) return;
+    const { status, body } = await get('/api/game/health-lies');
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(body.all_clear).toBe(true);
+    console.log(`[headless-loop] health-lies: all_clear=${body.all_clear} lies=${body.lies?.length ?? 0}`);
+  });
+
+  it('Step 13: qa-cycle returns HEALTHY with BLAKE3 cycle_receipt_hash for the seeded session', async () => {
+    if (MOCK || !seededSessionId) return;
+    const { status, body } = await post('/api/game/qa-cycle', { session_id: seededSessionId });
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(body.overall).toBe('HEALTHY');
+    expect(body.checks_passed).toBe(body.checks_total);
+    // cycle_receipt_hash must be 64-char BLAKE3 hex
+    expect(typeof body.cycle_receipt_hash).toBe('string');
+    expect(body.cycle_receipt_hash).toMatch(/^[0-9a-f]{64}$/);
+    console.log(`[headless-loop] qa-cycle: overall=${body.overall} checks=${body.checks_passed}/${body.checks_total} hash=${body.cycle_receipt_hash?.slice(0, 8)}…`);
+  });
 });
 
 // ── Shape contracts (MOCK mode — no server needed) ───────────────────────────
