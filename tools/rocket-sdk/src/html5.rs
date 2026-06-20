@@ -304,6 +304,17 @@ impl Html5PackageReport {
     }
 
     /// One-liner summary suitable for CLI output.
+    /// Independently re-hash the first real WASM (BLAKE3 hex), the same value
+    /// stored as `output_hash` in the cook receipt. Used for tamper detection:
+    /// compare against the previously-pushed receipt to prove the binary on disk
+    /// is the one that was cooked. Returns None if no real WASM is present.
+    pub fn output_hash(&self) -> Option<String> {
+        self.wasm_files.iter()
+            .find(|f| matches!(f.verdict, WasmVerdict::Real { .. }))
+            .and_then(|f| std::fs::read(&f.path).ok())
+            .map(|bytes| blake3::hash(&bytes).to_hex().to_string())
+    }
+
     pub fn summary(&self) -> String {
         if self.is_real_package {
             let size = self.wasm_files.iter().find_map(|f| {
@@ -1841,5 +1852,47 @@ mod tests {
         let supa_hash = supa_receipt.output_hash.as_deref().unwrap();
         assert_eq!(disk_hash, supa_hash,
             "output_hash must be identical in write_receipt() and as_supabase_receipt()");
+
+        // The public output_hash() helper (used by tamper-check) must agree too.
+        assert_eq!(report.output_hash().as_deref(), Some(disk_hash),
+            "output_hash() helper must match the receipt's output_hash for tamper-check");
+    }
+
+    #[test]
+    fn output_hash_is_none_for_stub_wasm() {
+        let dir = TempDir::new().unwrap();
+        let wasm = dir.path().join("Brm.wasm");
+        std::fs::write(&wasm, b"stub").unwrap();
+        let report = Html5PackageReport {
+            archive_dir: dir.path().to_owned(),
+            wasm_files: vec![WasmFileReport { path: wasm, verdict: WasmVerdict::Stub { size_bytes: 4 } }],
+            companions: CompanionReport { has_js: false, has_html: false, has_data_or_pak: false },
+            is_real_package: false,
+            ui_input_patched: false,
+            cook_session_id: None,
+            cook_log_events: vec![],
+        };
+        // No real WASM → no hash to compare → tamper-check yields NO_WASM.
+        assert!(report.output_hash().is_none());
+    }
+
+    #[test]
+    fn output_hash_is_deterministic_blake3_of_wasm_bytes() {
+        let dir = TempDir::new().unwrap();
+        let wasm = dir.path().join("Brm.wasm");
+        let bytes = b"\0asm\x01\0\0\0deterministic-tamper-check";
+        std::fs::write(&wasm, bytes).unwrap();
+        let report = Html5PackageReport {
+            archive_dir: dir.path().to_owned(),
+            wasm_files: vec![WasmFileReport { path: wasm, verdict: WasmVerdict::Real { size_bytes: bytes.len() as u64 } }],
+            companions: CompanionReport { has_js: true, has_html: true, has_data_or_pak: false },
+            is_real_package: true,
+            ui_input_patched: false,
+            cook_session_id: None,
+            cook_log_events: vec![],
+        };
+        // Same bytes → same hash, and it equals raw BLAKE3 of the file bytes.
+        let expected = blake3::hash(bytes).to_hex().to_string();
+        assert_eq!(report.output_hash(), Some(expected));
     }
 }

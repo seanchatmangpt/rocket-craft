@@ -499,6 +499,78 @@ fn verify_html5(archive: Option<String>, min_mb: Option<f64>, project: Option<St
     do_html5_verify(archive, min_mb, project)
 }
 
+/// Independent tamper check: re-hash the WASM on disk and compare to the
+/// output_hash of the last cook receipt pushed to Supabase. Detects a binary
+/// that was swapped or rebuilt since the last proven cook.
+///
+/// Verdicts:
+///   MATCH       — disk binary == last pushed receipt (no tamper)
+///   MISMATCH    — disk binary != last pushed receipt (TAMPER / stale build) → exit error
+///   NO_PRIOR    — no prior cook receipt to compare against (first cook)
+///   NO_WASM     — no real WASM found in the archive
+fn do_html5_tamper_check(archive: Option<String>, project: Option<String>) -> Result<Value> {
+    let dir = archive.unwrap_or_else(|| {
+        let name = project.as_deref().unwrap_or("brm").to_lowercase();
+        format!("/tmp/{name}-html5-archive/HTML5")
+    });
+
+    let report = rocket_sdk::Html5PackageVerifier::new(&dir)
+        .verify()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
+
+    let local_hash = match report.output_hash() {
+        Some(h) => h,
+        None => {
+            println!("[tamper-check] NO_WASM — no real WASM in {dir}");
+            return Ok(serde_json::json!({ "verdict": "NO_WASM", "archive": dir }));
+        }
+    };
+
+    // Fetch the last pushed cook receipt's output_hash from Supabase.
+    let url = std::env::var("SUPABASE_URL").unwrap_or_default();
+    let key = std::env::var("SUPABASE_ANON_KEY")
+        .or_else(|_| std::env::var("SUPABASE_SERVICE_ROLE_KEY"))
+        .unwrap_or_default();
+    if url.is_empty() || key.is_empty() {
+        println!("[tamper-check] NO_PRIOR — Supabase not configured; local_hash={}", &local_hash[..16]);
+        return Ok(serde_json::json!({ "verdict": "NO_PRIOR", "local_hash": local_hash }));
+    }
+
+    let svc = rocket_sdk::supabase::SupabaseService::new(url, key);
+    let rt = tokio::runtime::Runtime::new()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
+    let receipts = rt.block_on(svc.last_cook_receipt(1))
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{:#}", e)))?;
+
+    let prior_hash = receipts.first()
+        .and_then(|r| r.get("output_hash"))
+        .and_then(|h| h.as_str())
+        .map(|s| s.to_string());
+
+    match prior_hash {
+        None => {
+            println!("[tamper-check] NO_PRIOR — no prior cook receipt; local_hash={}", &local_hash[..16]);
+            Ok(serde_json::json!({ "verdict": "NO_PRIOR", "local_hash": local_hash }))
+        }
+        Some(prior) if prior == local_hash => {
+            println!("[tamper-check] MATCH — disk binary matches last pushed receipt ({}…)", &local_hash[..16]);
+            Ok(serde_json::json!({ "verdict": "MATCH", "local_hash": local_hash, "prior_hash": prior }))
+        }
+        Some(prior) => {
+            // Tamper / stale build — fail loudly.
+            Err(clap_noun_verb::NounVerbError::execution_error(format!(
+                "TAMPER DETECTED — disk WASM hash {}… != last pushed cook receipt {}…",
+                &local_hash[..16], &prior[..16.min(prior.len())]
+            )))
+        }
+    }
+}
+
+#[verb("tamper-check", "html5")]
+fn tamper_check_html5(archive: Option<String>, project: Option<String>) -> Result<Value> {
+    do_html5_tamper_check(archive, project)
+}
+
 fn do_html5_status(project: Option<String>) -> Result<Value> {
     let root = std::env::current_dir()
         .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;

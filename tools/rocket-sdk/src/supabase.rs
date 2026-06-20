@@ -338,7 +338,7 @@ impl SupabaseService {
     pub async fn last_cook_receipt(&self, limit: u32) -> Result<Vec<serde_json::Value>> {
         let url = format!(
             "{}/rest/v1/game_receipts\
-             ?select=id,verdict,milestone,engine_source,ocel_event_count,proven_at,receipt_hash,payload\
+             ?select=id,verdict,milestone,engine_source,ocel_event_count,proven_at,receipt_hash,output_hash,payload\
              &engine_source=eq.rocket_cli\
              &order=proven_at.desc\
              &limit={limit}",
