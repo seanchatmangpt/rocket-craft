@@ -17,7 +17,7 @@ const { isPlaying, events: ocelEvents, exportOcelLog, exportHashedOcelLog } = us
 const lifecycle = computed(() => [...new Set(ocelEvents.value.map(e => e.activity))]);
 
 // Persist OCEL events to Supabase with hash chaining for pm4py conformance replay
-const { syncedCount, syncError, dbSessionId, lastHash } = useGameSessionPersistence();
+const { syncedCount, syncError, dbSessionId, dbReceiptHash, lastHash } = useGameSessionPersistence();
 
 // Minimum lawful OCEL lifecycle for auto-commit (Van der Aalst: process must be provable)
 const PROVEN_LIFECYCLE = ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'] as const;
@@ -27,25 +27,23 @@ const hasAutoCommitted = ref(false);
 const lastCommitVerdict = ref<string | null>(null);
 
 async function commitReceipt() {
-  if (!dbSessionId.value) return;
-  const receiptHash = lastHash.value ? `blake3:${lastHash.value}` : `blake3:empty`;
+  if (!dbSessionId.value || !dbReceiptHash.value) return;
 
-  const result = await $fetch('/api/game/receipt', {
+  // Use receipt-finalize (chain-verified) instead of the bare receipt POST.
+  // dbReceiptHash is the hash the server computed in session.post — finalize
+  // verifies the chain tip matches before stamping PROVEN.
+  const result = await $fetch('/api/game/receipt-finalize', {
     method: 'POST',
     body: {
       session_id: dbSessionId.value,
-      ocel_lifecycle: lifecycle.value,
-      ocel_event_count: ocelEvents.value.length,
-      engine_source: isEngineReady.value ? 'real_ue4' : 'unknown',
-      receipt_hash: receiptHash,
-      milestone: 'GameSessionProof',
-      payload: { chain_tip: lastHash.value },
+      receipt_hash: dbReceiptHash.value,
+      update_receipt: true,
     },
   }).catch(() => null);
 
   if (result) {
     lastCommitVerdict.value = (result as { verdict?: string }).verdict ?? null;
-    console.info(`[rocket-craft] Receipt ${lastCommitVerdict.value} — auto-committed`);
+    console.info(`[rocket-craft] Receipt-finalize ${lastCommitVerdict.value} — auto-committed`);
   }
   return result;
 }
@@ -161,7 +159,7 @@ async function downloadHashedOcelLog() {
     <div ref="canvasRef" class="canvas-wrapper">
     <ClientOnly>
       <UE4Canvas
-        script-src="/manufactured/Brm.UE4.js"
+        src="/manufactured/Brm.html"
         title="Rocket-Craft World"
         @ready="onEngineReady"
         @error="onEngineError"
