@@ -249,6 +249,22 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     expect(body.cycle_receipt_hash).toMatch(/^[0-9a-f]{64}$/);
     console.log(`[headless-loop] qa-cycle: overall=${body.overall} checks=${body.checks_passed}/${body.checks_total} hash=${body.cycle_receipt_hash?.slice(0, 8)}…`);
   });
+
+  it('Step 14: leaderboard returns valid shape (rows may be empty for headless sessions)', async () => {
+    if (MOCK || !seededSessionId) return;
+    const { status, body } = await get('/api/game/leaderboard');
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    // Shape: { rows: array, total: number|null, limit: number, offset: number, cached_at: string }
+    // Headless sessions have no player_id, so rows may be empty — check shape only
+    expect(Array.isArray(body.rows)).toBe(true);
+    expect(typeof body.limit).toBe('number');
+    expect(typeof body.offset).toBe('number');
+    expect(body.total === null || typeof body.total === 'number').toBe(true);
+    expect(typeof body.cached_at).toBe('string');
+    expect(body.cached_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    console.log(`[headless-loop] leaderboard: rows=${body.rows?.length ?? 0} total=${body.total}`);
+  });
 });
 
 // ── Shape contracts (MOCK mode — no server needed) ───────────────────────────
