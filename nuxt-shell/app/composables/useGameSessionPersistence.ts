@@ -15,7 +15,6 @@
 export function useGameSessionPersistence() {
   const { events, sessionId, isPlaying } = useGameSessionOcel();
 
-  const { computeEventHash } = useHashChain();
   const dbSessionId = ref<string | null>(null);
   const dbReceiptHash = ref<string | null>(null);
   const lastHash = ref<string | null>(null);
@@ -69,15 +68,15 @@ export function useGameSessionPersistence() {
 
       for (const evt of unsync) {
         const seq = syncedCount.value;
-        const hash = await computeEventHash({
-          id: evt.id,
-          timestamp: new Date(evt.timestamp_ms).toISOString(),
-          type: evt.activity,
-          data: {
-            object_refs: evt.object_refs as unknown as Record<string, unknown>,
-            attributes: evt.attributes as Record<string, unknown>,
-          },
+        // Hash with the SERVER-canonical formula so server-side replay/chain-verify
+        // converges (was useHashChain's {id,timestamp,type,data,prev_hash} shape,
+        // which diverged → false tamper alarms on real browser sessions).
+        const hash = canonicalOcelEventHash({
+          session_id: dbSessionId.value!,
+          activity: evt.activity,
+          timestamp_ms: evt.timestamp_ms,
           prev_hash: lastHash.value,
+          attributes: evt.attributes as Record<string, unknown>,
         });
         batch.push({
           session_id: dbSessionId.value!,
