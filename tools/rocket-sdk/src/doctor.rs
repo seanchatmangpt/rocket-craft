@@ -13,23 +13,342 @@ pub enum CheckStatus {
     Fail,
 }
 
+impl CheckStatus {
+    /// Status glyph (plain ASCII-safe unicode).
+    pub fn glyph(&self) -> &'static str {
+        match self {
+            CheckStatus::Pass => "✔",
+            CheckStatus::Warn => "▲",
+            CheckStatus::Fail => "✘",
+        }
+    }
+
+    fn color(&self) -> &'static str {
+        match self {
+            CheckStatus::Pass => ansi::GREEN,
+            CheckStatus::Warn => ansi::YELLOW,
+            CheckStatus::Fail => ansi::RED,
+        }
+    }
+
+    fn label(&self) -> &'static str {
+        match self {
+            CheckStatus::Pass => "PASS",
+            CheckStatus::Warn => "WARN",
+            CheckStatus::Fail => "FAIL",
+        }
+    }
+}
+
+/// Logical grouping for a check so the report can be sectioned.
+#[derive(Debug, Serialize, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum CheckCategory {
+    #[default]
+    Environment,
+    Toolchain,
+    Project,
+    Git,
+    Optional,
+}
+
+impl CheckCategory {
+    pub fn label(&self) -> &'static str {
+        match self {
+            CheckCategory::Environment => "Environment",
+            CheckCategory::Toolchain => "Toolchain",
+            CheckCategory::Project => "Project",
+            CheckCategory::Git => "Git",
+            CheckCategory::Optional => "Optional",
+        }
+    }
+
+    /// Iteration order used when rendering / scoring.
+    pub fn ordered() -> [CheckCategory; 5] {
+        [
+            CheckCategory::Environment,
+            CheckCategory::Toolchain,
+            CheckCategory::Project,
+            CheckCategory::Git,
+            CheckCategory::Optional,
+        ]
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CheckResult
+// ---------------------------------------------------------------------------
+
 #[derive(Debug, Serialize, Clone)]
 pub struct CheckResult {
     pub name: String,
     pub status: CheckStatus,
     pub message: String,
     pub details: Option<String>,
+    /// Additive fields (kept after the original four for serde stability).
+    #[serde(default)]
+    pub category: CheckCategory,
+    /// A concrete command the user can run to remediate. Every Warn/Fail
+    /// SHOULD carry one.
+    #[serde(default)]
+    pub fix_command: Option<String>,
 }
 
+impl CheckResult {
+    /// Convenience constructor that mirrors the original struct-literal style
+    /// while letting category/fix be set fluently.
+    fn new(
+        name: impl Into<String>,
+        status: CheckStatus,
+        message: impl Into<String>,
+        category: CheckCategory,
+    ) -> Self {
+        CheckResult {
+            name: name.into(),
+            status,
+            message: message.into(),
+            details: None,
+            category,
+            fix_command: None,
+        }
+    }
+
+    fn with_details(mut self, details: impl Into<String>) -> Self {
+        self.details = Some(details.into());
+        self
+    }
+
+    fn with_fix(mut self, fix: impl Into<String>) -> Self {
+        self.fix_command = Some(fix.into());
+        self
+    }
+
+    /// Weight used in health scoring. Optional checks count less.
+    fn weight(&self) -> f64 {
+        match self.category {
+            CheckCategory::Optional => 0.5,
+            _ => 1.0,
+        }
+    }
+
+    /// 0.0..=1.0 score contribution for this check.
+    fn score_fraction(&self) -> f64 {
+        match self.status {
+            CheckStatus::Pass => 1.0,
+            CheckStatus::Warn => 0.5,
+            CheckStatus::Fail => 0.0,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// DiagnosticReport
+// ---------------------------------------------------------------------------
+
 // TRACKED_WORK(anti-cheat): DiagnosticReport previously derived Deserialize but DateTime<Utc>
-// requires chrono's "serde" feature flag which was not enabled in Cargo.toml, causing
-// a compile error. The CLI only serializes (outputs) diagnostic reports — it never
-// deserializes them — so Deserialize has been removed.
+// requires chrono's "serde" feature flag. The CLI only serializes diagnostic reports — it never
+// deserializes them — so Deserialize remains intentionally absent.
 #[derive(Debug, Serialize, Clone)]
 pub struct DiagnosticReport {
     pub timestamp: DateTime<Utc>,
     pub checks: Vec<CheckResult>,
 }
+
+impl DiagnosticReport {
+    /// Weighted health score in the inclusive range 0..=100.
+    pub fn health_score(&self) -> u8 {
+        let mut total_weight = 0.0;
+        let mut earned = 0.0;
+        for c in &self.checks {
+            let w = c.weight();
+            total_weight += w;
+            earned += w * c.score_fraction();
+        }
+        if total_weight == 0.0 {
+            return 100;
+        }
+        ((earned / total_weight) * 100.0).round() as u8
+    }
+
+    /// Overall status: Fail if any non-optional check failed, else Warn if any
+    /// warn/fail at all, else Pass.
+    pub fn overall_status(&self) -> CheckStatus {
+        let mut any_warn = false;
+        for c in &self.checks {
+            match c.status {
+                CheckStatus::Fail if c.category != CheckCategory::Optional => {
+                    return CheckStatus::Fail;
+                }
+                CheckStatus::Fail | CheckStatus::Warn => any_warn = true,
+                CheckStatus::Pass => {}
+            }
+        }
+        if any_warn {
+            CheckStatus::Warn
+        } else {
+            CheckStatus::Pass
+        }
+    }
+
+    pub fn counts(&self) -> (usize, usize, usize) {
+        let mut pass = 0;
+        let mut warn = 0;
+        let mut fail = 0;
+        for c in &self.checks {
+            match c.status {
+                CheckStatus::Pass => pass += 1,
+                CheckStatus::Warn => warn += 1,
+                CheckStatus::Fail => fail += 1,
+            }
+        }
+        (pass, warn, fail)
+    }
+
+    // ---- Output modes ----------------------------------------------------
+
+    /// JSON report (includes derived health score and overall status).
+    pub fn to_json(&self) -> String {
+        #[derive(Serialize)]
+        struct Out<'a> {
+            timestamp: &'a DateTime<Utc>,
+            health_score: u8,
+            overall_status: &'a CheckStatus,
+            pass: usize,
+            warn: usize,
+            fail: usize,
+            checks: &'a [CheckResult],
+        }
+        let (pass, warn, fail) = self.counts();
+        let out = Out {
+            timestamp: &self.timestamp,
+            health_score: self.health_score(),
+            overall_status: &self.overall_status(),
+            pass,
+            warn,
+            fail,
+            checks: &self.checks,
+        };
+        serde_json::to_string_pretty(&out).unwrap_or_else(|e| format!("{{\"error\":\"{e}\"}}"))
+    }
+
+    /// One-line compact summary, e.g.
+    /// `doctor: WARN  health 84/100  (12 pass, 2 warn, 0 fail)`.
+    pub fn compact_summary(&self, use_color: bool) -> String {
+        let (pass, warn, fail) = self.counts();
+        let overall = self.overall_status();
+        let score = self.health_score();
+        if use_color {
+            format!(
+                "{}doctor:{} {}{}{}  health {}{}/100{}  ({} pass, {} warn, {} fail)",
+                ansi::BOLD,
+                ansi::RESET,
+                overall.color(),
+                overall.label(),
+                ansi::RESET,
+                ansi::CYAN,
+                score,
+                ansi::RESET,
+                pass,
+                warn,
+                fail,
+            )
+        } else {
+            format!(
+                "doctor: {}  health {}/100  ({} pass, {} warn, {} fail)",
+                overall.label(),
+                score,
+                pass,
+                warn,
+                fail
+            )
+        }
+    }
+
+    /// Pretty, sectioned, human-readable report.
+    pub fn pretty(&self, use_color: bool) -> String {
+        let mut out = String::new();
+        let paint = |s: &str, color: &str| -> String {
+            if use_color {
+                format!("{color}{s}{}", ansi::RESET)
+            } else {
+                s.to_string()
+            }
+        };
+
+        out.push_str(&paint("Rocket Doctor", ansi::BOLD));
+        out.push('\n');
+        out.push_str(&format!("{}\n", self.timestamp.to_rfc3339()));
+        out.push('\n');
+
+        for cat in CheckCategory::ordered() {
+            let in_cat: Vec<&CheckResult> =
+                self.checks.iter().filter(|c| c.category == cat).collect();
+            if in_cat.is_empty() {
+                continue;
+            }
+            out.push_str(&paint(&format!("── {} ──", cat.label()), ansi::CYAN));
+            out.push('\n');
+            for c in in_cat {
+                let glyph = if use_color {
+                    format!("{}{}{}", c.status.color(), c.status.glyph(), ansi::RESET)
+                } else {
+                    format!("{} {}", c.status.glyph(), c.status.label())
+                };
+                out.push_str(&format!("  {glyph} {:<22} {}\n", c.name, c.message));
+                if let Some(d) = &c.details {
+                    out.push_str(&format!("       {}\n", paint(d, ansi::DIM)));
+                }
+                if c.status != CheckStatus::Pass {
+                    if let Some(fix) = &c.fix_command {
+                        out.push_str(&format!(
+                            "       {} {}\n",
+                            paint("fix:", ansi::YELLOW),
+                            fix
+                        ));
+                    }
+                }
+            }
+            out.push('\n');
+        }
+
+        out.push_str(&self.compact_summary(use_color));
+        out.push('\n');
+        out
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Auto-fix
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Serialize, Clone, PartialEq, Eq)]
+pub enum FixOutcome {
+    /// Would have run (dry-run) — not actually executed.
+    Planned,
+    Applied,
+    Skipped,
+    Failed,
+}
+
+#[derive(Debug, Serialize, Clone)]
+pub struct FixResult {
+    pub check_name: String,
+    pub command: String,
+    pub outcome: FixOutcome,
+    pub message: String,
+}
+
+/// A safe, whitelisted remediation that `run_fixes` is allowed to perform.
+/// We never shell out arbitrary `fix_command` strings — only these vetted ops.
+enum SafeFix {
+    /// `cargo fetch` inside the tools workspace — pure download, non-destructive.
+    CargoFetch,
+    /// Create a directory (and parents) if missing — non-destructive.
+    CreateDir(PathBuf),
+}
+
+// ---------------------------------------------------------------------------
+// RocketDoctor
+// ---------------------------------------------------------------------------
 
 pub struct RocketDoctor {
     project_root: PathBuf,
@@ -79,26 +398,135 @@ impl RocketDoctor {
             self.check_xcode(),
         ];
 
+        let mut results: Vec<(usize, CheckResult)> = std::thread::scope(|scope| {
+            let handles: Vec<_> = checks
+                .into_iter()
+                .map(|(idx, f)| scope.spawn(move || (idx, f())))
+                .collect();
+            handles
+                .into_iter()
+                .map(|h| h.join().expect("doctor check thread panicked"))
+                .collect()
+        });
+
+        results.sort_by_key(|(idx, _)| *idx);
+
         DiagnosticReport {
             timestamp: Utc::now(),
-            checks,
+            checks: results.into_iter().map(|(_, r)| r).collect(),
         }
     }
 
+    /// Execute the safe subset of remediations.
+    ///
+    /// `dry_run = true` (the recommended default) only *reports* what would be
+    /// done. Only whitelisted, non-destructive operations are ever performed —
+    /// arbitrary `fix_command` strings are NOT executed.
+    pub fn run_fixes(&self, dry_run: bool) -> Vec<FixResult> {
+        let report = self.run_diagnostics();
+        let mut out = Vec::new();
+
+        for check in &report.checks {
+            if check.status == CheckStatus::Pass {
+                continue;
+            }
+            let Some(safe) = self.safe_fix_for(check) else {
+                // Non-passing but no safe automated fix — surface the manual one.
+                if let Some(cmd) = &check.fix_command {
+                    out.push(FixResult {
+                        check_name: check.name.clone(),
+                        command: cmd.clone(),
+                        outcome: FixOutcome::Skipped,
+                        message: "No safe auto-fix; run the suggested command manually".into(),
+                    });
+                }
+                continue;
+            };
+
+            let (command, result) = self.apply_safe_fix(safe, dry_run);
+            out.push(FixResult {
+                check_name: check.name.clone(),
+                command,
+                outcome: result.0,
+                message: result.1,
+            });
+        }
+
+        out
+    }
+
+    /// Map a failing/warning check to a whitelisted safe fix, if one exists.
+    fn safe_fix_for(&self, check: &CheckResult) -> Option<SafeFix> {
+        match check.name.as_str() {
+            // Missing workspace deps: a plain fetch is safe & non-destructive.
+            "Cargo" | "Path Dependencies" => Some(SafeFix::CargoFetch),
+            "Versions Directory" => {
+                Some(SafeFix::CreateDir(self.project_root.join("versions")))
+            }
+            _ => None,
+        }
+    }
+
+    fn apply_safe_fix(&self, fix: SafeFix, dry_run: bool) -> (String, (FixOutcome, String)) {
+        match fix {
+            SafeFix::CargoFetch => {
+                let cmd = "cargo fetch (in tools/)".to_string();
+                if dry_run {
+                    return (cmd, (FixOutcome::Planned, "Would fetch dependencies".into()));
+                }
+                let tools_dir = self.project_root.join("tools");
+                let res = Command::new("cargo")
+                    .arg("fetch")
+                    .current_dir(if tools_dir.exists() {
+                        tools_dir
+                    } else {
+                        self.project_root.clone()
+                    })
+                    .output();
+                match res {
+                    Ok(o) if o.status.success() => {
+                        (cmd, (FixOutcome::Applied, "Dependencies fetched".into()))
+                    }
+                    Ok(o) => (
+                        cmd,
+                        (
+                            FixOutcome::Failed,
+                            String::from_utf8_lossy(&o.stderr).trim().to_string(),
+                        ),
+                    ),
+                    Err(e) => (cmd, (FixOutcome::Failed, e.to_string())),
+                }
+            }
+            SafeFix::CreateDir(path) => {
+                let cmd = format!("mkdir -p {}", path.display());
+                if dry_run {
+                    return (
+                        cmd,
+                        (FixOutcome::Planned, format!("Would create {}", path.display())),
+                    );
+                }
+                match std::fs::create_dir_all(&path) {
+                    Ok(()) => (cmd, (FixOutcome::Applied, format!("Created {}", path.display()))),
+                    Err(e) => (cmd, (FixOutcome::Failed, e.to_string())),
+                }
+            }
+        }
+    }
+
+    // ===================================================================
+    // Individual checks
+    // ===================================================================
+
     fn check_git(&self) -> CheckResult {
-        match Command::new("git").arg("--version").output() {
-            Ok(output) => CheckResult {
-                name: "Git".to_string(),
-                status: CheckStatus::Pass,
-                message: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-                details: None,
-            },
-            Err(_) => CheckResult {
-                name: "Git".to_string(),
-                status: CheckStatus::Fail,
-                message: "Git not found in PATH".to_string(),
-                details: None,
-            },
+        match command_version("git", &["--version"]) {
+            Some(v) => CheckResult::new("Git", CheckStatus::Pass, v, CheckCategory::Toolchain),
+            None => CheckResult::new(
+                "Git",
+                CheckStatus::Fail,
+                "Git not found in PATH",
+                CheckCategory::Toolchain,
+            )
+            .with_fix("Install git (e.g. apt install git / brew install git)"),
         }
     }
 
@@ -108,14 +536,12 @@ impl RocketDoctor {
                 let mut message = String::new();
                 let mut status = CheckStatus::Pass;
 
-                // Branch name
                 let head = match repo.head() {
                     Ok(head) => head.shorthand().unwrap_or("unknown").to_string(),
                     Err(_) => "HEAD detached or empty".to_string(),
                 };
                 message.push_str(&format!("Branch: {}", head));
 
-                // Uncommitted changes
                 let mut status_options = git2::StatusOptions::new();
                 status_options.include_untracked(true);
                 match repo.statuses(Some(&mut status_options)) {
@@ -128,104 +554,274 @@ impl RocketDoctor {
                         }
                     }
                     Err(e) => {
-                        return CheckResult {
-                            name: "Git Status".to_string(),
-                            status: CheckStatus::Warn,
-                            message: format!("Branch: {}, could not check statuses: {}", head, e),
-                            details: None,
-                        };
+                        return CheckResult::new(
+                            "Git Status",
+                            CheckStatus::Warn,
+                            format!("Branch: {}, could not check statuses: {}", head, e),
+                            CheckCategory::Git,
+                        );
                     }
                 }
 
-                CheckResult {
-                    name: "Git Status".to_string(),
-                    status,
-                    message,
-                    details: None,
+                let mut r = CheckResult::new("Git Status", status.clone(), message, CheckCategory::Git);
+                if status == CheckStatus::Warn {
+                    r = r.with_fix("git status  # review, then commit or stash");
                 }
+                r
             }
-            Err(e) => CheckResult {
-                name: "Git Status".to_string(),
-                status: CheckStatus::Fail,
-                message: "Not a git repository".to_string(),
-                details: Some(e.to_string()),
-            },
+            Err(e) => CheckResult::new(
+                "Git Status",
+                CheckStatus::Fail,
+                "Not a git repository",
+                CheckCategory::Git,
+            )
+            .with_details(e.to_string())
+            .with_fix("git init"),
         }
     }
 
     fn check_rust(&self) -> CheckResult {
-        match Command::new("rustc").arg("--version").output() {
-            Ok(output) => CheckResult {
-                name: "Rust".to_string(),
-                status: CheckStatus::Pass,
-                message: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-                details: None,
-            },
-            Err(_) => CheckResult {
-                name: "Rust".to_string(),
-                status: CheckStatus::Fail,
-                message: "Rust (rustc) not found in PATH".to_string(),
-                details: None,
-            },
+        match command_version("rustc", &["--version"]) {
+            Some(v) => {
+                // Expect rustc >= 1.80 for edition-2024 era toolchains.
+                let parsed = parse_semver_from(&v);
+                if let Some((maj, min, _)) = parsed {
+                    if (maj, min) < (1, 80) {
+                        return CheckResult::new(
+                            "Rust",
+                            CheckStatus::Warn,
+                            v,
+                            CheckCategory::Toolchain,
+                        )
+                        .with_details("rustc < 1.80; some workspaces target newer toolchains")
+                        .with_fix("rustup update stable");
+                    }
+                }
+                CheckResult::new("Rust", CheckStatus::Pass, v, CheckCategory::Toolchain)
+            }
+            None => CheckResult::new(
+                "Rust",
+                CheckStatus::Fail,
+                "Rust (rustc) not found in PATH",
+                CheckCategory::Toolchain,
+            )
+            .with_fix("curl https://sh.rustup.rs -sSf | sh"),
+        }
+    }
+
+    fn check_cargo(&self) -> CheckResult {
+        match command_version("cargo", &["--version"]) {
+            Some(v) => CheckResult::new("Cargo", CheckStatus::Pass, v, CheckCategory::Toolchain),
+            None => CheckResult::new(
+                "Cargo",
+                CheckStatus::Fail,
+                "cargo not found in PATH",
+                CheckCategory::Toolchain,
+            )
+            .with_fix("rustup component add cargo  # or reinstall rustup"),
+        }
+    }
+
+    fn check_clippy(&self) -> CheckResult {
+        match command_version("cargo", &["clippy", "--version"]) {
+            Some(v) => CheckResult::new("Clippy", CheckStatus::Pass, v, CheckCategory::Toolchain),
+            None => CheckResult::new(
+                "Clippy",
+                CheckStatus::Warn,
+                "cargo-clippy not available",
+                CheckCategory::Toolchain,
+            )
+            .with_fix("rustup component add clippy"),
+        }
+    }
+
+    fn check_rustfmt(&self) -> CheckResult {
+        match command_version("cargo", &["fmt", "--version"]) {
+            Some(v) => CheckResult::new("Rustfmt", CheckStatus::Pass, v, CheckCategory::Toolchain),
+            None => CheckResult::new(
+                "Rustfmt",
+                CheckStatus::Warn,
+                "rustfmt not available",
+                CheckCategory::Toolchain,
+            )
+            .with_fix("rustup component add rustfmt"),
         }
     }
 
     fn check_python(&self) -> CheckResult {
-        let cmd = if Command::new("python3").arg("--version").output().is_ok() {
-            "python3"
-        } else {
-            "python"
-        };
+        let candidates = ["python3", "python"];
+        for cmd in candidates {
+            if let Some(v) = command_version(cmd, &["--version"]) {
+                let parsed = parse_semver_from(&v);
+                if let Some((maj, _, _)) = parsed {
+                    if maj < 3 {
+                        return CheckResult::new(
+                            "Python",
+                            CheckStatus::Warn,
+                            v,
+                            CheckCategory::Toolchain,
+                        )
+                        .with_details("Python 3.x required for validate-assets.py")
+                        .with_fix("Install Python 3.x");
+                    }
+                }
+                return CheckResult::new("Python", CheckStatus::Pass, v, CheckCategory::Toolchain);
+            }
+        }
+        CheckResult::new(
+            "Python",
+            CheckStatus::Fail,
+            "Python not found in PATH",
+            CheckCategory::Toolchain,
+        )
+        .with_fix("Install Python 3.x (apt install python3 / brew install python)")
+    }
 
-        match Command::new(cmd).arg("--version").output() {
-            Ok(output) => CheckResult {
-                name: "Python".to_string(),
-                status: CheckStatus::Pass,
-                message: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-                details: None,
-            },
-            Err(_) => CheckResult {
-                name: "Python".to_string(),
-                status: CheckStatus::Fail,
-                message: "Python not found in PATH".to_string(),
-                details: None,
-            },
+    fn check_node(&self) -> CheckResult {
+        match command_version("node", &["--version"]) {
+            Some(v) => {
+                // node prints e.g. "v20.11.1"
+                let parsed = parse_semver_from(&v);
+                if let Some((maj, _, _)) = parsed {
+                    if maj < 20 {
+                        return CheckResult::new(
+                            "Node.js",
+                            CheckStatus::Warn,
+                            v,
+                            CheckCategory::Toolchain,
+                        )
+                        .with_details("pwa-staff targets Node 20.x")
+                        .with_fix("nvm install 20 && nvm use 20");
+                    }
+                }
+                CheckResult::new("Node.js", CheckStatus::Pass, v, CheckCategory::Toolchain)
+            }
+            None => CheckResult::new(
+                "Node.js",
+                CheckStatus::Warn,
+                "node not found in PATH",
+                CheckCategory::Toolchain,
+            )
+            .with_details("Only required for pwa-staff")
+            .with_fix("Install Node.js 20.x (https://nodejs.org)"),
         }
     }
 
+    fn check_blender(&self) -> CheckResult {
+        // Prefer BLENDER_PATH, fall back to `blender` on PATH.
+        if let Ok(path) = std::env::var("BLENDER_PATH") {
+            if Path::new(&path).exists() {
+                let v = command_version(&path, &["--version"])
+                    .unwrap_or_else(|| format!("BLENDER_PATH={path}"));
+                return CheckResult::new("Blender", CheckStatus::Pass, v, CheckCategory::Optional);
+            }
+            return CheckResult::new(
+                "Blender",
+                CheckStatus::Warn,
+                format!("BLENDER_PATH set but does not exist: {path}"),
+                CheckCategory::Optional,
+            )
+            .with_fix("Set BLENDER_PATH to a valid Blender executable");
+        }
+        match command_version("blender", &["--version"]) {
+            Some(v) => CheckResult::new("Blender", CheckStatus::Pass, v, CheckCategory::Optional),
+            None => CheckResult::new(
+                "Blender",
+                CheckStatus::Warn,
+                "Blender not found (BLENDER_PATH unset, not on PATH)",
+                CheckCategory::Optional,
+            )
+            .with_details("Required for the asset-pipeline workspace")
+            .with_fix("export BLENDER_PATH=/path/to/blender  # or add blender to PATH"),
+        }
+    }
+
+    fn check_disk_space(&self) -> CheckResult {
+        match free_disk_bytes(&self.project_root) {
+            Some(free) => {
+                let gib = free as f64 / (1024.0 * 1024.0 * 1024.0);
+                let msg = format!("{gib:.1} GiB free");
+                if gib < 5.0 {
+                    CheckResult::new("Disk Space", CheckStatus::Fail, msg, CheckCategory::Environment)
+                        .with_details("UE4 builds need tens of GiB")
+                        .with_fix("Free up disk space")
+                } else if gib < 20.0 {
+                    CheckResult::new("Disk Space", CheckStatus::Warn, msg, CheckCategory::Environment)
+                        .with_details("UE4 builds can consume large amounts of disk")
+                } else {
+                    CheckResult::new(
+                        "Disk Space",
+                        CheckStatus::Pass,
+                        msg,
+                        CheckCategory::Environment,
+                    )
+                }
+            }
+            None => CheckResult::new(
+                "Disk Space",
+                CheckStatus::Warn,
+                "Could not determine free disk space",
+                CheckCategory::Environment,
+            )
+            .with_fix("df -kP .  # check available space manually"),
+        }
+    }
+
+    /// Cheap network reachability flag. Does NOT make a network request by
+    /// default (that would be slow/flaky in CI); it reports whether the
+    /// `ROCKET_OFFLINE` opt-out is set, and a best-effort hint.
+    fn check_network(&self) -> CheckResult {
+        if std::env::var("ROCKET_OFFLINE").is_ok() {
+            return CheckResult::new(
+                "Network",
+                CheckStatus::Warn,
+                "Offline mode (ROCKET_OFFLINE set)",
+                CheckCategory::Environment,
+            )
+            .with_details("crates.io / supabase operations will be skipped")
+            .with_fix("unset ROCKET_OFFLINE  # to re-enable network operations");
+        }
+        CheckResult::new(
+            "Network",
+            CheckStatus::Pass,
+            "Online (ROCKET_OFFLINE not set)",
+            CheckCategory::Environment,
+        )
+    }
+
     fn check_ggen(&self) -> CheckResult {
-        match Command::new("ggen").arg("--version").output() {
-            Ok(output) => CheckResult {
-                name: "ggen".to_string(),
-                status: CheckStatus::Pass,
-                message: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-                details: None,
-            },
-            Err(_) => CheckResult {
-                name: "ggen".to_string(),
-                status: CheckStatus::Warn,
-                message: "ggen not found in PATH".to_string(),
-                details: Some("ggen is required for Ostar generative workflows.".to_string()),
-            },
+        match command_version("ggen", &["--version"]) {
+            Some(v) => CheckResult::new("ggen", CheckStatus::Pass, v, CheckCategory::Optional),
+            None => CheckResult::new(
+                "ggen",
+                CheckStatus::Warn,
+                "ggen not found in PATH",
+                CheckCategory::Optional,
+            )
+            .with_details("ggen is required for Ostar generative workflows.")
+            .with_fix("Install ggen (Ostar code generator)"),
         }
     }
 
     fn check_manifest(&self) -> CheckResult {
         let path = self.project_root.join("project-manifest.json");
         if path.exists() {
-            CheckResult {
-                name: "Project Manifest".to_string(),
-                status: CheckStatus::Pass,
-                message: "project-manifest.json found".to_string(),
-                details: Some(format!("Path: {}", path.display())),
-            }
+            CheckResult::new(
+                "Project Manifest",
+                CheckStatus::Pass,
+                "project-manifest.json found",
+                CheckCategory::Project,
+            )
+            .with_details(format!("Path: {}", path.display()))
         } else {
-            CheckResult {
-                name: "Project Manifest".to_string(),
-                status: CheckStatus::Fail,
-                message: "project-manifest.json MISSING".to_string(),
-                details: Some("Run 'rocket sync' to generate it.".to_string()),
-            }
+            CheckResult::new(
+                "Project Manifest",
+                CheckStatus::Fail,
+                "project-manifest.json MISSING",
+                CheckCategory::Project,
+            )
+            .with_details("Run 'rocket sync' to generate it.")
+            .with_fix("rocket sync")
         }
     }
 
@@ -325,12 +921,78 @@ impl RocketDoctor {
     fn check_versions_dir(&self) -> CheckResult {
         let path = self.project_root.join("versions");
         if path.exists() && path.is_dir() {
-            CheckResult {
-                name: "Versions Directory".to_string(),
-                status: CheckStatus::Pass,
-                message: "versions/ directory exists".to_string(),
-                details: None,
-            }
+            CheckResult::new(
+                "Versions Directory",
+                CheckStatus::Pass,
+                "versions/ directory exists",
+                CheckCategory::Project,
+            )
+        } else {
+            CheckResult::new(
+                "Versions Directory",
+                CheckStatus::Fail,
+                "versions/ directory MISSING or not a directory",
+                CheckCategory::Project,
+            )
+            .with_details("This directory should contain the Unreal Engine projects.")
+            .with_fix("mkdir -p versions  # then restore UE4 projects")
+        }
+    }
+
+    /// Verify every Rust workspace's Cargo.toml is present.
+    fn check_rust_workspaces(&self) -> CheckResult {
+        let workspaces = [
+            "tools/Cargo.toml",
+            "nexus-engine/Cargo.toml",
+            "blueprint-rs/Cargo.toml",
+            "unify-rs/Cargo.toml",
+            "infinity-blade-4/mud/Cargo.toml",
+            "chicago-tdd-tools/Cargo.toml",
+        ];
+        let missing: Vec<&str> = workspaces
+            .iter()
+            .copied()
+            .filter(|rel| !self.project_root.join(rel).exists())
+            .collect();
+        if missing.is_empty() {
+            CheckResult::new(
+                "Rust Workspaces",
+                CheckStatus::Pass,
+                format!("all {} workspace manifests present", workspaces.len()),
+                CheckCategory::Project,
+            )
+        } else {
+            CheckResult::new(
+                "Rust Workspaces",
+                CheckStatus::Warn,
+                format!("{} workspace manifest(s) missing", missing.len()),
+                CheckCategory::Project,
+            )
+            .with_details(format!("Missing: {}", missing.join(", ")))
+            .with_fix("git submodule update --init  # or restore the missing workspace")
+        }
+    }
+
+    fn check_pwa_node_modules(&self) -> CheckResult {
+        let pwa = self.project_root.join("pwa-staff");
+        if !pwa.exists() {
+            return CheckResult::new(
+                "PWA node_modules",
+                CheckStatus::Warn,
+                "pwa-staff/ not found",
+                CheckCategory::Project,
+            )
+            .with_details("Expected the pwa-staff/ directory at the project root")
+            .with_fix("git submodule update --init  # or restore pwa-staff/");
+        }
+        let node_modules = pwa.join("node_modules");
+        if node_modules.is_dir() {
+            CheckResult::new(
+                "PWA node_modules",
+                CheckStatus::Pass,
+                "pwa-staff/node_modules present",
+                CheckCategory::Project,
+            )
         } else {
             CheckResult {
                 name: "Versions Directory".to_string(),
@@ -341,24 +1003,41 @@ impl RocketDoctor {
                 ),
             }
         }
+        if offenders.is_empty() {
+            CheckResult::new(
+                "Path Dependencies",
+                CheckStatus::Pass,
+                "no absolute-path Cargo deps detected",
+                CheckCategory::Project,
+            )
+        } else {
+            CheckResult::new(
+                "Path Dependencies",
+                CheckStatus::Warn,
+                format!("{} absolute-path dep(s) will break on other machines", offenders.len()),
+                CheckCategory::Project,
+            )
+            .with_details(offenders.join("\n"))
+            .with_fix("Vendor wasm4pm-compat / clap-noun-verb or use crates.io versions")
+        }
     }
 
     fn check_anti_llm_cheat_lsp(&self) -> CheckResult {
-        match Command::new("anti-llm-cheat-lsp").arg("--version").output() {
-            Ok(output) => CheckResult {
-                name: "anti-llm-cheat-lsp".to_string(),
-                status: CheckStatus::Pass,
-                message: String::from_utf8_lossy(&output.stdout).trim().to_string(),
-                details: None,
-            },
-            Err(_) => CheckResult {
-                name: "anti-llm-cheat-lsp".to_string(),
-                status: CheckStatus::Warn,
-                message: "anti-llm-cheat-lsp not found in PATH".to_string(),
-                details: Some(
-                    "Install: cargo install lsp-max --bin anti-llm-cheat-lsp".to_string(),
-                ),
-            },
+        match command_version("anti-llm-cheat-lsp", &["--version"]) {
+            Some(v) => CheckResult::new(
+                "anti-llm-cheat-lsp",
+                CheckStatus::Pass,
+                v,
+                CheckCategory::Optional,
+            ),
+            None => CheckResult::new(
+                "anti-llm-cheat-lsp",
+                CheckStatus::Warn,
+                "anti-llm-cheat-lsp not found in PATH",
+                CheckCategory::Optional,
+            )
+            .with_details("Install: cargo install lsp-max --bin anti-llm-cheat-lsp")
+            .with_fix("cargo install lsp-max --bin anti-llm-cheat-lsp"),
         }
     }
 
@@ -685,6 +1364,15 @@ impl RocketDoctor {
                     "Run HTML5Setup.sh from the SpeculativeCoder/UnrealEngine fork to enable HTML5 packaging".to_string(),
                 ),
             }
+        }
+
+        if std::env::var("UE4_ROOT").is_ok() {
+            CheckResult::new(
+                "UE4 Root",
+                CheckStatus::Pass,
+                "UE4_ROOT environment variable is set",
+                CheckCategory::Environment,
+            )
         } else {
             CheckResult {
                 name: "UE4 Build Scripts".to_string(),
@@ -855,14 +1543,52 @@ impl RocketDoctor {
                 },
             }
         }
+        i += 1;
     }
+    None
 }
+
+fn parse_triple_at(s: &str) -> Option<(u64, u64, u64)> {
+    let mut parts = s
+        .split(|c: char| !c.is_ascii_digit())
+        .filter(|p| !p.is_empty());
+    let maj = parts.next()?.parse::<u64>().ok()?;
+    // Require at least major.minor to count as a version.
+    let min = parts.next()?.parse::<u64>().ok()?;
+    let patch = parts.next().and_then(|p| p.parse::<u64>().ok()).unwrap_or(0);
+    Some((maj, min, patch))
+}
+
+/// Best-effort free disk space (bytes) for the filesystem containing `path`.
+/// Uses `df -kP` (POSIX) — avoids adding a libc/sysinfo dependency.
+fn free_disk_bytes(path: &Path) -> Option<u64> {
+    let output = Command::new("df")
+        .arg("-kP")
+        .arg(path)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    let text = String::from_utf8_lossy(&output.stdout);
+    // Second line, 4th column = available 1K-blocks.
+    let line = text.lines().nth(1)?;
+    let cols: Vec<&str> = line.split_whitespace().collect();
+    let avail_kb = cols.get(3)?.parse::<u64>().ok()?;
+    Some(avail_kb * 1024)
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::fs;
     use tempfile::tempdir;
+
+    // ---- Preserved original tests (backward compatibility) --------------
 
     #[test]
     fn test_rocket_doctor_new() {
@@ -1143,7 +1869,6 @@ mod tests {
             "Branch: HEAD detached or empty, no uncommitted changes"
         );
 
-        // Add a file
         fs::write(dir.path().join("test.txt"), "hello").unwrap();
         let result = doctor.check_git_status();
         assert_eq!(result.status, CheckStatus::Warn);
