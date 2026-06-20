@@ -14,10 +14,22 @@
  *   proves a lawful process happened — not when API calls returned 200.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 
 const BASE = process.env.API_BASE_URL || 'http://localhost:3000';
 const MOCK = process.env.MOCK_API === '1';
+
+// Deterministic baseline: clear accumulated gameplay data before the suite so
+// ad-hoc reruns (without the orchestrator's reset) can't show false failures from
+// leftover sessions/receipts/leaderboard rows. Skip-safe in MOCK / when ungated.
+beforeAll(async () => {
+  if (MOCK) return;
+  await fetch(`${BASE}/api/test/reset-data`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ confirm: true }),
+  }).catch(() => { /* endpoint absent / not gated — tests still self-seed */ });
+});
 
 async function post(path: string, body: Record<string, unknown>) {
   const res = await fetch(`${BASE}${path}`, {
