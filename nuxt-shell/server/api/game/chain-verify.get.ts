@@ -71,6 +71,12 @@ export default defineEventHandler(async (event) => {
     session_id: string;
   }>;
 
+  // A specific session was requested but has no events — return 404 rather than
+  // a vacuous PASS (rows.every() on empty array = true, which is misleading).
+  if (sessionId && rows.length === 0) {
+    throw createError({ statusCode: 404, statusMessage: `No events found for session ${sessionId}` });
+  }
+
   const allOk = rows.every((r) => r.ok);
   const breaks = rows.filter((r) => !r.ok);
 

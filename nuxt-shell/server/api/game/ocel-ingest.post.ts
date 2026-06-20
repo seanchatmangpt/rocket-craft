@@ -95,7 +95,7 @@ export default defineEventHandler(async (event) => {
   const rows = body.events.map(evt => ({
     session_id: body.session_id,
     activity: evt.activity,
-    ts_ms: evt.timestamp_ms,
+    timestamp_ms: evt.timestamp_ms,
     object_refs: evt.object_refs,
     attributes: evt.attributes,
     event_hash: evt.event_hash,

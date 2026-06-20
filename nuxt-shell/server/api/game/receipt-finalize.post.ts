@@ -127,6 +127,7 @@ export default defineEventHandler(async (event) => {
         .update({
           receipt_hash: body.receipt_hash,
           session_ended_at: provenAt,
+          last_proof_at: provenAt,
           is_alive: false,
         })
         .eq('id', body.session_id)

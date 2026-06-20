@@ -59,6 +59,11 @@ export function useGameSessionPersistence() {
         seq: number;
       }> = [];
 
+      // Capture rollback state — if the fetch fails we must NOT advance lastHash/syncedCount
+      // or the next batch will start with wrong seq/prev_hash causing a SEQ GAP 422.
+      const preLastHash = lastHash.value;
+      const preSyncedCount = syncedCount.value;
+
       for (const evt of unsync) {
         const seq = syncedCount.value;
         const hash = await computeEventHash({
@@ -81,18 +86,26 @@ export function useGameSessionPersistence() {
           prev_hash: lastHash.value,
           seq,
         });
+        // Advance within-batch chain state (needed for next event's prev_hash)
         lastHash.value = hash;
         syncedCount.value = seq + 1;
       }
 
-      // Ingest via server route (handles ocel_events insert + continuing chain)
+      // Ingest via server route — rollback chain state on failure so the next
+      // sync attempt recomputes the batch from the correct seq/prev_hash.
+      let ingestFailed = false;
       await $fetch('/api/game/ocel-ingest', {
         method: 'POST',
         body: { session_id: dbSessionId.value, events: batch },
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         syncError.value = `ocel-ingest failed: ${msg}`;
+        // Rollback — prevents SEQ GAP on next retry
+        lastHash.value = preLastHash;
+        syncedCount.value = preSyncedCount;
+        ingestFailed = true;
       });
+      if (ingestFailed) return;
 
       // Update session alive status and count via PATCH
       await $fetch(`/api/game/session/${dbSessionId.value}`, {

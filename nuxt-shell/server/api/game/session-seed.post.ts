@@ -107,9 +107,13 @@ export default defineEventHandler(async (event) => {
   }
 
   const supabaseUrl = (config.public.supabaseUrl as string) || 'http://localhost:54321';
-  const serviceKey = (config.supabaseServiceRoleKey as string) || (config.public.supabaseAnonKey as string);
+  const serviceKey = config.supabaseServiceRoleKey as string;
+  // Silently falling back to anon key here would bypass RLS on inserts — reject loudly instead.
+  if (!serviceKey) {
+    throw createError({ statusCode: 503, statusMessage: 'SUPABASE_SERVICE_ROLE_KEY not set — session-seed requires service role' });
+  }
 
-  if (!supabaseUrl || !serviceKey) {
+  if (!supabaseUrl) {
     throw createError({ statusCode: 503, statusMessage: 'Supabase not configured' });
   }
 
@@ -124,15 +128,86 @@ export default defineEventHandler(async (event) => {
     : [];
   const activities = [...LAWFUL_LIFECYCLE, ...extraActivities];
 
+  // Optional: bind to a real player so the leaderboard trigger fires.
+  // Pass create_test_player=true (query or body) to auto-create a headless test player.
+  // Pass player_id=<uuid> (body) to bind to an existing player.
+  // Pass idempotency_key=<string> (body) to make this call retry-safe —
+  // a second call with the same key returns the existing session instead of creating a new one.
+  const body = await readBody(event).catch(() => ({}))
+  const createTestPlayer = query.create_test_player === 'true' || body?.create_test_player === true
+  const providedPlayerId: string | undefined = body?.player_id
+  const idempotencyKey: string | undefined = body?.idempotency_key
+
   const baseMs = Date.now();
+
+  // ── Idempotency check — return existing result on retry ─────────────────
+  if (idempotencyKey) {
+    const { data: existing } = await sb
+      .from('game_sessions')
+      .select('id, player_id')
+      .eq('idempotency_key', idempotencyKey)
+      .limit(1)
+      .single()
+
+    if (existing) {
+      // Fetch associated receipt to reconstruct full response
+      const { data: existingReceipt } = await sb
+        .from('game_receipts')
+        .select('id, receipt_hash, ocel_event_count, ocel_lifecycle')
+        .eq('session_id', existing.id)
+        .order('proven_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      const { data: chainTipRow } = await sb
+        .from('ocel_events')
+        .select('event_hash')
+        .eq('session_id', existing.id)
+        .order('seq', { ascending: false })
+        .limit(1)
+        .single()
+
+      return {
+        session_id: existing.id,
+        player_id: existing.player_id ?? null,
+        receipt_id: existingReceipt?.id ?? null,
+        receipt_hash: existingReceipt?.receipt_hash ?? null,
+        chain_tip: chainTipRow?.event_hash ?? null,
+        ocel_event_count: existingReceipt?.ocel_event_count ?? 0,
+        activities: existingReceipt?.ocel_lifecycle ?? [],
+        leaderboard_eligible: existing.player_id !== null,
+        idempotent_replay: true,
+      }
+    }
+  }
+
+  // 0. Resolve player_id (optional — leaderboard trigger requires it)
+  let resolvedPlayerId: string | null = null
+  if (providedPlayerId) {
+    resolvedPlayerId = providedPlayerId
+  } else if (createTestPlayer) {
+    // Auto-create a headless test player so the leaderboard trigger fires
+    const username = `headless-test-${Date.now()}`
+    const { data: playerRow, error: playerErr } = await sb
+      .from('players')
+      .insert({ username, high_score: 0 })
+      .select('id')
+      .single()
+    if (playerErr) {
+      throw createError({ statusCode: 500, statusMessage: `test player insert failed: ${playerErr.message}` })
+    }
+    resolvedPlayerId = playerRow.id
+  }
 
   // 1. Create the session row
   const { data: sessionRow, error: sessionErr } = await sb
     .from('game_sessions')
     .insert({
+      player_id: resolvedPlayerId,
       engine_source: 'rocket_cli',
       session_started_at: new Date(baseMs).toISOString(),
       is_alive: false,
+      ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
     })
     .select('id')
     .single();
@@ -162,6 +237,12 @@ export default defineEventHandler(async (event) => {
   );
 
   if (eventsErr) {
+    // Compensating action: delete orphaned session so next run starts clean
+    try { await sb.from('game_sessions').delete().eq('id', sessionId) } catch { /* best-effort */ }
+    if (resolvedPlayerId && !providedPlayerId) {
+      // Also clean up auto-created test player
+      try { await sb.from('players').delete().eq('id', resolvedPlayerId) } catch { /* best-effort */ }
+    }
     throw createError({ statusCode: 500, statusMessage: `events insert failed: ${eventsErr.message}` });
   }
 
@@ -202,10 +283,13 @@ export default defineEventHandler(async (event) => {
 
   return {
     session_id: sessionId,
+    player_id: resolvedPlayerId,
     receipt_id: receiptRow.id,
     receipt_hash: receiptHash,
     chain_tip: chainTip,
     ocel_event_count: events.length,
     activities,
+    leaderboard_eligible: resolvedPlayerId !== null,
+    idempotent_replay: false,
   };
 });

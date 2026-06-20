@@ -46,11 +46,10 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     if (MOCK) return;
     // create_test_player=true so the leaderboard trigger fires in step 14
     const { status, body } = await post('/api/game/session-seed', { create_test_player: true });
-    if (status === 503 || status === 403) {
-      // Supabase not configured or production guard — skip gracefully
-      console.log(`[headless-loop] session-seed returned ${status} — skipping live steps`);
-      return;
-    }
+    if (MOCK) return;
+    // In live mode (MOCK_API=0), session-seed failure is a hard error
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
 
     // Contract: must have all fields for the chain to be provable
@@ -105,7 +104,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 2: session-replay confirms every event in the seeded chain is intact', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get(`/api/game/session-replay?session_id=${seededSessionId}`);
-    if (status === 503) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
 
     // session-seed builds a lawful BLAKE3 chain — every event must verify
@@ -135,7 +135,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
       session_id: seededSessionId,
       receipt_hash: seededChainTip,  // chain tip IS the proof
     });
-    if (status === 503) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
 
     // With chain_tip as receipt_hash, verdict MUST be PROVEN
@@ -147,7 +148,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 4: dashboard-stats reflects the new seeded session', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get('/api/game/pipeline-health');
-    if (status === 503) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
 
     // After seeding, total_receipts must be > 0
@@ -162,7 +164,9 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 5: ocel-export returns a valid OCEL 2.0 document for the seeded session', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get(`/api/game/ocel-export?session_id=${seededSessionId}`);
-    if (status === 503 || status === 404) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
+    if (status === 404) return; // no data yet is legitimate for ocel-export
     expect(status).toBe(200);
 
     // OCEL 2.0 JSON format — objectTypes, eventTypes, objects, events (camelCase)
@@ -187,7 +191,7 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     // Querying with the chain_tip (not a real WASM hash) should return NO_DATA
     const zeroHash = '0'.repeat(64);
     const { status, body } = await get(`/api/game/wasm-crosscheck?output_hash=${zeroHash}`);
-    if (status === 503) return;
+    if (status === 503) return; // wasm-crosscheck is peripheral — no data yet is legitimate
     expect(status).toBe(200);
     expect(body.cross_check.verdict).toBe('NO_DATA');
     expect(body.receipts).toHaveLength(0);
@@ -207,7 +211,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
       proven_at: new Date().toISOString(),
       payload: { headless_loop: true },
     });
-    if (status === 503) return; // no service role key
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
     expect(body.verdict).toBe('PASS');
     expect(body.proof_gates_passed).toContain('not_synthetic');
@@ -218,7 +223,7 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 8: process-map shows lifecycle_ok=true for the seeded session', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get(`/api/game/process-map?session_id=${seededSessionId}`);
-    if (status === 503 || status === 500) return;
+    if (status === 503 || status === 500) return; // process-map is peripheral — may not have data yet
     expect(status).toBe(200);
     expect(body.lifecycle_ok).toBe(true);
     expect(body.total_events).toBeGreaterThan(0);
@@ -231,7 +236,7 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 9: cook-status reflects PASS verdict after cook-receipt insertion', async () => {
     if (MOCK) return;
     const { status, body } = await get('/api/game/cook-status');
-    if (status === 503 || status === 500) return;
+    if (status === 503 || status === 500) return; // cook-status is peripheral — no cook may have run yet
     expect(status).toBe(200);
     expect(['idle', 'cooking', 'done', 'failed']).toContain(body.status);
     if (body.last_receipt) {
@@ -242,7 +247,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 10: chain-verify confirms chain intact + conformance scores for the seeded session', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get(`/api/game/chain-verify?session_id=${seededSessionId}`);
-    if (status === 503 || status === 500) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
     expect(body.overall).toBe('PASS');
     expect(body.event_count).toBeGreaterThan(0);
@@ -265,7 +271,9 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 11: evidence-pack v2 — nested content hashes bind ocel + chain_proof + receipt', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await post('/api/game/evidence-pack', { session_id: seededSessionId });
-    if (status === 503 || status === 404) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
+    if (status === 404) return; // no evidence yet is legitimate
     expect(status).toBe(200);
 
     // Schema version 2.0 — nested content hashes
@@ -315,13 +323,15 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
       receipt_hash: seededReceiptHash,
       update_receipt: true,
     });
-    if (fs === 503 || fs === 500) return;
+    expect(fs).not.toBe(503);
+    expect(fs).not.toBe(500);
     // finalize may return NO_EVENTS if session was seeded without OCEL — skip gracefully
     if (fb?.verdict === 'NO_EVENTS') return;
 
     // Now verify session-state reflects the terminal state
     const { status, body } = await get(`/api/game/session-state?session_id=${seededSessionId}`);
-    if (status === 503 || status === 500) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
     expect(body.session_id).toBe(seededSessionId);
     // State machine: Proven (receipt_hash stamped) or Created/Closed (session was pre-sealed)
@@ -339,7 +349,7 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 12: health-lies returns all_clear=true after a clean seeded session', async () => {
     if (MOCK) return;
     const { status, body } = await get('/api/game/health-lies');
-    if (status === 503 || status === 500) return;
+    if (status === 503 || status === 500) return; // health-lies is peripheral — may not be wired up yet
     expect(status).toBe(200);
     expect(body.all_clear).toBe(true);
     console.log(`[headless-loop] health-lies: all_clear=${body.all_clear} lies=${body.lies?.length ?? 0}`);
@@ -348,7 +358,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 13: qa-cycle returns HEALTHY with BLAKE3 cycle_receipt_hash for the seeded session', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await post('/api/game/qa-cycle', { session_id: seededSessionId });
-    if (status === 503 || status === 500) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
     expect(body.overall).toBe('HEALTHY');
     expect(body.checks_passed).toBe(body.checks_total);
@@ -361,7 +372,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
   it('Step 14: leaderboard has ≥1 row because session-seed bound a player', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get('/api/game/leaderboard');
-    if (status === 503 || status === 500) return;
+    expect(status).not.toBe(503);
+    expect(status).not.toBe(500);
     expect(status).toBe(200);
     // Shape: { rows: array, total: number|null, limit: number, offset: number, cached_at: string }
     expect(Array.isArray(body.rows)).toBe(true);
