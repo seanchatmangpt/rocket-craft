@@ -62,6 +62,8 @@ export default defineEventHandler(async (event) => {
   await nukeAll('game_sessions');
   if (scope === 'all') {
     await nukeAll('leaderboard');
+    // Clear accumulated rotation test keys (active stays correct, but rotating/revoked pile up).
+    await nukeAll('signing_keys');
   }
 
   return { ok: true, scope, deleted, supabase_url: supabaseUrl };

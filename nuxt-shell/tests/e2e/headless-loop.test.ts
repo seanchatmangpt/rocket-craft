@@ -497,6 +497,41 @@ describe('cook-trigger contract (MOCK-safe)', () => {
   });
 });
 
+describe('Ed25519 key rotation invariant', () => {
+  // Two distinct valid-length base64 public keys (content irrelevant to rotation).
+  const KEY_A = 'A'.repeat(44);
+  const KEY_B = 'B'.repeat(44);
+
+  it('rotation keeps EXACTLY ONE active key and threads the replaces chain', async () => {
+    if (MOCK) return;
+
+    const rotA = await post('/api/game/rotate-key', { new_public_key_b64: KEY_A, notes: 'e2e-A' });
+    if (rotA.status === 503) return; // signing_keys not provisioned in this env
+    expect(rotA.status).toBe(200);
+    expect(rotA.body.rotated).toBe(true);
+
+    // Invariant after first rotation: exactly one active key, and it's the new one.
+    const s1 = await get('/api/test/signing-keys');
+    if (s1.status === 403) return;
+    expect(s1.body.active_count).toBe(1);
+    expect(s1.body.active_key_id).toBe(rotA.body.new_key_id);
+
+    const rotB = await post('/api/game/rotate-key', { new_public_key_b64: KEY_B, notes: 'e2e-B' });
+    expect(rotB.status).toBe(200);
+    // The new active replaces A: prior_key_id threads to A, A is demoted.
+    expect(rotB.body.prior_key_id).toBe(rotA.body.new_key_id);
+    expect(rotB.body.prior_key_demoted).toBe(true);
+
+    // Invariant after second rotation: STILL exactly one active (never zero, never two).
+    const s2 = await get('/api/test/signing-keys');
+    expect(s2.body.active_count).toBe(1);
+    expect(s2.body.active_key_id).toBe(rotB.body.new_key_id);
+    // The demoted prior is retained as 'rotating' (grace period), not deleted.
+    expect(s2.body.rotating_count).toBeGreaterThanOrEqual(1);
+    console.log(`[headless-loop] key-rotation: active=${s2.body.active_count} rotating=${s2.body.rotating_count} active_id=${String(s2.body.active_key_id).slice(0, 8)}`);
+  });
+});
+
 describe('cook-receipt proof gates (MOCK-safe property tests)', () => {
   const VALID = {
     verdict: 'PASS',
