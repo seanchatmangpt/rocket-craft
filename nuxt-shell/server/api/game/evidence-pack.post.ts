@@ -24,6 +24,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { blake3 } from '@noble/hashes/blake3.js';
+import { computeMerkleRoot } from '../../utils/merkle';
 
 function blake3Hex(input: string): string {
   const bytes = blake3(new TextEncoder().encode(input));
@@ -127,6 +128,7 @@ export default defineEventHandler(async (event) => {
   });
 
   const chainTip = rows[rows.length - 1]?.event_hash ?? null;
+  const merkleRoot = computeMerkleRoot(rows.map(r => r.event_hash).filter(Boolean));
 
   // Build OCEL 2.0 section (same format as ocel-export.get.ts)
   const activities = [...new Set(rows.map(r => r.activity))];
@@ -167,6 +169,7 @@ export default defineEventHandler(async (event) => {
       chain_intact: chainIntact,
       first_break_at: firstBreakAt,
       chain_tip: chainTip,
+      merkle_root: merkleRoot,
       activities,
       verdict: receipt?.verdict ?? null,
       engine_source: receipt?.engine_source ?? null,
