@@ -16,6 +16,34 @@
  */
 
 import { useSwipe, useVibrate, useMediaQuery, usePointerSwipe } from '@vueuse/core';
+import type { RocketIntent } from './useRocketInputBus';
+
+export type SwipeDirection = 'left' | 'right' | 'up' | 'down' | 'none';
+
+/**
+ * Normalize swipe velocity to 0–1 against a 1000 px/s ceiling. Pure + tested so
+ * the combat-verb intensity can't silently change. durationMs<=0 → 0 (guards /0).
+ */
+export function normalizeSwipeVelocity(lengthX: number, lengthY: number, durationMs: number): number {
+  if (durationMs <= 0) return 0;
+  const distPx = Math.sqrt(lengthX ** 2 + lengthY ** 2);
+  return Math.min(1, (distPx / (durationMs / 1000)) / 1000);
+}
+
+/**
+ * Pure gesture→intent mapping (GDD combat grammar). Extracted from useSwipe's
+ * callback so the bindings are unit-tested without a touch device.
+ *   right→MoveForward, left→MoveBackward, up→Interact, down→ExitImmersiveMode
+ */
+export function swipeToIntent(direction: SwipeDirection, velocityNorm: number): RocketIntent | null {
+  switch (direction) {
+    case 'right': return { type: 'MoveForward', value: velocityNorm, source: 'touch' };
+    case 'left': return { type: 'MoveBackward', value: velocityNorm, source: 'touch' };
+    case 'up': return { type: 'Interact', source: 'touch' };
+    case 'down': return { type: 'ExitImmersiveMode', source: 'touch' };
+    default: return null;
+  }
+}
 
 export interface TouchInputOptions {
   /** Minimum swipe distance in px to register (default 40) */
@@ -51,28 +79,15 @@ export function useRocketTouchInput(
     },
     onSwipeEnd(_e, direction) {
       const durationMs = Date.now() - swipeStartTime;
-      // Velocity: pixels per second, normalized to 0–1 against 1000px/s ceiling
-      const distPx = Math.sqrt(lengthX.value ** 2 + lengthY.value ** 2);
-      const velocityNorm = Math.min(1, (distPx / (durationMs / 1000)) / 1000);
-
-      switch (direction) {
-        case 'right':
-          emit({ type: 'MoveForward', value: velocityNorm, source: 'touch' });
-          haptic(10);
-          break;
-        case 'left':
-          emit({ type: 'MoveBackward', value: velocityNorm, source: 'touch' });
-          haptic(10);
-          break;
-        case 'up':
-          emit({ type: 'Interact', source: 'touch' });
-          haptic([10, 5, 10]);
-          break;
-        case 'down':
-          emit({ type: 'ExitImmersiveMode', source: 'touch' });
-          haptic(20);
-          break;
-      }
+      const velocityNorm = normalizeSwipeVelocity(lengthX.value, lengthY.value, durationMs);
+      const intent = swipeToIntent(direction as SwipeDirection, velocityNorm);
+      if (!intent) return;
+      emit(intent);
+      // Haptic pattern varies by gesture (kept inline — device-only side effect).
+      const patterns: Record<string, number | number[]> = {
+        MoveForward: 10, MoveBackward: 10, Interact: [10, 5, 10], ExitImmersiveMode: 20,
+      };
+      haptic(patterns[intent.type] ?? 10);
     },
   });
 
