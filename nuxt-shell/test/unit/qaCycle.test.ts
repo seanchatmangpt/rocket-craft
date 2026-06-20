@@ -102,16 +102,57 @@ describe('classifyOverall — CRITICAL', () => {
 describe('buildCycleResult — HEALTHY inputs', () => {
   const VALID_HASH = 'a'.repeat(64);
 
-  it('all valid inputs → all checks pass', () => {
+  it('all valid inputs → all checks pass (5 checks including CONFORMANCE_SCORE)', () => {
     const results = buildCycleResult({
       chainOk: true,
       activities: ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
       engineSource: 'rocket_cli',
       eventHashes: [VALID_HASH],
       merkleRoot: VALID_HASH,
+      // No miningEvents → CONFORMANCE_SCORE passes vacuously (no events to mine)
     });
-    expect(results).toHaveLength(4);
+    expect(results).toHaveLength(5);
     expect(results.every(r => r.passed)).toBe(true);
+  });
+
+  it('miningEvents with perfect lawful trace → CONFORMANCE_SCORE passes with score 1.0', () => {
+    const miningEvents = [
+      { activity: 'GameSessionStarted', timestamp_ms: 1000, seq: 0 },
+      { activity: 'FrameRendered', timestamp_ms: 2000, seq: 1 },
+      { activity: 'InputAdmitted', timestamp_ms: 3000, seq: 2 },
+    ];
+    const results = buildCycleResult({
+      chainOk: true,
+      activities: ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
+      engineSource: 'rocket_cli',
+      eventHashes: [VALID_HASH],
+      merkleRoot: VALID_HASH,
+      miningEvents,
+    });
+    const conformance = results.find(r => r.check === 'CONFORMANCE_SCORE');
+    expect(conformance?.passed).toBe(true);
+    expect((conformance?.evidence as { overall_score: number }).overall_score).toBeCloseTo(1.0, 3);
+  });
+
+  it('miningEvents with out-of-order trace → CONFORMANCE_SCORE may degrade overall', () => {
+    // All activities present but fitness < 1.0 due to order violation
+    const miningEvents = [
+      { activity: 'InputAdmitted', timestamp_ms: 1000, seq: 0 },   // out of order
+      { activity: 'GameSessionStarted', timestamp_ms: 2000, seq: 1 },
+      { activity: 'FrameRendered', timestamp_ms: 3000, seq: 2 },
+    ];
+    const results = buildCycleResult({
+      chainOk: true,
+      activities: ['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
+      engineSource: 'rocket_cli',
+      eventHashes: [VALID_HASH],
+      merkleRoot: VALID_HASH,
+      miningEvents,
+    });
+    const conformance = results.find(r => r.check === 'CONFORMANCE_SCORE');
+    // Presence check passes but conformance may not be 1.0
+    expect(conformance).toBeDefined();
+    expect(typeof (conformance?.evidence as { overall_score: number }).overall_score).toBe('number');
   });
 
   it('extra activities beyond required → still LIFECYCLE_COMPLETE passes', () => {

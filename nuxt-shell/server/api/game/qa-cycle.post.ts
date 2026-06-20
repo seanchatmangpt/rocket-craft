@@ -63,8 +63,9 @@ export default defineEventHandler(async (event) => {
   const [chainRes, eventsRes, receiptRes] = await Promise.all([
     sb.rpc('verify_event_chain', { p_session_id: body.session_id }),
     sb.from('ocel_events')
-      .select('activity, event_hash')
-      .eq('session_id', body.session_id),
+      .select('activity, event_hash, seq, timestamp_ms')
+      .eq('session_id', body.session_id)
+      .order('seq', { ascending: true }),
     sb.from('game_receipts')
       .select('engine_source')
       .eq('session_id', body.session_id)
@@ -74,13 +75,25 @@ export default defineEventHandler(async (event) => {
   ]);
 
   const chainOk: boolean | null = chainRes.data?.ok ?? null;
-  const eventRows = (eventsRes.data ?? []) as Array<{ activity: string; event_hash: string }>;
+  const eventRows = (eventsRes.data ?? []) as Array<{
+    activity: string;
+    event_hash: string;
+    seq: number;
+    timestamp_ms: number;
+  }>;
   const activities = [...new Set(eventRows.map(r => r.activity))];
   const eventHashes = eventRows.map(r => r.event_hash).filter(Boolean);
   const merkleRoot = computeMerkleRoot(eventHashes);
   const engineSource: string | null = receiptRes.data?.engine_source ?? null;
 
-  const results = buildCycleResult({ chainOk, activities, engineSource, eventHashes, merkleRoot });
+  // Build MiningEvent array for Van der Aalst conformance scoring
+  const miningEvents = eventRows.map(r => ({
+    activity: r.activity,
+    timestamp_ms: r.timestamp_ms ?? 0,
+    seq: r.seq ?? 0,
+  }));
+
+  const results = buildCycleResult({ chainOk, activities, engineSource, eventHashes, merkleRoot, miningEvents });
 
   const overall = classifyOverall(results);
   const checksPassed = results.filter(r => r.passed).length;
