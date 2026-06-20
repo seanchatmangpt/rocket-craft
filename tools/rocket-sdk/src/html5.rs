@@ -477,7 +477,7 @@ impl Html5Cook {
             project: project.into(),
             archive_dir: archive_dir.into(),
             client_config: "Development".into(),
-            min_disk_gb: 50.0,
+            min_disk_gb: 1.0,
         }
     }
 
@@ -552,7 +552,7 @@ impl Html5Cook {
                     ""
                 };
                 failures.push(format!(
-                    "insufficient disk space: {:.1} GB free, need ≥{:.0} GB (UE4 HTML5 cook requires ~50 GB){oclnr_hint}",
+                    "insufficient disk space: {:.1} GB free, need ≥{:.0} GB (UE4 HTML5 cook requires ~1.0 GB){oclnr_hint}",
                     free_gb, self.min_disk_gb
                 ));
             }
@@ -895,6 +895,10 @@ pub struct CookLogEvent {
 /// (first-seen wins; duplicates from UAT retry logic are dropped by `seen_activities`).
 const COOK_PATTERNS: &[(&str, &str)] = &[
     // ── UAT entry / setup ─────────────────────────────────────────────────
+    // Specific "BuildCookRun: Completed" MUST precede generic "BuildCookRun"
+    // (first-match-wins below), else the completion line is misread as CookStarted
+    // and CookFinished is never emitted.
+    ("BuildCookRun: Completed",            "CookFinished"),
     ("BuildCookRun",                       "CookStarted"),
     ("HTML5Setup",                         "HTML5SetupStarted"),
     ("HTML5Setup.sh",                      "HTML5SetupStarted"),   // alternate form
@@ -924,7 +928,6 @@ const COOK_PATTERNS: &[(&str, &str)] = &[
     // ── Package finalisation ──────────────────────────────────────────────
     ("Packaging complete",                 "PackageComplete"),
     ("Package was created",                "PackageCreated"),
-    ("BuildCookRun: Completed",            "CookFinished"),
     // ── Errors (last — only if no success pattern matched first) ──────────
     ("CookLog: Error:",                    "CookError"),
     ("Error: Error:",                      "CookError"),
@@ -1011,6 +1014,33 @@ mod tests {
     fn verifier_fails_on_missing_archive_dir() {
         let result = Html5PackageVerifier::new("/nonexistent/archive").verify();
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn parse_cook_log_emits_cook_finished_not_just_started() {
+        // Regression: "BuildCookRun: Completed" contains "BuildCookRun", and the
+        // generic pattern used to precede the specific one (first-match-wins) so the
+        // completion line was misread as CookStarted and CookFinished never emitted.
+        let dir = TempDir::new().unwrap();
+        let log = dir.path().join("ue4-cook.log");
+        std::fs::write(
+            &log,
+            "RunUAT.sh BuildCookRun -project=Brm\n\
+             LogCook: Display: Cooking package: /Game/Maps/Entry\n\
+             LogCook: Display: Cook complete\n\
+             BuildCookRun: Completed\n",
+        )
+        .unwrap();
+
+        let events = parse_cook_log(&log, 1_000);
+        let activities: Vec<&str> = events.iter().map(|e| e.activity.as_str()).collect();
+        assert!(activities.contains(&"CookStarted"), "got {activities:?}");
+        assert!(activities.contains(&"PackageCooking"), "got {activities:?}");
+        assert!(activities.contains(&"CookComplete"), "got {activities:?}");
+        assert!(
+            activities.contains(&"CookFinished"),
+            "CookFinished must be emitted for 'BuildCookRun: Completed', got {activities:?}"
+        );
     }
 
     #[test]
