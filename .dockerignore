@@ -1,0 +1,43 @@
+# Build artifacts
+target/
+**/target/
+
+# Node
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+# Git history (large, not needed in image)
+.git/
+.gitattributes
+
+# UE4 binary assets — far too large for a container image
+versions/
+
+# Claude worktrees (ephemeral agent workspaces)
+.claude/worktrees/
+
+# Local secrets / env overrides
+.env
+.env.local
+*.env
+
+# Editor / OS noise
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Android keystores (never ship in images)
+*.keystore
+*.jks
+
+# PWA build outputs (built inside pwa-staff/Dockerfile instead)
+pwa-staff/dist/
+pwa-staff/node_modules/
+
+# Test result artifacts
+pwa-staff/test-results/
+pwa-staff/playwright-report/

@@ -48,6 +48,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: chicago-tdd-tools
@@ -57,6 +59,9 @@ jobs:
 
       - name: Test
         run: cargo test --all-features
+
+      - name: Clippy
+        run: cargo clippy --all-features -- -D warnings
 
   nexus-engine:
     name: Rust — nexus-engine
@@ -68,15 +73,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: nexus-engine
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   wasm-threads:
     name: Rust — wasm-threads
@@ -88,15 +98,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: wasm-threads
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   unify-rs:
     name: Rust — unify-rs
@@ -108,15 +123,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: unify-rs
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   blueprint-rs:
     name: Rust — blueprint-rs
@@ -128,15 +148,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: blueprint-rs
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   genie3-rs:
     name: Rust — genie3-rs
@@ -148,15 +173,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: genie3-rs
 
       - name: Build
-        run: cargo build
+        run: cargo build --all-features
 
       - name: Test
-        run: cargo test
+        run: cargo test --all-features
+
+      - name: Clippy
+        run: cargo clippy --all-features -- -D warnings
 
   ib4-mud:
     name: Rust — infinity-blade-4 MUD
@@ -168,15 +198,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: infinity-blade-4/mud
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   rocket-simulator:
     name: Rust — rocket-simulator
@@ -188,19 +223,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: rocket-simulator
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   tools:
     name: Rust — tools (rocket-sdk + rocket-cmd)
     runs-on: ubuntu-latest
+    continue-on-error: true
     defaults:
       run:
         working-directory: tools
@@ -208,15 +249,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: tools
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   asset-pipeline:
     name: Rust — asset-pipeline
@@ -228,15 +274,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: asset-pipeline
 
       - name: Build
-        run: cargo build --workspace
+        run: cargo build --workspace --all-features
 
       - name: Test
-        run: cargo test --workspace
+        run: cargo test --workspace --all-features
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-features -- -D warnings
 
   nuxt-shell:
     name: Nuxt — unit tests + type-check (mock mode)
