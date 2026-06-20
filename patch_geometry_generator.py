@@ -94,21 +94,21 @@ part_mesh_tera = """#usda 1.0
                 def Cube "armor_plate_{{ i }}"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - ({{ i }} * 0.05), 1.0 - ({{ i }} * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, {{ i }} * 0.08)
+                    double3 xformOp:scale = ({{ 1.0 - (i * 0.05) }}, {{ 1.0 - (i * 0.05) }}, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, {{ i * 0.08 }})
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/{{ row.materialLocalName }}>
                 }
                 def Xform "hardpoint_{{ i }}"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, {{ i }} * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, {{ i * 0.08 }})
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_{{ i }}"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - ({{ i }} * 0.02), 0.4 - ({{ i }} * 0.02), {{ i }} * 0.08)
+                    double3 xformOp:translate = ({{ 0.4 - (i * 0.02) }}, {{ 0.4 - (i * 0.02) }}, {{ i * 0.08 }})
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -116,7 +116,7 @@ part_mesh_tera = """#usda 1.0
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + ({{ i }} * 0.02), -0.4 + ({{ i }} * 0.02), {{ i }} * 0.08)
+                    double3 xformOp:translate = ({{ -0.4 + (i * 0.02) }}, {{ -0.4 + (i * 0.02) }}, {{ i * 0.08 }})
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -126,9 +126,9 @@ part_mesh_tera = """#usda 1.0
                 def Cube "feather_blade_{{ i }}"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (0.8 - ({{ i }} * 0.05), 0.05, 1.5 - ({{ i }} * 0.1))
-                    double3 xformOp:translate = ({{ i }} * 0.1, {{ i }} * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (0, {{ i }} * 10.0, 0)
+                    double3 xformOp:scale = ({{ 0.8 - (i * 0.05) }}, 0.05, {{ 1.5 - (i * 0.1) }})
+                    double3 xformOp:translate = ({{ i * 0.1 }}, {{ i * 0.05 }}, 0.0)
+                    double3 xformOp:rotateXYZ = (0, {{ i * 10.0 }}, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/{{ row.materialLocalName }}>
                 }
@@ -136,9 +136,9 @@ part_mesh_tera = """#usda 1.0
                 {
                     double radius = 0.2
                     double height = 0.5
-                    double3 xformOp:translate = ({{ i }} * 0.1, {{ i }} * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (0, {{ i }} * 10.0, 0)
-                    double3 xformOp:translate:tip = (0.0, 0.0, 1.0 - ({{ i }} * 0.05))
+                    double3 xformOp:translate = ({{ i * 0.1 }}, {{ i * 0.05 }}, 0.0)
+                    double3 xformOp:rotateXYZ = (0, {{ i * 10.0 }}, 0)
+                    double3 xformOp:translate:tip = (0.0, 0.0, {{ 1.0 - (i * 0.05) }})
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:translate:tip"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
@@ -148,18 +148,18 @@ part_mesh_tera = """#usda 1.0
                 def Cube "beveled_plate_{{ i }}"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (0.6, 0.2, 1.0 - ({{ i }} * 0.15))
-                    double3 xformOp:translate = (0.0, {{ i }} * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = ({{ i }} * 5.0, 0, 0)
+                    double3 xformOp:scale = (0.6, 0.2, {{ 1.0 - (i * 0.15) }})
+                    double3 xformOp:translate = (0.0, {{ i * 0.05 }}, 0.0)
+                    double3 xformOp:rotateXYZ = ({{ i * 5.0 }}, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/{{ row.materialLocalName }}>
                 }
                 def Capsule "blade_edge_{{ i }}"
                 {
                     double radius = 0.02
-                    double height = 1.0 - ({{ i }} * 0.15)
-                    double3 xformOp:translate = (0.3, {{ i }} * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = ({{ i }} * 5.0, 0, 0)
+                    double height = {{ 1.0 - (i * 0.15) }}
+                    double3 xformOp:translate = (0.3, {{ i * 0.05 }}, 0.0)
+                    double3 xformOp:rotateXYZ = ({{ i * 5.0 }}, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }

@@ -1,6 +1,6 @@
 {
-  "operation_id": "b12c286d-ce84-484c-ab47-c2144f1b46da",
-  "timestamp": "2026-06-20T04:38:53.723776Z",
+  "operation_id": "e833ced1-94d7-4f81-942d-471874491f86",
+  "timestamp": "2026-06-20T04:39:38.504141Z",
   "input_hashes": [
     "actuator:ggen-sync@26.6.11",
     "ggen.toml:1f37a7258b073d4fdf9557c31190c6874a316a7b39095c09c8291fb4eac89927",
@@ -24,7 +24,7 @@
     "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract.sparql:a82b1976d52fd3ae4b401549a67e9ffe223a060c9144fd80a95f80bd3d98a3ca",
     "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract_h.tera:6b33f80f5d17b43accdea9a411ce5c1c68fb7098d229d064cfb1ef7237c2e479",
     "generated/mech_assets/reference_fabric_001/queries/materials.rq:6e453ef025113c8ad32ff9afab050e7158f1ab6da8a1c0f8a10f2b296a92a1c9",
-    "generated/mech_assets/reference_fabric_001/templates/usd/asset.usda.tera:a0abc5d3b10399573acb46fad7dc8ef97120f56610bc13119f14667d8693d3e6",
+    "generated/mech_assets/reference_fabric_001/templates/usd/asset.usda.tera:1522fa4a1a945bd90702032db50a65816f312ba455238933c8ca27d18bb37475",
     "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:97c5fb5f283dc87495ccd4913f5970ff7cdeda0b4f736f68d7280bc006dea8ce",
     "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:97c5fb5f283dc87495ccd4913f5970ff7cdeda0b4f736f68d7280bc006dea8ce",
     "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera:97c5fb5f283dc87495ccd4913f5970ff7cdeda0b4f736f68d7280bc006dea8ce",
@@ -50,7 +50,7 @@
   "output_hashes": [
     "./generated/mech_factory_mud/MechFactoryMudOcelSchema.json:1cc738c841b215cc18102ea697640086e8152a2bfd5dcbe7f8180736cddf3af2",
     "./generated/mech_factory_mud/MechFactoryMudReceiptSchema.json:af23a239dfb05cc00ffdb7d8a63a421ede634af1b4f22f10be75f35861bbfe58",
-    "./generated/mech_assets/reference_fabric_001/usd/ASSET_ReferenceFabric_001.usda:9d2660c718ec521ab9b2e9c0e6662967872cfa6f29e569e7878869d09c03c097",
+    "./generated/mech_assets/reference_fabric_001/usd/ASSET_ReferenceFabric_001.usda:a5400f459464d0a9122cb54dea95845123e0f82179e0a74b0ea22939d7293cb1",
     "./generated/mech_assets/reference_fabric_001/usd/SM_Torso.usda:a37cb007534ae11f052cfd8da1955cc34eb0fedd97695a39f6fa59d8ac8ed443",
     "./generated/mech_assets/reference_fabric_001/usd/SM_Head.usda:6bec3cb356c40085a0f9d6fd2c261b162900a52a467d9f907941c5a9ce24b98a",
     "./generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Left.usda:fb5c5c587fa986d091c8dc5a2718f45e4b92dcad245f2d9c338dba36f4e469cd",
@@ -67,6 +67,6 @@
     "./generated/mech_assets/reference_fabric_001/usd/SM_Limb_Right.usda:6ab235a636c35a28d17f6e47687a5934c5c0d3c644a22c6b7721fc7d8ce037dc",
     "./generated/mech_assets/reference_fabric_001/usd/SM_Loadout.usda:2f7b7487250302c3935564bfdff56f8ef43d508728b0ad14d4cdfd97e24148dc"
   ],
-  "signature": "9abfd2d1ff6abd209654bffe58cd483a3119a42e44ca8cedafff96f4a2cf2867cd4ad55574f8d079271fec3bd160994fff78d35d1a72230030edb8552caf0f04",
-  "previous_receipt_hash": "347db4c1ea5781e01ce6530570639bba3eab7cf6f76d0e89b260a14314d6ada9"
+  "signature": "1efb69a11e7bf0a3b8d619f9e9d1223a79b2c0435ef3ee0940240da7af0d1937cc4ae4dfcf02f2f8d60bb0e6dfd5db60d8ce2d20b3f7fcc941634917eef49e0c",
+  "previous_receipt_hash": "519408cac46c8e8f949ccdd413177e92158d4723d21e3384f390aaca7e8e6c95"
 }
