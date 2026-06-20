@@ -1,4 +1,5 @@
 pub mod crypto;
+pub mod deps;
 pub mod dev;
 pub mod doctor;
 pub mod env;

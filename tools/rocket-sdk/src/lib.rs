@@ -2,6 +2,7 @@ pub mod audit_affidavit;
 pub mod signing;
 pub mod config;
 pub mod crypto;
+pub mod deps;
 pub mod dev;
 pub mod doctor;
 pub mod error;
