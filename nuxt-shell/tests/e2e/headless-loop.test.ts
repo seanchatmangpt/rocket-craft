@@ -379,7 +379,20 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     const tamperedPack = { ...packPayload, ocel_hash: 'deadbeef'.repeat(8) };
     expect(hexOf(canonical(tamperedPack)), 'tampered manifest must NOT match pack_hash').not.toBe(body.pack_hash);
 
-    console.log(`[headless-loop] evidence-pack v2: pack_hash=${body.pack_hash?.slice(0, 8)}… re-verified all 3 nested hashes + pack binding + tamper detection`);
+    // ── Authentication: pack_signature (Ed25519 over pack_hash) ────────────────
+    // Unsigned (pack_signature=null) is valid when ROCKET_SIGNING_KEY is unset; when
+    // signed (CI/prod), the signature must verify against the active signing key's
+    // public key — proving the pack's ORIGIN, not just its internal consistency.
+    expect(body).toHaveProperty('pack_signature');
+    if (body.pack_signature) {
+      // Signed (ROCKET_SIGNING_KEY configured): signature is well-formed base64 and
+      // bound to an active key id. Full sign→verify crypto roundtrip is proven in
+      // test/unit/packSignature.test.ts.
+      expect(String(body.pack_signature)).toMatch(/^[A-Za-z0-9+/]+=*$/);
+      expect(body.signing_key_id).toMatch(/[0-9a-f-]{36}/);
+    }
+
+    console.log(`[headless-loop] evidence-pack v2: pack_hash=${body.pack_hash?.slice(0, 8)}… signed=${!!body.pack_signature} — re-verified 3 nested hashes + pack binding + tamper detection`);
   });
 
   it('Step 11b: session-state endpoint returns Proven state after receipt-finalize', async () => {

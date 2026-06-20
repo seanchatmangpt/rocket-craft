@@ -27,6 +27,7 @@ import { blake3 } from '@noble/hashes/blake3.js';
 import { computeMerkleRoot } from '../../utils/merkle';
 import { toOcel2 } from '../../utils/ocelFormat';
 import { canonicalJSON as canonicalize } from '../../utils/canonicalJson';
+import { signEd25519 } from '../../utils/ed25519';
 
 function blake3Hex(input: string): string {
   const bytes = blake3(new TextEncoder().encode(input));
@@ -151,10 +152,27 @@ export default defineEventHandler(async (event) => {
   };
   const packHash = blake3Hex(canonicalize(packPayload));
 
+  // Authenticate the pack: Ed25519-sign pack_hash with the active signing key, so a
+  // verifier can prove ORIGIN (not just internal consistency). Optional — when
+  // ROCKET_SIGNING_KEY is unset the pack is still tamper-evident, just unsigned.
+  const packSignature = await signEd25519(packHash, process.env.ROCKET_SIGNING_KEY);
+  let signingKeyId: string | null = null;
+  if (packSignature) {
+    const { data: activeKey } = await sb
+      .from('signing_keys')
+      .select('id')
+      .eq('status', 'active')
+      .maybeSingle();
+    signingKeyId = (activeKey?.id as string) ?? null;
+  }
+
   return {
     schema_version: '2.0',
     pack_hash: packHash,
     pack_algorithm: 'BLAKE3',
+    // Ed25519 signature over pack_hash + the key id that produced it (null when unsigned).
+    pack_signature: packSignature,
+    signing_key_id: signingKeyId,
     generated_at: new Date().toISOString(),
     session_id: body.session_id,
     manifest: {

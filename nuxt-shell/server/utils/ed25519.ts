@@ -55,3 +55,34 @@ export async function verifyReceiptSignature(
     return false;
   }
 }
+
+function bytesToB64(bytes: Uint8Array): string {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+/**
+ * Ed25519-sign an arbitrary message string with a base64 private key (32-byte
+ * seed). Returns the base64 signature, or null if the key is missing/malformed.
+ * Used to AUTHENTICATE the evidence-pack (sign its pack_hash) so a bundle proves
+ * origin, not just internal consistency.
+ */
+export async function signEd25519(message: string, privKeyB64: string | undefined): Promise<string | null> {
+  if (!privKeyB64) return null;
+  try {
+    const sig = await ed.signAsync(new TextEncoder().encode(message), b64ToBytes(privKeyB64));
+    return bytesToB64(sig);
+  } catch {
+    return null;
+  }
+}
+
+/** Verify an Ed25519 signature (base64) over a raw message string. */
+export async function verifyEd25519(message: string, sigB64: string, pubKeyB64: string): Promise<boolean> {
+  try {
+    return await ed.verifyAsync(b64ToBytes(sigB64), new TextEncoder().encode(message), b64ToBytes(pubKeyB64));
+  } catch {
+    return false;
+  }
+}
