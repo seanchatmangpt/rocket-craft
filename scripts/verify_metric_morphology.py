@@ -71,14 +71,14 @@ def declared_up_axis():
         return "UNKNOWN"
 
 PART_BANDS = {  # (class, lo, hi) height-ratio bands mirrored from 116
-    "SM_Head": ("MechaCrown", 0.08, 0.15),
-    "SM_Torso": ("TorsoSegment", 0.30, 0.45),
-    "SM_Limb_Left": ("BipedalLeg", 0.40, 0.55),
-    "SM_Limb_Right": ("BipedalLeg", 0.40, 0.55),
-    "SM_WingArray_Left": ("WingArray", 0.40, 0.90),
-    "SM_WingArray_Right": ("WingArray", 0.40, 0.90),
-    "SM_Blade_Left": ("MechaWeapon", 0.10, 0.60),
-    "SM_Blade_Right": ("MechaWeapon", 0.10, 0.60),
+    "SM_Head": ("MechaCrown", 0.1190, 0.1390),
+    "SM_Torso": ("TorsoSegment", 0.1190, 0.1390),
+    "SM_Limb_Left": ("BipedalLeg", 0.6207, 0.6407),
+    "SM_Limb_Right": ("BipedalLeg", 0.6207, 0.6407),
+    "SM_WingArray_Left": ("WingArray", 0.6113, 0.6313),
+    "SM_WingArray_Right": ("WingArray", 0.6113, 0.6313),
+    "SM_Blade_Left": ("MechaWeapon", 0.2245, 0.2445),
+    "SM_Blade_Right": ("MechaWeapon", 0.2245, 0.2445),
 }
 
 GROUP_RE = re.compile(r'def Xform "(prim_[^"]+)"\s*\{(.*?)\n        \}', re.DOTALL)

@@ -34,7 +34,8 @@ if [ "$MM_RC" -eq 2 ]; then
     echo "!! METRIC MORPHOLOGY GATE FAILED (law broken / negative fixture passed) -- aborting"
     exit 2
 elif [ "$MM_RC" -eq 1 ]; then
-    echo "!! METRIC MORPHOLOGY: PARTIAL_ALIVE -- real mech violates a band (see METRIC_MORPHOLOGY_REPORT.md). Render continues (non-blocking)."
+    echo "!! METRIC MORPHOLOGY: PARTIAL_ALIVE -- real mech violates a band (see METRIC_MORPHOLOGY_REPORT.md). Morphology band violation is fatal -- aborting."
+    exit 1
 else
     echo ">> METRIC MORPHOLOGY: ADMITTED"
 fi
