@@ -18,18 +18,11 @@ import { createClient } from '@supabase/supabase-js';
 import { blake3 } from '@noble/hashes/blake3.js';
 import { computeMerkleRoot } from '../../utils/merkle';
 import { classifyOverall, buildCycleResult } from '../../utils/qaCycle';
+import { canonicalJSON as canonicalize } from '../../utils/canonicalJson';
 
 function blake3Hex(input: string): string {
   const bytes = blake3(new TextEncoder().encode(input));
   return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function canonicalize(obj: unknown): string {
-  return JSON.stringify(obj, (_, v) =>
-    v && typeof v === 'object' && !Array.isArray(v)
-      ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort())
-      : v
-  );
 }
 
 function uuid(): string {
