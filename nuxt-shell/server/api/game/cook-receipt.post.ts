@@ -31,6 +31,12 @@
 
 import { createClient } from '@supabase/supabase-js'
 import * as ed from '@noble/ed25519'
+import { blake3 } from '@noble/hashes/blake3.js'
+
+function blake3Hex(input: string): string {
+  const bytes = blake3(new TextEncoder().encode(input))
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
+}
 
 const DECLARED_LIFECYCLE = ['GameSessionStarted', 'FrameRendered', 'InputAdmitted']
 
@@ -148,6 +154,31 @@ export default defineEventHandler(async (event) => {
     const { data: chainResult } = await supabase
       .rpc('verify_event_chain', { p_session_id: session_id })
     chainVerified = chainResult === true
+  }
+
+  // ── receipt.emit span (truex LIVE-13 pattern) ──────────────────────────────
+  // Emit an OCEL event marking that this receipt was witnessed + emitted by the
+  // proof aggregator. Makes the full lifecycle (seed→events→proven→emitted)
+  // auditable in pm4py process conformance. Non-fatal: failure doesn't block the response.
+  if (session_id && receipt.verdict === 'PASS') {
+    const emitHash = blake3Hex(JSON.stringify({ receipt_id: receipt.id, signer: 'proof_aggregator', ts: proven_at ?? new Date().toISOString() }))
+    await supabase.from('ocel_events').insert({
+      session_id,
+      activity: 'ReceiptEmitted',
+      ts_ms: Date.now(),
+      object_refs: [session_id, receipt.id],
+      attributes: {
+        signer: 'proof_aggregator',
+        receipt_hash,
+        verdict,
+        algorithm: 'BLAKE3',
+      },
+      event_hash: emitHash,
+      prev_hash: receipt_hash,
+      seq: 9999,
+    }).then(({ error }) => {
+      if (error) console.warn('[cook-receipt] receipt.emit insert failed (non-fatal):', error.message)
+    })
   }
 
   return {
