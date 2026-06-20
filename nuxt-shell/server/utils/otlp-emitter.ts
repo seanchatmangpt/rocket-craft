@@ -94,13 +94,17 @@ function hexId(bytes: number): string {
     .join('');
 }
 
-/** Convert a scalar value to an OTLP attribute object. */
-function toOtlpAttr(key: string, value: string | number | boolean): OtlpAttribute {
+/** Convert a scalar value to an OTLP attribute object. Exported for contract tests. */
+export function toOtlpAttr(key: string, value: string | number | boolean): OtlpAttribute {
   return { key, value: { stringValue: String(value) } };
 }
 
-/** Build the OTLP ExportTraceServiceRequest envelope from a span array. */
-function buildOtlpPayload(spans: OtlpSpan[]): Record<string, unknown> {
+/**
+ * Build the OTLP ExportTraceServiceRequest envelope from a span array.
+ * Exported so the payload structure is unit-tested — a malformed envelope is
+ * silently rejected by a collector and traces vanish with no other signal.
+ */
+export function buildOtlpPayload(spans: OtlpSpan[]): Record<string, unknown> {
   return {
     resourceSpans: [
       {
@@ -127,8 +131,9 @@ function resolveCollectorUrl(): string {
     const config = useRuntimeConfig();
     return (config.otlpCollectorUrl as string | undefined) ?? 'http://localhost:4318';
   } catch {
-    // useRuntimeConfig() can throw outside a Nitro request context (e.g. unit tests)
-    return 'http://localhost:4318';
+    // useRuntimeConfig() can throw outside a Nitro request context (e.g. unit tests).
+    // Honour OTLP_COLLECTOR_URL so non-Nitro callers and tests can redirect it.
+    return process.env.OTLP_COLLECTOR_URL ?? 'http://localhost:4318';
   }
 }
 
