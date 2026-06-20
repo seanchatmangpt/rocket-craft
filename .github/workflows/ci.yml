@@ -288,23 +288,26 @@ jobs:
           python3 - <<'EOF'
           import json, pathlib
           # Minimal OCEL 2.0 JSON for smoke-test (no Supabase needed)
+          # objectId MUST equal --session-id (ci-smoke) so the session filter keeps the
+          # events — otherwise they're filtered out and conformance is vacuous.
           ocel = {
             "ocel:global-log": {"ocel:version": "2.0", "ocel:ordering": "timestamp"},
             "ocel:global-event": {"ocel:activity": "__INVALID__"},
             "ocel:global-object": {"ocel:type": "session"},
             "ocel:events": {
-              "e1": {"ocel:activity": "GameSessionStarted", "ocel:timestamp": "2026-06-19T00:00:01Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
-              "e2": {"ocel:activity": "FrameRendered",      "ocel:timestamp": "2026-06-19T00:00:02Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
-              "e3": {"ocel:activity": "InputAdmitted",      "ocel:timestamp": "2026-06-19T00:00:03Z", "ocel:omap": ["s1"], "ocel:vmap": {}},
+              "e1": {"ocel:activity": "GameSessionStarted", "ocel:timestamp": "2026-06-19T00:00:01Z", "ocel:omap": ["ci-smoke"], "ocel:vmap": {}},
+              "e2": {"ocel:activity": "FrameRendered",      "ocel:timestamp": "2026-06-19T00:00:02Z", "ocel:omap": ["ci-smoke"], "ocel:vmap": {}},
+              "e3": {"ocel:activity": "InputAdmitted",      "ocel:timestamp": "2026-06-19T00:00:03Z", "ocel:omap": ["ci-smoke"], "ocel:vmap": {}},
             },
             "ocel:objects": {
-              "s1": {"ocel:type": "session", "ocel:ovmap": {}}
+              "ci-smoke": {"ocel:type": "session", "ocel:ovmap": {}}
             },
             "events": [
-              {"id":"e1","type":"GameSessionStarted","time":"2026-06-19T00:00:01Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
-              {"id":"e2","type":"FrameRendered","time":"2026-06-19T00:00:02Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
-              {"id":"e3","type":"InputAdmitted","time":"2026-06-19T00:00:03Z","attributes":{},"relationships":[{"objectId":"s1","qualifier":"session"}]},
+              {"id":"e1","type":"GameSessionStarted","time":"2026-06-19T00:00:01Z","attributes":{},"relationships":[{"objectId":"ci-smoke","qualifier":"session"}]},
+              {"id":"e2","type":"FrameRendered","time":"2026-06-19T00:00:02Z","attributes":{},"relationships":[{"objectId":"ci-smoke","qualifier":"session"}]},
+              {"id":"e3","type":"InputAdmitted","time":"2026-06-19T00:00:03Z","attributes":{},"relationships":[{"objectId":"ci-smoke","qualifier":"session"}]},
             ],
+            "objects": [{"id":"ci-smoke","type":"session","attributes":[]}],
             "objectTypes": [{"name":"session","attributes":[]}],
             "eventTypes": [
               {"name":"GameSessionStarted","attributes":[]},

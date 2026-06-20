@@ -113,7 +113,6 @@ def pm4py_conformance(events: list, session_id) -> dict:
     import pm4py
     from pm4py.objects.log.obj import EventLog, Trace, Event
     from pm4py.algo.conformance.tokenreplay import algorithm as token_replay
-    from pm4py.algo.discovery.inductive import algorithm as inductive_miner
 
     if session_id:
         events = [e for e in events if get_session_id(e) == session_id or get_session_id(e) is None]
@@ -131,11 +130,18 @@ def pm4py_conformance(events: list, session_id) -> dict:
     found_activities = {e["concept:name"] for t in log for e in t}
 
     try:
-        net, im, fm = inductive_miner.apply(log)
+        # pm4py 2.7's inductive_miner.apply returns a ProcessTree, not (net, im, fm).
+        # Use the high-level discoverer that returns a Petri net triple directly.
+        net, im, fm = pm4py.discover_petri_net_inductive(log)
         replayed = token_replay.apply(log, net, im, fm)
-        fitness = replayed[0].get("trace_fitness", 0.0) if replayed else 0.0
+        token_fitness = replayed[0].get("trace_fitness", 0.0) if replayed else 0.0
 
         required_found = [a for a in REQUIRED_ACTIVITIES if a in found_activities]
+        # Token replay returns a VACUOUS 1.0 on an empty/filtered log. Gate fitness on
+        # required-activity coverage too, so a session with zero matching events (or
+        # missing lawful activities) cannot PASS conformance.
+        required_coverage = len(required_found) / len(REQUIRED_ACTIVITIES) if REQUIRED_ACTIVITIES else 1.0
+        fitness = min(float(token_fitness), required_coverage)
         precision = len(required_found) / len(found_activities) if found_activities else 0.0
     except Exception as exc:
         result = simple_conformance(events, session_id)
@@ -181,6 +187,21 @@ def main() -> int:
     except ImportError:
         result = simple_conformance(events, args.session_id)
 
+    # OCEL 2.0 SPEC VALIDATION: prove the export is parseable by real pm4py's own
+    # OCEL 2.0 reader (the doctrine claim "drop the JSON into pm4py"). Only runs when
+    # pm4py is installed and the file is OCEL 2.0 shaped (has objectTypes/eventTypes).
+    if isinstance(ocel, dict) and "objectTypes" in ocel and "eventTypes" in ocel:
+        try:
+            import pm4py  # noqa: F401
+            parsed = pm4py.read_ocel2_json(ocel_path)
+            result["ocel2_pm4py_parseable"] = True
+            result["ocel2_event_count"] = int(len(parsed.events))
+        except ImportError:
+            result["ocel2_pm4py_parseable"] = None  # pm4py not installed (fallback mode)
+        except Exception as exc:  # real parse failure = spec-invalid export
+            result["ocel2_pm4py_parseable"] = False
+            result["ocel2_parse_error"] = str(exc)
+
     output = json.dumps(result, indent=2)
 
     if args.out:
@@ -190,6 +211,9 @@ def main() -> int:
     else:
         print(output)
 
+    # Fail on low fitness OR a spec-invalid OCEL 2.0 export (when real pm4py ran).
+    if result.get("ocel2_pm4py_parseable") is False:
+        return 1
     return 0 if result["fitness"] >= THRESHOLD else 1
 
 
