@@ -110,9 +110,14 @@ log "resetting gameplay data for deterministic baseline..."
 curl -sf -X POST "$API_BASE_URL/api/test/reset-data" -H 'content-type: application/json' \
   -d '{"confirm":true}' >/dev/null || log "WARN: reset-data failed (non-fatal)"
 
-# ── 7. Headless-loop E2E (24 tests, real Supabase) ────────────────────────────
+# ── 7. Headless-loop E2E (25 tests, real Supabase) ────────────────────────────
 log "running headless-loop E2E (MOCK_API=0)..."
 ( cd "$ROOT" && API_BASE_URL="$API_BASE_URL" MOCK_API=0 npx vitest run tests/e2e/headless-loop.test.ts --reporter=dot )
+
+# ── 7a. Fast Playwright E2E: control plane + real auth + synthetic OCEL loop ───
+# (shell.spec = DOM control plane, auth-flow = real login, game-loop = OCEL collect)
+log "running fast Playwright E2E (shell + auth-flow + game-loop)..."
+( cd "$ROOT" && npx playwright test e2e/shell.spec.ts e2e/auth-flow.spec.ts e2e/game-loop.spec.ts --project=game-loop --workers=2 )
 
 # ── 7b. WASM tamper check: re-hash the served binary vs the cook receipt ──────
 if [[ "${SKIP_UE4:-0}" != "1" && -f "$ARCHIVE/cook-receipt.json" ]]; then

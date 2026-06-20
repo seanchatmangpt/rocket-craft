@@ -14,6 +14,7 @@
  */
 
 import { test, expect } from '@playwright/test';
+import { typeInto } from './helpers';
 
 test.describe('Supabase auth flow', () => {
   test('seeded user can log in through the form and reach /game', async ({ page, request }) => {
@@ -40,19 +41,8 @@ test.describe('Supabase auth flow', () => {
     const passwordInput = page.locator('input[type="password"]');
     await expect(emailInput).toBeVisible({ timeout: 15_000 });
 
-    // Type, then self-heal if the focus race still dropped characters.
-    const typeInto = async (loc: typeof emailInput, value: string) => {
-      await loc.click();
-      await page.waitForTimeout(150);
-      await loc.pressSequentially(value, { delay: 15 });
-      if ((await loc.inputValue()) !== value) {
-        await loc.press('Control+a');
-        await loc.press('Backspace');
-        await loc.pressSequentially(value, { delay: 25 });
-      }
-    };
-    await typeInto(emailInput, email);
-    await typeInto(passwordInput, password);
+    await typeInto(page, emailInput, email);
+    await typeInto(page, passwordInput, password);
     await passwordInput.blur();
 
     const submit = page.getByTestId('btn-auth-submit');
