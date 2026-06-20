@@ -26,6 +26,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { buildCookSummary } from '../../utils/cookStatus'
 
 function latestCookLog(logDir: string, _project: string): { path: string; lines: string[] } | null {
   try {
@@ -42,15 +43,6 @@ function latestCookLog(logDir: string, _project: string): { path: string; lines:
   } catch {
     return null
   }
-}
-
-function inferCookStatus(logLines: string[]): 'idle' | 'cooking' | 'done' | 'failed' {
-  if (!logLines.length) return 'idle'
-  const last = logLines.slice(-20).join('\n').toLowerCase()
-  if (last.includes('cook failed') || last.includes('error:') || last.includes('build failed')) return 'failed'
-  if (last.includes('package completed') || last.includes('cook completed') || last.includes('success')) return 'done'
-  if (last.includes('cooking') || last.includes('shadercompile') || last.includes('buildcookrun')) return 'cooking'
-  return 'idle'
 }
 
 export default defineEventHandler(async (event) => {
@@ -91,16 +83,19 @@ export default defineEventHandler(async (event) => {
   // Read cook log if available
   const logDir = process.env.COOK_LOG_DIR ?? '/tmp'
   const logResult = latestCookLog(logDir, project)
-  const logTail = logResult ? logResult.lines.slice(-lines) : []
-  const logFile = logResult?.path ?? null
 
-  const status = logTail.length
-    ? inferCookStatus(logTail)
-    : (lastReceipt?.verdict === 'PASS' ? 'done' : 'idle')
+  const summary = buildCookSummary({
+    logLines: logResult?.lines ?? [],
+    logFile: logResult?.path ?? null,
+    project,
+    lastReceipt: lastReceipt ?? null,
+    cookEvents,
+    tailLines: lines,
+  })
 
   return {
-    status,
-    project,
+    status: summary.status,
+    project: summary.project,
     last_receipt: lastReceipt
       ? {
           verdict: lastReceipt.verdict,
@@ -109,8 +104,8 @@ export default defineEventHandler(async (event) => {
           engine_source: lastReceipt.engine_source,
         }
       : null,
-    log_tail: logTail,
-    log_file: logFile,
-    cook_events: cookEvents,
+    log_tail: summary.log_tail,
+    log_file: summary.log_file,
+    cook_events: summary.cook_events,
   }
 })
