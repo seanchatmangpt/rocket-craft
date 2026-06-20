@@ -46,7 +46,7 @@ const IDENTITY_HIERARCHY: readonly IdentityBoundary[] = [
   'mfa_verified',
 ];
 
-function checkRoute(
+export function checkRoute(
   identityBoundary: IdentityBoundary,
   route: RouteDefinition,
   roles: string[],

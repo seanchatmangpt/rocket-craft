@@ -18,12 +18,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-
-interface HealthLie {
-  code: 'LIE-1' | 'LIE-2' | 'LIE-4';
-  description: string;
-  evidence: Record<string, unknown>;
-}
+import { detectLies } from '../../utils/healthLies';
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event);
@@ -55,35 +50,11 @@ export default defineEventHandler(async (event) => {
       .limit(5),
   ]);
 
-  const lies: HealthLie[] = [];
-
-  if (lie1Res.status === 'fulfilled' && lie1Res.value.data?.length) {
-    lies.push({
-      code: 'LIE-1',
-      description: `${lie1Res.value.data.length} PASS receipt(s) claim zero OCEL events — impossible without evidence`,
-      evidence: { receipts: lie1Res.value.data.map((r: { id: string }) => r.id) },
-    });
-  }
-
-  if (lie2Res.status === 'fulfilled' && lie2Res.value.data?.length) {
-    lies.push({
-      code: 'LIE-2',
-      description: `${lie2Res.value.data.length} session(s) alive >10 min with no close — stale session leak`,
-      evidence: {
-        sessions: lie2Res.value.data.map((s: { id: string; project_name: string }) => ({
-          id: s.id, project: s.project_name,
-        })),
-      },
-    });
-  }
-
-  if (lie4Res.status === 'fulfilled' && lie4Res.value.data?.length) {
-    lies.push({
-      code: 'LIE-4',
-      description: `${lie4Res.value.data.length} receipt(s) with engine_source=synthetic bypassed the guard trigger`,
-      evidence: { receipts: lie4Res.value.data.map((r: { id: string }) => r.id) },
-    });
-  }
+  const lies = detectLies(
+    lie1Res.status === 'fulfilled' ? lie1Res.value.data : null,
+    lie2Res.status === 'fulfilled' ? lie2Res.value.data : null,
+    lie4Res.status === 'fulfilled' ? lie4Res.value.data : null,
+  );
 
   return {
     lies,
