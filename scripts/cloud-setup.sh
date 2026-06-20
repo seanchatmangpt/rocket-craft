@@ -236,3 +236,30 @@ else
     echo "  ./rocket pwa lint  # Lint pwa-staff"
     echo "  cd pwa-staff && npm test   # Run PWA unit tests"
 fi
+
+# ===========================================================================
+# 6. DIRENV / .envrc INTEGRATION
+# ===========================================================================
+echo ""
+info "Checking direnv integration..."
+
+if has_cmd direnv; then
+    DIRENV_VER="$(direnv version 2>&1)"
+    ok "direnv: ${DIRENV_VER}"
+    if [ ! -f "${PROJECT_ROOT}/.envrc" ]; then
+        info "No .envrc found — generating one with ./rocket env generate-envrc ..."
+        if [ -x "${PROJECT_ROOT}/rocket" ]; then
+            (cd "${PROJECT_ROOT}" && ./rocket env generate-envrc) \
+                && ok ".envrc generated. Run 'direnv allow' in ${PROJECT_ROOT} to activate." \
+                || warn "Failed to generate .envrc via rocket CLI."
+        else
+            warn "rocket binary not found at ${PROJECT_ROOT}/rocket. Build it first with: cd tools && cargo build --release"
+        fi
+    else
+        ok ".envrc already exists at ${PROJECT_ROOT}/.envrc"
+        info "Run 'direnv allow' if you haven't already."
+    fi
+else
+    warn "direnv not found. Install from https://direnv.net to enable automatic env loading."
+    info "Once installed, run: ./rocket env generate-envrc && direnv allow"
+fi
