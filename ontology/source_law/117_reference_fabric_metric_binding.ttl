@@ -1,0 +1,51 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix eng: <https://rocket-craft.com/ontology/engineering#> .
+@prefix law: <https://rocket-craft.com/ontology/law#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix rf: <https://rocket-craft.com/asset/reference_fabric_001#> .
+
+# ==============================================================================
+# 117 - Reference Fabric Metric Binding
+# ------------------------------------------------------------------------------
+# Binds the flagship mech (reference_fabric_001) to the metric frame of 110/116.
+# The per-geometry measured envelopes (Y_MIN/Y_MAX numericValues) are supplied
+# at gate time by scripts/verify_metric_morphology.py; THIS file fixes the
+# class typings, the parent assembly composition, and the body-height anchor.
+#
+# This flagship has NO shield -> 110/116 shield shapes pass vacuously (correct).
+# ==============================================================================
+
+<https://rocket-craft.com/ontology/law#117_reference_fabric_metric_binding>
+    a owl:Ontology ;
+    rdfs:label "Reference Fabric Metric Binding"@en ;
+    owl:imports <https://rocket-craft.com/ontology/law#116_metric_morphology_bands> .
+
+# --- The mech instance + canonical body-height anchor ------------------------
+# 18.0 m is a defensible flagship anchor. Morphology bands are RATIO-based and
+# therefore unit-free; this absolute value only feeds human-readable derived
+# envelopes. The gate re-measures body height from geometry and rebinds it.
+rf:ReferenceFabric_001 a law:BipedalTorso ;
+    rdfs:label "Reference Fabric 001 (flagship mech)"@en ;
+    eng:hasBodyHeight [
+        a sosa:Observation ;
+        sosa:hasResult [ qudt:numericValue "18.0"^^xsd:decimal ; qudt:unit unit:M ]
+    ] ;
+    eng:hasPart rf:SM_Torso , rf:SM_Head ,
+                rf:SM_Limb_Left , rf:SM_Limb_Right ,
+                rf:SM_WingArray_Left , rf:SM_WingArray_Right ,
+                rf:SM_Blade_Left , rf:SM_Blade_Right .
+
+# --- Part class typings (graph defines the robot) ----------------------------
+rf:SM_Head           a law:MechaCrown ;   eng:attachedTo rf:ReferenceFabric_001 .
+rf:SM_Torso          a law:TorsoSegment ;  eng:attachedTo rf:ReferenceFabric_001 .
+rf:SM_Limb_Left      a law:BipedalLeg , law:BipedalLimb ; eng:attachedTo rf:ReferenceFabric_001 .
+rf:SM_Limb_Right     a law:BipedalLeg , law:BipedalLimb ; eng:attachedTo rf:ReferenceFabric_001 .
+rf:SM_WingArray_Left  a law:WingArray ;   eng:attachedTo rf:ReferenceFabric_001 .
+rf:SM_WingArray_Right a law:WingArray ;   eng:attachedTo rf:ReferenceFabric_001 .
+rf:SM_Blade_Left     a law:MechaWeapon ;  eng:attachedTo rf:ReferenceFabric_001 .
+rf:SM_Blade_Right    a law:MechaWeapon ;  eng:attachedTo rf:ReferenceFabric_001 .

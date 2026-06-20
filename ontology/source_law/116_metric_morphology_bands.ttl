@@ -1,0 +1,190 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix eng: <https://rocket-craft.com/ontology/engineering#> .
+@prefix law: <https://rocket-craft.com/ontology/law#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+
+# ==============================================================================
+# 116 - Metric Morphology Bands (Graph Law, extends 110)
+# ------------------------------------------------------------------------------
+# Morphology is GRAPH LAW: a part's vertical envelope is a ratio of body height
+# (unit-free). The graph defines the robot; the render cannot. A "huge UFO disc"
+# is REFUSED here by metric band law, not discovered later in UE4/Playwright.
+#
+# Bands are T3_archetype_estimate (bipedal winged mecha). Ratios are unit-free;
+# the absolute meter anchor (eng:hasBodyHeight) only drives human-readable
+# derived envelopes. Vertical axis convention follows 110 (eng:hasBoundingBoxY*).
+# ==============================================================================
+
+<https://rocket-craft.com/ontology/law#116_metric_morphology_bands>
+    a owl:Ontology ;
+    rdfs:label "Metric Morphology Bands"@en ;
+    rdfs:comment "Per-part vertical envelope bands as ratio-of-body-height; archetype shield exception classes."@en ;
+    owl:imports <https://rocket-craft.com/ontology/law#> .
+
+# --- Archetype exception classes (referenced by 110's shield shapes) ----------
+law:TowerShieldArchetype a owl:Class ;
+    rdfs:subClassOf law:MechaShield ;
+    rdfs:label "Tower Shield Archetype"@en ;
+    rdfs:comment "Exception class: shield may occupy 55%-85% of body height."@en .
+
+law:SiegeShieldArchetype a owl:Class ;
+    rdfs:subClassOf law:MechaShield ;
+    rdfs:label "Siege Shield Archetype"@en ;
+    rdfs:comment "Exception class: heavy emplacement shield, exempt from default proportion."@en .
+
+law:MobileBarricadeArchetype a owl:Class ;
+    rdfs:subClassOf law:MechaShield ;
+    rdfs:label "Mobile Barricade Archetype"@en ;
+    rdfs:comment "Exception class: barricade-scale shield (0.85-1.10 of body height)."@en .
+
+law:TransformationShieldArchetype a owl:Class ;
+    rdfs:subClassOf law:MechaShield ;
+    rdfs:label "Transformation Shield Archetype"@en ;
+    rdfs:comment "Exception class: transformable shield permitted to reach 0.85-1.10 of body height."@en .
+
+# --- New morphology vocabulary (declared here) -------------------------------
+law:MorphologyBand a owl:Class ;
+    rdfs:label "Morphology Band"@en ;
+    rdfs:comment "A declarative [min,max] height-ratio band for a part class (unit-free)."@en .
+
+law:appliesToPartClass a owl:ObjectProperty ;
+    rdfs:domain law:MorphologyBand ;
+    rdfs:label "applies to part class"@en .
+
+law:bandMinRatio a owl:DatatypeProperty ; rdfs:domain law:MorphologyBand ; rdfs:range xsd:decimal .
+law:bandMaxRatio a owl:DatatypeProperty ; rdfs:domain law:MorphologyBand ; rdfs:range xsd:decimal .
+law:bandMinXSpanRatio a owl:DatatypeProperty ; rdfs:domain law:MorphologyBand ; rdfs:range xsd:decimal .
+law:bandMaxXSpanRatio a owl:DatatypeProperty ; rdfs:domain law:MorphologyBand ; rdfs:range xsd:decimal .
+
+eng:hasBoundingBoxYMax a owl:ObjectProperty ; rdfs:label "has bounding box Y max"@en .
+
+# --- Part morphology classes -------------------------------------------------
+law:BipedalLimb a owl:Class ;
+    rdfs:subClassOf eng:MechaPart ;
+    rdfs:label "Bipedal Limb"@en .
+
+# The torso SEGMENT part (distinct from law:BipedalTorso, which 110 uses as the
+# whole-body root carrying eng:hasBodyHeight + eng:hasPart anatomy bands).
+law:TorsoSegment a owl:Class ;
+    rdfs:subClassOf eng:MechaPart ;
+    rdfs:label "Torso Segment"@en .
+
+law:WingArray a owl:Class ;
+    rdfs:subClassOf eng:MechaPart ;
+    rdfs:label "Wing Array"@en .
+
+# Ensure the morphology part classes are reachable as eng:MechaPart so the
+# generic PartHeightBandShape (sh:targetClass eng:MechaPart) targets them.
+law:MechaCrown   rdfs:subClassOf eng:MechaPart .
+law:BipedalTorso rdfs:subClassOf eng:MechaPart .
+law:BipedalLeg   rdfs:subClassOf eng:MechaPart .
+
+law:MechaWeapon a owl:Class ;
+    rdfs:subClassOf eng:MechaPart ;
+    rdfs:label "Mecha Weapon"@en .
+
+# --- QUDT-typed ratio bands (T3_archetype_estimate) --------------------------
+# Each band: a declarative record of [min,max] height-ratio for a part class.
+law:HeadHeightBand a law:MorphologyBand ;
+    law:appliesToPartClass law:MechaCrown ;
+    law:bandMinRatio "0.08"^^xsd:decimal ;
+    law:bandMaxRatio "0.15"^^xsd:decimal ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio .
+
+law:TorsoHeightBand a law:MorphologyBand ;
+    law:appliesToPartClass law:TorsoSegment ;
+    law:bandMinRatio "0.30"^^xsd:decimal ;
+    law:bandMaxRatio "0.45"^^xsd:decimal ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio .
+
+law:LimbHeightBand a law:MorphologyBand ;
+    law:appliesToPartClass law:BipedalLimb ;
+    law:bandMinRatio "0.40"^^xsd:decimal ;
+    law:bandMaxRatio "0.55"^^xsd:decimal ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio .
+
+law:LegHeightBand a law:MorphologyBand ;
+    law:appliesToPartClass law:BipedalLeg ;
+    law:bandMinRatio "0.40"^^xsd:decimal ;
+    law:bandMaxRatio "0.55"^^xsd:decimal ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio .
+
+law:WingSpanBand a law:MorphologyBand ;
+    law:appliesToPartClass law:WingArray ;
+    law:bandMinXSpanRatio "0.30"^^xsd:decimal ;
+    law:bandMaxXSpanRatio "1.20"^^xsd:decimal ;
+    law:bandMinRatio "0.40"^^xsd:decimal ;
+    law:bandMaxRatio "0.90"^^xsd:decimal ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio .
+
+law:WeaponHeightBand a law:MorphologyBand ;
+    law:appliesToPartClass law:MechaWeapon ;
+    law:bandMinRatio "0.10"^^xsd:decimal ;
+    law:bandMaxRatio "0.60"^^xsd:decimal ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio .
+
+# Shield tiers (declared, enforced via 110 + extension below)
+law:ShieldNormalTier   a law:MorphologyBand ; law:bandMinRatio "0.25"^^xsd:decimal ; law:bandMaxRatio "0.35"^^xsd:decimal .
+law:ShieldLargeTier    a law:MorphologyBand ; law:bandMinRatio "0.35"^^xsd:decimal ; law:bandMaxRatio "0.55"^^xsd:decimal .
+law:ShieldTowerTier    a law:MorphologyBand ; law:bandMinRatio "0.55"^^xsd:decimal ; law:bandMaxRatio "0.85"^^xsd:decimal .
+law:ShieldExceptionTier a law:MorphologyBand ; law:bandMinRatio "0.85"^^xsd:decimal ; law:bandMaxRatio "1.10"^^xsd:decimal .
+
+# ==============================================================================
+# SHACL refusal shapes (mirror 110's sh:SPARQLConstraint style)
+# ==============================================================================
+
+# Generic per-part vertical-band refusal. A part bound to a MorphologyBand whose
+# measured height ratio falls outside [min,max] is REFUSED.
+law:PartHeightBandShape a sh:NodeShape ;
+    sh:targetClass eng:MechaPart ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_PART_HEIGHT_BAND: part height ratio falls outside its declared morphology band." ;
+        sh:select """
+            SELECT $this ?ratio ?lo ?hi
+            WHERE {
+                $this a ?pc .
+                ?band law:appliesToPartClass ?pc .
+                ?band law:bandMinRatio ?lo .
+                ?band law:bandMaxRatio ?hi .
+
+                $this eng:attachedTo ?mecha .
+                ?mecha eng:hasBodyHeight/sosa:hasResult/qudt:numericValue ?bodyHeight .
+                $this eng:hasBoundingBoxYMin/sosa:hasResult/qudt:numericValue ?ymin .
+                $this eng:hasBoundingBoxYMax/sosa:hasResult/qudt:numericValue ?ymax .
+
+                BIND( ( ?ymax - ?ymin ) / ?bodyHeight AS ?ratio )
+                FILTER ( ?ratio < ?lo || ?ratio > ?hi )
+            }
+        """
+    ] .
+
+# UFO-disc / oversized-shield refusal: a shield at exception scale (>0.85) is
+# only lawful WITH a declared *ShieldArchetype. Otherwise REFUSE.
+law:ShieldExceptionGateShape a sh:NodeShape ;
+    sh:targetClass law:MechaShield ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_DEFAULT_SHIELD_PROPORTION: a shield exceeding 85% of body height requires a declared *ShieldArchetype exception class." ;
+        sh:select """
+            SELECT $this ?ratio
+            WHERE {
+                $this eng:attachedTo ?mecha .
+                ?mecha eng:hasBodyHeight/sosa:hasResult/qudt:numericValue ?bodyHeight .
+                $this eng:hasShieldHeight/sosa:hasResult/qudt:numericValue ?shieldHeight .
+                BIND( ?shieldHeight / ?bodyHeight AS ?ratio )
+
+                FILTER ( ?ratio > 0.85 )
+                FILTER NOT EXISTS { $this a law:TowerShieldArchetype }
+                FILTER NOT EXISTS { $this a law:SiegeShieldArchetype }
+                FILTER NOT EXISTS { $this a law:MobileBarricadeArchetype }
+                FILTER NOT EXISTS { $this a law:TransformationShieldArchetype }
+            }
+        """
+    ] .
