@@ -220,8 +220,28 @@ def run_shacl(data, shapes):
     return conforms, msgs
 
 
+_AXIS_INDEX = {"X": 0, "Y": 1, "Z": 2}
+
+
+def detect_stacking_axis(raw):
+    """The axis along which the body actually stacks: where the head center sits
+    furthest from the limb center. Used only to FLAG agreement with upAxis — the
+    measurement itself is taken along the declared up-axis (render truth)."""
+    head = raw.get("SM_Head")
+    limb = raw.get("SM_Limb_Left") or raw.get("SM_Limb_Right")
+    if not head or not limb:
+        return VERT
+    hc = [0.5 * (head[0][a] + head[1][a]) for a in range(3)]
+    lc = [0.5 * (limb[0][a] + limb[1][a]) for a in range(3)]
+    return max(range(3), key=lambda a: abs(hc[a] - lc[a]))
+
+
 def measure_all():
-    parts = {}
+    """Measure along the DECLARED up-axis (usdrecord renders by upAxis, so that is
+    the vertical truth). The span axis is the widest horizontal axis (wing span).
+    The actual mass-stacking axis is detected separately to flag any disagreement."""
+    global VERT, SPAN
+    raw = {}
     for usd_name in FLAGSHIP_PARTS:
         path = os.path.join(USD_DIR, usd_name + ".usda")
         if not os.path.exists(path):
@@ -229,12 +249,19 @@ def measure_all():
         res = measure_part(path)
         if res is None:
             continue
-        mn, mx = res
+        raw[usd_name] = res
+    VERT = _AXIS_INDEX.get(declared_up_axis(), 1)
+    if raw:
+        extents = [max((mx[a] - mn[a]) for mn, mx in raw.values()) for a in range(3)]
+        SPAN = max((a for a in range(3) if a != VERT), key=lambda a: extents[a])
+    parts = {}
+    for usd_name, (mn, mx) in raw.items():
         parts[usd_name] = {
             "y_min_m": mn[VERT] * METERS_PER_UNIT,
             "y_max_m": mx[VERT] * METERS_PER_UNIT,
             "x_min_m": mn[SPAN] * METERS_PER_UNIT,
             "x_max_m": mx[SPAN] * METERS_PER_UNIT,
+            "_raw": (mn, mx),
         }
     return parts
 
@@ -285,7 +312,8 @@ def build_core(parts):
     # When they disagree, usdrecord renders the mech mis-oriented — a real defect
     # the metric graph exposes BEFORE the render (the whole point of this layer).
     up = declared_up_axis()
-    stacking = _AXIS_NAME[VERT]
+    raw = {n: d["_raw"] for n, d in parts.items() if "_raw" in d}
+    stacking = _AXIS_NAME[detect_stacking_axis(raw)] if raw else _AXIS_NAME[VERT]
     orientation_finding = {
         "declared_up_axis": up,
         "actual_stacking_axis": stacking,
@@ -300,8 +328,9 @@ def build_core(parts):
 
     core = {
         "gate": "metric_morphology_pre_render",
-        "vertical_axis": stacking,
-        "span_axis": "X",
+        "vertical_axis": _AXIS_NAME[VERT],
+        "measured_along_up_axis": up,
+        "span_axis": _AXIS_NAME[SPAN],
         "orientation_finding": orientation_finding,
         "meters_per_unit": METERS_PER_UNIT,
         "body_height_m": round(body_h, 6),

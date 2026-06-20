@@ -1,16 +1,8 @@
 {
-  "body_height_m": 0.2092,
-  "direct_band_refusals": [
-    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Left): ratio 0.1539 outside [0.22,0.24]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Right): ratio 0.1539 outside [0.22,0.24]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Head): ratio 0.0956 outside [0.12,0.14]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Left): ratio 0.3250 outside [0.62,0.64]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Right): ratio 0.3250 outside [0.62,0.64]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Torso): ratio 0.0621 outside [0.12,0.14]",
-    "REFUSE_PART_HEIGHT_BAND(SM_WingArray_Left): ratio 0.9880 outside [0.61,0.63]",
-    "REFUSE_PART_HEIGHT_BAND(SM_WingArray_Right): ratio 0.9880 outside [0.61,0.63]"
-  ],
+  "body_height_m": 0.101495,
+  "direct_band_refusals": [],
   "gate": "metric_morphology_pre_render",
+  "measured_along_up_axis": "Y",
   "meters_per_unit": 0.01,
   "negative_fixture": {
     "codes": [
@@ -38,47 +30,47 @@
         0.2245,
         0.2445
       ],
-      "height_m": 0.0322,
-      "height_ratio": 0.1539,
-      "in_band": false,
+      "height_m": 0.02387,
+      "height_ratio": 0.2352,
+      "in_band": true,
       "part": "SM_Blade_Left",
-      "y_max_m": 0.1092,
-      "y_min_m": 0.077
+      "y_max_m": 0.093995,
+      "y_min_m": 0.070125
     },
     {
       "band": [
         0.2245,
         0.2445
       ],
-      "height_m": 0.0322,
-      "height_ratio": 0.1539,
-      "in_band": false,
+      "height_m": 0.02387,
+      "height_ratio": 0.2352,
+      "in_band": true,
       "part": "SM_Blade_Right",
-      "y_max_m": 0.1092,
-      "y_min_m": 0.077
+      "y_max_m": 0.093995,
+      "y_min_m": 0.070125
     },
     {
       "band": [
         0.119,
         0.139
       ],
-      "height_m": 0.02,
-      "height_ratio": 0.0956,
-      "in_band": false,
+      "height_m": 0.013,
+      "height_ratio": 0.1281,
+      "in_band": true,
       "part": "SM_Head",
-      "y_max_m": 0.01,
-      "y_min_m": -0.01
+      "y_max_m": 0.083,
+      "y_min_m": 0.07
     },
     {
       "band": [
         0.6207,
         0.6407
       ],
-      "height_m": 0.068,
-      "height_ratio": 0.325,
-      "in_band": false,
+      "height_m": 0.064,
+      "height_ratio": 0.6306,
+      "in_band": true,
       "part": "SM_Limb_Left",
-      "y_max_m": 0.062,
+      "y_max_m": 0.058,
       "y_min_m": -0.006
     },
     {
@@ -86,11 +78,11 @@
         0.6207,
         0.6407
       ],
-      "height_m": 0.068,
-      "height_ratio": 0.325,
-      "in_band": false,
+      "height_m": 0.064,
+      "height_ratio": 0.6306,
+      "in_band": true,
       "part": "SM_Limb_Right",
-      "y_max_m": 0.062,
+      "y_max_m": 0.058,
       "y_min_m": -0.006
     },
     {
@@ -99,22 +91,22 @@
         0.139
       ],
       "height_m": 0.013,
-      "height_ratio": 0.0621,
-      "in_band": false,
+      "height_ratio": 0.1281,
+      "in_band": true,
       "part": "SM_Torso",
-      "y_max_m": 0.075,
-      "y_min_m": 0.062
+      "y_max_m": 0.07,
+      "y_min_m": 0.057
     },
     {
       "band": [
         0.6113,
         0.6313
       ],
-      "height_m": 0.2067,
-      "height_ratio": 0.988,
-      "in_band": false,
+      "height_m": 0.0629,
+      "height_ratio": 0.6197,
+      "in_band": true,
       "part": "SM_WingArray_Left",
-      "y_max_m": 0.1992,
+      "y_max_m": 0.0554,
       "y_min_m": -0.0075
     },
     {
@@ -122,35 +114,21 @@
         0.6113,
         0.6313
       ],
-      "height_m": 0.2067,
-      "height_ratio": 0.988,
-      "in_band": false,
+      "height_m": 0.0629,
+      "height_ratio": 0.6197,
+      "in_band": true,
       "part": "SM_WingArray_Right",
-      "y_max_m": 0.1992,
+      "y_max_m": 0.0554,
       "y_min_m": -0.0075
     }
   ],
-  "receipt_blake3": "blake3:f3e3569d2020efac49ca745c1bca982f7ad55b2704fd0f27549e8585b32f8144",
-  "refusals": [
-    "ANATOMY_PARADOX: The Head Y_MIN must be structurally higher than the Torso Y_MAX.",
-    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Left): ratio 0.1539 outside [0.22,0.24]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Right): ratio 0.1539 outside [0.22,0.24]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Head): ratio 0.0956 outside [0.12,0.14]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Left): ratio 0.3250 outside [0.62,0.64]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Right): ratio 0.3250 outside [0.62,0.64]",
-    "REFUSE_PART_HEIGHT_BAND(SM_Torso): ratio 0.0621 outside [0.12,0.14]",
-    "REFUSE_PART_HEIGHT_BAND(SM_WingArray_Left): ratio 0.9880 outside [0.61,0.63]",
-    "REFUSE_PART_HEIGHT_BAND(SM_WingArray_Right): ratio 0.9880 outside [0.61,0.63]",
-    "REFUSE_PART_HEIGHT_BAND: part height ratio falls outside its declared morphology band."
-  ],
+  "receipt_blake3": "blake3:8a8d306db77aa1746927ac848273ba0842f9d3fb9ecad734fea115e7c6a947ec",
+  "refusals": [],
   "replay_verified": true,
-  "shacl_conforms": false,
-  "shacl_messages": [
-    "ANATOMY_PARADOX: The Head Y_MIN must be structurally higher than the Torso Y_MAX.",
-    "REFUSE_PART_HEIGHT_BAND: part height ratio falls outside its declared morphology band."
-  ],
+  "shacl_conforms": true,
+  "shacl_messages": [],
   "span_axis": "X",
-  "timestamp_utc": "2026-06-20T23:36:50.745156Z",
-  "verdict": "PARTIAL_ALIVE",
+  "timestamp_utc": "2026-06-20T23:59:36.828253Z",
+  "verdict": "ADMITTED",
   "vertical_axis": "Y"
 }
