@@ -1,0 +1,38 @@
+ChoiceGraph(VisionSnapLoop) {
+  nodes: [
+    Activity(StartVisionLoop, "Start Vision Snap Loop"),
+    Activity(GenerateGeometry, "Generate Bounded Geometry"),
+    Activity(RenderProjection, "Render Visual Projection"),
+    Activity(ExtractTargets, "Extract Visual Targets"),
+    Activity(MeasureGap, "Measure Semantic vs Visual Gap"),
+    Loop(RepairLoop) {
+      do: Activity(ComputeResiduals, "Compute Residuals"),
+      redo: ChoiceGraph(ApplyRepair) {
+        nodes: [
+          Activity(SelectOperator, "Select Bounded Repair Operator"),
+          Activity(PatchLaw, "Patch Semantic Law"),
+          Activity(Regenerate, "Regenerate Bounded Geometry")
+        ],
+        edges: [
+          (SelectOperator, PatchLaw),
+          (PatchLaw, Regenerate)
+        ],
+        start: SelectOperator,
+        end: Regenerate
+      }
+    },
+    Activity(VerifyEngine, "Verify Playwright Engine Admissibility"),
+    Activity(EmitReceipt, "Emit BLAKE3 Receipt")
+  ],
+  edges: [
+    (StartVisionLoop, GenerateGeometry),
+    (GenerateGeometry, RenderProjection),
+    (RenderProjection, ExtractTargets),
+    (ExtractTargets, MeasureGap),
+    (MeasureGap, RepairLoop),
+    (RepairLoop, VerifyEngine),
+    (VerifyEngine, EmitReceipt)
+  ],
+  start: StartVisionLoop,
+  end: EmitReceipt
+}

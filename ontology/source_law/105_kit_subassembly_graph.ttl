@@ -1,0 +1,159 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix kit: <https://ggen.io/ontology/kit_assembly#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+kit:KitAssemblyOntology a owl:Ontology ;
+    rdfs:label "Pre-UE4 Hero Mech Kit Subassembly Graph" ;
+    rdfs:comment "Encodes runners, pegs, and assembly steps for the hero mech asset." .
+
+# ---------------------------------------------------------
+# Core Classes
+# ---------------------------------------------------------
+
+kit:Runner a owl:Class ; rdfs:label "Kit Runner" ; rdfs:comment "A plastic runner/sprue containing parts." .
+kit:Peg a owl:Class ; rdfs:label "Assembly Peg" ; rdfs:comment "Male connector for snap-fit assembly." .
+kit:Socket a owl:Class ; rdfs:label "Assembly Socket" ; rdfs:comment "Female connector for snap-fit assembly." .
+kit:Part a owl:Class ; rdfs:label "Kit Part" ; rdfs:comment "A discrete piece from a runner." .
+kit:Subassembly a owl:Class ; rdfs:label "Subassembly" ; rdfs:comment "An intermediate module made of parts or other subassemblies." .
+kit:AssemblyStep a owl:Class ; rdfs:label "Assembly Step" ; rdfs:comment "A deterministic manufacturing step in the assembly manual." .
+
+# ---------------------------------------------------------
+# Properties
+# ---------------------------------------------------------
+
+kit:hasPart a owl:ObjectProperty ; rdfs:domain kit:Runner ; rdfs:range kit:Part .
+kit:hasPeg a owl:ObjectProperty ; rdfs:domain kit:Part ; rdfs:range kit:Peg .
+kit:hasSocket a owl:ObjectProperty ; rdfs:domain kit:Part ; rdfs:range kit:Socket .
+kit:connectsTo a owl:ObjectProperty ; rdfs:domain kit:Peg ; rdfs:range kit:Socket .
+kit:produces a owl:ObjectProperty ; rdfs:domain kit:AssemblyStep ; rdfs:range kit:Subassembly .
+kit:requiresPart a owl:ObjectProperty ; rdfs:domain kit:AssemblyStep ; rdfs:range kit:Part .
+kit:requiresSubassembly a owl:ObjectProperty ; rdfs:domain kit:AssemblyStep ; rdfs:range kit:Subassembly .
+kit:nextStep a owl:ObjectProperty ; rdfs:domain kit:AssemblyStep ; rdfs:range kit:AssemblyStep .
+
+# ---------------------------------------------------------
+# Runners
+# ---------------------------------------------------------
+
+kit:Runner_A a kit:Runner ; rdfs:label "Runner A (Core Frame)" .
+kit:Runner_B a kit:Runner ; rdfs:label "Runner B (Armor Panels)" .
+kit:Runner_C a kit:Runner ; rdfs:label "Runner C (Joints & Pegs)" .
+kit:Runner_D a kit:Runner ; rdfs:label "Runner D (Wings & Feathers)" .
+
+# ---------------------------------------------------------
+# Parts
+# ---------------------------------------------------------
+
+kit:Part_TorsoCore a kit:Part ; 
+    rdfs:label "Torso Core Frame" ; 
+    kit:hasSocket kit:Socket_Torso_Neck, kit:Socket_Torso_LArm, kit:Socket_Torso_RArm, kit:Socket_Torso_Waist .
+kit:Runner_A kit:hasPart kit:Part_TorsoCore .
+
+kit:Part_HeadUnit a kit:Part ; 
+    rdfs:label "Head Unit" ; 
+    kit:hasPeg kit:Peg_Head_Neck .
+kit:Runner_A kit:hasPart kit:Part_HeadUnit .
+
+kit:Part_LArm a kit:Part ; 
+    rdfs:label "Left Arm Frame" ; 
+    kit:hasPeg kit:Peg_LArm_Shoulder .
+kit:Runner_A kit:hasPart kit:Part_LArm .
+
+kit:Part_RArm a kit:Part ; 
+    rdfs:label "Right Arm Frame" ; 
+    kit:hasPeg kit:Peg_RArm_Shoulder .
+kit:Runner_A kit:hasPart kit:Part_RArm .
+
+kit:Part_Waist a kit:Part ; 
+    rdfs:label "Waist Frame" ; 
+    kit:hasPeg kit:Peg_Waist_Torso ;
+    kit:hasSocket kit:Socket_Waist_LLeg, kit:Socket_Waist_RLeg .
+kit:Runner_A kit:hasPart kit:Part_Waist .
+
+kit:Part_LLeg a kit:Part ; 
+    rdfs:label "Left Leg Frame" ; 
+    kit:hasPeg kit:Peg_LLeg_Waist .
+kit:Runner_A kit:hasPart kit:Part_LLeg .
+
+kit:Part_RLeg a kit:Part ; 
+    rdfs:label "Right Leg Frame" ; 
+    kit:hasPeg kit:Peg_RLeg_Waist .
+kit:Runner_A kit:hasPart kit:Part_RLeg .
+
+# ---------------------------------------------------------
+# Pegs and Sockets
+# ---------------------------------------------------------
+
+kit:Peg_Head_Neck a kit:Peg .
+kit:Socket_Torso_Neck a kit:Socket .
+kit:Peg_Head_Neck kit:connectsTo kit:Socket_Torso_Neck .
+
+kit:Peg_LArm_Shoulder a kit:Peg .
+kit:Socket_Torso_LArm a kit:Socket .
+kit:Peg_LArm_Shoulder kit:connectsTo kit:Socket_Torso_LArm .
+
+kit:Peg_RArm_Shoulder a kit:Peg .
+kit:Socket_Torso_RArm a kit:Socket .
+kit:Peg_RArm_Shoulder kit:connectsTo kit:Socket_Torso_RArm .
+
+kit:Peg_Waist_Torso a kit:Peg .
+kit:Socket_Torso_Waist a kit:Socket .
+kit:Peg_Waist_Torso kit:connectsTo kit:Socket_Torso_Waist .
+
+kit:Peg_LLeg_Waist a kit:Peg .
+kit:Socket_Waist_LLeg a kit:Socket .
+kit:Peg_LLeg_Waist kit:connectsTo kit:Socket_Waist_LLeg .
+
+kit:Peg_RLeg_Waist a kit:Peg .
+kit:Socket_Waist_RLeg a kit:Socket .
+kit:Peg_RLeg_Waist kit:connectsTo kit:Socket_Waist_RLeg .
+
+# ---------------------------------------------------------
+# Subassemblies
+# ---------------------------------------------------------
+
+kit:Subassembly_Torso a kit:Subassembly ; rdfs:label "Torso Subassembly" .
+kit:Subassembly_Head a kit:Subassembly ; rdfs:label "Head Subassembly" .
+kit:Subassembly_Arms a kit:Subassembly ; rdfs:label "Arms Subassembly" .
+kit:Subassembly_Waist a kit:Subassembly ; rdfs:label "Waist Subassembly" .
+kit:Subassembly_Legs a kit:Subassembly ; rdfs:label "Legs Subassembly" .
+kit:Subassembly_FullMech a kit:Subassembly ; rdfs:label "Full Mech Assembly" .
+
+# ---------------------------------------------------------
+# Assembly Steps
+# ---------------------------------------------------------
+
+kit:Step_01_Torso a kit:AssemblyStep ;
+    rdfs:label "Step 1: Assemble Torso Core" ;
+    kit:requiresPart kit:Part_TorsoCore ;
+    kit:produces kit:Subassembly_Torso ;
+    kit:nextStep kit:Step_02_Head .
+
+kit:Step_02_Head a kit:AssemblyStep ;
+    rdfs:label "Step 2: Attach Head to Torso" ;
+    kit:requiresPart kit:Part_HeadUnit ;
+    kit:requiresSubassembly kit:Subassembly_Torso ;
+    kit:produces kit:Subassembly_Head ;
+    kit:nextStep kit:Step_03_Waist .
+
+kit:Step_03_Waist a kit:AssemblyStep ;
+    rdfs:label "Step 3: Attach Waist to Torso" ;
+    kit:requiresPart kit:Part_Waist ;
+    kit:requiresSubassembly kit:Subassembly_Head ;
+    kit:produces kit:Subassembly_Waist ;
+    kit:nextStep kit:Step_04_Arms .
+
+kit:Step_04_Arms a kit:AssemblyStep ;
+    rdfs:label "Step 4: Attach Arms" ;
+    kit:requiresPart kit:Part_LArm, kit:Part_RArm ;
+    kit:requiresSubassembly kit:Subassembly_Waist ;
+    kit:produces kit:Subassembly_Arms ;
+    kit:nextStep kit:Step_05_Legs .
+
+kit:Step_05_Legs a kit:AssemblyStep ;
+    rdfs:label "Step 5: Attach Legs" ;
+    kit:requiresPart kit:Part_LLeg, kit:Part_RLeg ;
+    kit:requiresSubassembly kit:Subassembly_Arms ;
+    kit:produces kit:Subassembly_FullMech .

@@ -1,4 +1,46 @@
 @prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
 
 :041_chassis_topology_space a :SourceLaw .
+
+# ---------------------------------------------------------
+# Datum Planes and Envelopes (Chassis Topology Space)
+# ---------------------------------------------------------
+
+mud:DatumPlane a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Datum Plane" ;
+    rdfs:comment "A mathematically precise reference plane (e.g. XY, XZ, YZ) defining symmetry, split lines, or absolute alignment boundaries within a Part Envelope." .
+
+mud:Envelope a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Bounding Envelope" ;
+    rdfs:comment "An absolute maximal physical volume boundary that a specific part/mesh may occupy. Vertices cannot protrude beyond this envelope." .
+
+mud:hasDatumPlane a owl:ObjectProperty ;
+    rdfs:domain mud:Envelope ;
+    rdfs:range mud:DatumPlane ;
+    rdfs:label "Has Datum Plane" .
+
+mud:DatumPlaneShape a sh:NodeShape ;
+    sh:targetClass mud:DatumPlane ;
+    sh:property [
+        sh:path core:isBounded ;
+        sh:datatype <http://www.w3.org/2001/XMLSchema#boolean> ;
+        sh:hasValue true ;
+        sh:message "Datum planes MUST be bounded."
+    ] .
+
+mud:EnvelopeShape a sh:NodeShape ;
+    sh:targetClass mud:Envelope ;
+    sh:property [
+        sh:path mud:hasDatumPlane ;
+        sh:class mud:DatumPlane ;
+        sh:minCount 1 ;
+        sh:message "A Bounding Envelope MUST be oriented by at least one Datum Plane."
+    ] .

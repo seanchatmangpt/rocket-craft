@@ -1,4 +1,4 @@
-//! GC-GUNDAM-FACTORY-001: Integration test — Gundam Factory OCEL trace replay.
+//! GC-MECHA-FACTORY-001: Integration test — Mecha Factory OCEL trace replay.
 
 use rocket_preue4_verifier::authority::AuthorityState;
 use rocket_preue4_verifier::error::RefusalReason;
@@ -9,7 +9,7 @@ use rocket_preue4_verifier::projection::{
 use rocket_preue4_verifier::receipt::{AdmissionStatus, ReceiptChain};
 use rocket_preue4_verifier::transitions::batch_update_damage_scalar;
 
-/// Expected Gundam Factory POWL step event types (must match gundam_factory_trace.json exactly).
+/// Expected Mecha Factory POWL step event types (must match mecha_factory_trace.json exactly).
 const EXPECTED_EVENT_TYPES: &[&str] = &[
     "Spawn",
     "Factory Entrance",
@@ -22,27 +22,27 @@ const EXPECTED_EVENT_TYPES: &[&str] = &[
     "Exit Or Loop",
 ];
 
-/// VERIFIED_UNDER_SCOPE: Parse real Gundam Factory OCEL trace and verify 9 events
+/// VERIFIED_UNDER_SCOPE: Parse real Mecha Factory OCEL trace and verify 9 events
 #[test]
-fn test_ocel_parse_real_gundam_trace() {
-    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/gundam_factory_trace.json")
-        .expect("BLOCKED: gundam_factory_trace.json not found");
+fn test_ocel_parse_real_mecha_trace() {
+    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/mecha_factory_trace.json")
+        .expect("BLOCKED: mecha_factory_trace.json not found");
 
     let log = OcelLog::from_powlv2lsp_trace(&json).expect("BLOCKED: Failed to parse OCEL trace");
 
     assert_eq!(
         log.events.len(),
         9,
-        "Expected exactly 9 Gundam Factory POWL events, found {}",
+        "Expected exactly 9 Mecha Factory POWL events, found {}",
         log.events.len()
     );
 }
 
-/// VERIFIED_UNDER_SCOPE: Parsed events match expected Gundam Factory POWL step types
+/// VERIFIED_UNDER_SCOPE: Parsed events match expected Mecha Factory POWL step types
 #[test]
-fn test_ocel_event_types_match_gundam_factory_powl() {
-    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/gundam_factory_trace.json")
-        .expect("BLOCKED: gundam_factory_trace.json not found");
+fn test_ocel_event_types_match_mecha_factory_powl() {
+    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/mecha_factory_trace.json")
+        .expect("BLOCKED: mecha_factory_trace.json not found");
 
     let log = OcelLog::from_powlv2lsp_trace(&json).expect("BLOCKED: Failed to parse OCEL trace");
 
@@ -60,9 +60,9 @@ fn test_ocel_event_types_match_gundam_factory_powl() {
 
 /// VERIFIED_UNDER_SCOPE: ReceiptChain mirroring OCEL events verifies cleanly
 #[test]
-fn test_receipt_chain_mirrors_gundam_ocel_events() {
-    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/gundam_factory_trace.json")
-        .expect("BLOCKED: gundam_factory_trace.json not found");
+fn test_receipt_chain_mirrors_mecha_ocel_events() {
+    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/mecha_factory_trace.json")
+        .expect("BLOCKED: mecha_factory_trace.json not found");
 
     let log = OcelLog::from_powlv2lsp_trace(&json).expect("BLOCKED: Failed to parse OCEL trace");
 
@@ -89,9 +89,9 @@ fn test_receipt_chain_mirrors_gundam_ocel_events() {
 
 /// VERIFIED_UNDER_SCOPE: Mutating a chain entry produces ReceiptChainBroken
 #[test]
-fn test_receipt_chain_mutation_produces_broken_error_gundam() {
-    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/gundam_factory_trace.json")
-        .expect("BLOCKED: gundam_factory_trace.json not found");
+fn test_receipt_chain_mutation_produces_broken_error_mecha() {
+    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/mecha_factory_trace.json")
+        .expect("BLOCKED: mecha_factory_trace.json not found");
 
     let log = OcelLog::from_powlv2lsp_trace(&json).expect("BLOCKED: Failed to parse OCEL trace");
 
@@ -123,8 +123,8 @@ fn test_receipt_chain_mutation_produces_broken_error_gundam() {
 /// VERIFIED_UNDER_SCOPE: Projection manifest with admitted row from Spawn receipt passes
 #[test]
 fn test_projection_manifest_with_spawn_receipt() {
-    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/gundam_factory_trace.json")
-        .expect("BLOCKED: gundam_factory_trace.json not found");
+    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/mecha_factory_trace.json")
+        .expect("BLOCKED: mecha_factory_trace.json not found");
 
     let log = OcelLog::from_powlv2lsp_trace(&json).expect("BLOCKED: Failed to parse OCEL trace");
 
@@ -139,14 +139,14 @@ fn test_projection_manifest_with_spawn_receipt() {
 
     // Build a projection manifest with one admitted row pointing to Spawn receipt
     let row = ProjectionRow {
-        projection_id: "proj-gundam-spawn-001".into(),
+        projection_id: "proj-mecha-spawn-001".into(),
         source_powl_step: "Spawn".into(),
         source_receipt: spawn_receipt.clone(),
         object_id: spawn_event.objects[0].clone(),
         projection_type: ProjectionType::SetMeshVariant,
         authority_inputs: vec!["damage_class".into(), "threat_class".into()],
         semantic_lod_class: "Primary".into(),
-        ue4_target_surface: "SM_GundamFrame".into(),
+        ue4_target_surface: "SM_MechaFrame".into(),
         admission_status: ProjAdmission::Admitted,
     };
 
@@ -160,9 +160,9 @@ fn test_projection_manifest_with_spawn_receipt() {
 
 /// VERIFIED_UNDER_SCOPE: All 9 OCEL events produce non-empty receipts and contain dynamic case id
 #[test]
-fn test_gundam_ocel_events_have_non_empty_receipts_and_correct_case_id() {
-    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/gundam_factory_trace.json")
-        .expect("BLOCKED: gundam_factory_trace.json not found");
+fn test_mecha_ocel_events_have_non_empty_receipts_and_correct_case_id() {
+    let json = std::fs::read_to_string("/Users/sac/powlv2lsp/mecha_factory_trace.json")
+        .expect("BLOCKED: mecha_factory_trace.json not found");
 
     let log = OcelLog::from_powlv2lsp_trace(&json).expect("BLOCKED: Failed to parse OCEL trace");
 

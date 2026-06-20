@@ -1,4 +1,29 @@
-@prefix : <http://example.org/law#> .
+@prefix core: <https://ggen.io/ontology/core/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix law: <https://ggen.io/ontology/law/> .
 
-:067_micro_detail_density_law a :SourceLaw .
+law:067_micro_detail_density_law a owl:Ontology ;
+    rdfs:label "Micro Detail Density and Greeble Law" .
+
+law:Greeble a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Greeble Detail" ;
+    rdfs:comment "High-density micro-detail grammar for mechanical scale." .
+
+law:hasGreeble a owl:ObjectProperty ;
+    rdfs:domain core:Entity ;
+    rdfs:range law:Greeble ;
+    rdfs:label "has Greeble" .
+
+law:GreebleShape a sh:NodeShape ;
+    sh:targetClass law:Greeble ;
+    sh:property [
+        sh:path core:isBounded ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "Greebles MUST be bounded Anti-Cartesian elements."
+    ] .

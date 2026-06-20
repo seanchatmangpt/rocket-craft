@@ -1,4 +1,173 @@
-@prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ipd: <http://rocket-craft.com/ontology/ip-distance#> .
 
-:097_external_expressive_distance_policy a :SourceLaw .
+#################################################################
+# 097_external_expressive_distance_policy.ttl
+#
+# Source-law mirror of ip_policy_packs/mecha_external_corpus.policy.json
+# (policy_id IP_DIST_MECHA_001). Declares the protected expressive clusters
+# (baselines), the genre commons every mech may share, the original axes a
+# candidate MUST occupy, and the baseline-usage law:
+#   usableForMetricBaseline = true, usableForGeneration = false.
+#
+# IP law: baselines are usable_for_metric_baseline only. Original shape
+# language only; never copy protected silhouettes/marks/names.
+#################################################################
+
+ipd:ExternalExpressiveDistancePolicy a owl:Ontology ;
+    rdfs:label "External Expressive Distance Policy" ;
+    rdfs:comment "Constitutional graph governing expressive distance from protected mecha franchises (IP_DIST_MECHA_001 v1.0.0)." ;
+    ipd:policyId "IP_DIST_MECHA_001" ;
+    ipd:policyVersion "1.0.0" .
+
+# ---------------------------------------------------------------
+# Classes
+# ---------------------------------------------------------------
+ipd:ProtectedCluster a owl:Class ;
+    rdfs:label "Protected Cluster" ;
+    rdfs:comment "A protected expressive cluster (franchise trade dress). Usable as a metric baseline only — never as a generation source." .
+ipd:ExpressiveSignature a owl:Class ;
+    rdfs:label "Expressive Signature" ;
+    rdfs:comment "A specific protected silhouette/mark/colorway/nomenclature signature of a ProtectedCluster." .
+ipd:MechaCommons a owl:Class ;
+    rdfs:label "Mecha Commons" ;
+    rdfs:comment "Genre-common, unprotected expressive elements every mech may freely share." .
+ipd:OriginalAxis a owl:Class ;
+    rdfs:label "Original Axis" ;
+    rdfs:comment "An original expressive axis a CandidateAdmissionShape MUST occupy to be distinct." .
+ipd:CandidateAdmissionShape a owl:Class ;
+    rdfs:label "Candidate Admission Shape" ;
+    rdfs:comment "A generated shape candidate seeking admission under the non-confusion policy." .
+ipd:BaselineUsage a owl:Class ;
+    rdfs:label "Baseline Usage" ;
+    rdfs:comment "Usage law attached to baselines: metric-baseline only, generation forbidden." .
+
+# ---------------------------------------------------------------
+# Properties
+# ---------------------------------------------------------------
+ipd:franchise a owl:DatatypeProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range xsd:string ;
+    rdfs:label "franchise" .
+ipd:tradeDressThreshold a owl:DatatypeProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range xsd:float ;
+    rdfs:label "trade dress threshold" ;
+    rdfs:comment "Proximity above which candidate is presumed to infringe this cluster's trade dress." .
+ipd:hasSignature a owl:ObjectProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range ipd:ExpressiveSignature ;
+    rdfs:label "has signature" .
+ipd:signatureText a owl:DatatypeProperty ;
+    rdfs:domain ipd:ExpressiveSignature ; rdfs:range xsd:string ;
+    rdfs:label "signature text" .
+ipd:hasBaselineUsage a owl:ObjectProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range ipd:BaselineUsage ;
+    rdfs:label "has baseline usage" .
+ipd:usableForMetricBaseline a owl:DatatypeProperty ;
+    rdfs:domain ipd:BaselineUsage ; rdfs:range xsd:boolean ;
+    rdfs:label "usable for metric baseline" .
+ipd:usableForGeneration a owl:DatatypeProperty ;
+    rdfs:domain ipd:BaselineUsage ; rdfs:range xsd:boolean ;
+    rdfs:label "usable for generation" .
+ipd:mustOccupyAxis a owl:ObjectProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range ipd:OriginalAxis ;
+    rdfs:label "must occupy original axis" .
+
+# ---------------------------------------------------------------
+# Baseline-usage law (single shared individual)
+# ---------------------------------------------------------------
+ipd:MetricBaselineOnly a ipd:BaselineUsage ;
+    rdfs:label "Metric Baseline Only" ;
+    ipd:usableForMetricBaseline true ;
+    ipd:usableForGeneration false ;
+    rdfs:comment "Baselines (Mecha/BiotechMech/ArmorFrame/GlobalCorp/Studio/tank/kit) may seed metrics, never generation." .
+
+# ---------------------------------------------------------------
+# Protected clusters (baselines) + signatures
+# ---------------------------------------------------------------
+ipd:Cluster_Mecha a ipd:ProtectedCluster ;
+    rdfs:label "Mecha (Mecha-adjacent)" ;
+    ipd:franchise "Mecha" ;
+    ipd:tradeDressThreshold "0.75"^^xsd:float ;
+    ipd:hasBaselineUsage ipd:MetricBaselineOnly ;
+    ipd:hasSignature ipd:Sig_VFinAntenna, ipd:Sig_Tricolor, ipd:Sig_Nomenclature, ipd:Sig_SourceIdentifiers, ipd:Sig_MonoEye .
+ipd:Sig_VFinAntenna a ipd:ExpressiveSignature ;
+    ipd:signatureText "V-fin antenna (especially dual yellow sweeping upward)" .
+ipd:Sig_Tricolor a ipd:ExpressiveSignature ;
+    ipd:signatureText "Tricolor scheme (white dominant, blue torso, red abdominal/waist, yellow vents/accents)" .
+ipd:Sig_Nomenclature a ipd:ExpressiveSignature ;
+    ipd:signatureText "XM-01, GruntUnit, mobile suit specific nomenclatures" .
+ipd:Sig_SourceIdentifiers a ipd:ExpressiveSignature ;
+    ipd:signatureText "Anaheim Electronics, ColonyRebels, EarthAlliance source identifiers" .
+ipd:Sig_MonoEye a ipd:ExpressiveSignature ;
+    ipd:signatureText "Red glowing mono-eye on spherical green/red head" .
+
+ipd:Cluster_BiotechMech a ipd:ProtectedCluster ;
+    rdfs:label "BiotechMech (BiotechMech-adjacent)" ;
+    ipd:franchise "BiotechMech" ;
+    ipd:tradeDressThreshold "0.8"^^xsd:float ;
+    ipd:hasBaselineUsage ipd:MetricBaselineOnly ;
+    ipd:hasSignature ipd:Sig_OrganicLimbs, ipd:Sig_PurpleGreen, ipd:Sig_HornedHead, ipd:Sig_ChestCore, ipd:Sig_HexUI .
+ipd:Sig_OrganicLimbs a ipd:ExpressiveSignature ;
+    ipd:signatureText "Organic/biomechanical limb proportions (excessively long/slender)" .
+ipd:Sig_PurpleGreen a ipd:ExpressiveSignature ;
+    ipd:signatureText "Purple and neon green color blocking (Unit-01)" .
+ipd:Sig_HornedHead a ipd:ExpressiveSignature ;
+    ipd:signatureText "Horned singular headpiece (Unit-01)" .
+ipd:Sig_ChestCore a ipd:ExpressiveSignature ;
+    ipd:signatureText "Red glowing chest core" .
+ipd:Sig_HexUI a ipd:ExpressiveSignature ;
+    ipd:signatureText "CommandCenter source identifiers or hexagon UI themes" .
+
+ipd:Cluster_ArmorFrame a ipd:ProtectedCluster ;
+    rdfs:label "ArmorFrame (ArmorFrame-adjacent)" ;
+    ipd:franchise "ArmorFrame" ;
+    ipd:tradeDressThreshold "0.8"^^xsd:float ;
+    ipd:hasBaselineUsage ipd:MetricBaselineOnly ;
+    ipd:hasSignature ipd:Sig_WalkingTank, ipd:Sig_ChickenWalker, ipd:Sig_InnerSphere .
+ipd:Sig_WalkingTank a ipd:ExpressiveSignature ;
+    ipd:signatureText "Walking tank morphology without humanoid arms (e.g., Alpha Walker / Feral Walker)" .
+ipd:Sig_ChickenWalker a ipd:ExpressiveSignature ;
+    ipd:signatureText "Chicken-walker reversed knee joints combined with missile box shoulders" .
+ipd:Sig_InnerSphere a ipd:ExpressiveSignature ;
+    ipd:signatureText "Inner Sphere / Clan source identifiers" .
+
+# ---------------------------------------------------------------
+# Mecha commons (freely shareable genre elements)
+# ---------------------------------------------------------------
+ipd:Commons_HumanoidForm a ipd:MechaCommons ; rdfs:label "Giant robot humanoid form" .
+ipd:Commons_Cockpit a ipd:MechaCommons ; rdfs:label "Cockpit affordance" .
+ipd:Commons_Thrusters a ipd:MechaCommons ; rdfs:label "Thrusters/boosters" .
+ipd:Commons_Articulation a ipd:MechaCommons ; rdfs:label "Joint articulation (knees, elbows, shoulders)" .
+ipd:Commons_Weaponry a ipd:MechaCommons ; rdfs:label "Handheld energy/kinetic weaponry" .
+ipd:Commons_ArmorPlating a ipd:MechaCommons ; rdfs:label "Armor plating" .
+ipd:Commons_PanelLines a ipd:MechaCommons ; rdfs:label "Panel lines" .
+
+# ---------------------------------------------------------------
+# Original axes (candidate MUST occupy at least one)
+# ---------------------------------------------------------------
+ipd:Axis_ProcessIntelligence a ipd:OriginalAxis ; rdfs:label "Process-intelligence visual grammar" .
+ipd:Axis_SupportHeroes a ipd:OriginalAxis ; rdfs:label "Support roles as first-class heroes" .
+ipd:Axis_ReceiptBearing a ipd:OriginalAxis ; rdfs:label "Receipt-bearing parts" .
+ipd:Axis_LogisticsAesthetics a ipd:OriginalAxis ; rdfs:label "Logistics-as-combat aesthetics" .
+ipd:Axis_ByteLawAuthority a ipd:OriginalAxis ; rdfs:label "Byte-law gameplay authority" .
+
+# ---------------------------------------------------------------
+# SHACL: every ProtectedCluster MUST be metric-baseline-only
+# ---------------------------------------------------------------
+ipd:ProtectedClusterBaselineShape a sh:NodeShape ;
+    sh:targetClass ipd:ProtectedCluster ;
+    sh:property [
+        sh:path ipd:tradeDressThreshold ;
+        sh:datatype xsd:float ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Each ProtectedCluster MUST declare exactly one tradeDressThreshold."
+    ] ;
+    sh:property [
+        sh:path ipd:hasBaselineUsage ;
+        sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "Every ProtectedCluster MUST be MetricBaselineOnly (usableForGeneration=false)."
+    ] .

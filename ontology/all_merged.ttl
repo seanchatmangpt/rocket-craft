@@ -848,24 +848,426 @@ law:GreebleShape a sh:NodeShape ;
 
 
 # --- Source: 097_external_expressive_distance_policy.ttl ---
-@prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ipd: <http://rocket-craft.com/ontology/ip-distance#> .
 
-:097_external_expressive_distance_policy a :SourceLaw .
+#################################################################
+# 097_external_expressive_distance_policy.ttl
+#
+# Source-law mirror of ip_policy_packs/mecha_external_corpus.policy.json
+# (policy_id IP_DIST_MECHA_001). Declares the protected expressive clusters
+# (baselines), the genre commons every mech may share, the original axes a
+# candidate MUST occupy, and the baseline-usage law:
+#   usableForMetricBaseline = true, usableForGeneration = false.
+#
+# IP law: baselines are usable_for_metric_baseline only. Original shape
+# language only; never copy protected silhouettes/marks/names.
+#################################################################
+
+ipd:ExternalExpressiveDistancePolicy a owl:Ontology ;
+    rdfs:label "External Expressive Distance Policy" ;
+    rdfs:comment "Constitutional graph governing expressive distance from protected mecha franchises (IP_DIST_MECHA_001 v1.0.0)." ;
+    ipd:policyId "IP_DIST_MECHA_001" ;
+    ipd:policyVersion "1.0.0" .
+
+# ---------------------------------------------------------------
+# Classes
+# ---------------------------------------------------------------
+ipd:ProtectedCluster a owl:Class ;
+    rdfs:label "Protected Cluster" ;
+    rdfs:comment "A protected expressive cluster (franchise trade dress). Usable as a metric baseline only — never as a generation source." .
+ipd:ExpressiveSignature a owl:Class ;
+    rdfs:label "Expressive Signature" ;
+    rdfs:comment "A specific protected silhouette/mark/colorway/nomenclature signature of a ProtectedCluster." .
+ipd:MechaCommons a owl:Class ;
+    rdfs:label "Mecha Commons" ;
+    rdfs:comment "Genre-common, unprotected expressive elements every mech may freely share." .
+ipd:OriginalAxis a owl:Class ;
+    rdfs:label "Original Axis" ;
+    rdfs:comment "An original expressive axis a CandidateAdmissionShape MUST occupy to be distinct." .
+ipd:CandidateAdmissionShape a owl:Class ;
+    rdfs:label "Candidate Admission Shape" ;
+    rdfs:comment "A generated shape candidate seeking admission under the non-confusion policy." .
+ipd:BaselineUsage a owl:Class ;
+    rdfs:label "Baseline Usage" ;
+    rdfs:comment "Usage law attached to baselines: metric-baseline only, generation forbidden." .
+
+# ---------------------------------------------------------------
+# Properties
+# ---------------------------------------------------------------
+ipd:franchise a owl:DatatypeProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range xsd:string ;
+    rdfs:label "franchise" .
+ipd:tradeDressThreshold a owl:DatatypeProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range xsd:float ;
+    rdfs:label "trade dress threshold" ;
+    rdfs:comment "Proximity above which candidate is presumed to infringe this cluster's trade dress." .
+ipd:hasSignature a owl:ObjectProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range ipd:ExpressiveSignature ;
+    rdfs:label "has signature" .
+ipd:signatureText a owl:DatatypeProperty ;
+    rdfs:domain ipd:ExpressiveSignature ; rdfs:range xsd:string ;
+    rdfs:label "signature text" .
+ipd:hasBaselineUsage a owl:ObjectProperty ;
+    rdfs:domain ipd:ProtectedCluster ; rdfs:range ipd:BaselineUsage ;
+    rdfs:label "has baseline usage" .
+ipd:usableForMetricBaseline a owl:DatatypeProperty ;
+    rdfs:domain ipd:BaselineUsage ; rdfs:range xsd:boolean ;
+    rdfs:label "usable for metric baseline" .
+ipd:usableForGeneration a owl:DatatypeProperty ;
+    rdfs:domain ipd:BaselineUsage ; rdfs:range xsd:boolean ;
+    rdfs:label "usable for generation" .
+ipd:mustOccupyAxis a owl:ObjectProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range ipd:OriginalAxis ;
+    rdfs:label "must occupy original axis" .
+
+# ---------------------------------------------------------------
+# Baseline-usage law (single shared individual)
+# ---------------------------------------------------------------
+ipd:MetricBaselineOnly a ipd:BaselineUsage ;
+    rdfs:label "Metric Baseline Only" ;
+    ipd:usableForMetricBaseline true ;
+    ipd:usableForGeneration false ;
+    rdfs:comment "Baselines (Mecha/BiotechMech/ArmorFrame/GlobalCorp/Studio/tank/kit) may seed metrics, never generation." .
+
+# ---------------------------------------------------------------
+# Protected clusters (baselines) + signatures
+# ---------------------------------------------------------------
+ipd:Cluster_Mecha a ipd:ProtectedCluster ;
+    rdfs:label "Mecha (Mecha-adjacent)" ;
+    ipd:franchise "Mecha" ;
+    ipd:tradeDressThreshold "0.75"^^xsd:float ;
+    ipd:hasBaselineUsage ipd:MetricBaselineOnly ;
+    ipd:hasSignature ipd:Sig_VFinAntenna, ipd:Sig_Tricolor, ipd:Sig_Nomenclature, ipd:Sig_SourceIdentifiers, ipd:Sig_MonoEye .
+ipd:Sig_VFinAntenna a ipd:ExpressiveSignature ;
+    ipd:signatureText "V-fin antenna (especially dual yellow sweeping upward)" .
+ipd:Sig_Tricolor a ipd:ExpressiveSignature ;
+    ipd:signatureText "Tricolor scheme (white dominant, blue torso, red abdominal/waist, yellow vents/accents)" .
+ipd:Sig_Nomenclature a ipd:ExpressiveSignature ;
+    ipd:signatureText "XM-01, GruntUnit, mobile suit specific nomenclatures" .
+ipd:Sig_SourceIdentifiers a ipd:ExpressiveSignature ;
+    ipd:signatureText "Anaheim Electronics, ColonyRebels, EarthAlliance source identifiers" .
+ipd:Sig_MonoEye a ipd:ExpressiveSignature ;
+    ipd:signatureText "Red glowing mono-eye on spherical green/red head" .
+
+ipd:Cluster_BiotechMech a ipd:ProtectedCluster ;
+    rdfs:label "BiotechMech (BiotechMech-adjacent)" ;
+    ipd:franchise "BiotechMech" ;
+    ipd:tradeDressThreshold "0.8"^^xsd:float ;
+    ipd:hasBaselineUsage ipd:MetricBaselineOnly ;
+    ipd:hasSignature ipd:Sig_OrganicLimbs, ipd:Sig_PurpleGreen, ipd:Sig_HornedHead, ipd:Sig_ChestCore, ipd:Sig_HexUI .
+ipd:Sig_OrganicLimbs a ipd:ExpressiveSignature ;
+    ipd:signatureText "Organic/biomechanical limb proportions (excessively long/slender)" .
+ipd:Sig_PurpleGreen a ipd:ExpressiveSignature ;
+    ipd:signatureText "Purple and neon green color blocking (Unit-01)" .
+ipd:Sig_HornedHead a ipd:ExpressiveSignature ;
+    ipd:signatureText "Horned singular headpiece (Unit-01)" .
+ipd:Sig_ChestCore a ipd:ExpressiveSignature ;
+    ipd:signatureText "Red glowing chest core" .
+ipd:Sig_HexUI a ipd:ExpressiveSignature ;
+    ipd:signatureText "CommandCenter source identifiers or hexagon UI themes" .
+
+ipd:Cluster_ArmorFrame a ipd:ProtectedCluster ;
+    rdfs:label "ArmorFrame (ArmorFrame-adjacent)" ;
+    ipd:franchise "ArmorFrame" ;
+    ipd:tradeDressThreshold "0.8"^^xsd:float ;
+    ipd:hasBaselineUsage ipd:MetricBaselineOnly ;
+    ipd:hasSignature ipd:Sig_WalkingTank, ipd:Sig_ChickenWalker, ipd:Sig_InnerSphere .
+ipd:Sig_WalkingTank a ipd:ExpressiveSignature ;
+    ipd:signatureText "Walking tank morphology without humanoid arms (e.g., Alpha Walker / Feral Walker)" .
+ipd:Sig_ChickenWalker a ipd:ExpressiveSignature ;
+    ipd:signatureText "Chicken-walker reversed knee joints combined with missile box shoulders" .
+ipd:Sig_InnerSphere a ipd:ExpressiveSignature ;
+    ipd:signatureText "Inner Sphere / Clan source identifiers" .
+
+# ---------------------------------------------------------------
+# Mecha commons (freely shareable genre elements)
+# ---------------------------------------------------------------
+ipd:Commons_HumanoidForm a ipd:MechaCommons ; rdfs:label "Giant robot humanoid form" .
+ipd:Commons_Cockpit a ipd:MechaCommons ; rdfs:label "Cockpit affordance" .
+ipd:Commons_Thrusters a ipd:MechaCommons ; rdfs:label "Thrusters/boosters" .
+ipd:Commons_Articulation a ipd:MechaCommons ; rdfs:label "Joint articulation (knees, elbows, shoulders)" .
+ipd:Commons_Weaponry a ipd:MechaCommons ; rdfs:label "Handheld energy/kinetic weaponry" .
+ipd:Commons_ArmorPlating a ipd:MechaCommons ; rdfs:label "Armor plating" .
+ipd:Commons_PanelLines a ipd:MechaCommons ; rdfs:label "Panel lines" .
+
+# ---------------------------------------------------------------
+# Original axes (candidate MUST occupy at least one)
+# ---------------------------------------------------------------
+ipd:Axis_ProcessIntelligence a ipd:OriginalAxis ; rdfs:label "Process-intelligence visual grammar" .
+ipd:Axis_SupportHeroes a ipd:OriginalAxis ; rdfs:label "Support roles as first-class heroes" .
+ipd:Axis_ReceiptBearing a ipd:OriginalAxis ; rdfs:label "Receipt-bearing parts" .
+ipd:Axis_LogisticsAesthetics a ipd:OriginalAxis ; rdfs:label "Logistics-as-combat aesthetics" .
+ipd:Axis_ByteLawAuthority a ipd:OriginalAxis ; rdfs:label "Byte-law gameplay authority" .
+
+# ---------------------------------------------------------------
+# SHACL: every ProtectedCluster MUST be metric-baseline-only
+# ---------------------------------------------------------------
+ipd:ProtectedClusterBaselineShape a sh:NodeShape ;
+    sh:targetClass ipd:ProtectedCluster ;
+    sh:property [
+        sh:path ipd:tradeDressThreshold ;
+        sh:datatype xsd:float ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Each ProtectedCluster MUST declare exactly one tradeDressThreshold."
+    ] ;
+    sh:property [
+        sh:path ipd:hasBaselineUsage ;
+        sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "Every ProtectedCluster MUST be MetricBaselineOnly (usableForGeneration=false)."
+    ] .
 
 
 # --- Source: 098_non_confusion_policy.ttl ---
-@prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ipd: <http://rocket-craft.com/ontology/ip-distance#> .
 
-:098_non_confusion_policy a :SourceLaw .
+#################################################################
+# 098_non_confusion_policy.ttl
+#
+# Verdict taxonomy and non-confusion SHACL shape for candidate admission.
+# Mirrors admission_rules + prohibited_provenance of
+# ip_policy_packs/mecha_external_corpus.policy.json (IP_DIST_MECHA_001).
+#
+# A CandidateAdmissionShape is admitted ONLY if it shares the genre commons,
+# occupies at least one original axis, and stays below every cluster's
+# trade-dress threshold with non-prohibited provenance. Otherwise the verdict
+# is REFUSE_EXPRESSIVE_PROXIMITY.
+#################################################################
+
+ipd:NonConfusionPolicy a owl:Ontology ;
+    rdfs:label "Non-Confusion Policy" ;
+    rdfs:comment "Verdict individuals and SHACL non-confusion shape for candidate admission against protected clusters." ;
+    owl:imports <http://rocket-craft.com/ontology/ip-distance#> .
+
+# ---------------------------------------------------------------
+# Verdict class + individuals
+# ---------------------------------------------------------------
+ipd:AdmissionVerdict a owl:Class ;
+    rdfs:label "Admission Verdict" ;
+    rdfs:comment "Bounded verdict vocabulary for the non-confusion gate. Every admission carries exactly one." .
+
+ipd:ADMIT_ORIGINAL a ipd:AdmissionVerdict ;
+    rdfs:label "ADMIT_ORIGINAL" ;
+    ipd:verdictCondition "Shares genre commons, occupies >=1 original axis, below all cluster trade-dress thresholds, non-prohibited provenance." .
+ipd:REFUSE_EXPRESSIVE_PROXIMITY a ipd:AdmissionVerdict ;
+    rdfs:label "REFUSE_EXPRESSIVE_PROXIMITY" ;
+    ipd:verdictCondition "Candidate proximity to a ProtectedCluster meets or exceeds its tradeDressThreshold — presumed trade-dress confusion." .
+ipd:REFUSE_PROHIBITED_PROVENANCE a ipd:AdmissionVerdict ;
+    rdfs:label "REFUSE_PROHIBITED_PROVENANCE" ;
+    ipd:verdictCondition "Candidate derives from prohibited provenance (scans/rips/traced art/style-of generation)." .
+ipd:REFUSE_NO_ORIGINAL_AXIS a ipd:AdmissionVerdict ;
+    rdfs:label "REFUSE_NO_ORIGINAL_AXIS" ;
+    ipd:verdictCondition "Candidate occupies no OriginalAxis — genre commons alone are insufficient for admission." .
+
+# ---------------------------------------------------------------
+# Prohibited provenance vocabulary
+# ---------------------------------------------------------------
+ipd:ProhibitedProvenance a owl:Class ;
+    rdfs:label "Prohibited Provenance" ;
+    rdfs:comment "Provenance sources that disqualify a candidate from admission." .
+ipd:Prov_KitScans a ipd:ProhibitedProvenance ;
+    rdfs:label "Scans of physical model kits (MechKit, ActionFigures)" .
+ipd:Prov_GameRips a ipd:ProhibitedProvenance ;
+    rdfs:label "Rips of game assets from official titles" .
+ipd:Prov_TracedConceptArt a ipd:ProhibitedProvenance ;
+    rdfs:label "Concept art traced from official line art" .
+ipd:Prov_StyleOfGeneration a ipd:ProhibitedProvenance ;
+    rdfs:label "Generative AI outputs prompted with 'in the style of [Franchise]'" .
+
+# ---------------------------------------------------------------
+# Admission-rule literals (mirror admission_rules block)
+# ---------------------------------------------------------------
+ipd:AdmissionRules a owl:NamedIndividual ;
+    rdfs:label "IP_DIST_MECHA_001 admission rules" ;
+    ipd:requireCommonGenre true ;
+    ipd:requireOriginalAxis true ;
+    ipd:rejectIfClusterProximityAbove "0.7"^^xsd:float .
+
+ipd:requireCommonGenre a owl:DatatypeProperty ;
+    rdfs:range xsd:boolean ; rdfs:label "require common genre" .
+ipd:requireOriginalAxis a owl:DatatypeProperty ;
+    rdfs:range xsd:boolean ; rdfs:label "require original axis" .
+ipd:rejectIfClusterProximityAbove a owl:DatatypeProperty ;
+    rdfs:range xsd:float ; rdfs:label "reject if cluster proximity above" .
+ipd:verdictCondition a owl:DatatypeProperty ;
+    rdfs:domain ipd:AdmissionVerdict ; rdfs:range xsd:string ;
+    rdfs:label "verdict condition" .
+
+# ---------------------------------------------------------------
+# Candidate properties referenced by the non-confusion shape
+# ---------------------------------------------------------------
+ipd:maxClusterProximity a owl:DatatypeProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range xsd:float ;
+    rdfs:label "max cluster proximity" ;
+    rdfs:comment "Highest measured proximity of this candidate to any ProtectedCluster." .
+ipd:hasProvenance a owl:ObjectProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range ipd:ProhibitedProvenance ;
+    rdfs:label "has provenance" .
+ipd:hasVerdict a owl:ObjectProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range ipd:AdmissionVerdict ;
+    rdfs:label "has verdict" .
+
+# ---------------------------------------------------------------
+# SHACL non-confusion shape
+# ---------------------------------------------------------------
+ipd:NonConfusionShape a sh:NodeShape ;
+    rdfs:label "Non-Confusion Shape" ;
+    sh:targetClass ipd:CandidateAdmissionShape ;
+    sh:property [
+        sh:path ipd:mustOccupyAxis ;
+        sh:class ipd:OriginalAxis ;
+        sh:minCount 1 ;
+        sh:message "Candidate MUST occupy at least one OriginalAxis (genre commons alone are insufficient) -> REFUSE_NO_ORIGINAL_AXIS."
+    ] ;
+    sh:property [
+        sh:path ipd:maxClusterProximity ;
+        sh:datatype xsd:float ;
+        sh:maxExclusive "0.7"^^xsd:float ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Candidate proximity to any ProtectedCluster MUST stay below 0.7 -> REFUSE_EXPRESSIVE_PROXIMITY."
+    ] ;
+    sh:property [
+        sh:path ipd:hasProvenance ;
+        sh:maxCount 0 ;
+        sh:message "Candidate MUST NOT carry any ProhibitedProvenance -> REFUSE_PROHIBITED_PROVENANCE."
+    ] .
 
 
 # --- Source: 099_ip_distance_report_schema.ttl ---
-@prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ipd: <http://rocket-craft.com/ontology/ip-distance#> .
 
-:099_ip_distance_report_schema a :SourceLaw .
+#################################################################
+# 099_ip_distance_report_schema.ttl
+#
+# SHACL schema for the IP-distance evidence artifacts:
+#   IP_DISTANCE_REPORT.json    — per-cluster proximity scores
+#   NON_CONFUSION_REPORT.json  — verdict + axis/provenance findings
+#   ADMISSION_RECEIPT.jsonl     — one receipt per candidate admission
+#
+# Every artifact MUST carry a BLAKE3 hash and a baseline_usage record
+# (usableForMetricBaseline=true / usableForGeneration=false). Receipts are
+# BLAKE3 everywhere.
+#################################################################
+
+ipd:IpDistanceReportSchema a owl:Ontology ;
+    rdfs:label "IP Distance Report Schema" ;
+    rdfs:comment "SHACL shapes validating the IP-distance / non-confusion / admission-receipt evidence artifacts." ;
+    owl:imports <http://rocket-craft.com/ontology/ip-distance#> .
+
+# ---------------------------------------------------------------
+# Report classes (artifact carriers)
+# ---------------------------------------------------------------
+ipd:IpDistanceReport a owl:Class ;
+    rdfs:label "IP Distance Report" ;
+    rdfs:comment "Carrier for IP_DISTANCE_REPORT.json." .
+ipd:NonConfusionReport a owl:Class ;
+    rdfs:label "Non-Confusion Report" ;
+    rdfs:comment "Carrier for NON_CONFUSION_REPORT.json." .
+ipd:AdmissionReceipt a owl:Class ;
+    rdfs:label "Admission Receipt" ;
+    rdfs:comment "Carrier for one ADMISSION_RECEIPT.jsonl line." .
+
+# ---------------------------------------------------------------
+# Shared evidence properties
+# ---------------------------------------------------------------
+ipd:blake3Hash a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "blake3 hash" ;
+    rdfs:comment "BLAKE3 hash of the artifact payload (receipts are BLAKE3 everywhere)." .
+ipd:baselineUsage a owl:ObjectProperty ;
+    rdfs:range ipd:BaselineUsage ;
+    rdfs:label "baseline usage" ;
+    rdfs:comment "Reference to the BaselineUsage law applied (must be ipd:MetricBaselineOnly)." .
+ipd:reportPolicyId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ; rdfs:label "report policy id" .
+ipd:clusterProximity a owl:DatatypeProperty ;
+    rdfs:range xsd:float ; rdfs:label "cluster proximity" .
+ipd:reportVerdict a owl:ObjectProperty ;
+    rdfs:range ipd:AdmissionVerdict ; rdfs:label "report verdict" .
+ipd:candidateId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ; rdfs:label "candidate id" .
+
+# ---------------------------------------------------------------
+# SHACL: IP_DISTANCE_REPORT.json
+# ---------------------------------------------------------------
+ipd:IpDistanceReportShape a sh:NodeShape ;
+    sh:targetClass ipd:IpDistanceReport ;
+    sh:property [
+        sh:path ipd:blake3Hash ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 32 ;
+        sh:message "IP_DISTANCE_REPORT.json MUST carry exactly one BLAKE3 hash."
+    ] ;
+    sh:property [
+        sh:path ipd:baselineUsage ; sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "IP_DISTANCE_REPORT.json MUST record baseline_usage = MetricBaselineOnly."
+    ] ;
+    sh:property [
+        sh:path ipd:clusterProximity ; sh:datatype xsd:float ; sh:minCount 1 ;
+        sh:message "IP_DISTANCE_REPORT.json MUST record at least one per-cluster proximity score."
+    ] .
+
+# ---------------------------------------------------------------
+# SHACL: NON_CONFUSION_REPORT.json
+# ---------------------------------------------------------------
+ipd:NonConfusionReportShape a sh:NodeShape ;
+    sh:targetClass ipd:NonConfusionReport ;
+    sh:property [
+        sh:path ipd:blake3Hash ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 32 ;
+        sh:message "NON_CONFUSION_REPORT.json MUST carry exactly one BLAKE3 hash."
+    ] ;
+    sh:property [
+        sh:path ipd:baselineUsage ; sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "NON_CONFUSION_REPORT.json MUST record baseline_usage = MetricBaselineOnly."
+    ] ;
+    sh:property [
+        sh:path ipd:reportVerdict ; sh:class ipd:AdmissionVerdict ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "NON_CONFUSION_REPORT.json MUST carry exactly one AdmissionVerdict."
+    ] .
+
+# ---------------------------------------------------------------
+# SHACL: ADMISSION_RECEIPT.jsonl (one shape per line)
+# ---------------------------------------------------------------
+ipd:AdmissionReceiptShape a sh:NodeShape ;
+    sh:targetClass ipd:AdmissionReceipt ;
+    sh:property [
+        sh:path ipd:blake3Hash ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 32 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST carry exactly one BLAKE3 hash."
+    ] ;
+    sh:property [
+        sh:path ipd:baselineUsage ; sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST record baseline_usage = MetricBaselineOnly."
+    ] ;
+    sh:property [
+        sh:path ipd:candidateId ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST identify its candidate."
+    ] ;
+    sh:property [
+        sh:path ipd:reportVerdict ; sh:class ipd:AdmissionVerdict ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST carry exactly one AdmissionVerdict."
+    ] .
 
 
 # --- Source: 100_receipts_ocel_replay_law.ttl ---
@@ -1051,6 +1453,18 @@ prior:exceptionClass   a owl:ObjectProperty .
 prior:repairOperator   a owl:ObjectProperty .
 prior:appliesToGate    a owl:ObjectProperty .
 
+# --- Bounded-operator machine-checkable contract (R5) ----------
+# Every prior:RepairOperator carries these so an ACCEPT/REVERT
+# loop is validated without trusting prose.
+prior:boundsStepMax       a owl:DatatypeProperty ;
+    rdfs:comment "Max magnitude a single operator application may move its patched source-law value (in the patchesTriple unit)."@en .
+prior:preservesMetric     a owl:ObjectProperty ;
+    rdfs:comment "Metric floor(s) this operator must NOT regress (metrics:silhouetteIoU / metrics:colorPaletteSimilarity)."@en .
+prior:patchesTriple       a owl:DatatypeProperty ;
+    rdfs:comment "Exact source-law subject+predicate the operator may mutate, as 'subjectQName predicateQName'."@en .
+prior:requiresOwnerProvenance a owl:DatatypeProperty ;
+    rdfs:comment "If true the patched prim must retain mud:belongsToPart owner provenance after the operator runs."@en .
+
 #################################################################
 # GATE 1: foreground_component_count
 # unit: count (dimensionless integer count of foreground blobs)
@@ -1084,12 +1498,20 @@ prior:MultiTurretOrModularSwarmArchetype a prior:ExceptionClass ;
 prior:compose_adjacent_parts_within_overlap_band a prior:RepairOperator ;
     rdfs:label "compose_adjacent_parts_within_overlap_band"@en ;
     rdfs:comment "Fuse parts whose bounding boxes overlap within the overlap band into one foreground component; bounded by silhouette IoU."@en ;
-    prior:appliesToGate prior:foreground_component_count .
+    prior:appliesToGate prior:foreground_component_count ;
+    prior:boundsStepMax "0.05"^^xsd:decimal ;
+    prior:preservesMetric metrics:silhouetteIoU , metrics:colorPaletteSimilarity ;
+    prior:patchesTriple "mud:prim_torso_core mud:translateX" ;
+    prior:requiresOwnerProvenance true .
 
 prior:merge_feather_components_preserving_wingspan a prior:RepairOperator ;
     rdfs:label "merge_feather_components_preserving_wingspan"@en ;
     rdfs:comment "Merge fragmented wing-feather blobs into the wing array while holding wingspan constant."@en ;
-    prior:appliesToGate prior:foreground_component_count .
+    prior:appliesToGate prior:foreground_component_count ;
+    prior:boundsStepMax "0.05"^^xsd:decimal ;
+    prior:preservesMetric metrics:silhouetteIoU , metrics:wingSpanDelta ;
+    prior:patchesTriple "mud:prim_wing_left mud:translateZ" ;
+    prior:requiresOwnerProvenance true .
 
 #################################################################
 # GATE 2: core_compactness_delta
@@ -1119,7 +1541,11 @@ prior:core_compactness_delta a prior:Gate, prior:Band, sh:NodeShape ;
 prior:tighten_core_mass_inside_envelope a prior:RepairOperator ;
     rdfs:label "tighten_core_mass_inside_envelope"@en ;
     rdfs:comment "Pull torso/core primitive mass toward the centroid until compactness matches reference, bounded by the silhouette envelope."@en ;
-    prior:appliesToGate prior:core_compactness_delta .
+    prior:appliesToGate prior:core_compactness_delta ;
+    prior:boundsStepMax "0.08"^^xsd:decimal ;
+    prior:preservesMetric metrics:silhouetteIoU , metrics:bodyMassDelta ;
+    prior:patchesTriple "mud:prim_torso_core mud:scaleX" ;
+    prior:requiresOwnerProvenance true .
 
 #################################################################
 # GATE 3: blade_length_angle_delta
@@ -1154,12 +1580,20 @@ prior:CurvedOrFoldedBladeArchetype a prior:ExceptionClass ;
 prior:set_blade_mount_angle_within_band a prior:RepairOperator ;
     rdfs:label "set_blade_mount_angle_within_band"@en ;
     rdfs:comment "Set blade mount rotation toward the reference 15-degree sweep, bounded to the band."@en ;
-    prior:appliesToGate prior:blade_length_angle_delta .
+    prior:appliesToGate prior:blade_length_angle_delta ;
+    prior:boundsStepMax "15.0"^^xsd:decimal ;
+    prior:preservesMetric metrics:silhouetteIoU , metrics:cyanRegionSimilarity ;
+    prior:patchesTriple "mud:prim_blade_main mud:rotateZ" ;
+    prior:requiresOwnerProvenance true .
 
 prior:set_blade_length_ratio_within_band a prior:RepairOperator ;
     rdfs:label "set_blade_length_ratio_within_band"@en ;
     rdfs:comment "Scale blade length toward the reference 180-unit ratio, bounded to the band."@en ;
-    prior:appliesToGate prior:blade_length_angle_delta .
+    prior:appliesToGate prior:blade_length_angle_delta ;
+    prior:boundsStepMax "8.0"^^xsd:decimal ;
+    prior:preservesMetric metrics:silhouetteIoU , metrics:cyanRegionSimilarity ;
+    prior:patchesTriple "mud:prim_blade_main mud:scaleX" ;
+    prior:requiresOwnerProvenance true .
 
 prior:none a prior:ExceptionClass ;
     rdfs:label "no exception"@en ;
@@ -1172,32 +1606,97 @@ prior:none a prior:ExceptionClass ;
 
 # Reference Fabric Materials
 mud:M_WhiteArmor rdf:type mud:Material ;
+    mud:materialClass "clearcoat_armor" ;
     mud:color "#FFFFFF" ;
     mud:colorR 1.0 ; mud:colorG 1.0 ; mud:colorB 1.0 ;
     mud:roughness 0.2 ;
     mud:emissive 0.0 ;
-    mud:metallic 0.8 .
+    mud:emissionColorR 0.0 ; mud:emissionColorG 0.0 ; mud:emissionColorB 0.0 ;
+    mud:metallic 0.8 ;
+    mud:coat 1.0 ;
+    mud:anisotropy 0.0 ;
+    mud:baseColorTex "M_WhiteArmor_BaseColor.png" ;
+    mud:roughnessTex "M_WhiteArmor_Roughness.png" ;
+    mud:metallicTex "M_WhiteArmor_Metallic.png" ;
+    mud:normalTex "M_WhiteArmor_Normal.png" .
 
 mud:M_CyanBlade rdf:type mud:Material ;
+    mud:materialClass "emissive_blade" ;
     mud:color "#00FFFF" ;
     mud:colorR 0.0 ; mud:colorG 1.0 ; mud:colorB 1.0 ;
     mud:roughness 0.1 ;
     mud:emissive 1.0 ;
-    mud:metallic 0.9 .
+    mud:emissionColorR 0.0 ; mud:emissionColorG 1.0 ; mud:emissionColorB 1.0 ;
+    mud:metallic 0.9 ;
+    mud:coat 0.0 ;
+    mud:anisotropy 0.3 ;
+    mud:baseColorTex "M_CyanBlade_BaseColor.png" ;
+    mud:roughnessTex "M_CyanBlade_Roughness.png" ;
+    mud:metallicTex "M_CyanBlade_Metallic.png" ;
+    mud:emissiveTex "M_CyanBlade_Emissive.png" ;
+    mud:normalTex "M_CyanBlade_Normal.png" .
 
 mud:M_DarkFrame rdf:type mud:Material ;
+    mud:materialClass "anodized_frame" ;
     mud:color "#222222" ;
     mud:colorR 0.1333 ; mud:colorG 0.1333 ; mud:colorB 0.1333 ;
     mud:roughness 0.8 ;
     mud:emissive 0.0 ;
-    mud:metallic 0.1 .
+    mud:emissionColorR 0.0 ; mud:emissionColorG 0.0 ; mud:emissionColorB 0.0 ;
+    mud:metallic 0.1 ;
+    mud:coat 0.0 ;
+    mud:anisotropy 0.5 ;
+    mud:baseColorTex "M_DarkFrame_BaseColor.png" ;
+    mud:roughnessTex "M_DarkFrame_Roughness.png" ;
+    mud:metallicTex "M_DarkFrame_Metallic.png" ;
+    mud:normalTex "M_DarkFrame_Normal.png" .
 
 mud:M_GoldVisor rdf:type mud:Material ;
+    mud:materialClass "emissive_visor" ;
     mud:color "#FFD700" ;
     mud:colorR 1.0 ; mud:colorG 0.8431 ; mud:colorB 0.0 ;
     mud:roughness 0.1 ;
     mud:emissive 0.5 ;
-    mud:metallic 1.0 .
+    mud:emissionColorR 1.0 ; mud:emissionColorG 0.8431 ; mud:emissionColorB 0.0 ;
+    mud:metallic 1.0 ;
+    mud:coat 1.0 ;
+    mud:anisotropy 0.0 ;
+    mud:baseColorTex "M_GoldVisor_BaseColor.png" ;
+    mud:roughnessTex "M_GoldVisor_Roughness.png" ;
+    mud:metallicTex "M_GoldVisor_Metallic.png" ;
+    mud:emissiveTex "M_GoldVisor_Emissive.png" ;
+    mud:normalTex "M_GoldVisor_Normal.png" .
+
+# Texture Programs (one per material; feeds texture_programs.rq)
+mud:TP_WhiteArmor rdf:type mud:TextureProgram ;
+    mud:targetMaterial mud:M_WhiteArmor ;
+    mud:resolution 512 ;
+    mud:baseColorTex "M_WhiteArmor_BaseColor.png" ;
+    mud:roughnessTex "M_WhiteArmor_Roughness.png" ;
+    mud:normalTex "M_WhiteArmor_Normal.png" .
+
+mud:TP_CyanBlade rdf:type mud:TextureProgram ;
+    mud:targetMaterial mud:M_CyanBlade ;
+    mud:resolution 512 ;
+    mud:baseColorTex "M_CyanBlade_BaseColor.png" ;
+    mud:roughnessTex "M_CyanBlade_Roughness.png" ;
+    mud:normalTex "M_CyanBlade_Normal.png" ;
+    mud:emissiveTex "M_CyanBlade_Emissive.png" .
+
+mud:TP_DarkFrame rdf:type mud:TextureProgram ;
+    mud:targetMaterial mud:M_DarkFrame ;
+    mud:resolution 512 ;
+    mud:baseColorTex "M_DarkFrame_BaseColor.png" ;
+    mud:roughnessTex "M_DarkFrame_Roughness.png" ;
+    mud:normalTex "M_DarkFrame_Normal.png" .
+
+mud:TP_GoldVisor rdf:type mud:TextureProgram ;
+    mud:targetMaterial mud:M_GoldVisor ;
+    mud:resolution 512 ;
+    mud:baseColorTex "M_GoldVisor_BaseColor.png" ;
+    mud:roughnessTex "M_GoldVisor_Roughness.png" ;
+    mud:normalTex "M_GoldVisor_Normal.png" ;
+    mud:emissiveTex "M_GoldVisor_Emissive.png" .
 
 # Reference Fabric Primitives
 mud:prim_torso_core rdf:type mud:GeometryPrimitive ;
@@ -1845,18 +2344,27 @@ core:TypestateShape a sh:NodeShape ;
     ] .
 core:EntityShape a sh:NodeShape ;
     sh:targetClass core:Entity ;
+    sh:property [
         sh:path core:hasByteClass ;
         sh:class core:ByteClass ;
         sh:message "An Entity MUST map its truth into at least one bounded Byte-Class vector."
+    ] ;
+    sh:property [
         sh:path core:authoritativeStanding ;
         sh:datatype xsd:boolean ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
         sh:message "An Entity MUST explicitly declare its admission to authoritative standing."
+    ] .
+
 core:TopologyShape a sh:NodeShape ;
     sh:targetClass core:TopologyNode ;
+    sh:property [
+        sh:path core:isBounded ;
         sh:datatype xsd:boolean ;
+        sh:hasValue true ;
         sh:message "Topology Nodes MUST enforce anti-Cartesian extraction logic to allow bounded SPARQL SELECTs."
+    ] .
 
 
 # --- Source: 106_lore_spec_measurements.ttl ---
@@ -2000,10 +2508,15 @@ eng:VehicleHeightBand a sh:NodeShape ;
     ] .
 
 
-# --- Source: 107_gundam_nexus_primitives.ttl ---
-@prefix gn: <https://ggen.io/ontology/gundam-nexus/> .
-gn:GundamNexusOntology a owl:Ontology ;
-    rdfs:label "Gundam Nexus Ontology" ;
+# --- Source: 107_mecha_nexus_primitives.ttl ---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix gn: <https://ggen.io/ontology/mecha-nexus/> .
+gn:MechaNexusOntology a owl:Ontology ;
+    rdfs:label "Mecha Nexus Ontology" ;
     rdfs:comment "Constitutional semantic primitives for Combinatorial Maximalist universe manufacturing." .
 # --- MECH PRIMITIVES ---
 gn:MechAssembly a owl:Class ;
@@ -2035,10 +2548,10 @@ gn:Gundanium a gn:Resource ;
 gn:LunaTitanium a gn:Resource ;
     rdfs:label "Luna Titanium" .
 # --- SPECIFIC COMPONENTS ---
-gn:GundamFrame a gn:Frame ;
-    rdfs:label "Gundam Frame" .
-gn:ZakuFrame a gn:Frame ;
-    rdfs:label "Zaku Frame" .
+gn:MechaFrame a gn:Frame ;
+    rdfs:label "Mecha Frame" .
+gn:GruntUnitFrame a gn:Frame ;
+    rdfs:label "GruntUnit Frame" .
 gn:GMFrame a gn:Frame ;
     rdfs:label "GM Frame" .
 gn:MinovskyUltracompact a gn:Power ;
@@ -2058,6 +2571,11 @@ gn:DualSensor a gn:Sensor ;
 
 
 # --- Source: 108_mech_factory_mud_twin.ttl ---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix core: <https://ggen.io/ontology/core/> .
 @prefix mud: <https://ggen.io/ontology/mech_factory_mud/> .
 mud:MechFactoryMudOntology a owl:Ontology ;
@@ -2108,18 +2626,18 @@ mud:PartFamily a owl:Class ;
     rdfs:subClassOf core:Entity ;
     rdfs:label "Part Family" ;
     rdfs:comment "Mechanized part families generated at stations." .
-mud:Frame a mud:PartFamily ; rdfs:label "Frame" ; core:isBounded true ; core:compilesToZST true .
-mud:Shoulder a mud:PartFamily ; rdfs:label "Shoulder" ; core:isBounded true ; core:compilesToZST true .
-mud:Arm a mud:PartFamily ; rdfs:label "Arm" ; core:isBounded true ; core:compilesToZST true .
-mud:Leg a mud:PartFamily ; rdfs:label "Leg" ; core:isBounded true ; core:compilesToZST true .
-mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true .
-mud:ArmorPanel a mud:PartFamily ; rdfs:label "ArmorPanel" ; core:isBounded true ; core:compilesToZST true .
-mud:WeaponMount a mud:PartFamily ; rdfs:label "WeaponMount" ; core:isBounded true ; core:compilesToZST true .
-mud:CoolingVent a mud:PartFamily ; rdfs:label "CoolingVent" ; core:isBounded true ; core:compilesToZST true .
-mud:SkinLayer a mud:PartFamily ; rdfs:label "SkinLayer" ; core:isBounded true ; core:compilesToZST true .
-mud:MotionFamily a mud:PartFamily ; rdfs:label "MotionFamily" ; core:isBounded true ; core:compilesToZST true .
-mud:LODVariant a mud:PartFamily ; rdfs:label "LODVariant" ; core:isBounded true ; core:compilesToZST true .
-mud:ReceiptTerminalPart a mud:PartFamily ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+mud:Frame a mud:PartFamily ; rdfs:label "Frame" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:Shoulder a mud:PartFamily ; rdfs:label "Shoulder" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:Arm a mud:PartFamily ; rdfs:label "Arm" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:Leg a mud:PartFamily ; rdfs:label "Leg" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:ArmorPanel a mud:PartFamily ; rdfs:label "ArmorPanel" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:WeaponMount a mud:PartFamily ; rdfs:label "WeaponMount" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:CoolingVent a mud:PartFamily ; rdfs:label "CoolingVent" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:SkinLayer a mud:PartFamily ; rdfs:label "SkinLayer" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:MotionFamily a mud:PartFamily ; rdfs:label "MotionFamily" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:LODVariant a mud:PartFamily ; rdfs:label "LODVariant" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
+mud:ReceiptTerminalPart a mud:PartFamily ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true ; core:authoritativeStanding true .
 # ---------------------------------------------------------
 # Stations
 # ---------------------------------------------------------
@@ -2161,9 +2679,10 @@ mud:ExitOrLoop a mud:RouteNode ; rdfs:label "ExitOrLoop" ; core:isBounded true ;
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix mb:   <https://ggen.io/ontology/mechbirth/> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
 # ─────────────────────────────────────────────────────────────────────────────
 # MECHBIRTH ONTOLOGY — O* (Admitted Truth Graph)
-# GC-MECHBIRTH-002 / GC-GUNDAM-FACTORY-001
+# GC-MECHBIRTH-002 / GC-MECHA-FACTORY-001
 #
 # This file IS the source of truth. All Rust, C++, and SPARQL artifacts are
 # projections (A = μ(O*)). Do not derive laws from the Rust code.
@@ -2251,17 +2770,22 @@ mb:PeerProjection a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
     rdfs:label "Peer Projection" ;
     mb:law "Clients may exchange high-resolution visual details peer-to-peer (sparks, particle effects, animations) but these hold no authoritative standing." ;
     sh:targetClass mb:PeerEffect ;
+    sh:property [
         sh:path mb:hasAuthoritativeStanding ;
         sh:hasValue "false"^^xsd:boolean ;
         sh:message "Peer projection details hold no authoritative standing."
+    ] .
+
 mb:ClientAsProjector a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
     rdfs:label "Client as Projector" ;
     mb:law "The local client renders the absolute maximum fidelity, but relies entirely on the server for the admitted truth. The server does not synchronize the object; it synchronizes the right to believe the object." ;
     sh:targetClass mb:ClientRenderState ;
+    sh:property [
         sh:path mb:dependsOnAuthority ;
         sh:class mb:AuthorityState ;
         sh:minCount 1 ;
         sh:message "Client rendering relies entirely on the server for the admitted truth."
+    ] .
 # ─────────────────────────────────────────────────────────────────────────────
 # BRANCHLESS TRANSITION KERNEL LAWS
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2591,12 +3115,18 @@ mud:SocketGeometrySmugglingShape a sh:NodeShape ;
 
 
 # --- Source: 115_destruction_ontology.ttl ---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
 # =========================================================
 # Destruction Ontology
 # =========================================================
 
 @prefix core: <https://ggen.io/ontology/core/> .
 @prefix ds: <https://ggen.io/ontology/destruction/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
 ds:DestructionOntology a owl:Ontology ;
     rdfs:label "Destruction States Ontology" ;
     rdfs:comment "Combinatorial Destruction States: armor break states, exposed frame states, damaged material states, detached panel declarations, damage-zone transitions, VFX socket bindings." ;

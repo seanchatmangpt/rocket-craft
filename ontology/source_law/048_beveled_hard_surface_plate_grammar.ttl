@@ -1,4 +1,34 @@
-@prefix : <http://example.org/law#> .
+@prefix core: <https://ggen.io/ontology/core/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix law: <https://ggen.io/ontology/law/> .
 
-:048_beveled_hard_surface_plate_grammar a :SourceLaw .
+law:048_beveled_hard_surface_plate_grammar a owl:Ontology ;
+    rdfs:label "Bevel Grammar Law" .
+
+law:HardSurfacePlate a owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Hard Surface Plate" ;
+    rdfs:comment "A discrete plate component with hard surface characteristics." .
+
+law:Bevel a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Bevel Detail" ;
+    rdfs:comment "Bevel geometry grammar rule." .
+
+law:hasBevel a owl:ObjectProperty ;
+    rdfs:domain law:HardSurfacePlate ;
+    rdfs:range law:Bevel ;
+    rdfs:label "has Bevel" .
+
+law:HardSurfacePlateShape a sh:NodeShape ;
+    sh:targetClass law:HardSurfacePlate ;
+    sh:property [
+        sh:path law:hasBevel ;
+        sh:class law:Bevel ;
+        sh:minCount 1 ;
+        sh:message "Every hard surface plate MUST have at least one defined bevel to avoid infinite sharp edge errors."
+    ] .

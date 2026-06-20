@@ -74,7 +74,7 @@ impl OcelLog {
                 }
             }
             if event_objects.is_empty() {
-                event_objects.push("case-gundam-factory-001".into());
+                event_objects.push("case-mecha-factory-001".into());
             }
             events.push(OcelEvent {
                 id: e.id.clone(),
@@ -171,6 +171,6 @@ mod tests {
     #[test]
     fn each_event_object_contains_case_id() {
         let log = OcelLog::from_powlv2lsp_trace(MINIMAL_OCEL).unwrap();
-        assert!(log.events[0].objects.contains(&"case-gundam-factory-001".into()));
+        assert!(log.events[0].objects.contains(&"case-mecha-factory-001".into()));
     }
 }

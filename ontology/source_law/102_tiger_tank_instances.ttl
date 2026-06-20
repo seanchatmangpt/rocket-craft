@@ -1,0 +1,46 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+@prefix eng: <https://rocket-craft.com/ontology/engineering#> .
+@prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
+
+mud:tiger_tank_hull a eng:ArmorBaseline_Tiger_I_V0, ue4:GermanTigerTank ;
+    rdfs:label "Tiger Tank Hull" .
+
+mud:tank_treads a mud:Part ;
+    rdfs:label "tank_treads" ;
+    mud:partOf mud:tiger_tank_hull .
+
+mud:interleaved_wheels a mud:Part ;
+    rdfs:label "interleaved_wheels" ;
+    mud:partOf mud:tiger_tank_hull .
+
+mud:kwk36_gun a mud:Part ;
+    rdfs:label "kwk36_gun" ;
+    mud:partOf mud:tiger_tank_hull .
+
+# Geometry Primitives to satisfy SPARQL queries
+
+mud:tank_treads_geom a mud:GeometryPrimitive ;
+    mud:primitiveFamily "Cube" ;
+    mud:belongsToPart mud:tank_treads ;
+    mud:translateX "0.0" ; mud:translateY "-1.8" ; mud:translateZ "0.5" ;
+    mud:scaleX "6.0" ; mud:scaleY "0.8" ; mud:scaleZ "1.0" ;
+    mud:rotateX "0.0" ; mud:rotateY "0.0" ; mud:rotateZ "0.0" ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:interleaved_wheels_geom a mud:GeometryPrimitive ;
+    mud:primitiveFamily "Cylinder" ;
+    mud:belongsToPart mud:interleaved_wheels ;
+    mud:translateX "0.0" ; mud:translateY "-1.6" ; mud:translateZ "0.4" ;
+    mud:scaleX "0.8" ; mud:scaleY "0.2" ; mud:scaleZ "0.8" ;
+    mud:rotateX "0.0" ; mud:rotateY "0.0" ; mud:rotateZ "0.0" ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:kwk36_gun_geom a mud:GeometryPrimitive ;
+    mud:primitiveFamily "Cylinder" ;
+    mud:belongsToPart mud:kwk36_gun ;
+    mud:translateX "2.5" ; mud:translateY "0.0" ; mud:translateZ "2.2" ;
+    mud:scaleX "4.5" ; mud:scaleY "0.15" ; mud:scaleZ "0.15" ;
+    mud:rotateX "0.0" ; mud:rotateY "0.0" ; mud:rotateZ "0.0" ;
+    mud:materialBinding mud:M_DarkFrame .

@@ -111,13 +111,22 @@ pub fn mechbirth_002_residuals() -> Vec<String> {
     ]
 }
 
-/// Produce a default GC-GUNDAM-FACTORY-001 report with known static residuals.
-pub fn gundam_factory_001_residuals() -> Vec<String> {
+/// Produce a default GC-MECHA-FACTORY-001 report with known static residuals.
+pub fn mecha_factory_001_residuals() -> Vec<String> {
     vec![
         "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline".into(),
         "visual_delta: no Playwright browser session in pre-UE4 scope".into(),
         "signing_layer: tamper-evident, not cryptographically signed".into(),
         "stress_1M: 1M cell stress test deferred pending dev machine capacity check".into(),
+    ]
+}
+
+/// Produce a default GC-VISION-SNAP-001 report with known static residuals.
+pub fn vision_snap_001_residuals() -> Vec<String> {
+    vec![
+        "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline".into(),
+        "visual_delta: no Playwright browser session in pre-UE4 scope".into(),
+        "signing_layer: tamper-evident, not cryptographically signed".into(),
     ]
 }
 

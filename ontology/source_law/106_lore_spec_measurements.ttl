@@ -1,0 +1,138 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantitykind: <http://qudt.org/vocab/quantitykind/> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix eng: <http://rocket-craft.com/ontology/engineering#> .
+
+#################################################################
+# 106_lore_spec_measurements.ttl
+#
+# Mines lore/spec baselines into QUDT/SOSA measurements and SHACL
+# tolerance bands.
+#################################################################
+
+eng:LoreSpecMeasurementsLayer a owl:Ontology ;
+    rdfs:label "Lore/Spec Baselines QUDT/SOSA Layer"@en ;
+    rdfs:comment "Mines lore baselines into QUDT/SOSA measurements and SHACL tolerance bands."@en ;
+    owl:versionInfo "1.0.0" .
+
+# --- SOSA Observable Properties (QUDT Quantity Kinds) ---
+
+eng:FrontArmorThickness a sosa:ObservableProperty, qudt:QuantityKind ;
+    rdfs:label "Front Armor Thickness"@en .
+
+eng:SideArmorThickness a sosa:ObservableProperty, qudt:QuantityKind ;
+    rdfs:label "Side Armor Thickness"@en .
+
+eng:TopArmorThickness a sosa:ObservableProperty, qudt:QuantityKind ;
+    rdfs:label "Top Armor Thickness"@en .
+
+eng:MantletArmorThickness a sosa:ObservableProperty, qudt:QuantityKind ;
+    rdfs:label "Mantlet Armor Thickness"@en .
+
+eng:VehicleHeight a sosa:ObservableProperty, qudt:QuantityKind ;
+    rdfs:label "Vehicle Height"@en .
+
+# --- SHACL Tolerance Bands (Lore/Spec Baselines) ---
+# These shapes enforce that any Observation of these properties
+# falls within the acceptable ±10% tolerance band of the lore baseline.
+
+eng:FrontArmorThicknessBand a sh:NodeShape ;
+    sh:targetSubjectsOf sosa:observedProperty ;
+    sh:property [
+        sh:path sosa:observedProperty ;
+        sh:in ( eng:FrontArmorThickness ) ;
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:numericValue ) ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive "90.0"^^xsd:decimal ;
+        sh:maxInclusive "110.0"^^xsd:decimal ;
+        sh:message "Front armor thickness must be within tolerance band of 100mm baseline (90.0 - 110.0)."
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:unit ) ;
+        sh:hasValue unit:MilliM ;
+        sh:message "Thickness must be measured in millimeters."
+    ] .
+
+eng:SideArmorThicknessBand a sh:NodeShape ;
+    sh:targetSubjectsOf sosa:observedProperty ;
+    sh:property [
+        sh:path sosa:observedProperty ;
+        sh:in ( eng:SideArmorThickness ) ;
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:numericValue ) ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive "72.0"^^xsd:decimal ;
+        sh:maxInclusive "88.0"^^xsd:decimal ;
+        sh:message "Side armor thickness must be within tolerance band of 80mm baseline (72.0 - 88.0)."
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:unit ) ;
+        sh:hasValue unit:MilliM ;
+        sh:message "Thickness must be measured in millimeters."
+    ] .
+
+eng:TopArmorThicknessBand a sh:NodeShape ;
+    sh:targetSubjectsOf sosa:observedProperty ;
+    sh:property [
+        sh:path sosa:observedProperty ;
+        sh:in ( eng:TopArmorThickness ) ;
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:numericValue ) ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive "23.4"^^xsd:decimal ;
+        sh:maxInclusive "28.6"^^xsd:decimal ;
+        sh:message "Top armor thickness must be within tolerance band of 26mm baseline (23.4 - 28.6)."
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:unit ) ;
+        sh:hasValue unit:MilliM ;
+        sh:message "Thickness must be measured in millimeters."
+    ] .
+
+eng:MantletArmorThicknessBand a sh:NodeShape ;
+    sh:targetSubjectsOf sosa:observedProperty ;
+    sh:property [
+        sh:path sosa:observedProperty ;
+        sh:in ( eng:MantletArmorThickness ) ;
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:numericValue ) ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive "108.0"^^xsd:decimal ;
+        sh:maxInclusive "132.0"^^xsd:decimal ;
+        sh:message "Mantlet armor thickness must be within tolerance band of 120mm baseline (108.0 - 132.0)."
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:unit ) ;
+        sh:hasValue unit:MilliM ;
+        sh:message "Thickness must be measured in millimeters."
+    ] .
+
+eng:VehicleHeightBand a sh:NodeShape ;
+    sh:targetSubjectsOf sosa:observedProperty ;
+    sh:property [
+        sh:path sosa:observedProperty ;
+        sh:in ( eng:VehicleHeight ) ;
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:numericValue ) ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive "2.7"^^xsd:decimal ;
+        sh:maxInclusive "3.3"^^xsd:decimal ;
+        sh:message "Vehicle height must be within tolerance band of 3.0m baseline (2.7 - 3.3)."
+    ] ;
+    sh:property [
+        sh:path ( sosa:hasResult qudt:unit ) ;
+        sh:hasValue unit:M ;
+        sh:message "Vehicle height must be measured in meters."
+    ] .

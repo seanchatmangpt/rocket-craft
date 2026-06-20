@@ -1,4 +1,56 @@
 @prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
 
 :038_socket_boundary_law a :SourceLaw .
+
+# ---------------------------------------------------------
+# Socket/Peg Laws and Part Split Lines
+# ---------------------------------------------------------
+
+mud:PartSplitLine a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Part Split Line" ;
+    rdfs:comment "An intersection boundary where two parts cleanly split without overlap. Dictates the physical edge of separated components." .
+
+mud:Peg a owl:Class ;
+    rdfs:subClassOf mud:PartFamily ;
+    rdfs:label "Peg" ;
+    rdfs:comment "An extrusion from a part designed strictly to insert into a matching Socket. Contains no high-fidelity external mesh details." .
+
+mud:insertsIntoSocket a owl:ObjectProperty ;
+    rdfs:domain mud:Peg ;
+    rdfs:range mud:Socket ;
+    rdfs:label "Inserts Into Socket" .
+
+mud:splitByLine a owl:ObjectProperty ;
+    rdfs:domain mud:PartFamily ;
+    rdfs:range mud:PartSplitLine ;
+    rdfs:label "Split By Line" .
+
+mud:PegShape a sh:NodeShape ;
+    sh:targetClass mud:Peg ;
+    sh:property [
+        sh:path mud:insertsIntoSocket ;
+        sh:class mud:Socket ;
+        sh:minCount 1 ;
+        sh:message "A Peg MUST insert into a Socket."
+    ] ;
+    sh:property [
+        sh:path core:mesh ;
+        sh:maxCount 0 ;
+        sh:message "Pegs must not smuggle geometry."
+    ] .
+
+mud:PartSplitLineShape a sh:NodeShape ;
+    sh:targetClass mud:PartSplitLine ;
+    sh:property [
+        sh:path core:isBounded ;
+        sh:datatype <http://www.w3.org/2001/XMLSchema#boolean> ;
+        sh:hasValue true ;
+        sh:message "Part Split Lines MUST be bounded."
+    ] .

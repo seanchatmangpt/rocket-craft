@@ -1,4 +1,124 @@
-@prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ipd: <http://rocket-craft.com/ontology/ip-distance#> .
 
-:099_ip_distance_report_schema a :SourceLaw .
+#################################################################
+# 099_ip_distance_report_schema.ttl
+#
+# SHACL schema for the IP-distance evidence artifacts:
+#   IP_DISTANCE_REPORT.json    — per-cluster proximity scores
+#   NON_CONFUSION_REPORT.json  — verdict + axis/provenance findings
+#   ADMISSION_RECEIPT.jsonl     — one receipt per candidate admission
+#
+# Every artifact MUST carry a BLAKE3 hash and a baseline_usage record
+# (usableForMetricBaseline=true / usableForGeneration=false). Receipts are
+# BLAKE3 everywhere.
+#################################################################
+
+ipd:IpDistanceReportSchema a owl:Ontology ;
+    rdfs:label "IP Distance Report Schema" ;
+    rdfs:comment "SHACL shapes validating the IP-distance / non-confusion / admission-receipt evidence artifacts." ;
+    owl:imports <http://rocket-craft.com/ontology/ip-distance#> .
+
+# ---------------------------------------------------------------
+# Report classes (artifact carriers)
+# ---------------------------------------------------------------
+ipd:IpDistanceReport a owl:Class ;
+    rdfs:label "IP Distance Report" ;
+    rdfs:comment "Carrier for IP_DISTANCE_REPORT.json." .
+ipd:NonConfusionReport a owl:Class ;
+    rdfs:label "Non-Confusion Report" ;
+    rdfs:comment "Carrier for NON_CONFUSION_REPORT.json." .
+ipd:AdmissionReceipt a owl:Class ;
+    rdfs:label "Admission Receipt" ;
+    rdfs:comment "Carrier for one ADMISSION_RECEIPT.jsonl line." .
+
+# ---------------------------------------------------------------
+# Shared evidence properties
+# ---------------------------------------------------------------
+ipd:blake3Hash a owl:DatatypeProperty ;
+    rdfs:range xsd:string ;
+    rdfs:label "blake3 hash" ;
+    rdfs:comment "BLAKE3 hash of the artifact payload (receipts are BLAKE3 everywhere)." .
+ipd:baselineUsage a owl:ObjectProperty ;
+    rdfs:range ipd:BaselineUsage ;
+    rdfs:label "baseline usage" ;
+    rdfs:comment "Reference to the BaselineUsage law applied (must be ipd:MetricBaselineOnly)." .
+ipd:reportPolicyId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ; rdfs:label "report policy id" .
+ipd:clusterProximity a owl:DatatypeProperty ;
+    rdfs:range xsd:float ; rdfs:label "cluster proximity" .
+ipd:reportVerdict a owl:ObjectProperty ;
+    rdfs:range ipd:AdmissionVerdict ; rdfs:label "report verdict" .
+ipd:candidateId a owl:DatatypeProperty ;
+    rdfs:range xsd:string ; rdfs:label "candidate id" .
+
+# ---------------------------------------------------------------
+# SHACL: IP_DISTANCE_REPORT.json
+# ---------------------------------------------------------------
+ipd:IpDistanceReportShape a sh:NodeShape ;
+    sh:targetClass ipd:IpDistanceReport ;
+    sh:property [
+        sh:path ipd:blake3Hash ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 32 ;
+        sh:message "IP_DISTANCE_REPORT.json MUST carry exactly one BLAKE3 hash."
+    ] ;
+    sh:property [
+        sh:path ipd:baselineUsage ; sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "IP_DISTANCE_REPORT.json MUST record baseline_usage = MetricBaselineOnly."
+    ] ;
+    sh:property [
+        sh:path ipd:clusterProximity ; sh:datatype xsd:float ; sh:minCount 1 ;
+        sh:message "IP_DISTANCE_REPORT.json MUST record at least one per-cluster proximity score."
+    ] .
+
+# ---------------------------------------------------------------
+# SHACL: NON_CONFUSION_REPORT.json
+# ---------------------------------------------------------------
+ipd:NonConfusionReportShape a sh:NodeShape ;
+    sh:targetClass ipd:NonConfusionReport ;
+    sh:property [
+        sh:path ipd:blake3Hash ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 32 ;
+        sh:message "NON_CONFUSION_REPORT.json MUST carry exactly one BLAKE3 hash."
+    ] ;
+    sh:property [
+        sh:path ipd:baselineUsage ; sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "NON_CONFUSION_REPORT.json MUST record baseline_usage = MetricBaselineOnly."
+    ] ;
+    sh:property [
+        sh:path ipd:reportVerdict ; sh:class ipd:AdmissionVerdict ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "NON_CONFUSION_REPORT.json MUST carry exactly one AdmissionVerdict."
+    ] .
+
+# ---------------------------------------------------------------
+# SHACL: ADMISSION_RECEIPT.jsonl (one shape per line)
+# ---------------------------------------------------------------
+ipd:AdmissionReceiptShape a sh:NodeShape ;
+    sh:targetClass ipd:AdmissionReceipt ;
+    sh:property [
+        sh:path ipd:blake3Hash ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ; sh:minLength 32 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST carry exactly one BLAKE3 hash."
+    ] ;
+    sh:property [
+        sh:path ipd:baselineUsage ; sh:hasValue ipd:MetricBaselineOnly ;
+        sh:minCount 1 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST record baseline_usage = MetricBaselineOnly."
+    ] ;
+    sh:property [
+        sh:path ipd:candidateId ; sh:datatype xsd:string ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST identify its candidate."
+    ] ;
+    sh:property [
+        sh:path ipd:reportVerdict ; sh:class ipd:AdmissionVerdict ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Each ADMISSION_RECEIPT.jsonl entry MUST carry exactly one AdmissionVerdict."
+    ] .

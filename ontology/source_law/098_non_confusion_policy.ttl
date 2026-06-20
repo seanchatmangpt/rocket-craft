@@ -1,4 +1,117 @@
-@prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix ipd: <http://rocket-craft.com/ontology/ip-distance#> .
 
-:098_non_confusion_policy a :SourceLaw .
+#################################################################
+# 098_non_confusion_policy.ttl
+#
+# Verdict taxonomy and non-confusion SHACL shape for candidate admission.
+# Mirrors admission_rules + prohibited_provenance of
+# ip_policy_packs/mecha_external_corpus.policy.json (IP_DIST_MECHA_001).
+#
+# A CandidateAdmissionShape is admitted ONLY if it shares the genre commons,
+# occupies at least one original axis, and stays below every cluster's
+# trade-dress threshold with non-prohibited provenance. Otherwise the verdict
+# is REFUSE_EXPRESSIVE_PROXIMITY.
+#################################################################
+
+ipd:NonConfusionPolicy a owl:Ontology ;
+    rdfs:label "Non-Confusion Policy" ;
+    rdfs:comment "Verdict individuals and SHACL non-confusion shape for candidate admission against protected clusters." ;
+    owl:imports <http://rocket-craft.com/ontology/ip-distance#> .
+
+# ---------------------------------------------------------------
+# Verdict class + individuals
+# ---------------------------------------------------------------
+ipd:AdmissionVerdict a owl:Class ;
+    rdfs:label "Admission Verdict" ;
+    rdfs:comment "Bounded verdict vocabulary for the non-confusion gate. Every admission carries exactly one." .
+
+ipd:ADMIT_ORIGINAL a ipd:AdmissionVerdict ;
+    rdfs:label "ADMIT_ORIGINAL" ;
+    ipd:verdictCondition "Shares genre commons, occupies >=1 original axis, below all cluster trade-dress thresholds, non-prohibited provenance." .
+ipd:REFUSE_EXPRESSIVE_PROXIMITY a ipd:AdmissionVerdict ;
+    rdfs:label "REFUSE_EXPRESSIVE_PROXIMITY" ;
+    ipd:verdictCondition "Candidate proximity to a ProtectedCluster meets or exceeds its tradeDressThreshold — presumed trade-dress confusion." .
+ipd:REFUSE_PROHIBITED_PROVENANCE a ipd:AdmissionVerdict ;
+    rdfs:label "REFUSE_PROHIBITED_PROVENANCE" ;
+    ipd:verdictCondition "Candidate derives from prohibited provenance (scans/rips/traced art/style-of generation)." .
+ipd:REFUSE_NO_ORIGINAL_AXIS a ipd:AdmissionVerdict ;
+    rdfs:label "REFUSE_NO_ORIGINAL_AXIS" ;
+    ipd:verdictCondition "Candidate occupies no OriginalAxis — genre commons alone are insufficient for admission." .
+
+# ---------------------------------------------------------------
+# Prohibited provenance vocabulary
+# ---------------------------------------------------------------
+ipd:ProhibitedProvenance a owl:Class ;
+    rdfs:label "Prohibited Provenance" ;
+    rdfs:comment "Provenance sources that disqualify a candidate from admission." .
+ipd:Prov_KitScans a ipd:ProhibitedProvenance ;
+    rdfs:label "Scans of physical model kits (MechKit, ActionFigures)" .
+ipd:Prov_GameRips a ipd:ProhibitedProvenance ;
+    rdfs:label "Rips of game assets from official titles" .
+ipd:Prov_TracedConceptArt a ipd:ProhibitedProvenance ;
+    rdfs:label "Concept art traced from official line art" .
+ipd:Prov_StyleOfGeneration a ipd:ProhibitedProvenance ;
+    rdfs:label "Generative AI outputs prompted with 'in the style of [Franchise]'" .
+
+# ---------------------------------------------------------------
+# Admission-rule literals (mirror admission_rules block)
+# ---------------------------------------------------------------
+ipd:AdmissionRules a owl:NamedIndividual ;
+    rdfs:label "IP_DIST_MECHA_001 admission rules" ;
+    ipd:requireCommonGenre true ;
+    ipd:requireOriginalAxis true ;
+    ipd:rejectIfClusterProximityAbove "0.7"^^xsd:float .
+
+ipd:requireCommonGenre a owl:DatatypeProperty ;
+    rdfs:range xsd:boolean ; rdfs:label "require common genre" .
+ipd:requireOriginalAxis a owl:DatatypeProperty ;
+    rdfs:range xsd:boolean ; rdfs:label "require original axis" .
+ipd:rejectIfClusterProximityAbove a owl:DatatypeProperty ;
+    rdfs:range xsd:float ; rdfs:label "reject if cluster proximity above" .
+ipd:verdictCondition a owl:DatatypeProperty ;
+    rdfs:domain ipd:AdmissionVerdict ; rdfs:range xsd:string ;
+    rdfs:label "verdict condition" .
+
+# ---------------------------------------------------------------
+# Candidate properties referenced by the non-confusion shape
+# ---------------------------------------------------------------
+ipd:maxClusterProximity a owl:DatatypeProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range xsd:float ;
+    rdfs:label "max cluster proximity" ;
+    rdfs:comment "Highest measured proximity of this candidate to any ProtectedCluster." .
+ipd:hasProvenance a owl:ObjectProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range ipd:ProhibitedProvenance ;
+    rdfs:label "has provenance" .
+ipd:hasVerdict a owl:ObjectProperty ;
+    rdfs:domain ipd:CandidateAdmissionShape ; rdfs:range ipd:AdmissionVerdict ;
+    rdfs:label "has verdict" .
+
+# ---------------------------------------------------------------
+# SHACL non-confusion shape
+# ---------------------------------------------------------------
+ipd:NonConfusionShape a sh:NodeShape ;
+    rdfs:label "Non-Confusion Shape" ;
+    sh:targetClass ipd:CandidateAdmissionShape ;
+    sh:property [
+        sh:path ipd:mustOccupyAxis ;
+        sh:class ipd:OriginalAxis ;
+        sh:minCount 1 ;
+        sh:message "Candidate MUST occupy at least one OriginalAxis (genre commons alone are insufficient) -> REFUSE_NO_ORIGINAL_AXIS."
+    ] ;
+    sh:property [
+        sh:path ipd:maxClusterProximity ;
+        sh:datatype xsd:float ;
+        sh:maxExclusive "0.7"^^xsd:float ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Candidate proximity to any ProtectedCluster MUST stay below 0.7 -> REFUSE_EXPRESSIVE_PROXIMITY."
+    ] ;
+    sh:property [
+        sh:path ipd:hasProvenance ;
+        sh:maxCount 0 ;
+        sh:message "Candidate MUST NOT carry any ProhibitedProvenance -> REFUSE_PROHIBITED_PROVENANCE."
+    ] .

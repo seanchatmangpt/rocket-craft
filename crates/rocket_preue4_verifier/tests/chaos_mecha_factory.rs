@@ -1,5 +1,5 @@
-//! GC-GUNDAM-FACTORY-001: Chaos tests — each test MUST fail for the EXPECTED reason.
-//! These tests verify the refusal boundary law for Gundam Factory: every invalid
+//! GC-MECHA-FACTORY-001: Chaos tests — each test MUST fail for the EXPECTED reason.
+//! These tests verify the refusal boundary law for Mecha Factory: every invalid
 //! input must produce a specific RefusalReason, not a panic or silent wrong answer.
 
 use rocket_preue4_verifier::{
@@ -11,7 +11,7 @@ use rocket_preue4_verifier::{
 };
 
 #[test]
-fn chaos_simd_divergence_detected_for_gundam() {
+fn chaos_simd_divergence_detected_for_mecha() {
     use rocket_preue4_verifier::simd::verify_simd_scalar_equivalence;
     let heat = vec![15u8; 32];
     let stress = vec![15u8; 32];
@@ -43,7 +43,7 @@ fn chaos_simd_divergence_detected_for_gundam() {
 }
 
 #[test]
-fn chaos_invalid_class_caught_in_gundam_authority() {
+fn chaos_invalid_class_caught_in_mecha_authority() {
     let mut state = AuthorityState::new(16);
     state.damage[5] = MAX_CLASS + 1; // over boundary
     state.heat[12] = 255; // REFUSED_CLASS
@@ -69,7 +69,7 @@ fn chaos_invalid_class_caught_in_gundam_authority() {
 }
 
 #[test]
-fn chaos_mismatched_buffer_lengths_gundam() {
+fn chaos_mismatched_buffer_lengths_mecha() {
     let mut state = AuthorityState::new(8);
     state.stress.pop(); // length 7 vs others 8
 

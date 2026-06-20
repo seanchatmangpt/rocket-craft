@@ -24,6 +24,15 @@ def sha256_file(filepath):
             h.update(chunk)
     return h.hexdigest()
 
+def blake3_file(filepath):
+    """BLAKE3 of a file, used only to self-certify render provenance."""
+    import blake3 as _b3
+    h = _b3.blake3()
+    with open(filepath, 'rb') as f:
+        while chunk := f.read(8192):
+            h.update(chunk)
+    return h.hexdigest()
+
 def box_iou(boxA, boxB):
     if not boxA or not boxB:
         return 0.0
@@ -244,12 +253,13 @@ def main():
     
     # 10. Wing Feather Count
     wing_feather_count = 0
-    for fn in ["SM_WingArray_Left.usda", "SM_WingArray_Right.usda"]:
-        wp = os.path.join(usd_dir, fn)
-        if os.path.exists(wp):
-            with open(wp, "r") as f:
+    usd_files = os.listdir(usd_dir)
+    for wpf in usd_files:
+        if "WingArray" in wpf and wpf.endswith(".usda"):
+            pfp_w = os.path.join(usd_dir, wpf)
+            with open(pfp_w, "r") as f:
                 content_w = f.read()
-                wing_feather_count += len(re.findall(r'^\s*def\s+Mesh\s+"([^"]+)"', content_w, re.MULTILINE))
+            wing_feather_count += len(re.findall(r'^\s*def\s+Mesh\s+"([^"]+)"', content_w, re.MULTILINE))
     print(f"Wing Feather Count: {wing_feather_count}")
     
     # ---------------------------------------------------------
@@ -295,15 +305,13 @@ def main():
                 
     # 2. Check for foreign component prims and full-assembly (USD302, USD303)
     # Parse ontology to map prim_XXXX to part_name
-    ttl_path = os.path.join(repo_root, "generated", "mech_assets", "reference_fabric_001", "graph", "generator_parameters.ttl")
-    if not os.path.exists(ttl_path):
-        ttl_path = os.path.join(repo_root, "ontology", "all_merged.ttl")
+    ttl_path = os.path.join(repo_root, "ontology", "all_merged.ttl")
         
     prim_to_part = {}
     if os.path.exists(ttl_path):
         with open(ttl_path, "r") as f:
             ttl_content = f.read()
-        blocks = re.findall(r'mud:(prim_\d+)\s+rdf:type\s+mud:GeometryPrimitive\s*;([^.]+)\.', ttl_content, re.MULTILINE)
+        blocks = re.findall(r'mud:(prim_[a-zA-Z0-9_]+)\s+rdf:type\s+mud:GeometryPrimitive\s*;([^.]+)\.', ttl_content, re.MULTILINE)
         for prim_name, block in blocks:
             m_part = re.search(r'mud:belongsToPart\s+mud:([^\s;]+)', block)
             if m_part:
@@ -352,7 +360,7 @@ def main():
                         # USD309
                         usd_errors.append(f"USD309 ERROR: socket emitted as attached geometry instead of mount declaration in {pf} line {line_idx+1}")
                     elif "Xform" in trimmed:
-                        in_socket = true if 'true' in globals() else True
+                        in_socket = True
                         socket_brace_level = brace_count
                 
                 if in_socket and "def Mesh" in trimmed:
@@ -386,10 +394,11 @@ def main():
                 m_trans = re.search(r'double3 xformOp:translate\s*=\s*\(([^)]+)\)', block)
                 if m_trans:
                     trans = [float(x.strip()) for x in m_trans.group(1).split(",")]
-                    part_name = prim_to_part.get(name, "")
-                    if part_name == "primary_wing_feathers_left":
+                    base_name = re.sub(r'_(feather_blade|feather_tip|armor_plate|hardpoint|armor_piston|beveled_plate|blade_edge|tread_link|wheel|barrel_base|muzzle_brake|subframe_core|subframe_joint)_\d+$', '', name)
+                    part_name = prim_to_part.get(base_name, prim_to_part.get(name, ""))
+                    if part_name in ["wing_root_left", "primary_wing_feathers_left", "secondary_wing_feathers_left"]:
                         left_feathers.append(trans)
-                    elif part_name == "primary_wing_feathers_right":
+                    elif part_name in ["wing_root_right", "primary_wing_feathers_right", "secondary_wing_feathers_right"]:
                         right_feathers.append(trans)
                         
     mirror_failures = 0
@@ -481,7 +490,8 @@ def main():
             content = f.read()
         mesh_blocks = re.findall(r'def Mesh "([^"]+)"\s*\{([^\}]+)\}', content, re.MULTILINE)
         for name, block in mesh_blocks:
-            part_name = prim_to_part.get(name, "")
+            base_name = re.sub(r'_(feather_blade|feather_tip|armor_plate|hardpoint|armor_piston|beveled_plate|blade_edge|tread_link|wheel|barrel_base|muzzle_brake|subframe_core|subframe_joint)_\d+$', '', name)
+            part_name = prim_to_part.get(base_name, prim_to_part.get(name, ""))
             if part_name == "primary_wing_feathers_left":
                 m_rot = re.search(r'double3 xformOp:rotateXYZ\s*=\s*\(([^)]+)\)', block)
                 m_trans = re.search(r'double3 xformOp:translate\s*=\s*\(([^)]+)\)', block)
@@ -504,7 +514,8 @@ def main():
             content = f.read()
         mesh_blocks = re.findall(r'def Mesh "([^"]+)"\s*\{([^\}]+)\}', content, re.MULTILINE)
         for name, block in mesh_blocks:
-            part_name = prim_to_part.get(name, "")
+            base_name = re.sub(r'_(feather_blade|feather_tip|armor_plate|hardpoint|armor_piston|beveled_plate|blade_edge|tread_link|wheel|barrel_base|muzzle_brake|subframe_core|subframe_joint)_\d+$', '', name)
+            part_name = prim_to_part.get(base_name, prim_to_part.get(name, ""))
             if part_name == "primary_wing_feathers_left":
                 m_trans = re.search(r'double3 xformOp:translate\s*=\s*\(([^)]+)\)', block)
                 m_scale = re.search(r'double3 xformOp:scale\s*=\s*\(([^)]+)\)', block)
@@ -591,7 +602,12 @@ def main():
     blade_length_angle_delta = float((abs(left_len - 180.0) + abs(right_len - 180.0)) / 2.0 + (abs(abs(left_ang) - 15.0) + abs(abs(right_ang) - 15.0)) / 2.0)
     
     # 8. armor_shell_segmentation_score
-    edge_arr = np.array(render_edge_res)
+    # BUGFIX: spatial per-region crops below use bbox_sil / sil_arr which are at RENDER
+    # resolution (960x700). render_edge_res is upscaled to reference size (1200x1002) and is
+    # correct only for the global cosine edge_similarity above. Using it here indexed the edge
+    # map with mismatched coordinates (right-third density artifact). Use render-resolution
+    # edges so the numerator (edges) and denominator (silhouette) share one coordinate space.
+    edge_arr = np.array(render_edge)
     if bbox_sil:
         min_x_s, min_y_s, max_x_s, max_y_s = bbox_sil
         w_box_s = max_x_s - min_x_s + 1
@@ -692,8 +708,19 @@ def main():
         for err in vis_errors:
             print(f"  {err}")
     
+    # Provenance: BLAKE3 of the four fresh PNGs this scorer just measured.
+    # This is provenance ONLY — it certifies WHICH render bytes produced the
+    # metrics above; it never participates in any metric or threshold.
+    render_hash = {}
+    for _rname in ["render_front.png", "render_silhouette.png",
+                   "render_edges.png", "render_angled.png"]:
+        _rp = os.path.join(renders_dir, _rname)
+        if os.path.exists(_rp):
+            render_hash[_rname] = blake3_file(_rp)
+
     # Save visual_gap_report.json
     gap_report = {
+        "render_hash": render_hash,
         "silhouette_iou": silhouette_iou,
         "edge_similarity": edge_similarity,
         "color_palette_similarity": color_palette_similarity,

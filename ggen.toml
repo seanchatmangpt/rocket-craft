@@ -294,28 +294,84 @@ output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Blade_Right.usd
 
 [[generation.rules]]
 name = "M_WhiteArmor"
-query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?material ?materialLocalName ?materialClass ?color ?colorR ?colorG ?colorB ?roughness ?emissive ?metallic ?coat ?anisotropy ?emissionColorR ?emissionColorG ?emissionColorB ?baseColorTex ?roughnessTex ?metallicTex ?normalTex ?emissiveTex
+WHERE {
+  ?material rdf:type mud:Material ; mud:color ?color ; mud:roughness ?roughness ; mud:emissive ?emissive ; mud:metallic ?metallic .
+  OPTIONAL { ?material mud:materialClass ?materialClass }
+  OPTIONAL { ?material mud:colorR ?colorR } OPTIONAL { ?material mud:colorG ?colorG } OPTIONAL { ?material mud:colorB ?colorB }
+  OPTIONAL { ?material mud:coat ?coat } OPTIONAL { ?material mud:anisotropy ?anisotropy }
+  OPTIONAL { ?material mud:emissionColorR ?emissionColorR } OPTIONAL { ?material mud:emissionColorG ?emissionColorG } OPTIONAL { ?material mud:emissionColorB ?emissionColorB }
+  OPTIONAL { ?material mud:baseColorTex ?baseColorTex } OPTIONAL { ?material mud:roughnessTex ?roughnessTex } OPTIONAL { ?material mud:metallicTex ?metallicTex } OPTIONAL { ?material mud:normalTex ?normalTex } OPTIONAL { ?material mud:emissiveTex ?emissiveTex }
+  BIND(STRAFTER(STR(?material), "#") AS ?materialLocalName)
+  FILTER (?materialLocalName = "M_WhiteArmor")
+}
+""" }
 mode = "Overwrite"
 template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
 output_file = "generated/mech_assets/reference_fabric_001/materialx/M_WhiteArmor.mtlx"
 
 [[generation.rules]]
 name = "M_CyanBlade"
-query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?material ?materialLocalName ?materialClass ?color ?colorR ?colorG ?colorB ?roughness ?emissive ?metallic ?coat ?anisotropy ?emissionColorR ?emissionColorG ?emissionColorB ?baseColorTex ?roughnessTex ?metallicTex ?normalTex ?emissiveTex
+WHERE {
+  ?material rdf:type mud:Material ; mud:color ?color ; mud:roughness ?roughness ; mud:emissive ?emissive ; mud:metallic ?metallic .
+  OPTIONAL { ?material mud:materialClass ?materialClass }
+  OPTIONAL { ?material mud:colorR ?colorR } OPTIONAL { ?material mud:colorG ?colorG } OPTIONAL { ?material mud:colorB ?colorB }
+  OPTIONAL { ?material mud:coat ?coat } OPTIONAL { ?material mud:anisotropy ?anisotropy }
+  OPTIONAL { ?material mud:emissionColorR ?emissionColorR } OPTIONAL { ?material mud:emissionColorG ?emissionColorG } OPTIONAL { ?material mud:emissionColorB ?emissionColorB }
+  OPTIONAL { ?material mud:baseColorTex ?baseColorTex } OPTIONAL { ?material mud:roughnessTex ?roughnessTex } OPTIONAL { ?material mud:metallicTex ?metallicTex } OPTIONAL { ?material mud:normalTex ?normalTex } OPTIONAL { ?material mud:emissiveTex ?emissiveTex }
+  BIND(STRAFTER(STR(?material), "#") AS ?materialLocalName)
+  FILTER (?materialLocalName = "M_CyanBlade")
+}
+""" }
 mode = "Overwrite"
 template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
 output_file = "generated/mech_assets/reference_fabric_001/materialx/M_CyanBlade.mtlx"
 
 [[generation.rules]]
 name = "M_DarkFrame"
-query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?material ?materialLocalName ?materialClass ?color ?colorR ?colorG ?colorB ?roughness ?emissive ?metallic ?coat ?anisotropy ?emissionColorR ?emissionColorG ?emissionColorB ?baseColorTex ?roughnessTex ?metallicTex ?normalTex ?emissiveTex
+WHERE {
+  ?material rdf:type mud:Material ; mud:color ?color ; mud:roughness ?roughness ; mud:emissive ?emissive ; mud:metallic ?metallic .
+  OPTIONAL { ?material mud:materialClass ?materialClass }
+  OPTIONAL { ?material mud:colorR ?colorR } OPTIONAL { ?material mud:colorG ?colorG } OPTIONAL { ?material mud:colorB ?colorB }
+  OPTIONAL { ?material mud:coat ?coat } OPTIONAL { ?material mud:anisotropy ?anisotropy }
+  OPTIONAL { ?material mud:emissionColorR ?emissionColorR } OPTIONAL { ?material mud:emissionColorG ?emissionColorG } OPTIONAL { ?material mud:emissionColorB ?emissionColorB }
+  OPTIONAL { ?material mud:baseColorTex ?baseColorTex } OPTIONAL { ?material mud:roughnessTex ?roughnessTex } OPTIONAL { ?material mud:metallicTex ?metallicTex } OPTIONAL { ?material mud:normalTex ?normalTex } OPTIONAL { ?material mud:emissiveTex ?emissiveTex }
+  BIND(STRAFTER(STR(?material), "#") AS ?materialLocalName)
+  FILTER (?materialLocalName = "M_DarkFrame")
+}
+""" }
 mode = "Overwrite"
 template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
 output_file = "generated/mech_assets/reference_fabric_001/materialx/M_DarkFrame.mtlx"
 
 [[generation.rules]]
 name = "M_GoldVisor"
-query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?material ?materialLocalName ?materialClass ?color ?colorR ?colorG ?colorB ?roughness ?emissive ?metallic ?coat ?anisotropy ?emissionColorR ?emissionColorG ?emissionColorB ?baseColorTex ?roughnessTex ?metallicTex ?normalTex ?emissiveTex
+WHERE {
+  ?material rdf:type mud:Material ; mud:color ?color ; mud:roughness ?roughness ; mud:emissive ?emissive ; mud:metallic ?metallic .
+  OPTIONAL { ?material mud:materialClass ?materialClass }
+  OPTIONAL { ?material mud:colorR ?colorR } OPTIONAL { ?material mud:colorG ?colorG } OPTIONAL { ?material mud:colorB ?colorB }
+  OPTIONAL { ?material mud:coat ?coat } OPTIONAL { ?material mud:anisotropy ?anisotropy }
+  OPTIONAL { ?material mud:emissionColorR ?emissionColorR } OPTIONAL { ?material mud:emissionColorG ?emissionColorG } OPTIONAL { ?material mud:emissionColorB ?emissionColorB }
+  OPTIONAL { ?material mud:baseColorTex ?baseColorTex } OPTIONAL { ?material mud:roughnessTex ?roughnessTex } OPTIONAL { ?material mud:metallicTex ?metallicTex } OPTIONAL { ?material mud:normalTex ?normalTex } OPTIONAL { ?material mud:emissiveTex ?emissiveTex }
+  BIND(STRAFTER(STR(?material), "#") AS ?materialLocalName)
+  FILTER (?materialLocalName = "M_GoldVisor")
+}
+""" }
 mode = "Overwrite"
 template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
 output_file = "generated/mech_assets/reference_fabric_001/materialx/M_GoldVisor.mtlx"
@@ -333,7 +389,6 @@ query = { file = "generated/mech_assets/reference_fabric_001/queries/verifier_ex
 mode = "Overwrite"
 template = { file = "generated/mech_assets/reference_fabric_001/templates/visual_gap_report.md.tera" }
 output_file = "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.md"
-
 
 [[generation.rules]]
 name = "SM_Limb_Left"
@@ -362,6 +417,7 @@ WHERE {
   BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
   BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
   BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
 }
 ORDER BY ?prim
 ''' }
@@ -396,6 +452,7 @@ WHERE {
   BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
   BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
   BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
 }
 ORDER BY ?prim
 ''' }
@@ -430,9 +487,115 @@ WHERE {
   BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
   BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
   BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
 }
 ORDER BY ?prim
 ''' }
 mode = "Overwrite"
 template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
 output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Loadout.usda"
+
+[[generation.rules]]
+name = "SM_TankTreads"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:tank_treads) (mud:tread_left) (mud:tread_right)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_TankTreads.usda"
+
+[[generation.rules]]
+name = "SM_InterleavedWheels"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:interleaved_wheels) (mud:wheels_left) (mud:wheels_right)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_InterleavedWheels.usda"
+
+[[generation.rules]]
+name = "SM_KwK36Gun"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:kwk36_gun) (mud:main_gun_88mm)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_KwK36Gun.usda"

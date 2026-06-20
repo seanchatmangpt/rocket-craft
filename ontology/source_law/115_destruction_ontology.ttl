@@ -1,0 +1,109 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+# =========================================================
+# Destruction Ontology
+# =========================================================
+
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix ds: <https://ggen.io/ontology/destruction/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+ds:DestructionOntology a owl:Ontology ;
+    rdfs:label "Destruction States Ontology" ;
+    rdfs:comment "Combinatorial Destruction States: armor break states, exposed frame states, damaged material states, detached panel declarations, damage-zone transitions, VFX socket bindings." ;
+    owl:imports <https://ggen.io/ontology/core/> .
+# --- BASE DESTRUCTION STATE ---
+ds:DestructionState a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Destruction State" ;
+    rdfs:comment "A branchless typestate defining deterministic destruction geometry and VFX triggers." .
+# --- 1. ARMOR BREAK STATES ---
+ds:ArmorBreakState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Armor Break State" ;
+    rdfs:comment "Admitted topology for fractured or completely broken armor plates." ;
+    core:compilesToZST true .
+# --- 2. EXPOSED FRAME STATES ---
+ds:ExposedFrameState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Exposed Frame State" ;
+    rdfs:comment "Admitted topology indicating the mechanical frame is exposed due to destroyed armor." ;
+    core:compilesToZST true .
+# --- 3. DAMAGED MATERIAL STATES ---
+ds:DamagedMaterialState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Damaged Material State" ;
+    rdfs:comment "Admitted material shader typestate switching, e.g., scorched or ablated surfaces." ;
+    core:compilesToZST true .
+# --- 4. DETACHED PANEL DECLARATIONS ---
+ds:DetachedPanelDeclaration a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Detached Panel Declaration" ;
+    rdfs:comment "Authority declaration that a panel has fully detached from its socket." ;
+    core:compilesToZST true .
+# --- 5. DAMAGE-ZONE TRANSITIONS ---
+ds:DamageZoneTransition a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Damage Zone Transition" ;
+    rdfs:comment "Branchless transition boundary between varying states of structural integrity." ;
+    core:compilesToZST true .
+# --- 6. VFX SOCKET BINDINGS ---
+ds:VFXSocketBinding a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "VFX Socket Binding" ;
+    rdfs:comment "Deterministic binding point for peer-projection VFX (e.g., spark emitters, smoke)." ;
+    core:compilesToZST true .
+# --- 7. SEMANTIC LOD MAPPINGS ---
+# Map the new high-poly USD files (1.8MB) back to the byte-class compact network payloads.
+mud:hasNetworkPayload a owl:ObjectProperty ;
+    rdfs:label "has Network Payload" ;
+    rdfs:comment "Maps a visual asset or part to its authoritative byte-class network payload." .
+mud:ue4TargetSurface a owl:DatatypeProperty ;
+    rdfs:label "UE4 Target Surface" ;
+    rdfs:comment "The target USD or UE4 surface for the part." .
+mud:torso_core 
+    mud:ue4TargetSurface "SM_Torso.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass, mud:StressClass, mud:FatigueClass ;
+    mud:lodClass "CROWN" .
+mud:head_unit 
+    mud:ue4TargetSurface "SM_Head.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass ;
+    mud:lodClass "CROWN" .
+mud:arm_left 
+    mud:ue4TargetSurface "SM_Limb_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+mud:arm_right 
+    mud:ue4TargetSurface "SM_Limb_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+mud:leg_left 
+    mud:ue4TargetSurface "SM_Limb_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+mud:leg_right 
+    mud:ue4TargetSurface "SM_Limb_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+mud:wing_root_left 
+    mud:ue4TargetSurface "SM_WingArray_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass ;
+    mud:lodClass "SECONDARY" .
+mud:wing_root_right 
+    mud:ue4TargetSurface "SM_WingArray_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass ;
+    mud:lodClass "SECONDARY" .
+mud:blade_left 
+    mud:ue4TargetSurface "SM_Blade_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:FatigueClass ;
+    mud:lodClass "PRIMARY" .
+mud:blade_right 
+    mud:ue4TargetSurface "SM_Blade_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:FatigueClass ;
+    mud:lodClass "PRIMARY" .
+mud:backpack_core 
+    mud:ue4TargetSurface "SM_Loadout.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass, mud:FatigueClass ;
+    mud:lodClass "SECONDARY" .
