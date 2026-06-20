@@ -11,6 +11,7 @@
 # Usage:
 #   ./scripts/full-stack-e2e.sh                 # full run (headless-loop + real UE4)
 #   SKIP_UE4=1 ./scripts/full-stack-e2e.sh      # skip the heavy real-UE4 Playwright step
+#   HEADLESS=1 ./scripts/full-stack-e2e.sh      # real-UE4 headless (SwiftShader, no GPU window)
 #   KEEP_UP=1  ./scripts/full-stack-e2e.sh      # leave the stack running after tests
 #   ARCHIVE=/path/to/HTML5 ./scripts/full-stack-e2e.sh   # custom cooked-wasm dir
 #
@@ -153,9 +154,16 @@ if [[ "${SKIP_UE4:-0}" != "1" && -f "$ARCHIVE/cook-receipt.json" ]]; then
 fi
 
 # ── 8. Real-UE4 Playwright (WebGL2, genuine EngineReady) ──────────────────────
+# HEADLESS=1 (or CI) → SwiftShader software WebGL2, no GPU window (truly zero
+# interaction). Default → headed Metal GPU (sharper, for local visual inspection).
 if [[ "${SKIP_UE4:-0}" != "1" ]]; then
-  log "running real-UE4 Playwright proof..."
-  ( cd "$ROOT" && npx playwright test --config=playwright.ue4.config.ts )
+  if [[ "${HEADLESS:-0}" == "1" || "${CI:-}" == "true" ]]; then
+    log "running real-UE4 Playwright proof (HEADLESS / SwiftShader)..."
+    ( cd "$ROOT" && npx playwright test --config=playwright.ue4.ci.config.ts )
+  else
+    log "running real-UE4 Playwright proof (headed GPU; set HEADLESS=1 for no-window)..."
+    ( cd "$ROOT" && npx playwright test --config=playwright.ue4.config.ts )
+  fi
 else
   log "real-UE4 stage skipped"
 fi
