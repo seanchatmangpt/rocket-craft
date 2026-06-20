@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
       supabase.rpc('verify_event_chain', { p_session_id: receipt.session_id }),
       supabase
         .from('ocel_events')
-        .select('ts_ms, activity')
+        .select('timestamp_ms, activity')
         .eq('session_id', receipt.session_id)
         .order('seq', { ascending: true }),
     ])
@@ -60,10 +60,10 @@ export default defineEventHandler(async (event) => {
     const events = eventsResult.data ?? []
     ocelEventCount = events.length
     if (events.length) {
-      const first = events[0] as { ts_ms: number }
-      const last = events[events.length - 1] as { ts_ms: number }
-      firstEventAt = new Date(first.ts_ms).toISOString()
-      lastEventAt = new Date(last.ts_ms).toISOString()
+      const first = events[0] as { timestamp_ms: number }
+      const last = events[events.length - 1] as { timestamp_ms: number }
+      firstEventAt = new Date(first.timestamp_ms).toISOString()
+      lastEventAt = new Date(last.timestamp_ms).toISOString()
     }
   }
 

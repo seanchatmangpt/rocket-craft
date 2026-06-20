@@ -31,10 +31,28 @@ create table if not exists signing_keys (
   created_at           timestamptz not null default now(),
   rotated_at           timestamptz,           -- when this key was superseded
   revoked_at           timestamptz,           -- when this key was revoked
-  expires_at           timestamptz generated always as
-                         (created_at + (rotation_interval_days || ' days')::interval) stored,
+  -- Populated by trigger (below): a generated column can't be used because
+  -- timestamptz + interval is STABLE (timezone-dependent), not IMMUTABLE.
+  expires_at           timestamptz,
   notes                text
 );
+
+-- Compute expires_at from created_at + rotation_interval_days on insert/update.
+create or replace function signing_keys_set_expires_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.expires_at := new.created_at + make_interval(days => new.rotation_interval_days);
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_signing_keys_expires_at on signing_keys;
+create trigger trg_signing_keys_expires_at
+  before insert or update of created_at, rotation_interval_days on signing_keys
+  for each row
+  execute function signing_keys_set_expires_at();
 
 comment on table signing_keys is
   'Ed25519 key lifecycle for receipt signing. Private key in ROCKET_SIGNING_KEY env only.';

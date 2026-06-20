@@ -51,7 +51,7 @@ BEGIN
         ON game_sessions
         FOR SELECT
         TO authenticated
-        USING (player_id = auth.uid()::text)
+        USING (player_id = auth.uid())
     $policy$;
   END IF;
 END;

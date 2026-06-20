@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
 
   let q = supabase
     .from('ocel_events')
-    .select('session_id, activity, seq, ts_ms')
+    .select('session_id, activity, seq, timestamp_ms')
     .order('session_id', { ascending: true })
     .order('seq', { ascending: true })
     .limit(limit)

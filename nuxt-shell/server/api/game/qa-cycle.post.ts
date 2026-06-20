@@ -74,7 +74,10 @@ export default defineEventHandler(async (event) => {
       .single(),
   ]);
 
-  const chainOk: boolean | null = chainRes.data?.ok ?? null;
+  // verify_event_chain RETURNS TABLE(...) — an array of rows, not a scalar object.
+  // Chain is OK when every row reports ok=true; null when no events exist.
+  const chainRows = (chainRes.data ?? []) as Array<{ ok: boolean }>;
+  const chainOk: boolean | null = chainRows.length > 0 ? chainRows.every(r => r.ok === true) : null;
   const eventRows = (eventsRes.data ?? []) as Array<{
     activity: string;
     event_hash: string;

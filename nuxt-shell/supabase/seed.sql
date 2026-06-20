@@ -16,7 +16,7 @@ INSERT INTO game_sessions (
   '00000000-0000-0000-0000-000000000001',
   now() - interval '1 hour',
   now() - interval '55 minutes',
-  false, 7, 'synthetic', 'seed-receipt-hash'
+  false, 7, 'unknown', 'seed-receipt-hash'
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Seed a PASS receipt (will fire the trigger to populate leaderboard)
@@ -31,7 +31,7 @@ INSERT INTO game_receipts (
   'SeedSession',
   7,
   ARRAY['GameSessionStarted', 'FrameRendered', 'InputAdmitted'],
-  'synthetic',
+  'unknown',
   'seed-receipt-hash',
   now() - interval '55 minutes',
   '{"note": "seed data for local dev"}'::jsonb

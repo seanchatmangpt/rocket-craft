@@ -15,11 +15,15 @@ import { computeMerkleRoot } from '../../utils/merkle';
 import { checkConformance } from '../../utils/processMining';
 import { getCachedConformance, cacheConformance } from '../../utils/conformanceCache';
 
+// Lawful lifecycle — must match session-seed's LAWFUL_LIFECYCLE, game.vue's
+// PROVEN_LIFECYCLE, and qaCycle's REQUIRED_ACTIVITIES. The previous order
+// (InputAdmitted before FrameRendered) plus a never-emitted GameSessionClosed
+// forced precision to 0, collapsing the geometric-mean overall_score to 0 for
+// every lawful session.
 const DECLARED_LIFECYCLE = [
   'GameSessionStarted',
-  'InputAdmitted',
   'FrameRendered',
-  'GameSessionClosed',
+  'InputAdmitted',
 ];
 
 export default defineEventHandler(async (event) => {

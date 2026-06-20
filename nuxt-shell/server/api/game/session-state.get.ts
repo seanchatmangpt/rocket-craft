@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
   // Fetch session row + receipt summary + OCEL event count in parallel
   const [sessionRes, receiptRes, eventCountRes] = await Promise.all([
     sb.from('game_sessions')
-      .select('id, is_alive, session_ended_at, receipt_hash, created_at')
+      .select('id, is_alive, session_ended_at, receipt_hash, session_started_at')
       .eq('id', sessionId)
       .single(),
     sb.from('game_receipts')
@@ -81,7 +81,7 @@ export default defineEventHandler(async (event) => {
     is_alive: boolean;
     session_ended_at: string | null;
     receipt_hash: string | null;
-    created_at: string;
+    session_started_at: string;
   };
 
   const state = deriveSessionState({

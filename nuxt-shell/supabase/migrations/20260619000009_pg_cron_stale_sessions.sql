@@ -19,8 +19,10 @@ BEGIN
 END;
 $$;
 
--- Schedule cleanup every 5 minutes (only if pg_cron is installed)
-DO $$
+-- Schedule cleanup every 5 minutes (only if pg_cron is installed).
+-- Outer block uses a distinct $do$ tag so the inner $$ dollar-quoted command
+-- string ($$SELECT close_stale_sessions()$$) does not prematurely terminate it.
+DO $do$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron') THEN
     -- Remove any existing job with this name before re-creating (idempotent)
@@ -30,18 +32,19 @@ BEGIN
     PERFORM cron.schedule(
       'rocket-stale-sessions',
       '*/5 * * * *',
-      $$SELECT close_stale_sessions()$$
+      $job$SELECT close_stale_sessions()$job$
     );
     RAISE NOTICE 'pg_cron job rocket-stale-sessions scheduled (every 5 min)';
   END IF;
 END;
-$$;
+$do$;
 
 -- View: show which sessions cron has closed (for observability)
 CREATE OR REPLACE VIEW pg_cron_session_audit AS
 SELECT
   gs.id,
-  gs.project_name,
+  -- project_name lives in the free-form metadata JSONB, not a dedicated column
+  gs.metadata->>'project_name' AS project_name,
   gs.session_started_at,
   gs.session_ended_at,
   gs.is_alive,

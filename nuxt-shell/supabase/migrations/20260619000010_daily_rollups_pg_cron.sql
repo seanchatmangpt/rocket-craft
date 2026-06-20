@@ -19,6 +19,12 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_session_stats_daily_date
   ON session_stats_daily (session_date DESC);
 
 -- ── Materialized view: daily receipt stats ─────────────────────────────────
+-- Migration 000004 created receipt_stats_daily as a regular VIEW. A regular view
+-- cannot be indexed, so CREATE MATERIALIZED VIEW IF NOT EXISTS silently skipped
+-- and the unique-index creation below failed. Drop the regular view first so the
+-- materialized version (which IS indexable + refreshable by pg_cron) is created.
+-- Nothing queries the regular view directly (dashboard-stats reads game_receipts).
+DROP VIEW IF EXISTS receipt_stats_daily CASCADE;
 CREATE MATERIALIZED VIEW IF NOT EXISTS receipt_stats_daily AS
 SELECT
   date_trunc('day', proven_at) AS receipt_date,

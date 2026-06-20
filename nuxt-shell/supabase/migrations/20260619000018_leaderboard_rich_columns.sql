@@ -45,7 +45,8 @@ BEGIN
 
   -- Resolve player_id from session (may be NULL for CLI cook receipts)
   IF NEW.session_id IS NOT NULL THEN
-    SELECT gs.player_id, p.display_name
+    -- players has `username` (no display_name column) — use it as the display name.
+    SELECT gs.player_id, p.username
       INTO v_player_id, v_display_name
       FROM game_sessions gs
       LEFT JOIN players p ON p.id = gs.player_id

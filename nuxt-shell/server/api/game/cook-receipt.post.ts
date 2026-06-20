@@ -150,9 +150,13 @@ export default defineEventHandler(async (event) => {
   // ── Chain verify (if session_id provided) ──────────────────────────────────
   let chainVerified = false
   if (session_id) {
-    const { data: chainResult } = await supabase
+    // verify_event_chain RETURNS TABLE(ok, message, broken_at, session_id) — an
+    // array of rows, not a scalar boolean. The chain is verified when every row
+    // reports ok=true (and at least one row exists).
+    const { data: chainRows } = await supabase
       .rpc('verify_event_chain', { p_session_id: session_id })
-    chainVerified = chainResult === true
+    const rows = (chainRows ?? []) as Array<{ ok: boolean }>
+    chainVerified = rows.length > 0 && rows.every(r => r.ok === true)
   }
 
   // ── receipt.emit OTel span (truex LIVE-13 pattern) ────────────────────────
