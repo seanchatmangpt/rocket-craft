@@ -16,9 +16,11 @@ fn do_lock() -> Result<Value> {
 fn do_clean() -> Result<Value> {
     use std::fs;
     use walkdir::WalkDir;
+    let root = std::env::current_dir()
+        .map_err(|e| clap_noun_verb::NounVerbError::execution_error(format!("{e}")))?;
     tracing::info!("{}", "=== Cleaning Workspace ===");
     let targets = ["Binaries", "Intermediate", "Saved"];
-    for entry in WalkDir::new("versions")
+    for entry in WalkDir::new(root.join("versions"))
         .into_iter()
         .filter_map(|e| e.ok())
         .filter(|e| {
@@ -133,10 +135,7 @@ fn do_list(json: bool) -> Result<Value> {
         ("unify-rs", "unify-rs"),
         ("infinity-blade-4/mud", "infinity-blade-4/mud"),
         ("chicago-tdd-tools", "chicago-tdd-tools"),
-        (
-            "asset-pipeline",
-            ".claude/worktrees/agent-a63d171fb05007da1/asset-pipeline",
-        ),
+        ("asset-pipeline", "asset-pipeline"),
     ];
 
     let workspaces: Vec<WorkspaceInfo> = definitions
@@ -239,10 +238,7 @@ fn do_check(json: bool) -> Result<Value> {
         ("unify-rs", "unify-rs"),
         ("infinity-blade-4/mud", "infinity-blade-4/mud"),
         ("chicago-tdd-tools", "chicago-tdd-tools"),
-        (
-            "asset-pipeline",
-            ".claude/worktrees/agent-a63d171fb05007da1/asset-pipeline",
-        ),
+        ("asset-pipeline", "asset-pipeline"),
     ];
 
     // Filter to only workspaces that exist on disk.

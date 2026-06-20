@@ -305,7 +305,7 @@ fn lint_pwa(path: &PathBuf, fix: bool) -> Result<LintResult, LintError> {
     let output = if fix {
         Command::new("npx")
             .current_dir(path)
-            .args(["eslint", "--fix", "src/"])
+            .args(["eslint", "--fix", "."])
             .output()
             .map_err(|e| LintError::SpawnFailed {
                 workspace: PWA_NAME.to_string(),

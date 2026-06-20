@@ -2,10 +2,7 @@
 
 use clap_noun_verb::Result;
 use clap_noun_verb_macros::verb;
-use rocket_sdk::doctor::{
-    CheckCategory, print_check, print_health_score, print_json_report, print_section,
-    RocketDoctor,
-};
+use rocket_sdk::doctor::{print_json_report, render_diagnostics, RocketDoctor};
 use serde_json::Value;
 
 fn do_doctor_check(fix: bool, json: bool) -> Result<Value> {
@@ -23,50 +20,13 @@ fn do_doctor_check(fix: bool, json: bool) -> Result<Value> {
     if json {
         print_json_report(&report);
     } else {
-        // -- Required section
-        print_section("Required");
-        for check in report
-            .checks
-            .iter()
-            .filter(|c| c.category == Some(CheckCategory::Required))
-        {
-            print_check(check);
-        }
-
-        // -- Optional section
-        print_section("Optional");
-        for check in report
-            .checks
-            .iter()
-            .filter(|c| c.category == Some(CheckCategory::Optional))
-        {
-            print_check(check);
-        }
-
-        // Ungrouped checks (no category assigned)
-        let ungrouped: Vec<_> = report
-            .checks
-            .iter()
-            .filter(|c| c.category.is_none())
-            .collect();
-        if !ungrouped.is_empty() {
-            print_section("Other");
-            for check in &ungrouped {
-                print_check(check);
-            }
-        }
-
-        print_health_score(&report);
+        render_diagnostics(&report);
     }
 
-    let pass = report.required_pass_count();
-    let total = report.required_total();
-    let all_pass = report.all_required_pass();
-
     Ok(serde_json::json!({
-        "overall": if all_pass { "PASS" } else { "FAIL" },
-        "required_pass": pass,
-        "required_total": total,
+        "overall": if report.all_required_pass() { "PASS" } else { "FAIL" },
+        "required_pass": report.required_pass_count(),
+        "required_total": report.required_total(),
         "timestamp": report.timestamp.to_rfc3339(),
     }))
 }

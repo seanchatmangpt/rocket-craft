@@ -179,6 +179,29 @@ pub fn print_health_score(report: &DiagnosticReport) {
     println!("\n{score_colored}  {bar_str}  {pct_str}");
 }
 
+/// Render a full human-readable diagnostics report to stdout (Required / Optional / Other sections + health score).
+pub fn render_diagnostics(report: &DiagnosticReport) {
+    print_section("Required");
+    for check in report.checks.iter().filter(|c| c.category == Some(CheckCategory::Required)) {
+        print_check(check);
+    }
+
+    print_section("Optional");
+    for check in report.checks.iter().filter(|c| c.category == Some(CheckCategory::Optional)) {
+        print_check(check);
+    }
+
+    let ungrouped: Vec<_> = report.checks.iter().filter(|c| c.category.is_none()).collect();
+    if !ungrouped.is_empty() {
+        print_section("Other");
+        for check in &ungrouped {
+            print_check(check);
+        }
+    }
+
+    print_health_score(report);
+}
+
 /// Emit a structured JSON report to stdout.
 pub fn print_json_report(report: &DiagnosticReport) {
     let checks: Vec<serde_json::Value> = report

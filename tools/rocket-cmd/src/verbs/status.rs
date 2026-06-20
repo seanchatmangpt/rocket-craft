@@ -49,7 +49,7 @@ fn do_status(quiet: bool, json: bool) -> Result<Value> {
 /// # Arguments
 /// * `quiet` - Only print failing or warning checks (suppress passing ones)
 /// * `json`  - Output machine-readable JSON instead of coloured text
-#[verb("status", "workspace")]
-fn status_workspace(quiet: bool, json: bool) -> Result<Value> {
+#[verb("show", "workspace")]
+fn show_workspace(quiet: bool, json: bool) -> Result<Value> {
     do_status(quiet, json)
 }
