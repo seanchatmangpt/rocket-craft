@@ -340,10 +340,46 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
           : v
       );
     }
+    // ── FULL independent re-verification (the offline-proof guarantee) ──────────
+    // Recompute ALL THREE nested hashes from the pack's own payload sections.
     const recomputedOcelHash = hexOf(canonical(body.ocel));
-    expect(recomputedOcelHash).toBe(body.manifest.ocel_hash);
+    expect(recomputedOcelHash, 'ocel_hash').toBe(body.manifest.ocel_hash);
 
-    console.log(`[headless-loop] evidence-pack v2: pack_hash=${body.pack_hash?.slice(0, 8)}… ocel_hash=${body.manifest.ocel_hash?.slice(0, 8)}… chain_proof_hash=${body.manifest.chain_proof_hash?.slice(0, 8)}…`);
+    // chain_proof_hash binds the chain events array (server hashes chainEvents).
+    const recomputedChainHash = hexOf(canonical(body.chain_proof.events));
+    expect(recomputedChainHash, 'chain_proof_hash').toBe(body.manifest.chain_proof_hash);
+
+    if (body.receipt !== null) {
+      const recomputedReceiptHash = hexOf(canonical(body.receipt));
+      expect(recomputedReceiptHash, 'receipt_content_hash').toBe(body.manifest.receipt_content_hash);
+    }
+
+    // Reconstruct the pack payload exactly as the server does and recompute pack_hash —
+    // proves pack_hash actually BINDS the three section hashes (independently checkable).
+    const packPayload = {
+      session_id: body.session_id,
+      ocel_hash: body.manifest.ocel_hash,
+      chain_proof_hash: body.manifest.chain_proof_hash,
+      receipt_content_hash: body.manifest.receipt_content_hash,
+      ocel_event_count: body.manifest.total_events,
+      chain_intact: body.manifest.chain_intact,
+      chain_tip: body.manifest.chain_tip,
+      merkle_root: body.manifest.merkle_root,
+    };
+    expect(hexOf(canonical(packPayload)), 'pack_hash binds the manifest').toBe(body.pack_hash);
+
+    // ── TAMPER DETECTION (the whole point of the pack) ─────────────────────────
+    // Mutate a payload field → its section hash must change → no longer matches manifest.
+    const tamperedOcel = JSON.parse(JSON.stringify(body.ocel));
+    if (Array.isArray(tamperedOcel.events) && tamperedOcel.events.length) {
+      tamperedOcel.events[0].type = 'TAMPERED_ACTIVITY';
+      expect(hexOf(canonical(tamperedOcel)), 'tampered ocel must NOT match').not.toBe(body.manifest.ocel_hash);
+    }
+    // Mutate a manifest section hash → reconstructed pack_hash must change.
+    const tamperedPack = { ...packPayload, ocel_hash: 'deadbeef'.repeat(8) };
+    expect(hexOf(canonical(tamperedPack)), 'tampered manifest must NOT match pack_hash').not.toBe(body.pack_hash);
+
+    console.log(`[headless-loop] evidence-pack v2: pack_hash=${body.pack_hash?.slice(0, 8)}… re-verified all 3 nested hashes + pack binding + tamper detection`);
   });
 
   it('Step 11b: session-state endpoint returns Proven state after receipt-finalize', async () => {
