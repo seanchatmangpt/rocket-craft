@@ -95,7 +95,8 @@ fi
 
 # ── 5. Nuxt dev server ────────────────────────────────────────────────────────
 log "starting Nuxt dev on :$NUXT_PORT..."
-( cd "$ROOT" && npx nuxt dev --port "$NUXT_PORT" >/tmp/nuxt-dev.log 2>&1 ) &
+# ROCKET_CRAFT_ROOT lets /api/game/cook-trigger find ./rocket (dev cwd is nuxt-shell).
+( cd "$ROOT" && ROCKET_CRAFT_ROOT="$REPO_ROOT" npx nuxt dev --port "$NUXT_PORT" >/tmp/nuxt-dev.log 2>&1 ) &
 NUXT_PID=$!
 wait_for "$API_BASE_URL/api/game/leaderboard" "Nuxt" 40 || { tail -20 /tmp/nuxt-dev.log; exit 1; }
 

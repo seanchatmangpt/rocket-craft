@@ -452,11 +452,23 @@ describe('cook-trigger contract (MOCK-safe)', () => {
   it('cook-trigger response shape: job_id, status, project, poll', async () => {
     if (MOCK) return;
     const { status, body } = await post('/api/game/cook-trigger', { project: 'Brm' });
-    if (status !== 200) return; // 403/409 are acceptable
+    if (status !== 200) return; // 403/409/503 are acceptable
     expect(typeof body.job_id).toBe('string');
-    expect(body.status).toBe('queued');
+    // Honest status: the child actually started → 'running' (was a hardcoded 'queued').
+    expect(['queued', 'running']).toContain(body.status);
     expect(body.project).toBe('Brm');
     expect(body.poll).toContain('/api/game/cook-status');
+  });
+
+  it('cook-trigger fails HONESTLY (503) when the rocket CLI is missing — not a false 200', async () => {
+    if (MOCK) return;
+    // When ROCKET_CRAFT_ROOT/ROCKET_CLI_PATH is misconfigured (dev server cwd is
+    // nuxt-shell, so ./rocket is absent), the endpoint must reject with a clear
+    // 503 rather than returning 200 'running' for a cook that can never start.
+    const { status, body } = await post('/api/game/cook-trigger', { project: 'Brm' });
+    if (status === 200 || status === 403 || status === 409) return; // CLI present / guarded / busy
+    expect(status).toBe(503);
+    expect(String(body.message ?? body.statusMessage ?? '')).toMatch(/rocket CLI not found|ROCKET_CLI_PATH|ROCKET_CRAFT_ROOT/);
   });
 });
 

@@ -21,6 +21,7 @@
 import { spawn } from 'node:child_process'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
+import { existsSync } from 'node:fs'
 
 interface CookJob {
   job_id: string
@@ -30,6 +31,7 @@ interface CookJob {
   triggered_at: string
   pid?: number
   exit_code?: number
+  error?: string
 }
 
 // In-process job registry (resets on server restart — use Supabase for persistence)
@@ -60,6 +62,19 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Resolve + validate the CLI BEFORE claiming the job started. spawn() of a
+  // missing binary does NOT throw synchronously — it emits an async 'error'
+  // event. Without this pre-check the endpoint returned 200 'running' for a cook
+  // that never ran (the caller would poll cook-status forever).
+  const repoRoot = process.env.ROCKET_CRAFT_ROOT ?? process.cwd()
+  const rocketCli = process.env.ROCKET_CLI_PATH ?? join(repoRoot, 'rocket')
+  if (!existsSync(rocketCli)) {
+    throw createError({
+      statusCode: 503,
+      message: `rocket CLI not found at ${rocketCli} (set ROCKET_CLI_PATH / ROCKET_CRAFT_ROOT)`,
+    })
+  }
+
   const job_id = randomUUID()
   const triggered_at = new Date().toISOString()
 
@@ -73,9 +88,6 @@ export default defineEventHandler(async (event) => {
   activeJobs.set(job_id, job)
 
   // Spawn cook pipeline async (do not await)
-  const repoRoot = process.env.ROCKET_CRAFT_ROOT ?? process.cwd()
-  const rocketCli = process.env.ROCKET_CLI_PATH ?? join(repoRoot, 'rocket')
-
   const cookProcess = spawn(
     rocketCli,
     ['html5', 'pipeline', '--project', project],
@@ -87,7 +99,21 @@ export default defineEventHandler(async (event) => {
     },
   )
 
+  // Async spawn failure (ENOENT, EACCES, etc.) — mark the job failed instead of
+  // leaving it 'running' forever. Unhandled, this event can also crash Nitro.
+  cookProcess.on('error', (err) => {
+    job.status = 'failed'
+    job.exit_code = -1
+    job.error = err.message
+  })
+
   job.pid = cookProcess.pid
+  // pid is undefined when the spawn could not be initiated at all → fail fast.
+  if (!cookProcess.pid) {
+    job.status = 'failed'
+    activeJobs.delete(job_id)
+    throw createError({ statusCode: 500, message: `failed to spawn cook process for ${project} (no pid)` })
+  }
   job.status = 'running'
 
   // Collect stdout/stderr to COOK_LOG_DIR
@@ -112,7 +138,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     job_id,
-    status: 'queued' as const,
+    status: job.status,
     project,
     target,
     pid: cookProcess.pid,
