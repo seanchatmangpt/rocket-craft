@@ -363,6 +363,24 @@ jobs:
           echo "SUPABASE_ANON_KEY=$ANON_KEY" >> $GITHUB_ENV
           echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_KEY" >> $GITHUB_ENV
 
+      - name: Generate Ed25519 signing key + register active (exercises signed evidence-pack)
+        run: |
+          node --input-type=module -e "
+            import * as ed from '@noble/ed25519';
+            const b64 = u => Buffer.from(u).toString('base64');
+            const priv = ed.utils.randomPrivateKey();
+            const pub = await ed.getPublicKeyAsync(priv);
+            process.stdout.write(b64(priv)+'\n'+b64(pub)+'\n');
+          " > /tmp/kp.txt
+          PRIV=$(sed -n 1p /tmp/kp.txt); PUB=$(sed -n 2p /tmp/kp.txt)
+          # Register the public key as the active signing key so signing_key_id resolves.
+          curl -s -X POST "http://localhost:54321/rest/v1/signing_keys" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d "{\"public_key_b64\":\"$PUB\",\"status\":\"active\"}"
+          echo "ROCKET_SIGNING_KEY=$PRIV" >> $GITHUB_ENV
+          echo "ROCKET_SIGNING_PUBKEY=$PUB" >> $GITHUB_ENV
+
       - name: Start Nitro dev server (background)
         run: |
           npx nuxt dev --port 3000 &
@@ -373,6 +391,10 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
           ALLOW_SESSION_SEED: "1"
           ALLOW_ANON_GAME: "1"
+          # With these set, evidence-pack signs pack_hash → headless Step 11 verifies
+          # the signed path (not just graceful-null).
+          ROCKET_SIGNING_KEY: ${{ env.ROCKET_SIGNING_KEY }}
+          ROCKET_SIGNING_PUBKEY: ${{ env.ROCKET_SIGNING_PUBKEY }}
           NODE_ENV: development
 
       - name: Run headless gameplay loop (all steps, MOCK_API=0)
