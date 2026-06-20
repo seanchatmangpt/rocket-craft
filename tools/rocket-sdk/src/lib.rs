@@ -11,6 +11,10 @@ pub mod completions;
 pub mod wizard;
 pub mod cache;
 pub mod watch;
+pub mod access_control;
+pub mod audit_log;
+pub mod secret_scan;
+pub mod sbom;
 
 use std::path::{Path, PathBuf};
 use anyhow::Result;
