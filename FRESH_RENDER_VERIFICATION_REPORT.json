@@ -1,0 +1,91 @@
+{
+  "workstream": "R4",
+  "verdict": "FRESH_VERIFIED",
+  "timestamp_run1": "2026-06-20T22:41:31Z",
+  "timestamp_run2": "2026-06-20T22:41:34Z",
+  "stale_baseline": {
+    "render_mtime": "2026-06-20T22:41:18Z",
+    "render_hash": {
+      "render_front.png": "8ebe5bcc18c78428ef5a5e4a33403b095f1b961aa5fd309a3df32b2a01376569",
+      "render_silhouette.png": "e32888a9e13fb9ce7ec69d2b47985d983ff337bfe8d6a2fcf336d4fc0f56805b",
+      "render_edges.png": "4be340c4b18731e575e73f86af2f08fd6d02b1796ff6ff1ca748ebd97ead354d",
+      "render_angled.png": "fb0489e9a6326c596c4a6188eccedf29eca66e561322e04007894616b0bf89c6"
+    }
+  },
+  "render_blake3": {
+    "run1": {
+      "render_front.png": "8ebe5bcc18c78428ef5a5e4a33403b095f1b961aa5fd309a3df32b2a01376569",
+      "render_silhouette.png": "cfcd62528994b87ba93cd4a781e85e1b1adf26e597146b44fb43043686520e16",
+      "render_edges.png": "58b551642c8da7d530368c7ba5f3b6ec989d572500f736234b2850425ebf485b",
+      "render_angled.png": "fb0489e9a6326c596c4a6188eccedf29eca66e561322e04007894616b0bf89c6"
+    },
+    "run2": {
+      "render_front.png": "8ebe5bcc18c78428ef5a5e4a33403b095f1b961aa5fd309a3df32b2a01376569",
+      "render_silhouette.png": "cfcd62528994b87ba93cd4a781e85e1b1adf26e597146b44fb43043686520e16",
+      "render_edges.png": "58b551642c8da7d530368c7ba5f3b6ec989d572500f736234b2850425ebf485b",
+      "render_angled.png": "fb0489e9a6326c596c4a6188eccedf29eca66e561322e04007894616b0bf89c6"
+    }
+  },
+  "report_blake3": {
+    "run1": "eb80bc685d8f2de513a8c9ee8f0d844901dfe96edcd8cc4c7a929271221c5d2f",
+    "run2": "eb80bc685d8f2de513a8c9ee8f0d844901dfe96edcd8cc4c7a929271221c5d2f"
+  },
+  "run1_metrics": {
+    "armor_shell_segmentation_score": 0.265,
+    "blade_length_angle_delta": 195.0,
+    "body_mass_delta": 0.2288,
+    "color_palette_similarity": 0.5798,
+    "core_compactness_delta": 0.3699,
+    "cyan_region_similarity": 0.0,
+    "edge_density_distribution": 0.7005,
+    "edge_similarity": 0.1521,
+    "feather_overlap_depth_score": 0.0,
+    "feather_panel_curvature_score": 0.0,
+    "foreground_component_count": 8,
+    "head_to_torso_ratio_delta": 0.0167,
+    "part_graph_similarity": 1.0,
+    "silhouette_iou": 0.3016,
+    "symmetry_delta": 0.2359,
+    "thresholds_met": false,
+    "wing_feather_count": 0,
+    "wing_layer_count_delta": 2.0,
+    "wing_span_delta": 144.5
+  },
+  "run2_metrics": {
+    "armor_shell_segmentation_score": 0.265,
+    "blade_length_angle_delta": 195.0,
+    "body_mass_delta": 0.2288,
+    "color_palette_similarity": 0.5798,
+    "core_compactness_delta": 0.3699,
+    "cyan_region_similarity": 0.0,
+    "edge_density_distribution": 0.7005,
+    "edge_similarity": 0.1521,
+    "feather_overlap_depth_score": 0.0,
+    "feather_panel_curvature_score": 0.0,
+    "foreground_component_count": 8,
+    "head_to_torso_ratio_delta": 0.0167,
+    "part_graph_similarity": 1.0,
+    "silhouette_iou": 0.3016,
+    "symmetry_delta": 0.2359,
+    "thresholds_met": false,
+    "wing_feather_count": 0,
+    "wing_layer_count_delta": 2.0,
+    "wing_span_delta": 144.5
+  },
+  "identical_4dp": true,
+  "scorer_git_unchanged": false,
+  "render_script_unchanged": true,
+  "stale_refusal_fixture": {
+    "status": "PASS",
+    "detail": "report.render_hash matches live fresh PNG bytes"
+  },
+  "gap_closure_superseded": true,
+  "resolved_truth": {
+    "foreground_component_count": 8,
+    "blade_length_angle_delta": 195.0,
+    "feather_panel_curvature_score": 0.0,
+    "wing_feather_count": 0,
+    "thresholds_met": false,
+    "note": "blade_delta=195 was the cyan<10 SENTINEL; fc=35 was stale. These are the fresh-rendered truths."
+  }
+}

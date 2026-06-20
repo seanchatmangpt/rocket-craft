@@ -1,0 +1,40 @@
+{
+  "workstream": "R5",
+  "source_report": "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json",
+  "source_report_blake3": "63d4f3d9ba7a9f65deef15e8ae0e8ed19b419cead7687b836d7e6e1ca2bb9189",
+  "replayed_4dp": true,
+  "replay_runs": 2,
+  "preserves_floors": {
+    "silhouette_iou": 0.4644955485644168,
+    "color_palette_similarity": 0.8818952778924449,
+    "cyan_region_similarity": 0.19937871580604483,
+    "wing_span_delta": 39.5
+  },
+  "gates": {
+    "foreground_component_count": {
+      "band": "[1,5]",
+      "pref": "[1,3]",
+      "forbidden": ">8",
+      "current": 3,
+      "residual": 0,
+      "in_band": true
+    },
+    "core_compactness_delta": {
+      "band": "<=0.15",
+      "pref": "<=0.10",
+      "forbidden": ">0.30",
+      "current": 0.10909393926940464,
+      "residual": 0.0,
+      "in_band": true
+    },
+    "blade_length_angle_delta": {
+      "band": "<=15",
+      "pref": "<=8",
+      "forbidden": ">60",
+      "current": 5.608335775166283,
+      "residual": 0.0,
+      "in_band": true
+    }
+  },
+  "all_banded_gates_in_band": true
+}

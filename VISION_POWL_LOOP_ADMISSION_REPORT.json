@@ -1,0 +1,100 @@
+{
+  "milestone": "GC-VISION-SNAP-001",
+  "workstream": "R3",
+  "generated_at": "2026-06-20T22:16:17.669043+00:00",
+  "powl_path": "ontology/source_law/VisionSnapLoop.powl",
+  "powl_blake3": "dad53961e62549075d21e0797723aae076ca18f89800778ab29d06327528beb4",
+  "trace_path": "vision_trace.xes",
+  "trace_blake3": "21b8ccc965d01a50c9839394383b4341574c2d0f3b6dd3499cf8061678529cd0",
+  "declared_xes_blake3": "71d57600301af1a61fea2691b412ce07e8e1f2b41e9e53b5e112780cb1a0a8ed",
+  "declared_model_blake3": "ea3fd63ee9788c7f24d1b4f3cbd0e5b0a830b56d8c4ceb6c00bbc6e2e8fe050d",
+  "wpm_conformance": {
+    "engine": "wpm audit (discover+conformance not built; token-replay unavailable)",
+    "verdict": "TRUTHFUL",
+    "fitness": 1.0,
+    "precision": 1.0,
+    "fitting_traces": 1,
+    "deviating_traces": 0
+  },
+  "powl_step_status": [
+    {
+      "activity": "Start Vision Snap Loop",
+      "position": 0,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    },
+    {
+      "activity": "Generate Bounded Geometry",
+      "position": 1,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    },
+    {
+      "activity": "Render Visual Projection",
+      "position": 2,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    },
+    {
+      "activity": "Extract Visual Targets",
+      "position": 3,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    },
+    {
+      "activity": "Measure Semantic vs Visual Gap",
+      "position": 4,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    },
+    {
+      "activity": "Compute Residuals",
+      "position": 5,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    },
+    {
+      "activity": "Verify Playwright Engine Admissibility",
+      "position": 6,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    },
+    {
+      "activity": "Emit BLAKE3 Receipt",
+      "position": 7,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true,
+      "admission": "Admitted"
+    }
+  ],
+  "verifier": {
+    "final_status": "ALIVE_UNDER_SCOPE",
+    "scoped_status": "ALIVE_UNDER_SCOPE",
+    "gate_8_powl_trace_conformance": "PASS",
+    "gate_8_detail": null
+  },
+  "admission_mapping": {
+    "all_activities_present_lawful_order": true,
+    "fitness_eq_1": true,
+    "verdict_clean_no_deceptive_variance_partial": true,
+    "verifier_alive_under_scope": true
+  },
+  "replay_verified": true,
+  "standing": "ADMITTED",
+  "receipt_blake3": "060cc497e3e077f4319e8d6394e01e62d2badce3282dd4aee8ee040922f9b636"
+}

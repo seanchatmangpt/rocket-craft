@@ -1,0 +1,20 @@
+{
+  "workstream": "R5",
+  "touched_generated_artifacts": false,
+  "touched_scorer": false,
+  "touched_render_script": false,
+  "edited_all_merged_ttl": false,
+  "patches": [
+    {
+      "file": "ontology/source_law/103_proportion_priors.ttl",
+      "kind": "authoritative_source_law",
+      "change": "Added bounded-operator contract vocabulary (prior:boundsStepMax, prior:preservesMetric, prior:patchesTriple, prior:requiresOwnerProvenance) and attached full bounds to all 5 prior:RepairOperator instances. Bands survived 2 ggen syncs, no GGEN diagnostics."
+    },
+    {
+      "file": "generated/mech_assets/reference_fabric_001/queries/usd_prims.rq",
+      "kind": "paired_sparql_select",
+      "change": "Added ?colorR ?colorG ?colorB to SELECT and an OPTIONAL { ?materialBinding mud:colorR/G/B } join so part_mesh.usda.tera displayColor DERIVES from mud:color (closes latent GGEN-TPL-001 static-literal desync). Metric-neutral, replays 4dp x2."
+    }
+  ],
+  "note": "part_mesh.usda.tera template was NOT hand-edited beyond its existing row.colorR/G/B bindings (which now resolve from the paired SELECT instead of falling through to default()). No generated usd/renders hand-edited."
+}

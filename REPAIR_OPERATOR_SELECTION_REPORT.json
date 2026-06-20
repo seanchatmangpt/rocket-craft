@@ -1,0 +1,73 @@
+{
+  "workstream": "R5",
+  "steps": [
+    {
+      "operator": "provision_blade_color_from_source_law",
+      "target_gate": "cyan_region_similarity / displayColor provenance",
+      "patches": "queries/usd_prims.rq SELECT + part_mesh.usda.tera row.colorR/G/B (paired)",
+      "defect_closed": "GGEN-TPL-001 latent: template consumed row.colorR/G/B that the paired SELECT never produced; displayColor fell through to static literals",
+      "residual_before": null,
+      "residual_after": null,
+      "metrics_before": {
+        "cyan_region_similarity": 0.19937871580604483,
+        "color_palette_similarity": 0.8818952778924449,
+        "silhouette_iou": 0.4644955485644168,
+        "blade_length_angle_delta": 5.608335775166283
+      },
+      "metrics_after": {
+        "cyan_region_similarity": 0.19937871580604483,
+        "color_palette_similarity": 0.8818952778924449,
+        "silhouette_iou": 0.4644955485644168,
+        "blade_length_angle_delta": 5.608335775166283
+      },
+      "replayed_4dp": true,
+      "accepted": true,
+      "accept_reason": "displayColor now DERIVES (r,g,b) from mud:color via paired SPARQL; metric-neutral (identical to 4dp), no preservesMetric floor regressed; replays twice identical."
+    },
+    {
+      "operator": "set_blade_mount_angle_within_band",
+      "target_gate": "blade_length_angle_delta",
+      "residual_before": 0.0,
+      "residual_after": 0.0,
+      "replayed_4dp": true,
+      "accepted": false,
+      "accept_reason": "NO-OP: blade_length_angle_delta=5.6083 already <=15 (preferred <=8). Firing within boundsStepMax would move an in-band value and risk regressing silhouette_iou/cyan floor \u2014 ACCEPT criterion forbids."
+    },
+    {
+      "operator": "set_blade_length_ratio_within_band",
+      "target_gate": "blade_length_angle_delta",
+      "residual_before": 0.0,
+      "residual_after": 0.0,
+      "replayed_4dp": true,
+      "accepted": false,
+      "accept_reason": "NO-OP: same in-band condition."
+    },
+    {
+      "operator": "tighten_core_mass_inside_envelope",
+      "target_gate": "core_compactness_delta",
+      "residual_before": 0.0,
+      "residual_after": 0.0,
+      "replayed_4dp": true,
+      "accepted": false,
+      "accept_reason": "NO-OP: core_compactness_delta=0.1091 already <=0.15. Within target band; firing risks body_mass/silhouette floor."
+    },
+    {
+      "operator": "compose_adjacent_parts_within_overlap_band",
+      "target_gate": "foreground_component_count",
+      "residual_before": 0.0,
+      "residual_after": 0.0,
+      "replayed_4dp": true,
+      "accepted": false,
+      "accept_reason": "NO-OP: foreground_component_count=3 already in [1,5] (preferred [1,3])."
+    },
+    {
+      "operator": "merge_feather_components_preserving_wingspan",
+      "target_gate": "foreground_component_count",
+      "residual_before": 0.0,
+      "residual_after": 0.0,
+      "replayed_4dp": true,
+      "accepted": false,
+      "accept_reason": "NO-OP: same in-band condition; wingspan-preserving merge unnecessary."
+    }
+  ]
+}

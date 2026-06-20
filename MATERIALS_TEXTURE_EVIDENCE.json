@@ -1,0 +1,79 @@
+{
+  "workstream": "MATERIALS/TEXTURES",
+  "run_id": "materials_texture_20260620T222420Z",
+  "replay_pointer": "scripts/verify_asset.sh",
+  "asset": "generated/mech_assets/reference_fabric_001",
+  "verifier": {
+    "metrics": "scripts/verify_asset.sh",
+    "binding_check": "crates/ggen-asset-lsp/target/debug/check_all_bindings (src/bin/check_all_bindings.rs, run_diagnostics over all usda)"
+  },
+  "source_law": {
+    "file": "ontology/source_law/104_reference_fabric.ttl",
+    "output_hash": "46ffe86ec7eac92314e50408939cf2ac75ccf85d2f5d0fa527abff4ac772af75"
+  },
+  "template": {
+    "file": "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera",
+    "output_hash": "79732ca8fa582e34399e9e7faf32940024346f5f95fe6682d95fc39033137ad0"
+  },
+  "query": {
+    "file": "generated/mech_assets/reference_fabric_001/queries/materials.rq",
+    "output_hash": "c7e0574fe6b438e28a22dd4f042654cff36d5f20a137fabb2b5899484d182c52"
+  },
+  "material_binding_count": 1012,
+  "defined_materials": ["M_CyanBlade", "M_DarkFrame", "M_GoldVisor", "M_WhiteArmor"],
+  "usd_binding_targets": ["M_CyanBlade", "M_DarkFrame", "M_WhiteArmor"],
+  "binding_check": {
+    "usda_files_scanned": 13,
+    "missing_material_binding": 0,
+    "invalid_material_binding": 0
+  },
+  "openpbr_node_validity": true,
+  "stubs": 0,
+  "texture_manifest_completeness": {
+    "declared_output_maps": 18,
+    "materials": 4
+  },
+  "materials": {
+    "M_WhiteArmor": {
+      "materialClass": "clearcoat_armor",
+      "bytes": 4654,
+      "has_open_pbr_surface": true,
+      "has_named_surfacematerial": true,
+      "output_hash": "7c15955aaca1507b922327f30cda4877fd29dbbdf7b5d49f9576a4ce63239343"
+    },
+    "M_DarkFrame": {
+      "materialClass": "anodized_frame",
+      "bytes": 4582,
+      "has_open_pbr_surface": true,
+      "has_named_surfacematerial": true,
+      "output_hash": "241a2c8c9bf5dbb1f6ace45b60fb076969117900051d5fc10c95394ce22910c3"
+    },
+    "M_CyanBlade": {
+      "materialClass": "emissive_blade",
+      "bytes": 4646,
+      "has_open_pbr_surface": true,
+      "has_named_surfacematerial": true,
+      "output_hash": "5298ba33799cc67cdf94d973ccb9afb8acc3267128308ae29b0d41143f61a81c"
+    },
+    "M_GoldVisor": {
+      "materialClass": "emissive_visor",
+      "bytes": 4757,
+      "has_open_pbr_surface": true,
+      "has_named_surfacematerial": true,
+      "output_hash": "8efbef93fca7bac1ce391c9c706b316f11a8aa14e7a70b04bd6db2770adc3383"
+    }
+  },
+  "fresh_render_metrics": {
+    "color_palette_similarity": 0.8818952778924449,
+    "silhouette_iou": 0.4644955485644168,
+    "usd_prim_count": 1129,
+    "material_binding_count": 1012,
+    "vis_errors": 0,
+    "thresholds_met": true
+  },
+  "replay_verified_twice": true,
+  "replay_runs": [
+    {"silhouette_iou": 0.4644955485644168, "color_palette_similarity": 0.8818952778924449, "usd_prim_count": 1129, "vis_errors": 0},
+    {"silhouette_iou": 0.4644955485644168, "color_palette_similarity": 0.8818952778924449, "usd_prim_count": 1129, "vis_errors": 0}
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "workstream": "R2b",
+  "gate": "R2b_source_law_triage_and_authoring",
+  "timestamp_utc": "2026-06-20T15:30:00Z",
+  "standing": "ADMITTED",
+  "summary": "Contamination delta already resolved in working tree; HEAD all_merged.ttl == fresh merge_ontology.py output (BLAKE3 identical). IP source laws 097/098/099 authored as rich RDF in the ip-distance# namespace. sync_source_law.py is idempotent. Two clean merges and two ggen syncs are byte-stable with no GGEN-* andon.",
+  "triage": {
+    "head_vs_fresh_merge_delta_lines": 0,
+    "note": "The ~3573-line HEAD-only contamination delta described in the task no longer exists. git diff(HEAD:ontology/all_merged.ttl, fresh merge_ontology.py output) == 0 lines. No REAL-LAW blocks needed lifting and no STALE blocks needed dropping this run; the merged blob is fully regenerable from ontology/source_law/*.ttl.",
+    "real_law_lifted": [],
+    "stale_dropped": []
+  },
+  "replay": {
+    "verifier": "scripts/verify_source_law_replay.py",
+    "report": "SOURCE_LAW_REPLAY_REPORT.json",
+    "standing": "ADMITTED",
+    "contamination_free": true,
+    "head_merged_b3": "932d05f7849bff59b400770852fdbae2",
+    "fresh_merge_b3": "932d05f7849bff59b400770852fdbae2",
+    "source_law_count": 113
+  },
+  "idempotency_fix": {
+    "script": "sync_source_law.py",
+    "status": "ALREADY_IDEMPOTENT",
+    "mechanism": "Lines 13-25: a manifest-listed file is only stubbed when missing or whitespace-empty; any file carrying real RDF (non-whitespace content) is preserved.",
+    "marker_proof": {
+      "file": "ontology/source_law/097_external_expressive_distance_policy.ttl",
+      "marker": "# R2B-MARKER-PROOF-20260620",
+      "result": "SURVIVED",
+      "sync_output": "Sync: 0 stubbed, 100 preserved (real RDF) of 100 manifest files",
+      "post_proof_cleanup": "marker removed; file restored byte-exact via git checkout (git diff empty)"
+    }
+  },
+  "ip_source_laws": {
+    "097_external_expressive_distance_policy.ttl": {
+      "lines": 173,
+      "namespace": "http://rocket-craft.com/ontology/ip-distance#",
+      "contains": ["ProtectedCluster", "tradeDressThreshold", "MechaCommons", "OriginalAxis", "CandidateAdmissionShape", "BaselineUsage(usableForMetricBaseline=true,usableForGeneration=false)"]
+    },
+    "098_non_confusion_policy.ttl": {
+      "lines": 117,
+      "namespace": "http://rocket-craft.com/ontology/ip-distance#",
+      "contains": ["REFUSE_EXPRESSIVE_PROXIMITY verdict", "prohibitedProvenance", "non-confusion SHACL shape"]
+    },
+    "099_ip_distance_report_schema.ttl": {
+      "lines": 124,
+      "namespace": "http://rocket-craft.com/ontology/ip-distance#",
+      "contains": ["SHACL shapes for IP_DISTANCE_REPORT.json / NON_CONFUSION_REPORT.json / ADMISSION_RECEIPT.jsonl", "BLAKE3 hash requirement", "baseline_usage requirement"]
+    },
+    "policy_pack_mirror": "ip_policy_packs/mecha_external_corpus.policy.json (present)"
+  },
+  "regeneration_proof": {
+    "merge_runs": 2,
+    "merge_b3_run1": "932d05f7849bff59b400770852fdbae2",
+    "merge_b3_run2": "932d05f7849bff59b400770852fdbae2",
+    "merge_byte_identical": true,
+    "ggen_sync_runs": 2,
+    "ggen_sync_exit_codes": [0, 0],
+    "ggen_sync_status": ["success", "success"],
+    "ggen_andon_codes": [],
+    "files_synced": 20,
+    "generation_rules_executed": 28
+  },
+  "next_action": "proceed to render/score gate (bash scripts/verify_asset.sh)"
+}

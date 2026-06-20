@@ -1,0 +1,56 @@
+{
+  "report": "MODULAR_IDENTITY_REPORT",
+  "workstream": "R1",
+  "generated_utc": "2026-06-20T00:00:00.000000Z",
+  "regenerator": "scripts/run_mecha_doe.py",
+  "regenerator_runnable": true,
+  "fresh_rerun_performed": true,
+  "fresh_rerun_release_decision": "DOE_RELEASED",
+  "static_evidence_release_decision": "DOE_RELEASED",
+  "replay_verified": true,
+  "replay_runs": 2,
+  "replay_note": "scripts/run_mecha_doe.py was run twice (delete-and-resync of /tmp/mecha_doe_workspace each run). Both runs reproduce DOE_RELEASED with identical dispositions (3 PASS_FLAGSHIP smoke seeds, 5 REFUSE_MODULAR_USD negative fixtures).",
+  "repair": {
+    "summary": "Removed the stale hardcoded part_files lists and the dead allowed_parts prim map from run_mecha_doe.py. The flagship part set is now DERIVED from the assembly root's live `references = @./SM_*.usda@` (function derive_part_files), and each part's root identity is verified against its own `custom string owner_part_id` metadata. Also fixed a Rust-ism bug (m.to_lowercase()) in the foreign-prim scan and generalized USD303/USD310 foreign-component detection to be family-token driven rather than torso/head-only.",
+    "flagship_part_set": [
+      "SM_Torso.usda",
+      "SM_Head.usda",
+      "SM_WingArray_Left.usda",
+      "SM_WingArray_Right.usda",
+      "SM_Blade_Left.usda",
+      "SM_Blade_Right.usda",
+      "SM_Limb_Left.usda",
+      "SM_Limb_Right.usda",
+      "SM_Loadout.usda"
+    ],
+    "out_of_scope_orphans": [
+      "SM_TankTreads.usda",
+      "SM_KwK36Gun.usda",
+      "SM_InterleavedWheels.usda"
+    ],
+    "orphan_note": "SM_TankTreads/SM_KwK36Gun/SM_InterleavedWheels are empty header-only USD shells (defaultPrim=SM_Unknown, no prims, no owner_part_id) that the assembly root does NOT reference. They are not foreign geometry and are not part of the flagship hero asset, so they are correctly out of scope for the flagship modular-identity DOE. They contain no geometry and cannot smuggle foreign prims."
+  },
+  "smoke_batch": {
+    "smoke_seed_pass_count": 3,
+    "negative_fixture_refusal_count": 5,
+    "smoke_seeds": ["101:PASS_FLAGSHIP", "102:PASS_FLAGSHIP", "103:PASS_FLAGSHIP"],
+    "negative_fixtures": {
+      "201_torso_contains_foreign_parts": "REFUSE_MODULAR_USD (USD303 + USD310)",
+      "202_socket_contains_mesh_payload": "REFUSE_MODULAR_USD (USD311)",
+      "203_assembly_reference_inside_part_file": "REFUSE_MODULAR_USD (USD308 + USD312)",
+      "204_duplicate_part_fingerprint": "REFUSE_MODULAR_USD (USD301 + USD306)",
+      "205_missing_owner_part_id": "REFUSE_MODULAR_USD (USD304)"
+    }
+  },
+  "fresh_geometry_check": {
+    "flagship_parts_present": 9,
+    "unique_fingerprints": 9,
+    "all_unique": true,
+    "owner_part_id_complete": true,
+    "torso_foreign_geometry": false,
+    "socket_mesh_payload": false
+  },
+  "standing": "ADMITTED",
+  "release_decision": "DOE_RELEASED",
+  "next_action": "none"
+}

@@ -14,21 +14,36 @@ def sha256_file(filepath):
             h.update(chunk)
     return h.hexdigest()
 
+ASSEMBLY_ROOT = "ASSET_ReferenceFabric_001.usda"
+
+def derive_part_files(usd_dir):
+    """Derive the flagship part set from the assembly root's actual references.
+
+    The authoritative membership of the flagship hero asset is exactly the set of
+    SM_*.usda part files the assembly root references via `references = @./SM_*.usda@`.
+    Read from the live generated USD (never a hardcoded list) so the DOE cannot drift
+    from canonical ggen output. The assembly root and any *.backup files are excluded.
+    Orphan SM_* files not referenced by the assembly (e.g. empty SM_Unknown shells such
+    as SM_TankTreads/SM_KwK36Gun/SM_InterleavedWheels) are not part of the flagship and
+    are intentionally out of scope for the flagship DOE.
+    """
+    assembly_path = os.path.join(usd_dir, ASSEMBLY_ROOT)
+    if not os.path.exists(assembly_path):
+        return []
+    with open(assembly_path, "r") as f:
+        content = f.read()
+    refs = re.findall(r'references\s*=\s*@\./(SM_[A-Za-z0-9_]+\.usda)@', content)
+    seen = []
+    for r in refs:
+        if r == ASSEMBLY_ROOT or r.endswith(".backup"):
+            continue
+        if r not in seen and os.path.exists(os.path.join(usd_dir, r)):
+            seen.append(r)
+    return seen
+
 def get_fingerprints(usd_dir):
     fingerprints = {}
-    part_files = [
-        "SM_Torso.usda",
-        "SM_Head.usda",
-        "SM_Wing_Left.usda",
-        "SM_Wing_Right.usda",
-        "SM_Blade_Left.usda",
-        "SM_Blade_Right.usda",
-        "SM_Arm_Left.usda",
-        "SM_Arm_Right.usda",
-        "SM_Leg_Left.usda",
-        "SM_Leg_Right.usda"
-    ]
-    for pf in part_files:
+    for pf in derive_part_files(usd_dir):
         pfp = os.path.join(usd_dir, pf)
         if os.path.exists(pfp):
             fingerprints[pf] = sha256_file(pfp)
@@ -38,21 +53,14 @@ def run_diagnostics_on_usd(usd_dir):
     """
     Runs the exact diagnostics logic matching USD301-312 on a USD directory.
     Returns a list of errors found.
+
+    The part set is derived from the assembly root's live references (the flagship
+    membership), and each part's allowed root identity is its own declared
+    owner_part_id metadata — no hardcoded part-name list, no hardcoded prim map.
     """
     errors = []
-    part_files = [
-        "SM_Torso.usda",
-        "SM_Head.usda",
-        "SM_Wing_Left.usda",
-        "SM_Wing_Right.usda",
-        "SM_Blade_Left.usda",
-        "SM_Blade_Right.usda",
-        "SM_Arm_Left.usda",
-        "SM_Arm_Right.usda",
-        "SM_Leg_Left.usda",
-        "SM_Leg_Right.usda"
-    ]
-    
+    part_files = derive_part_files(usd_dir)
+
     # Check existences
     hashes = {}
     for pf in part_files:
@@ -101,20 +109,25 @@ def run_diagnostics_on_usd(usd_dir):
             if not root_identity_ok:
                 errors.append(f"USD304 ERROR: expected part root missing in {pf}")
                 
-    # Check for foreign component prims and full-assembly (USD302, USD303)
-    allowed_parts = {
-        "SM_Torso.usda": {"torso_core"},
-        "SM_Head.usda": {"head_unit", "v_fin_left", "v_fin_right"},
-        "SM_Wing_Left.usda": {"wing_root_left", "primary_wing_feathers_left", "secondary_wing_feathers_left"},
-        "SM_Wing_Right.usda": {"wing_root_right", "primary_wing_feathers_right", "secondary_wing_feathers_right"},
-        "SM_Blade_Left.usda": {"blade_left"},
-        "SM_Blade_Right.usda": {"blade_right"},
-        "SM_Arm_Left.usda": {"shoulder_left", "arm_left"},
-        "SM_Arm_Right.usda": {"shoulder_right", "arm_right"},
-        "SM_Leg_Left.usda": {"leg_left"},
-        "SM_Leg_Right.usda": {"leg_right"}
+    # Check for foreign component prims and full-assembly (USD302, USD303).
+    # A part's identity is its declared owner_part_id; a prim is "foreign" when it
+    # carries a signature token belonging to a DIFFERENT part family. Tokens are
+    # derived from the live flagship part set, not a hardcoded allow-map, so the
+    # check tracks whatever the assembly actually contains.
+    family_tokens = {
+        "Torso": ["torso"],
+        "Head": ["head", "crown", "visor"],
+        "WingArray": ["wing", "feather"],
+        "Blade": ["blade"],
+        "Limb": ["arm", "leg", "shoulder", "limb"],
+        "Loadout": ["backpack", "thruster", "loadout"],
     }
-    
+    def family_of(part_filename):
+        for fam in family_tokens:
+            if fam.lower() in part_filename.lower():
+                return fam
+        return None
+
     for pf in part_files:
         pfp = os.path.join(usd_dir, pf)
         if os.path.exists(pfp):
@@ -156,19 +169,19 @@ def run_diagnostics_on_usd(usd_dir):
                     # USD311
                     errors.append(f"USD311 ERROR: socket prim contains mesh payload in {pf} line {line_idx+1}")
             
-            # Foreign components search (heuristic based on names matching allowed parts)
+            # Foreign components search: any prim carrying a token from a DIFFERENT
+            # part family is foreign to this part (USD303/USD310).
+            own_family = family_of(pf)
             meshes = re.findall(r'def Mesh "([^"]+)"', content)
             for m in meshes:
-                lower = m.to_lowercase() if hasattr(m, 'to_lowercase') else m.lower()
-                # If torso contains head/blade/wing or visa versa
-                if pf == "SM_Torso.usda":
-                    if "head" in lower or "blade" in lower or "wing" in lower:
+                lower = m.lower()
+                for fam, tokens in family_tokens.items():
+                    if fam == own_family:
+                        continue
+                    if any(tok in lower for tok in tokens):
                         errors.append(f"USD303 ERROR: part-local file {pf} contains foreign component prims: {m}")
                         errors.append(f"USD310 ERROR: part-scope query returned nonlocal rows in {pf}")
-                elif pf == "SM_Head.usda":
-                    if "torso" in lower or "blade" in lower or "wing" in lower:
-                        errors.append(f"USD303 ERROR: part-local file {pf} contains foreign component prims: {m}")
-                        errors.append(f"USD310 ERROR: part-scope query returned nonlocal rows in {pf}")
+                        break
                         
             # Check bounding box overlap (USD307)
             extents_matches = re.findall(r'extents\s*=\s*\[([^\]]+)\]', content)
