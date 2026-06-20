@@ -366,6 +366,31 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     console.log(`[headless-loop] session-state: state=${body.state} events=${body.ocel_event_count} has_receipt=${body.has_receipt}`);
   });
 
+  it('Step 11c: stale-session cleanup closes an alive session with no recent events', async () => {
+    if (MOCK) return;
+    // Create a fresh ALIVE session (no OCEL events), then trigger the
+    // close_stale_sessions() procedure with timeout 0 — it must transition the
+    // session to Closed (is_alive=false). This exercises the zombie-session
+    // invariant that otherwise only runs via pg_cron (absent in local Supabase).
+    const created = await post('/api/game/session', { browser_session_id: `stale-${Date.now()}`, engine_source: 'browser' });
+    if (created.status === 503) return;
+    expect(created.status).toBe(200);
+    const sid = created.body.session_id as string;
+
+    const before = await get(`/api/game/session-state?session_id=${sid}`);
+    expect(before.body.state).toBe('Active');
+
+    const cleanup = await post('/api/test/close-stale-sessions', { timeout_minutes: 0 });
+    if (cleanup.status === 403) return; // not enabled in this env
+    expect(cleanup.status).toBe(200);
+    expect(cleanup.body.closed_count).toBeGreaterThanOrEqual(1);
+
+    const after = await get(`/api/game/session-state?session_id=${sid}`);
+    expect(after.body.state).toBe('Closed');
+    expect(after.body.is_alive).toBe(false);
+    console.log(`[headless-loop] stale-cleanup: closed ${cleanup.body.closed_count} session(s); ${sid} → ${after.body.state}`);
+  });
+
   it('Step 12: health-lies returns all_clear=true after a clean seeded session', async () => {
     if (MOCK) return;
     const { status, body } = await get('/api/game/health-lies');
