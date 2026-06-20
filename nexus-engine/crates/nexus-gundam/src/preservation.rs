@@ -1,4 +1,4 @@
-use crate::generated_gundam::{OntologyName, PreservationDomainCategory};
+use crate::mech_primitives::{OntologyName, PreservationDomainCategory};
 use anyhow::{anyhow, Result};
 use sha2::{Digest, Sha256};
 use std::collections::HashMap;
@@ -164,7 +164,7 @@ impl PreservationLayer for GundamPreservationManager {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generated_gundam::{Arcades, FlashGames};
+    use crate::mech_primitives::{Arcades, FlashGames};
 
     fn mgr() -> GundamPreservationManager {
         GundamPreservationManager::new()

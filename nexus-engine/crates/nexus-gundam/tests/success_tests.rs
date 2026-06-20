@@ -1,5 +1,5 @@
 use nexus_gundam::builder::{CivilizationBuilder, MechBuilder, ValidationError};
-use nexus_gundam::generated_gundam::{
+use nexus_gundam::mech_primitives::{
     Armor, Earth, Frame, Joint, Mars, Mobility, Power, RotationLimits, Sensor, UtilitySystem,
     Venus, Walking, Weapon, AABB,
 };
@@ -257,7 +257,7 @@ fn test_load_capacity_exceeded() {
 #[test]
 fn test_planetary_incompatibility() {
     use nexus_gundam::builder::PlanetMechCompatibility;
-    use nexus_gundam::generated_gundam::{Earth, Mars, Venus};
+    use nexus_gundam::mech_primitives::{Earth, Mars, Venus};
 
     let earth = Earth;
     let mars = Mars;
@@ -315,7 +315,7 @@ fn test_civilization_success() {
 
 #[test]
 fn test_preservation_success() {
-    use nexus_gundam::generated_gundam::FlashGames;
+    use nexus_gundam::mech_primitives::FlashGames;
 
     let manager = GundamPreservationManager::new();
     let mut metadata = HashMap::new();

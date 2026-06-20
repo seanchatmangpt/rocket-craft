@@ -1,7 +1,16 @@
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix gn: <https://rocket-craft.io/ontology/gundam-nexus/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix gn:   <https://rocket-craft.io/ontology/gundam-nexus/> .
+
+# Lore provenance: UC Gundam official tech specs (Bandai/Sunrise model kit manuals)
+# Physics units: QUDT 2.1 - https://qudt.org/
+# Rule: 99% imported vocabularies (QUDT, OWL, RDF), 1% custom gn: predicates.
+# OCEL/OTel: these physical values are OTel span attributes on every PhysicsStep event.
+# POWL v2: canonical specs define lawful process baselines for pm4py conformance.
 
 # --- Ontological Classes ---
 
@@ -70,22 +79,126 @@ gn:Expansion a gn:PlanetDimension ;
 gn:Ambition a gn:PlanetDimension ;
     rdfs:label "Ambition" .
 
-# --- Mobility Primitive Instances ---
+# --- Mobility Data Properties (QUDT-typed) ---
+# Custom predicates: mass, speed, load use qudt:quantityValue + qudt:unit patterns.
+# These are the OCEL event attribute keys emitted on every PhysicsStep OTel span.
 
+gn:canonicalMass_kg a owl:DatatypeProperty ;
+    rdfs:label "canonical mass (kg)" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:decimal ;
+    qudt:unit unit:KiloGM ;
+    rdfs:comment "Dry mass in kilograms. Source: official Bandai tech manual." .
+
+gn:canonicalMaxSpeed_ms a owl:DatatypeProperty ;
+    rdfs:label "canonical max speed (m/s)" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:decimal ;
+    qudt:unit unit:M-PER-SEC ;
+    rdfs:comment "Maximum rated speed in metres per second (from official spec km/h ÷ 3.6)." .
+
+gn:canonicalLoadCapacity_kg a owl:DatatypeProperty ;
+    rdfs:label "canonical load capacity (kg)" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:decimal ;
+    qudt:unit unit:KiloGM ;
+    rdfs:comment "Maximum additional payload in kilograms." .
+
+# Typestate-specific geometry properties
+gn:canonicalLegCount a owl:DatatypeProperty ;
+    rdfs:label "canonical leg count" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of articulated limbs for walking locomotion." .
+
+gn:canonicalWingSpan_m a owl:DatatypeProperty ;
+    rdfs:label "canonical wing span (m)" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:decimal ;
+    qudt:unit unit:M ;
+    rdfs:comment "Wing span in metres for flight mobility." .
+
+gn:canonicalGroundClearance_m a owl:DatatypeProperty ;
+    rdfs:label "canonical ground clearance (m)" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:decimal ;
+    qudt:unit unit:M ;
+    rdfs:comment "Minimum distance from undercarriage to terrain surface in metres." .
+
+gn:canonicalThrusterCount a owl:DatatypeProperty ;
+    rdfs:label "canonical thruster count" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Number of main verniers/thrusters for space mobility." .
+
+gn:canonicalDepthRating_m a owl:DatatypeProperty ;
+    rdfs:label "canonical depth rating (m)" ;
+    rdfs:domain gn:MobilityType ;
+    rdfs:range xsd:decimal ;
+    qudt:unit unit:M ;
+    rdfs:comment "Maximum operational depth in metres for aquatic mobility." .
+
+# --- Mobility Primitive Instances (lore-grounded) ---
+
+# Walking — canonical reference: RX-78-2 Gundam (UC 0079)
+# Source: Gundam Fix Figuration / MG 1/100 RX-78-2 Ver.3.0 tech manual
+# Official specs: dry weight 60.0t; max walking speed 165 km/h = 45.83 m/s
+# Leg config: bipedal (2 legs)
 gn:Walking a gn:MobilityType ;
-    rdfs:label "Walking" .
+    rdfs:label "Walking" ;
+    rdfs:comment "Reference suit: RX-78-2 Gundam (UC 0079). 60,000 kg, 165 km/h ground speed." ;
+    gn:canonicalMass_kg "60000"^^xsd:decimal ;
+    gn:canonicalMaxSpeed_ms "45.83"^^xsd:decimal ;
+    gn:canonicalLoadCapacity_kg "55000"^^xsd:decimal ;
+    gn:canonicalLegCount "2"^^xsd:integer .
 
+# Flight — canonical reference: XXXG-01W Wing Gundam (AC 195)
+# Source: Wing Gundam MG 1/100 tech manual, Endless Waltz model specs
+# Official specs: empty weight 7,150 kg; max air speed (Neo-Bird mode) Mach 1+
+# Wing span (bird mode): 14.4 m
 gn:Flight a gn:MobilityType ;
-    rdfs:label "Flight" .
+    rdfs:label "Flight" ;
+    rdfs:comment "Reference suit: Wing Gundam (AC 195). 7,150 kg, Mach 1+ air speed, 14.4m wing span." ;
+    gn:canonicalMass_kg "7150"^^xsd:decimal ;
+    gn:canonicalMaxSpeed_ms "340"^^xsd:decimal ;
+    gn:canonicalLoadCapacity_kg "4000"^^xsd:decimal ;
+    gn:canonicalWingSpan_m "14.4"^^xsd:decimal .
 
+# Hover — canonical reference: PMX-003 The O (UC 0087)
+# Source: Z Gundam setting notes; The O uses sub-thruster hover (not flight)
+# Approximate specs derived from Zeta-era design documentation
+# Mass: 58,800 kg; max hover/dash speed ~150 km/h = 41.67 m/s; clearance 1.2 m
 gn:Hover a gn:MobilityType ;
-    rdfs:label "Hover" .
+    rdfs:label "Hover" ;
+    rdfs:comment "Reference suit: The O (UC 0087). 58,800 kg, 150 km/h hover speed, 1.2m clearance." ;
+    gn:canonicalMass_kg "58800"^^xsd:decimal ;
+    gn:canonicalMaxSpeed_ms "41.67"^^xsd:decimal ;
+    gn:canonicalLoadCapacity_kg "50000"^^xsd:decimal ;
+    gn:canonicalGroundClearance_m "1.2"^^xsd:decimal .
 
+# Aquatic — canonical reference: MSM-03 Gogg (UC 0079)
+# Source: 0079 setting notes / HG Gogg spec sheet
+# Official specs: weight 76,400 kg; underwater max speed 45 knots = 23.15 m/s;
+# rated depth: 100m operational, 500m crush depth
 gn:Aquatic a gn:MobilityType ;
-    rdfs:label "Aquatic" .
+    rdfs:label "Aquatic" ;
+    rdfs:comment "Reference suit: MSM-03 Gogg (UC 0079). 76,400 kg, 45 knots (23.15 m/s), rated to 100m depth." ;
+    gn:canonicalMass_kg "76400"^^xsd:decimal ;
+    gn:canonicalMaxSpeed_ms "23.15"^^xsd:decimal ;
+    gn:canonicalLoadCapacity_kg "60000"^^xsd:decimal ;
+    gn:canonicalDepthRating_m "100"^^xsd:decimal .
 
+# Space — canonical reference: MS-14A Gelgoog (UC 0079)
+# Source: MG 1/100 Gelgoog tech manual
+# Official specs: weight 73,800 kg; thruster output 890 kN across 4 main verniers
+# Delta-v limited; max boost acceleration ~12.1 m/s² (890000 N / 73800 kg)
 gn:Space a gn:MobilityType ;
-    rdfs:label "Space" .
+    rdfs:label "Space" ;
+    rdfs:comment "Reference suit: MS-14A Gelgoog (UC 0079). 73,800 kg, 890 kN thrust (4 verniers)." ;
+    gn:canonicalMass_kg "73800"^^xsd:decimal ;
+    gn:canonicalMaxSpeed_ms "12.1"^^xsd:decimal ;
+    gn:canonicalLoadCapacity_kg "65000"^^xsd:decimal ;
+    gn:canonicalThrusterCount "4"^^xsd:integer .
 
 # --- Mech Class Instances ---
 

@@ -1,4 +1,4 @@
-use crate::generated_gundam::{
+use crate::mech_primitives::{
     Armor, Earth, Frame, Joint, Mars, MobilityTypeCategory, PlanetCategory, Power, Sensor,
     UtilitySystem, Venus, Weapon, AABB,
 };
@@ -30,7 +30,7 @@ pub struct Mech<Mob> {
 ///
 /// ```
 /// use nexus_gundam::builder::{MechBuilder, Set, Unset};
-/// use nexus_gundam::generated_gundam::{Frame, Power, Armor, Flight, Mobility, AABB};
+/// use nexus_gundam::mech_primitives::{Frame, Power, Armor, Flight, Mobility, AABB};
 ///
 /// let frame = Frame::default();
 /// let power = Power::default();
@@ -443,7 +443,7 @@ pub struct Civilization<Plan> {
 ///
 /// ```
 /// use nexus_gundam::builder::{CivilizationBuilder, Set, Unset};
-/// use nexus_gundam::generated_gundam::Earth;
+/// use nexus_gundam::mech_primitives::Earth;
 ///
 /// let earth_civ = CivilizationBuilder::new()
 ///     .with_planet(Earth)
@@ -612,14 +612,14 @@ impl Civilization<Venus> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generated_gundam::{Flight, Frame, Power, Walking, Weapon, AABB};
+    use crate::mech_primitives::{Flight, Frame, Mobility, Power, Walking, Weapon, AABB};
 
     fn non_overlapping_aabb(offset: f32) -> AABB {
         AABB::new([offset, offset, offset], [offset + 0.1, offset + 0.1, offset + 0.1])
     }
 
     fn basic_walking_mech() -> Mech<Walking> {
-        use crate::generated_gundam::{Armor, Frame, Mobility, Power};
+        use crate::mech_primitives::{Armor, Frame, Mobility, Power};
         // Each component occupies a distinct non-overlapping 0.1³ region
         MechBuilder::new()
             .with_frame(Frame {
@@ -657,7 +657,7 @@ mod tests {
         // Explicitly sets all components; used where we need a fully populated mech
         MechBuilder::new()
             .with_mobility(Walking {
-                physical: crate::generated_gundam::Mobility {
+                physical: crate::mech_primitives::Mobility {
                     load_capacity: 500.0,
                     ..Default::default()
                 },
@@ -679,8 +679,12 @@ mod tests {
 
     #[test]
     fn build_flight_mech_with_class() {
+        let flight = Flight {
+            physical: Mobility::default(),
+            wing_span: 12.0,
+        };
         let mech = MechBuilder::new()
-            .with_mobility(Flight::default())
+            .with_mobility(flight)
             .with_class("Angel Wing")
             .build();
         assert_eq!(mech.class, "Angel Wing");
@@ -722,7 +726,7 @@ mod tests {
 
     #[test]
     fn mech_with_joint_missing_limits_fails_validation() {
-        use crate::generated_gundam::Joint;
+        use crate::mech_primitives::Joint;
         let mech = MechBuilder::new()
             .with_mobility(Walking::default())
             .add_joint(Joint {

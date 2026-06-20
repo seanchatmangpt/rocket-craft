@@ -214,7 +214,37 @@ GROUP BY ?name
 ORDER BY ?name
 """ }
 template = { file = "templates/gundam_nexus.rs.tera" }
-output_file = "crates/nexus-gundam/src/generated_gundam.rs"
+output_file = "crates/nexus-gundam/src/mech_primitives.rs"
+mode = "Overwrite"
+
+# Secondary rule: extract canonical lore-grounded specs for mobility defaults.
+# These feed a second SPARQL result set passed to the same template as `mobility_specs`.
+[[generation.rules]]
+name = "generate-mobility-specs"
+query = { inline = """
+PREFIX gn: <https://rocket-craft.io/ontology/gundam-nexus/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?name ?mass_kg ?max_speed_ms ?load_capacity_kg
+       ?leg_count ?wing_span_m ?ground_clearance_m
+       ?thruster_count ?depth_rating_m
+WHERE {
+  ?inst a gn:MobilityType ;
+        rdfs:label ?name .
+  OPTIONAL { ?inst gn:canonicalMass_kg ?mass_kg }
+  OPTIONAL { ?inst gn:canonicalMaxSpeed_ms ?max_speed_ms }
+  OPTIONAL { ?inst gn:canonicalLoadCapacity_kg ?load_capacity_kg }
+  OPTIONAL { ?inst gn:canonicalLegCount ?leg_count }
+  OPTIONAL { ?inst gn:canonicalWingSpan_m ?wing_span_m }
+  OPTIONAL { ?inst gn:canonicalGroundClearance_m ?ground_clearance_m }
+  OPTIONAL { ?inst gn:canonicalThrusterCount ?thruster_count }
+  OPTIONAL { ?inst gn:canonicalDepthRating_m ?depth_rating_m }
+}
+ORDER BY ?name
+""" }
+template = { file = "templates/mobility_defaults.rs.tera" }
+output_file = "crates/nexus-gundam/src/mobility_defaults.rs"
 mode = "Overwrite"
 
 [sync]

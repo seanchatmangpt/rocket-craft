@@ -1,5 +1,5 @@
 use nexus_gundam::builder::MechBuilder;
-use nexus_gundam::generated_gundam::GundamFrame;
+use nexus_gundam::mech_primitives::GundamFrame;
 
 fn main() {
     // Attempting to build without calling with_mobility, with_power, with_armor, or with_sensor.

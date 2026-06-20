@@ -1,4 +1,4 @@
-use crate::generated_gundam::*;
+use crate::mech_primitives::*;
 
 pub struct BranchlessPartsGenerator;
 

@@ -1,22 +1,23 @@
 /**
  * POST /api/game/ocel-ingest
  *
- * Server-side OCEL event ingest endpoint.
- * Pattern: ~/dashboard.bak/server/api/otel/logs.post.js (OTLP proxy)
- * Extended: each OCEL batch also emits an OTLP span to the local collector.
+ * Server-side OCEL event ingest — primary write path for ocel_events.
+ * Accepts a pre-hashed batch from useGameSessionPersistence and:
+ *   1. Inserts into ocel_events (Supabase — source of truth)
+ *   2. Emits OTel spans to the local collector (non-fatal if down)
  *
  * Body: { session_id: string, events: OcelEventBatch[] }
+ *   where each event already has event_hash + prev_hash computed client-side.
+ *
  * Returns: { ingested: number, trace_id: string | null, session_id: string }
  *
- * OTel attributes per event (from ~/truex/packages/observability/src/fields.ts pattern):
- *   game.session_id, game.activity, game.timestamp_ms,
- *   ocel.event_hash, ocel.seq, ocel.object_refs[]
- *
- * OTLP emission is handled by server/utils/otlp-emitter — failures are logged
- * but never propagate; Supabase OCEL storage is the source of truth.
+ * The client-side BLAKE3 hashes are stored verbatim — the server does not
+ * recompute them. The chain is later verified by verify_event_chain() RPC
+ * which recomputes all hashes server-side and checks prev_hash threading.
  */
 
-import { emitOtelSpans, type SpanDescriptor } from '~/server/utils/otlp-emitter';
+import { createClient } from '@supabase/supabase-js';
+import { emitOtelSpans, type SpanDescriptor } from '../../utils/otlp-emitter';
 
 interface OcelEventBatch {
   activity: string;
@@ -24,6 +25,7 @@ interface OcelEventBatch {
   object_refs: string[];
   attributes: Record<string, unknown>;
   event_hash: string;
+  prev_hash: string | null;
   seq: number;
   session_id: string;
 }
@@ -35,9 +37,31 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'session_id and non-empty events[] required' });
   }
 
-  // Map OCEL events to SpanDescriptors for the batch emitter
+  const supabaseUrl = process.env.SUPABASE_URL ?? 'http://localhost:54321';
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = createClient<any>(supabaseUrl, supabaseKey);
+
+  // 1. Insert events into ocel_events (source of truth)
+  const rows = body.events.map(evt => ({
+    session_id: body.session_id,
+    activity: evt.activity,
+    ts_ms: evt.timestamp_ms,
+    object_refs: evt.object_refs,
+    attributes: evt.attributes,
+    event_hash: evt.event_hash,
+    prev_hash: evt.prev_hash ?? null,
+    seq: evt.seq,
+  }));
+
+  const { error: insertErr } = await supabase.from('ocel_events').insert(rows);
+  if (insertErr) {
+    throw createError({ statusCode: 500, message: `ocel_events insert failed: ${insertErr.message}` });
+  }
+
+  // 2. Emit OTel spans (non-fatal — Supabase is source of truth)
   const descriptors: SpanDescriptor[] = body.events.map(evt => ({
-    session_id: evt.session_id,
+    session_id: body.session_id,
     activity: evt.activity,
     timestamp_ms: evt.timestamp_ms,
     attributes: {
@@ -47,7 +71,7 @@ export default defineEventHandler(async (event) => {
     },
   }));
 
-  const { traceId } = await emitOtelSpans(descriptors);
+  const { traceId } = await emitOtelSpans(descriptors).catch(() => ({ traceId: null }));
 
   return {
     ingested: body.events.length,

@@ -2166,3 +2166,35 @@ Use bounded status language.
 
 The milestone is secured only by tests, receipts, replay, visual actuation, and published residuals.
 </USER_REQUEST>
+
+## Follow-up — 2026-06-19T19:14:48Z
+
+<USER_REQUEST>
+# Teamwork Project Prompt — Draft
+
+> Status: Launched
+> Goal: Craft prompt → get user approval → delegate to teamwork_preview
+
+Autonomous Gap-Closure Mode for the Mech Factory MUD. The agent will run the `mud_gap_check.py` script on a loop, parsing the missing requirements and autonomously writing templates and code to close each gap until the acceptance matrix is entirely fulfilled.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Continuous Autonomous Loop
+The agent must read the output of `python3 scripts/mud_gap_check.py` to identify the `next_gap`, apply a patch, test it, and re-run the checker in a loop until no gaps remain.
+
+### R2. Persistent Blockers
+If the agent encounters a persistent blocker, it should attempt to bypass the constraint creatively and keep going. Do not halt the loop for minor setbacks.
+
+### R3. Maintain Architectural Law
+Do not add new game features or bypass the ontology. All fixes must be implemented via `ggen.toml`, `.tera` templates, and the generated Rust or UE4 DataTables. Do not bypass the Combinatorial Maximalist Doctrine.
+
+## Acceptance Criteria
+
+### Full Verification
+- [ ] `python3 scripts/mud_gap_check.py` returns `Requirements failed: 0`.
+- [ ] `cargo run -p mech_factory_mud -- verify` outputs `PASS`.
+- [ ] 0 tests ignored or failed across the workspace.
+</USER_REQUEST>

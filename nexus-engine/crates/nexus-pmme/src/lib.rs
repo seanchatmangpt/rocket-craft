@@ -1,5 +1,5 @@
 #![allow(clippy::type_complexity)]
-use nexus_gundam::generated_gundam::{Mars, PlanetCategory, RotationLimits, Venus, AABB};
+use nexus_gundam::mech_primitives::{Mars, PlanetCategory, RotationLimits, Venus, AABB};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::marker::PhantomData;
@@ -83,7 +83,7 @@ pub struct PlanetaryValues {
 
 #[derive(Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct CulturalProfile<P = nexus_gundam::generated_gundam::Earth> {
+pub struct CulturalProfile<P = nexus_gundam::mech_primitives::Earth> {
     pub planetary_values: PlanetaryValues,
     #[serde(skip)]
     pub _marker: PhantomData<P>,
@@ -126,7 +126,7 @@ pub enum FunctionalRole {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(bound = "")]
-pub struct MechAssemblySpec<State = Unvalidated, P = nexus_gundam::generated_gundam::Earth> {
+pub struct MechAssemblySpec<State = Unvalidated, P = nexus_gundam::mech_primitives::Earth> {
     pub frame: Frame,
     pub joints: Vec<Joint>,
     pub power: Power,
@@ -187,7 +187,7 @@ impl<State, P> PartialEq for MechAssemblySpec<State, P> {
 ///     CollisionVolume, MaterialSpec, CulturalProfile, PlanetaryValues,
 ///     FunctionalRole, Set, Unset
 /// };
-/// use nexus_gundam::generated_gundam::{Earth, AABB};
+/// use nexus_gundam::mech_primitives::{Earth, AABB};
 ///
 /// let frame = Frame {
 ///     id: "TestFrame".to_string(),
@@ -1202,7 +1202,7 @@ impl<P: PlanetCategory + 'static> MechAssemblySpec<Validated, P> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nexus_gundam::generated_gundam::Earth;
+    use nexus_gundam::mech_primitives::Earth;
 
     #[test]
     fn test_generating_valid_ark_class() {

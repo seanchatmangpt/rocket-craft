@@ -1334,8 +1334,65 @@ The internal engine executes a strict 5-stage pipeline:
 
 Update all runbooks, scripts, and specifications immediately to reflect `ggen sync` and the μ₁–μ₅ pipeline. You are cleared to proceed with executing the `ggen` pipeline using this syntax.
 
+## 2026-06-19T19:14:48Z
 
+<USER_REQUEST>
+# Teamwork Project Prompt — Draft
 
+> Status: Launched
+> Goal: Craft prompt → get user approval → delegate to teamwork_preview
 
+Autonomous Gap-Closure Mode for the Mech Factory MUD. The agent will run the `mud_gap_check.py` script on a loop, parsing the missing requirements and autonomously writing templates and code to close each gap until the acceptance matrix is entirely fulfilled.
 
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
 
+## Requirements
+
+### R1. Continuous Autonomous Loop
+The agent must read the output of `python3 scripts/mud_gap_check.py` to identify the `next_gap`, apply a patch, test it, and re-run the checker in a loop until no gaps remain.
+
+### R2. Persistent Blockers
+If the agent encounters a persistent blocker, it should attempt to bypass the constraint creatively and keep going. Do not halt the loop for minor setbacks.
+
+### R3. Maintain Architectural Law
+Do not add new game features or bypass the ontology. All fixes must be implemented via `ggen.toml`, `.tera` templates, and the generated Rust or UE4 DataTables. Do not bypass the Combinatorial Maximalist Doctrine.
+
+## Acceptance Criteria
+
+### Full Verification
+- [ ] `python3 scripts/mud_gap_check.py` returns `Requirements failed: 0`.
+- [ ] `cargo run -p mech_factory_mud -- verify` outputs `PASS`.
+- [ ] 0 tests ignored or failed across the workspace.
+</USER_REQUEST>
+
+## 2026-06-19T20:09:40Z
+
+<USER_REQUEST>
+# Teamwork Project Prompt — Draft
+
+> Status: Launched
+> Goal: Craft prompt → get user approval → delegate to teamwork_preview
+
+Complete milestone GC-MECH-FACTORY-MUD-002. Convert python-based verification scripts into native Rust tools and continue to build out the system strictly via the ontology-driven pipeline.
+
+Working directory: /Users/sac/rocket-craft
+Integrity mode: benchmark
+
+## Requirements
+
+### R1. Strict Generation Pipeline Only
+All architecture, logic, and state transitions must be produced exclusively by editing the `ggen.toml` manifest, the ontology (`.ttl`), extraction queries (`.rq`), and `Tera` templates. No manual edits to target source files.
+
+### R2. Convert Python Scripts to Native Rust
+Convert as many of the existing Python scripts (e.g., `scripts/mud_gap_check.py`) into native Rust verification tools within the workspace. Ensure they fit within the Combinatorial Maximalist Doctrine and execute seamlessly as part of the overall pipeline.
+
+## Acceptance Criteria
+
+### Verification Integrity
+- [ ] `mud_gap_check.py` functionality is fully replicated by a new native Rust tool.
+- [ ] The new Rust gap checker produces a deterministic pass/fail output without human intervention.
+- [ ] The system continues to generate successfully using `ggen sync` without errors.
+
+**CRITICAL OVERRIDE FROM USER**: Ensure you launch a 10-agent team to accomplish this, matching the user's initial `/teamwork-preview launch 10 agents to complete GC-MECH-FACTORY-MUD-002` command.
+</USER_REQUEST>

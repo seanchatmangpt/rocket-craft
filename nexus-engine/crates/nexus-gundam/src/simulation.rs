@@ -1,4 +1,4 @@
-use crate::generated_gundam::{
+use crate::mech_primitives::{
     BecomeMythology, Build, CreateHistory, Discover, Expand, Explore, Preserve,
 };
 use anyhow::{anyhow, Result};

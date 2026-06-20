@@ -209,6 +209,19 @@ pub struct Mobility {
 
 impl MechPrimitiveCategory for Mobility {}
 
+impl Default for Mobility {
+    fn default() -> Self {
+        Self {
+            id: "mobility-default".to_string(),
+            mass: 10.0,
+            occupancy: AABB::default(),
+            clearance: AABB::default(),
+            load_capacity: 100.0,
+            max_speed: 10.0,
+        }
+    }
+}
+
 // --- Mobility Typestates ---
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -229,6 +242,12 @@ impl MobilityTypeCategory for Walking {
 impl OntologyName for Walking {
     fn ontology_name() -> &'static str {
         "Walking"
+    }
+}
+
+impl Default for Walking {
+    fn default() -> Self {
+        Self { physical: Mobility::default(), leg_count: 2 }
     }
 }
 
@@ -253,6 +272,12 @@ impl OntologyName for Flight {
     }
 }
 
+impl Default for Flight {
+    fn default() -> Self {
+        Self { physical: Mobility::default(), wing_span: 5.0 }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Hover {
     pub physical: Mobility,
@@ -271,6 +296,12 @@ impl MobilityTypeCategory for Hover {
 impl OntologyName for Hover {
     fn ontology_name() -> &'static str {
         "Hover"
+    }
+}
+
+impl Default for Hover {
+    fn default() -> Self {
+        Self { physical: Mobility::default(), ground_clearance: 0.5 }
     }
 }
 
@@ -295,6 +326,12 @@ impl OntologyName for Space {
     }
 }
 
+impl Default for Space {
+    fn default() -> Self {
+        Self { physical: Mobility::default(), thruster_count: 4 }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Aquatic {
     pub physical: Mobility,
@@ -313,6 +350,12 @@ impl MobilityTypeCategory for Aquatic {
 impl OntologyName for Aquatic {
     fn ontology_name() -> &'static str {
         "Aquatic"
+    }
+}
+
+impl Default for Aquatic {
+    fn default() -> Self {
+        Self { physical: Mobility::default(), depth_rating: 100.0 }
     }
 }
 

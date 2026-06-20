@@ -1,4 +1,4 @@
-use crate::generated_gundam::*;
+use crate::mech_primitives::*;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -34,7 +34,7 @@ impl ProceduralMechManufacturingEngine {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::generated_gundam::{AABB, Armor, Frame, Mobility, Power, Sensor, Weapon};
+    use crate::mech_primitives::{AABB, Armor, Frame, Mobility, Power, Sensor, Weapon};
 
     fn small_aabb() -> AABB {
         AABB::new([0.0, 0.0, 0.0], [0.5, 0.5, 0.5])

@@ -1,5 +1,6 @@
 pub mod builder;
-pub mod generated_gundam;
+pub mod mech_primitives;
+pub mod mobility_defaults;
 pub mod pmme;
 pub mod preservation;
 pub mod simulation;

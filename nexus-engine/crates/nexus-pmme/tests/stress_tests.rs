@@ -1,4 +1,4 @@
-use nexus_gundam::generated_gundam::{Earth, Mars, RotationLimits, Venus, AABB};
+use nexus_gundam::mech_primitives::{Earth, Mars, RotationLimits, Venus, AABB};
 use nexus_pmme::*;
 use std::marker::PhantomData;
 

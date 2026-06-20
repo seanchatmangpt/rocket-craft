@@ -361,3 +361,16 @@ All progress and status reports MUST strictly adhere to this format. Collapse al
 Do not generate WebGL assets from ontology. Unreal generates and packages render assets. `ggen` generates semantic authority artifacts consumed by Unreal C++: headers, enums, structs, constants, DataTables, Render BOM metadata, walkthrough coordinates, byte-class matrices, and receipt paths.
 
 `VaRest` is removed only when UE4 no longer requires runtime REST/JSON/Blueprint plugin logic to obtain world structure or Semantic LOD state.
+
+---
+
+# The Telemetry Codec Law
+
+**UE4 emits bytes. Rust restores meaning.**
+Do not stream strings out of the game. Stream admitted byte facts (OCEL8/OTEL8), then expand them at the authority boundary.
+
+---
+
+# Gap Closure Law
+
+Audit findings are not progress. A finding becomes progress only when it is converted into a failing check, repaired by the smallest scoped patch, and re-verified by a command. In-scope gaps must be closed automatically; out-of-scope gaps must be recorded as residuals, not discussed.
