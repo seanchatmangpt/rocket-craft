@@ -54,7 +54,11 @@ export default defineEventHandler(async (event) => {
     seq: evt.seq,
   }));
 
-  const { error: insertErr } = await supabase.from('ocel_events').insert(rows);
+  // Upsert on (session_id, seq) unique constraint — idempotent-receiver pattern.
+  // Duplicate event batches (retry on network error) produce the same rows, not duplicates.
+  const { error: insertErr } = await supabase
+    .from('ocel_events')
+    .upsert(rows, { onConflict: 'session_id,seq', ignoreDuplicates: true });
   if (insertErr) {
     throw createError({ statusCode: 500, message: `ocel_events insert failed: ${insertErr.message}` });
   }
