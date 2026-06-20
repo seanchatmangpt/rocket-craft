@@ -1,0 +1,35 @@
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+
+# -----------------------------------------------------------------------------
+# SPARQL: extract_phase_ordering_constraints.sparql
+# Bounded SELECT: phase ordering constraints (CF-1, CF-2 Petri-net precedences).
+# Drives positional-ordering enforcement code in the motion.rs Tera template.
+# Anti-Cartesian: LIMIT guards against unbounded cross-product on phase pairs.
+# -----------------------------------------------------------------------------
+
+SELECT
+  ?constraintLabel
+  ?predecessorLabel
+  ?successorLabel
+  ?counterfactual
+  ?law
+  ?heatThreshold
+WHERE {
+  ?constraint a mb:PhaseOrderingConstraint ;
+              mb:predecessor ?pred ;
+              mb:successor ?succ .
+
+  ?pred rdfs:label ?predecessorLabel .
+  ?succ rdfs:label ?successorLabel .
+
+  OPTIONAL { ?constraint rdfs:label ?constraintLabel . }
+  OPTIONAL { ?constraint mb:counterfactual ?counterfactual . }
+  OPTIONAL { ?constraint mb:law ?law . }
+  OPTIONAL { ?constraint mb:heatThreshold ?heatThreshold . }
+}
+ORDER BY ?counterfactual
+LIMIT 50

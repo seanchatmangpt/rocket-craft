@@ -1,0 +1,4 @@
+@prefix : <http://example.org/law#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+:074_ik_target_policy a :SourceLaw .

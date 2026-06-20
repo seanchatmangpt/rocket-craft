@@ -1,0 +1,92 @@
+{
+  "objects": {
+    "ontology:all_merged": "Ontology",
+    "asset:reference_fabric_001": "Asset",
+    "file:textures/T_WhiteArmor_BaseColor.png": "File",
+    "file:textures/T_WhiteArmor_Roughness.png": "File",
+    "file:textures/T_WhiteArmor_Normal.png": "File",
+    "file:textures/T_CyanBlade_Emissive.png": "File",
+    "file:textures/texture_manifest.json": "File",
+    "file:usd/ASSET_ReferenceFabric_001.usda": "File",
+    "file:renders/render_front.png": "File",
+    "file:renders/render_angled.png": "File",
+    "file:renders/render_silhouette.png": "File",
+    "file:renders/render_edges.png": "File",
+    "file:reports/visual_gap_report.json": "File",
+    "file:reports/visual_gap_report.md": "File",
+    "file:reports/verifier_report.json": "File",
+    "file:reports/verifier_report.md": "File",
+    "file:receipts/asset_receipts.jsonl": "File"
+  },
+  "events": [
+    {
+      "ocel:eid": "e_cv_extract",
+      "ocel:activity": "CV_Extraction",
+      "ocel:omap": [
+        "ontology:all_merged",
+        "asset:reference_fabric_001"
+      ]
+    },
+    {
+      "ocel:eid": "e_ont_merge",
+      "ocel:activity": "Ontology_Merge",
+      "ocel:omap": [
+        "ontology:all_merged"
+      ]
+    },
+    {
+      "ocel:eid": "e_ggen_sync",
+      "ocel:activity": "Ggen_Sync_Compilation",
+      "ocel:omap": [
+        "ontology:all_merged",
+        "asset:reference_fabric_001",
+        "file:usd/ASSET_ReferenceFabric_001.usda"
+      ]
+    },
+    {
+      "ocel:eid": "e_tex_gen",
+      "ocel:activity": "Texture_Generation",
+      "ocel:omap": [
+        "asset:reference_fabric_001",
+        "file:textures/T_WhiteArmor_BaseColor.png",
+        "file:textures/T_WhiteArmor_Roughness.png",
+        "file:textures/T_WhiteArmor_Normal.png",
+        "file:textures/T_CyanBlade_Emissive.png",
+        "file:textures/texture_manifest.json"
+      ]
+    },
+    {
+      "ocel:eid": "e_usd_render",
+      "ocel:activity": "USD_Rendering",
+      "ocel:omap": [
+        "asset:reference_fabric_001",
+        "file:usd/ASSET_ReferenceFabric_001.usda",
+        "file:renders/render_front.png",
+        "file:renders/render_angled.png"
+      ]
+    },
+    {
+      "ocel:eid": "e_vis_compare",
+      "ocel:activity": "Visual_Comparison",
+      "ocel:omap": [
+        "asset:reference_fabric_001",
+        "file:renders/render_front.png",
+        "file:renders/render_silhouette.png",
+        "file:renders/render_edges.png",
+        "file:reports/visual_gap_report.json",
+        "file:reports/visual_gap_report.md"
+      ]
+    },
+    {
+      "ocel:eid": "e_verification",
+      "ocel:activity": "Verification",
+      "ocel:omap": [
+        "asset:reference_fabric_001",
+        "file:reports/visual_gap_report.json",
+        "file:reports/verifier_report.json",
+        "file:reports/verifier_report.md",
+        "file:receipts/asset_receipts.jsonl"
+      ]
+    }
+  ]
+}

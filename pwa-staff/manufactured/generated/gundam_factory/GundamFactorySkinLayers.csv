@@ -1,0 +1,8 @@
+layer_index,layer_name,authority_binding,thermal_vent_visible,admission_status
+0,BaseMaterial,none,true,ADMITTED
+1,FactionPalette,none,true,ADMITTED
+2,ThermalZones,heat_class,true,ADMITTED
+3,DamageMasks,damage_class,true,ADMITTED
+4,WearMasks,stress_class,true,ADMITTED
+5,SemanticHighlights,lod_class,true,ADMITTED
+6,LodTextureSet,lod_class,true,ADMITTED

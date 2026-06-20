@@ -1,0 +1,7 @@
+lod_class,numeric_value,authority_required,projection_priority
+Crown,0,true,255
+Primary,1,true,200
+Secondary,2,false,128
+Tertiary,3,false,64
+Background,4,false,16
+Refused,255,false,0

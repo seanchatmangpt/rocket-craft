@@ -1,0 +1,10 @@
+PREFIX factory: <http://example.org/factory#>
+
+SELECT ?station_state ?part_state ?next_station_state
+WHERE {
+  ?transition a factory:StationProcessTransition ;
+              factory:stationState ?station_state ;
+              factory:partState ?part_state ;
+              factory:nextStationState ?next_station_state .
+}
+ORDER BY ?station_state ?part_state

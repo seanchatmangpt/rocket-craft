@@ -1,0 +1,108 @@
+// Mobility Default implementations — lore-grounded from UC Gundam tech manuals.
+// Physical quantities use QUDT 2.1 units (https://qudt.org/).
+// Source of truth: nexus-engine/.specify/schema/gundam_nexus.ttl
+
+use crate::generated_gundam::{Mobility, Walking, Flight, Hover, Aquatic, Space};
+use crate::generated_gundam::AABB;
+
+{% for row in results %}
+{% if row.name == "Walking" %}
+impl Default for Mobility {
+    /// Canonical baseline: RX-78-2 Gundam (UC 0079) bipedal locomotion.
+    /// mass={{ row.mass_kg | default(value="60000") }} kg (QUDT unit:KiloGM)
+    /// max_speed={{ row.max_speed_ms | default(value="45.83") }} m/s = 165 km/h (QUDT unit:M-PER-SEC)
+    fn default() -> Self {
+        Self {
+            id: "mobility-default".to_string(),
+            mass: {{ row.mass_kg | default(value="60000") }}_f32,
+            occupancy: AABB::default(),
+            clearance: AABB::default(),
+            load_capacity: {{ row.load_capacity_kg | default(value="55000") }}_f32,
+            max_speed: {{ row.max_speed_ms | default(value="45.83") }}_f32,
+        }
+    }
+}
+
+impl Default for Walking {
+    /// Canonical bipedal walking: RX-78-2 Gundam (2 legs, 165 km/h ground speed)
+    fn default() -> Self {
+        Self {
+            physical: Mobility::default(),
+            leg_count: {{ row.leg_count | default(value="2") }},
+        }
+    }
+}
+{% endif %}
+{% if row.name == "Flight" %}
+impl Default for Flight {
+    /// Canonical flight: Wing Gundam (AC 195) — 7,150 kg, Mach 1+, 14.4m wing span
+    fn default() -> Self {
+        Self {
+            physical: Mobility {
+                id: "flight-mobility".to_string(),
+                mass: {{ row.mass_kg | default(value="7150") }}_f32,
+                occupancy: AABB::default(),
+                clearance: AABB::default(),
+                load_capacity: {{ row.load_capacity_kg | default(value="4000") }}_f32,
+                max_speed: {{ row.max_speed_ms | default(value="340") }}_f32,
+            },
+            wing_span: {{ row.wing_span_m | default(value="14.4") }}_f32,
+        }
+    }
+}
+{% endif %}
+{% if row.name == "Hover" %}
+impl Default for Hover {
+    /// Canonical hover: The O (UC 0087) — 58,800 kg, 150 km/h, 1.2m ground clearance
+    fn default() -> Self {
+        Self {
+            physical: Mobility {
+                id: "hover-mobility".to_string(),
+                mass: {{ row.mass_kg | default(value="58800") }}_f32,
+                occupancy: AABB::default(),
+                clearance: AABB::default(),
+                load_capacity: {{ row.load_capacity_kg | default(value="50000") }}_f32,
+                max_speed: {{ row.max_speed_ms | default(value="41.67") }}_f32,
+            },
+            ground_clearance: {{ row.ground_clearance_m | default(value="1.2") }}_f32,
+        }
+    }
+}
+{% endif %}
+{% if row.name == "Aquatic" %}
+impl Default for Aquatic {
+    /// Canonical aquatic: MSM-03 Gogg (UC 0079) — 76,400 kg, 45 knots, rated to 100m
+    fn default() -> Self {
+        Self {
+            physical: Mobility {
+                id: "aquatic-mobility".to_string(),
+                mass: {{ row.mass_kg | default(value="76400") }}_f32,
+                occupancy: AABB::default(),
+                clearance: AABB::default(),
+                load_capacity: {{ row.load_capacity_kg | default(value="60000") }}_f32,
+                max_speed: {{ row.max_speed_ms | default(value="23.15") }}_f32,
+            },
+            depth_rating: {{ row.depth_rating_m | default(value="100") }}_f32,
+        }
+    }
+}
+{% endif %}
+{% if row.name == "Space" %}
+impl Default for Space {
+    /// Canonical space: MS-14A Gelgoog (UC 0079) — 73,800 kg, 890 kN (4 verniers)
+    fn default() -> Self {
+        Self {
+            physical: Mobility {
+                id: "space-mobility".to_string(),
+                mass: {{ row.mass_kg | default(value="73800") }}_f32,
+                occupancy: AABB::default(),
+                clearance: AABB::default(),
+                load_capacity: {{ row.load_capacity_kg | default(value="65000") }}_f32,
+                max_speed: {{ row.max_speed_ms | default(value="12.1") }}_f32,
+            },
+            thruster_count: {{ row.thruster_count | default(value="4") }},
+        }
+    }
+}
+{% endif %}
+{% endfor %}

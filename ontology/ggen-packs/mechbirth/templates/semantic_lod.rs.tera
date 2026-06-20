@@ -1,0 +1,114 @@
+// GENERATED FILE - DO NOT EDIT MANUALLY
+// Source: O* = ontology/ggen-packs/mechbirth/schema/mechbirth_lod_geom_motion.ttl
+// Pipeline: ggen -> extract_lod_classes.sparql -> semantic_lod.rs.tera
+// Synthesis: van der Aalst (worldline classification) + Carmack (flat u8 SoA, branchless SIMD, zero allocation)
+//
+// GC-MECHBIRTH-002 Semantic LOD Engine (SIMD SoA Rewrite)
+
+pub const BATCH_SIZE: usize = 64;
+
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum LodClass {
+{% for row in results %}
+    {{ row.label }} = {{ row.discriminant }},
+{% endfor %}
+}
+
+#[derive(Clone)]
+pub struct LodInputsSoA {
+    pub distance_class: [u8; BATCH_SIZE],
+    pub mission_relevance: [u8; BATCH_SIZE],
+    pub damage_class: [u8; BATCH_SIZE],
+    pub threat_class: [u8; BATCH_SIZE],
+    pub interaction_probability: [u8; BATCH_SIZE],
+    pub process_step_relevance: [u8; BATCH_SIZE],
+    pub prediction_relevance: [u8; BATCH_SIZE],
+}
+
+#[derive(Clone)]
+pub struct LodOutputSoA {
+    pub lod_class: [u8; BATCH_SIZE], // stores LodClass discriminant
+    pub projection_priority: [u8; BATCH_SIZE],
+    pub authority_required: [u8; BATCH_SIZE], // 0 or 1
+    pub refusal_mask: [u8; BATCH_SIZE], // 0 = ok, 1 = refused
+}
+
+impl LodOutputSoA {
+    pub fn new() -> Self {
+        Self {
+            lod_class: [0; BATCH_SIZE],
+            projection_priority: [0; BATCH_SIZE],
+            authority_required: [0; BATCH_SIZE],
+            refusal_mask: [0; BATCH_SIZE],
+        }
+    }
+}
+
+pub fn batch_classify(inputs: &LodInputsSoA, outputs: &mut LodOutputSoA) {
+    const MAX_CLASS: u8 = 15;
+    
+    // LUT for Projection Priority based on discriminant
+    let mut proj_priority_lut = [0u8; 256];
+{% for row in results %}
+    proj_priority_lut[{{ row.discriminant }}] = {{ row.projectionPriority }};
+{% endfor %}
+
+    // Branchless tight loop for LLVM auto-vectorization
+    for i in 0..BATCH_SIZE {
+        let v_dist = inputs.distance_class[i];
+        let v_miss = inputs.mission_relevance[i];
+        let v_dmg = inputs.damage_class[i];
+        let v_thr = inputs.threat_class[i];
+        let v_int = inputs.interaction_probability[i];
+        let v_proc = inputs.process_step_relevance[i];
+        let v_pred = inputs.prediction_relevance[i];
+
+        // CF-4 guard: all inputs <= 15
+        let out_of_bounds = (v_dist > MAX_CLASS) as u8
+            | (v_miss > MAX_CLASS) as u8
+            | (v_dmg > MAX_CLASS) as u8
+            | (v_thr > MAX_CLASS) as u8
+            | (v_int > MAX_CLASS) as u8
+            | (v_proc > MAX_CLASS) as u8
+            | (v_pred > MAX_CLASS) as u8;
+
+        // Branchless max()
+        let mut score = v_miss;
+        score = if v_dmg > score { v_dmg } else { score };
+        score = if v_thr > score { v_thr } else { score };
+        score = if v_int > score { v_int } else { score };
+        score = if v_proc > score { v_proc } else { score };
+
+        let is_crown = (score >= 13) as u8;
+        let is_primary = ((score >= 9) as u8) & (1 - is_crown);
+        let is_secondary = ((score >= 5) as u8) & (1 - (is_crown | is_primary));
+        let is_tertiary = ((score >= 2) as u8) & (1 - (is_crown | is_primary | is_secondary));
+        
+        let mut class_disc: u8 = 0;
+{% for row in results %}
+{% if row.label == "Crown" %}
+        class_disc = (is_crown * {{ row.discriminant }}) | ((1 - is_crown) * class_disc);
+{% elif row.label == "Primary" %}
+        class_disc = (is_primary * {{ row.discriminant }}) | ((1 - is_primary) * class_disc);
+{% elif row.label == "Secondary" %}
+        class_disc = (is_secondary * {{ row.discriminant }}) | ((1 - is_secondary) * class_disc);
+{% elif row.label == "Tertiary" %}
+        class_disc = (is_tertiary * {{ row.discriminant }}) | ((1 - is_tertiary) * class_disc);
+{% else %}
+        // Background sets class_disc if others are 0, initialized to 0
+{% endif %}
+{% endfor %}
+
+        // Crown explicit authority guard
+        let has_explicit = (v_miss >= 13) as u8 | (v_dmg >= 13) as u8 | (v_thr >= 13) as u8 | (v_proc >= 13) as u8;
+        let crown_violation = is_crown & (1 - has_explicit);
+
+        let refusal = out_of_bounds | crown_violation;
+
+        outputs.lod_class[i] = class_disc;
+        outputs.projection_priority[i] = proj_priority_lut[class_disc as usize];
+        outputs.authority_required[i] = is_crown | is_primary;
+        outputs.refusal_mask[i] = refusal;
+    }
+}

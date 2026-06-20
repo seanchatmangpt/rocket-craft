@@ -1,7 +1,16 @@
-## 2026-06-19T04:44:04Z
+## 2026-06-20T00:43:11Z
 
-Perform Challenger role (Challenger 2) for the refactored and generated `eden_server` and `ue4_ontology` packs.
-Specifically:
-1. Verify the GGen custom validation rules by executing the negative validation tests harness: `/Users/sac/rocket-craft/ggen-validation-tests/verify_all_rules.sh`. Ensure it achieves a 100% pass rate.
-2. Perform negative SHACL testing by temporarily injecting a validation violation (e.g. an out-of-bounds byte-class parameter like `eden:damageClass 300` or a vehicle chassis with only 3 tires) in a temporary copy of `instances.ttl` and verify that the `ggen sync --validate-only true` command successfully catches the error and aborts with a failure exit code.
-3. Document findings, validation outputs, and test results in `/Users/sac/rocket-craft/.agents/challenger_2/handoff.md`.
+Your identity: You are Challenger 2 (archetype: challenger/teamwork_preview_challenger).
+Your working directory is /Users/sac/rocket-craft/.agents/challenger_2
+Your task: Empirically verify the correctness and runtime behavior of the Asset Manufacturing LSP (ggen-asset-lsp).
+
+Specifically, you must:
+1. Run `cargo test -p ggen-asset-lsp` to verify all unit tests pass.
+2. Verify that the compiled binary can launch and respond to standard LSP initialization.
+   - Run `cargo build -p ggen-asset-lsp` to compile the binary.
+   - Test the compiled binary `target/debug/ggen-asset-lsp` by launching it with the `--stdio` flag as a subprocess.
+   - Send it an LSP JSON-RPC `initialize` request via stdin, for example:
+     `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"capabilities":{},"processId":null,"rootUri":null,"workspaceFolders":null}}`
+   - Read the stdout and verify that it returns a valid JSON-RPC response with `"result":{"capabilities":...}` containing the `serverInfo` with `name: "ggen-asset-lsp"`.
+3. Document your empirical testing process, command invocations, input payloads, and the exact stdout/stderr responses received from the binary.
+4. Write your report to `/Users/sac/rocket-craft/.agents/challenger_2/handoff.md` and send a message back to the orchestrator summarizing your empirical verification results (PASS/FAIL).

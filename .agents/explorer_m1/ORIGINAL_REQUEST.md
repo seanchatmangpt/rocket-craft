@@ -13,3 +13,15 @@ Specifically:
 4. Produce a detailed gap analysis report at `/Users/sac/rocket-craft/.agents/orchestrator_swarm_audit/m1_gap_report.md` specifying exactly which files have gaps, what the gaps are, and recommended solutions.
 Your working directory is `/Users/sac/rocket-craft/.agents/explorer_m1/`. Your identity is explorer_m1.
 Send a message back to the orchestrator when you are finished.
+
+## 2026-06-20T00:25:40Z
+Your identity: You are Explorer 1 (archetype: explorer/teamwork_preview_explorer).
+Your working directory is /Users/sac/rocket-craft/.agents/explorer_m1
+Your task: Explore the workspace and the external lsp-max framework to define the architecture for the Asset Manufacturing LSP (ggen-asset-lsp).
+
+Specifically:
+1. Examine `/Users/sac/lsp-max` to see how `LanguageServer`, `Client`, and other types are used. Check `examples/powl-lsp` and `examples/anti-llm-cheat-lsp` as references.
+2. Inspect the asset directory `generated/mech_assets/reference_fabric_001/` if it exists. Look at the `.usda`, `.mtlx` files, and any existing `visual_gap_report.json` or `usdchecker` logs to understand what they look like and how missing payloads, missing material bindings, unreceipted prims, and visual gap scores are structured.
+3. Find the generator parameter sources (SPARQL query, Tera template, or Rust parameter row) that generated `reference_fabric_001`. Where do they reside in `/Users/sac/rocket-craft`? What are the file paths? How does the generated USDA file reference or map back to these source generator files?
+4. Document all your findings, and provide a clear recommendation on how to map diagnostics and generate Code Actions pointing to the source generator files.
+5. Write your report to `/Users/sac/rocket-craft/.agents/explorer_m1/handoff.md` and send a message back to the orchestrator summarizing your findings and linking to your report.

@@ -1,0 +1,103 @@
+{
+  "ocelVersion": "2.0",
+  "objectTypes": [
+    {"name": "gundam", "attributes": [{"name": "gundam_id", "type": "string"}]}
+  ],
+  "eventTypes": [
+    {"name": "Spawn", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "FactoryEntrance", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "FrameAssembly", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "SocketTopology", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "ArmorSkinStation", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "RigMotionStation", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "VerificationGate", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "ReceiptTerminal", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]},
+    {"name": "ExitOrLoop", "attributes": [{"name": "audit_receipt", "type": "string"}, {"name": "prev_hash", "type": "string"}]}
+  ],
+  "objects": [
+    {"id": "case-gundam-factory-001", "type": "gundam", "attributes": [{"name": "gundam_id", "value": "case-gundam-factory-001"}], "relationships": []}
+  ],
+  "events": [
+    {
+      "id": "e1",
+      "type": "Spawn",
+      "attributes": [
+        {"name": "audit_receipt", "value": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f"},
+        {"name": "prev_hash", "value": "0000000000000000000000000000000000000000000000000000000000000000"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e2",
+      "type": "FactoryEntrance",
+      "attributes": [
+        {"name": "audit_receipt", "value": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099"},
+        {"name": "prev_hash", "value": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e3",
+      "type": "FrameAssembly",
+      "attributes": [
+        {"name": "audit_receipt", "value": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e"},
+        {"name": "prev_hash", "value": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e4",
+      "type": "SocketTopology",
+      "attributes": [
+        {"name": "audit_receipt", "value": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5"},
+        {"name": "prev_hash", "value": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e5",
+      "type": "ArmorSkinStation",
+      "attributes": [
+        {"name": "audit_receipt", "value": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e"},
+        {"name": "prev_hash", "value": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e6",
+      "type": "RigMotionStation",
+      "attributes": [
+        {"name": "audit_receipt", "value": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909"},
+        {"name": "prev_hash", "value": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e7",
+      "type": "VerificationGate",
+      "attributes": [
+        {"name": "audit_receipt", "value": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012"},
+        {"name": "prev_hash", "value": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e8",
+      "type": "ReceiptTerminal",
+      "attributes": [
+        {"name": "audit_receipt", "value": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1"},
+        {"name": "prev_hash", "value": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    },
+    {
+      "id": "e9",
+      "type": "ExitOrLoop",
+      "attributes": [
+        {"name": "audit_receipt", "value": "7b3f9e2fe08a1e5e30e03dbdd49b960ef189eb113f5ffb4460d898b9b7378818"},
+        {"name": "prev_hash", "value": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1"}
+      ],
+      "relationships": [{"objectId": "case-gundam-factory-001", "qualifier": "case"}]
+    }
+  ]
+}

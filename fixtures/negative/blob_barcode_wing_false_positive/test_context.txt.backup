@@ -1,0 +1,112 @@
+Context: {
+  "color": "0.0 0.8 1.0",
+  "emissive": "0.8",
+  "entities": [
+    {
+      "color": "0.0 0.8 1.0",
+      "emissive": "0.8",
+      "material": "https://rocket-craft.com/ontology/mud#M_CyanBlade",
+      "materialLocalName": "M_CyanBlade",
+      "metallic": "0.9",
+      "roughness": "0.15"
+    },
+    {
+      "color": "0.15 0.15 0.18",
+      "emissive": "0",
+      "material": "https://rocket-craft.com/ontology/mud#M_DarkFrame",
+      "materialLocalName": "M_DarkFrame",
+      "metallic": "0.5",
+      "roughness": "0.6"
+    },
+    {
+      "color": "1.0 0.8 0.0",
+      "emissive": "0.5",
+      "material": "https://rocket-craft.com/ontology/mud#M_GoldVisor",
+      "materialLocalName": "M_GoldVisor",
+      "metallic": "0.9",
+      "roughness": "0.1"
+    },
+    {
+      "color": "1.0 1.0 1.0",
+      "emissive": "0",
+      "material": "https://rocket-craft.com/ontology/mud#M_WhiteArmor",
+      "materialLocalName": "M_WhiteArmor",
+      "metallic": "0",
+      "roughness": "0.4"
+    }
+  ],
+  "material": "https://rocket-craft.com/ontology/mud#M_CyanBlade",
+  "materialLocalName": "M_CyanBlade",
+  "metallic": "0.9",
+  "results": [
+    {
+      "color": "0.0 0.8 1.0",
+      "emissive": "0.8",
+      "material": "https://rocket-craft.com/ontology/mud#M_CyanBlade",
+      "materialLocalName": "M_CyanBlade",
+      "metallic": "0.9",
+      "roughness": "0.15"
+    },
+    {
+      "color": "0.15 0.15 0.18",
+      "emissive": "0",
+      "material": "https://rocket-craft.com/ontology/mud#M_DarkFrame",
+      "materialLocalName": "M_DarkFrame",
+      "metallic": "0.5",
+      "roughness": "0.6"
+    },
+    {
+      "color": "1.0 0.8 0.0",
+      "emissive": "0.5",
+      "material": "https://rocket-craft.com/ontology/mud#M_GoldVisor",
+      "materialLocalName": "M_GoldVisor",
+      "metallic": "0.9",
+      "roughness": "0.1"
+    },
+    {
+      "color": "1.0 1.0 1.0",
+      "emissive": "0",
+      "material": "https://rocket-craft.com/ontology/mud#M_WhiteArmor",
+      "materialLocalName": "M_WhiteArmor",
+      "metallic": "0",
+      "roughness": "0.4"
+    }
+  ],
+  "roughness": "0.15",
+  "sparql_results": [
+    {
+      "color": "0.0 0.8 1.0",
+      "emissive": "0.8",
+      "material": "https://rocket-craft.com/ontology/mud#M_CyanBlade",
+      "materialLocalName": "M_CyanBlade",
+      "metallic": "0.9",
+      "roughness": "0.15"
+    },
+    {
+      "color": "0.15 0.15 0.18",
+      "emissive": "0",
+      "material": "https://rocket-craft.com/ontology/mud#M_DarkFrame",
+      "materialLocalName": "M_DarkFrame",
+      "metallic": "0.5",
+      "roughness": "0.6"
+    },
+    {
+      "color": "1.0 0.8 0.0",
+      "emissive": "0.5",
+      "material": "https://rocket-craft.com/ontology/mud#M_GoldVisor",
+      "materialLocalName": "M_GoldVisor",
+      "metallic": "0.9",
+      "roughness": "0.1"
+    },
+    {
+      "color": "1.0 1.0 1.0",
+      "emissive": "0",
+      "material": "https://rocket-craft.com/ontology/mud#M_WhiteArmor",
+      "materialLocalName": "M_WhiteArmor",
+      "metallic": "0",
+      "roughness": "0.4"
+    }
+  ]
+}
+template_name: none
+__template_name: none

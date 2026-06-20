@@ -261,4 +261,28 @@ mod tests {
         assert_eq!(snap.turn_number, 5);
         assert!(!snap.is_player1_turn);
     }
+
+    // ── Task C1: Prevent Authority Stream Inflation ────────────────────────────
+
+    #[test]
+    fn ensure_byte_class_server_authority_stream_not_inflated_by_high_poly() {
+        // Task C1: "Ensure the high-poly client projection doesn't inflate the byte-class server authority stream."
+        // We enforce this by guaranteeing the in-memory size of any ClientMessage
+        // or ServerMessage remains extremely compact. If a developer accidentally
+        // adds a `Vec<f32>` mesh transform array, this size will dramatically increase.
+        let client_size = std::mem::size_of::<ClientMessage>();
+        let server_size = std::mem::size_of::<ServerMessage>();
+
+        assert!(
+            client_size <= 128,
+            "ClientMessage has grown to {} bytes! Do not inflate the authority stream with projection data.",
+            client_size
+        );
+        
+        assert!(
+            server_size <= 256,
+            "ServerMessage has grown to {} bytes! Do not inflate the authority stream with projection data.",
+            server_size
+        );
+    }
 }

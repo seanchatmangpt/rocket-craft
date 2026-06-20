@@ -23,6 +23,7 @@ members = [
     "tools/gait-wasm",
     "tools/standalone-tps",
     "crates/rocket_preue4_verifier", "crates/wasm4pm-cognition", "crates/mech_factory_mud",
+    "crates/ggen-asset-lsp",
 ]
 exclude = [
     "unify-rs",

@@ -1,0 +1,29 @@
+// GENERATED FILE - DO NOT EDIT
+// Pipeline: ggen -> FIBO SoA Rust
+// Combines Aalst Petri Nets with Carmack SoA memory layout.
+
+use std::alloc::{alloc, dealloc, Layout};
+
+pub const MAX_CONTRACTS: usize = 1_000_000;
+
+{% for state in places %}
+pub const STATE_{{ state.name | upper }}: u8 = {{ state.mask_value }};
+{% endfor %}
+
+/// Contiguous Array of Structures of Arrays for FIBO execution
+pub struct FiboPetriNetSoA {
+    // 1-byte state mask per contract
+    pub state_mask: *mut u8,
+    // Add additional vectorizable fields derived from SPARQL here
+}
+
+impl FiboPetriNetSoA {
+    pub fn new() -> Self {
+        let layout = Layout::array::<u8>(MAX_CONTRACTS).unwrap();
+        unsafe {
+            Self {
+                state_mask: alloc(layout),
+            }
+        }
+    }
+}

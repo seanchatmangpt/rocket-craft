@@ -1,0 +1,13 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?ue4_projection ?owner_part_id ?type ?uassetPath ?blueprintClass
+WHERE {
+  ?ue4_projection rdf:type ?type .
+  ?type rdfs:subClassOf* mud:UE4Projection .
+  ?ue4_projection mud:owner_part_id ?owner_part_id .
+  OPTIONAL { ?ue4_projection mud:uassetPath ?uassetPath }
+  OPTIONAL { ?ue4_projection mud:blueprintClass ?blueprintClass }
+}
+ORDER BY ?owner_part_id ?ue4_projection

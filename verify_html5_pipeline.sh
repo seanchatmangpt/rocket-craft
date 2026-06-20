@@ -81,7 +81,7 @@ log_info "[2/5] Staging HTML5 package to pwa-staff/manufactured/..."
 SERVE_DIR="$CWD/pwa-staff/manufactured"
 mkdir -p "$SERVE_DIR"
 # Copy the entire archive directory (Brm.*, Utility.js, Brm.UE4.js, jquery/, bootstrap/)
-if [ -d "$ARCHIVE_DIR" ]; then
+if [ -d "$ARCHIVE_DIR" ] && [ "$ARCHIVE_DIR" != "$SERVE_DIR" ]; then
   cp -rf "$ARCHIVE_DIR"/. "$SERVE_DIR/"
 fi
 # Always ensure the wasm is present

@@ -1,0 +1,33 @@
+// GENERATED FILE - DO NOT EDIT
+// Pipeline: ggen -> FIBO SIMDe Kernel
+// Executes Petri net firing rules via branchless vector math.
+
+#include <simde/x86/avx2.h>
+#include <stdint.h>
+
+extern "C" {
+
+void execute_fibo_transitions(uint8_t* state_mask, size_t num_contracts) {
+    // Process 32 contracts per cycle
+    for (size_t i = 0; i < num_contracts; i += 32) {
+        simde__m256i current_states = simde_mm256_loadu_si256((simde__m256i*)&state_mask[i]);
+        
+        {% for transition in transitions %}
+        // Transition: {{ transition.name }} 
+        // Fires if state == {{ transition.input_state }}
+        // Result: {{ transition.output_state }}
+        
+        simde__m256i input_mask_{{ loop.index }} = simde_mm256_set1_epi8({{ transition.input_state_val }});
+        simde__m256i is_match_{{ loop.index }} = simde_mm256_cmpeq_epi8(current_states, input_mask_{{ loop.index }});
+        
+        simde__m256i target_state_{{ loop.index }} = simde_mm256_set1_epi8({{ transition.output_state_val }});
+        
+        // Branchless execution: blend target state in if matched
+        current_states = simde_mm256_blendv_epi8(current_states, target_state_{{ loop.index }}, is_match_{{ loop.index }});
+        {% endfor %}
+
+        simde_mm256_storeu_si256((simde__m256i*)&state_mask[i], current_states);
+    }
+}
+
+} // extern "C"

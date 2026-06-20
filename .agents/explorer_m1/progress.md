@@ -1,9 +1,10 @@
 # Progress - explorer_m1
 
-- Last visited: 2026-06-19T04:34:20Z
-- Status: Completed audit of RDF ontologies, SHACL validation shapes, and SPARQL queries in `/Users/sac/.ggen/packs/eden_server/` and `/Users/sac/.ggen/packs/ue4_ontology/`. Detailed report written to `/Users/sac/rocket-craft/.agents/orchestrator_swarm_audit/m1_gap_report.md`.
+- Last visited: 2026-06-20T00:29:10Z
+- Status: VERIFIED
 - Tasks:
-  - [x] Map classes, properties, SHACL shapes, and validation rules.
-  - [x] Check for missing elements (12 gameplay cells, 8 resolutions, LOD classes, rendering parameters, walkthrough, authority state dimensions).
-  - [x] Audit SPARQL queries for explicit ORDER BY clauses.
-  - [x] Compile detailed gap analysis report at `/Users/sac/rocket-craft/.agents/orchestrator_swarm_audit/m1_gap_report.md`.
+  - [x] Explore `/Users/sac/lsp-max` usage of `LanguageServer` and `Client` types (especially `powl-lsp` and `anti-llm-cheat-lsp`)
+  - [x] Inspect asset directory `generated/mech_assets/reference_fabric_001/` (.usda, .mtlx, visual gap report, usdchecker logs)
+  - [x] Find generator parameter sources in `/Users/sac/rocket-craft` and trace mapping
+  - [x] Define recommendation for diagnostics and Code Actions mapping back to source generator files
+  - [x] Write handoff.md report and notify orchestrator

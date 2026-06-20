@@ -1,0 +1,56 @@
+[
+    {
+        "fixture": "torso_contains_foreign_parts",
+        "seed": 201,
+        "disposition": "REFUSE_MODULAR_USD",
+        "errors": [
+            "USD303 ERROR: part-local file SM_Torso.usda contains foreign component prims: prim_head_visor",
+            "USD310 ERROR: part-scope query returned nonlocal rows in SM_Torso.usda"
+        ],
+        "expected_disposition": "REFUSE_MODULAR_USD",
+        "passed": true
+    },
+    {
+        "fixture": "socket_contains_mesh_payload",
+        "seed": 202,
+        "disposition": "REFUSE_MODULAR_USD",
+        "errors": [
+            "USD311 ERROR: socket prim contains mesh payload in SM_Torso.usda line 4560"
+        ],
+        "expected_disposition": "REFUSE_MODULAR_USD",
+        "passed": true
+    },
+    {
+        "fixture": "assembly_reference_inside_part_file",
+        "seed": 203,
+        "disposition": "REFUSE_MODULAR_USD",
+        "errors": [
+            "USD308 ERROR: part file SM_Torso.usda contains assembly-level children",
+            "USD312 ERROR: part file SM_Torso.usda references assembly root"
+        ],
+        "expected_disposition": "REFUSE_MODULAR_USD",
+        "passed": true
+    },
+    {
+        "fixture": "duplicate_part_fingerprint",
+        "seed": 204,
+        "disposition": "REFUSE_MODULAR_USD",
+        "errors": [
+            "USD301 ERROR: duplicate USD geometry fingerprint between SM_Blade_Right.usda and SM_Blade_Left.usda",
+            "USD306 ERROR: generated USD files share identical source template expansion between SM_Blade_Right.usda and SM_Blade_Left.usda",
+            "USD304 ERROR: expected part root missing in SM_Blade_Right.usda"
+        ],
+        "expected_disposition": "REFUSE_MODULAR_USD",
+        "passed": true
+    },
+    {
+        "fixture": "missing_owner_part_id",
+        "seed": 205,
+        "disposition": "REFUSE_MODULAR_USD",
+        "errors": [
+            "USD304 ERROR: expected part root missing in SM_Torso.usda"
+        ],
+        "expected_disposition": "REFUSE_MODULAR_USD",
+        "passed": true
+    }
+]

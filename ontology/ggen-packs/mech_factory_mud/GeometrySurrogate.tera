@@ -1,0 +1,30 @@
+// ggen-manufactured Geometry Surrogate Law
+// DO NOT EDIT BY HAND.
+// Hash: {{ __ggen_source_hash }}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct GeometrySurrogate {
+    pub aabb_min: [f32; 3],
+    pub aabb_max: [f32; 3],
+    pub has_socket: u8,
+    pub clearance_radius: f32,
+}
+
+pub const GEOMETRY_SURROGATES: &[GeometrySurrogate] = &[
+{% for row in results %}
+    GeometrySurrogate {
+        aabb_min: [{{ row.aabbMinX }}f32, {{ row.aabbMinY }}f32, {{ row.aabbMinZ }}f32],
+        aabb_max: [{{ row.aabbMaxX }}f32, {{ row.aabbMaxY }}f32, {{ row.aabbMaxZ }}f32],
+        has_socket: {{ row.hasSocket }},
+        clearance_radius: {{ row.clearanceRadius }}f32,
+    },
+{% endfor %}
+];
+
+// Branchless clearance check
+#[inline(always)]
+pub fn check_clearance(surrogate_index: usize, required_clearance: f32) -> u8 {
+    let surrogate = &GEOMETRY_SURROGATES[surrogate_index];
+    (surrogate.clearance_radius >= required_clearance) as u8
+}

@@ -1,0 +1,250 @@
+#usda 1.0
+(
+    defaultPrim = "SnowWhitePrelude"
+    metersPerUnit = 1.0
+    upAxis = "Y"
+    doc = "Structural USDA representation for the Snow White Prelude mecha, metric scale (meters)."
+)
+
+def Xform "SnowWhitePrelude" (
+    kind = "assembly"
+)
+{
+    # Base translation to place the mecha off the ground (in flight)
+    double3 xformOp:translate = (0, 15.0, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+    def Xform "Torso" (
+        kind = "component"
+    )
+    {
+        def Cube "Chest"
+        {
+            double3 xformOp:scale = (1.5, 1.8, 1.2)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Sphere "Sensor"
+        {
+            double radius = 0.4
+            double3 xformOp:translate = (0, 0, 1.2)
+            color3f[] primvars:displayColor = [(0.1, 0.8, 0.6)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "Head" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (0, 2.5, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        def Cube "Cranium"
+        {
+            double3 xformOp:scale = (0.6, 0.8, 0.7)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Cone "VFinLeft"
+        {
+            double radius = 0.1
+            double height = 1.2
+            double3 xformOp:translate = (-0.4, 0.5, 0.6)
+            double3 xformOp:rotateXYZ = (30, 0, -45)
+            color3f[] primvars:displayColor = [(0.9, 0.7, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cone "VFinRight"
+        {
+            double radius = 0.1
+            double height = 1.2
+            double3 xformOp:translate = (0.4, 0.5, 0.6)
+            double3 xformOp:rotateXYZ = (30, 0, 45)
+            color3f[] primvars:displayColor = [(0.9, 0.7, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+    }
+
+    def Xform "LeftArm" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (-2.5, 1.0, 0)
+        double3 xformOp:rotateXYZ = (20, -30, 45)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cube "ShoulderArmor"
+        {
+            double3 xformOp:scale = (1.0, 1.2, 1.0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Cylinder "Bicep"
+        {
+            double radius = 0.4
+            double height = 2.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "BeamSaber"
+        {
+            double radius = 0.15
+            double height = 8.0
+            double3 xformOp:translate = (0, -6.0, 2.0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.1, 0.9, 0.7)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+    }
+
+    def Xform "RightArm" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (2.5, 1.0, 0)
+        double3 xformOp:rotateXYZ = (20, 30, -45)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cube "ShoulderArmor"
+        {
+            double3 xformOp:scale = (1.0, 1.2, 1.0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Cylinder "Bicep"
+        {
+            double radius = 0.4
+            double height = 2.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "BeamSaber"
+        {
+            double radius = 0.15
+            double height = 8.0
+            double3 xformOp:translate = (0, -6.0, 2.0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.1, 0.9, 0.7)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+    }
+
+    def Xform "LeftLeg" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (-1.0, -2.5, 0)
+        double3 xformOp:rotateXYZ = (-20, 0, 10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cylinder "Thigh"
+        {
+            double radius = 0.6
+            double height = 3.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Calf"
+        {
+            double radius = 0.8
+            double height = 4.0
+            double3 xformOp:translate = (0, -5.0, 0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "RightLeg" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (1.0, -2.5, 0)
+        double3 xformOp:rotateXYZ = (10, 0, -10)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        def Cylinder "Thigh"
+        {
+            double radius = 0.6
+            double height = 3.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Calf"
+        {
+            double radius = 0.8
+            double height = 4.0
+            double3 xformOp:translate = (0, -5.0, 0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "Backpack_Wings" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (0, 0.0, -1.5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        # Main Feathers / Primary Wing Binders
+        def Xform "LeftPrimaryWing"
+        {
+            double3 xformOp:translate = (-2.0, 2.0, -1.0)
+            double3 xformOp:rotateXYZ = (20, 30, -30)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "WingBase"
+            {
+                double3 xformOp:scale = (6.0, 2.0, 0.2)
+                color3f[] primvars:displayColor = [(0.95, 0.95, 0.95)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+        def Xform "RightPrimaryWing"
+        {
+            double3 xformOp:translate = (2.0, 2.0, -1.0)
+            double3 xformOp:rotateXYZ = (20, -30, 30)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "WingBase"
+            {
+                double3 xformOp:scale = (6.0, 2.0, 0.2)
+                color3f[] primvars:displayColor = [(0.95, 0.95, 0.95)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+
+        # Sub-wings / Drei Zwerg binders
+        def Xform "LeftSubWing"
+        {
+            double3 xformOp:translate = (-3.0, -2.0, -0.5)
+            double3 xformOp:rotateXYZ = (-10, 45, -45)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "SubWingBase"
+            {
+                double3 xformOp:scale = (5.0, 1.5, 0.15)
+                color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+        def Xform "RightSubWing"
+        {
+            double3 xformOp:translate = (3.0, -2.0, -0.5)
+            double3 xformOp:rotateXYZ = (-10, -45, 45)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "SubWingBase"
+            {
+                double3 xformOp:scale = (5.0, 1.5, 0.15)
+                color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+    }
+}

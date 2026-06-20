@@ -1,0 +1,18 @@
+{
+  "event": "hash_after_regeneration",
+  "artifacts": {
+    "generated/gundam_factory/GundamFactoryReceiptManifest.json": "f0fdd4c17f7424674dae74c59857ffcaf623cc23be58d2a9ea1b881652a81d5b",
+    "generated/gundam_factory/GundamFactorySteps.rs": "2ed9c61b5516aff2ab1e3bbf017208494ea225548d93eb028f1f4d8021278420",
+    "generated/gundam_factory/GundamFactoryMotionFamilies.csv": "004928cc6aa45ab6c12fee3244c03ea45fb34c9e2501e98a6e9e59bba0506a86",
+    "generated/gundam_factory/GundamFactoryTransitionTable.csv": "e889bc0c51b021002376490c303c68e68711a01b9b0355077598e4cde2c9ecff",
+    "generated/gundam_factory/GundamFactorySocketTopology.csv": "e4fa8d32a99e5ec7b3f0aea2b5cb59a44e9fa74b5967d169c3f561847d68c6f9",
+    "generated/gundam_factory/GundamFactoryOCELSeed.json": "318761a486ccd760e6ea44a2037b4518be641487692ab0a7e5c23394dc05bf03",
+    "generated/gundam_factory/GundamFactoryLODClasses.csv": "b930f8236d7b3e36b3c6a9817a16ef1653df1794120c862274ae32458c11802b",
+    "generated/gundam_factory/GundamFactoryAuthorityClasses.csv": "827aa08b38b604805245aa63e98ea4131fab5be4113eefd1fdeb90877e176eb5",
+    "generated/gundam_factory/GundamFactoryProjectionRows.csv": "560608b30b4bb53fcbd34f5c63af6f288c4b3e86b6dfcf29b987617366dd8305",
+    "generated/gundam_factory/GundamFactoryProjectionManifest.json": "4a117f7e9eb29a5a1f46ad1d759ccf0586ffcf7fc98f1734db7546c5699ee237",
+    "generated/gundam_factory/GundamFactorySteps.h": "b6a65f3cc7d85e8507dacd742e79a058513e2e8700fd58b93123177546cb6dc2",
+    "generated/gundam_factory/GundamFactoryPredictionRules.csv": "8056e83822536870986a0d0482843f372b589b6edbd6debad72690e8e4bd724e",
+    "generated/gundam_factory/GundamFactorySkinLayers.csv": "e4c4971ec44f86fb88942420b44632b6e94f611cc6c573e59a618e31960dec00"
+  }
+}

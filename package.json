@@ -1,0 +1,19 @@
+{
+  "name": "rocket-craft",
+  "version": "1.0.0",
+  "description": "Rocket Craft is a multiplatform gaming ecosystem built on the battle-tested **Unreal Engine 4.24** architecture. Orchestrated by a modern **Rust SDK** (`rocket-sdk` and the `./rocket` CLI), Rocket Craft provides a unified developer experience (DX) for managing, building, and deploying highly optimized Unreal Engine projects across Web (HTML5/WebGL), Windows, Linux, macOS, Android, and iOS.",
+  "main": "genie_server.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0",
+    "playwright": "^1.61.0"
+  }
+}

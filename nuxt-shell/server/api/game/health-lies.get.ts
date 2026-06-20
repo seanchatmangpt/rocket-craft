@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
   const sb = createClient<any>(supabaseUrl, serviceKey);
   const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
-  const [lie1Res, lie2Res, lie4Res] = await Promise.allSettled([
+  const [lie1Res, lie2Res, lie4Res, lie5Res, lie6Res] = await Promise.allSettled([
     sb.from('game_receipts')
       .select('id, verdict, ocel_event_count')
       .eq('verdict', 'PASS')
@@ -48,12 +48,25 @@ export default defineEventHandler(async (event) => {
       .select('id, engine_source')
       .eq('engine_source', 'synthetic')
       .limit(5),
+    // LIE-5: FAIL receipt on sessions that have ocel_event_count > 0 (false-negative rejection)
+    sb.from('game_receipts')
+      .select('id, session_id, verdict, ocel_event_count')
+      .eq('verdict', 'FAIL')
+      .gt('ocel_event_count', 0)
+      .limit(5),
+    // LIE-6: receipts with NULL verdict — pipeline stalled
+    sb.from('game_receipts')
+      .select('id, session_id, verdict')
+      .is('verdict', null)
+      .limit(5),
   ]);
 
   const lies = detectLies(
     lie1Res.status === 'fulfilled' ? lie1Res.value.data : null,
     lie2Res.status === 'fulfilled' ? lie2Res.value.data : null,
     lie4Res.status === 'fulfilled' ? lie4Res.value.data : null,
+    lie5Res.status === 'fulfilled' ? lie5Res.value.data : null,
+    lie6Res.status === 'fulfilled' ? lie6Res.value.data : null,
   );
 
   return {

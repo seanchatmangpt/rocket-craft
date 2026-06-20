@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ReceiptEvent {
@@ -30,10 +30,7 @@ pub fn verify_receipt_chain(chain: &[ReceiptEvent]) -> anyhow::Result<()> {
         if receipt.prev_hash != expected_prev {
             anyhow::bail!("Broken prev_hash");
         }
-        let payload = format!(
-            "{}:{}:{}",
-            receipt.sequence, receipt.event_type, receipt.status
-        );
+        let payload = format!("{}:{}:{}", receipt.sequence, receipt.event_type, receipt.status);
         let expected_hash = generate_hash(&payload);
         if receipt.receipt != expected_hash {
             anyhow::bail!("Mutated event");

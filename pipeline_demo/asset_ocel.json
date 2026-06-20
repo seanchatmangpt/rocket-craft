@@ -1,0 +1,25 @@
+{
+  "ocel:global-event": { "ocel:activity": "AssetManufactured" },
+  "ocel:global-object": { "ocel:type": "USD_Asset" },
+  "ocel:events": {
+    "evt_001": {
+      "ocel:activity": "SPARQL_Extraction",
+      "ocel:timestamp": "2026-06-19T17:10:00Z",
+      "ocel:omap": ["SM_TestArmorPanel"]
+    },
+    "evt_002": {
+      "ocel:activity": "Tera_Projection",
+      "ocel:timestamp": "2026-06-19T17:10:01Z",
+      "ocel:omap": ["SM_TestArmorPanel", "M_TestArmorPanel"]
+    },
+    "evt_003": {
+      "ocel:activity": "Validation_usdchecker",
+      "ocel:timestamp": "2026-06-19T17:10:02Z",
+      "ocel:omap": ["SM_TestArmorPanel"]
+    }
+  },
+  "ocel:objects": {
+    "SM_TestArmorPanel": { "ocel:type": "USD_StaticMesh" },
+    "M_TestArmorPanel": { "ocel:type": "MaterialX_Definition" }
+  }
+}

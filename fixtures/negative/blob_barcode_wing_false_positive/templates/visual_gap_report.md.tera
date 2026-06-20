@@ -1,0 +1,17 @@
+# Visual Gap Report — GC-MECH-ASSET-FABRIC-001
+
+This report compiles the target expectations from the setup phase.
+
+## Visual Target Expectations
+
+{% for row in results %}
+- **Aspect Ratio**: {{ row.aspectRatio }}
+- **Symmetry**: {{ row.symmetry }}
+- **Bounding Box**: [{{ row.bboxMinX }}, {{ row.bboxMinY }}, {{ row.bboxMaxX }}, {{ row.bboxMaxY }}]
+- **Color Proportions**:
+  - **White (Armor)**: {{ row.whiteProportion }}
+  - **Dark (Frame)**: {{ row.darkProportion }}
+  - **Cyan (Blade/Emissive)**: {{ row.cyanProportion }}
+  - **Gold (Visor/Highlight)**: {{ row.goldProportion }}
+  - **Red (Accent)**: {{ row.redProportion }}
+{% endfor %}

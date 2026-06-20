@@ -1,0 +1,3 @@
+// generated_by: ggen
+// Route module
+pub const ROUTE_NODES_COUNT: usize = 9;

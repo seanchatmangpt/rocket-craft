@@ -1,0 +1,92 @@
+[
+  {
+    "projection_id": "PROJ-001",
+    "source_powl_step": "Spawn",
+    "source_receipt": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetMeshVariant",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_GundamFrame",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-002",
+    "source_powl_step": "FactoryEntrance",
+    "source_receipt": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetMeshVariant",
+    "semantic_lod_class": "Crown",
+    "ue4_target_surface": "BP_GundamSocket",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-003",
+    "source_powl_step": "FrameAssembly",
+    "source_receipt": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetMaterialMask",
+    "semantic_lod_class": "Secondary",
+    "ue4_target_surface": "BP_ArmorPanel",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-004",
+    "source_powl_step": "SocketTopology",
+    "source_receipt": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetAnimationParam",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_GundamRig",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-005",
+    "source_powl_step": "ArmorSkinStation",
+    "source_receipt": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetAnimationParam",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_MotionFamily",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-006",
+    "source_powl_step": "RigMotionStation",
+    "source_receipt": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetMaterialMask",
+    "semantic_lod_class": "Secondary",
+    "ue4_target_surface": "BP_SkinLayer",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-007",
+    "source_powl_step": "VerificationGate",
+    "source_receipt": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetVisibilityBatch",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_GundamProjection",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-008",
+    "source_powl_step": "ReceiptTerminal",
+    "source_receipt": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetDebugReceiptOverlay",
+    "semantic_lod_class": "Crown",
+    "ue4_target_surface": "BP_ReceiptOverlay",
+    "admission_status": "ADMITTED"
+  },
+  {
+    "projection_id": "PROJ-009",
+    "source_powl_step": "ExitOrLoop",
+    "source_receipt": "7b3f9e2fe08a1e5e30e03dbdd49b960ef189eb113f5ffb4460d898b9b7378818",
+    "object_id": "case-gundam-factory-001",
+    "projection_type": "SetVisibilityBatch",
+    "semantic_lod_class": "Primary",
+    "ue4_target_surface": "BP_ExitOverlay",
+    "admission_status": "ADMITTED"
+  }
+]

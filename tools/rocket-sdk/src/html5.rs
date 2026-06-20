@@ -191,11 +191,17 @@ impl Html5PackageReport {
 
         // OCEL lifecycle: prefer UAT log-derived events (richer evidence); fall back to
         // artifact-derived stages when no log events are available (offline verify).
+        //
+        // PreflightPassed is always prepended — it proves the pipeline gate ran before UAT.
+        // PackageVerified is always appended after the verify step completes.
         let lifecycle: Vec<String> = if !self.cook_log_events.is_empty() {
             // Log-derived: real cook evidence from UAT log patterns
-            let mut lc: Vec<String> = self.cook_log_events.iter()
-                .map(|e| e.activity.clone())
-                .collect();
+            let mut lc = vec!["PreflightPassed".to_string()];
+            for e in &self.cook_log_events {
+                if !lc.contains(&e.activity) {
+                    lc.push(e.activity.clone());
+                }
+            }
             // Append verify-time stages that the log can't observe (they happen after UAT exits)
             if self.ui_input_patched && !lc.contains(&"UiInputPatched".to_string()) {
                 lc.push("UiInputPatched".to_string());
@@ -206,7 +212,7 @@ impl Html5PackageReport {
             lc
         } else {
             // Artifact-derived fallback (offline verify / no log available)
-            let mut lc = vec!["CookStarted".to_string()];
+            let mut lc = vec!["PreflightPassed".to_string(), "CookStarted".to_string()];
             if self.wasm_files.iter().any(|f| matches!(f.verdict, WasmVerdict::Real { .. })) {
                 lc.push("WasmPackaged".to_string());
             }
@@ -1505,11 +1511,14 @@ mod tests {
     }
 
     #[test]
-    fn as_supabase_receipt_lifecycle_starts_with_cook_started() {
+    fn as_supabase_receipt_lifecycle_starts_with_preflight_passed() {
         let dir = TempDir::new().unwrap();
         let report = make_real_report(&dir);
         let receipt = report.as_supabase_receipt();
-        assert_eq!(receipt.ocel_lifecycle[0], "CookStarted");
+        // PreflightPassed is always first — proves the gate ran before UAT
+        assert_eq!(receipt.ocel_lifecycle[0], "PreflightPassed");
+        // CookStarted must follow in the artifact-derived fallback path
+        assert!(receipt.ocel_lifecycle.contains(&"CookStarted".to_string()));
         assert!(receipt.ocel_lifecycle.contains(&"WasmPackaged".to_string()));
         assert!(receipt.ocel_lifecycle.contains(&"PackageVerified".to_string()));
     }

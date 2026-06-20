@@ -160,3 +160,8 @@ clean-html5:
 clean-pwa:
     rm -rf pwa-staff/node_modules
     cd pwa-staff && npm ci
+
+# Verify flagship mecha pipeline (F1 Cinematic gate)
+verify-flagship-ue4-mech:
+    ./verify_mecha_pipeline.sh
+

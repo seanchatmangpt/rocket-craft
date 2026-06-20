@@ -1,0 +1,230 @@
+{
+  "generated_at": "2026-06-19T19:20:30.760791+00:00",
+  "ggen_version": "26.6.11",
+  "inputs": {
+    "manifest_hash": "a5127df93ac3d06cb114c76169c2e6ce30dcf36a77704612b4e5f76b4de88bdb",
+    "ontology_hashes": {
+      "/Users/sac/rocket-craft/ggen-validation-tests/core.ttl": "8cc6ef64df949e6fb48d40a33fade523ae1c7af0095e600a5a1acc4f7ddaa0be"
+    },
+    "template_hashes": {},
+    "query_hashes": {}
+  },
+  "pipeline": [
+    {
+      "step_type": "inference",
+      "name": "infer-is-component-of",
+      "duration_ms": 5,
+      "triples_added": 2,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "inference",
+      "name": "infer-is-level-of",
+      "duration_ms": 0,
+      "triples_added": 1,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactorySteps_h",
+      "duration_ms": 2,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactorySteps_rs",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryProjectionRows_csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactorySocketTopology_csv",
+      "duration_ms": 4,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactorySkinLayers_csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryMotionFamilies_csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryLODClasses_csv",
+      "duration_ms": 4,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryAuthorityClasses_csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryTransitionTable_csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryPredictionRules_csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryReceiptManifest_json",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryProjectionManifest_json",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "GundamFactoryOCELSeed_json",
+      "duration_ms": 3,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "readme",
+      "duration_ms": 8,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.h",
+      "content_hash": "a41f4e17330f314eb027d2aa1bb97a6a09cdcc484c365484ed9f3025e1709043",
+      "size_bytes": 441,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.h"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.rs",
+      "content_hash": "2d1bad3d0b4f829733806983cba52f76983b2237b160246e67d83e9f9cf7a5e8",
+      "size_bytes": 855,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionRows.csv",
+      "content_hash": "bf4fdc61b77ffc7aeb4a30f52a5ae46556d7a6f13d099e710c256756011651d3",
+      "size_bytes": 1589,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionRows.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySocketTopology.csv",
+      "content_hash": "fb728136a4235ce38a7e3cdc795dd7c3df917efa703c372e4c99f2181e053dd2",
+      "size_bytes": 344,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySocketTopology.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySkinLayers.csv",
+      "content_hash": "ee3ba66a54859e9ed96a1e9e0f0588d87b9c2509101a17bf07811d248d14a88c",
+      "size_bytes": 353,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySkinLayers.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryMotionFamilies.csv",
+      "content_hash": "d09836ac14b53e2d7353665faee9e7cab492b89c345b1b94f8291a49fdeeffd0",
+      "size_bytes": 370,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryMotionFamilies.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryLODClasses.csv",
+      "content_hash": "e9917393a5ebb25835ceb967f769fbc4b6f275ff22dc88b6ff4c8836b54b0b86",
+      "size_bytes": 182,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryLODClasses.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryAuthorityClasses.csv",
+      "content_hash": "e5b20abb29bd42613a1d44bfd2b60e451ebf6dafa18885926950ad05f6630613",
+      "size_bytes": 338,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryAuthorityClasses.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryTransitionTable.csv",
+      "content_hash": "07e61110f8d7092ee4df04a4549877e9e25d745983093e0cacb8403ca44f495b",
+      "size_bytes": 346,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryTransitionTable.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryPredictionRules.csv",
+      "content_hash": "7af38ce6fc7954325d9337cbbbc65c6e2827836d1e56cc149436721f3e2c9630",
+      "size_bytes": 307,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryPredictionRules.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryReceiptManifest.json",
+      "content_hash": "f517a4362325803ff6bbc6484dc889ca8f8d89eb2d4997adb4f33a11168811fb",
+      "size_bytes": 1620,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryReceiptManifest.json"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionManifest.json",
+      "content_hash": "dfe9cf77f26f55cda2303f427d3bcc21680ef932c4401efc6d2a0c2e57a76dff",
+      "size_bytes": 3400,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionManifest.json"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryOCELSeed.json",
+      "content_hash": "983f782fc16bdcb539ac633fe1280f2c6808eaa3289eb88aea1f1cc25a3131ea",
+      "size_bytes": 5127,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryOCELSeed.json"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/ggen-validation-tests/./README.md",
+      "content_hash": "f9503915554dbc304a8c20b83b3977b64568da4726c80122831cb49d35e40e08",
+      "size_bytes": 14,
+      "source_rule": "rule-/Users/sac/rocket-craft/ggen-validation-tests/./README.md"
+    }
+  ],
+  "validation_passed": true,
+  "total_duration_ms": 0
+}

@@ -1,31 +1,31 @@
-# BRIEFING — 2026-06-19T20:44:00Z
+# BRIEFING — 2026-06-20T00:56:13Z
 
 ## Mission
-Complete milestone GC-MECH-FACTORY-MUD-002: convert python-based verification scripts into native Rust tools and continue to build out the system strictly via the ontology-driven pipeline.
+Monitor the orchestrator to construct the full design-space product for AAA UE4 mech assets.
 
 ## 🔒 My Identity
 - Archetype: sentinel
 - Working directory: /Users/sac/rocket-craft/.agents/
-- Orchestrator: 6f2354dc-f3cf-4d95-ac26-1866cb1cb85e
-- Victory Auditor: 2202ef00-71d3-48e2-b636-da02ea0616e4
+- Orchestrator: e67fe348-6bc0-4ff7-816b-a8276de6783f
+- Victory Auditor: TBD
 
 ## 🔒 Key Constraints
 - No technical decisions — relay only
 - Victory Audit is MANDATORY before reporting completion
-- Working directory for project: /Users/sac/rocket-craft
-- Integrity mode: benchmark
+- Target AAA_UE4_MECH_PACK_001 using combinatorial maximalism
+- Run parallel generation swarms and refuse aggressively
 
 ## User Context
-- **Last user request**: Convert python-based verification scripts to native Rust (GC-MECH-FACTORY-MUD-002).
+- **Last user request**: Target AAA_UE4_MECH_PACK_001 using combinatorial maximalism
 - **Pending clarifications**: none
-- **Delivered results**: Replicated python-based verification scripts to native Rust tools and verified via ontology-driven pipeline.
+- **Delivered results**: none
 
 ## Project Status
-- **Phase**: complete
+- **Phase**: in progress
 
 ## Victory Audit Status
-- **Triggered**: yes
-- **Verdict**: VICTORY CONFIRMED
+- **Triggered**: no
+- **Verdict**: pending
 - **Retry count**: 0
 
 ## Artifact Index

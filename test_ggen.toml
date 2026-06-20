@@ -1,0 +1,15 @@
+[project]
+name = "test"
+version = "0.1.0"
+description = "test"
+
+[ontology]
+source = "ontology/all_merged.ttl"
+standard_only = false
+
+[[generation.rules]]
+name = "dummy"
+query = { inline = "SELECT * WHERE { ?s ?p ?o } LIMIT 1" }
+mode = "Overwrite"
+template = { inline = "test" }
+output_file = "generated/dummy.txt"

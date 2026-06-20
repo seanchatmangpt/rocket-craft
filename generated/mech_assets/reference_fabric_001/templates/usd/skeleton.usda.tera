@@ -1,0 +1,30 @@
+#usda 1.0
+(
+    defaultPrim = "Rig"
+    upAxis = "Y"
+    metersPerUnit = 0.01
+)
+
+def SkelRoot "Rig"
+{
+    def Skeleton "Skeleton"
+    {
+        uniform token[] joints = [
+            {% for row in results %}
+            "{{ row.owner_part_id | split(pat="#") | last }}"{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        ]
+        
+        uniform matrix4d[] bindTransforms = [
+            {% for row in results %}
+            ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) ){% if not loop.last %}, {% endif %}
+            {% endfor %}
+        ]
+        
+        uniform matrix4d[] restTransforms = [
+            {% for row in results %}
+            ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1) ){% if not loop.last %}, {% endif %}
+            {% endfor %}
+        ]
+    }
+}

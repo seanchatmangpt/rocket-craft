@@ -1,10 +1,11 @@
 # Progress
 
-- [x] Initialize BRIEFING.md and ORIGINAL_REQUEST.md
-- [x] Run validation checks on eden_server and ue4_ontology packs
-- [x] Inspect validation queries and shapes for ORDER BY and syntax correctness
-- [x] Check generated output files for auto-generated / DO NOT EDIT banners
-- [x] Formulate quality and adversarial review reports
-- [x] Write handoff.md and notify orchestrator
+- [x] Read new request and update ORIGINAL_REQUEST.md and BRIEFING.md
+- [ ] Verify cargo check and cargo test for ggen-asset-lsp
+- [ ] Review implementation correctness (R1-R5)
+- [ ] Review implementation completeness and robustness
+- [ ] Review code style and AGENTS.md compliance
+- [ ] Formulate review report and write to handoff.md
+- [ ] Notify orchestrator of verdict and findings
 
-Last visited: 2026-06-19T04:45:52Z
+Last visited: 2026-06-20T00:43:00Z

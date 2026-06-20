@@ -1,0 +1,4 @@
+@prefix : <http://example.org/law#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+:086_ue4_skeletal_mesh_projection a :SourceLaw .

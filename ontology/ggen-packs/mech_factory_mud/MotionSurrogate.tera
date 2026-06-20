@@ -1,0 +1,29 @@
+// ggen-manufactured Motion Surrogate Law
+// DO NOT EDIT BY HAND.
+// Hash: {{ __ggen_source_hash }}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MotionSurrogate {
+    pub inspect_precedence: u8,
+    pub repair_precedence: u8,
+    pub fire_weapon_precedence: u8,
+}
+
+pub const MOTION_SURROGATES: &[MotionSurrogate] = &[
+{% for row in results %}
+    MotionSurrogate {
+        inspect_precedence: {{ row.inspectPrecedence }},
+        repair_precedence: {{ row.repairPrecedence }},
+        fire_weapon_precedence: {{ row.fireWeaponPrecedence }},
+    },
+{% endfor %}
+];
+
+// Branchless precedence check: returns 1 if action is allowed, 0 otherwise
+#[inline(always)]
+pub fn can_fire_weapon(surrogate_index: usize, current_state_precedence: u8) -> u8 {
+    let surrogate = &MOTION_SURROGATES[surrogate_index];
+    // Must be strictly greater than or equal precedence
+    (current_state_precedence >= surrogate.fire_weapon_precedence) as u8
+}

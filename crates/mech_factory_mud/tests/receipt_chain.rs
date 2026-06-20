@@ -1,4 +1,4 @@
-use mech_factory_mud::receipt::{ReceiptEvent, generate_hash, verify_receipt_chain};
+use mech_factory_mud::receipt::{ReceiptEvent, verify_receipt_chain, generate_hash};
 
 #[test]
 fn test_valid_receipt_chain_passes() {

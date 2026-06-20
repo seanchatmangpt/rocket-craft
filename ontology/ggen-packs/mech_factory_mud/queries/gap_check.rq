@@ -1,0 +1,32 @@
+PREFIX mud: <http://rocket-craft.com/ontology/mud#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?subject ?type ?path ?fileType ?checkId ?desc ?checkType ?cmd WHERE {
+    {
+        ?subject a mud:ExpectedFile ;
+                 mud:filePath ?path ;
+                 mud:fileType ?fileType .
+        BIND("ExpectedFile" AS ?type)
+    }
+    UNION
+    {
+        ?subject a mud:GapCheckRule ;
+                 mud:checkId ?checkId ;
+                 mud:checkDescription ?desc ;
+                 mud:checkType ?checkType .
+        BIND("GapCheckRule" AS ?type)
+        OPTIONAL { ?subject mud:checkCommand ?cmd }
+        OPTIONAL { ?subject mud:filePath ?path }
+    }
+    UNION
+    {
+        ?subject a mud:Station .
+        BIND("Station" AS ?type)
+    }
+    UNION
+    {
+        ?subject a mud:RouteNode .
+        BIND("RouteNode" AS ?type)
+    }
+} ORDER BY ?type ?subject ?checkId

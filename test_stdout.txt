@@ -1,0 +1,96 @@
+
+running 24 tests
+test generated_tests::generated_tests::crate_uses_ggen_generated_constants ... ok
+test generated_tests::generated_tests::generated_authority_constants_exist ... ok
+test generated_tests::generated_tests::generated_authority_header_exists ... ok
+test generated_tests::generated_tests::generated_factory_stations_csv_has_6_canonical_rows ... ok
+test generated_tests::generated_tests::generated_header_station_ids_match_factory_stations_csv ... ok
+test generated_tests::generated_tests::generated_header_route_ids_match_walkthrough_route_csv ... ok
+test generated_tests::generated_tests::generated_motion_families_csv_exists ... ok
+test generated_tests::generated_tests::generated_ocel_constants_exist ... ok
+test generated_tests::generated_tests::generated_part_constants_exist ... ok
+test generated_tests::generated_tests::generated_projection_commands_csv_exists ... ok
+test generated_tests::generated_tests::generated_part_families_csv_exists ... ok
+test generated_tests::generated_tests::generated_projection_constants_exist ... ok
+test generated_tests::generated_tests::generated_projection_header_exists ... ok
+test generated_tests::generated_tests::generated_receipt_constants_exist ... ok
+test generated_tests::generated_tests::generated_route_constants_exist ... ok
+test generated_tests::generated_tests::generated_semantic_lod_csv_exists ... ok
+test generated_tests::generated_tests::generated_projection_commands_have_source_receipt_required ... ok
+test generated_tests::generated_tests::generated_skin_layers_csv_exists ... ok
+test generated_tests::generated_tests::generated_socket_topology_csv_exists ... ok
+test generated_tests::generated_tests::generated_station_constants_exist ... ok
+test generated_tests::generated_tests::generated_steps_header_exists ... ok
+test generated_tests::generated_tests::generated_walkthrough_route_has_9_nodes ... ok
+test generated_tests::generated_tests::generated_walkthrough_route_is_connected ... ok
+test generated_tests::generated_tests::generated_walkthrough_route_order_is_deterministic ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 25 tests
+test generated_authority_field_bounds_are_field_specific ... ok
+test t1 ... ok
+test t10 ... ok
+test t12 ... ok
+test t11 ... ok
+test t14 ... ok
+test t15 ... ok
+test t13 ... ok
+test t16 ... ok
+test t17 ... ok
+test t19 ... ok
+test t2 ... ok
+test t18 ... ok
+test t21 ... ok
+test t22 ... ok
+test t23 ... ok
+test t24 ... ok
+test t3 ... ok
+test t4 ... ok
+test t6 ... ok
+test t5 ... ok
+test t7 ... ok
+test t8 ... ok
+test t9 ... ok
+test t20 ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+
+running 5 tests
+test test_broken_prev_hash_fails ... ok
+test test_duplicate_sequence_fails ... ok
+test test_missing_sequence_fails ... ok
+test test_mutated_event_fails ... ok
+test test_valid_receipt_chain_passes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test test_refused_missing_socket ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 1 test
+test test_generated_header_disagrees_with_csv ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

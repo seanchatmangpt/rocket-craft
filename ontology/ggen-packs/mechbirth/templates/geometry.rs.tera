@@ -1,0 +1,87 @@
+// GENERATED FILE - DO NOT EDIT MANUALLY
+// Source: O* = ontology/ggen-packs/mechbirth/schema/mechbirth_lod_geom_motion.ttl
+// Pipeline: ggen -> extract_part_families.sparql -> geometry.rs.tera
+// Synthesis: van der Aalst (validation as token-gate) + Carmack (flat byte arrays, branchless SIMD, zero allocation)
+//
+// GC-MECHBIRTH-002 Geometry Surrogate (SIMD SoA Rewrite)
+
+pub const BATCH_SIZE: usize = 64;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PartFamily {
+{% for row in results %}
+    {{ row.label }} = {{ loop.index0 }},
+{% endfor %}
+}
+
+#[derive(Clone)]
+pub struct GeometrySoA {
+    pub family: [u8; BATCH_SIZE],
+    
+    // AABBs stored as flat arrays
+    pub bounds_min_x: [f32; BATCH_SIZE],
+    pub bounds_min_y: [f32; BATCH_SIZE],
+    pub bounds_min_z: [f32; BATCH_SIZE],
+    pub bounds_max_x: [f32; BATCH_SIZE],
+    pub bounds_max_y: [f32; BATCH_SIZE],
+    pub bounds_max_z: [f32; BATCH_SIZE],
+
+    // Counts mapping to nested structures
+    pub socket_counts: [u8; BATCH_SIZE],
+    pub clearance_zone_counts: [u8; BATCH_SIZE],
+    
+    // Semantic bitmasks
+    pub lod_required_crown: [u8; BATCH_SIZE], // 1 if CROWN features exist, 0 otherwise
+}
+
+#[derive(Clone)]
+pub struct GeometryOutputSoA {
+    pub validation_mask: [u8; BATCH_SIZE], // 0 = ok, 1 = invalid
+}
+
+impl GeometryOutputSoA {
+    pub fn new() -> Self {
+        Self { validation_mask: [0; BATCH_SIZE] }
+    }
+}
+
+pub fn batch_validate_geometry(inputs: &GeometrySoA, outputs: &mut GeometryOutputSoA) {
+    let mut weapon_mount_id = 255;
+    let mut armor_panel_id = 255;
+
+{% for row in results %}
+{% if row.label == "WeaponMount" %}
+    weapon_mount_id = {{ loop.index0 }};
+{% endif %}
+{% if row.label == "ArmorPanel" %}
+    armor_panel_id = {{ loop.index0 }};
+{% endif %}
+{% endfor %}
+
+    for i in 0..BATCH_SIZE {
+        let fam = inputs.family[i];
+        
+        let min_x = inputs.bounds_min_x[i];
+        let min_y = inputs.bounds_min_y[i];
+        let min_z = inputs.bounds_min_z[i];
+        let max_x = inputs.bounds_max_x[i];
+        let max_y = inputs.bounds_max_y[i];
+        let max_z = inputs.bounds_max_z[i];
+
+        // AABB validity: min <= max
+        let bounds_invalid = (min_x > max_x) as u8 | (min_y > max_y) as u8 | (min_z > max_z) as u8;
+
+        // WeaponMount missing sockets
+        let is_weapon = (fam == weapon_mount_id) as u8;
+        let missing_sockets = (inputs.socket_counts[i] == 0) as u8;
+        let weapon_socket_err = is_weapon & missing_sockets;
+
+        // ArmorPanel with Crown needs clearance zones
+        let is_armor = (fam == armor_panel_id) as u8;
+        let has_crown_feat = inputs.lod_required_crown[i];
+        let missing_clearance = (inputs.clearance_zone_counts[i] == 0) as u8;
+        let armor_clearance_err = is_armor & has_crown_feat & missing_clearance;
+
+        outputs.validation_mask[i] = bounds_invalid | weapon_socket_err | armor_clearance_err;
+    }
+}

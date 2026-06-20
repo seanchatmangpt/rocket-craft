@@ -1,0 +1,842 @@
+[
+    {
+        "candidate_id": "CANDIDATE_001",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_002",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_003",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_004",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_005",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_006",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_007",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_008",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_009",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_010",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_011",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_012",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_013",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_014",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_015",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_016",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_017",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_018",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_019",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_020",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_021",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_022",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_023",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_024",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_025",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_026",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_027",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_028",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_029",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_030",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_031",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_032",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_033",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_034",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_035",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_036",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_037",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_038",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_039",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_040",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_041",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_042",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_043",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_044",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_045",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_046",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_047",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_048",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_049",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_050",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_051",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_052",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_053",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_054",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_055",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "missing_sockets",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_056",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_057",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_058",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_059",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_060",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_061",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_062",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_063",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_064",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_065",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_066",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_067",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_068",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_069",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_070",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_071",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_072",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_073",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_074",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_075",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_076",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_077",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_078",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_079",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_080",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_081",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_082",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_083",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "invalid_joint_limits",
+        "loadout_factor": "valid_loadout",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_084",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_085",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_086",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_087",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_088",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_089",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_090",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "complete_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_091",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_092",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_093",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_094",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_095",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_096",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_097",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_manifest",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_098",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_099",
+        "chassis_factor": "torso_contains_foreign_parts",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_100",
+        "chassis_factor": "socket_contains_mesh_payload",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_101",
+        "chassis_factor": "assembly_reference_inside_part_file",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_102",
+        "chassis_factor": "duplicate_part_fingerprint",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_103",
+        "chassis_factor": "missing_owner_part_id",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_104",
+        "chassis_factor": "invalid_envelope_exceeded",
+        "surface_factor": "missing_basecolor",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    },
+    {
+        "candidate_id": "CANDIDATE_105",
+        "chassis_factor": "valid_f1",
+        "surface_factor": "missing_metallic",
+        "rig_factor": "valid_sockets",
+        "loadout_factor": "invalid_weapon_mounts",
+        "destruction_factor": "valid_destruction"
+    }
+]

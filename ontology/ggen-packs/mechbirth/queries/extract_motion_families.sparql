@@ -1,0 +1,26 @@
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+
+# -----------------------------------------------------------------------------
+# SPARQL: extract_motion_families.sparql
+# Bounded SELECT: all MotionFamily instances with their handler and laws.
+# Drives match arm generation in motion.rs Tera template.
+# -----------------------------------------------------------------------------
+
+SELECT
+  ?label
+  ?handlerFn
+  ?cf4GuardRequired
+  ?law
+WHERE {
+  ?family a mb:MotionFamily ;
+          rdfs:label ?label .
+
+  OPTIONAL { ?family mb:handlerFn ?handlerFn . }
+  OPTIONAL { ?family mb:cf4GuardRequired ?cf4GuardRequired . }
+  OPTIONAL { ?family mb:law ?law . }
+}
+ORDER BY ?label

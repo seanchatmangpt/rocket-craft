@@ -1,0 +1,151 @@
+[project]
+name = "mechbirth-lod-geom-motion"
+version = "0.1.0"
+description = "GC-MECHBIRTH-002 Agent 2: Semantic LOD, Geometry Surrogate, Motion Surrogate manufacturing pack. A = mu(O*)."
+authors = ["GC-MECHBIRTH-002 Agent 2"]
+
+[ontology]
+source = "schema/mechbirth_lod_geom_motion.ttl"
+standard_only = false
+
+[inference]
+
+[[inference.rules]]
+name = "standard-normalization"
+construct = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o } ORDER BY ?s ?p ?o"
+
+[generation]
+require_audit_trail = true
+
+# --- RULE 1: semantic_lod.rs -------------------------------------------------
+# Two queries joined by the template: lod_classes (enum + thresholds) +
+# lod_input_fields (CF-4 bounds array + authority_score exclusion mask).
+
+[[generation.rules]]
+name = "generate-semantic-lod"
+mode = "Overwrite"
+query = { file = "queries/extract_lod_classes.sparql" }
+template = { file = "templates/semantic_lod.rs.tera" }
+output_file = "crates/rocket_preue4_verifier/src/semantic_lod.rs"
+
+# --- RULE 2: motion.rs -------------------------------------------------------
+# Two queries joined by the template: motion_families (match-arm dispatch) +
+# phase_ordering_constraints (CF-1/CF-2 positional checks).
+
+[[generation.rules]]
+name = "generate-motion"
+mode = "Overwrite"
+query = { file = "queries/extract_motion_families.sparql" }
+template = { file = "templates/motion.rs.tera" }
+output_file = "crates/rocket_preue4_verifier/src/motion.rs"
+
+# --- RULE 3: geometry.rs -----------------------------------------------------
+# One query: part_families with per-family validation laws.
+
+[[generation.rules]]
+name = "generate-geometry"
+mode = "Overwrite"
+query = { file = "queries/extract_part_families.sparql" }
+template = { file = "templates/geometry.rs.tera" }
+output_file = "crates/rocket_preue4_verifier/src/geometry.rs"
+
+# --- RULE 4: receipt.rs -----------------------------------------------------
+# One query: extract_receipt_payload.sparql to generate the ReceiptEntry and hashing logic.
+
+[[generation.rules]]
+name = "generate-receipt"
+mode = "Overwrite"
+query = { file = "queries/extract_receipt_payload.sparql" }
+template = { file = "templates/receipt.rs.tera" }
+output_file = "crates/rocket_preue4_verifier/src/receipt.rs"
+
+# --- VALIDATION (ASK queries as DMAIC quality gates) -------------------------
+
+[validation]
+strict_mode = true
+
+[[validation.rules]]
+name = "CrownRequiresExplicitReason"
+description = "GATE: Crown LOD class must have requiresExplicitReason=true in O*."
+ask = """
+PREFIX mb: <https://ggen.io/ontology/mechbirth/>
+ASK {
+  mb:LodCrown mb:requiresExplicitReason true .
+}
+"""
+
+[[validation.rules]]
+name = "PredictionRelevanceExcludedFromAuthorityScore"
+description = "GATE: prediction_relevance field must have contributesToAuthorityScore=false."
+ask = """
+PREFIX mb: <https://ggen.io/ontology/mechbirth/>
+ASK {
+  mb:PredictionRelevanceField mb:contributesToAuthorityScore false .
+}
+"""
+
+[[validation.rules]]
+name = "CF1PlantFeetBeforeFireEncoded"
+description = "GATE: PlantFeets?Fire ordering constraint is present in O*."
+ask = """
+PREFIX mb: <https://ggen.io/ontology/mechbirth/>
+ASK {
+  mb:PlantFeetBeforeFire a mb:PhaseOrderingConstraint ;
+                          mb:predecessor mb:PlantFeetPhase ;
+                          mb:successor mb:FirePhase .
+}
+"""
+
+[[validation.rules]]
+name = "CF2VentHeatBeforeFireEncoded"
+description = "GATE: VentHeat?Fire ordering constraint with heatThreshold is present in O*."
+ask = """
+PREFIX mb: <https://ggen.io/ontology/mechbirth/>
+ASK {
+  mb:VentHeatBeforeFire a mb:PhaseOrderingConstraint ;
+                         mb:predecessor mb:VentHeatPhase ;
+                         mb:successor mb:FirePhase ;
+                         mb:heatThreshold ?t .
+}
+"""
+
+[[validation.rules]]
+name = "CF4LodInputBoundsLawEncoded"
+description = "GATE: CF-4 LodInputBoundsLaw is present and specifies maxValue=15."
+ask = """
+PREFIX mb: <https://ggen.io/ontology/mechbirth/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+ASK {
+  mb:LodInputBoundsLaw mb:maxValue "15"^^xsd:integer .
+}
+"""
+
+[[validation.rules]]
+name = "WeaponMountSocketLawEncoded"
+description = "GATE: WeaponMountFamily has non-empty socket law in O*."
+ask = """
+PREFIX mb: <https://ggen.io/ontology/mechbirth/>
+ASK {
+  mb:WeaponMountFamily mb:refusalReason mb:MissingSocket .
+}
+"""
+
+[sync]
+enabled = true
+on_change = "manual"
+validate_after = true
+conflict_mode = "fail"
+
+[rdf]
+formats = ["turtle"]
+default_format = "turtle"
+strict_validation = false
+
+[templates]
+enable_caching = true
+auto_reload = true
+
+[output]
+formatting = "default"
+line_length = 100
+indent = 4

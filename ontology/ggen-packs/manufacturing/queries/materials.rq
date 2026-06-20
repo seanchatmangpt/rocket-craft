@@ -1,0 +1,13 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?material ?owner_part_id ?type ?label ?shader
+WHERE {
+  ?material rdf:type ?type .
+  ?type rdfs:subClassOf* mud:Material .
+  ?material mud:owner_part_id ?owner_part_id .
+  OPTIONAL { ?material rdfs:label ?label }
+  OPTIONAL { ?material mud:shader ?shader }
+}
+ORDER BY ?owner_part_id ?material

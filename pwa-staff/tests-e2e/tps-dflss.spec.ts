@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { blake3 } from '@noble/hashes/blake3';
+import { blake3 } from '@noble/hashes/blake3.js';
 const blake3Hex = (s: string | Buffer): string => Buffer.from(blake3(typeof s === 'string' ? Buffer.from(s) : s)).toString('hex');
 const hashJsonString = blake3Hex;
 import { PNG } from 'pngjs';
@@ -93,9 +93,17 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
       const imgB1 = PNG.sync.read(beforeBuffer1);
       const imgB2 = PNG.sync.read(beforeBuffer2);
       const { width, height } = imgB1;
-      const diffIdle = new PNG({ width, height });
+      let diffIdle: PNG;
+      let idleDeltaPixels = 0;
 
-      const idleDeltaPixels = pixelmatch(imgB1.data, imgB2.data, diffIdle.data, width, height, { threshold: 0.1 });
+      if (imgB1.width !== imgB2.width || imgB1.height !== imgB2.height) {
+        console.log(`Idle render shape changed from ${imgB1.width}x${imgB1.height} to ${imgB2.width}x${imgB2.height}.`);
+        idleDeltaPixels = Math.max(imgB1.width * imgB1.height, imgB2.width * imgB2.height);
+        diffIdle = imgB2;
+      } else {
+        diffIdle = new PNG({ width, height });
+        idleDeltaPixels = pixelmatch(imgB1.data, imgB2.data, diffIdle.data, width, height, { threshold: 0.1 });
+      }
       console.log(`Idle background animation delta: ${idleDeltaPixels}px`);
 
       // 4. Actuate (Drive the vehicle or interact with the game's first UI)
@@ -115,11 +123,19 @@ test.describe('TPS/DfLSS Playwright Manufacturing Strategy', () => {
 
       // Calculate Pixel Delta against the second baseline
       const imgAfter = PNG.sync.read(afterBuffer);
-      const diffActuated = new PNG({ width, height });
+      let diffActuated: PNG;
+      let numDiffPixels = 0;
 
-      const numDiffPixels = pixelmatch(imgB2.data, imgAfter.data, diffActuated.data, width, height, {
-        threshold: 0.1,
-      });
+      if (imgB2.width !== imgAfter.width || imgB2.height !== imgAfter.height) {
+        console.log(`Actuated render shape changed from ${imgB2.width}x${imgB2.height} to ${imgAfter.width}x${imgAfter.height}.`);
+        numDiffPixels = Math.max(imgB2.width * imgB2.height, imgAfter.width * imgAfter.height);
+        diffActuated = imgAfter;
+      } else {
+        diffActuated = new PNG({ width, height });
+        numDiffPixels = pixelmatch(imgB2.data, imgAfter.data, diffActuated.data, width, height, {
+          threshold: 0.1,
+        });
+      }
       console.log(`Actuated visual delta: ${numDiffPixels}px`);
 
       // Primary proof: the rendered frame must not be blank (all-black canvas).

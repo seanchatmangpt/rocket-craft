@@ -1,0 +1,107 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+core:Ontology a owl:Ontology ;
+    rdfs:label "Core Combinatorial Ontology (Module 7)" ;
+    rdfs:comment "Foundational semantic truth for Combinatorial Maximalism. Defines branchless typestates, bounded byte-classes, and anti-Cartesian primitives." .
+
+# ---------------------------------------------------------
+# Combinatorial Typestate Boundaries
+# ---------------------------------------------------------
+
+core:ByteClass a owl:Class ;
+    rdfs:label "Byte-Class Authority Vector" ;
+    rdfs:comment "A compact, deterministic authority constraint matrix. Must compile down to fixed SIMD/Scalar width vectors with no runtime branching." .
+
+core:Typestate a owl:Class ;
+    rdfs:label "Branchless Typestate" ;
+    rdfs:comment "A compile-time bounded structural constraint representing absolute semantic standing. Objects violating these states MUST fail compiler-level parsing (e.g., via Rust Zero-Sized Types)." .
+
+core:SemanticLOD a owl:Class ;
+    rdfs:label "Semantic Level of Detail" ;
+    rdfs:comment "Defines the extraction resolution of the entity. Governs the three-resolution networking model (Server owns byte-class standing, Client projects high-res detail)." .
+
+# ---------------------------------------------------------
+# Base Authority Primitives
+# ---------------------------------------------------------
+
+core:TopologyNode a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Topology Node" ;
+    rdfs:comment "A bounded, discrete spatial or structural construct. Exporting must be boundable to prevent Cartesian exhaustion." .
+
+core:Entity a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Entity" ;
+    rdfs:comment "An authoritative entity governed by deterministic combinations." .
+
+core:Action a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Actuation State" ;
+    rdfs:comment "A discrete, provable state mutation bounded by the compiler logic, producing an unforgeable BLAKE3 receipt." .
+
+# ---------------------------------------------------------
+# Properties
+# ---------------------------------------------------------
+
+core:hasByteClass a owl:ObjectProperty ;
+    rdfs:domain core:Typestate ;
+    rdfs:range core:ByteClass ;
+    rdfs:label "has Byte Class" .
+
+core:compilesToZST a owl:DatatypeProperty ;
+    rdfs:domain core:Typestate ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Compiles to Zero-Sized Type" .
+
+core:isBounded a owl:DatatypeProperty ;
+    rdfs:domain core:TopologyNode ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Is Anti-Cartesian Bounded" .
+
+core:authoritativeStanding a owl:DatatypeProperty ;
+    rdfs:domain core:Entity ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Has Authoritative Standing" .
+
+# ---------------------------------------------------------
+# SHACL Constraints for Admittance Laws
+# ---------------------------------------------------------
+
+core:TypestateShape a sh:NodeShape ;
+    sh:targetClass core:Typestate ;
+    sh:property [
+        sh:path core:compilesToZST ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "All Typestates MUST resolve mathematically without runtime branching (ZST constraint)."
+    ] .
+
+core:EntityShape a sh:NodeShape ;
+    sh:targetClass core:Entity ;
+    sh:property [
+        sh:path core:hasByteClass ;
+        sh:class core:ByteClass ;
+        sh:minCount 1 ;
+        sh:message "An Entity MUST map its truth into at least one bounded Byte-Class vector."
+    ] ;
+    sh:property [
+        sh:path core:authoritativeStanding ;
+        sh:datatype xsd:boolean ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "An Entity MUST explicitly declare its admission to authoritative standing."
+    ] .
+
+core:TopologyShape a sh:NodeShape ;
+    sh:targetClass core:TopologyNode ;
+    sh:property [
+        sh:path core:isBounded ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "Topology Nodes MUST enforce anti-Cartesian extraction logic to allow bounded SPARQL SELECTs."
+    ] .

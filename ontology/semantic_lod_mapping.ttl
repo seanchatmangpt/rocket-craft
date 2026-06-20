@@ -1,0 +1,78 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+@prefix factory: <http://example.org/factory#> .
+
+# Semantic LOD Mapping: High-Poly USD -> Byte-Class Network Payloads
+# Formalizing the Projection Law: Server owns authority (bytes), Client owns pixels (USD)
+
+# Properties
+mud:hasNetworkPayload a owl:ObjectProperty ;
+    rdfs:label "has Network Payload" ;
+    rdfs:comment "Maps a visual asset or part to its authoritative byte-class network payload." .
+
+mud:ue4TargetSurface a owl:DatatypeProperty ;
+    rdfs:label "UE4 Target Surface" ;
+    rdfs:comment "The target USD or UE4 surface for the part." .
+
+# Torso
+mud:torso_core 
+    mud:ue4TargetSurface "SM_Torso.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass, mud:StressClass, mud:FatigueClass ;
+    mud:lodClass "CROWN" .
+
+# Head
+mud:head_unit 
+    mud:ue4TargetSurface "SM_Head.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass ;
+    mud:lodClass "CROWN" .
+
+# Limbs
+mud:arm_left 
+    mud:ue4TargetSurface "SM_Limb_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:arm_right 
+    mud:ue4TargetSurface "SM_Limb_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:leg_left 
+    mud:ue4TargetSurface "SM_Limb_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:leg_right 
+    mud:ue4TargetSurface "SM_Limb_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+# Wings
+mud:wing_root_left 
+    mud:ue4TargetSurface "SM_WingArray_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass ;
+    mud:lodClass "SECONDARY" .
+
+mud:wing_root_right 
+    mud:ue4TargetSurface "SM_WingArray_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass ;
+    mud:lodClass "SECONDARY" .
+
+# Blades
+mud:blade_left 
+    mud:ue4TargetSurface "SM_Blade_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:FatigueClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:blade_right 
+    mud:ue4TargetSurface "SM_Blade_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:FatigueClass ;
+    mud:lodClass "PRIMARY" .
+
+# Loadout / Backpack
+mud:backpack_core 
+    mud:ue4TargetSurface "SM_Loadout.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass, mud:FatigueClass ;
+    mud:lodClass "SECONDARY" .

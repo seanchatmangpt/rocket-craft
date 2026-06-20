@@ -153,6 +153,51 @@ fn do_html5_serve(dir: Option<String>, port: Option<u16>, project: Option<String
 
     println!("Serving {dir} on http://0.0.0.0:{port} (COOP/COEP headers enabled)");
 
+    // Emit ServeStarted OCEL event — proves the serve stage ran (Van der Aalst: log or it didn't happen).
+    // Non-fatal: serve must still work when Supabase is unreachable.
+    {
+        let sb_url = std::env::var("SUPABASE_URL").unwrap_or_default();
+        let sb_key = std::env::var("SUPABASE_ANON_KEY")
+            .or_else(|_| std::env::var("SUPABASE_SERVICE_ROLE_KEY"))
+            .unwrap_or_default();
+        if !sb_url.is_empty() && !sb_key.is_empty() {
+            let svc = rocket_sdk::supabase::SupabaseService::new(sb_url, sb_key);
+            let dir_clone = dir.clone();
+            let port_copy = port;
+            let project_clone = project.clone().unwrap_or_else(|| "unknown".into());
+            if let Ok(rt) = tokio::runtime::Runtime::new() {
+                rt.block_on(async move {
+                    // Create a minimal serve-session; push ServeStarted event
+                    let session_id = svc.create_cook_session(
+                        &project_clone,
+                        &dir_clone,
+                    ).await.ok();
+                    if let Some(ref sid) = session_id {
+                        let now_ms = std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .map(|d| d.as_millis() as u64)
+                            .unwrap_or(0);
+                        let mut emitter = rocket_sdk::supabase::ChainedOcelEmitter::new(
+                            Some(sid.clone()),
+                            format!("serve:{dir_clone}"),
+                        );
+                        emitter.emit("ServeStarted", now_ms, serde_json::json!({
+                            "port": port_copy,
+                            "dir": dir_clone,
+                            "coop_coep": true,
+                        }));
+                        let events = emitter.into_events();
+                        if let Err(e) = svc.push_ocel_events(&events).await {
+                            eprintln!("[serve-ocel] warn: push_ocel_events failed (non-fatal): {e:#}");
+                        } else {
+                            println!("[serve-ocel] ServeStarted event emitted → session {sid}");
+                        }
+                    }
+                });
+            }
+        }
+    }
+
     if background {
         let child = Command::new("python3")
             .args(["-c", COEP_SERVER_SCRIPT, &port.to_string()])

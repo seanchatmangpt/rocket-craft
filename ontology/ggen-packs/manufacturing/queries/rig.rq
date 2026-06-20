@@ -1,0 +1,13 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?rig ?owner_part_id ?boneCount ?skeleton
+WHERE {
+  ?rig rdf:type ?type .
+  ?type rdfs:subClassOf* mud:Rig .
+  ?rig mud:owner_part_id ?owner_part_id .
+  OPTIONAL { ?rig mud:boneCount ?boneCount }
+  OPTIONAL { ?rig mud:skeleton ?skeleton }
+}
+ORDER BY ?owner_part_id ?rig

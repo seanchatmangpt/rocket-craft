@@ -1,0 +1,16 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?surrogateId ?aabbMinX ?aabbMinY ?aabbMinZ ?aabbMaxX ?aabbMaxY ?aabbMaxZ ?hasSocket ?clearanceRadius
+WHERE {
+  ?surrogateId rdf:type mud:GeometrySurrogate ;
+               mud:aabbMinX ?aabbMinX ;
+               mud:aabbMinY ?aabbMinY ;
+               mud:aabbMinZ ?aabbMinZ ;
+               mud:aabbMaxX ?aabbMaxX ;
+               mud:aabbMaxY ?aabbMaxY ;
+               mud:aabbMaxZ ?aabbMaxZ ;
+               mud:hasSocket ?hasSocket ;
+               mud:clearanceRadius ?clearanceRadius .
+}
+ORDER BY ?surrogateId

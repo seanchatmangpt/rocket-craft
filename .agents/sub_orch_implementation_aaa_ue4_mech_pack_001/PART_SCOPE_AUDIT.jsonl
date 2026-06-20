@@ -1,0 +1,9 @@
+{"seed": 201, "fixture": "torso_contains_foreign_parts", "error": "USD303 ERROR: part-local file SM_Torso.usda contains foreign component prims: prim_head_visor"}
+{"seed": 201, "fixture": "torso_contains_foreign_parts", "error": "USD310 ERROR: part-scope query returned nonlocal rows in SM_Torso.usda"}
+{"seed": 202, "fixture": "socket_contains_mesh_payload", "error": "USD311 ERROR: socket prim contains mesh payload in SM_Torso.usda line 4560"}
+{"seed": 203, "fixture": "assembly_reference_inside_part_file", "error": "USD308 ERROR: part file SM_Torso.usda contains assembly-level children"}
+{"seed": 203, "fixture": "assembly_reference_inside_part_file", "error": "USD312 ERROR: part file SM_Torso.usda references assembly root"}
+{"seed": 204, "fixture": "duplicate_part_fingerprint", "error": "USD301 ERROR: duplicate USD geometry fingerprint between SM_Blade_Right.usda and SM_Blade_Left.usda"}
+{"seed": 204, "fixture": "duplicate_part_fingerprint", "error": "USD306 ERROR: generated USD files share identical source template expansion between SM_Blade_Right.usda and SM_Blade_Left.usda"}
+{"seed": 204, "fixture": "duplicate_part_fingerprint", "error": "USD304 ERROR: expected part root missing in SM_Blade_Right.usda"}
+{"seed": 205, "fixture": "missing_owner_part_id", "error": "USD304 ERROR: expected part root missing in SM_Torso.usda"}

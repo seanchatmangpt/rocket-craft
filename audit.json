@@ -1,0 +1,439 @@
+{
+  "generated_at": "2026-06-19T20:42:57.237140+00:00",
+  "ggen_version": "26.6.11",
+  "inputs": {
+    "manifest_hash": "7b32386a8447b7bb84472cf60d5e53fc2acfc1b850ab08474fe595d80027c67e",
+    "ontology_hashes": {
+      "ontology/ggen-packs/mech_factory_mud/schema/mech_factory_mud.ttl": "f0d742f51f81c939db2ff910d17d7345891e014dd0710d3dfc9e26c0c3cdb130"
+    },
+    "template_hashes": {
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/authority.rs.tera": "524b87255f7cab872c179246a8002b4fb49541e250db837db4464e92738896f7",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/constants.rs.tera": "65ec8416db3e2c526feda20d1feb92af25342c7a6297d12c6178d77e6375acdc",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/mud_gap_check.rs.tera": "b126d703f25791ff8704e7f5e92c35ece4ba9234e7796798bb610db99b8b1360",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/ocel.rs.tera": "b7998d9cc2a86f178a69e5df6475a7e577a924ac80ff2b115a10f6027b2889db",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/parts.rs.tera": "7d095453a37c0bfa23e2d268b50a510b245b71f76c4e865cf55db88d1086dbe3",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/projection.rs.tera": "65ca2db092f5f27d8c32040c7cff9655f8ade3cb7ca781eaf3e978ec01b56428",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/receipt.rs.tera": "1fc68615d2ed9054ce764591b02bd9263ab2768301b2d09d413196bf0b92c090",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/route.rs.tera": "a4e8f636b04f640952be8b12f76e48e97047175b123c14cc460334042ee38262",
+      "ontology/ggen-packs/mech_factory_mud/templates/rust/stations.rs.tera": "971414bf4ce634fb307bccb7a257da179233b334328cd6cf1ef5de386094d12e",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/FactoryStations.csv.tera": "b345f739f2bd58138491aab4b6760fc2ccd99a94bbd58fefe0413029cc6dec01",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/Headers/MechFactoryMudAuthority.h.tera": "102e8748121f591fae4af9328c482561cfae1a216b9e05b957ede9c8dbeeea84",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/Headers/MechFactoryMudProjection.h.tera": "9819899a5554171f96b62ed67f2402a0a09cab329d73d55c75fc655e61fb8503",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/Headers/MechFactoryMudSteps.h.tera": "1ba55a86a2893ea10cf00447dd761bdeadd3dd7eef065516caf27be1dfad3c6f",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/MotionFamilies.csv.tera": "65903ee8e6ad72445e30f2e6851f261177d4dee0f381c99bd3e9142a113fb235",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/PartFamilies.csv.tera": "413bb9237604f2f6c3afb79e98b7fd244e5637d5b5f8fc79c2ed3d89f3272b4a",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/ProjectionCommands.csv.tera": "bf90bfe4bc56d10676bce22f7fb91f947f33a0814c4329ed96d76306c9d76124",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/SemanticLOD.csv.tera": "adb38f34e9f3e059b77510efdfc0b22c984ccc194657039b993f6e55470afbd2",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/SkinLayers.csv.tera": "f02c36593b923df9afe584b1ca19336a3a031165d43eb92b9405290009e7f3c5",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/SocketTopology.csv.tera": "646b77beb3ecc814a316f95aea5b40bf3159638217a29efbe417ba10e70db293",
+      "ontology/ggen-packs/mech_factory_mud/templates/ue4/WalkthroughRoute.csv.tera": "72d1db81963eb8379b93a27407f358b3c1f7e3201733829939184020c2260571"
+    },
+    "query_hashes": {}
+  },
+  "pipeline": [
+    {
+      "step_type": "inference",
+      "name": "standard-normalization",
+      "duration_ms": 5,
+      "triples_added": 212,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-constants",
+      "duration_ms": 10,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-route",
+      "duration_ms": 11,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-stations",
+      "duration_ms": 4,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-parts",
+      "duration_ms": 11,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-authority",
+      "duration_ms": 11,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-projection",
+      "duration_ms": 13,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-receipt",
+      "duration_ms": 11,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-ocel",
+      "duration_ms": 9,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-stations-csv",
+      "duration_ms": 6,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-route-csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-parts-csv",
+      "duration_ms": 12,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-socket-csv",
+      "duration_ms": 11,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-skin-csv",
+      "duration_ms": 12,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-motion-csv",
+      "duration_ms": 11,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-lod-csv",
+      "duration_ms": 13,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-projection-csv",
+      "duration_ms": 12,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-steps-h",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-authority-h",
+      "duration_ms": 9,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-projection-h",
+      "duration_ms": 6,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-stations-csv",
+      "duration_ms": 11,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-route-csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-parts-csv",
+      "duration_ms": 9,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-socket-csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-skin-csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-motion-csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-lod-csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "ue4-dt-projection-csv",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    },
+    {
+      "step_type": "render",
+      "name": "rust-gap-checker",
+      "duration_ms": 5,
+      "triples_added": null,
+      "status": "success",
+      "error": null
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/Users/sac/rocket-craft/crates/mech_factory_mud/src/generated_constants.rs",
+      "content_hash": "c69ade5952152f76daacc076ead1d809d9b24ffa65744bb670c74c9bea84e93f",
+      "size_bytes": 1155,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/mech_factory_mud/src/generated_constants.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/rust/route.rs",
+      "content_hash": "04be67bee384f0afd940a4023fe620d69c09c107c7c3e56cd869ca42358bf7c3",
+      "size_bytes": 77,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/rust/route.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/rust/stations.rs",
+      "content_hash": "0aa93dff47b2c3ebf39f5a00d647753bfa26cf5086b7c1f526b0f55aa7f84b69",
+      "size_bytes": 77,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/rust/stations.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/rust/parts.rs",
+      "content_hash": "4e4779b5d92a53f253445e374dfa4796de7cb81ed69caa00966ad34efccf06f0",
+      "size_bytes": 71,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/rust/parts.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/rust/authority.rs",
+      "content_hash": "036f4b85268d763d1b0655ebb4ea0e0384ad24850fadafa7445f1e3302e24520",
+      "size_bytes": 489,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/rust/authority.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/rust/projection.rs",
+      "content_hash": "479529c986c1a6ae83f9420e9ae94ce32a3f9ee3687c94afce9dc4c907ca6992",
+      "size_bytes": 87,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/rust/projection.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/rust/receipt.rs",
+      "content_hash": "0fdf9e5a382e840b72c7df5d323e85e9c6c793ca072f5584ec063f51f7457a18",
+      "size_bytes": 82,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/rust/receipt.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/rust/ocel.rs",
+      "content_hash": "21c35ac2a6e2abf82a245823f6a19d568c063e25e07eddf3aba4c57593025886",
+      "size_bytes": 129,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/rust/ocel.rs"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/FactoryStations.csv",
+      "content_hash": "e1206691863ff137cf57f359709ec3124d2d1a5556895b47ef4b5aa7dbd1cb22",
+      "size_bytes": 629,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/FactoryStations.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/WalkthroughRoute.csv",
+      "content_hash": "227ec539acd78e2e4e532c4eb5ca32b2ebe2cdd973fde41ecb492619c18fd36f",
+      "size_bytes": 736,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/WalkthroughRoute.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/PartFamilies.csv",
+      "content_hash": "af3eda3d9c43f7e845caa8269a9904b7d8fa78ab28ff3c5ff47641788b6e8f71",
+      "size_bytes": 43,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/PartFamilies.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/SocketTopology.csv",
+      "content_hash": "ab8c9693f3521fcc9fac3c7f68ab2c0afd3d343a9075a0d37ee619113892a5a0",
+      "size_bytes": 45,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/SocketTopology.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/SkinLayers.csv",
+      "content_hash": "93432088833ea15ce6b1988efac5b3a56b84a2fb8fff39b7171f4b10c3c8c7c6",
+      "size_bytes": 42,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/SkinLayers.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/MotionFamilies.csv",
+      "content_hash": "00ad3241fe209ff8e1be931675a3ad81486fa07b3b0dca960d27bbbfd18ebd1b",
+      "size_bytes": 44,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/MotionFamilies.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/SemanticLOD.csv",
+      "content_hash": "12bb87541c5bbfce2b5507795fbd752064de6acd8683658568c6528dcd7a91ae",
+      "size_bytes": 34,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/SemanticLOD.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/ProjectionCommands.csv",
+      "content_hash": "fa8ed5b3f3a46481633dbc17258174ba8bd799f846144f7ab8966d4f032f818e",
+      "size_bytes": 68,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/ProjectionCommands.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/Headers/MechFactoryMudSteps.h",
+      "content_hash": "6b8c29e0d03add2808d6de79c1d56ad9aec62f4adbc11a40f50c76a6cdb07d65",
+      "size_bytes": 67,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/Headers/MechFactoryMudSteps.h"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/Headers/MechFactoryMudAuthority.h",
+      "content_hash": "a3ebebf71b721dda1db1dae1bd156dc05952a95d019464a30c74edd53566d1d8",
+      "size_bytes": 79,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/Headers/MechFactoryMudAuthority.h"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/Headers/MechFactoryMudProjection.h",
+      "content_hash": "1337264fd177f5bcaaa9110749a5a0fa4f592f7faba2c43a408f97a1ed1fb098",
+      "size_bytes": 63,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/Headers/MechFactoryMudProjection.h"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_FactoryStations.csv",
+      "content_hash": "e1206691863ff137cf57f359709ec3124d2d1a5556895b47ef4b5aa7dbd1cb22",
+      "size_bytes": 629,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_FactoryStations.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_WalkthroughRoute.csv",
+      "content_hash": "227ec539acd78e2e4e532c4eb5ca32b2ebe2cdd973fde41ecb492619c18fd36f",
+      "size_bytes": 736,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_WalkthroughRoute.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_PartFamilies.csv",
+      "content_hash": "af3eda3d9c43f7e845caa8269a9904b7d8fa78ab28ff3c5ff47641788b6e8f71",
+      "size_bytes": 43,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_PartFamilies.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_SocketTopology.csv",
+      "content_hash": "ab8c9693f3521fcc9fac3c7f68ab2c0afd3d343a9075a0d37ee619113892a5a0",
+      "size_bytes": 45,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_SocketTopology.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_SkinLayers.csv",
+      "content_hash": "93432088833ea15ce6b1988efac5b3a56b84a2fb8fff39b7171f4b10c3c8c7c6",
+      "size_bytes": 42,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_SkinLayers.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_MotionFamilies.csv",
+      "content_hash": "00ad3241fe209ff8e1be931675a3ad81486fa07b3b0dca960d27bbbfd18ebd1b",
+      "size_bytes": 44,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_MotionFamilies.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_SemanticLOD.csv",
+      "content_hash": "12bb87541c5bbfce2b5507795fbd752064de6acd8683658568c6528dcd7a91ae",
+      "size_bytes": 34,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_SemanticLOD.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_ProjectionCommands.csv",
+      "content_hash": "fa8ed5b3f3a46481633dbc17258174ba8bd799f846144f7ab8966d4f032f818e",
+      "size_bytes": 68,
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mech_factory_mud/ue4/DataTables/DT_ProjectionCommands.csv"
+    },
+    {
+      "path": "/Users/sac/rocket-craft/crates/mech_factory_mud/src/bin/mud_gap_check.rs",
+      "content_hash": "d9fbf1cfa97de64ff3cb16f39d781329303ba258ab4e9f00277d8f55397d21c3",
+      "size_bytes": 20063,
+      "source_rule": "rule-/Users/sac/rocket-craft/crates/mech_factory_mud/src/bin/mud_gap_check.rs"
+    }
+  ],
+  "validation_passed": true,
+  "total_duration_ms": 1
+}

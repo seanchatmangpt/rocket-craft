@@ -1,0 +1,92 @@
+[
+    {
+        "seed": 101,
+        "file": "SM_Torso.usda",
+        "fingerprint": "14178bfcfd9f613e570f7accdbe143433368741d4623a2c39a155f2b1ddf5c1e"
+    },
+    {
+        "seed": 101,
+        "file": "SM_Head.usda",
+        "fingerprint": "555528040383f4c9d934895df09e37378dde1aaa4d73d44d92f9e78e8f7893c7"
+    },
+    {
+        "seed": 101,
+        "file": "SM_WingArray_Left.usda",
+        "fingerprint": "0569ecfe2a1592bc39dec172ee336b95d4184f590670d33bbe0e3685119e466a"
+    },
+    {
+        "seed": 101,
+        "file": "SM_WingArray_Right.usda",
+        "fingerprint": "2ddbe16a35a312185fedbc95e232eb4f198896db0142389583a7e26ae9f86204"
+    },
+    {
+        "seed": 101,
+        "file": "SM_Blade_Left.usda",
+        "fingerprint": "98db91cbaf63189aa39c57c7e48147926f840cfa2b6b6a47e360a900995df814"
+    },
+    {
+        "seed": 101,
+        "file": "SM_Blade_Right.usda",
+        "fingerprint": "6f5d68dad7b55b112101f706fbb28fd1925a8f98e5b34aabcc28e69fdb287ae4"
+    },
+    {
+        "seed": 102,
+        "file": "SM_Torso.usda",
+        "fingerprint": "14178bfcfd9f613e570f7accdbe143433368741d4623a2c39a155f2b1ddf5c1e"
+    },
+    {
+        "seed": 102,
+        "file": "SM_Head.usda",
+        "fingerprint": "555528040383f4c9d934895df09e37378dde1aaa4d73d44d92f9e78e8f7893c7"
+    },
+    {
+        "seed": 102,
+        "file": "SM_WingArray_Left.usda",
+        "fingerprint": "0569ecfe2a1592bc39dec172ee336b95d4184f590670d33bbe0e3685119e466a"
+    },
+    {
+        "seed": 102,
+        "file": "SM_WingArray_Right.usda",
+        "fingerprint": "2ddbe16a35a312185fedbc95e232eb4f198896db0142389583a7e26ae9f86204"
+    },
+    {
+        "seed": 102,
+        "file": "SM_Blade_Left.usda",
+        "fingerprint": "98db91cbaf63189aa39c57c7e48147926f840cfa2b6b6a47e360a900995df814"
+    },
+    {
+        "seed": 102,
+        "file": "SM_Blade_Right.usda",
+        "fingerprint": "6f5d68dad7b55b112101f706fbb28fd1925a8f98e5b34aabcc28e69fdb287ae4"
+    },
+    {
+        "seed": 103,
+        "file": "SM_Torso.usda",
+        "fingerprint": "14178bfcfd9f613e570f7accdbe143433368741d4623a2c39a155f2b1ddf5c1e"
+    },
+    {
+        "seed": 103,
+        "file": "SM_Head.usda",
+        "fingerprint": "555528040383f4c9d934895df09e37378dde1aaa4d73d44d92f9e78e8f7893c7"
+    },
+    {
+        "seed": 103,
+        "file": "SM_WingArray_Left.usda",
+        "fingerprint": "0569ecfe2a1592bc39dec172ee336b95d4184f590670d33bbe0e3685119e466a"
+    },
+    {
+        "seed": 103,
+        "file": "SM_WingArray_Right.usda",
+        "fingerprint": "2ddbe16a35a312185fedbc95e232eb4f198896db0142389583a7e26ae9f86204"
+    },
+    {
+        "seed": 103,
+        "file": "SM_Blade_Left.usda",
+        "fingerprint": "98db91cbaf63189aa39c57c7e48147926f840cfa2b6b6a47e360a900995df814"
+    },
+    {
+        "seed": 103,
+        "file": "SM_Blade_Right.usda",
+        "fingerprint": "6f5d68dad7b55b112101f706fbb28fd1925a8f98e5b34aabcc28e69fdb287ae4"
+    }
+]

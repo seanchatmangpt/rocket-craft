@@ -1,0 +1,746 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+core:Ontology a owl:Ontology ;
+    rdfs:label "Core Combinatorial Ontology (Module 7)" ;
+    rdfs:comment "Foundational semantic truth for Combinatorial Maximalism. Defines branchless typestates, bounded byte-classes, and anti-Cartesian primitives." .
+
+# ---------------------------------------------------------
+# Combinatorial Typestate Boundaries
+# ---------------------------------------------------------
+
+core:ByteClass a owl:Class ;
+    rdfs:label "Byte-Class Authority Vector" ;
+    rdfs:comment "A compact, deterministic authority constraint matrix. Must compile down to fixed SIMD/Scalar width vectors with no runtime branching." .
+
+core:Typestate a owl:Class ;
+    rdfs:label "Branchless Typestate" ;
+    rdfs:comment "A compile-time bounded structural constraint representing absolute semantic standing. Objects violating these states MUST fail compiler-level parsing (e.g., via Rust Zero-Sized Types)." .
+
+core:SemanticLOD a owl:Class ;
+    rdfs:label "Semantic Level of Detail" ;
+    rdfs:comment "Defines the extraction resolution of the entity. Governs the three-resolution networking model (Server owns byte-class standing, Client projects high-res detail)." .
+
+# ---------------------------------------------------------
+# Base Authority Primitives
+# ---------------------------------------------------------
+
+core:TopologyNode a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Topology Node" ;
+    rdfs:comment "A bounded, discrete spatial or structural construct. Exporting must be boundable to prevent Cartesian exhaustion." .
+
+core:Entity a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Entity" ;
+    rdfs:comment "An authoritative entity governed by deterministic combinations." .
+
+core:Action a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Actuation State" ;
+    rdfs:comment "A discrete, provable state mutation bounded by the compiler logic, producing an unforgeable BLAKE3 receipt." .
+
+# ---------------------------------------------------------
+# Properties
+# ---------------------------------------------------------
+
+core:hasByteClass a owl:ObjectProperty ;
+    rdfs:domain core:Typestate ;
+    rdfs:range core:ByteClass ;
+    rdfs:label "has Byte Class" .
+
+core:compilesToZST a owl:DatatypeProperty ;
+    rdfs:domain core:Typestate ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Compiles to Zero-Sized Type" .
+
+core:isBounded a owl:DatatypeProperty ;
+    rdfs:domain core:TopologyNode ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Is Anti-Cartesian Bounded" .
+
+core:authoritativeStanding a owl:DatatypeProperty ;
+    rdfs:domain core:Entity ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Has Authoritative Standing" .
+
+# ---------------------------------------------------------
+# SHACL Constraints for Admittance Laws
+# ---------------------------------------------------------
+
+core:TypestateShape a sh:NodeShape ;
+    sh:targetClass core:Typestate ;
+    sh:property [
+        sh:path core:compilesToZST ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "All Typestates MUST resolve mathematically without runtime branching (ZST constraint)."
+    ] .
+
+core:EntityShape a sh:NodeShape ;
+    sh:targetClass core:Entity ;
+    sh:property [
+        sh:path core:hasByteClass ;
+        sh:class core:ByteClass ;
+        sh:minCount 1 ;
+        sh:message "An Entity MUST map its truth into at least one bounded Byte-Class vector."
+    ] ;
+    sh:property [
+        sh:path core:authoritativeStanding ;
+        sh:datatype xsd:boolean ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "An Entity MUST explicitly declare its admission to authoritative standing."
+    ] .
+
+core:TopologyShape a sh:NodeShape ;
+    sh:targetClass core:TopologyNode ;
+    sh:property [
+        sh:path core:isBounded ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "Topology Nodes MUST enforce anti-Cartesian extraction logic to allow bounded SPARQL SELECTs."
+    ] .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix gn: <https://ggen.io/ontology/gundam-nexus/> .
+
+gn:GundamNexusOntology a owl:Ontology ;
+    rdfs:label "Gundam Nexus Ontology" ;
+    rdfs:comment "Constitutional semantic primitives for Combinatorial Maximalist universe manufacturing." .
+
+# --- MECH PRIMITIVES ---
+
+gn:MechAssembly a owl:Class ;
+    rdfs:label "Mech Assembly" ;
+    rdfs:comment "A mech is an assembly, not an asset." .
+
+gn:MechPrimitive a owl:Class ;
+    rdfs:label "Mech Primitive" .
+
+gn:Frame a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Frame" .
+gn:Mobility a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Mobility" .
+gn:Power a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Power" .
+gn:Armor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Armor" .
+gn:Weapon a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Weapon" .
+gn:Sensor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Sensor" .
+gn:UtilitySystem a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Utility System" .
+
+gn:MechClass a owl:Class ;
+    rdfs:label "Mech Class" .
+gn:Worker a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Worker" .
+gn:Explorer a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Explorer" .
+gn:Warrior a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Warrior" .
+gn:Guardian a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Guardian" .
+gn:Ark a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Ark" .
+
+# --- RESOURCES ---
+
+gn:Resource a owl:Class ;
+    rdfs:label "Resource" .
+
+gn:MinovskyParticles a gn:Resource ;
+    rdfs:label "Minovsky Particles" .
+
+gn:Gundanium a gn:Resource ;
+    rdfs:label "Gundanium" .
+
+gn:LunaTitanium a gn:Resource ;
+    rdfs:label "Luna Titanium" .
+
+# --- SPECIFIC COMPONENTS ---
+
+gn:GundamFrame a gn:Frame ;
+    rdfs:label "Gundam Frame" .
+
+gn:ZakuFrame a gn:Frame ;
+    rdfs:label "Zaku Frame" .
+
+gn:GMFrame a gn:Frame ;
+    rdfs:label "GM Frame" .
+
+gn:MinovskyUltracompact a gn:Power ;
+    rdfs:label "Minovsky Ultracompact" .
+
+gn:FusionReactor a gn:Power ;
+    rdfs:label "Fusion Reactor" .
+
+gn:BeamRifle a gn:Weapon ;
+    rdfs:label "Beam Rifle" .
+
+gn:BeamSaber a gn:Weapon ;
+    rdfs:label "Beam Saber" .
+
+gn:HeatHawk a gn:Weapon ;
+    rdfs:label "Heat Hawk" .
+
+gn:Monoeye a gn:Sensor ;
+    rdfs:label "Monoeye" .
+
+gn:DualSensor a gn:Sensor ;
+    rdfs:label "Dual Sensor" .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://ggen.io/ontology/mech_factory_mud/> .
+
+mud:MechFactoryMudOntology a owl:Ontology ;
+    rdfs:label "Mech Factory MUD Digital Twin Ontology" ;
+    rdfs:comment "Headless Rust digital twin of the mech factory walkthrough. Governs Walkthrough Route, Stations, Part Families, and Authority Byte Fields." ;
+    owl:imports <https://ggen.io/ontology/core/> .
+
+# ---------------------------------------------------------
+# Authority Byte Fields
+# ---------------------------------------------------------
+mud:AuthorityByteField a owl:Class ;
+    rdfs:subClassOf core:ByteClass ;
+    rdfs:label "Authority Byte Field" ;
+    rdfs:comment "Dense byte authority state for the digital twin." .
+
+mud:DamageClass a mud:AuthorityByteField ;
+    rdfs:label "damage_class" ;
+    core:compilesToZST true .
+
+mud:HeatClass a mud:AuthorityByteField ;
+    rdfs:label "heat_class" ;
+    core:compilesToZST true .
+
+mud:StressClass a mud:AuthorityByteField ;
+    rdfs:label "stress_class" ;
+    core:compilesToZST true .
+
+mud:GripClass a mud:AuthorityByteField ;
+    rdfs:label "grip_class" ;
+    core:compilesToZST true .
+
+mud:SocketHealthClass a mud:AuthorityByteField ;
+    rdfs:label "socket_health_class" ;
+    core:compilesToZST true .
+
+mud:LodClass a mud:AuthorityByteField ;
+    rdfs:label "lod_class" ;
+    core:compilesToZST true .
+
+mud:WalkthroughStateClass a mud:AuthorityByteField ;
+    rdfs:label "walkthrough_state_class" ;
+    core:compilesToZST true .
+
+mud:StationStateClass a mud:AuthorityByteField ;
+    rdfs:label "station_state_class" ;
+    core:compilesToZST true .
+
+mud:ProjectionStateClass a mud:AuthorityByteField ;
+    rdfs:label "projection_state_class" ;
+    core:compilesToZST true .
+
+mud:ReceiptStateClass a mud:AuthorityByteField ;
+    rdfs:label "receipt_state_class" ;
+    core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Part Families
+# ---------------------------------------------------------
+mud:PartFamily a owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Part Family" ;
+    rdfs:comment "Mechanized part families generated at stations." .
+
+mud:Frame a mud:PartFamily ; rdfs:label "Frame" ; core:isBounded true ; core:compilesToZST true .
+mud:Shoulder a mud:PartFamily ; rdfs:label "Shoulder" ; core:isBounded true ; core:compilesToZST true .
+mud:Arm a mud:PartFamily ; rdfs:label "Arm" ; core:isBounded true ; core:compilesToZST true .
+mud:Leg a mud:PartFamily ; rdfs:label "Leg" ; core:isBounded true ; core:compilesToZST true .
+mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true .
+mud:ArmorPanel a mud:PartFamily ; rdfs:label "ArmorPanel" ; core:isBounded true ; core:compilesToZST true .
+mud:WeaponMount a mud:PartFamily ; rdfs:label "WeaponMount" ; core:isBounded true ; core:compilesToZST true .
+mud:CoolingVent a mud:PartFamily ; rdfs:label "CoolingVent" ; core:isBounded true ; core:compilesToZST true .
+mud:SkinLayer a mud:PartFamily ; rdfs:label "SkinLayer" ; core:isBounded true ; core:compilesToZST true .
+mud:MotionFamily a mud:PartFamily ; rdfs:label "MotionFamily" ; core:isBounded true ; core:compilesToZST true .
+mud:LODVariant a mud:PartFamily ; rdfs:label "LODVariant" ; core:isBounded true ; core:compilesToZST true .
+mud:ReceiptTerminalPart a mud:PartFamily ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Stations
+# ---------------------------------------------------------
+mud:Station a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Factory Station" ;
+    rdfs:comment "Discrete manufacturing or verification station." .
+
+mud:FrameAssembly a mud:Station ; rdfs:label "FrameAssembly" ; core:isBounded true ; core:compilesToZST true .
+mud:SocketTopologyStation a mud:Station ; rdfs:label "SocketTopology" ; core:isBounded true ; core:compilesToZST true .
+mud:ArmorSkinStation a mud:Station ; rdfs:label "ArmorSkinStation" ; core:isBounded true ; core:compilesToZST true .
+mud:RigMotionStation a mud:Station ; rdfs:label "RigMotionStation" ; core:isBounded true ; core:compilesToZST true .
+mud:VerificationGate a mud:Station ; rdfs:label "VerificationGate" ; core:isBounded true ; core:compilesToZST true .
+mud:ReceiptTerminalStation a mud:Station ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Walkthrough Route Nodes
+# ---------------------------------------------------------
+mud:RouteNode a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Walkthrough Route Node" ;
+    rdfs:comment "A node in the deterministic factory walkthrough." .
+
+mud:hasNextNode a owl:ObjectProperty ;
+    rdfs:domain mud:RouteNode ;
+    rdfs:range mud:RouteNode ;
+    rdfs:label "has Next Node" .
+
+mud:Spawn a mud:RouteNode ; rdfs:label "Spawn" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:FactoryEntrance .
+mud:FactoryEntrance a mud:RouteNode ; rdfs:label "FactoryEntrance" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:FrameAssemblyNode .
+mud:FrameAssemblyNode a mud:RouteNode ; rdfs:label "FrameAssembly" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:SocketTopologyNode .
+mud:SocketTopologyNode a mud:RouteNode ; rdfs:label "SocketTopology" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ArmorSkinStationNode .
+mud:ArmorSkinStationNode a mud:RouteNode ; rdfs:label "ArmorSkinStation" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:RigMotionStationNode .
+mud:RigMotionStationNode a mud:RouteNode ; rdfs:label "RigMotionStation" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:VerificationGateNode .
+mud:VerificationGateNode a mud:RouteNode ; rdfs:label "VerificationGate" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ReceiptTerminalNode .
+mud:ReceiptTerminalNode a mud:RouteNode ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ExitOrLoop .
+mud:ExitOrLoop a mud:RouteNode ; rdfs:label "ExitOrLoop" ; core:isBounded true ; core:compilesToZST true .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix mb:   <https://ggen.io/ontology/mechbirth/> .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MECHBIRTH ONTOLOGY — O* (Admitted Truth Graph)
+# GC-MECHBIRTH-002 / GC-GUNDAM-FACTORY-001
+#
+# This file IS the source of truth. All Rust, C++, and SPARQL artifacts are
+# projections (A = μ(O*)). Do not derive laws from the Rust code.
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:MechBirthOntology a owl:Ontology ;
+    rdfs:label "MechBirth Pre-UE4 Verifier Ontology" ;
+    rdfs:comment "Constitutional graph encoding authority byte field laws, branchless transition kernels, SIMD equivalence constraints, and prediction shadow invariants for GC-MECHBIRTH-002." .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AUTHORITY BYTE FIELD LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:AuthorityByteField a owl:Class ;
+    rdfs:label "Authority Byte Field" ;
+    rdfs:comment "A u8 field in SoA authority state. Value domain: [0, MAX_CLASS]. Layout: Vec<u8> parallel buffer." .
+
+mb:MAX_CLASS a owl:NamedIndividual ;
+    rdfs:label "MAX_CLASS" ;
+    mb:value "15"^^xsd:integer ;
+    mb:rustType "u8" ;
+    rdfs:comment "Maximum admitted class value for any authority byte field." .
+
+mb:REFUSED_CLASS a owl:NamedIndividual ;
+    rdfs:label "REFUSED_CLASS" ;
+    mb:value "255"^^xsd:integer ;
+    mb:rustType "u8" ;
+    rdfs:comment "Sentinel value indicating refusal — never admitted to live state." .
+
+# Individual authority fields
+
+mb:DamageField a mb:AuthorityByteField ;
+    rdfs:label "damage" ;
+    mb:fieldName "damage" ;
+    mb:defaultValue "0"^^xsd:integer ;
+    mb:nominalValue "0"^^xsd:integer ;
+    mb:semantics "per-part damage accumulation class" ;
+    mb:derivedFrom "scalar_failure_risk(heat, stress, socket_health)" ;
+    mb:soaIndex "0"^^xsd:integer .
+
+mb:HeatField a mb:AuthorityByteField ;
+    rdfs:label "heat" ;
+    mb:fieldName "heat" ;
+    mb:defaultValue "0"^^xsd:integer ;
+    mb:nominalValue "0"^^xsd:integer ;
+    mb:semantics "per-part thermal accumulation class" ;
+    mb:soaIndex "1"^^xsd:integer .
+
+mb:StressField a mb:AuthorityByteField ;
+    rdfs:label "stress" ;
+    mb:fieldName "stress" ;
+    mb:defaultValue "0"^^xsd:integer ;
+    mb:nominalValue "0"^^xsd:integer ;
+    mb:semantics "per-part structural stress class" ;
+    mb:soaIndex "2"^^xsd:integer .
+
+mb:GripField a mb:AuthorityByteField ;
+    rdfs:label "grip" ;
+    mb:fieldName "grip" ;
+    mb:defaultValue "7"^^xsd:integer ;
+    mb:nominalValue "7"^^xsd:integer ;
+    mb:semantics "per-part grip class — 7 is nominal" ;
+    mb:soaIndex "3"^^xsd:integer .
+
+mb:SocketHealthField a mb:AuthorityByteField ;
+    rdfs:label "socket_health" ;
+    mb:fieldName "socket_health" ;
+    mb:defaultValue "15"^^xsd:integer ;
+    mb:nominalValue "15"^^xsd:integer ;
+    mb:semantics "per-socket health class — MAX_CLASS means fully healthy" ;
+    mb:soaIndex "4"^^xsd:integer .
+
+mb:LodField a mb:AuthorityByteField ;
+    rdfs:label "lod" ;
+    mb:fieldName "lod" ;
+    mb:defaultValue "2"^^xsd:integer ;
+    mb:nominalValue "2"^^xsd:integer ;
+    mb:semantics "LOD tier: 0=PRIMARY(CROWN), 1=SECONDARY, 2=TERTIARY" ;
+    mb:soaIndex "5"^^xsd:integer .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THREE-RESOLUTION NETWORKING MODEL LAWS (MODULE 3)
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:ThreeResolutionNetworkingModel a owl:Class ;
+    rdfs:label "Three-Resolution Networking Model" ;
+    rdfs:comment "Module 3 of the Combinatorial Maximalist Doctrine. Defines the exact separation between Authority, Peer Projection, and Client rendering." .
+
+mb:ByteClassAuthority a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
+    rdfs:label "Byte-Class Authority" ;
+    mb:law "The server owns standing, not visual detail. Authoritative state must be compacted into discrete byte-class vectors and Merkle-rooted assembly graphs." ;
+    sh:targetClass mb:AuthorityState ;
+    sh:property [
+        sh:path mb:hasByteField ;
+        sh:class mb:AuthorityByteField ;
+        sh:minCount 1 ;
+        sh:message "Byte-Class Authority requires state to be compacted into discrete byte-class vectors."
+    ] .
+
+mb:PeerProjection a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
+    rdfs:label "Peer Projection" ;
+    mb:law "Clients may exchange high-resolution visual details peer-to-peer (sparks, particle effects, animations) but these hold no authoritative standing." ;
+    sh:targetClass mb:PeerEffect ;
+    sh:property [
+        sh:path mb:hasAuthoritativeStanding ;
+        sh:hasValue "false"^^xsd:boolean ;
+        sh:message "Peer projection details hold no authoritative standing."
+    ] .
+
+mb:ClientAsProjector a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
+    rdfs:label "Client as Projector" ;
+    mb:law "The local client renders the absolute maximum fidelity, but relies entirely on the server for the admitted truth. The server does not synchronize the object; it synchronizes the right to believe the object." ;
+    sh:targetClass mb:ClientRenderState ;
+    sh:property [
+        sh:path mb:dependsOnAuthority ;
+        sh:class mb:AuthorityState ;
+        sh:minCount 1 ;
+        sh:message "Client rendering relies entirely on the server for the admitted truth."
+    ] .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BRANCHLESS TRANSITION KERNEL LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:TransitionKernel a owl:Class ;
+    rdfs:label "Transition Kernel" ;
+    rdfs:comment "A branchless, table-or-scalar function mapping authority inputs to damage output." .
+
+mb:ScalarFailureRisk a mb:TransitionKernel ;
+    rdfs:label "scalar_failure_risk" ;
+    mb:rustFnName "scalar_failure_risk" ;
+    mb:inputs "heat: u8, stress: u8, socket_health: u8" ;
+    mb:output "u8" ;
+    mb:formula "clamp((heat + stress + (MAX_CLASS - socket_health)) / 3, 0, MAX_CLASS)" ;
+    mb:useSaturating "true"^^xsd:boolean ;
+    mb:intermediateType "u16" ;
+    mb:comment "Uses u16 intermediate to avoid overflow on u8 inputs." .
+
+mb:TransitionTable a mb:TransitionKernel ;
+    rdfs:label "TransitionTable" ;
+    mb:rustStructName "TransitionTable" ;
+    mb:dimensions "16 x 16 x 16"^^xsd:string ;
+    mb:totalEntries "4096"^^xsd:integer ;
+    mb:indexFormula "heat * 256 + stress * 16 + socket_health" ;
+    mb:guarantee "bit-identical to scalar_failure_risk for all inputs in [0,15]^3" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SIMD EQUIVALENCE LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:SimdEquivalenceLaw a owl:Class ;
+    rdfs:label "SIMD Equivalence Law" ;
+    rdfs:comment "Law binding a SIMD-shaped path to produce bit-identical output to the scalar reference." .
+
+mb:SimdLaneWidth a owl:NamedIndividual ;
+    rdfs:label "SIMD Lane Width" ;
+    mb:value "16"^^xsd:integer ;
+    mb:unit "u8 lanes" ;
+    mb:comment "16 u8 lanes = 128-bit register width (SSE2/NEON floor)." .
+
+mb:SimdEquiv_GC_MECHBIRTH_002 a mb:SimdEquivalenceLaw ;
+    rdfs:label "GC-MECHBIRTH-002 SIMD Equivalence" ;
+    mb:laneWidth mb:SimdLaneWidth ;
+    mb:scalarRef mb:ScalarFailureRisk ;
+    mb:verificationFn "verify_simd_scalar_equivalence" ;
+    mb:residual "GC-MECHBIRTH-003: SIMDe FFI C intrinsic kernel deferred" ;
+    mb:guarantee "chunked 16-lane arithmetic produces identical output to scalar for all inputs" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PREDICTION SHADOW ENGINE LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:PredictionLaw a owl:Class ;
+    rdfs:label "Prediction Law" ;
+    rdfs:comment "Invariant laws governing the prediction shadow engine." .
+
+mb:ShadowOnlyInvariant a mb:PredictionLaw ;
+    rdfs:label "Shadow-Only Invariant" ;
+    mb:law "Prediction NEVER writes to admitted AuthorityState. All writes target shadow buffers only." ;
+    mb:refusalReason "PredictionAuthorityMutation" ;
+    mb:enforcement "attempt_authority_promotion() always returns Err(PredictionAuthorityMutation)" .
+
+mb:PredictionField a owl:Class ;
+    rdfs:label "Prediction Shadow Field" ;
+    rdfs:comment "A shadow buffer in PredictionState — parallel to an AuthorityByteField but never admitted." .
+
+mb:FutureDamageField a mb:PredictionField ;
+    mb:fieldName "future_damage" ;
+    mb:mirrors mb:DamageField ;
+    mb:formula "scalar_failure_risk(future_heat, future_stress, admitted.socket_health)" .
+
+mb:FutureHeatField a mb:PredictionField ;
+    mb:fieldName "future_heat" ;
+    mb:mirrors mb:HeatField ;
+    mb:formula "clamp(admitted.heat + ticks, 0, MAX_CLASS)" .
+
+mb:FutureStressField a mb:PredictionField ;
+    mb:fieldName "future_stress" ;
+    mb:mirrors mb:StressField ;
+    mb:formula "clamp(admitted.stress + ticks/2, 0, MAX_CLASS)" .
+
+mb:ConfidenceField a mb:PredictionField ;
+    mb:fieldName "confidence" ;
+    mb:formula "15.saturating_sub(ticks)" ;
+    mb:comment "Confidence degrades linearly with prediction tick distance." .
+
+mb:FutureLodField a mb:PredictionField ;
+    mb:fieldName "future_lod" ;
+    mb:formula "if future_damage > 10 { 0 } else { admitted.lod }" ;
+    mb:comment "LOD demoted to CROWN when predicted damage is critical." .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REFUSAL REASON TAXONOMY
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:RefusalReason a owl:Class ;
+    rdfs:label "Refusal Reason" ;
+    rdfs:comment "Bounded taxonomy of all possible refusal reasons. Every refusal carries exactly one." .
+
+mb:InvalidAuthorityClass a mb:RefusalReason ;
+    mb:variant "InvalidAuthorityClass" ;
+    mb:fields "field: String, class: u8" ;
+    mb:errorTemplate "invalid authority class {class} for field {field}" .
+
+mb:MissingSocket a mb:RefusalReason ;
+    mb:variant "MissingSocket" ;
+    mb:fields "dependent: String" ;
+    mb:errorTemplate "missing socket required by {dependent}" .
+
+mb:MotionClearanceViolation a mb:RefusalReason ;
+    mb:variant "MotionClearanceViolation" ;
+    mb:fields "detail: String" ;
+    mb:errorTemplate "motion clearance violation: {detail}" .
+
+mb:SkinOccludesRequiredFeature a mb:RefusalReason ;
+    mb:variant "SkinOccludesRequiredFeature" ;
+    mb:fields "feature: String" ;
+    mb:errorTemplate "skin occludes required feature: {feature}" .
+
+mb:LodDemotedCrownFeature a mb:RefusalReason ;
+    mb:variant "LodDemotedCrownFeature" ;
+    mb:fields "feature: String" ;
+    mb:errorTemplate "LOD demoted CROWN feature without authority reason: {feature}" .
+
+mb:PredictionAuthorityMutation a mb:RefusalReason ;
+    mb:variant "PredictionAuthorityMutation" ;
+    mb:fields "" ;
+    mb:errorTemplate "prediction attempted to overwrite admitted authority state" .
+
+mb:SimdScalarDivergence a mb:RefusalReason ;
+    mb:variant "SimdScalarDivergence" ;
+    mb:fields "index: usize" ;
+    mb:errorTemplate "SIMD output diverges from scalar for input index {index}" .
+
+mb:ReceiptChainBroken a mb:RefusalReason ;
+    mb:variant "ReceiptChainBroken" ;
+    mb:fields "sequence: u64, expected: String, actual: String" ;
+    mb:errorTemplate "receipt chain broken at sequence {sequence}: expected {expected}, got {actual}" .
+
+mb:OrphanProjectionRow a mb:RefusalReason ;
+    mb:variant "OrphanProjectionRow" ;
+    mb:fields "row_id: String" ;
+    mb:errorTemplate "orphan projection row {row_id} has no source receipt" .
+
+mb:MissingPowlStep a mb:RefusalReason ;
+    mb:variant "MissingPowlStep" ;
+    mb:fields "step: String" ;
+    mb:errorTemplate "POWL step missing from trace: {step}" .
+
+mb:GeometryValidationFailed a mb:RefusalReason ;
+    mb:variant "GeometryValidationFailed" ;
+    mb:fields "detail: String" ;
+    mb:errorTemplate "geometry validation failed: {detail}" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GATE TAXONOMY (GATE 0–7)
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:VerifierGate a owl:Class ;
+    rdfs:label "Verifier Gate" ;
+    rdfs:comment "A sequential gate in the GC-MECHBIRTH-002 acceptance matrix." .
+
+mb:GateScope a owl:Class ;
+    rdfs:label "Gate Scope" .
+
+mb:RustScope a mb:GateScope ;
+    rdfs:label "RustScope" ;
+    mb:comment "In-scope for Rust pre-UE4 verifier. Counts toward ALIVE_UNDER_SCOPE." .
+
+mb:ResidualScope a mb:GateScope ;
+    rdfs:label "ResidualScope" ;
+    mb:comment "Out-of-scope (UE4/WASM/Playwright). Does NOT count against ALIVE_UNDER_SCOPE." .
+
+mb:Gate0 a mb:VerifierGate ;
+    mb:gateId "GATE_0_SOURCE_ADMISSION" ;
+    mb:gateIndex "0"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "Contract for prompt is declared" ;
+    mb:alwaysPass "true"^^xsd:boolean .
+
+mb:Gate1 a mb:VerifierGate ;
+    mb:gateId "GATE_1_AUTHORITY_LENGTHS" ;
+    mb:gateIndex "1"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "All SoA buffers have identical length" ;
+    mb:validates "AuthorityState::validate_lengths" .
+
+mb:Gate2 a mb:VerifierGate ;
+    mb:gateId "GATE_2_AUTHORITY_CLASSES" ;
+    mb:gateIndex "2"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "All class values in [0, MAX_CLASS]" ;
+    mb:validates "AuthorityState::validate_classes" .
+
+mb:Gate3 a mb:VerifierGate ;
+    mb:gateId "GATE_3_SCALAR_TABLE_EQUIV" ;
+    mb:gateIndex "3"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "SIMD-equivalent path produces bit-identical output to scalar reference" ;
+    mb:validates "verify_simd_scalar_equivalence" .
+
+mb:Gate4 a mb:VerifierGate ;
+    mb:gateId "GATE_4_RECEIPT_CHAIN" ;
+    mb:gateIndex "4"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "Receipt chain prev_hash links are intact" ;
+    mb:validates "ReceiptChain::verify" .
+
+mb:Gate5 a mb:VerifierGate ;
+    mb:gateId "GATE_5_UE4_WASM_PACKAGE" ;
+    mb:gateIndex "5"^^xsd:integer ;
+    mb:scope mb:ResidualScope ;
+    mb:law "SpeculativeCoder UE4.27 HTML5 ES3 build produces browser-deployable output" ;
+    mb:residual "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline" .
+
+mb:Gate6 a mb:VerifierGate ;
+    mb:gateId "GATE_6_MOTION_DELTA" ;
+    mb:gateIndex "6"^^xsd:integer ;
+    mb:scope mb:ResidualScope ;
+    mb:law "Playwright motion delta exceeds threshold after input actuation" ;
+    mb:residual "visual_delta: no Playwright browser session in pre-UE4 scope" .
+
+mb:Gate7 a mb:VerifierGate ;
+    mb:gateId "GATE_7_RECEIPT" ;
+    mb:gateIndex "7"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "Every receipt entry hash equals blake3(content)" ;
+    mb:validates "ReceiptChain::verify_hashes" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STATUS VOCABULARY
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:StatusTerm a owl:Class ;
+    rdfs:label "Status Term" ;
+    rdfs:comment "Bounded status vocabulary. Never use 'done' or 'complete'." .
+
+mb:VerifiedUnderScope a mb:StatusTerm ;
+    rdfs:label "VERIFIED_UNDER_SCOPE" .
+
+mb:AliveUnderScope a mb:StatusTerm ;
+    rdfs:label "ALIVE_UNDER_SCOPE" ;
+    mb:condition "All RustScope gates pass; ResidualScope gates excluded." .
+
+mb:PartialAliveCandidate a mb:StatusTerm ;
+    rdfs:label "PARTIAL_ALIVE_CANDIDATE" ;
+    mb:condition "At least one RustScope gate failed." .
+
+mb:Blocked a mb:StatusTerm ;
+    rdfs:label "BLOCKED" ;
+    mb:condition "A hard RustScope gate failure prevents progress." .
+
+mb:Residual a mb:StatusTerm ;
+    rdfs:label "RESIDUAL" ;
+    mb:condition "Gate is ResidualScope — deferred to UE4/WASM pipeline." .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CRYPTOGRAPHIC RECEIPT PAYLOAD LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:ReceiptPayloadField a owl:Class ;
+    rdfs:label "Receipt Payload Field" ;
+    rdfs:comment "Fields that must be included in the unforgeable BLAKE3 receipt hash." .
+
+mb:SequenceField a mb:ReceiptPayloadField ;
+    mb:fieldName "sequence" ;
+    mb:fieldType "u64" ;
+    mb:hashOrder "1"^^xsd:integer .
+
+mb:EventTypeField a mb:ReceiptPayloadField ;
+    mb:fieldName "event_type" ;
+    mb:fieldType "String" ;
+    mb:hashOrder "2"^^xsd:integer .
+
+mb:PrevHashField a mb:ReceiptPayloadField ;
+    mb:fieldName "prev_hash" ;
+    mb:fieldType "String" ;
+    mb:hashOrder "3"^^xsd:integer .
+
+mb:ObjectsField a mb:ReceiptPayloadField ;
+    mb:fieldName "objects" ;
+    mb:fieldType "Vec<String>" ;
+    mb:hashOrder "4"^^xsd:integer .
+
+mb:StatusField a mb:ReceiptPayloadField ;
+    mb:fieldName "status" ;
+    mb:fieldType "AdmissionStatus" ;
+    mb:hashOrder "5"^^xsd:integer .
+
+mb:ResidualsField a mb:ReceiptPayloadField ;
+    mb:fieldName "residuals" ;
+    mb:fieldType "Vec<String>" ;
+    mb:hashOrder "6"^^xsd:integer .
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix antillm: <https://ggen.io/ontology/anti_llm/> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+antillm:Repository a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Repository" .
+antillm:Crate a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Crate" .
+antillm:File a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "File" .
+antillm:FileRange a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "FileRange" .
+antillm:Checkpoint a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Checkpoint" .
+antillm:DiagnosticCode a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "DiagnosticCode" .
+antillm:ForbiddenImplication a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "ForbiddenImplication" .
+antillm:Diagnostic a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Diagnostic" .
+antillm:Receipt a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Receipt" .
+antillm:Digest a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Digest" .
+antillm:Lsp318FeatureRow a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Lsp318FeatureRow" .
+antillm:NegativeControlFixture a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "NegativeControlFixture" .

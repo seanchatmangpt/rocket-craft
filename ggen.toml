@@ -1,0 +1,438 @@
+[project]
+name = "mech-factory-mud"
+version = "0.1.0"
+description = "Mech Factory MUD digital twin"
+
+[ontology]
+source = "ontology/all_merged.ttl"
+standard_only = false
+
+[inference]
+rules = [
+    { name = "standard-normalization", construct = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }" }
+]
+
+[[generation.rules]]
+name = "geometry-surrogate"
+query = { file = "ontology/ggen-packs/mech_factory_mud/GeometrySurrogate.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/GeometrySurrogate.tera" }
+output_file = "crates/mech_factory_mud/src/GeometrySurrogate.rs"
+
+[[generation.rules]]
+name = "ocel-schema"
+query = { file = "ontology/ggen-packs/mech_factory_mud/MechFactoryMudOcelSchema.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/MechFactoryMudOcelSchema.json.tera" }
+output_file = "generated/mech_factory_mud/MechFactoryMudOcelSchema.json"
+
+[[generation.rules]]
+name = "receipt-schema"
+query = { file = "ontology/ggen-packs/mech_factory_mud/MechFactoryMudReceiptSchema.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/MechFactoryMudReceiptSchema.json.tera" }
+output_file = "generated/mech_factory_mud/MechFactoryMudReceiptSchema.json"
+
+[[generation.rules]]
+name = "motion-surrogate"
+query = { file = "ontology/ggen-packs/mech_factory_mud/MotionSurrogate.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/MotionSurrogate.tera" }
+output_file = "crates/mech_factory_mud/src/MotionSurrogate.rs"
+
+[[generation.rules]]
+name = "skin-surrogate"
+query = { file = "ontology/ggen-packs/mech_factory_mud/SkinSurrogate.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/SkinSurrogate.tera" }
+output_file = "crates/mech_factory_mud/src/SkinSurrogate.rs"
+
+[[generation.rules]]
+name = "station-processes"
+query = { file = "ontology/ggen-packs/mech_factory_mud/station_processes.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/station_processes.rs.tera" }
+output_file = "crates/mech_factory_mud/src/MechFactoryMudStations.rs"
+
+[[generation.rules]]
+name = "walkthrough-transitions"
+query = { file = "ontology/ggen-packs/mech_factory_mud/walkthrough_transitions.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/walkthrough_transitions.rs.tera" }
+output_file = "crates/mech_factory_mud/src/MechFactoryMudWalkthrough.rs"
+
+[[generation.rules]]
+name = "ue4-projection-csv"
+query = { file = "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract_csv.tera" }
+output_file = "generated/mech_factory_mud/ue4/DataTables/ProjectionCommands.csv"
+
+[[generation.rules]]
+name = "ue4-projection-h"
+query = { file = "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/ue4_projection_contract_h.tera" }
+output_file = "generated/mech_factory_mud/ue4/Headers/MechFactoryMudProjection.h"
+
+[[generation.rules]]
+name = "ASSET_ReferenceFabric_001"
+query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/asset.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/ASSET_ReferenceFabric_001.usda"
+
+[[generation.rules]]
+name = "SM_Torso"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:torso_core)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Torso.usda"
+
+[[generation.rules]]
+name = "SM_Head"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:head_unit) (mud:v_fin_left) (mud:v_fin_right)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Head.usda"
+
+[[generation.rules]]
+name = "SM_WingArray_Left"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:wing_root_left) (mud:primary_wing_feathers_left) (mud:secondary_wing_feathers_left)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Left.usda"
+
+[[generation.rules]]
+name = "SM_WingArray_Right"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:wing_root_right) (mud:primary_wing_feathers_right) (mud:secondary_wing_feathers_right)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Right.usda"
+
+[[generation.rules]]
+name = "SM_Blade_Left"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:blade_left)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Blade_Left.usda"
+
+[[generation.rules]]
+name = "SM_Blade_Right"
+query = { inline = """
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:blade_right)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+  FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))
+}
+ORDER BY ?prim
+""" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Blade_Right.usda"
+
+[[generation.rules]]
+name = "M_WhiteArmor"
+query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/materialx/M_WhiteArmor.mtlx"
+
+[[generation.rules]]
+name = "M_CyanBlade"
+query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/materialx/M_CyanBlade.mtlx"
+
+[[generation.rules]]
+name = "M_DarkFrame"
+query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/materialx/M_DarkFrame.mtlx"
+
+[[generation.rules]]
+name = "M_GoldVisor"
+query = { file = "generated/mech_assets/reference_fabric_001/queries/materials.rq" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/materialx/M_GoldVisor.mtlx"
+
+[[generation.rules]]
+name = "texture_program_rs"
+query = { file = "generated/mech_assets/reference_fabric_001/queries/texture_programs.rq" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/texture_program.rs.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/textures/texture_program.rs"
+
+[[generation.rules]]
+name = "visual_gap_report_md"
+query = { file = "generated/mech_assets/reference_fabric_001/queries/verifier_expectations.rq" }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/visual_gap_report.md.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.md"
+
+
+[[generation.rules]]
+name = "SM_Limb_Left"
+query = { inline = '''
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:shoulder_left) (mud:arm_left) (mud:leg_left)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+}
+ORDER BY ?prim
+''' }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Limb_Left.usda"
+
+[[generation.rules]]
+name = "SM_Limb_Right"
+query = { inline = '''
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:shoulder_right) (mud:arm_right) (mud:leg_right)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+}
+ORDER BY ?prim
+''' }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Limb_Right.usda"
+
+[[generation.rules]]
+name = "SM_Loadout"
+query = { inline = '''
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+SELECT ?prim ?part ?type ?translateX ?translateY ?translateZ ?scaleX ?scaleY ?scaleZ ?rotateX ?rotateY ?rotateZ ?materialBinding ?partLocalName ?materialLocalName ?primLocalName
+WHERE {
+  VALUES (?CURRENT_PART_ID) {
+    (mud:backpack_core) (mud:thruster_cluster)
+  }
+  ?prim rdf:type mud:GeometryPrimitive ;
+        mud:belongsToPart ?CURRENT_PART_ID ;
+        mud:belongsToPart ?part ;
+        mud:primitiveFamily ?type ;
+        mud:translateX ?translateX ;
+        mud:translateY ?translateY ;
+        mud:translateZ ?translateZ ;
+        mud:scaleX ?scaleX ;
+        mud:scaleY ?scaleY ;
+        mud:scaleZ ?scaleZ ;
+        mud:rotateX ?rotateX ;
+        mud:rotateY ?rotateY ;
+        mud:rotateZ ?rotateZ ;
+        mud:materialBinding ?materialBinding .
+  BIND(STRAFTER(STR(?part), "#") AS ?partLocalName)
+  BIND(STRAFTER(STR(?materialBinding), "#") AS ?materialLocalName)
+  BIND(STRAFTER(STR(?prim), "#") AS ?primLocalName)
+}
+ORDER BY ?prim
+''' }
+mode = "Overwrite"
+template = { file = "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera" }
+output_file = "generated/mech_assets/reference_fabric_001/usd/SM_Loadout.usda"

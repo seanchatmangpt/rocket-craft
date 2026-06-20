@@ -1,86 +1,116 @@
-# Handoff Report - explorer_m1
+# Handoff Report - Asset Manufacturing LSP (ggen-asset-lsp) Architecture
 
 ## 1. Observation
 
-Direct observations of file locations, parameters, and structures in `/Users/sac/.ggen/packs/eden_server/` and `/Users/sac/.ggen/packs/ue4_ontology/`:
+Direct observations of the lsp-max framework and the rocket-craft workspace files:
 
-* **SPARQL Query Order By clauses**:
-  * In `eden_server/ggen.toml`:
-    * Line 25: `ORDER BY ?socket ?component`
-    * Line 40: `ORDER BY ?component ?socket`
-    * Line 50: `ORDER BY ?s`
-  * In `eden_server/queries/extract_assembly_deltas.rq` line 22: `ORDER BY DESC(?timestamp) ?delta`
-  * In `eden_server/queries/extract_authority_deltas.rq` line 24: `ORDER BY DESC(?timestamp) ?delta`
-  * In `eden_server/queries/extract_receipt_deltas.rq` line 27: `ORDER BY DESC(?timestamp) ?delta`
-  * In `eden_server/queries/substrate.rq` line 27: `ORDER BY ?root ?parent ?socket ?child`
-  * In `ue4_ontology/ggen.toml`:
-    * Line 27: `ORDER BY ?actor ?component`
-    * Line 44: `ORDER BY ?world ?level`
-    * Line 55: `ORDER BY ?s`
-  * In `ue4_ontology/shacl/validation.shacl.ttl`:
-    * SPARQL validations like `PinConnectionDirectionShape` (lines 95-103) utilize a `sh:select` query: `SELECT $this ?other WHERE { ... }` without an `ORDER BY` clause.
-* **Gameplay Cells Coverage**:
-  * `bandai_tps.ttl` (lines 39-78) models polymers and manufacturing FoundryProcess (covering the **Manufacturing** cell).
-  * `egp_racing.ttl` (lines 32-91) models RacingTire, RacingEngine, gripClass, and PitStrategy (covering the **Race** cell).
-  * `mars_market.ttl` (lines 35-72) models DimensionalAsset, OwnershipRecord, riskClass, and proofClass (covering the **Trade** cell).
-  * The other 9 cells (Repair, Insurance, Prediction, Resource Collection, Infrastructure, Defense, Exploration, Discovery, Research) are completely absent.
-* **States of Resolution**:
-  * Only `AssemblyComponent`, `SubAssembly`, `Part`, and `Socket` are defined in `pack.ttl` (lines 47-80).
-  * `Global`, `Regional`, `Zone`, and `Facility` are completely missing.
-* **Semantic Importance (LOD)**:
-  * No entities or classes matching `CROWN`, `PRIMARY`, `SECONDARY`, `TERTIARY`, or `BACKGROUND` are defined in any file.
-* **Dynamic Rendering Parameters**:
-  * No properties mapping to instancing, silhouette, or interaction distance are present in `core.ttl` or `blueprints.ttl`.
-* **Walkthrough Closure**:
-  * Pathing topology waypoints, exits, routes, interactables, and facility layouts are completely absent.
-* **Authority State Dimensions**:
-  * `damageClass` (line 130), `stressClass` (line 140), `heatClass` (line 150), `fatigueClass` (line 160) in `pack.ttl`, `gripClass` in `egp_racing.ttl` (line 63), and `riskClass` (line 51) / `proofClass` (line 59) in `mars_market.ttl` are defined as `xsd:unsignedByte` and validated to range `[0, 255]` by Shapes in `validation_shapes.ttl` (lines 18-96).
-  * Five dimensions (Energy, Resource, Market Condition, Conformance, Standing) are completely missing.
+### 1.1 lsp-max Core and Examples
+* **Location**: `/Users/sac/lsp-max`
+* **Crates Structure**: Standard cargo workspace containing `lsp-max` (server core), `lsp-max-protocol` (types and `max/*` methods), `lsp-max-runtime` (state machine), and `examples/`.
+* **LanguageServer Trait**: Defined in `/Users/sac/lsp-max/src/language_server.rs` with default implementations for all LSP 3.18 methods.
+* **powl-lsp Reference**: `/Users/sac/lsp-max/examples/powl-lsp/src/server.rs` overrides handlers like `initialize`, `did_open`, `did_change`, and `did_save` using `Client` to publish diagnostics (`self.client.publish_diagnostics`).
+* **anti-llm-cheat-lsp Reference**: `/Users/sac/lsp-max/examples/anti-llm-cheat-lsp/src/server.rs` overrides `code_action` (returning `Option<CodeActionResponse>`), which collects Quickfix actions from `recommend::repair_actions` defined in `src/server/recommend.rs`. It attaches originating diagnostics to the code action:
+  ```rust
+  CodeActionOrCommand::CodeAction(CodeAction {
+      title: format!("{}: {}", d.code, brief(&d.required_correction)),
+      kind: Some(CodeActionKind::QUICKFIX),
+      diagnostics: Some(vec![d.to_lsp()]),
+      command: Some(Command {
+          title: "Open receipt ledger".to_string(),
+          command: "anti-llm.openReceiptLedger".to_string(),
+          arguments: None,
+      }),
+      ..Default::default()
+  })
+  ```
+
+### 1.2 Asset Directory `generated/mech_assets/reference_fabric_001/`
+* **Directories present**: `graph`, `materialx`, `ocel`, `queries`, `receipts`, `reference`, `renders`, `reports`, `templates`, `textures`, `usd` (observed from `list_dir`).
+* **Asset Population**: USD, MaterialX, and report directories are currently empty, as the manufacturing worker agent (`worker_reference_fabric_001_generation`) has not yet generated them.
+* **Reference Targets**: The folder `reference/` contains the following extracted targets (from `extract_reference_visual_targets.py`):
+  * `reference_original.jpg` (SHA-256: `7693fdb87e7fc7f9151550830e6f5447f8ba8d1912f4c39bc06ec71467f14f27`)
+  * `reference_silhouette.png` (binary mask)
+  * `reference_edges.png` (PIL Find Edges map)
+  * `reference_color_histogram.json` (dominant color palette proportions)
+  * `reference_measurements.json`:
+    * aspect_ratio: `1.2024048096192386`
+    * wing_span_estimate_px: `1200`
+    * central_torso_mass_estimate: `torso_pixel_count: 294339, ratio: 0.3008, density: 0.8170`
+    * left_right_symmetry_estimate: `0.9594455577822312`
+    * cyan_weapon_regions and head_visor_highlight_regions metadata.
+
+### 1.3 Generator Parameter Sources in `rocket-craft`
+* **Ontology**: Merged Turtle file at `/Users/sac/rocket-craft/ontology/all_merged.ttl`. Target source triples for `reference_fabric_001` are planned to be written to:
+  * `generated/mech_assets/reference_fabric_001/graph/asset_fabric.ttl` (mech part grammar)
+  * `generated/mech_assets/reference_fabric_001/graph/generator_parameters.ttl` (120+ primitive instances and parameter bindings)
+  * `generated/mech_assets/reference_fabric_001/graph/visual_targets.ttl` (extracted measurements)
+* **SPARQL Queries**: Planned to be written under `generated/mech_assets/reference_fabric_001/queries/`:
+  * `usd_prims.rq` (selects primitives with transforms/materials, ordered by key)
+  * `materials.rq` (selects material parameters)
+  * `verifier_expectations.rq` (selects target metrics)
+* **Tera Templates**: Planned to be written under `generated/mech_assets/reference_fabric_001/templates/`:
+  * `templates/usd/asset.usda.tera` (generates master USD file)
+  * `templates/usd/part_mesh.usda.tera` (generates mesh geom prims)
+  * `templates/materialx/materials.mtlx.tera` (generates material definitions)
+* **Configuration Mapping**: Declarations are registered in `/Users/sac/rocket-craft/ggen.toml` as `[[generation.rules]]`.
 
 ---
 
 ## 2. Logic Chain
 
-1. **SPARQL Query Audit**: From direct observation of all query blocks in `.rq` files and `ggen.toml` files, every query contains an explicit `ORDER BY` statement, proving determinism for the code-generation and inference compiler pipelines. However, the SHACL-based validation queries in `validation.shacl.ttl` do not have an `ORDER BY` clause because SHACL engines typically evaluate violations as a set; nevertheless, this introduces a minor order-indeterminism risk when rendering lists of validation output.
-2. **Gameplay Coverage**: By searching for class declarations matching the 12 target cells, only Manufacturing, Race, and Trade were located. Thus, 9 cells remain completely unmodeled.
-3. **Resolution Coverage**: By tracing classes defined under `eden:AssemblyComponent`, only the subassembly, part, socket, and root structures are mapped. This leaves the higher-level environmental and infrastructure contexts (Global, Regional, Zone, Facility) unrepresented.
-4. **LOD & Rendering Details**: Auditing the RDF/OWL files showed no declarations of visual priority (CROWN, PRIMARY, etc.) or parameters like interaction distance or instancing, indicating a complete gap in client-side spatial representation.
-5. **Pathing & Walkthrough**: No classes exist in the schemas representing connectivity graphs (waypoints, corridors, exits), confirming walkthrough closure is completely absent.
-6. **Authority State Dimensions**: Tracing properties mapping to the 12 authority dimensions showed only 7 are defined (Damage, Heat, Stress, Fatigue, Grip, Risk, Provenance) and validated via `validation_shapes.ttl`. The other 5 dimensions (Energy, Resource, Market Condition, Conformance, Standing) are not defined as RDF properties, meaning they also lack SHACL rules.
+1. **Diagnostics Surface**: The compiler surface includes generated assets (`.usda`, `.mtlx`) and validation outputs (`usdchecker` logs, `visual_gap_report.json`).
+2. **Line and Range Resolution**:
+   * For `usdchecker` logs (e.g. `Failed verification on prim /World/Torso/Panel_001: Mesh has no normals`), the LSP can scan the generated USDA file for the declaration `def Mesh "Panel_001"` or `def "Panel_001"` to resolve the line number and range, then project a `PublishDiagnostics` error on that line.
+   * For `visual_gap_report.json` errors (e.g. `silhouette_iou < 0.90`), the error represents a global failure of the assembly mesh. The LSP should project this error on the root Xform definition in the master `ASSET_ReferenceFabric_001.usda` file (typically line 1 or the main Xform prim).
+   * For unresolved material bindings or missing payloads, the LSP can parse the generated `.usda` syntax, check paths, and highlight the faulty property lines.
+3. **Traceability to Generator Sources**:
+   * The rule definition in `ggen.toml` links each generated file to its template and SPARQL query.
+   * Inside the template (`part_mesh.usda.tera`), the output is structured by looping over query rows.
+   * Each query row in `usd_prims.rq` corresponds to an RDF resource (instance) in `generator_parameters.ttl` (e.g. `mud:TorsoPrimitive_001`).
+   * By including source metadata (e.g., as comments `# ggen-source: mud:TorsoPrimitive_001` or as custom OpenUSD metadata attributes `custom string ggen:source_uri` on the prim), the LSP can instantly map any generated prim in the `.usda` back to its source RDF resource.
+4. **Code Actions Actuation**:
+   * Quickfix actions must point to the *source* files, not the generated files, since the generated files are overwritten during `ggen sync`.
+   * For a given diagnostic on `/World/Torso/Panel_001` in `SM_Torso.usda`:
+     * The LSP identifies the source RDF resource `mud:TorsoPrimitive_001`.
+     * It searches `generator_parameters.ttl` (and other loaded Turtle files) for the text block defining `mud:TorsoPrimitive_001`.
+     * It constructs an LSP `CodeAction` with a `WorkspaceEdit` that targets `generator_parameters.ttl` at the resolved range, or a `Command` (like `vscode.open` or a custom LSP command) to jump to the Turtle definition or the `part_mesh.usda.tera` template line.
 
 ---
 
 ## 3. Caveats
 
-* The audit assumes that missing gameplay cells and resolution states must be modeled as formal RDFS/OWL classes within the pack schemas.
-* It assumes that validation queries in SHACL schemas should enforce ordering for strict determinism, even though the SHACL standard itself does not mandate it.
-* The local validation test commands execute `ggen sync --validate-only true`, which runs schema validations but does not generate final output code.
+* The asset directory `generated/mech_assets/reference_fabric_001/` currently does not contain the generated USDA and MaterialX files. We assume their schema, structure, and query maps conform to standard GGen compiler projections.
+* Tracing generated prims back to their Turtle sources is highly robust if the templates append metadata comments (e.g., `# ggen-source: <uri>`) or custom attributes to the generated USDA. If this metadata is omitted, the LSP must fall back to resolving the name (e.g. `Panel_001`) via executing the SPARQL query against the merged ontology, which adds runtime overhead.
 
 ---
 
-## 4. Conclusion
+## 4. Conclusion & Architectural Recommendation
 
-The current RDF packs `eden_server` and `ue4_ontology` are structurally sound and deterministic under the GGen compiler pipeline. However, they lack essential schema definitions, properties, and SHACL validation coverage required for fully realized TPS/DfLSS simulated play across the R1-R12 criteria.
+We recommend the following architecture for `ggen-asset-lsp`:
 
-Remediation requires:
-1. Writing class and property definitions for the 9 missing cells, 4 missing resolution states, 5 LOD classes, and 5 missing authority dimensions.
-2. Adding corresponding SHACL validation shapes in `validation_shapes.ttl` and `validation.shacl.ttl` to enforce `xsd:unsignedByte` ranges of `[0, 255]` on new authority dimensions.
-3. Injecting `ORDER BY` clauses to all `sh:select` blocks in `validation.shacl.ttl`.
+### 4.1 Crate Structure
+* Establish `crates/ggen-asset-lsp` depending on `lsp-max`, `lsp-types-max`, `serde_json`, and a basic TTL/SPARQL parser.
+* Implement `AssetLsp` implementing `lsp_max::LanguageServer`.
+
+### 4.2 Diagnostic Resolution and Projections
+* **usdchecker parser**: The server monitors changes to `.usda` files. It parses `usdchecker` output logs and maps warnings/errors to specific prim line numbers in the editor.
+* **Visual Gap parser**: On save, it parses `reports/visual_gap_report.json`. If `status` is `FAILED` or a key metric (e.g. `silhouette_iou`) is below the threshold, it publishes a diagnostic on the root `Xform` prim of the master `.usda` file.
+* **Static Asset Linter**: Detects missing payload references (empty paths or missing files) and invalid material bindings by verifying if the targeted `.mtlx` path exists and contains the material.
+
+### 4.3 Diagnostic Mapping and Code Actions
+* **Turtle Trace Mapping**: The LSP reads `ggen.toml` to link output files to templates/queries, and parses comments (or attributes) in the generated `.usda` files to locate the source RDF resource URI.
+* **LSP Code Actions**:
+  * `Go to Source Parameter`: Traces the prim name to its RDF resource in `generator_parameters.ttl`, resolves its range, and offers a navigation command.
+  * `Go to Generator Template`: Resolves the template path in `ggen.toml` (e.g. `part_mesh.usda.tera`) and maps the prim type to the template file range.
+  * `Fix Material Binding`: If a material binding is missing, queries the ontology for valid material URIs and offers a quickfix edit to change the `mud:materialBinding` property inside `generator_parameters.ttl`.
+
+### 4.4 OCEL Event Integration
+* Emit OCEL event logs (`Validate` and `Repair` activities) on diagnostic evaluation and Code Action execution to feed the process-mining loop.
 
 ---
 
 ## 5. Verification Method
 
-1. **Verify Gap Report Integrity**: Inspect `/Users/sac/rocket-craft/.agents/orchestrator_swarm_audit/m1_gap_report.md` to confirm detailed lists of missing elements and remediation Turtle templates are accurately written.
-2. **Execute GGen Validation Command for `ue4_ontology`**:
-   ```bash
-   cd /Users/sac/.ggen/packs/ue4_ontology/
-   /Users/sac/.local/bin/ggen sync --validate-only true
-   ```
-   Expect output ending in `All validations passed` and `SUCCESS: Ontology validation passed`.
-3. **Execute GGen Validation Command for `eden_server`**:
-   ```bash
-   cd /Users/sac/.ggen/packs/eden_server/
-   /Users/sac/.local/bin/ggen sync --validate-only true
-   ```
-   Expect output ending in `All validations passed`.
+1. **Verify Report Location**: Check that this report exists at `/Users/sac/rocket-craft/.agents/explorer_m1/handoff.md`.
+2. **Review lsp-max server loop**: Run `cargo check --examples` in `/Users/sac/lsp-max` to confirm that all lsp-max types build successfully.
+3. **Verify reference measurements path**: Verify `/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/reference/reference_measurements.json` contains valid dimensions.

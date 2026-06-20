@@ -1,0 +1,26 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+mud:VisualTargetsOntology a owl:Ontology ;
+    rdfs:label "Visual Targets Ontology" ;
+    rdfs:comment "Defines target measurements and metrics from reference analysis." .
+
+mud:VisualTargetExpectation rdf:type owl:Class ;
+    rdfs:label "Visual Target Expectation" .
+
+mud:reference_fabric_expectations rdf:type mud:VisualTargetExpectation ;
+    mud:aspectRatio "1.2024"^^xsd:float ;
+    mud:symmetry "0.9594"^^xsd:float ;
+    mud:bboxMinX "0"^^xsd:integer ;
+    mud:bboxMinY "2"^^xsd:integer ;
+    mud:bboxMaxX "1199"^^xsd:integer ;
+    mud:bboxMaxY "999"^^xsd:integer ;
+    mud:whiteProportion "0.4236"^^xsd:float ;
+    mud:darkProportion "0.0345"^^xsd:float ;
+    mud:cyanProportion "0.0091"^^xsd:float ;
+    mud:goldProportion "0.0019"^^xsd:float ;
+    mud:redProportion "0.0032"^^xsd:float .

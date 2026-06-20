@@ -1,0 +1,4 @@
+projection_id,object_id,station_id,route_node_id,source_process_step,source_receipt,authority_inputs,lod_class,projection_type,ue4_target_surface,admission_status
+{% for row in results -%}
+{{ row.projection_id }},{{ row.object_id }},{{ row.station_id }},{{ row.route_node_id }},{{ row.source_process_step }},{{ row.source_receipt }},{{ row.authority_inputs }},{{ row.lod_class }},{{ row.projection_type }},{{ row.ue4_target_surface }},{{ row.admission_status }}
+{% endfor -%}

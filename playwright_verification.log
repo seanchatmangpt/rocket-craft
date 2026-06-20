@@ -1,0 +1,1835 @@
+============================================
+   Rocket Craft — Stage 6 HTML5 E2E Proof   
+============================================
+[WARN] 95 blueprint errors in cook log (VaRest redirects unresolved — networking UI skipped in pak)
+[INFO] [1/5] Verifying WASM artifact...
+[INFO] Release binary not found — building automatically...
+[INFO] Building rocket-cmd (release)...
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.45
+   Compiling unicode-ident v1.0.24
+   Compiling libc v0.2.186
+   Compiling cfg-if v1.0.4
+   Compiling version_check v0.9.5
+   Compiling memchr v2.8.2
+   Compiling once_cell v1.21.4
+   Compiling smallvec v1.15.2
+   Compiling autocfg v1.5.1
+   Compiling log v0.4.32
+   Compiling typenum v1.20.1
+   Compiling bitflags v2.13.0
+   Compiling serde_core v1.0.228
+   Compiling parking_lot_core v0.9.12
+   Compiling shlex v2.0.1
+   Compiling scopeguard v1.2.0
+   Compiling find-msvc-tools v0.1.9
+   Compiling syn v1.0.109
+   Compiling lock_api v0.4.14
+   Compiling stable_deref_trait v1.2.1
+   Compiling pin-project-lite v0.2.17
+   Compiling generic-array v0.14.7
+   Compiling equivalent v1.0.2
+   Compiling bytes v1.11.1
+   Compiling itoa v1.0.18
+   Compiling crossbeam-utils v0.8.21
+   Compiling ident_case v1.0.1
+   Compiling hashbrown v0.17.1
+   Compiling subtle v2.6.1
+   Compiling pkg-config v0.3.33
+   Compiling serde v1.0.228
+   Compiling lazy_static v1.5.0
+   Compiling core-foundation-sys v0.8.7
+   Compiling tracing-core v0.1.36
+   Compiling zmij v1.0.21
+   Compiling vcpkg v0.2.15
+   Compiling ahash v0.7.8
+   Compiling futures-core v0.3.32
+   Compiling aho-corasick v1.1.4
+   Compiling num-traits v0.2.19
+   Compiling indexmap v2.14.0
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling fnv v1.0.7
+   Compiling regex-syntax v0.8.11
+   Compiling writeable v0.6.3
+   Compiling litemap v0.8.2
+   Compiling thiserror v1.0.69
+   Compiling zeroize v1.9.0
+   Compiling indexmap v1.9.3
+   Compiling proc-macro-error v1.0.4
+   Compiling getrandom v0.4.2
+   Compiling rand_core v0.10.1
+   Compiling icu_properties_data v2.2.0
+   Compiling bytecheck v0.6.12
+   Compiling regex-automata v0.4.14
+   Compiling errno v0.3.14
+   Compiling signal-hook-registry v1.4.8
+   Compiling mio v1.2.1
+   Compiling parking_lot v0.12.5
+   Compiling jobserver v0.1.34
+   Compiling getrandom v0.2.17
+   Compiling cc v1.2.64
+   Compiling cpufeatures v0.2.17
+   Compiling socket2 v0.6.4
+   Compiling utf8_iter v1.0.4
+   Compiling icu_normalizer_data v2.2.0
+   Compiling openssl-sys v0.9.117
+   Compiling num-conv v0.2.2
+   Compiling rend v0.4.2
+   Compiling time-core v0.1.9
+   Compiling percent-encoding v2.3.2
+   Compiling object v0.37.3
+   Compiling simdutf8 v0.1.5
+   Compiling crypto-common v0.1.7
+   Compiling block-buffer v0.10.4
+   Compiling digest v0.10.7
+   Compiling block-padding v0.3.3
+   Compiling sha2 v0.10.9
+   Compiling inout v0.1.4
+   Compiling cipher v0.4.4
+   Compiling time-macros v0.2.29
+   Compiling syn v2.0.118
+   Compiling hashbrown v0.12.3
+   Compiling http v1.4.2
+   Compiling base64ct v1.8.3
+   Compiling rkyv v0.7.46
+   Compiling powerfmt v0.2.0
+   Compiling hashbrown v0.14.5
+   Compiling thiserror v2.0.18
+   Compiling target-lexicon v0.12.16
+   Compiling bitflags v1.3.2
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.21.3
+   Compiling deranged v0.5.8
+   Compiling gimli v0.32.3
+   Compiling rustix v1.1.4
+   Compiling slab v0.4.12
+   Compiling crunchy v0.2.4
+   Compiling adler2 v2.0.1
+   Compiling miniz_oxide v0.8.9
+   Compiling time v0.3.49
+   Compiling ptr_meta_derive v0.1.4
+   Compiling bytecheck_derive v0.6.12
+   Compiling displaydoc v0.2.6
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling serde_derive v1.0.228
+   Compiling tracing-attributes v0.1.31
+   Compiling tokio-macros v2.7.0
+   Compiling thiserror-impl v1.0.69
+   Compiling darling_macro v0.21.3
+   Compiling zerofrom v0.1.8
+   Compiling ptr_meta v0.1.4
+   Compiling tokio v1.52.3
+   Compiling darling v0.21.3
+   Compiling tracing v0.1.44
+   Compiling addr2line v0.25.1
+   Compiling der_derive v0.7.3
+   Compiling thiserror-impl v2.0.18
+   Compiling enum-iterator-derive v0.7.0
+   Compiling rkyv_derive v0.7.46
+   Compiling pem-rfc7468 v0.7.0
+   Compiling crossbeam-epoch v0.9.18
+   Compiling libz-sys v1.1.29
+   Compiling memoffset v0.9.1
+   Compiling corosensei v0.1.4
+   Compiling signal-hook v0.3.18
+   Compiling const-oid v0.9.6
+   Compiling either v1.16.0
+   Compiling rustc-demangle v0.1.27
+   Compiling hex v0.4.3
+   Compiling seahash v4.1.0
+   Compiling serde_json v1.0.150
+   Compiling minimal-lexical v0.2.1
+   Compiling tiny-keccak v2.0.2
+   Compiling leb128 v0.2.7
+   Compiling flagset v0.4.7
+   Compiling unicode-width v0.1.14
+   Compiling der v0.7.10
+   Compiling nom v7.1.3
+   Compiling yoke v0.8.3
+   Compiling backtrace v0.3.76
+   Compiling enumset_derive v0.15.0
+   Compiling enumset v1.1.13
+   Compiling crossbeam-deque v0.8.6
+   Compiling enum-iterator v0.7.0
+   Compiling http-body v1.0.1
+   Compiling form_urlencoded v1.2.2
+   Compiling semver v1.0.28
+   Compiling mach2 v0.4.3
+   Compiling thread_local v1.1.9
+   Compiling futures-sink v0.3.32
+   Compiling futures-task v0.3.32
+   Compiling heck v0.5.0
+   Compiling rustversion v1.0.22
+   Compiling more-asserts v0.2.2
+   Compiling byteorder v1.5.0
+   Compiling xxhash-rust v0.8.15
+   Compiling ryu v1.0.23
+   Compiling rayon-core v1.13.0
+   Compiling httparse v1.10.1
+   Compiling system-configuration-sys v0.6.0
+   Compiling base64 v0.22.1
+   Compiling fastrand v2.4.1
+   Compiling tempfile v3.27.0
+   Compiling tokio-util v0.7.18
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling spki v0.7.3
+   Compiling futures-util v0.3.32
+   Compiling region v3.0.2
+   Compiling rusticata-macros v4.1.0
+   Compiling asn1-rs-derive v0.6.0
+   Compiling asn1-rs-impl v0.2.0
+   Compiling derivative v2.2.0
+   Compiling dashmap v6.2.1
+   Compiling crossbeam-queue v0.3.12
+   Compiling libssh2-sys v0.3.1
+   Compiling core-foundation v0.10.1
+   Compiling mio v0.8.11
+   Compiling memmap2 v0.6.2
+   Compiling security-framework-sys v2.17.0
+   Compiling linkme-impl v0.3.36
+   Compiling atomic-waker v1.1.2
+   Compiling try-lock v0.2.5
+   Compiling utf8parse v0.2.2
+   Compiling linkme v0.3.36
+   Compiling native-tls v0.2.18
+   Compiling anyhow v1.0.102
+   Compiling same-file v1.0.6
+   Compiling tower-service v0.3.3
+   Compiling walkdir v2.5.0
+   Compiling const-random-macro v0.1.16
+   Compiling dynasm v1.2.3
+   Compiling anstyle-parse v1.0.0
+   Compiling asn1-rs v0.7.2
+   Compiling want v0.3.1
+   Compiling h2 v0.4.15
+   Compiling security-framework v3.7.0
+   Compiling shared-buffer v0.1.4
+   Compiling signal-hook-mio v0.2.5
+   Compiling wasmparser v0.121.2
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling serde_spanned v0.6.9
+   Compiling icu_locale_core v2.2.0
+   Compiling icu_collections v2.2.0
+   Compiling toml_datetime v0.6.11
+   Compiling wasm-encoder v0.32.0
+   Compiling num-integer v0.1.46
+   Compiling hmac v0.12.1
+   Compiling matchers v0.2.0
+   Compiling core-foundation v0.9.4
+   Compiling memmap2 v0.5.10
+   Compiling futures-channel v0.3.32
+   Compiling tracing-log v0.2.0
+   Compiling sharded-slab v0.1.7
+   Compiling anstyle-query v1.1.5
+   Compiling icu_provider v2.2.0
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling self_cell v1.2.2
+   Compiling deunicode v1.6.2
+   Compiling unicode-width v0.2.0
+   Compiling colorchoice v1.0.5
+   Compiling oid-registry v0.8.1
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling toml_write v0.1.2
+   Compiling strsim v0.11.1
+   Compiling unicode-segmentation v1.13.3
+   Compiling fallible-iterator v0.2.0
+   Compiling nu-ansi-term v0.50.3
+   Compiling anstyle v1.0.14
+   Compiling winnow v0.7.15
+   Compiling gimli v0.26.2
+   Compiling anstream v1.0.0
+   Compiling tracing-subscriber v0.3.23
+   Compiling darling_core v0.23.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling wasmer-types v4.4.0
+   Compiling slug v0.1.6
+   Compiling hyper v1.10.1
+   Compiling system-configuration v0.7.0
+   Compiling wast v64.0.0
+   Compiling url v2.5.8
+   Compiling dynasmrt v1.2.3
+   Compiling toml_edit v0.22.27
+   Compiling pbkdf2 v0.12.2
+   Compiling num-bigint v0.4.6
+   Compiling rayon v1.12.0
+   Compiling const-random v0.1.18
+   Compiling x509-cert v0.2.5
+   Compiling salsa20 v0.10.2
+   Compiling ring v0.17.14
+   Compiling wasmer-vm v4.4.0
+   Compiling libgit2-sys v0.17.0+1.8.1
+   Compiling blake3 v1.8.5
+   Compiling sync_wrapper v1.0.2
+   Compiling bstr v1.12.1
+   Compiling portable-atomic v1.13.1
+   Compiling clap_lex v1.1.0
+   Compiling owo-colors v4.3.0
+   Compiling ipnet v2.12.0
+   Compiling rustix v0.38.44
+   Compiling tower-layer v0.3.3
+   Compiling wasmer-compiler v4.4.0
+   Compiling der-parser v10.0.0
+   Compiling toml v0.8.23
+   Compiling cms v0.2.3
+   Compiling tower v0.5.3
+   Compiling clap_builder v4.6.0
+   Compiling wasmer-compiler-singlepass v4.4.0
+   Compiling hyper-util v0.1.20
+   Compiling globset v0.4.18
+   Compiling wat v1.0.71
+   Compiling jmespath v0.3.0
+   Compiling scrypt v0.11.0
+   Compiling dlv-list v0.5.2
+   Compiling darling_macro v0.23.0
+   Compiling tokio-native-tls v0.3.1
+   Compiling console v0.15.11
+   Compiling clap_derive v4.6.1
+   Compiling http-body-util v0.1.3
+   Compiling wasmer-derive v4.4.0
+   Compiling cbc v0.1.2
+   Compiling aes v0.8.4
+   Compiling chacha20 v0.10.0
+   Compiling rustls-pki-types v1.14.1
+   Compiling iana-time-zone v0.1.65
+   Compiling constant_time_eq v0.4.2
+   Compiling paste v1.0.15
+   Compiling color-spantrace v0.3.0
+   Compiling openssl v0.10.81
+   Compiling allocator-api2 v0.2.21
+   Compiling arrayvec v0.7.6
+   Compiling data-encoding v2.11.0
+   Compiling camino v1.2.2
+   Compiling foreign-types-shared v0.1.1
+   Compiling untrusted v0.9.0
+   Compiling foldhash v0.1.5
+   Compiling eyre v0.6.12
+   Compiling instability v0.3.12
+   Compiling arrayref v0.3.9
+   Compiling hashbrown v0.15.5
+   Compiling x509-parser v0.18.1
+   Compiling foreign-types v0.3.2
+   Compiling clap v4.6.1
+   Compiling wasmer v4.4.0
+   Compiling chrono v0.4.45
+   Compiling pkcs5 v0.7.1
+   Compiling rand v0.10.1
+   Compiling hyper-tls v0.6.0
+   Compiling darling v0.23.0
+   Compiling ordered-multimap v0.7.3
+   Compiling ignore v0.4.26
+   Compiling pkcs12 v0.1.0
+   Compiling tower-http v0.6.11
+   Compiling tracing-error v0.2.1
+   Compiling newline-converter v0.3.0
+   Compiling strum_macros v0.26.4
+   Compiling castaway v0.2.4
+   Compiling crossterm v0.25.0
+   Compiling pem v3.0.6
+   Compiling serde_urlencoded v0.7.1
+   Compiling fxhash v0.2.1
+   Compiling fuzzy-matcher v0.3.7
+   Compiling yasna v0.5.2
+   Compiling itertools v0.13.0
+   Compiling openssl-macros v0.1.1
+   Compiling rc2 v0.8.1
+   Compiling des v0.8.1
+   Compiling sha1 v0.10.6
+   Compiling crossbeam-channel v0.5.15
+   Compiling filetime v0.2.29
+   Compiling fsevent-sys v4.1.0
+   Compiling encoding_rs v0.8.35
+   Compiling indenter v0.3.4
+   Compiling static_assertions v1.1.0
+   Compiling mime v0.3.17
+   Compiling number_prefix v0.4.0
+   Compiling unsafe-libyaml v0.2.11
+   Compiling indoc v2.0.7
+   Compiling dyn-clone v1.0.20
+   Compiling inquire v0.7.5
+   Compiling notify v6.1.1
+   Compiling indicatif v0.17.11
+   Compiling serde_yaml v0.9.34+deprecated
+   Compiling reqwest v0.12.28
+   Compiling knhk v0.1.0 (/Users/sac/rocket-craft/tools/knhk)
+   Compiling unicode-truncate v1.1.0
+   Compiling p12-keystore v0.2.1
+   Compiling rcgen v0.13.2
+   Compiling crossterm v0.28.1
+   Compiling clap-noun-verb-macros v26.6.2
+   Compiling rust-ini v0.21.3
+   Compiling lru v0.12.5
+   Compiling unrdf v0.1.0 (/Users/sac/rocket-craft/tools/unrdf)
+   Compiling cargo-platform v0.1.9
+   Compiling compact_str v0.8.2
+   Compiling regex v1.12.4
+   Compiling atty v0.2.14
+   Compiling colored v2.2.0
+   Compiling cassowary v0.3.0
+   Compiling shell-words v1.1.1
+   Compiling dialoguer v0.11.0
+   Compiling clap-noun-verb v26.6.2
+   Compiling cargo_metadata v0.19.2
+   Compiling color-eyre v0.6.5
+   Compiling clap_complete v4.6.5
+   Compiling strum v0.26.3
+   Compiling ratatui v0.29.0
+   Compiling git2 v0.19.0
+   Compiling rocket-sdk v0.1.0 (/Users/sac/rocket-craft/tools/rocket-sdk)
+   Compiling rocket-cmd v0.1.0 (/Users/sac/rocket-craft/tools/rocket-cmd)
+    Finished `release` profile [optimized] target(s) in 1m 45s
+[SUCCESS] rocket-cmd built.
+PASS: /Users/sac/rocket-craft/pwa-staff/manufactured/Brm.wasm (175.4 MB)
+{
+  "path": "/Users/sac/rocket-craft/pwa-staff/manufactured/Brm.wasm",
+  "size_bytes": 183929485,
+  "size_mb": 175.4088258743286,
+  "status": "pass"
+}
+[PASS] WASM artifact: /Users/sac/rocket-craft/pwa-staff/manufactured/Brm.wasm
+[PASS] REAL package — 175.4 MB WASM, js=true, html=true, data=true
+[receipt] /tmp/brm-html5-archive/HTML5/cook-receipt.json
+[PASS] Cook receipt: /Users/sac/rocket-craft/pwa-staff/manufactured/cook-receipt.json (verdict=PASS)
+[INFO] [2/5] Staging HTML5 package to pwa-staff/manufactured/...
+[PASS] Staged to /Users/sac/rocket-craft/pwa-staff/manufactured (20 items)
+[INFO] [3/5] Starting HTTP server on port 8080...
+[WARN] Port 8080 in use — stopping existing process
+Waiting for 127.0.0.1:8080 (timeout 15s)...
+READY: 127.0.0.1:8080
+{
+  "addr": "127.0.0.1:8080",
+  "status": "ready"
+}
+[PASS] Server ready at http://localhost:8080
+[INFO] [4/5] Running Playwright TPS-DFLSS proof...
+[INFO] Using game page: Brm.html
+
+Running 1 test using 1 worker
+
+BROWSER LOG: Fork of Unreal Engine 4.27.2 with HTML5 ES3 (WebGL 2) platform - see https://github.com/SpeculativeCoder/UnrealEngine-HTML5-ES3 for more information.
+BROWSER LOG: Emscripten version: /Users/sac/ue-4.27-html5-es3/Engine/Platforms/HTML5/Build/emsdk/emsdk-5.0.7/upstream/emscripten
+BROWSER LOG: Emscripten configuration: /Users/sac/ue-4.27-html5-es3/Engine/Platforms/HTML5/Build/emsdk/emsdk-5.0.7/.emscripten
+BROWSER LOG: userAgent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.55 Safari/537.36
+BROWSER LOG: iPhone: false
+BROWSER LOG: iPad: false
+BROWSER LOG: android: false
+BROWSER LOG: mobile: false
+BROWSER LOG: Running with IndexedDB access disabled.
+BROWSER LOG: Google Inc. (Apple) ANGLE (Apple, ANGLE Metal Renderer: Apple M3 Max, Unspecified Version)/WebKit WebKit WebGL WebGL 2.0 (OpenGL ES 3.0 Chromium), WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)
+BROWSER LOG: openIndexedDB: IndexedDB disabled by "?noidbread" option
+BROWSER LOG: Failed to load resource: the server responded with a status of 404 (File not found)
+BROWSER LOG: Used memory before allocating anything was 0.00MB
+
+BROWSER LOG: Project file not found: ../../../Brm/Brm.uproject
+
+BROWSER LOG: Looking for binary: ../../../Brm/Config/BinaryConfig.ini
+
+BROWSER LOG: LogHTML5Launch: Display: Starting UE4 ... 
+
+
+BROWSER LOG: LogHTML5Launch: Display: Command line:    ../../../Brm/Brm.uproject  -stdout
+
+
+BROWSER LOG: LogTemp: Display: HTML5_Init
+
+BROWSER LOG: LogTemp: Display: PreInit Start
+
+BROWSER LOG: LogInit: Display: Project file not found: ../../../Brm/Brm.uproject
+
+BROWSER LOG: LogInit: Display: 	Attempting to find via project info helper.
+
+BROWSER LOG: LogUProjectInfo: Found projects:
+
+BROWSER LOG: LogPakFile: Display: Found Pak file ../../../Brm/Content/Paks/Brm-HTML5.pak attempting to mount.
+
+BROWSER LOG: LogPakFile: Display: Mounting pak file ../../../Brm/Content/Paks/Brm-HTML5.pak.
+
+BROWSER LOG: LogPakFile: PakFile PrimaryIndexSize=30518
+
+BROWSER LOG: LogPakFile: PakFile PathHashIndexSize=42723
+
+BROWSER LOG: LogPakFile: PakFile FullDirectoryIndexSize=56084
+
+BROWSER LOG: LogShaderLibrary: Display: ShaderCodeLibraryPakFileMountedCallback: PakFile '../../../Brm/Content/Paks/Brm-HTML5.pak' (chunk index -1, root '../../../') mounted
+
+BROWSER LOG: LogShaderLibrary: Display: ShaderCodeLibraryPakFileMountedCallback: pending pak file info (ChunkID:-1 Root:../../../ File:../../../Brm/Content/Paks/Brm-HTML5.pak)
+
+BROWSER LOG: LogTaskGraph: Started task graph with 4 named threads and 5 total threads with 1 sets of task threads.
+
+BROWSER LOG: LogStats: Stats thread started at 0.025630
+
+BROWSER LOG: LogICUInternationalization: ICU TimeZone Detection - Raw Offset: -8:00, Platform Override: ''
+
+BROWSER LOG: LogInit: Display: Loading text-based GConfig....
+
+BROWSER LOG: LogPluginManager: Mounting plugin RawInput
+
+BROWSER LOG: LogPluginManager: Mounting plugin WebSocketNetworking
+
+BROWSER LOG: LogPluginManager: Mounting plugin Paper2D
+
+BROWSER LOG: LogPluginManager: Mounting plugin AISupport
+
+BROWSER LOG: LogPluginManager: Mounting plugin EnvironmentQueryEditor
+
+BROWSER LOG: LogPluginManager: Mounting plugin LightPropagationVolume
+
+BROWSER LOG: LogPluginManager: Mounting plugin CameraShakePreviewer
+
+BROWSER LOG: LogPluginManager: Mounting plugin GameplayCameras
+
+BROWSER LOG: LogPluginManager: Mounting plugin TemplateSequence
+
+BROWSER LOG: LogPluginManager: Mounting plugin LevelSequenceEditor
+
+BROWSER LOG: LogPluginManager: Mounting plugin AnimationSharing
+
+BROWSER LOG: LogPluginManager: Mounting plugin SignificanceManager
+
+BROWSER LOG: LogPluginManager: Mounting plugin PluginUtils
+
+BROWSER LOG: LogPluginManager: Mounting plugin PropertyAccessEditor
+
+BROWSER LOG: LogPluginManager: Mounting plugin UObjectPlugin
+
+BROWSER LOG: LogPluginManager: Mounting plugin AssetManagerEditor
+
+BROWSER LOG: LogPluginManager: Mounting plugin FacialAnimation
+
+BROWSER LOG: LogPluginManager: Mounting plugin GeometryMode
+
+BROWSER LOG: LogPluginManager: Mounting plugin SpeedTreeImporter
+
+BROWSER LOG: LogPluginManager: Mounting plugin DatasmithContent
+
+BROWSER LOG: LogPluginManager: Mounting plugin VariantManagerContent
+
+BROWSER LOG: LogPluginManager: Mounting plugin AlembicImporter
+
+BROWSER LOG: LogPluginManager: Mounting plugin GeometryCache
+
+BROWSER LOG: LogPluginManager: Mounting plugin AutomationUtils
+
+BROWSER LOG: LogPluginManager: Mounting plugin ScreenshotTools
+
+BROWSER LOG: LogPluginManager: Mounting plugin ChaosCloth
+
+BROWSER LOG: LogPluginManager: Mounting plugin ChaosClothEditor
+
+BROWSER LOG: LogPluginManager: Mounting plugin ChaosEditor
+
+BROWSER LOG: LogPluginManager: Mounting plugin PlanarCut
+
+BROWSER LOG: LogPluginManager: Mounting plugin GeometryProcessing
+
+BROWSER LOG: LogPluginManager: Mounting plugin EditableMesh
+
+BROWSER LOG: LogPluginManager: Mounting plugin GeometryCollectionPlugin
+
+BROWSER LOG: LogPluginManager: Mounting plugin ProceduralMeshComponent
+
+BROWSER LOG: LogPluginManager: Mounting plugin ChaosSolverPlugin
+
+BROWSER LOG: LogPluginManager: Mounting plugin ChaosNiagara
+
+BROWSER LOG: LogPluginManager: Mounting plugin Niagara
+
+BROWSER LOG: LogPluginManager: Mounting plugin PythonScriptPlugin
+
+BROWSER LOG: LogPluginManager: Mounting plugin CharacterAI
+
+BROWSER LOG: LogPluginManager: Mounting plugin MotoSynth
+
+BROWSER LOG: LogPluginManager: Mounting plugin ImgMedia
+
+BROWSER LOG: LogPluginManager: Mounting plugin MediaCompositing
+
+BROWSER LOG: LogPluginManager: Mounting plugin MeshPainting
+
+BROWSER LOG: LogPluginManager: Mounting plugin ActorSequence
+
+BROWSER LOG: LogPluginManager: Mounting plugin MatineeToLevelSequence
+
+BROWSER LOG: LogPluginManager: Mounting plugin OnlineSubsystem
+
+BROWSER LOG: LogPluginManager: Mounting plugin OnlineSubsystemNull
+
+BROWSER LOG: LogPluginManager: Mounting plugin OnlineSubsystemUtils
+
+BROWSER LOG: LogPluginManager: Mounting plugin ActorLayerUtilities
+
+BROWSER LOG: LogPluginManager: Mounting plugin AndroidPermission
+
+BROWSER LOG: LogPluginManager: Mounting plugin AppleImageUtils
+
+BROWSER LOG: LogPluginManager: Mounting plugin ArchVisCharacter
+
+BROWSER LOG: LogPluginManager: Mounting plugin AssetTags
+
+BROWSER LOG: LogPluginManager: Mounting plugin AudioCapture
+
+BROWSER LOG: LogPluginManager: Mounting plugin CableComponent
+
+BROWSER LOG: LogPluginManager: Mounting plugin ChunkDownloader
+
+BROWSER LOG: LogPluginManager: Mounting plugin ExampleDeviceProfileSelector
+
+BROWSER LOG: LogPluginManager: Mounting plugin LocationServicesBPLibrary
+
+BROWSER LOG: LogPluginManager: Mounting plugin MobilePatchingUtils
+
+BROWSER LOG: LogPluginManager: Mounting plugin PhysXVehicles
+
+BROWSER LOG: LogPluginManager: Mounting plugin RuntimePhysXCooking
+
+BROWSER LOG: LogPluginManager: Mounting plugin SoundFields
+
+BROWSER LOG: LogPluginManager: Mounting plugin Synthesis
+
+BROWSER LOG: LogPluginManager: Mounting plugin AudioSynesthesia
+
+BROWSER LOG: LogOnline: OSS: Creating online subsystem instance for: NULL
+
+BROWSER LOG: LogOnline: OSS: TryLoadSubsystemAndSetDefault: Loaded subsystem for module [NULL]
+
+BROWSER LOG: LogInit: Build: ++UE4+Release-4.27-CL-0
+
+BROWSER LOG: LogInit: Engine Version: 4.27.2-0+++UE4+Release-4.27
+
+BROWSER LOG: LogInit: Compatible Engine Version: 4.27.0-0+++UE4+Release-4.27
+
+BROWSER LOG: LogInit: Net CL: 0
+
+BROWSER LOG: LogInit: OS: GenericOSVersionLabel (GenericOSSubVersionLabel), CPU: GenericCPUBrand, GPU: GenericGPUBrand
+
+BROWSER LOG: LogInit: Compiled (32-bit): Jun 19 2026 11:53:14
+
+BROWSER LOG: LogInit: Compiled with Clang: 23.0.0git (https:/github.com/llvm/llvm-project 7b58716d96c3ae4c0c4e6f72e29b16137bb6224b)
+
+BROWSER LOG: LogInit: Build Configuration: Development
+
+BROWSER LOG: LogInit: Branch Name: ++UE4+Release-4.27
+
+BROWSER LOG: LogInit: Command Line:   -stdout
+
+BROWSER LOG: LogInit: Base Directory: 
+
+BROWSER LOG: LogInit: Allocator: ANSI
+
+BROWSER LOG: LogInit: Installed Engine Build: 0
+
+BROWSER LOG: LogDevObjectVersion: Number of dev versions registered: 29
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Blueprints (B0D832E4-1F89-4F0D-ACCF-7EB736FD4AA2): 10
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Build (E1C64328-A22C-4D53-A36C-8E866417BD8C): 0
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Core (375EC13C-06E4-48FB-B500-84F0262A717E): 4
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Editor (E4B068ED-F494-42E9-A231-DA0B2E46BB41): 40
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Framework (CFFC743F-43B0-4480-9391-14DF171D2073): 37
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Mobile (B02B49B5-BB20-44E9-A304-32B752E40360): 3
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Networking (A4E4105C-59A1-49B5-A7C5-40C4547EDFEE): 0
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Online (39C831C9-5AE6-47DC-9A44-9C173E1C8E7C): 0
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Physics (78F01B33-EBEA-4F98-B9B4-84EACCB95AA2): 14
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Platform (6631380F-2D4D-43E0-8009-CF276956A95A): 0
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Rendering (12F88B9F-8875-4AFC-A67C-D90C383ABD29): 45
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Sequencer (7B5AE74C-D270-4C10-A958-57980B212A5A): 13
+
+BROWSER LOG: LogDevObjectVersion:   Dev-VR (D7296918-1DD6-4BDD-9DE2-64A83CC13884): 3
+
+BROWSER LOG: LogDevObjectVersion:   Dev-LoadTimes (C2A15278-BFE7-4AFE-6C17-90FF531DF755): 1
+
+BROWSER LOG: LogDevObjectVersion:   Private-Geometry (6EACA3D4-40EC-4CC1-B786-8BED09428FC5): 3
+
+BROWSER LOG: LogDevObjectVersion:   Dev-AnimPhys (29E575DD-E0A3-4627-9D10-D276232CDCEA): 17
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Anim (AF43A65D-7FD3-4947-9873-3E8ED9C1BB05): 15
+
+BROWSER LOG: LogDevObjectVersion:   Dev-ReflectionCapture (6B266CEC-1EC7-4B8F-A30B-E4D90942FC07): 1
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Automation (0DF73D61-A23F-47EA-B727-89E90C41499A): 1
+
+BROWSER LOG: LogDevObjectVersion:   FortniteMain (601D1886-AC64-4F84-AA16-D3DE0DEAC7D6): 47
+
+BROWSER LOG: LogDevObjectVersion:   FortniteRelease (E7086368-6B23-4C58-8439-1B7016265E91): 1
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Enterprise (9DFFBCD6-494F-0158-E221-12823C92A888): 10
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Niagara (F2AED0AC-9AFE-416F-8664-AA7FFA26D6FC): 1
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Destruction (174F1F0B-B4C6-45A5-B13F-2EE8D0FB917D): 10
+
+BROWSER LOG: LogDevObjectVersion:   Dev-Physics-Ext (35F94A83-E258-406C-A318-09F59610247C): 41
+
+BROWSER LOG: LogDevObjectVersion:   Dev-PhysicsMaterial-Chaos (B68FC16E-8B1B-42E2-B453-215C058844FE): 1
+
+BROWSER LOG: LogDevObjectVersion:   Dev-CineCamera (B2E18506-4273-CFC2-A54E-F4BB758BBA07): 1
+
+BROWSER LOG: LogDevObjectVersion:   Dev-VirtualProduction (64F58936-FD1B-42BA-BA96-7289D5D0FA4E): 1
+
+BROWSER LOG: LogDevObjectVersion:   Dev-MediaFramework (6F0ED827-A609-4895-9C91-998D90180EA4): 2
+
+BROWSER LOG: LogInit: Presizing for max 2097152 objects, including 1 objects not considered by GC, pre-allocating 0 bytes for permanent pool.
+
+BROWSER LOG: LogConfig: Applying CVar settings from Section [/Script/Engine.StreamingSettings] File [../../../Brm/Saved/Config/HTML5/Engine.ini]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.MinBulkDataSizeForAsyncLoading:131072]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.AsyncLoadingThreadEnabled:0]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.EventDrivenLoaderEnabled:1]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.WarnIfTimeLimitExceeded:0]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.TimeLimitExceededMultiplier:1.5]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.TimeLimitExceededMinTime:0.005]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.UseBackgroundLevelStreaming:1]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.PriorityAsyncLoadingExtraTime:15.0]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.LevelStreamingActorsUpdateTimeLimit:5.0]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.PriorityLevelStreamingActorsUpdateExtraTime:5.0]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.LevelStreamingComponentsRegistrationGranularity:10]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.UnregisterComponentsTimeLimit:1.0]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.LevelStreamingComponentsUnregistrationGranularity:5]]
+
+BROWSER LOG: LogConfig: Setting CVar [[s.FlushStreamingOnExit:1]]
+
+BROWSER LOG: LogStreaming: Display: Async Loading initialized: Event Driven Loader: true, Async Loading Thread: false, Async Post Load: false
+
+BROWSER LOG: LogInit: Object subsystem initialized
+
+BROWSER LOG: LogConfig: Setting CVar [[con.DebugEarlyDefault:1]]
+
+BROWSER LOG: LogConfig: Setting CVar [[r.setres:1280x720]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[con.DebugEarlyDefault:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.setres:1280x720]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Applying CVar settings from Section [/Script/Engine.RendererSettings] File [../../../Brm/Saved/Config/HTML5/Engine.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.GPUCrashDebugging:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.MobileHDR:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.Mobile.DisableVertexFog:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.Shadow.CSM.MaxMobileCascades:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.MobileMSAA:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.Mobile.UseHWsRGBEncoding:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.Mobile.AllowDitheredLODTransition:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:566][  0]LogConfig: Setting CVar [[r.Mobile.AllowSoftwareOcclusion:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.DiscardUnusedQuality:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.AllowOcclusionQueries:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.MinScreenRadiusForLights:0.030000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.MinScreenRadiusForDepthPrepass:0.030000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.MinScreenRadiusForCSMDepth:0.010000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.PrecomputedVisibilityWarning:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[Compat.UseDXT5NormalMaps:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.ClearCoatNormal:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.ReflectionCaptureResolution:128]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.ReflectionEnvironmentLightmapMixBasedOnRoughness:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.ForwardShading:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.VertexFoggingForOpaque:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.AllowStaticLighting:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.NormalMapsForStaticLighting:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.GenerateMeshDistanceFields:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.DistanceFieldBuild.EightBit:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.GenerateLandscapeGIData:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.DistanceFieldBuild.Compress:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:567][  0]LogConfig: Setting CVar [[r.TessellationAdaptivePixelsPerTriangle:48.000000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.SeparateTranslucency:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.TranslucentSortPolicy:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.CustomDepth:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.CustomDepthTemporalAAJitter:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.PostProcessing.PropagateAlpha:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.Bloom:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.AmbientOcclusion:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.AmbientOcclusionStaticFraction:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.AutoExposure:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.AutoExposure.Method:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.AutoExposure.ExtendDefaultLuminanceRange:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.UsePreExposure:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.MotionBlur:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.LensFlare:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.TemporalAA.Upsampling:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.AntiAliasing:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultFeature.LightUnits:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.DefaultBackBufferPixelFormat:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.Shadow.UnbuiltPreviewInGame:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:568][  0]LogConfig: Setting CVar [[r.StencilForLODDither:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.EarlyZPass:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.EarlyZPassOnlyMaterialMasking:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.DBuffer:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.ClearSceneMethod:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.BasePassOutputsVelocity:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.SelectiveBasePassOutputs:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[fx.GPUSimulationTextureSizeX:1024]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[fx.GPUSimulationTextureSizeY:1024]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.AllowGlobalClipPlane:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.GBufferFormat:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[r.MorphTarget.Mode:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[vr.InstancedStereo:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[vr.MobileMultiView:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[vr.RoundRobinOcclusion:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:569][  0]LogConfig: Setting CVar [[vr.ODSCapture:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.WireframeCullThreshold:5.000000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.RayTracing:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SupportStationarySkylight:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SupportLowQualityLightmaps:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SupportPointLightWholeSceneShadows:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SupportAtmosphericFog:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SkinCache.CompileShaders:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.Mobile.EnableStaticAndCSMShadowReceivers:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.Mobile.EnableMovableLightCSMShaderCulling:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.Mobile.AllowDistanceFieldShadows:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.Mobile.AllowMovableDirectionalLights:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.MobileNumDynamicPointLights:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.MobileDynamicPointLightsUseStaticBranch:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.Mobile.EnableMovableSpotlights:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SkinCache.SceneMemoryLimitInMB:128.000000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.GPUSkin.Limit2BoneInfluences:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SupportDepthOnlyIndexBuffers:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Setting CVar [[r.SupportReversedIndexBuffers:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:570][  0]LogConfig: Applying CVar settings from Section [/Script/Engine.RendererOverrideSettings] File [../../../Brm/Saved/Config/HTML5/Engine.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Applying CVar settings from Section [/Script/Engine.StreamingSettings] File [../../../Brm/Saved/Config/HTML5/Engine.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.MinBulkDataSizeForAsyncLoading:131072]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.AsyncLoadingThreadEnabled:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.EventDrivenLoaderEnabled:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.WarnIfTimeLimitExceeded:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.TimeLimitExceededMultiplier:1.5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.TimeLimitExceededMinTime:0.005]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.UseBackgroundLevelStreaming:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.PriorityAsyncLoadingExtraTime:15.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.LevelStreamingActorsUpdateTimeLimit:5.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.PriorityLevelStreamingActorsUpdateExtraTime:5.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.LevelStreamingComponentsRegistrationGranularity:10]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.UnregisterComponentsTimeLimit:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.LevelStreamingComponentsUnregistrationGranularity:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[s.FlushStreamingOnExit:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Applying CVar settings from Section [/Script/Engine.GarbageCollectionSettings] File [../../../Brm/Saved/Config/HTML5/Engine.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[gc.MaxObjectsNotConsideredByGC:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[gc.SizeOfPermanentObjectPool:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:571][  0]LogConfig: Setting CVar [[gc.FlushStreamingOnGC:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.NumRetriesBeforeForcingGC:10]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.AllowParallelGC:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.TimeBetweenPurgingPendingKillObjects:61.1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.MaxObjectsInEditor:25165824]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.IncrementalBeginDestroyEnabled:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.CreateGCClusters:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.MinGCClusterSize:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.ActorClusteringEnabled:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.BlueprintClusteringEnabled:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.UseDisregardForGCOnDedicatedServers:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[gc.MultithreadedDestructionEnabled:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Applying CVar settings from Section [/Script/Engine.NetworkSettings] File [../../../Brm/Saved/Config/HTML5/Engine.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:572][  0]LogConfig: Setting CVar [[n.VerifyPeer:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Applying CVar settings from Section [ViewDistanceQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Setting CVar [[r.SkeletalMeshLODBias:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Setting CVar [[r.ViewDistanceScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Applying CVar settings from Section [AntiAliasingQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Setting CVar [[r.PostProcessAAQuality:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Applying CVar settings from Section [ShadowQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Setting CVar [[r.LightFunctionQuality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:573][  0]LogConfig: Setting CVar [[r.ShadowQuality:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.Shadow.CSM.MaxCascades:10]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.Shadow.MaxResolution:2048]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.Shadow.MaxCSMResolution:2048]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.Shadow.RadiusThreshold:0.01]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.Shadow.DistanceScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.Shadow.CSM.TransitionScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.Shadow.PreShadowResolutionFactor:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.DistanceFieldShadowing:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.DistanceFieldAO:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.AOQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.VolumetricFog:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.VolumetricFog.GridPixelSize:8]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.VolumetricFog.GridSizeZ:128]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.VolumetricFog.HistoryMissSupersampleCount:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.LightMaxDrawDistanceScale:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:574][  0]LogConfig: Setting CVar [[r.CapsuleShadows:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Applying CVar settings from Section [PostProcessQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.MotionBlurQuality:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.AmbientOcclusionMipLevelFactor:0.4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.AmbientOcclusionMaxQuality:100]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.AmbientOcclusionLevels:-1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.AmbientOcclusionRadiusScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.DepthOfFieldQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.RenderTargetPoolMin:400]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.LensFlareQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.SceneColorFringeQuality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.EyeAdaptationQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.BloomQuality:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.FastBlurThreshold:100]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.Upscale.Quality:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:575][  0]LogConfig: Setting CVar [[r.Tonemapper.GrainQuantization:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.LightShaftQuality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.Filter.SizeScale:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.Tonemapper.Quality:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Gather.AccumulatorQuality:1        ; higher gathering accumulator quality]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Gather.PostfilterMethod:1          ; Median3x3 postfilering method]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Gather.EnableBokehSettings:0       ; no bokeh simulation when gathering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Gather.RingCount:4                 ; medium number of samples when gathering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Scatter.ForegroundCompositing:1    ; additive foreground scattering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Scatter.BackgroundCompositing:2    ; additive background scattering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Scatter.EnableBokehSettings:1      ; bokeh simulation when scattering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Scatter.MaxSpriteRatio:0.1         ; only a maximum of 10 percent of scattered bokeh]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Recombine.Quality:1                ; cheap slight out of focus]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Recombine.EnableBokehSettings:0    ; no bokeh simulation on slight out of focus]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.TemporalAAQuality:1                ; more stable temporal accumulation]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Kernel.MaxForegroundRadius:0.025]]
+
+BROWSER LOG: [2026.06.20-02.12.40:576][  0]LogConfig: Setting CVar [[r.DOF.Kernel.MaxBackgroundRadius:0.025]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Applying CVar settings from Section [TextureQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.Streaming.MipBias:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.Streaming.AmortizeCPUToGPUCopy:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.Streaming.MaxNumTexturesToStreamPerFrame:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.Streaming.Boost:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.MaxAnisotropy:8]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.VT.MaxAnisotropy:8]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.Streaming.LimitPoolSizeToVRAM:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.Streaming.PoolSize:1000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.Streaming.MaxEffectiveScreenSize:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Applying CVar settings from Section [EffectsQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.TranslucencyLightingVolumeDim:64]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.RefractionQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.SSR.Quality:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:577][  0]LogConfig: Setting CVar [[r.SSR.HalfResSceneColor:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SceneColorFormat:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.DetailMode:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.TranslucencyVolumeBlur:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.MaterialQualityLevel:1 ; High quality]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.AnisotropicMaterials:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SSS.Scale:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SSS.SampleSet:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SSS.Quality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SSS.HalfRes:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SSGI.Quality:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.EmitterSpawnRateScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.ParticleLightQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.AerialPerspectiveLUT.FastApplyOnOpaque:1 ; Always have FastSkyLUT 1 in this case to avoid wrong sky]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.AerialPerspectiveLUT.SampleCountMaxPerSlice:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.AerialPerspectiveLUT.DepthResolution:16.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:578][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.FastSkyLUT:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.FastSkyLUT.SampleCountMin:4.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.FastSkyLUT.SampleCountMax:128.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.SampleCountMin:4.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.SampleCountMax:128.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.TransmittanceLUT.UseSmallFormat:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.TransmittanceLUT.SampleCount:10.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.MultiScatteringLUT.SampleCount:15.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.SkyLight.RealTimeReflectionCapture:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[fx.Niagara.QualityLevel:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Applying CVar settings from Section [FoliageQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[foliage.DensityScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[grass.DensityScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Applying CVar settings from Section [ShadingQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.HairStrands.SkyLighting.IntegrationType:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:579][  0]LogConfig: Setting CVar [[r.HairStrands.SkyAO.SampleCount:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:580][  0]LogConfig: Setting CVar [[r.HairStrands.Visibility.MSAA.SamplePerPixel:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:580][  0]LogInit: Selected Device Profile: [HTML5]
+
+BROWSER LOG: [2026.06.20-02.12.40:580][  0]LogInit: Applying CVar settings loaded from the selected device profile: [HTML5]
+
+BROWSER LOG: [2026.06.20-02.12.40:580][  0]LogHAL: Display: Platform has ~ 0 GB [0 / 4294967296 / 0], which maps to Smallest [LargestMinGB=32, LargerMinGB=12, DefaultMinGB=8, SmallerMinGB=6, SmallestMinGB=0)
+
+BROWSER LOG: [2026.06.20-02.12.40:580][  0]LogConfig: Setting CVar [[r.MobileContentScaleFactor:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:580][  0]LogConfig: Setting CVar [[r.ShadowQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogInit: Warning: Creating unregistered Device Profile CVar: [[r.ReflectionQuality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.BloomQuality:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.DepthOfFieldQuality:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogInit: Going up to parent DeviceProfile []
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Applying CVar settings from Section [ViewDistanceQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.SkeletalMeshLODBias:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.ViewDistanceScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Applying CVar settings from Section [AntiAliasingQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.PostProcessAAQuality:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Applying CVar settings from Section [ShadowQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.LightFunctionQuality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.ShadowQuality:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConsoleManager: Setting the console variable 'r.ShadowQuality' with 'SetByScalability' was ignored as it is lower priority than the previous 'SetByDeviceProfile'. Value remains '2'
+
+BROWSER LOG: [2026.06.20-02.12.40:581][  0]LogConfig: Setting CVar [[r.Shadow.CSM.MaxCascades:10]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.Shadow.MaxResolution:2048]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.Shadow.MaxCSMResolution:2048]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.Shadow.RadiusThreshold:0.01]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.Shadow.DistanceScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.Shadow.CSM.TransitionScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.Shadow.PreShadowResolutionFactor:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.DistanceFieldShadowing:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.DistanceFieldAO:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.AOQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.VolumetricFog:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.VolumetricFog.GridPixelSize:8]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.VolumetricFog.GridSizeZ:128]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.VolumetricFog.HistoryMissSupersampleCount:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.LightMaxDrawDistanceScale:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Setting CVar [[r.CapsuleShadows:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:582][  0]LogConfig: Applying CVar settings from Section [PostProcessQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.MotionBlurQuality:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.AmbientOcclusionMipLevelFactor:0.4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.AmbientOcclusionMaxQuality:100]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.AmbientOcclusionLevels:-1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.AmbientOcclusionRadiusScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.DepthOfFieldQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConsoleManager: Setting the console variable 'r.DepthOfFieldQuality' with 'SetByScalability' was ignored as it is lower priority than the previous 'SetByDeviceProfile'. Value remains '0'
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.RenderTargetPoolMin:400]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.LensFlareQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.SceneColorFringeQuality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.EyeAdaptationQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.BloomQuality:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConsoleManager: Setting the console variable 'r.BloomQuality' with 'SetByScalability' was ignored as it is lower priority than the previous 'SetByDeviceProfile'. Value remains '0'
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.FastBlurThreshold:100]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.Upscale.Quality:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:583][  0]LogConfig: Setting CVar [[r.Tonemapper.GrainQuantization:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.LightShaftQuality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.Filter.SizeScale:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.Tonemapper.Quality:5]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Gather.AccumulatorQuality:1        ; higher gathering accumulator quality]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Gather.PostfilterMethod:1          ; Median3x3 postfilering method]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Gather.EnableBokehSettings:0       ; no bokeh simulation when gathering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Gather.RingCount:4                 ; medium number of samples when gathering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Scatter.ForegroundCompositing:1    ; additive foreground scattering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Scatter.BackgroundCompositing:2    ; additive background scattering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Scatter.EnableBokehSettings:1      ; bokeh simulation when scattering]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Scatter.MaxSpriteRatio:0.1         ; only a maximum of 10 percent of scattered bokeh]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Recombine.Quality:1                ; cheap slight out of focus]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Recombine.EnableBokehSettings:0    ; no bokeh simulation on slight out of focus]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.TemporalAAQuality:1                ; more stable temporal accumulation]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Kernel.MaxForegroundRadius:0.025]]
+
+BROWSER LOG: [2026.06.20-02.12.40:584][  0]LogConfig: Setting CVar [[r.DOF.Kernel.MaxBackgroundRadius:0.025]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Applying CVar settings from Section [TextureQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.Streaming.MipBias:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.Streaming.AmortizeCPUToGPUCopy:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.Streaming.MaxNumTexturesToStreamPerFrame:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.Streaming.Boost:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.MaxAnisotropy:8]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.VT.MaxAnisotropy:8]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.Streaming.LimitPoolSizeToVRAM:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.Streaming.PoolSize:1000]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.Streaming.MaxEffectiveScreenSize:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Applying CVar settings from Section [EffectsQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.TranslucencyLightingVolumeDim:64]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.RefractionQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.SSR.Quality:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.SSR.HalfResSceneColor:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:585][  0]LogConfig: Setting CVar [[r.SceneColorFormat:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.DetailMode:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.TranslucencyVolumeBlur:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.MaterialQualityLevel:1 ; High quality]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.AnisotropicMaterials:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SSS.Scale:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SSS.SampleSet:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SSS.Quality:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SSS.HalfRes:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SSGI.Quality:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.EmitterSpawnRateScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.ParticleLightQuality:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.AerialPerspectiveLUT.FastApplyOnOpaque:1 ; Always have FastSkyLUT 1 in this case to avoid wrong sky]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.AerialPerspectiveLUT.SampleCountMaxPerSlice:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.AerialPerspectiveLUT.DepthResolution:16.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.FastSkyLUT:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.FastSkyLUT.SampleCountMin:4.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:586][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.FastSkyLUT.SampleCountMax:128.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.SampleCountMin:4.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.SampleCountMax:128.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.TransmittanceLUT.UseSmallFormat:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.TransmittanceLUT.SampleCount:10.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.SkyAtmosphere.MultiScatteringLUT.SampleCount:15.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.SkyLight.RealTimeReflectionCapture:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[fx.Niagara.QualityLevel:3]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Applying CVar settings from Section [FoliageQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[foliage.DensityScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[grass.DensityScale:1.0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Applying CVar settings from Section [ShadingQuality@3] File [../../../Brm/Saved/Config/HTML5/Scalability.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.HairStrands.SkyLighting.IntegrationType:2]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.HairStrands.SkyAO.SampleCount:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Setting CVar [[r.HairStrands.Visibility.MSAA.SamplePerPixel:4]]
+
+BROWSER LOG: [2026.06.20-02.12.40:587][  0]LogConfig: Applying CVar settings from Section [Startup] File [../../../Engine/Config/ConsoleVariables.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogConfig: Setting CVar [[net.UseAdaptiveNetUpdateFrequency:0]]
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogConfig: Setting CVar [[p.chaos.AllowCreatePhysxBodies:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogConfig: Setting CVar [[fx.SkipVectorVMBackendOptimizations:1]]
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogConfig: Applying CVar settings from Section [ConsoleVariables] File [../../../Brm/Saved/Config/HTML5/Engine.ini]
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogInit: Computer: Browser
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogInit: User: GenericUser
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogInit: Current Culture: en-US
+
+BROWSER LOG: [2026.06.20-02.12.40:588][  0]LogInit: High frequency timer resolution =1.000000 MHz
+
+BROWSER LOG: [2026.06.20-02.12.40:589][  0]LogInit: Memory total: Physical=0.0GB (0GB approx) 
+
+BROWSER LOG: [2026.06.20-02.12.40:590][  0]LogInit: Physics initialised using underlying interface: PhysX
+
+BROWSER LOG: [2026.06.20-02.12.40:591][  0]LogInit: Using OS detected language (en-US).
+
+BROWSER LOG: [2026.06.20-02.12.40:591][  0]LogInit: Using OS detected locale (en-US).
+
+BROWSER LOG: [2026.06.20-02.12.40:592][  0]LogTextLocalizationManager: No specific localization for 'en-US' exists, so the 'en' localization will be used.
+
+BROWSER LOG: [2026.06.20-02.12.40:621][  0]LogHTML5Application: Display: FHTML5Application -- using emscripten native functions
+
+BROWSER LOG: registerOrRemoveHandler: the target element for event handler registration does not exist, when processing the following event handler registration:
+BROWSER LOG: {target: null, allowsDeferredCalls: true, eventTypeString: click, eventTypeId: 4, userData: 53160752}
+BROWSER LOG: [2026.06.20-02.12.40:641][  0]LogSlate: New Slate User Created.  User Index 0, Is Virtual User: 0
+
+BROWSER LOG: [2026.06.20-02.12.40:641][  0]LogSlate: Slate User Registered.  User Index 0, Is Virtual User: 0
+
+BROWSER LOG: [2026.06.20-02.12.40:644][  0]LogTemp: Warning: PlatformInitOpenGL
+
+BROWSER LOG: [2026.06.20-02.12.40:645][  0]LogRHI: Multithreading not enabled, setting explicitSwapControl=0
+
+BROWSER LOG: [2026.06.20-02.12.40:653][  0]LogRHI: WebGL context successfully activated!
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI: Initializing OpenGL RHI
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI:   GL_VENDOR: WebKit
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI:   GL_RENDERER: WebKit WebGL
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI:   GL_VERSION: OpenGL ES 3.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI:   GL_SHADING_LANGUAGE_VERSION: OpenGL ES GLSL ES 3.00 (WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium))
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI: OpenGL Extensions:
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI:   EXT_clip_control
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI:   EXT_color_buffer_float
+
+BROWSER LOG: [2026.06.20-02.12.40:654][  0]LogRHI:   EXT_color_buffer_half_float
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_conservative_depth
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_depth_clamp
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_disjoint_timer_query_webgl2
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_float_blend
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_polygon_offset_clamp
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_texture_compression_bptc
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_texture_compression_rgtc
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_texture_filter_anisotropic
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   EXT_texture_norm16
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   KHR_parallel_shader_compile
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   NV_shader_noperspective_interpolation
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   OES_texture_float_linear
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_blend_func_extended
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_clip_cull_distance
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_compressed_texture_astc
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_compressed_texture_etc
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_compressed_texture_etc1
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_compressed_texture_s3tc
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_compressed_texture_s3tc_srgb
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_debug_renderer_info
+
+BROWSER LOG: [2026.06.20-02.12.40:655][  0]LogRHI:   WEBGL_debug_shaders
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   WEBGL_lose_context
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   WEBGL_multi_draw
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   WEBGL_polygon_mode
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_clip_control
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_color_buffer_float
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_color_buffer_half_float
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_conservative_depth
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_depth_clamp
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_disjoint_timer_query_webgl2
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_float_blend
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_polygon_offset_clamp
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_texture_compression_bptc
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_texture_compression_rgtc
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_texture_filter_anisotropic
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_EXT_texture_norm16
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_KHR_parallel_shader_compile
+
+BROWSER LOG: [2026.06.20-02.12.40:656][  0]LogRHI:   GL_NV_shader_noperspective_interpolation
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_OES_texture_float_linear
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_blend_func_extended
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_clip_cull_distance
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_compressed_texture_astc
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_compressed_texture_etc
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_compressed_texture_etc1
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_compressed_texture_s3tc
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_compressed_texture_s3tc_srgb
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_debug_renderer_info
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_debug_shaders
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_lose_context
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_multi_draw
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_WEBGL_polygon_mode
+
+BROWSER LOG: [2026.06.20-02.12.40:657][  0]LogRHI:   GL_MAX_VERTEX_ATTRIBS: 16
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI:   GL_MAX_VARYING_VECTORS: 30
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI:   GL_MAX_VERTEX_UNIFORM_VECTORS: 1024
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI:   GL_MAX_FRAGMENT_UNIFORM_VECTORS: 1024
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI: Fragment shader lowp precision: 23
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI: Fragment shader mediump precision: 23
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI: Fragment shader highp precision: 23
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI:   GL_MAX_TEXTURE_SIZE: 16384
+
+BROWSER LOG: [2026.06.20-02.12.40:658][  0]LogRHI:   GL_MAX_CUBE_MAP_TEXTURE_SIZE: 16384
+
+BROWSER LOG: [2026.06.20-02.12.40:659][  0]LogRHI:   GL_MAX_ARRAY_TEXTURE_LAYERS: 2048
+
+BROWSER LOG: [2026.06.20-02.12.40:659][  0]LogRHI:   GL_MAX_3D_TEXTURE_SIZE: 2048
+
+BROWSER LOG: [2026.06.20-02.12.40:659][  0]LogRHI:   GL_MAX_RENDERBUFFER_SIZE: 16384
+
+BROWSER LOG: [2026.06.20-02.12.40:659][  0]LogRHI:   GL_MAX_TEXTURE_IMAGE_UNITS: 16
+
+BROWSER LOG: [2026.06.20-02.12.40:659][  0]LogRHI:   GL_MAX_DRAW_BUFFERS: 8
+
+BROWSER LOG: [2026.06.20-02.12.40:659][  0]LogRHI:   GL_MAX_COLOR_ATTACHMENTS: 8
+
+BROWSER LOG: [2026.06.20-02.12.40:659][  0]LogRHI:   GL_MAX_SAMPLES: 4
+
+BROWSER LOG: [2026.06.20-02.12.40:660][  0]LogRHI:   GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS: 32
+
+BROWSER LOG: [2026.06.20-02.12.40:660][  0]LogRHI:   GL_MAX_VERTEX_ATTRIBS: 16
+
+BROWSER LOG: [2026.06.20-02.12.40:660][  0]LogRHI:   GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: 16
+
+BROWSER LOG: [2026.06.20-02.12.40:660][  0]LogRHI: OpenGL MajorVersion = 3, MinorVersion = 0, ShaderPlatform = GLSL_ES3_0_HTML5, FeatureLevel = ES3_1
+
+BROWSER LOG: [2026.06.20-02.12.40:660][  0]LogRHI: FOpenGLProgramBinaryCache disabled by r.ProgramBinaryCache.Enable=0
+
+BROWSER LOG: [2026.06.20-02.12.40:661][  0]LogRHI: Texture pool is 1000 MB (of 0 MB total graphics mem)
+
+BROWSER LOG: [2026.06.20-02.12.40:674][  0]LogRendererCore: Ray tracing is disabled. Reason: r.RayTracing=0.
+
+BROWSER LOG: [2026.06.20-02.12.40:674][  0]LogODSC: ODSC Thread active.
+
+BROWSER LOG: [2026.06.20-02.12.40:695][  0]LogSlate: Using FreeType 2.10.0
+
+BROWSER LOG: [2026.06.20-02.12.40:696][  0]LogSlate: SlateFontServices - WITH_FREETYPE: 1, WITH_HARFBUZZ: 1
+
+BROWSER LOG: [2026.06.20-02.12.40:736][  0]LogInit: Using OS detected language (en-US).
+
+BROWSER LOG: [2026.06.20-02.12.40:736][  0]LogInit: Using OS detected locale (en-US).
+
+BROWSER LOG: [2026.06.20-02.12.40:736][  0]LogTextLocalizationManager: No localization for 'en-US' exists, so 'en' will be used for the language.
+
+BROWSER LOG: [2026.06.20-02.12.40:736][  0]LogTextLocalizationManager: No localization for 'en-US' exists, so 'en' will be used for the locale.
+
+BROWSER LOG: [2026.06.20-02.12.40:736][  0]LogSlate: FontCache flush requested. Reason: Culture for localization was changed
+
+BROWSER LOG: [2026.06.20-02.12.40:736][  0]LogSlate: FontCache flush requested. Reason: Culture for localization was changed
+
+BROWSER LOG: [2026.06.20-02.12.40:738][  0]LogAssetRegistry: FAssetRegistry took 0.0008 seconds to start up
+
+BROWSER LOG: [2026.06.20-02.12.40:955][  0]LogStreaming: Display: FlushAsyncLoading: 1 QueuedPackages, 0 AsyncPackages
+
+BROWSER LOG: [2026.06.20-02.12.40:958][  0]LogPackageLocalizationCache: Processed 18 localized package path(s) for 1 prioritized culture(s) in 0.000645 seconds
+
+BROWSER LOG: [2026.06.20-02.12.40:972][  0]LogSerialization: Display: AllowBulkDataInIoStore: 'true'
+
+BROWSER LOG: [2026.06.20-02.12.40:973][  0]LogInit: Selected Device Profile: [HTML5]
+
+BROWSER LOG: [2026.06.20-02.12.40:975][  0]LogInit: Active device profile: [][ 49] HTM
+
+BROWSER LOG: [2026.06.20-02.12.40:975][  0]LogInit: Profiles: [][ 49] HTML5
+
+BROWSER LOG: [2026.06.20-02.12.40:988][  0]LogNetVersion: Brm 1.0.0, NetCL: 0, EngineNetVer: 17, GameNetVer: 0 (Checksum: 2484317461)
+
+BROWSER LOG: [2026.06.20-02.12.41:044][  0]LogTexture: Warning: VolumeTexture /Engine/EngineSky/VolumetricClouds/T_VolumeNoiseShape64.T_VolumeNoiseShape64 cannot be created, rhi does not support format DXT1.
+
+BROWSER LOG: [2026.06.20-02.12.41:045][  0]LogTexture: Warning: VolumeTexture /Engine/EngineSky/VolumetricClouds/T_VolumeNoiseErosion32.T_VolumeNoiseErosion32 cannot be created, rhi does not support format DXT1.
+
+BROWSER LOG: [2026.06.20-02.12.41:063][  0]LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+
+BROWSER LOG: [2026.06.20-02.12.41:063][  0]LogAudioCaptureCore: Display: No Audio Capture implementations found. Audio input will be silent.
+
+BROWSER LOG: [2026.06.20-02.12.41:109][  0]LogTextLocalizationManager: Compacting localization data took   0.23ms
+
+BROWSER LOG: [2026.06.20-02.12.41:121][  0]LogNiagaraDebuggerClient: Niagara Debugger Client Initialized | Session: 0002C66708DECE36BB9129B600000324 | Instance: 0001FA1608DECE36BB9129840000031F (Browser-0).
+
+BROWSER LOG: [2026.06.20-02.12.41:125][  0]LogAndroidPermission: UAndroidPermissionCallbackProxy::GetInstance
+
+BROWSER LOG: [2026.06.20-02.12.41:132][  0]LogUObjectArray: 14603 objects as part of root set at end of initial load.
+
+BROWSER LOG: [2026.06.20-02.12.41:132][  0]LogUObjectArray: 2 objects are not in the root set, but can never be destroyed because they are in the DisregardForGC set.
+
+BROWSER LOG: [2026.06.20-02.12.41:132][  0]LogUObjectAllocator: 2098008 out of 0 bytes used by permanent object pool.
+
+BROWSER LOG: [2026.06.20-02.12.41:132][  0]LogUObjectArray: CloseDisregardForGC: 14603/14603 objects in disregard for GC pool
+
+BROWSER LOG: [2026.06.20-02.12.41:133][  0]LogHTML5Launch: Display: PreInit Complete
+
+BROWSER LOG: [2026.06.20-02.12.41:133][  0]LogHTML5Launch: Display: Init Start
+
+BROWSER LOG: [2026.06.20-02.12.41:134][  0]LogEngine: Initializing Engine...
+
+BROWSER LOG: [2026.06.20-02.12.41:137][  0]LogStats: UGameplayTagsManager::InitializeManager -  0.001 s
+
+BROWSER LOG: [2026.06.20-02.12.41:147][  0]LogInit: Initializing FReadOnlyCVARCache
+
+BROWSER LOG: [2026.06.20-02.12.41:148][  0]LogAudio: Display: Initializing Audio Device Manager...
+
+BROWSER LOG: [2026.06.20-02.12.41:148][  0]LogAudio: Display: Loading Default Audio Settings Objects...
+
+BROWSER LOG: [2026.06.20-02.12.41:148][  0]LogAudio: Display: No default SoundConcurrencyObject specified (or failed to load).
+
+BROWSER LOG: [2026.06.20-02.12.41:149][  0]LogAudio: Display: Audio Device Manager Initialized
+
+BROWSER LOG: [2026.06.20-02.12.41:149][  0]LogAudio: Display: Creating Audio Device:                 Id: 1, Scope: Shared, Realtime: True
+
+BROWSER LOG: [2026.06.20-02.12.41:149][  0]LogAudio: Display: AudioDevice MaxSources: 32
+
+BROWSER LOG: [2026.06.20-02.12.41:149][  0]LogAudio: Display: Audio Spatialization Plugin: None (built-in).
+
+BROWSER LOG: [2026.06.20-02.12.41:150][  0]LogAudio: Display: Audio Reverb Plugin: None (built-in).
+
+BROWSER LOG: [2026.06.20-02.12.41:150][  0]LogAudio: Display: Audio Occlusion Plugin: None (built-in).
+
+BROWSER LOG: [2026.06.20-02.12.41:150][  0]LogALAudio: ALAudio device opened : Emscripten OpenAL
+
+BROWSER LOG: [2026.06.20-02.12.41:151][  0]LogALAudio: AL_VENDOR      : Emscripten
+
+BROWSER LOG: [2026.06.20-02.12.41:151][  0]LogALAudio: AL_RENDERER    : WebAudio
+
+BROWSER LOG: [2026.06.20-02.12.41:151][  0]LogALAudio: AL_VERSION     : 1.1
+
+BROWSER LOG: [2026.06.20-02.12.41:151][  0]LogALAudio: AL_EXTENSIONS  : AL_EXT_float32 AL_SOFT_loop_points AL_SOFT_source_length AL_EXT_source_distance_model AL_SOFT_source_spatialize
+
+BROWSER LOG: [2026.06.20-02.12.41:152][  0]LogInit: FAudioDevice initialized.
+
+BROWSER LOG: [2026.06.20-02.12.41:152][  0]LogAudio: Error: Submix buffer listener only works with the audio mixer. Please run with audio mixer enabled.
+
+BROWSER LOG: [2026.06.20-02.12.41:153][  0]LogAudio: Error: Submix buffer listener only works with the audio mixer. Please run with audio mixer enabled.
+
+BROWSER LOG: [2026.06.20-02.12.41:153][  0]LogNetVersion: Set ProjectVersion to 1.0.0.0. Version Checksum will be recalculated on next use.
+
+BROWSER LOG: [2026.06.20-02.12.41:153][  0]LogInit: Texture streaming: Disabled
+
+BROWSER LOG: [2026.06.20-02.12.41:172][  0]LogAudio: Display: Audio Device (ID: 1) registered with world 'Untitled'.
+
+BROWSER LOG: [2026.06.20-02.12.41:173][  0]LogEngine: GameWindow did not exist.  Was created
+
+BROWSER LOG: [2026.06.20-02.12.41:181][  0]LogRHI: Multithreading not enabled, setting explicitSwapControl=0
+
+BROWSER LOG: [2026.06.20-02.12.41:181][  0]LogRHI: WebGL context successfully activated!
+
+BROWSER LOG: [2026.06.20-02.12.41:228][  0]LogSlate: InvalidateAllWidgets triggered.  All widgets were invalidated
+
+BROWSER LOG: [2026.06.20-02.12.41:229][  0]LogSlate: Slate font cache was flushed
+
+BROWSER LOG: [2026.06.20-02.12.41:232][  0]LogSlate: Updating window title bar state: overlay mode, drag disabled, window buttons hidden, title bar hidden
+
+BROWSER LOG: [2026.06.20-02.12.41:238][  0]LogRHI: Using OpenGL program LRU cache: 0
+
+BROWSER LOG: [2026.06.20-02.12.41:248][  0]LogInit: Display: Game Engine Initialized.
+
+BROWSER LOG: [2026.06.20-02.12.41:249][  0]LogInit: Display: Starting Game.
+
+BROWSER LOG: [2026.06.20-02.12.41:249][  0]LogNet: Browse: /Game/Maps/menuMap?Name=Player
+
+BROWSER LOG: [2026.06.20-02.12.41:250][  0]LogLoad: LoadMap: /Game/Maps/menuMap?Name=Player
+
+BROWSER LOG: [2026.06.20-02.12.41:250][  0]LogWorld: BeginTearingDown for /Temp/Untitled_0
+
+BROWSER LOG: [2026.06.20-02.12.41:258][  0]LogWorld: UWorld::CleanupWorld for Untitled, bSessionEnded=true, bCleanupResources=true
+
+BROWSER LOG: [2026.06.20-02.12.41:259][  0]LogSlate: InvalidateAllWidgets triggered.  All widgets were invalidated
+
+BROWSER LOG: [2026.06.20-02.12.41:269][  0]LogAudio: Display: Audio Device unregistered from world 'None'.
+
+BROWSER LOG: [2026.06.20-02.12.41:276][  0]LogUObjectHash: Compacting FUObjectHashTables data took   0.65ms
+
+BROWSER LOG: XXX XXX PlatformFlushIfNeeded -- PlatformFlushIfNeeded -- PlatformFlushIfNeeded 
+BROWSER LOG: [2026.06.20-02.12.41:289][  0]LogAudio: Display: Audio Device (ID: 1) registered with world 'menuMap'.
+
+BROWSER LOG: [2026.06.20-02.12.41:293][  0]LogAIModule: Creating AISystem for world menuMap
+
+BROWSER LOG: [2026.06.20-02.12.41:294][  0]LogLoad: Game class is 'menuMode_C'
+
+BROWSER LOG: [2026.06.20-02.12.41:297][  0]LogWorld: Bringing World /Game/Maps/menuMap.menuMap up for play (max tick rate 0) at 2026.06.19-19.12.41
+
+BROWSER LOG: [2026.06.20-02.12.41:299][  0]LogWorld: Bringing up level for play took: 0.002575
+
+BROWSER LOG: [2026.06.20-02.12.41:302][  0]LogGameMode: FindPlayerStart: PATHS NOT DEFINED or NO PLAYERSTART with positive rating
+
+BROWSER LOG: [2026.06.20-02.12.41:317][  0]LogBlueprintUserMessages: [menuMode_C_2147482567] HTML5
+
+BROWSER LOG: [2026.06.20-02.12.41:317][  0]LogBlueprintUserMessages: [main-config_C_2147482607] CAN NOT BE HOST
+
+BROWSER LOG: [2026.06.20-02.12.41:317][  0]LogBlueprintUserMessages: [menuMode_C_2147482567] WEB Detected no host
+
+BROWSER LOG: [2026.06.20-02.12.41:318][  0]LogBlueprintUserMessages: [main-config_C_2147482607] CAN NOT BE HOST
+
+BROWSER LOG: [2026.06.20-02.12.41:330][  0]LogSlate: Took 0.000845 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K)
+
+BROWSER LOG: [2026.06.20-02.12.41:336][  0]LogViewport: Display: Viewport MouseLockMode Changed, LockOnCapture -> DoNotLock
+
+BROWSER LOG: [2026.06.20-02.12.41:336][  0]LogViewport: Display: Viewport MouseCaptureMode Changed, CapturePermanently_IncludingInitialMouseDown -> NoCapture
+
+BROWSER LOG: [2026.06.20-02.12.41:336][  0]LogBlueprintUserMessages: [menuMode_C_2147482567] true
+
+BROWSER LOG: [2026.06.20-02.12.41:358][  0]LogRenderer: Reallocating scene render targets to support 304x152 Format 2 NumSamples 1 (Frame:1).
+
+BROWSER LOG: [2026.06.20-02.12.41:373][  0]LogLoad: Took 0.122375 seconds to LoadMap(/Game/Maps/menuMap)
+
+BROWSER LOG: [2026.06.20-02.12.41:373][  0]LogPakFile: AllPaks IndexSizes: DirectoryHashSize=234220, PathHashSize=16, EntriesSize=30404, TotalSize=264640
+
+BROWSER LOG: [2026.06.20-02.12.41:373][  0]LogInit: Display: Engine is initialized. Leaving FEngineLoop::Init()
+
+BROWSER LOG: [2026.06.20-02.12.41:374][  0]LogHTML5Launch: Display: Init Complete
+
+BROWSER LOG: Resizing viewport due to setres change, 304 x 152
+
+BROWSER LOG: [2026.06.20-02.12.41:381][  0]LogHTML5Application: Display: Canvas size changed: New size: 1200x675
+
+BROWSER LOG: [2026.06.20-02.12.41:398][  0]LogSlate: Took 0.000200 seconds to synchronously load lazily loaded font '../../../Brm/Content/fonts/Spacetime.ufont' (83K)
+
+BROWSER LOG: [2026.06.20-02.12.41:402][  0]LogSlate: Took 0.000210 seconds to synchronously load lazily loaded font '../../../Brm/Content/Fonts/DBXLNN__.ufont' (31K)
+
+BROWSER LOG: [2026.06.20-02.12.41:403][  0]LogSlate: Took 0.000190 seconds to synchronously load lazily loaded font '../../../Brm/Content/Fonts/DBXLNI__.ufont' (32K)
+
+BROWSER LOG: [2026.06.20-02.12.41:404][  0]LogSlate: Took 0.000185 seconds to synchronously load lazily loaded font '../../../Brm/Content/Fonts/DBXLNEW_.ufont' (33K)
+
+BROWSER LOG: [2026.06.20-02.12.41:406][  0]LogRenderer: Reallocating scene render targets to support 1200x676 Format 2 NumSamples 1 (Frame:3).
+
+BROWSER LOG: [.WebGL-0x10c00546c00] GL_INVALID_OPERATION: glClearBufferfv: No defined conversion between clear value and attachment format.
+Canvas clicked successfully
+Idle background animation delta: 0px
+Actuated visual delta: 0px
+Non-black rendered pixels: 362762
+Visual proof: motion=false content=true verdict=FAIL
+Receipt generated at /Users/sac/rocket-craft/pwa-staff/test-results/tps-dflss-receipt.json with visual delta 0 and verdict FAIL
+[ANDON PULL] DEFECT DETECTED IN CELL: visual-delta cell
+  ✘  1 [chromium] › tests-e2e/tps-dflss.spec.ts:32:7 › TPS/DfLSS Playwright Manufacturing Strategy › verify WASM world drives and generates cryptographic receipt (54.3s)
+
+
+  1) [chromium] › tests-e2e/tps-dflss.spec.ts:32:7 › TPS/DfLSS Playwright Manufacturing Strategy › verify WASM world drives and generates cryptographic receipt 
+
+    Error: DefectError: World compiled but visual proof failed. Non-black pixels: 362762, motion delta: 0
+
+      273 |       currentCell = 'visual-delta cell';
+      274 |       if (verdict === 'FAIL') {
+    > 275 |         throw new Error(
+          |               ^
+      276 |           `DefectError: World compiled but visual proof failed. Non-black pixels: ${nonBlackPixels}, motion delta: ${numDiffPixels}`
+      277 |         );
+      278 |       }
+        at /Users/sac/rocket-craft/pwa-staff/tests-e2e/tps-dflss.spec.ts:275:15
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/tps-dflss-TPS-DfLSS-Playwr-a39a0-rates-cryptographic-receipt-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    test-results/tps-dflss-TPS-DfLSS-Playwr-a39a0-rates-cryptographic-receipt-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/tps-dflss-TPS-DfLSS-Playwr-a39a0-rates-cryptographic-receipt-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/tps-dflss-TPS-DfLSS-Playwr-a39a0-rates-cryptographic-receipt-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/tps-dflss-TPS-DfLSS-Playwr-a39a0-rates-cryptographic-receipt-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests-e2e/tps-dflss.spec.ts:32:7 › TPS/DfLSS Playwright Manufacturing Strategy › verify WASM world drives and generates cryptographic receipt 
+[INFO] [5/5] Validating receipt...
+Error: ExecutionError { message: "FAIL /Users/sac/rocket-craft/pwa-staff/test-results/tps-dflss-receipt.json: verdict is 'FAIL', expected 'PASS'; visualDelta=0 < 20 — canvas appears static" }
+[INFO] Stopping HTTP server (PID 34612)

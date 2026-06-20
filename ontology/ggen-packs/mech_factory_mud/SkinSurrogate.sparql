@@ -1,0 +1,10 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?surrogateId ?thermalZoneId ?damageMaskId
+WHERE {
+  ?surrogateId rdf:type mud:SkinSurrogate ;
+               mud:thermalZoneId ?thermalZoneId ;
+               mud:damageMaskId ?damageMaskId .
+}
+ORDER BY ?surrogateId

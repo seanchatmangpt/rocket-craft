@@ -1,0 +1,19 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?expectations ?aspectRatio ?symmetry ?bboxMinX ?bboxMinY ?bboxMaxX ?bboxMaxY ?whiteProportion ?darkProportion ?cyanProportion ?goldProportion ?redProportion
+WHERE {
+  ?expectations rdf:type mud:VisualTargetExpectation ;
+                mud:aspectRatio ?aspectRatio ;
+                mud:symmetry ?symmetry ;
+                mud:bboxMinX ?bboxMinX ;
+                mud:bboxMinY ?bboxMinY ;
+                mud:bboxMaxX ?bboxMaxX ;
+                mud:bboxMaxY ?bboxMaxY ;
+                mud:whiteProportion ?whiteProportion ;
+                mud:darkProportion ?darkProportion ;
+                mud:cyanProportion ?cyanProportion ;
+                mud:goldProportion ?goldProportion ;
+                mud:redProportion ?redProportion .
+}
+ORDER BY ?expectations

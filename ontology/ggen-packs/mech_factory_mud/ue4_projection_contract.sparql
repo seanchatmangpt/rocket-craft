@@ -1,0 +1,20 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX factory: <http://example.org/factory#>
+
+SELECT ?projection_id ?object_id ?station_id ?route_node_id ?source_process_step ?source_receipt ?authority_inputs ?lod_class ?projection_type ?ue4_target_surface ?admission_status
+WHERE {
+  ?proj a factory:ProjectionRow ;
+        factory:projectionId ?projection_id ;
+        factory:objectId ?object_id ;
+        factory:stationId ?station_id ;
+        factory:routeNodeId ?route_node_id ;
+        factory:sourceProcessStep ?source_process_step ;
+        factory:sourceReceipt ?source_receipt ;
+        factory:authorityInputs ?authority_inputs ;
+        factory:lodClass ?lod_class ;
+        factory:projectionType ?projection_type ;
+        factory:ue4TargetSurface ?ue4_target_surface ;
+        factory:admissionStatus ?admission_status .
+}
+ORDER BY ?projection_id

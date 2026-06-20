@@ -1,0 +1,22 @@
+[project]
+name = "mech-factory-mud"
+version = "0.1.0"
+description = "Mech Factory MUD digital twin"
+
+[ontology]
+source = "ontology/all_merged.ttl"
+standard_only = false
+
+[inference]
+rules = [
+    { name = "standard-normalization", construct = "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }" }
+]
+
+[[generation.rules]]
+name = "geometry-surrogate"
+query = { file = "ontology/ggen-packs/mech_factory_mud/GeometrySurrogate.sparql" }
+mode = "Overwrite"
+template = { file = "ontology/ggen-packs/mech_factory_mud/GeometrySurrogate.tera" }
+output_file = "crates/mech_factory_mud/src/GeometrySurrogate.rs"
+
+

@@ -1,0 +1,73 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+mud:AssetFabricOntology a owl:Ontology ;
+    rdfs:label "Asset Fabric Ontology" ;
+    rdfs:comment "Defines part grammar and geometry families for reference fabric mech assets." .
+
+# ---------------------------------------------------------
+# Part Grammar Classes
+# ---------------------------------------------------------
+mud:MechPart rdf:type owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Mech Part" .
+
+mud:TorsoCore rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:HeadUnit rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:WingRootLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:WingRootRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:PrimaryWingFeathersLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:PrimaryWingFeathersRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:SecondaryWingFeathersLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:SecondaryWingFeathersRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:BladeLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:BladeRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:BackpackCore rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ThrusterCluster rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ShoulderLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ShoulderRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ArmLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ArmRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:LegLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:LegRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:VFinLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:VFinRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+
+# ---------------------------------------------------------
+# Part Grammar Instances
+# ---------------------------------------------------------
+mud:torso_core rdf:type mud:TorsoCore ; rdfs:label "torso_core" .
+mud:head_unit rdf:type mud:HeadUnit ; rdfs:label "head_unit" .
+mud:wing_root_left rdf:type mud:WingRootLeft ; rdfs:label "wing_root_left" .
+mud:wing_root_right rdf:type mud:WingRootRight ; rdfs:label "wing_root_right" .
+mud:primary_wing_feathers_left rdf:type mud:PrimaryWingFeathersLeft ; rdfs:label "primary_wing_feathers_left" .
+mud:primary_wing_feathers_right rdf:type mud:PrimaryWingFeathersRight ; rdfs:label "primary_wing_feathers_right" .
+mud:secondary_wing_feathers_left rdf:type mud:SecondaryWingFeathersLeft ; rdfs:label "secondary_wing_feathers_left" .
+mud:secondary_wing_feathers_right rdf:type mud:SecondaryWingFeathersRight ; rdfs:label "secondary_wing_feathers_right" .
+mud:blade_left rdf:type mud:BladeLeft ; rdfs:label "blade_left" .
+mud:blade_right rdf:type mud:BladeRight ; rdfs:label "blade_right" .
+mud:backpack_core rdf:type mud:BackpackCore ; rdfs:label "backpack_core" .
+mud:thruster_cluster rdf:type mud:ThrusterCluster ; rdfs:label "thruster_cluster" .
+mud:shoulder_left rdf:type mud:ShoulderLeft ; rdfs:label "shoulder_left" .
+mud:shoulder_right rdf:type mud:ShoulderRight ; rdfs:label "shoulder_right" .
+mud:arm_left rdf:type mud:ArmLeft ; rdfs:label "arm_left" .
+mud:arm_right rdf:type mud:ArmRight ; rdfs:label "arm_right" .
+mud:leg_left rdf:type mud:LegLeft ; rdfs:label "leg_left" .
+mud:leg_right rdf:type mud:LegRight ; rdfs:label "leg_right" .
+mud:v_fin_left rdf:type mud:VFinLeft ; rdfs:label "v_fin_left" .
+mud:v_fin_right rdf:type mud:VFinRight ; rdfs:label "v_fin_right" .
+
+# ---------------------------------------------------------
+# Geometry Primitive Families
+# ---------------------------------------------------------
+mud:GeometryPrimitiveFamily rdf:type owl:Class ;
+    rdfs:label "Geometry Primitive Family" .
+
+mud:TaperedBox rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "tapered_box" .
+mud:FeatherPanel rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "feather_panel" .
+mud:BladePrism rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "blade_prism" .
+mud:Cylinder rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "cylinder" .

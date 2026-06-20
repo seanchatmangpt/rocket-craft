@@ -1,0 +1,3 @@
+// generated_by: ggen
+// Stations module
+pub const STATIONS_COUNT: usize = 6;

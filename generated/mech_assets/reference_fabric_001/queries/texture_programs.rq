@@ -1,0 +1,17 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?texProg ?targetMaterial ?targetMaterialLocalName ?baseColorTex ?roughnessTex ?normalTex ?emissiveTex ?resolution
+WHERE {
+  ?texProg rdf:type mud:TextureProgram ;
+           mud:targetMaterial ?targetMaterial ;
+           mud:resolution ?resolution .
+  
+  OPTIONAL { ?texProg mud:baseColorTex ?baseColorTex }
+  OPTIONAL { ?texProg mud:roughnessTex ?roughnessTex }
+  OPTIONAL { ?texProg mud:normalTex ?normalTex }
+  OPTIONAL { ?texProg mud:emissiveTex ?emissiveTex }
+  
+  BIND(STRAFTER(STR(?targetMaterial), "#") AS ?targetMaterialLocalName)
+}
+ORDER BY ?texProg

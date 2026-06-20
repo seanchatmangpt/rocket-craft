@@ -1,0 +1,18 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX fibo: <https://spec.edmcouncil.org/fibo/ontology/>
+
+# Bounded SELECT Query: Extract deterministic state transitions (Petri net)
+SELECT ?stateClass ?transitionProperty ?targetState ?maskValue
+WHERE {
+    ?stateClass a owl:Class .
+    ?stateClass rdfs:subClassOf ?restriction .
+    ?restriction a owl:Restriction ;
+                 owl:onProperty ?transitionProperty ;
+                 owl:allValuesFrom ?targetState .
+                 
+    # Bounded subset: Only pull explicit execution states, not the whole graph.
+    FILTER(STRSTARTS(STR(?stateClass), STR(fibo:)))
+}
+ORDER BY ?stateClass ?transitionProperty ?targetState

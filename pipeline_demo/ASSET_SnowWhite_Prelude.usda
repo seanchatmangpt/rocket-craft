@@ -1,0 +1,50 @@
+#usda 1.0
+(
+    defaultPrim = "SnowWhitePrelude"
+    metersPerUnit = 1.0
+    upAxis = "Y"
+    doc = "Structural USDA representation for the Snow White Prelude mecha, metric scale (meters)."
+)
+
+def Xform "SnowWhitePrelude" (
+    kind = "assembly"
+)
+{
+    double3 xformOp:translate = (0, 15.0, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+    def Xform "Torso" (
+        references = @./SM_Torso.usda@</Torso>
+    )
+    {}
+
+    def Xform "Head" (
+        references = @./SM_Head.usda@</Head>
+    )
+    {}
+
+    def Xform "LeftArm" (
+        references = @./SM_LeftArm.usda@</LeftArm>
+    )
+    {}
+
+    def Xform "RightArm" (
+        references = @./SM_RightArm.usda@</RightArm>
+    )
+    {}
+
+    def Xform "LeftLeg" (
+        references = @./SM_LeftLeg.usda@</LeftLeg>
+    )
+    {}
+
+    def Xform "RightLeg" (
+        references = @./SM_RightLeg.usda@</RightLeg>
+    )
+    {}
+
+    def Xform "Backpack_Wings" (
+        references = @./SM_Backpack_Wings.usda@</Backpack_Wings>
+    )
+    {}
+}

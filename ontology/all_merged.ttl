@@ -1,0 +1,3823 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+core:Ontology a owl:Ontology ;
+    rdfs:label "Core Combinatorial Ontology (Module 7)" ;
+    rdfs:comment "Foundational semantic truth for Combinatorial Maximalism. Defines branchless typestates, bounded byte-classes, and anti-Cartesian primitives." .
+
+# ---------------------------------------------------------
+# Combinatorial Typestate Boundaries
+# ---------------------------------------------------------
+
+core:ByteClass a owl:Class ;
+    rdfs:label "Byte-Class Authority Vector" ;
+    rdfs:comment "A compact, deterministic authority constraint matrix. Must compile down to fixed SIMD/Scalar width vectors with no runtime branching." .
+
+core:Typestate a owl:Class ;
+    rdfs:label "Branchless Typestate" ;
+    rdfs:comment "A compile-time bounded structural constraint representing absolute semantic standing. Objects violating these states MUST fail compiler-level parsing (e.g., via Rust Zero-Sized Types)." .
+
+core:SemanticLOD a owl:Class ;
+    rdfs:label "Semantic Level of Detail" ;
+    rdfs:comment "Defines the extraction resolution of the entity. Governs the three-resolution networking model (Server owns byte-class standing, Client projects high-res detail)." .
+
+# ---------------------------------------------------------
+# Base Authority Primitives
+# ---------------------------------------------------------
+
+core:TopologyNode a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Topology Node" ;
+    rdfs:comment "A bounded, discrete spatial or structural construct. Exporting must be boundable to prevent Cartesian exhaustion." .
+
+core:Entity a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Entity" ;
+    rdfs:comment "An authoritative entity governed by deterministic combinations." .
+
+core:Action a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Actuation State" ;
+    rdfs:comment "A discrete, provable state mutation bounded by the compiler logic, producing an unforgeable BLAKE3 receipt." .
+
+# ---------------------------------------------------------
+# Properties
+# ---------------------------------------------------------
+
+core:hasByteClass a owl:ObjectProperty ;
+    rdfs:domain core:Typestate ;
+    rdfs:range core:ByteClass ;
+    rdfs:label "has Byte Class" .
+
+core:compilesToZST a owl:DatatypeProperty ;
+    rdfs:domain core:Typestate ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Compiles to Zero-Sized Type" .
+
+core:isBounded a owl:DatatypeProperty ;
+    rdfs:domain core:TopologyNode ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Is Anti-Cartesian Bounded" .
+
+core:authoritativeStanding a owl:DatatypeProperty ;
+    rdfs:domain core:Entity ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "Has Authoritative Standing" .
+
+# ---------------------------------------------------------
+# SHACL Constraints for Admittance Laws
+# ---------------------------------------------------------
+
+core:TypestateShape a sh:NodeShape ;
+    sh:targetClass core:Typestate ;
+    sh:property [
+        sh:path core:compilesToZST ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "All Typestates MUST resolve mathematically without runtime branching (ZST constraint)."
+    ] .
+
+core:EntityShape a sh:NodeShape ;
+    sh:targetClass core:Entity ;
+    sh:property [
+        sh:path core:hasByteClass ;
+        sh:class core:ByteClass ;
+        sh:minCount 1 ;
+        sh:message "An Entity MUST map its truth into at least one bounded Byte-Class vector."
+    ] ;
+    sh:property [
+        sh:path core:authoritativeStanding ;
+        sh:datatype xsd:boolean ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "An Entity MUST explicitly declare its admission to authoritative standing."
+    ] .
+
+core:TopologyShape a sh:NodeShape ;
+    sh:targetClass core:TopologyNode ;
+    sh:property [
+        sh:path core:isBounded ;
+        sh:datatype xsd:boolean ;
+        sh:hasValue true ;
+        sh:message "Topology Nodes MUST enforce anti-Cartesian extraction logic to allow bounded SPARQL SELECTs."
+    ] .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix gn: <https://ggen.io/ontology/gundam-nexus/> .
+
+gn:GundamNexusOntology a owl:Ontology ;
+    rdfs:label "Gundam Nexus Ontology" ;
+    rdfs:comment "Constitutional semantic primitives for Combinatorial Maximalist universe manufacturing." .
+
+# --- MECH PRIMITIVES ---
+
+gn:MechAssembly a owl:Class ;
+    rdfs:label "Mech Assembly" ;
+    rdfs:comment "A mech is an assembly, not an asset." .
+
+gn:MechPrimitive a owl:Class ;
+    rdfs:label "Mech Primitive" .
+
+gn:Frame a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Frame" .
+gn:Mobility a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Mobility" .
+gn:Power a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Power" .
+gn:Armor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Armor" .
+gn:Weapon a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Weapon" .
+gn:Sensor a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Sensor" .
+gn:UtilitySystem a owl:Class ; rdfs:subClassOf gn:MechPrimitive ; rdfs:label "Utility System" .
+
+gn:MechClass a owl:Class ;
+    rdfs:label "Mech Class" .
+gn:Worker a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Worker" .
+gn:Explorer a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Explorer" .
+gn:Warrior a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Warrior" .
+gn:Guardian a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Guardian" .
+gn:Ark a owl:Class ; rdfs:subClassOf gn:MechClass ; rdfs:label "Ark" .
+
+# --- RESOURCES ---
+
+gn:Resource a owl:Class ;
+    rdfs:label "Resource" .
+
+gn:MinovskyParticles a gn:Resource ;
+    rdfs:label "Minovsky Particles" .
+
+gn:Gundanium a gn:Resource ;
+    rdfs:label "Gundanium" .
+
+gn:LunaTitanium a gn:Resource ;
+    rdfs:label "Luna Titanium" .
+
+# --- SPECIFIC COMPONENTS ---
+
+gn:GundamFrame a gn:Frame ;
+    rdfs:label "Gundam Frame" .
+
+gn:ZakuFrame a gn:Frame ;
+    rdfs:label "Zaku Frame" .
+
+gn:GMFrame a gn:Frame ;
+    rdfs:label "GM Frame" .
+
+gn:MinovskyUltracompact a gn:Power ;
+    rdfs:label "Minovsky Ultracompact" .
+
+gn:FusionReactor a gn:Power ;
+    rdfs:label "Fusion Reactor" .
+
+gn:BeamRifle a gn:Weapon ;
+    rdfs:label "Beam Rifle" .
+
+gn:BeamSaber a gn:Weapon ;
+    rdfs:label "Beam Saber" .
+
+gn:HeatHawk a gn:Weapon ;
+    rdfs:label "Heat Hawk" .
+
+gn:Monoeye a gn:Sensor ;
+    rdfs:label "Monoeye" .
+
+gn:DualSensor a gn:Sensor ;
+    rdfs:label "Dual Sensor" .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://ggen.io/ontology/mech_factory_mud/> .
+
+mud:MechFactoryMudOntology a owl:Ontology ;
+    rdfs:label "Mech Factory MUD Digital Twin Ontology" ;
+    rdfs:comment "Headless Rust digital twin of the mech factory walkthrough. Governs Walkthrough Route, Stations, Part Families, and Authority Byte Fields." ;
+    owl:imports <https://ggen.io/ontology/core/> .
+
+# ---------------------------------------------------------
+# Authority Byte Fields
+# ---------------------------------------------------------
+mud:AuthorityByteField a owl:Class ;
+    rdfs:subClassOf core:ByteClass ;
+    rdfs:label "Authority Byte Field" ;
+    rdfs:comment "Dense byte authority state for the digital twin." .
+
+mud:DamageClass a mud:AuthorityByteField ;
+    rdfs:label "damage_class" ;
+    core:compilesToZST true .
+
+mud:HeatClass a mud:AuthorityByteField ;
+    rdfs:label "heat_class" ;
+    core:compilesToZST true .
+
+mud:StressClass a mud:AuthorityByteField ;
+    rdfs:label "stress_class" ;
+    core:compilesToZST true .
+
+mud:GripClass a mud:AuthorityByteField ;
+    rdfs:label "grip_class" ;
+    core:compilesToZST true .
+
+mud:SocketHealthClass a mud:AuthorityByteField ;
+    rdfs:label "socket_health_class" ;
+    core:compilesToZST true .
+
+mud:LodClass a mud:AuthorityByteField ;
+    rdfs:label "lod_class" ;
+    core:compilesToZST true .
+
+mud:WalkthroughStateClass a mud:AuthorityByteField ;
+    rdfs:label "walkthrough_state_class" ;
+    core:compilesToZST true .
+
+mud:StationStateClass a mud:AuthorityByteField ;
+    rdfs:label "station_state_class" ;
+    core:compilesToZST true .
+
+mud:ProjectionStateClass a mud:AuthorityByteField ;
+    rdfs:label "projection_state_class" ;
+    core:compilesToZST true .
+
+mud:ReceiptStateClass a mud:AuthorityByteField ;
+    rdfs:label "receipt_state_class" ;
+    core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Part Families
+# ---------------------------------------------------------
+mud:PartFamily a owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Part Family" ;
+    rdfs:comment "Mechanized part families generated at stations." .
+
+mud:Frame a mud:PartFamily ; rdfs:label "Frame" ; core:isBounded true ; core:compilesToZST true .
+mud:Shoulder a mud:PartFamily ; rdfs:label "Shoulder" ; core:isBounded true ; core:compilesToZST true .
+mud:Arm a mud:PartFamily ; rdfs:label "Arm" ; core:isBounded true ; core:compilesToZST true .
+mud:Leg a mud:PartFamily ; rdfs:label "Leg" ; core:isBounded true ; core:compilesToZST true .
+mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true .
+mud:ArmorPanel a mud:PartFamily ; rdfs:label "ArmorPanel" ; core:isBounded true ; core:compilesToZST true .
+mud:WeaponMount a mud:PartFamily ; rdfs:label "WeaponMount" ; core:isBounded true ; core:compilesToZST true .
+mud:CoolingVent a mud:PartFamily ; rdfs:label "CoolingVent" ; core:isBounded true ; core:compilesToZST true .
+mud:SkinLayer a mud:PartFamily ; rdfs:label "SkinLayer" ; core:isBounded true ; core:compilesToZST true .
+mud:MotionFamily a mud:PartFamily ; rdfs:label "MotionFamily" ; core:isBounded true ; core:compilesToZST true .
+mud:LODVariant a mud:PartFamily ; rdfs:label "LODVariant" ; core:isBounded true ; core:compilesToZST true .
+mud:ReceiptTerminalPart a mud:PartFamily ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Stations
+# ---------------------------------------------------------
+mud:Station a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Factory Station" ;
+    rdfs:comment "Discrete manufacturing or verification station." .
+
+mud:FrameAssembly a mud:Station ; rdfs:label "FrameAssembly" ; core:isBounded true ; core:compilesToZST true .
+mud:SocketTopologyStation a mud:Station ; rdfs:label "SocketTopology" ; core:isBounded true ; core:compilesToZST true .
+mud:ArmorSkinStation a mud:Station ; rdfs:label "ArmorSkinStation" ; core:isBounded true ; core:compilesToZST true .
+mud:RigMotionStation a mud:Station ; rdfs:label "RigMotionStation" ; core:isBounded true ; core:compilesToZST true .
+mud:VerificationGate a mud:Station ; rdfs:label "VerificationGate" ; core:isBounded true ; core:compilesToZST true .
+mud:ReceiptTerminalStation a mud:Station ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+
+# ---------------------------------------------------------
+# Walkthrough Route Nodes
+# ---------------------------------------------------------
+mud:RouteNode a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Walkthrough Route Node" ;
+    rdfs:comment "A node in the deterministic factory walkthrough." .
+
+mud:hasNextNode a owl:ObjectProperty ;
+    rdfs:domain mud:RouteNode ;
+    rdfs:range mud:RouteNode ;
+    rdfs:label "has Next Node" .
+
+mud:Spawn a mud:RouteNode ; rdfs:label "Spawn" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:FactoryEntrance .
+mud:FactoryEntrance a mud:RouteNode ; rdfs:label "FactoryEntrance" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:FrameAssemblyNode .
+mud:FrameAssemblyNode a mud:RouteNode ; rdfs:label "FrameAssembly" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:SocketTopologyNode .
+mud:SocketTopologyNode a mud:RouteNode ; rdfs:label "SocketTopology" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ArmorSkinStationNode .
+mud:ArmorSkinStationNode a mud:RouteNode ; rdfs:label "ArmorSkinStation" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:RigMotionStationNode .
+mud:RigMotionStationNode a mud:RouteNode ; rdfs:label "RigMotionStation" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:VerificationGateNode .
+mud:VerificationGateNode a mud:RouteNode ; rdfs:label "VerificationGate" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ReceiptTerminalNode .
+mud:ReceiptTerminalNode a mud:RouteNode ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true ; mud:hasNextNode mud:ExitOrLoop .
+mud:ExitOrLoop a mud:RouteNode ; rdfs:label "ExitOrLoop" ; core:isBounded true ; core:compilesToZST true .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix mb:   <https://ggen.io/ontology/mechbirth/> .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MECHBIRTH ONTOLOGY — O* (Admitted Truth Graph)
+# GC-MECHBIRTH-002 / GC-GUNDAM-FACTORY-001
+#
+# This file IS the source of truth. All Rust, C++, and SPARQL artifacts are
+# projections (A = μ(O*)). Do not derive laws from the Rust code.
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:MechBirthOntology a owl:Ontology ;
+    rdfs:label "MechBirth Pre-UE4 Verifier Ontology" ;
+    rdfs:comment "Constitutional graph encoding authority byte field laws, branchless transition kernels, SIMD equivalence constraints, and prediction shadow invariants for GC-MECHBIRTH-002." .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AUTHORITY BYTE FIELD LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:AuthorityByteField a owl:Class ;
+    rdfs:label "Authority Byte Field" ;
+    rdfs:comment "A u8 field in SoA authority state. Value domain: [0, MAX_CLASS]. Layout: Vec<u8> parallel buffer." .
+
+mb:MAX_CLASS a owl:NamedIndividual ;
+    rdfs:label "MAX_CLASS" ;
+    mb:value "15"^^xsd:integer ;
+    mb:rustType "u8" ;
+    rdfs:comment "Maximum admitted class value for any authority byte field." .
+
+mb:REFUSED_CLASS a owl:NamedIndividual ;
+    rdfs:label "REFUSED_CLASS" ;
+    mb:value "255"^^xsd:integer ;
+    mb:rustType "u8" ;
+    rdfs:comment "Sentinel value indicating refusal — never admitted to live state." .
+
+# Individual authority fields
+
+mb:DamageField a mb:AuthorityByteField ;
+    rdfs:label "damage" ;
+    mb:fieldName "damage" ;
+    mb:defaultValue "0"^^xsd:integer ;
+    mb:nominalValue "0"^^xsd:integer ;
+    mb:semantics "per-part damage accumulation class" ;
+    mb:derivedFrom "scalar_failure_risk(heat, stress, socket_health)" ;
+    mb:soaIndex "0"^^xsd:integer .
+
+mb:HeatField a mb:AuthorityByteField ;
+    rdfs:label "heat" ;
+    mb:fieldName "heat" ;
+    mb:defaultValue "0"^^xsd:integer ;
+    mb:nominalValue "0"^^xsd:integer ;
+    mb:semantics "per-part thermal accumulation class" ;
+    mb:soaIndex "1"^^xsd:integer .
+
+mb:StressField a mb:AuthorityByteField ;
+    rdfs:label "stress" ;
+    mb:fieldName "stress" ;
+    mb:defaultValue "0"^^xsd:integer ;
+    mb:nominalValue "0"^^xsd:integer ;
+    mb:semantics "per-part structural stress class" ;
+    mb:soaIndex "2"^^xsd:integer .
+
+mb:GripField a mb:AuthorityByteField ;
+    rdfs:label "grip" ;
+    mb:fieldName "grip" ;
+    mb:defaultValue "7"^^xsd:integer ;
+    mb:nominalValue "7"^^xsd:integer ;
+    mb:semantics "per-part grip class — 7 is nominal" ;
+    mb:soaIndex "3"^^xsd:integer .
+
+mb:SocketHealthField a mb:AuthorityByteField ;
+    rdfs:label "socket_health" ;
+    mb:fieldName "socket_health" ;
+    mb:defaultValue "15"^^xsd:integer ;
+    mb:nominalValue "15"^^xsd:integer ;
+    mb:semantics "per-socket health class — MAX_CLASS means fully healthy" ;
+    mb:soaIndex "4"^^xsd:integer .
+
+mb:LodField a mb:AuthorityByteField ;
+    rdfs:label "lod" ;
+    mb:fieldName "lod" ;
+    mb:defaultValue "2"^^xsd:integer ;
+    mb:nominalValue "2"^^xsd:integer ;
+    mb:semantics "LOD tier: 0=PRIMARY(CROWN), 1=SECONDARY, 2=TERTIARY" ;
+    mb:soaIndex "5"^^xsd:integer .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THREE-RESOLUTION NETWORKING MODEL LAWS (MODULE 3)
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:ThreeResolutionNetworkingModel a owl:Class ;
+    rdfs:label "Three-Resolution Networking Model" ;
+    rdfs:comment "Module 3 of the Combinatorial Maximalist Doctrine. Defines the exact separation between Authority, Peer Projection, and Client rendering." .
+
+mb:ByteClassAuthority a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
+    rdfs:label "Byte-Class Authority" ;
+    mb:law "The server owns standing, not visual detail. Authoritative state must be compacted into discrete byte-class vectors and Merkle-rooted assembly graphs." ;
+    sh:targetClass mb:AuthorityState ;
+    sh:property [
+        sh:path mb:hasByteField ;
+        sh:class mb:AuthorityByteField ;
+        sh:minCount 1 ;
+        sh:message "Byte-Class Authority requires state to be compacted into discrete byte-class vectors."
+    ] .
+
+mb:PeerProjection a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
+    rdfs:label "Peer Projection" ;
+    mb:law "Clients may exchange high-resolution visual details peer-to-peer (sparks, particle effects, animations) but these hold no authoritative standing." ;
+    sh:targetClass mb:PeerEffect ;
+    sh:property [
+        sh:path mb:hasAuthoritativeStanding ;
+        sh:hasValue "false"^^xsd:boolean ;
+        sh:message "Peer projection details hold no authoritative standing."
+    ] .
+
+mb:ClientAsProjector a mb:ThreeResolutionNetworkingModel, sh:NodeShape ;
+    rdfs:label "Client as Projector" ;
+    mb:law "The local client renders the absolute maximum fidelity, but relies entirely on the server for the admitted truth. The server does not synchronize the object; it synchronizes the right to believe the object." ;
+    sh:targetClass mb:ClientRenderState ;
+    sh:property [
+        sh:path mb:dependsOnAuthority ;
+        sh:class mb:AuthorityState ;
+        sh:minCount 1 ;
+        sh:message "Client rendering relies entirely on the server for the admitted truth."
+    ] .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BRANCHLESS TRANSITION KERNEL LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:TransitionKernel a owl:Class ;
+    rdfs:label "Transition Kernel" ;
+    rdfs:comment "A branchless, table-or-scalar function mapping authority inputs to damage output." .
+
+mb:ScalarFailureRisk a mb:TransitionKernel ;
+    rdfs:label "scalar_failure_risk" ;
+    mb:rustFnName "scalar_failure_risk" ;
+    mb:inputs "heat: u8, stress: u8, socket_health: u8" ;
+    mb:output "u8" ;
+    mb:formula "clamp((heat + stress + (MAX_CLASS - socket_health)) / 3, 0, MAX_CLASS)" ;
+    mb:useSaturating "true"^^xsd:boolean ;
+    mb:intermediateType "u16" ;
+    mb:comment "Uses u16 intermediate to avoid overflow on u8 inputs." .
+
+mb:TransitionTable a mb:TransitionKernel ;
+    rdfs:label "TransitionTable" ;
+    mb:rustStructName "TransitionTable" ;
+    mb:dimensions "16 x 16 x 16"^^xsd:string ;
+    mb:totalEntries "4096"^^xsd:integer ;
+    mb:indexFormula "heat * 256 + stress * 16 + socket_health" ;
+    mb:guarantee "bit-identical to scalar_failure_risk for all inputs in [0,15]^3" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SIMD EQUIVALENCE LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:SimdEquivalenceLaw a owl:Class ;
+    rdfs:label "SIMD Equivalence Law" ;
+    rdfs:comment "Law binding a SIMD-shaped path to produce bit-identical output to the scalar reference." .
+
+mb:SimdLaneWidth a owl:NamedIndividual ;
+    rdfs:label "SIMD Lane Width" ;
+    mb:value "16"^^xsd:integer ;
+    mb:unit "u8 lanes" ;
+    mb:comment "16 u8 lanes = 128-bit register width (SSE2/NEON floor)." .
+
+mb:SimdEquiv_GC_MECHBIRTH_002 a mb:SimdEquivalenceLaw ;
+    rdfs:label "GC-MECHBIRTH-002 SIMD Equivalence" ;
+    mb:laneWidth mb:SimdLaneWidth ;
+    mb:scalarRef mb:ScalarFailureRisk ;
+    mb:verificationFn "verify_simd_scalar_equivalence" ;
+    mb:residual "GC-MECHBIRTH-003: SIMDe FFI C intrinsic kernel deferred" ;
+    mb:guarantee "chunked 16-lane arithmetic produces identical output to scalar for all inputs" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PREDICTION SHADOW ENGINE LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:PredictionLaw a owl:Class ;
+    rdfs:label "Prediction Law" ;
+    rdfs:comment "Invariant laws governing the prediction shadow engine." .
+
+mb:ShadowOnlyInvariant a mb:PredictionLaw ;
+    rdfs:label "Shadow-Only Invariant" ;
+    mb:law "Prediction NEVER writes to admitted AuthorityState. All writes target shadow buffers only." ;
+    mb:refusalReason "PredictionAuthorityMutation" ;
+    mb:enforcement "attempt_authority_promotion() always returns Err(PredictionAuthorityMutation)" .
+
+mb:PredictionField a owl:Class ;
+    rdfs:label "Prediction Shadow Field" ;
+    rdfs:comment "A shadow buffer in PredictionState — parallel to an AuthorityByteField but never admitted." .
+
+mb:FutureDamageField a mb:PredictionField ;
+    mb:fieldName "future_damage" ;
+    mb:mirrors mb:DamageField ;
+    mb:formula "scalar_failure_risk(future_heat, future_stress, admitted.socket_health)" .
+
+mb:FutureHeatField a mb:PredictionField ;
+    mb:fieldName "future_heat" ;
+    mb:mirrors mb:HeatField ;
+    mb:formula "clamp(admitted.heat + ticks, 0, MAX_CLASS)" .
+
+mb:FutureStressField a mb:PredictionField ;
+    mb:fieldName "future_stress" ;
+    mb:mirrors mb:StressField ;
+    mb:formula "clamp(admitted.stress + ticks/2, 0, MAX_CLASS)" .
+
+mb:ConfidenceField a mb:PredictionField ;
+    mb:fieldName "confidence" ;
+    mb:formula "15.saturating_sub(ticks)" ;
+    mb:comment "Confidence degrades linearly with prediction tick distance." .
+
+mb:FutureLodField a mb:PredictionField ;
+    mb:fieldName "future_lod" ;
+    mb:formula "if future_damage > 10 { 0 } else { admitted.lod }" ;
+    mb:comment "LOD demoted to CROWN when predicted damage is critical." .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REFUSAL REASON TAXONOMY
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:RefusalReason a owl:Class ;
+    rdfs:label "Refusal Reason" ;
+    rdfs:comment "Bounded taxonomy of all possible refusal reasons. Every refusal carries exactly one." .
+
+mb:InvalidAuthorityClass a mb:RefusalReason ;
+    mb:variant "InvalidAuthorityClass" ;
+    mb:fields "field: String, class: u8" ;
+    mb:errorTemplate "invalid authority class {class} for field {field}" .
+
+mb:MissingSocket a mb:RefusalReason ;
+    mb:variant "MissingSocket" ;
+    mb:fields "dependent: String" ;
+    mb:errorTemplate "missing socket required by {dependent}" .
+
+mb:MotionClearanceViolation a mb:RefusalReason ;
+    mb:variant "MotionClearanceViolation" ;
+    mb:fields "detail: String" ;
+    mb:errorTemplate "motion clearance violation: {detail}" .
+
+mb:SkinOccludesRequiredFeature a mb:RefusalReason ;
+    mb:variant "SkinOccludesRequiredFeature" ;
+    mb:fields "feature: String" ;
+    mb:errorTemplate "skin occludes required feature: {feature}" .
+
+mb:LodDemotedCrownFeature a mb:RefusalReason ;
+    mb:variant "LodDemotedCrownFeature" ;
+    mb:fields "feature: String" ;
+    mb:errorTemplate "LOD demoted CROWN feature without authority reason: {feature}" .
+
+mb:PredictionAuthorityMutation a mb:RefusalReason ;
+    mb:variant "PredictionAuthorityMutation" ;
+    mb:fields "" ;
+    mb:errorTemplate "prediction attempted to overwrite admitted authority state" .
+
+mb:SimdScalarDivergence a mb:RefusalReason ;
+    mb:variant "SimdScalarDivergence" ;
+    mb:fields "index: usize" ;
+    mb:errorTemplate "SIMD output diverges from scalar for input index {index}" .
+
+mb:ReceiptChainBroken a mb:RefusalReason ;
+    mb:variant "ReceiptChainBroken" ;
+    mb:fields "sequence: u64, expected: String, actual: String" ;
+    mb:errorTemplate "receipt chain broken at sequence {sequence}: expected {expected}, got {actual}" .
+
+mb:OrphanProjectionRow a mb:RefusalReason ;
+    mb:variant "OrphanProjectionRow" ;
+    mb:fields "row_id: String" ;
+    mb:errorTemplate "orphan projection row {row_id} has no source receipt" .
+
+mb:MissingPowlStep a mb:RefusalReason ;
+    mb:variant "MissingPowlStep" ;
+    mb:fields "step: String" ;
+    mb:errorTemplate "POWL step missing from trace: {step}" .
+
+mb:GeometryValidationFailed a mb:RefusalReason ;
+    mb:variant "GeometryValidationFailed" ;
+    mb:fields "detail: String" ;
+    mb:errorTemplate "geometry validation failed: {detail}" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GATE TAXONOMY (GATE 0–7)
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:VerifierGate a owl:Class ;
+    rdfs:label "Verifier Gate" ;
+    rdfs:comment "A sequential gate in the GC-MECHBIRTH-002 acceptance matrix." .
+
+mb:GateScope a owl:Class ;
+    rdfs:label "Gate Scope" .
+
+mb:RustScope a mb:GateScope ;
+    rdfs:label "RustScope" ;
+    mb:comment "In-scope for Rust pre-UE4 verifier. Counts toward ALIVE_UNDER_SCOPE." .
+
+mb:ResidualScope a mb:GateScope ;
+    rdfs:label "ResidualScope" ;
+    mb:comment "Out-of-scope (UE4/WASM/Playwright). Does NOT count against ALIVE_UNDER_SCOPE." .
+
+mb:Gate0 a mb:VerifierGate ;
+    mb:gateId "GATE_0_SOURCE_ADMISSION" ;
+    mb:gateIndex "0"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "Contract for prompt is declared" ;
+    mb:alwaysPass "true"^^xsd:boolean .
+
+mb:Gate1 a mb:VerifierGate ;
+    mb:gateId "GATE_1_AUTHORITY_LENGTHS" ;
+    mb:gateIndex "1"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "All SoA buffers have identical length" ;
+    mb:validates "AuthorityState::validate_lengths" .
+
+mb:Gate2 a mb:VerifierGate ;
+    mb:gateId "GATE_2_AUTHORITY_CLASSES" ;
+    mb:gateIndex "2"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "All class values in [0, MAX_CLASS]" ;
+    mb:validates "AuthorityState::validate_classes" .
+
+mb:Gate3 a mb:VerifierGate ;
+    mb:gateId "GATE_3_SCALAR_TABLE_EQUIV" ;
+    mb:gateIndex "3"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "SIMD-equivalent path produces bit-identical output to scalar reference" ;
+    mb:validates "verify_simd_scalar_equivalence" .
+
+mb:Gate4 a mb:VerifierGate ;
+    mb:gateId "GATE_4_RECEIPT_CHAIN" ;
+    mb:gateIndex "4"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "Receipt chain prev_hash links are intact" ;
+    mb:validates "ReceiptChain::verify" .
+
+mb:Gate5 a mb:VerifierGate ;
+    mb:gateId "GATE_5_UE4_WASM_PACKAGE" ;
+    mb:gateIndex "5"^^xsd:integer ;
+    mb:scope mb:ResidualScope ;
+    mb:law "SpeculativeCoder UE4.27 HTML5 ES3 build produces browser-deployable output" ;
+    mb:residual "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline" .
+
+mb:Gate6 a mb:VerifierGate ;
+    mb:gateId "GATE_6_MOTION_DELTA" ;
+    mb:gateIndex "6"^^xsd:integer ;
+    mb:scope mb:ResidualScope ;
+    mb:law "Playwright motion delta exceeds threshold after input actuation" ;
+    mb:residual "visual_delta: no Playwright browser session in pre-UE4 scope" .
+
+mb:Gate7 a mb:VerifierGate ;
+    mb:gateId "GATE_7_RECEIPT" ;
+    mb:gateIndex "7"^^xsd:integer ;
+    mb:scope mb:RustScope ;
+    mb:law "Every receipt entry hash equals blake3(content)" ;
+    mb:validates "ReceiptChain::verify_hashes" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STATUS VOCABULARY
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:StatusTerm a owl:Class ;
+    rdfs:label "Status Term" ;
+    rdfs:comment "Bounded status vocabulary. Never use 'done' or 'complete'." .
+
+mb:VerifiedUnderScope a mb:StatusTerm ;
+    rdfs:label "VERIFIED_UNDER_SCOPE" .
+
+mb:AliveUnderScope a mb:StatusTerm ;
+    rdfs:label "ALIVE_UNDER_SCOPE" ;
+    mb:condition "All RustScope gates pass; ResidualScope gates excluded." .
+
+mb:PartialAliveCandidate a mb:StatusTerm ;
+    rdfs:label "PARTIAL_ALIVE_CANDIDATE" ;
+    mb:condition "At least one RustScope gate failed." .
+
+mb:Blocked a mb:StatusTerm ;
+    rdfs:label "BLOCKED" ;
+    mb:condition "A hard RustScope gate failure prevents progress." .
+
+mb:Residual a mb:StatusTerm ;
+    rdfs:label "RESIDUAL" ;
+    mb:condition "Gate is ResidualScope — deferred to UE4/WASM pipeline." .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CRYPTOGRAPHIC RECEIPT PAYLOAD LAWS
+# ─────────────────────────────────────────────────────────────────────────────
+
+mb:ReceiptPayloadField a owl:Class ;
+    rdfs:label "Receipt Payload Field" ;
+    rdfs:comment "Fields that must be included in the unforgeable BLAKE3 receipt hash." .
+
+mb:SequenceField a mb:ReceiptPayloadField ;
+    mb:fieldName "sequence" ;
+    mb:fieldType "u64" ;
+    mb:hashOrder "1"^^xsd:integer .
+
+mb:EventTypeField a mb:ReceiptPayloadField ;
+    mb:fieldName "event_type" ;
+    mb:fieldType "String" ;
+    mb:hashOrder "2"^^xsd:integer .
+
+mb:PrevHashField a mb:ReceiptPayloadField ;
+    mb:fieldName "prev_hash" ;
+    mb:fieldType "String" ;
+    mb:hashOrder "3"^^xsd:integer .
+
+mb:ObjectsField a mb:ReceiptPayloadField ;
+    mb:fieldName "objects" ;
+    mb:fieldType "Vec<String>" ;
+    mb:hashOrder "4"^^xsd:integer .
+
+mb:StatusField a mb:ReceiptPayloadField ;
+    mb:fieldName "status" ;
+    mb:fieldType "AdmissionStatus" ;
+    mb:hashOrder "5"^^xsd:integer .
+
+mb:ResidualsField a mb:ReceiptPayloadField ;
+    mb:fieldName "residuals" ;
+    mb:fieldType "Vec<String>" ;
+    mb:hashOrder "6"^^xsd:integer .
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix antillm: <https://ggen.io/ontology/anti_llm/> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+antillm:Repository a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Repository" .
+antillm:Crate a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Crate" .
+antillm:File a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "File" .
+antillm:FileRange a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "FileRange" .
+antillm:Checkpoint a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Checkpoint" .
+antillm:DiagnosticCode a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "DiagnosticCode" .
+antillm:ForbiddenImplication a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "ForbiddenImplication" .
+antillm:Diagnostic a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Diagnostic" .
+antillm:Receipt a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Receipt" .
+antillm:Digest a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Digest" .
+antillm:Lsp318FeatureRow a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "Lsp318FeatureRow" .
+antillm:NegativeControlFixture a owl:Class ; rdfs:subClassOf core:Entity ; rdfs:label "NegativeControlFixture" .
+
+
+# =========================================================
+# Appended from asset_fabric.ttl
+# =========================================================
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+mud:AssetFabricOntology a owl:Ontology ;
+    rdfs:label "Asset Fabric Ontology" ;
+    rdfs:comment "Defines part grammar and geometry families for reference fabric mech assets." .
+
+# ---------------------------------------------------------
+# Part Grammar Classes
+# ---------------------------------------------------------
+mud:MechPart rdf:type owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Mech Part" .
+
+mud:TorsoCore rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:HeadUnit rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:WingRootLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:WingRootRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:PrimaryWingFeathersLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:PrimaryWingFeathersRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:SecondaryWingFeathersLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:SecondaryWingFeathersRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:BladeLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:BladeRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:BackpackCore rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ThrusterCluster rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ShoulderLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ShoulderRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ArmLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:ArmRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:LegLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:LegRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:VFinLeft rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+mud:VFinRight rdf:type owl:Class ; rdfs:subClassOf mud:MechPart .
+
+# ---------------------------------------------------------
+# Part Grammar Instances
+# ---------------------------------------------------------
+mud:torso_core rdf:type mud:TorsoCore ; rdfs:label "torso_core" .
+mud:head_unit rdf:type mud:HeadUnit ; rdfs:label "head_unit" .
+mud:wing_root_left rdf:type mud:WingRootLeft ; rdfs:label "wing_root_left" .
+mud:wing_root_right rdf:type mud:WingRootRight ; rdfs:label "wing_root_right" .
+mud:primary_wing_feathers_left rdf:type mud:PrimaryWingFeathersLeft ; rdfs:label "primary_wing_feathers_left" .
+mud:primary_wing_feathers_right rdf:type mud:PrimaryWingFeathersRight ; rdfs:label "primary_wing_feathers_right" .
+mud:secondary_wing_feathers_left rdf:type mud:SecondaryWingFeathersLeft ; rdfs:label "secondary_wing_feathers_left" .
+mud:secondary_wing_feathers_right rdf:type mud:SecondaryWingFeathersRight ; rdfs:label "secondary_wing_feathers_right" .
+mud:blade_left rdf:type mud:BladeLeft ; rdfs:label "blade_left" .
+mud:blade_right rdf:type mud:BladeRight ; rdfs:label "blade_right" .
+mud:backpack_core rdf:type mud:BackpackCore ; rdfs:label "backpack_core" .
+mud:thruster_cluster rdf:type mud:ThrusterCluster ; rdfs:label "thruster_cluster" .
+mud:shoulder_left rdf:type mud:ShoulderLeft ; rdfs:label "shoulder_left" .
+mud:shoulder_right rdf:type mud:ShoulderRight ; rdfs:label "shoulder_right" .
+mud:arm_left rdf:type mud:ArmLeft ; rdfs:label "arm_left" .
+mud:arm_right rdf:type mud:ArmRight ; rdfs:label "arm_right" .
+mud:leg_left rdf:type mud:LegLeft ; rdfs:label "leg_left" .
+mud:leg_right rdf:type mud:LegRight ; rdfs:label "leg_right" .
+mud:v_fin_left rdf:type mud:VFinLeft ; rdfs:label "v_fin_left" .
+mud:v_fin_right rdf:type mud:VFinRight ; rdfs:label "v_fin_right" .
+
+# ---------------------------------------------------------
+# Geometry Primitive Families
+# ---------------------------------------------------------
+mud:GeometryPrimitiveFamily rdf:type owl:Class ;
+    rdfs:label "Geometry Primitive Family" .
+
+mud:TaperedBox rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "tapered_box" .
+mud:FeatherPanel rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "feather_panel" .
+mud:BladePrism rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "blade_prism" .
+mud:Cylinder rdf:type mud:GeometryPrimitiveFamily ; rdfs:label "cylinder" .
+
+
+# =========================================================
+# Appended from visual_targets.ttl
+# =========================================================
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+mud:VisualTargetsOntology a owl:Ontology ;
+    rdfs:label "Visual Targets Ontology" ;
+    rdfs:comment "Defines target measurements and metrics from reference analysis." .
+
+mud:VisualTargetExpectation rdf:type owl:Class ;
+    rdfs:label "Visual Target Expectation" .
+
+mud:reference_fabric_expectations rdf:type mud:VisualTargetExpectation ;
+    mud:aspectRatio "1.2024"^^xsd:float ;
+    mud:symmetry "0.9594"^^xsd:float ;
+    mud:bboxMinX "0"^^xsd:integer ;
+    mud:bboxMinY "2"^^xsd:integer ;
+    mud:bboxMaxX "1199"^^xsd:integer ;
+    mud:bboxMaxY "999"^^xsd:integer ;
+    mud:whiteProportion "0.4236"^^xsd:float ;
+    mud:darkProportion "0.0345"^^xsd:float ;
+    mud:cyanProportion "0.0091"^^xsd:float ;
+    mud:goldProportion "0.0019"^^xsd:float ;
+    mud:redProportion "0.0032"^^xsd:float .
+
+
+# =========================================================
+# Appended from generator_parameters.ttl
+
+# =========================================================
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+mud:GeneratorParametersOntology a owl:Ontology ;
+    rdfs:label "Generator Parameters Ontology" ;
+    rdfs:comment "Defines materials, texture programs, and the geometry primitives for reference fabric mech assets." .
+
+# ---------------------------------------------------------
+# Materials
+# ---------------------------------------------------------
+mud:Material rdf:type owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Material" .
+
+mud:M_WhiteArmor rdf:type mud:Material ;
+    mud:color "1.0 1.0 1.0" ;
+    mud:roughness "0.4"^^xsd:float ;
+    mud:emissive "0.0"^^xsd:float ;
+    mud:metallic "0.0"^^xsd:float .
+
+mud:M_CyanBlade rdf:type mud:Material ;
+    mud:color "0.0 0.8 1.0" ;
+    mud:roughness "0.15"^^xsd:float ;
+    mud:emissive "0.8"^^xsd:float ;
+    mud:metallic "0.9"^^xsd:float .
+
+mud:M_DarkFrame rdf:type mud:Material ;
+    mud:color "0.15 0.15 0.18" ;
+    mud:roughness "0.6"^^xsd:float ;
+    mud:emissive "0.0"^^xsd:float ;
+    mud:metallic "0.5"^^xsd:float .
+
+mud:M_GoldVisor rdf:type mud:Material ;
+    mud:color "1.0 0.8 0.0" ;
+    mud:roughness "0.1"^^xsd:float ;
+    mud:emissive "0.5"^^xsd:float ;
+    mud:metallic "0.9"^^xsd:float .
+
+# ---------------------------------------------------------
+# Texture Programs
+# ---------------------------------------------------------
+mud:TextureProgram rdf:type owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Texture Program" .
+
+mud:tex_prog_armor rdf:type mud:TextureProgram ;
+    mud:targetMaterial mud:M_WhiteArmor ;
+    mud:baseColorTex "T_WhiteArmor_BaseColor.png" ;
+    mud:roughnessTex "T_WhiteArmor_Roughness.png" ;
+    mud:normalTex "T_WhiteArmor_Normal.png" ;
+    mud:resolution "2048"^^xsd:integer .
+
+mud:tex_prog_blade rdf:type mud:TextureProgram ;
+    mud:targetMaterial mud:M_CyanBlade ;
+    mud:emissiveTex "T_CyanBlade_Emissive.png" ;
+    mud:resolution "2048"^^xsd:integer .
+
+# ---------------------------------------------------------
+# Geometry Primitives
+# ---------------------------------------------------------
+mud:GeometryPrimitive rdf:type owl:Class ;
+    rdfs:subClassOf core:Entity ;
+    rdfs:label "Geometry Primitive" .
+
+mud:prim_0001 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "115.0000"^^xsd:float ;
+    mud:scaleX "14.0000"^^xsd:float ;
+    mud:scaleY "10.0000"^^xsd:float ;
+    mud:scaleZ "12.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0002 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-6.0000"^^xsd:float ;
+    mud:translateY "3.5000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "6.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "8.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "20.0000"^^xsd:float ;
+    mud:rotateZ "10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0003 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "6.0000"^^xsd:float ;
+    mud:translateY "3.5000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "6.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "8.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "-20.0000"^^xsd:float ;
+    mud:rotateZ "-10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0004 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "4.0000"^^xsd:float ;
+    mud:translateZ "128.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "5.0000"^^xsd:float ;
+    mud:scaleZ "4.0000"^^xsd:float ;
+    mud:rotateX "-15.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0005 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "100.0000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0006 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-3.0000"^^xsd:float ;
+    mud:translateZ "95.0000"^^xsd:float ;
+    mud:scaleX "6.0000"^^xsd:float ;
+    mud:scaleY "5.0000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0007 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-5.0000"^^xsd:float ;
+    mud:translateZ "112.0000"^^xsd:float ;
+    mud:scaleX "12.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "14.0000"^^xsd:float ;
+    mud:rotateX "-20.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0008 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "105.0000"^^xsd:float ;
+    mud:scaleX "2.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "8.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "15.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0009 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "105.0000"^^xsd:float ;
+    mud:scaleX "2.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "8.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "-15.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0010 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "4.5000"^^xsd:float ;
+    mud:translateZ "118.0000"^^xsd:float ;
+    mud:scaleX "2.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "6.0000"^^xsd:float ;
+    mud:rotateX "30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0011 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "135.0000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0012 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "136.5000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0013 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "138.0000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0014 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "139.5000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0015 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "141.0000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0016 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "142.5000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0017 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "144.0000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0018 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "145.5000"^^xsd:float ;
+    mud:scaleX "8.0000"^^xsd:float ;
+    mud:scaleY "8.0000"^^xsd:float ;
+    mud:scaleZ "1.5000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0019 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_left ;
+    mud:primitiveFamily "blade_prism" ;
+    mud:translateX "-1.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "145.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "30.0000"^^xsd:float ;
+    mud:rotateZ "10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0020 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_left ;
+    mud:primitiveFamily "blade_prism" ;
+    mud:translateX "-2.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "147.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "30.0000"^^xsd:float ;
+    mud:rotateZ "10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0021 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-3.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "149.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "30.0000"^^xsd:float ;
+    mud:rotateZ "10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0022 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-4.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "151.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "30.0000"^^xsd:float ;
+    mud:rotateZ "10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0023 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_right ;
+    mud:primitiveFamily "blade_prism" ;
+    mud:translateX "1.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "145.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "-30.0000"^^xsd:float ;
+    mud:rotateZ "-10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0024 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_right ;
+    mud:primitiveFamily "blade_prism" ;
+    mud:translateX "2.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "147.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "-30.0000"^^xsd:float ;
+    mud:rotateZ "-10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0025 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "3.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "149.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "-30.0000"^^xsd:float ;
+    mud:rotateZ "-10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0026 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:v_fin_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "4.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "151.0000"^^xsd:float ;
+    mud:scaleX "1.0000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "3.0000"^^xsd:float ;
+    mud:rotateX "15.0000"^^xsd:float ;
+    mud:rotateY "-30.0000"^^xsd:float ;
+    mud:rotateZ "-10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0027 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-15.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0028 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-16.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "121.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0029 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-17.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "122.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0030 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-18.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "123.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0031 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-19.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "124.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0032 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "125.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0033 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-21.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "126.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0034 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-22.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "127.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "45.0000"^^xsd:float ;
+    mud:rotateZ "20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0035 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "15.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0036 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "16.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "121.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0037 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "17.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "122.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0038 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "18.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "123.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0039 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "19.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "124.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0040 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "125.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0041 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "21.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "126.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0042 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:wing_root_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "22.0000"^^xsd:float ;
+    mud:translateY "8.0000"^^xsd:float ;
+    mud:translateZ "127.0000"^^xsd:float ;
+    mud:scaleX "4.0000"^^xsd:float ;
+    mud:scaleY "4.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-45.0000"^^xsd:float ;
+    mud:rotateZ "-20.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0043 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-15.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "3.5000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "28.0000"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "35.0000"^^xsd:float ;
+    mud:rotateZ "15.0000"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0044 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-16.5217"^^xsd:float ;
+    mud:translateY "5.8261"^^xsd:float ;
+    mud:translateZ "121.0019"^^xsd:float ;
+    mud:scaleX "3.4348"^^xsd:float ;
+    mud:scaleY "0.4891"^^xsd:float ;
+    mud:scaleZ "27.3043"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "36.7391"^^xsd:float ;
+    mud:rotateZ "16.5217"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0045 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-18.0435"^^xsd:float ;
+    mud:translateY "5.6522"^^xsd:float ;
+    mud:translateZ "121.8336"^^xsd:float ;
+    mud:scaleX "3.3696"^^xsd:float ;
+    mud:scaleY "0.4783"^^xsd:float ;
+    mud:scaleZ "26.6087"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "38.4783"^^xsd:float ;
+    mud:rotateZ "18.0435"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0046 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-19.5652"^^xsd:float ;
+    mud:translateY "5.4783"^^xsd:float ;
+    mud:translateZ "122.4953"^^xsd:float ;
+    mud:scaleX "3.3043"^^xsd:float ;
+    mud:scaleY "0.4674"^^xsd:float ;
+    mud:scaleZ "25.9130"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "40.2174"^^xsd:float ;
+    mud:rotateZ "19.5652"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0047 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-21.0870"^^xsd:float ;
+    mud:translateY "5.3043"^^xsd:float ;
+    mud:translateZ "122.9868"^^xsd:float ;
+    mud:scaleX "3.2391"^^xsd:float ;
+    mud:scaleY "0.4565"^^xsd:float ;
+    mud:scaleZ "25.2174"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "41.9565"^^xsd:float ;
+    mud:rotateZ "21.0870"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0048 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-22.6087"^^xsd:float ;
+    mud:translateY "5.1304"^^xsd:float ;
+    mud:translateZ "123.3081"^^xsd:float ;
+    mud:scaleX "3.1739"^^xsd:float ;
+    mud:scaleY "0.4457"^^xsd:float ;
+    mud:scaleZ "24.5217"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "43.6957"^^xsd:float ;
+    mud:rotateZ "22.6087"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0049 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-24.1304"^^xsd:float ;
+    mud:translateY "4.9565"^^xsd:float ;
+    mud:translateZ "123.4594"^^xsd:float ;
+    mud:scaleX "3.1087"^^xsd:float ;
+    mud:scaleY "0.4348"^^xsd:float ;
+    mud:scaleZ "23.8261"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "45.4348"^^xsd:float ;
+    mud:rotateZ "24.1304"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0050 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-25.6522"^^xsd:float ;
+    mud:translateY "4.7826"^^xsd:float ;
+    mud:translateZ "123.4405"^^xsd:float ;
+    mud:scaleX "3.0435"^^xsd:float ;
+    mud:scaleY "0.4239"^^xsd:float ;
+    mud:scaleZ "23.1304"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "47.1739"^^xsd:float ;
+    mud:rotateZ "25.6522"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0051 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-27.1739"^^xsd:float ;
+    mud:translateY "4.6087"^^xsd:float ;
+    mud:translateZ "123.2514"^^xsd:float ;
+    mud:scaleX "2.9783"^^xsd:float ;
+    mud:scaleY "0.4130"^^xsd:float ;
+    mud:scaleZ "22.4348"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "48.9130"^^xsd:float ;
+    mud:rotateZ "27.1739"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0052 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-28.6957"^^xsd:float ;
+    mud:translateY "4.4348"^^xsd:float ;
+    mud:translateZ "122.8922"^^xsd:float ;
+    mud:scaleX "2.9130"^^xsd:float ;
+    mud:scaleY "0.4022"^^xsd:float ;
+    mud:scaleZ "21.7391"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "50.6522"^^xsd:float ;
+    mud:rotateZ "28.6957"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0053 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-30.2174"^^xsd:float ;
+    mud:translateY "4.2609"^^xsd:float ;
+    mud:translateZ "122.3629"^^xsd:float ;
+    mud:scaleX "2.8478"^^xsd:float ;
+    mud:scaleY "0.3913"^^xsd:float ;
+    mud:scaleZ "21.0435"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "52.3913"^^xsd:float ;
+    mud:rotateZ "30.2174"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0054 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-31.7391"^^xsd:float ;
+    mud:translateY "4.0870"^^xsd:float ;
+    mud:translateZ "121.6635"^^xsd:float ;
+    mud:scaleX "2.7826"^^xsd:float ;
+    mud:scaleY "0.3804"^^xsd:float ;
+    mud:scaleZ "20.3478"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "54.1304"^^xsd:float ;
+    mud:rotateZ "31.7391"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0055 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-33.2609"^^xsd:float ;
+    mud:translateY "3.9130"^^xsd:float ;
+    mud:translateZ "120.7940"^^xsd:float ;
+    mud:scaleX "2.7174"^^xsd:float ;
+    mud:scaleY "0.3696"^^xsd:float ;
+    mud:scaleZ "19.6522"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "55.8696"^^xsd:float ;
+    mud:rotateZ "33.2609"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0056 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-34.7826"^^xsd:float ;
+    mud:translateY "3.7391"^^xsd:float ;
+    mud:translateZ "119.7543"^^xsd:float ;
+    mud:scaleX "2.6522"^^xsd:float ;
+    mud:scaleY "0.3587"^^xsd:float ;
+    mud:scaleZ "18.9565"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "57.6087"^^xsd:float ;
+    mud:rotateZ "34.7826"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0057 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-36.3043"^^xsd:float ;
+    mud:translateY "3.5652"^^xsd:float ;
+    mud:translateZ "118.5444"^^xsd:float ;
+    mud:scaleX "2.5870"^^xsd:float ;
+    mud:scaleY "0.3478"^^xsd:float ;
+    mud:scaleZ "18.2609"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "59.3478"^^xsd:float ;
+    mud:rotateZ "36.3043"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0058 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-37.8261"^^xsd:float ;
+    mud:translateY "3.3913"^^xsd:float ;
+    mud:translateZ "117.1645"^^xsd:float ;
+    mud:scaleX "2.5217"^^xsd:float ;
+    mud:scaleY "0.3370"^^xsd:float ;
+    mud:scaleZ "17.5652"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "61.0870"^^xsd:float ;
+    mud:rotateZ "37.8261"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0059 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-39.3478"^^xsd:float ;
+    mud:translateY "3.2174"^^xsd:float ;
+    mud:translateZ "115.6144"^^xsd:float ;
+    mud:scaleX "2.4565"^^xsd:float ;
+    mud:scaleY "0.3261"^^xsd:float ;
+    mud:scaleZ "16.8696"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "62.8261"^^xsd:float ;
+    mud:rotateZ "39.3478"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0060 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-40.8696"^^xsd:float ;
+    mud:translateY "3.0435"^^xsd:float ;
+    mud:translateZ "113.8941"^^xsd:float ;
+    mud:scaleX "2.3913"^^xsd:float ;
+    mud:scaleY "0.3152"^^xsd:float ;
+    mud:scaleZ "16.1739"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "64.5652"^^xsd:float ;
+    mud:rotateZ "40.8696"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0061 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-42.3913"^^xsd:float ;
+    mud:translateY "2.8696"^^xsd:float ;
+    mud:translateZ "112.0038"^^xsd:float ;
+    mud:scaleX "2.3261"^^xsd:float ;
+    mud:scaleY "0.3043"^^xsd:float ;
+    mud:scaleZ "15.4783"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "66.3043"^^xsd:float ;
+    mud:rotateZ "42.3913"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0062 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-43.9130"^^xsd:float ;
+    mud:translateY "2.6957"^^xsd:float ;
+    mud:translateZ "109.9433"^^xsd:float ;
+    mud:scaleX "2.2609"^^xsd:float ;
+    mud:scaleY "0.2935"^^xsd:float ;
+    mud:scaleZ "14.7826"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "68.0435"^^xsd:float ;
+    mud:rotateZ "43.9130"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0063 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-45.4348"^^xsd:float ;
+    mud:translateY "2.5217"^^xsd:float ;
+    mud:translateZ "107.7127"^^xsd:float ;
+    mud:scaleX "2.1957"^^xsd:float ;
+    mud:scaleY "0.2826"^^xsd:float ;
+    mud:scaleZ "14.0870"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "69.7826"^^xsd:float ;
+    mud:rotateZ "45.4348"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0064 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-46.9565"^^xsd:float ;
+    mud:translateY "2.3478"^^xsd:float ;
+    mud:translateZ "105.3119"^^xsd:float ;
+    mud:scaleX "2.1304"^^xsd:float ;
+    mud:scaleY "0.2717"^^xsd:float ;
+    mud:scaleZ "13.3913"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "71.5217"^^xsd:float ;
+    mud:rotateZ "46.9565"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0065 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-48.4783"^^xsd:float ;
+    mud:translateY "2.1739"^^xsd:float ;
+    mud:translateZ "102.7410"^^xsd:float ;
+    mud:scaleX "2.0652"^^xsd:float ;
+    mud:scaleY "0.2609"^^xsd:float ;
+    mud:scaleZ "12.6957"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "73.2609"^^xsd:float ;
+    mud:rotateZ "48.4783"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0066 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-50.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "100.0000"^^xsd:float ;
+    mud:scaleX "2.0000"^^xsd:float ;
+    mud:scaleY "0.2500"^^xsd:float ;
+    mud:scaleZ "12.0000"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "75.0000"^^xsd:float ;
+    mud:rotateZ "50.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0067 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "15.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "3.5000"^^xsd:float ;
+    mud:scaleY "0.5000"^^xsd:float ;
+    mud:scaleZ "28.0000"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-35.0000"^^xsd:float ;
+    mud:rotateZ "-15.0000"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0068 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "16.5217"^^xsd:float ;
+    mud:translateY "5.8261"^^xsd:float ;
+    mud:translateZ "121.0019"^^xsd:float ;
+    mud:scaleX "3.4348"^^xsd:float ;
+    mud:scaleY "0.4891"^^xsd:float ;
+    mud:scaleZ "27.3043"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-36.7391"^^xsd:float ;
+    mud:rotateZ "-16.5217"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0069 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "18.0435"^^xsd:float ;
+    mud:translateY "5.6522"^^xsd:float ;
+    mud:translateZ "121.8336"^^xsd:float ;
+    mud:scaleX "3.3696"^^xsd:float ;
+    mud:scaleY "0.4783"^^xsd:float ;
+    mud:scaleZ "26.6087"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-38.4783"^^xsd:float ;
+    mud:rotateZ "-18.0435"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0070 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "19.5652"^^xsd:float ;
+    mud:translateY "5.4783"^^xsd:float ;
+    mud:translateZ "122.4953"^^xsd:float ;
+    mud:scaleX "3.3043"^^xsd:float ;
+    mud:scaleY "0.4674"^^xsd:float ;
+    mud:scaleZ "25.9130"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-40.2174"^^xsd:float ;
+    mud:rotateZ "-19.5652"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0071 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "21.0870"^^xsd:float ;
+    mud:translateY "5.3043"^^xsd:float ;
+    mud:translateZ "122.9868"^^xsd:float ;
+    mud:scaleX "3.2391"^^xsd:float ;
+    mud:scaleY "0.4565"^^xsd:float ;
+    mud:scaleZ "25.2174"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-41.9565"^^xsd:float ;
+    mud:rotateZ "-21.0870"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0072 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "22.6087"^^xsd:float ;
+    mud:translateY "5.1304"^^xsd:float ;
+    mud:translateZ "123.3081"^^xsd:float ;
+    mud:scaleX "3.1739"^^xsd:float ;
+    mud:scaleY "0.4457"^^xsd:float ;
+    mud:scaleZ "24.5217"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-43.6957"^^xsd:float ;
+    mud:rotateZ "-22.6087"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0073 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "24.1304"^^xsd:float ;
+    mud:translateY "4.9565"^^xsd:float ;
+    mud:translateZ "123.4594"^^xsd:float ;
+    mud:scaleX "3.1087"^^xsd:float ;
+    mud:scaleY "0.4348"^^xsd:float ;
+    mud:scaleZ "23.8261"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-45.4348"^^xsd:float ;
+    mud:rotateZ "-24.1304"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0074 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "25.6522"^^xsd:float ;
+    mud:translateY "4.7826"^^xsd:float ;
+    mud:translateZ "123.4405"^^xsd:float ;
+    mud:scaleX "3.0435"^^xsd:float ;
+    mud:scaleY "0.4239"^^xsd:float ;
+    mud:scaleZ "23.1304"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-47.1739"^^xsd:float ;
+    mud:rotateZ "-25.6522"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0075 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "27.1739"^^xsd:float ;
+    mud:translateY "4.6087"^^xsd:float ;
+    mud:translateZ "123.2514"^^xsd:float ;
+    mud:scaleX "2.9783"^^xsd:float ;
+    mud:scaleY "0.4130"^^xsd:float ;
+    mud:scaleZ "22.4348"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-48.9130"^^xsd:float ;
+    mud:rotateZ "-27.1739"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0076 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "28.6957"^^xsd:float ;
+    mud:translateY "4.4348"^^xsd:float ;
+    mud:translateZ "122.8922"^^xsd:float ;
+    mud:scaleX "2.9130"^^xsd:float ;
+    mud:scaleY "0.4022"^^xsd:float ;
+    mud:scaleZ "21.7391"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-50.6522"^^xsd:float ;
+    mud:rotateZ "-28.6957"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0077 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "30.2174"^^xsd:float ;
+    mud:translateY "4.2609"^^xsd:float ;
+    mud:translateZ "122.3629"^^xsd:float ;
+    mud:scaleX "2.8478"^^xsd:float ;
+    mud:scaleY "0.3913"^^xsd:float ;
+    mud:scaleZ "21.0435"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-52.3913"^^xsd:float ;
+    mud:rotateZ "-30.2174"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0078 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "31.7391"^^xsd:float ;
+    mud:translateY "4.0870"^^xsd:float ;
+    mud:translateZ "121.6635"^^xsd:float ;
+    mud:scaleX "2.7826"^^xsd:float ;
+    mud:scaleY "0.3804"^^xsd:float ;
+    mud:scaleZ "20.3478"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-54.1304"^^xsd:float ;
+    mud:rotateZ "-31.7391"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0079 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "33.2609"^^xsd:float ;
+    mud:translateY "3.9130"^^xsd:float ;
+    mud:translateZ "120.7940"^^xsd:float ;
+    mud:scaleX "2.7174"^^xsd:float ;
+    mud:scaleY "0.3696"^^xsd:float ;
+    mud:scaleZ "19.6522"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-55.8696"^^xsd:float ;
+    mud:rotateZ "-33.2609"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0080 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "34.7826"^^xsd:float ;
+    mud:translateY "3.7391"^^xsd:float ;
+    mud:translateZ "119.7543"^^xsd:float ;
+    mud:scaleX "2.6522"^^xsd:float ;
+    mud:scaleY "0.3587"^^xsd:float ;
+    mud:scaleZ "18.9565"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-57.6087"^^xsd:float ;
+    mud:rotateZ "-34.7826"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0081 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "36.3043"^^xsd:float ;
+    mud:translateY "3.5652"^^xsd:float ;
+    mud:translateZ "118.5444"^^xsd:float ;
+    mud:scaleX "2.5870"^^xsd:float ;
+    mud:scaleY "0.3478"^^xsd:float ;
+    mud:scaleZ "18.2609"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-59.3478"^^xsd:float ;
+    mud:rotateZ "-36.3043"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0082 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "37.8261"^^xsd:float ;
+    mud:translateY "3.3913"^^xsd:float ;
+    mud:translateZ "117.1645"^^xsd:float ;
+    mud:scaleX "2.5217"^^xsd:float ;
+    mud:scaleY "0.3370"^^xsd:float ;
+    mud:scaleZ "17.5652"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-61.0870"^^xsd:float ;
+    mud:rotateZ "-37.8261"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0083 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "39.3478"^^xsd:float ;
+    mud:translateY "3.2174"^^xsd:float ;
+    mud:translateZ "115.6144"^^xsd:float ;
+    mud:scaleX "2.4565"^^xsd:float ;
+    mud:scaleY "0.3261"^^xsd:float ;
+    mud:scaleZ "16.8696"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-62.8261"^^xsd:float ;
+    mud:rotateZ "-39.3478"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0084 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "40.8696"^^xsd:float ;
+    mud:translateY "3.0435"^^xsd:float ;
+    mud:translateZ "113.8941"^^xsd:float ;
+    mud:scaleX "2.3913"^^xsd:float ;
+    mud:scaleY "0.3152"^^xsd:float ;
+    mud:scaleZ "16.1739"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-64.5652"^^xsd:float ;
+    mud:rotateZ "-40.8696"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0085 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "42.3913"^^xsd:float ;
+    mud:translateY "2.8696"^^xsd:float ;
+    mud:translateZ "112.0038"^^xsd:float ;
+    mud:scaleX "2.3261"^^xsd:float ;
+    mud:scaleY "0.3043"^^xsd:float ;
+    mud:scaleZ "15.4783"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-66.3043"^^xsd:float ;
+    mud:rotateZ "-42.3913"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0086 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "43.9130"^^xsd:float ;
+    mud:translateY "2.6957"^^xsd:float ;
+    mud:translateZ "109.9433"^^xsd:float ;
+    mud:scaleX "2.2609"^^xsd:float ;
+    mud:scaleY "0.2935"^^xsd:float ;
+    mud:scaleZ "14.7826"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-68.0435"^^xsd:float ;
+    mud:rotateZ "-43.9130"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0087 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "45.4348"^^xsd:float ;
+    mud:translateY "2.5217"^^xsd:float ;
+    mud:translateZ "107.7127"^^xsd:float ;
+    mud:scaleX "2.1957"^^xsd:float ;
+    mud:scaleY "0.2826"^^xsd:float ;
+    mud:scaleZ "14.0870"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-69.7826"^^xsd:float ;
+    mud:rotateZ "-45.4348"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0088 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "46.9565"^^xsd:float ;
+    mud:translateY "2.3478"^^xsd:float ;
+    mud:translateZ "105.3119"^^xsd:float ;
+    mud:scaleX "2.1304"^^xsd:float ;
+    mud:scaleY "0.2717"^^xsd:float ;
+    mud:scaleZ "13.3913"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-71.5217"^^xsd:float ;
+    mud:rotateZ "-46.9565"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0089 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "48.4783"^^xsd:float ;
+    mud:translateY "2.1739"^^xsd:float ;
+    mud:translateZ "102.7410"^^xsd:float ;
+    mud:scaleX "2.0652"^^xsd:float ;
+    mud:scaleY "0.2609"^^xsd:float ;
+    mud:scaleZ "12.6957"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-73.2609"^^xsd:float ;
+    mud:rotateZ "-48.4783"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0090 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:primary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "50.0000"^^xsd:float ;
+    mud:translateY "2.0000"^^xsd:float ;
+    mud:translateZ "100.0000"^^xsd:float ;
+    mud:scaleX "2.0000"^^xsd:float ;
+    mud:scaleY "0.2500"^^xsd:float ;
+    mud:scaleZ "12.0000"^^xsd:float ;
+    mud:rotateX "8.0000"^^xsd:float ;
+    mud:rotateY "-75.0000"^^xsd:float ;
+    mud:rotateZ "-50.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0091 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-15.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "110.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0092 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-16.2000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "108.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0093 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-17.4000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "107.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0094 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-18.6000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "105.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0095 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-19.8000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "104.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0096 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-21.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "102.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0097 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-22.2000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "101.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0098 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_left ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "-23.4000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "99.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "80.0000"^^xsd:float ;
+    mud:rotateZ "45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0099 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "15.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "110.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0100 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "16.2000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "108.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0101 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "17.4000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "107.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0102 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "18.6000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "105.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0103 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "19.8000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "104.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0104 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "21.0000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "102.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0105 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "22.2000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "101.0000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0106 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:secondary_wing_feathers_right ;
+    mud:primitiveFamily "feather_panel" ;
+    mud:translateX "23.4000"^^xsd:float ;
+    mud:translateY "6.0000"^^xsd:float ;
+    mud:translateZ "99.5000"^^xsd:float ;
+    mud:scaleX "1.5000"^^xsd:float ;
+    mud:scaleY "0.3000"^^xsd:float ;
+    mud:scaleZ "10.0000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "-80.0000"^^xsd:float ;
+    mud:rotateZ "-45.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0107 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:blade_left ;
+    mud:primitiveFamily "blade_prism" ;
+    mud:translateX "-25.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "75.0000"^^xsd:float ;
+    mud:scaleX "2.0000"^^xsd:float ;
+    mud:scaleY "2.0000"^^xsd:float ;
+    mud:scaleZ "40.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "-15.0000"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0108 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:blade_right ;
+    mud:primitiveFamily "blade_prism" ;
+    mud:translateX "25.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "75.0000"^^xsd:float ;
+    mud:scaleX "2.0000"^^xsd:float ;
+    mud:scaleY "2.0000"^^xsd:float ;
+    mud:scaleZ "40.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "15.0000"^^xsd:float ;
+    mud:materialBinding mud:M_CyanBlade .
+
+mud:prim_0109 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "105.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0110 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "107.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0111 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "109.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0112 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "111.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0113 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "113.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0114 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "115.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0115 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "117.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0116 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "0.0000"^^xsd:float ;
+    mud:translateY "-10.0000"^^xsd:float ;
+    mud:translateZ "119.0000"^^xsd:float ;
+    mud:scaleX "10.0000"^^xsd:float ;
+    mud:scaleY "6.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-10.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0117 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "95.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0118 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "97.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0119 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "99.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0120 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "101.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0121 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "95.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0122 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "97.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0123 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "99.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0124 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:thruster_cluster ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "4.0000"^^xsd:float ;
+    mud:translateY "-14.0000"^^xsd:float ;
+    mud:translateZ "101.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.0000"^^xsd:float ;
+    mud:rotateX "-30.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_GoldVisor .
+
+mud:prim_0125 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-15.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0126 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-15.4000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "120.5000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "5.0000"^^xsd:float ;
+    mud:rotateZ "5.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0127 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-15.8000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "121.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0128 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-16.2000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "5.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0129 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-16.6000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "120.5000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "5.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0130 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-17.0000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "121.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "5.0000"^^xsd:float ;
+    mud:rotateZ "10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0131 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-17.4000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0132 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-17.8000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "120.5000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "5.0000"^^xsd:float ;
+    mud:rotateZ "5.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0133 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "15.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-0.0000"^^xsd:float ;
+    mud:rotateZ "-0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0134 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "15.4000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "120.5000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-5.0000"^^xsd:float ;
+    mud:rotateZ "-5.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0135 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "15.8000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "121.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-0.0000"^^xsd:float ;
+    mud:rotateZ "-10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0136 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "16.2000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-5.0000"^^xsd:float ;
+    mud:rotateZ "-0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0137 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "16.6000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "120.5000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-0.0000"^^xsd:float ;
+    mud:rotateZ "-5.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0138 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "17.0000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "121.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-5.0000"^^xsd:float ;
+    mud:rotateZ "-10.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0139 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "17.4000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "120.0000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-0.0000"^^xsd:float ;
+    mud:rotateZ "-0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0140 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:shoulder_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "17.8000"^^xsd:float ;
+    mud:translateY "0.5000"^^xsd:float ;
+    mud:translateZ "120.5000"^^xsd:float ;
+    mud:scaleX "5.0000"^^xsd:float ;
+    mud:scaleY "7.0000"^^xsd:float ;
+    mud:scaleZ "5.0000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "-5.0000"^^xsd:float ;
+    mud:rotateZ "-5.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0141 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "110.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0142 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "107.8000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0143 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "105.6000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0144 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "103.4000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0145 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "101.2000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0146 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "99.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0147 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "96.8000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0148 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "94.6000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0149 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "92.4000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0150 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "90.2000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0151 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "88.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0152 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "85.8000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0153 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "110.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0154 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "107.8000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0155 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "105.6000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0156 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "103.4000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0157 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "101.2000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0158 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "99.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0159 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "96.8000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0160 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "94.6000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0161 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "92.4000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0162 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "90.2000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0163 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "88.0000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0164 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "20.0000"^^xsd:float ;
+    mud:translateY "0.0000"^^xsd:float ;
+    mud:translateZ "85.8000"^^xsd:float ;
+    mud:scaleX "3.0000"^^xsd:float ;
+    mud:scaleY "3.0000"^^xsd:float ;
+    mud:scaleZ "2.2000"^^xsd:float ;
+    mud:rotateX "0.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0165 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "85.0000"^^xsd:float ;
+    mud:scaleX "4.5000"^^xsd:float ;
+    mud:scaleY "4.5000"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0166 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "81.2000"^^xsd:float ;
+    mud:scaleX "4.4200"^^xsd:float ;
+    mud:scaleY "4.4200"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0167 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "77.4000"^^xsd:float ;
+    mud:scaleX "4.3400"^^xsd:float ;
+    mud:scaleY "4.3400"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0168 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "73.6000"^^xsd:float ;
+    mud:scaleX "4.2600"^^xsd:float ;
+    mud:scaleY "4.2600"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0169 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "69.8000"^^xsd:float ;
+    mud:scaleX "4.1800"^^xsd:float ;
+    mud:scaleY "4.1800"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0170 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "66.0000"^^xsd:float ;
+    mud:scaleX "4.1000"^^xsd:float ;
+    mud:scaleY "4.1000"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0171 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "62.2000"^^xsd:float ;
+    mud:scaleX "4.0200"^^xsd:float ;
+    mud:scaleY "4.0200"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0172 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "58.4000"^^xsd:float ;
+    mud:scaleX "3.9400"^^xsd:float ;
+    mud:scaleY "3.9400"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0173 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "54.6000"^^xsd:float ;
+    mud:scaleX "3.8600"^^xsd:float ;
+    mud:scaleY "3.8600"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0174 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "50.8000"^^xsd:float ;
+    mud:scaleX "3.7800"^^xsd:float ;
+    mud:scaleY "3.7800"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0175 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "47.0000"^^xsd:float ;
+    mud:scaleX "3.7000"^^xsd:float ;
+    mud:scaleY "3.7000"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0176 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "43.2000"^^xsd:float ;
+    mud:scaleX "3.6200"^^xsd:float ;
+    mud:scaleY "3.6200"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0177 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "39.4000"^^xsd:float ;
+    mud:scaleX "3.5400"^^xsd:float ;
+    mud:scaleY "3.5400"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0178 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "-8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "35.6000"^^xsd:float ;
+    mud:scaleX "3.4600"^^xsd:float ;
+    mud:scaleY "3.4600"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0179 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "85.0000"^^xsd:float ;
+    mud:scaleX "4.5000"^^xsd:float ;
+    mud:scaleY "4.5000"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0180 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "81.2000"^^xsd:float ;
+    mud:scaleX "4.4200"^^xsd:float ;
+    mud:scaleY "4.4200"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0181 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "77.4000"^^xsd:float ;
+    mud:scaleX "4.3400"^^xsd:float ;
+    mud:scaleY "4.3400"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0182 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "73.6000"^^xsd:float ;
+    mud:scaleX "4.2600"^^xsd:float ;
+    mud:scaleY "4.2600"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0183 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "69.8000"^^xsd:float ;
+    mud:scaleX "4.1800"^^xsd:float ;
+    mud:scaleY "4.1800"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0184 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "66.0000"^^xsd:float ;
+    mud:scaleX "4.1000"^^xsd:float ;
+    mud:scaleY "4.1000"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0185 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "62.2000"^^xsd:float ;
+    mud:scaleX "4.0200"^^xsd:float ;
+    mud:scaleY "4.0200"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0186 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "58.4000"^^xsd:float ;
+    mud:scaleX "3.9400"^^xsd:float ;
+    mud:scaleY "3.9400"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0187 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "54.6000"^^xsd:float ;
+    mud:scaleX "3.8600"^^xsd:float ;
+    mud:scaleY "3.8600"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0188 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "50.8000"^^xsd:float ;
+    mud:scaleX "3.7800"^^xsd:float ;
+    mud:scaleY "3.7800"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0189 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "47.0000"^^xsd:float ;
+    mud:scaleX "3.7000"^^xsd:float ;
+    mud:scaleY "3.7000"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0190 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "43.2000"^^xsd:float ;
+    mud:scaleX "3.6200"^^xsd:float ;
+    mud:scaleY "3.6200"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+mud:prim_0191 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "tapered_box" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "39.4000"^^xsd:float ;
+    mud:scaleX "3.5400"^^xsd:float ;
+    mud:scaleY "3.5400"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_DarkFrame .
+
+mud:prim_0192 rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "cylinder" ;
+    mud:translateX "8.0000"^^xsd:float ;
+    mud:translateY "-1.0000"^^xsd:float ;
+    mud:translateZ "35.6000"^^xsd:float ;
+    mud:scaleX "3.4600"^^xsd:float ;
+    mud:scaleY "3.4600"^^xsd:float ;
+    mud:scaleZ "3.8000"^^xsd:float ;
+    mud:rotateX "5.0000"^^xsd:float ;
+    mud:rotateY "0.0000"^^xsd:float ;
+    mud:rotateZ "0.0000"^^xsd:float ;
+    mud:materialBinding mud:M_WhiteArmor .
+
+
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix mud:  <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SOCKETS AND MOUNTS EXTENSION
+# ─────────────────────────────────────────────────────────────────────────────
+# This ontology extension defines specialized socket and mount types required
+# for the Combinatorial Engine, and enforces the "No Geometry Smuggling" rule.
+
+# Sockets are already defined in mech_factory_mud.ttl as:
+# mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true .
+# We declare the specialized socket types here.
+
+mud:WeaponSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Weapon Socket" .
+
+mud:SupportToolSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Support Tool Socket" .
+
+mud:VfxSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "VFX Socket" .
+
+mud:CameraSocket a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Camera Socket" .
+
+mud:LoadoutMount a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Loadout Mount" .
+
+mud:DamageZoneAnchor a owl:Class ;
+    rdfs:subClassOf mud:Socket ;
+    rdfs:label "Damage Zone Anchor" .
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SHACL VALIDATION: NO GEOMETRY SMUGGLING
+# ─────────────────────────────────────────────────────────────────────────────
+# "Sockets must not smuggle geometry."
+# We enforce this by ensuring no mud:GeometryPrimitive points to a Socket
+# using mud:belongsToPart.
+
+mud:SocketGeometrySmugglingShape a sh:NodeShape ;
+    sh:targetClass mud:Socket ;
+    sh:property [
+        sh:path [ sh:inversePath mud:belongsToPart ] ;
+        sh:maxCount 0 ;
+        sh:message "Sockets must not smuggle geometry. A mud:GeometryPrimitive must not have mud:belongsToPart pointing to a mud:Socket."
+    ] ;
+    sh:property [
+        sh:path mud:hasGeometry ;
+        sh:maxCount 0 ;
+        sh:message "Sockets must not smuggle geometry. mud:hasGeometry is forbidden on any Socket."
+    ] ;
+    sh:property [
+        sh:path core:mesh ;
+        sh:maxCount 0 ;
+        sh:message "Sockets must not smuggle geometry. core:mesh is forbidden on any Socket."
+    ] .
+
+# =========================================================
+# Destruction Ontology
+# =========================================================
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix ds: <https://ggen.io/ontology/destruction/> .
+
+ds:DestructionOntology a owl:Ontology ;
+    rdfs:label "Destruction States Ontology" ;
+    rdfs:comment "Combinatorial Destruction States: armor break states, exposed frame states, damaged material states, detached panel declarations, damage-zone transitions, VFX socket bindings." ;
+    owl:imports <https://ggen.io/ontology/core/> .
+
+# --- BASE DESTRUCTION STATE ---
+
+ds:DestructionState a owl:Class ;
+    rdfs:subClassOf core:Typestate ;
+    rdfs:label "Destruction State" ;
+    rdfs:comment "A branchless typestate defining deterministic destruction geometry and VFX triggers." .
+
+# --- 1. ARMOR BREAK STATES ---
+
+ds:ArmorBreakState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Armor Break State" ;
+    rdfs:comment "Admitted topology for fractured or completely broken armor plates." ;
+    core:compilesToZST true .
+
+# --- 2. EXPOSED FRAME STATES ---
+
+ds:ExposedFrameState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Exposed Frame State" ;
+    rdfs:comment "Admitted topology indicating the mechanical frame is exposed due to destroyed armor." ;
+    core:compilesToZST true .
+
+# --- 3. DAMAGED MATERIAL STATES ---
+
+ds:DamagedMaterialState a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Damaged Material State" ;
+    rdfs:comment "Admitted material shader typestate switching, e.g., scorched or ablated surfaces." ;
+    core:compilesToZST true .
+
+# --- 4. DETACHED PANEL DECLARATIONS ---
+
+ds:DetachedPanelDeclaration a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Detached Panel Declaration" ;
+    rdfs:comment "Authority declaration that a panel has fully detached from its socket." ;
+    core:compilesToZST true .
+
+# --- 5. DAMAGE-ZONE TRANSITIONS ---
+
+ds:DamageZoneTransition a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "Damage Zone Transition" ;
+    rdfs:comment "Branchless transition boundary between varying states of structural integrity." ;
+    core:compilesToZST true .
+
+# --- 6. VFX SOCKET BINDINGS ---
+
+ds:VFXSocketBinding a owl:Class ;
+    rdfs:subClassOf ds:DestructionState ;
+    rdfs:label "VFX Socket Binding" ;
+    rdfs:comment "Deterministic binding point for peer-projection VFX (e.g., spark emitters, smoke)." ;
+    core:compilesToZST true .
+
+
+# --- 7. SEMANTIC LOD MAPPINGS ---
+# Map the new high-poly USD files (1.8MB) back to the byte-class compact network payloads.
+
+mud:hasNetworkPayload a owl:ObjectProperty ;
+    rdfs:label "has Network Payload" ;
+    rdfs:comment "Maps a visual asset or part to its authoritative byte-class network payload." .
+
+mud:ue4TargetSurface a owl:DatatypeProperty ;
+    rdfs:label "UE4 Target Surface" ;
+    rdfs:comment "The target USD or UE4 surface for the part." .
+
+mud:torso_core 
+    mud:ue4TargetSurface "SM_Torso.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass, mud:StressClass, mud:FatigueClass ;
+    mud:lodClass "CROWN" .
+
+mud:head_unit 
+    mud:ue4TargetSurface "SM_Head.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass ;
+    mud:lodClass "CROWN" .
+
+mud:arm_left 
+    mud:ue4TargetSurface "SM_Limb_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:arm_right 
+    mud:ue4TargetSurface "SM_Limb_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:leg_left 
+    mud:ue4TargetSurface "SM_Limb_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:leg_right 
+    mud:ue4TargetSurface "SM_Limb_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:HeatClass, mud:SocketHealthClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:wing_root_left 
+    mud:ue4TargetSurface "SM_WingArray_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass ;
+    mud:lodClass "SECONDARY" .
+
+mud:wing_root_right 
+    mud:ue4TargetSurface "SM_WingArray_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass ;
+    mud:lodClass "SECONDARY" .
+
+mud:blade_left 
+    mud:ue4TargetSurface "SM_Blade_Left.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:FatigueClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:blade_right 
+    mud:ue4TargetSurface "SM_Blade_Right.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:FatigueClass ;
+    mud:lodClass "PRIMARY" .
+
+mud:backpack_core 
+    mud:ue4TargetSurface "SM_Loadout.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:HeatClass, mud:FatigueClass ;
+    mud:lodClass "SECONDARY" .
+

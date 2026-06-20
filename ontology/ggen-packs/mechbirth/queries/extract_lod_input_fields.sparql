@@ -1,0 +1,26 @@
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX mb:   <https://ggen.io/ontology/mechbirth/>
+
+# -----------------------------------------------------------------------------
+# SPARQL: extract_lod_input_fields.sparql
+# Bounded SELECT: extracts all LodInputField instances with authority semantics.
+# Drives the CF-4 bounds-check array and authority_score computation in Tera.
+# -----------------------------------------------------------------------------
+
+SELECT
+  ?fieldName
+  ?contributesToAuthorityScore
+  ?isExplicitAuthorityField
+  ?semantics
+WHERE {
+  ?field a mb:LodInputField ;
+         mb:fieldName ?fieldName ;
+         mb:contributesToAuthorityScore ?contributesToAuthorityScore .
+
+  OPTIONAL { ?field mb:isExplicitAuthorityField ?isExplicitAuthorityField . }
+  OPTIONAL { ?field mb:semantics ?semantics . }
+}
+ORDER BY ?fieldName

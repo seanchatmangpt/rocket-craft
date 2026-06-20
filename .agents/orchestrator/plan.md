@@ -1,59 +1,35 @@
-# Project: Eden Manufacturing Server Ontology
-# Scope: Complete Ontology and SPARQL Query suite implementation for Eden Manufacturing Server
+# Project: Asset Manufacturing LSP (ggen-asset-lsp)
+# Scope: Complete LSP server implementation using lsp-max for USDA/MaterialX diagnostics, visual proof routing, generator code actions, and OCEL integration.
 
 ## Architecture
-The Eden Manufacturing Server Ontology provides the semantic representation for Industry 4.0 reliability twin engineering, Combinatorial Assembly Trees, and the 5 Delta families in the Combinatorial Maximalist platform.
+The `ggen-asset-lsp` treats 3D assets (USD, MaterialX, textures, rigs, renders, receipts) as a diagnosable compiler surface. It maps asset pipeline errors and headless render results directly into LSP diagnostics and routes quick-fixes to generator parameter sources.
 
-- **Workspace Path**: `/Users/sac/.ggen/packs/eden_server`
-- **Ontology Layout**:
-  - `ontology/pack.ttl`: Core ontology importing FIBO, SOSA, QUDT, and PROV-O. Defines the Combinatorial Assembly Tree (mech root, subassemblies, parts, sockets) and reliability twin properties (damage, stress, heat, fatigue class) mapped as byte-class authority types.
-  - `ontology/deltas.ttl`: Formalizing the 5 Delta families: `AuthorityDelta`, `AssemblyDelta`, `ProjectionDelta`, `InterestDelta`, and `ReceiptDelta`.
-- **Query Layout**:
-  - `queries/substrate.rq`: SPARQL 1.1 query to extract the assembly root and tree.
-  - `queries/extract_authority_deltas.rq`: SPARQL 1.1 query to extract `AuthorityDelta` records.
-  - `queries/extract_assembly_deltas.rq`: SPARQL 1.1 query to extract `AssemblyDelta` records.
-  - `queries/extract_receipt_deltas.rq`: SPARQL 1.1 query to extract `ReceiptDelta` records.
-- **Verification Infrastructure**:
-  - A validation script will be written to parse Turtle (`.ttl`) files and SPARQL (`.rq`) files using Python's `rdflib` or other tools to check syntactic validity, RDF namespaces, classes/properties, and import declarations.
+- **Workspace Path**: `/Users/sac/rocket-craft`
+- **Crate Path**: `crates/ggen-asset-lsp`
+- **Asset Scope**: `generated/mech_assets/reference_fabric_001/`
+- **External Framework**: `/Users/sac/lsp-max`
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|---|---|---|---|
-| 1 | Workspace Initialization | Create workspace directories, prepare verification environment, check Python tools. | None | PLANNED |
-| 2 | RDF Ontology Authoring | Author `ontology/pack.ttl` and `ontology/deltas.ttl` with complete class hierarchies and public imports. | M1 | PLANNED |
-| 3 | SPARQL Query Suite Authoring | Author `queries/substrate.rq`, `queries/extract_authority_deltas.rq`, `queries/extract_assembly_deltas.rq`, and `queries/extract_receipt_deltas.rq`. | M1 | PLANNED |
-| 4 | Syntactic & Logic Verification | Run syntax parsing, validation tests, namespace checks, class structure validation. | M2, M3 | PLANNED |
-| 5 | Integrity Audit & Handoff | Run the Forensic Auditor to ensure zero violations, clean verdict, and generate final handoff. | M4 | PLANNED |
+| 1 | Exploration & Architecture Definition | Inspect lsp-max framework and examples, locate reference assets, define diagnostics mapping rules. | None | DONE |
+| 2 | Crate Setup & Workspace Cargo Setup | Create crates/ggen-asset-lsp, update root Cargo.toml, configure dependencies on lsp-max. | M1 | DONE |
+| 3 | Core LSP Server & Diagnostics | Implement LSP server shell, USD/MaterialX parsing, visual gap report routing. | M2 | DONE |
+| 4 | Code Actions & OCEL Integration | Implement generator code actions, emit OCEL events for validation/repair lifecycles. | M3 | DONE |
+| 5 | E2E Verification | Run review rounds and challenger tests on the core LSP server. | M4 | DONE |
+| 6 | Morphology & Modularity Updates | Implement VIS200 morphology and USD300 modularity diagnostics (fingerprints, part boundaries, transform proofs). | M5 | IN_PROGRESS |
+| 7 | Final Forensic Audit & Handoff | Run the Forensic Auditor to check for integrity violations and prepare the final handoff. | M6 | PLANNED |
 
-## Interface & Ontology Contracts
-### Prefix / Namespaces
-- `rdf`: `http://www.w3.org/1999/02/22-rdf-syntax-ns#`
-- `rdfs`: `http://www.w3.org/2000/01/rdf-schema#`
-- `owl`: `http://www.w3.org/2002/07/owl#`
-- `xsd`: `http://www.w3.org/2001/XMLSchema#`
-- `eden`: `https://ggen.io/ontology/eden-server/`
-- `fibo`: `https://spec.edmcouncil.org/fibo/ontology/`
-- `sosa`: `http://www.w3.org/ns/sosa/`
-- `qudt`: `http://qudt.org/schema/qudt/`
-- `prov`: `http://www.w3.org/ns/prov#`
+## Interface & Diagnostic Contracts
+### Diagnostics Rules
+- **Missing Payload**: A prim of type `Mesh` or similar that should reference a payload, but lacks a valid reference (e.g. `payload = @mesh.usd@` missing).
+- **Missing Material Binding**: A prim lacking a material binding, or referencing a non-existent material.
+- **Unreceipted USD Prim**: Prims that do not have associated cryptographic receipts.
+- **Visual Gap Routing**: If `visual_gap_report.json` indicates silhouette IOU < threshold, project error on the root Xform/Mesh in USDA.
+- **usdchecker Logs**: Project usdchecker errors onto the matching USDA lines.
 
-### Imports
-`ontology/pack.ttl` must declare:
-```turtle
-owl:imports <https://spec.edmcouncil.org/fibo/ontology/> ,
-            <http://www.w3.org/ns/sosa/> ,
-            <http://qudt.org/schema/qudt/> ,
-            <http://www.w3.org/ns/prov#> .
-```
+### Code Actions
+- Targets the **source** (e.g., `template.usda.tera`, SPARQL queries, or Rust parameter row), NOT the generated USDA.
 
-### Class Hierarchy Details
-- **Assembly Tree**:
-  - `eden:AssemblyComponent` as a base class.
-  - `eden:MechRoot`, `eden:SubAssembly`, `eden:Part`, and `eden:Socket` as subclasses.
-  - Sockets represent connection points. Parts plug into sockets.
-- **Reliability Twin Properties**:
-  - `eden:damageClass`, `eden:stressClass`, `eden:heatClass`, `eden:fatigueClass` (or classes/properties as needed).
-  - Properties mapping to byte-class authority values (e.g. `xsd:unsignedByte`).
-- **Deltas**:
-  - `eden:Delta` as base class.
-  - Subclasses: `eden:AuthorityDelta`, `eden:AssemblyDelta`, `eden:ProjectionDelta`, `eden:InterestDelta`, `eden:ReceiptDelta`.
+### OCEL Events
+- Emit OCEL events (e.g. `validate`, `repair`) whenever validation or repairs are executed.

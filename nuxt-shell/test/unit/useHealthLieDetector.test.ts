@@ -105,10 +105,56 @@ describe('detectLies — LIE-4', () => {
   })
 })
 
+// ── LIE-5: FAIL receipt on session with lawful events ────────────────────────
+
+describe('detectLies — LIE-5', () => {
+  it('FAIL receipt with ocel_event_count > 0 → LIE-5', () => {
+    const lies = detectLies(null, null, null, [{ id: 'r1', session_id: 's1' }])
+    expect(lies).toHaveLength(1)
+    expect(lies[0]!.code).toBe('LIE-5')
+  })
+
+  it('LIE-5 description mentions possible false rejection', () => {
+    const lies = detectLies(null, null, null, [{ id: 'r1', session_id: 's1' }])
+    expect(lies[0]!.description.toLowerCase()).toContain('false rejection')
+  })
+
+  it('LIE-5 evidence contains receipt_id and session_id', () => {
+    const lies = detectLies(null, null, null, [{ id: 'r99', session_id: 'sess-abc' }])
+    const evidence = lies[0]!.evidence as { receipts: Array<{ receipt_id: string; session_id: string }> }
+    expect(evidence.receipts[0]).toMatchObject({ receipt_id: 'r99', session_id: 'sess-abc' })
+  })
+
+  it('empty LIE-5 rows → no LIE-5', () => {
+    const lies = detectLies(null, null, null, [])
+    expect(lies.map(l => l.code)).not.toContain('LIE-5')
+  })
+})
+
+// ── LIE-6: NULL verdict receipt ───────────────────────────────────────────────
+
+describe('detectLies — LIE-6', () => {
+  it('receipt with NULL verdict → LIE-6', () => {
+    const lies = detectLies(null, null, null, null, [{ id: 'r2', session_id: 's2' }])
+    expect(lies).toHaveLength(1)
+    expect(lies[0]!.code).toBe('LIE-6')
+  })
+
+  it('LIE-6 description mentions never finalized', () => {
+    const lies = detectLies(null, null, null, null, [{ id: 'r2', session_id: 's2' }])
+    expect(lies[0]!.description.toLowerCase()).toContain('never finalized')
+  })
+
+  it('empty LIE-6 rows → no LIE-6', () => {
+    const lies = detectLies(null, null, null, null, [])
+    expect(lies.map(l => l.code)).not.toContain('LIE-6')
+  })
+})
+
 // ── Multiple simultaneous lies ────────────────────────────────────────────────
 
 describe('detectLies — multiple lies', () => {
-  it('all three violated → three lies in order LIE-1, LIE-2, LIE-4', () => {
+  it('all three classic violated → three lies in order LIE-1, LIE-2, LIE-4', () => {
     const lies: HealthLie[] = detectLies(
       [{ id: 'r1' }],
       [{ id: 's1', project_name: 'Brm' }],
@@ -116,6 +162,18 @@ describe('detectLies — multiple lies', () => {
     )
     expect(lies).toHaveLength(3)
     expect(lies.map(l => l.code)).toEqual(['LIE-1', 'LIE-2', 'LIE-4'])
+  })
+
+  it('all 5 lie types → 5 lies in order', () => {
+    const lies: HealthLie[] = detectLies(
+      [{ id: 'r1' }],
+      [{ id: 's1', project_name: 'Brm' }],
+      [{ id: 'syn-1' }],
+      [{ id: 'r2', session_id: 's2' }],
+      [{ id: 'r3', session_id: 's3' }],
+    )
+    expect(lies).toHaveLength(5)
+    expect(lies.map(l => l.code)).toEqual(['LIE-1', 'LIE-2', 'LIE-4', 'LIE-5', 'LIE-6'])
   })
 
   it('LIE-1 + LIE-4 but no stale sessions → two lies, no LIE-2', () => {

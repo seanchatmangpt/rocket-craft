@@ -1,0 +1,35 @@
+// ggen-manufactured Skin Surrogate Law
+// DO NOT EDIT BY HAND.
+// Hash: {{ __ggen_source_hash }}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SkinSurrogate {
+    pub thermal_zone_id: u8,
+    pub damage_mask_id: u8,
+}
+
+pub const SKIN_SURROGATES: &[SkinSurrogate] = &[
+{% for row in results %}
+    SkinSurrogate {
+        thermal_zone_id: {{ row.thermalZoneId }},
+        damage_mask_id: {{ row.damageMaskId }},
+    },
+{% endfor %}
+];
+
+// Branchless mapping from authority heat/damage to skin projection state
+#[inline(always)]
+pub fn compute_skin_projection(surrogate_index: usize, heat_class: u8, damage_class: u8) -> u16 {
+    let surrogate = &SKIN_SURROGATES[surrogate_index];
+    
+    // Branchless accumulation: 
+    // Top 8 bits = (thermal_zone_id * heat_class) projection mapping
+    // Bottom 8 bits = (damage_mask_id * damage_class) projection mapping
+    // (This is a surrogate demonstration of branchless typestate projection)
+    
+    let thermal_projection = surrogate.thermal_zone_id.wrapping_mul(heat_class) as u16;
+    let damage_projection = surrogate.damage_mask_id.wrapping_mul(damage_class) as u16;
+    
+    (thermal_projection << 8) | damage_projection
+}

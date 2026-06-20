@@ -1,0 +1,12 @@
+{
+  "sequence": 1,
+  "event_type": "...",
+  "surface": "mech_factory_mud",
+  "objects": ["..."],
+  "input_hash": "...",
+  "output_hash": "...",
+  "prev_hash": "...",
+  "receipt": "...",
+  "status": "ADMITTED|REFUSED|RESIDUAL",
+  "residuals": []
+}

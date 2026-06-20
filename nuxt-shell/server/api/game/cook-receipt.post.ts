@@ -33,6 +33,7 @@ import { createClient } from '@supabase/supabase-js'
 import * as ed from '@noble/ed25519'
 import { emitOtelSpans } from '../../utils/otlp-emitter'
 import { runProofGates } from '../../utils/proofGates'
+import { auditGateRun } from '../../utils/proofGateAudit'
 
 function canonicalJSON(obj: unknown): string {
   if (obj === null || obj === undefined) return 'null'
@@ -76,9 +77,32 @@ export default defineEventHandler(async (event) => {
   } = body ?? {}
 
   // ── Proof gates (pure functions from proofGates.ts) ───────────────────────
-  const gateResult = runProofGates({ verdict, milestone, engine_source, receipt_hash, ocel_lifecycle })
+  const gateInput = { verdict, milestone, engine_source, receipt_hash, ocel_lifecycle }
+  const gateResult = runProofGates(gateInput)
+
+  // Supabase client needed for audit; construct lazily but before throwing
+  const supabaseUrl = process.env.SUPABASE_URL ?? 'http://localhost:54321'
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const sbForAudit = serviceKey ? createClient(supabaseUrl, serviceKey) : null
+
   if (!gateResult.ok) {
+    // Map message → gate name for the audit row
+    const gateNameMap: Record<string, string> = {
+      'Missing required fields': 'required_fields',
+      'receipt_hash must be': 'receipt_hash_format',
+      'synthetic': 'not_synthetic',
+      'ocel_lifecycle': 'lifecycle_complete',
+    }
+    const failedGate = Object.entries(gateNameMap).find(([k]) => gateResult.message?.includes(k))?.[1] ?? 'unknown'
+    if (sbForAudit && session_id) {
+      auditGateRun(sbForAudit, session_id, gateInput, failedGate, gateResult.message ?? null)
+    }
     throw createError({ statusCode: gateResult.statusCode ?? 400, message: gateResult.message ?? 'Proof gate rejected' })
+  }
+
+  // Gates passed — record audit (fire-and-forget)
+  if (sbForAudit && session_id) {
+    auditGateRun(sbForAudit, session_id, gateInput, null, null)
   }
 
   // ── Proof gate 4: Ed25519 signature (required in production) ───────────────
@@ -95,13 +119,11 @@ export default defineEventHandler(async (event) => {
   }
 
   // ── Insert into game_receipts ───────────────────────────────────────────────
-  const supabaseUrl = process.env.SUPABASE_URL ?? 'http://localhost:54321'
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!serviceKey) {
     throw createError({ statusCode: 503, message: 'SUPABASE_SERVICE_ROLE_KEY not configured' })
   }
 
-  const supabase = createClient(supabaseUrl, serviceKey)
+  const supabase = sbForAudit!
 
   const { data: receipt, error: insertErr } = await supabase
     .from('game_receipts')
@@ -142,10 +164,12 @@ export default defineEventHandler(async (event) => {
       activity: 'ReceiptEmitted',
       timestamp_ms: Date.now(),
       session_id,
+      // OCEL linkage fields — close the OTel ↔ OCEL correlation gap
+      receipt_id: receipt.id,
+      receipt_hash,
+      ocel_event_count: Number(ocel_event_count ?? 0),
       attributes: {
         signer: 'proof_aggregator',
-        receipt_id: receipt.id,
-        receipt_hash,
         verdict,
         algorithm: 'BLAKE3',
       },

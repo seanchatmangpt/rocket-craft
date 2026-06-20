@@ -137,19 +137,29 @@ export default defineEventHandler(async (event) => {
 
   const receipt = receiptRes.error ? null : (receiptRes.data as ReceiptRow);
 
-  // BLAKE3 pack hash covers ocel + chain_proof + receipt (tamper detection)
+  // Nested content hashes — each section is independently committed so any
+  // mutation to payload fields changes the corresponding section hash, which
+  // then changes pack_hash. Summary-only hashing cannot detect content tampering.
+  const ocelHash = blake3Hex(canonicalize(ocel2));
+  const chainProofHash = blake3Hex(canonicalize(chainEvents));
+  const receiptContentHash = receipt ? blake3Hex(canonicalize(receipt)) : null;
+
+  // pack_hash binds all three content hashes together (not summaries)
   const packPayload = {
     session_id: body.session_id,
+    ocel_hash: ocelHash,
+    chain_proof_hash: chainProofHash,
+    receipt_content_hash: receiptContentHash,
+    // summary fields kept for fast pre-check before full re-hash
     ocel_event_count: rows.length,
     chain_intact: chainIntact,
     chain_tip: chainTip,
-    receipt_hash: receipt?.receipt_hash ?? null,
-    verdict: receipt?.verdict ?? null,
+    merkle_root: merkleRoot,
   };
   const packHash = blake3Hex(canonicalize(packPayload));
 
   return {
-    schema_version: '1.0',
+    schema_version: '2.0',
     pack_hash: packHash,
     pack_algorithm: 'BLAKE3',
     generated_at: new Date().toISOString(),
@@ -163,6 +173,10 @@ export default defineEventHandler(async (event) => {
       activities,
       verdict: receipt?.verdict ?? null,
       engine_source: receipt?.engine_source ?? null,
+      // nested content hashes — a verifier recomputes these to detect tampering
+      ocel_hash: ocelHash,
+      chain_proof_hash: chainProofHash,
+      receipt_content_hash: receiptContentHash,
     },
     ocel: ocel2,
     chain_proof: {

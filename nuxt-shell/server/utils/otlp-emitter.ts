@@ -48,6 +48,10 @@ export interface OtlpSpan {
 /**
  * Caller-facing span descriptor — a simplified view that the utility converts
  * to the OTLP wire format.
+ *
+ * The OCEL linkage fields (receipt_id, receipt_hash, ocel_event_count, chain_tip)
+ * close the correlation gap between OTel traces and OCEL sessions: a process mining
+ * tool can join on receipt_id to link every OTel trace back to its OCEL event log.
  */
 export interface SpanDescriptor {
   /** Human-readable activity name — becomes "ocel.<activity>" as the span name. */
@@ -58,6 +62,15 @@ export interface SpanDescriptor {
   session_id: string;
   /** Additional key-value attributes merged into the OTLP span. */
   attributes?: Record<string, string | number | boolean>;
+  // ── OCEL linkage (gap-12) ──────────────────────────────────────────────────
+  /** Receipt UUID that finalised this session — enables OTel ↔ OCEL join. */
+  receipt_id?: string;
+  /** BLAKE3 hash of the receipt payload — tamper detection for cross-stream joins. */
+  receipt_hash?: string;
+  /** Total OCEL events in this session at the time the span was emitted. */
+  ocel_event_count?: number;
+  /** BLAKE3 hash of the last OCEL event — proves chain tip at this point in time. */
+  chain_tip?: string;
 }
 
 /** Return shape from both emit variants. */
@@ -230,6 +243,12 @@ export async function emitOtelSpans(descriptors: SpanDescriptor[]): Promise<Emit
       toOtlpAttr('game.activity', desc.activity),
       toOtlpAttr('game.timestamp_ms', desc.timestamp_ms),
     ];
+    // OCEL linkage attributes — present only when the span is tied to a receipt/chain
+    const ocelLink: OtlpAttribute[] = [];
+    if (desc.receipt_id)        ocelLink.push(toOtlpAttr('ocel.receipt_id', desc.receipt_id));
+    if (desc.receipt_hash)      ocelLink.push(toOtlpAttr('ocel.receipt_hash', desc.receipt_hash));
+    if (desc.ocel_event_count != null) ocelLink.push(toOtlpAttr('ocel.event_count', desc.ocel_event_count));
+    if (desc.chain_tip)         ocelLink.push(toOtlpAttr('ocel.chain_tip', desc.chain_tip));
     const extra: OtlpAttribute[] = Object.entries(desc.attributes ?? {}).map(([k, v]) =>
       toOtlpAttr(k, v),
     );
@@ -240,7 +259,7 @@ export async function emitOtelSpans(descriptors: SpanDescriptor[]): Promise<Emit
       name: `ocel.${desc.activity}`,
       startTimeUnixNano: startNs.toString(),
       endTimeUnixNano: (startNs + 1_000_000n).toString(),
-      attributes: [...builtIn, ...extra],
+      attributes: [...builtIn, ...ocelLink, ...extra],
       status: { code: 1 }, // STATUS_CODE_OK
     };
   });

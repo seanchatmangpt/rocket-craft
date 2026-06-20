@@ -1,0 +1,14 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX mud: <https://rocket-craft.com/ontology/mud#>
+
+SELECT ?material ?color ?roughness ?emissive ?metallic ?materialLocalName
+WHERE {
+  ?material rdf:type mud:Material ;
+            mud:color ?color ;
+            mud:roughness ?roughness ;
+            mud:emissive ?emissive ;
+            mud:metallic ?metallic .
+            
+  BIND(STRAFTER(STR(?material), "#") AS ?materialLocalName)
+}
+ORDER BY ?material

@@ -1396,3 +1396,138 @@ Convert as many of the existing Python scripts (e.g., `scripts/mud_gap_check.py`
 
 **CRITICAL OVERRIDE FROM USER**: Ensure you launch a 10-agent team to accomplish this, matching the user's initial `/teamwork-preview launch 10 agents to complete GC-MECH-FACTORY-MUD-002` command.
 </USER_REQUEST>
+
+## 2026-06-20T00:19:04Z
+
+<USER_REQUEST>
+20-AGENT CORRECTION — DETERMINISTIC VISUAL-CONVERGENCE MANUFACTURING
+
+Stop asking what dimension to optimize.
+The dimension is: DETERMINISTIC_VISUAL_CONVERGENCE_MANUFACTURING
+
+The prior output failed because it produced USD text, payload references, missing meshes, block proxy geometry, and claims of pipeline readiness, but did not produce a visible mech matching the reference image, a headless render, a similarity report, a geometry gap ledger, or a closed manufacturing loop.
+
+From this point forward, do not claim asset generation unless the generated asset can be rendered headlessly and compared against the reference image.
+
+---
+# Mission
+Create a zero-human, ggen-driven manufacturing loop that turns the reference image into a deterministic, generated USD/MaterialX/texture/gameplay-ready asset approximation.
+The goal is not perfect copy. The goal is a measurable, improving, procedurally generated mech whose rendered silhouette, color distribution, wing structure, weapon structure, and material layout converge toward the reference under verifier control.
+
+No artist. No Blender manual edit. No Maya manual edit. No Unreal clicking. No payload placeholders. No “artist will fill this in.” No “LLM cannot generate geometry” excuses.
+
+If a human would sculpt it, ggen must instead generate a grammar, parameters, meshes, materials, textures, and validation loop.
+
+---
+# Active Milestone
+GC-MECH-ASSET-FABRIC-001: REFERENCE_IMAGE_TO_GENERATED_USD_VISUAL_CONVERGENCE
+Expected status: PARTIAL_ALIVE
+Expected scoped status when admitted: REFERENCE_TO_USD_RENDER_VERIFIED_UNDER_SCOPE
+
+---
+# Core Pipeline
+reference image → extract visual measurements → generate part grammar → emit USD/USDA geometry → emit MaterialX/OpenPBR materials → emit procedural textures → render headlessly → compare render to reference → emit gap report → patch generator parameters → repeat → receipt admitted result
+
+The generated USD is the manufactured artifact. The verifier decides whether the artifact has standing.
+
+---
+# Required Inputs
+Use the image at: /Users/sac/Documents/Papers/61gOtV1wnAL._AC_SL1200_.jpg
+Also support a copied project-local reference path: references/mech/61gOtV1wnAL._AC_SL1200_.jpg
+Do not modify the source image.
+
+---
+# Required Output Directory
+Write all artifacts under: generated/mech_assets/reference_fabric_001/
+Required structure:
+reference/ (reference_original.jpg, reference_silhouette.png, reference_measurements.json)
+graph/ (asset_fabric.ttl, visual_targets.ttl, generator_parameters.ttl)
+queries/ (candidate_parts.rq, usd_prims.rq, materials.rq)
+templates/ (usd/asset.usda.tera, usd/part_mesh.usda.tera, materialx/materials.mtlx.tera)
+usd/ (ASSET_ReferenceFabric_001.usda, SM_Torso.usda, SM_Head.usda, SM_WingArray_Left.usda, SM_WingArray_Right.usda, SM_Blade_Left.usda, SM_Blade_Right.usda)
+materialx/ (M_WhiteArmor.mtlx, M_CyanBlade.mtlx, M_DarkFrame.mtlx, M_GoldVisor.mtlx)
+textures/ (texture manifests and PNGs)
+renders/ (render_front.png, render_angled.png, render_silhouette.png)
+reports/ (visual_gap_report.json, verifier_report.md)
+ocel/ (asset_manufacturing.ocel.json)
+receipts/ (asset_receipts.jsonl)
+
+---
+# Required Visual Targets
+Extract these from the reference image using scriptable computer vision (write to reference_measurements.json):
+silhouette mask, edge map, dominant color palette, white/black/cyan/yellow/red color proportions, bounding box, aspect ratio, wing span estimate, central torso mass estimate, left/right symmetry estimate, cyan weapon/blade regions, head/visor highlight region.
+No subjective labels. Only measured values.
+
+---
+# Required Generated Geometry Grammar
+Do not handwrite a single block proxy. Generate a part grammar.
+Minimum generated part families: torso_core, head_unit, v_fin_left/right, shoulder_left/right, arm_left/right, leg_left/right, wing_root_left/right, primary_wing_feathers_left/right, secondary_wing_feathers_left/right, blade_left/right, backpack_core, thruster_cluster.
+Minimum geometry primitive families: tapered_box, beveled_panel, triangular_fin, feather_panel, wing_binder, cylinder_joint, sphere_joint, blade_prism, armor_shell, greeble_panel.
+Minimum generated USD prim count: >= 120
+Minimum wing-feather panels: >= 48
+Minimum material bindings: >= 4
+
+---
+# Required ggen Behavior
+ggen must generate actual visible geometry. Outputs must not have missing payloads, empty `def Mesh`, zero-point meshes, or renders that show only a sphere/cylinder.
+
+---
+# Required Headless Render
+Render the generated USD from front and angled_three_quarter cameras. Output to renders/render_front.png and renders/render_angled.png.
+Use any available headless renderer in the environment (usdrecord, Blender background mode, Python OpenGL).
+Manual screenshot/viewport approval is FORBIDDEN.
+
+---
+# Required Similarity Metrics
+Compare the generated render to the reference. Write to reports/visual_gap_report.json with metrics: silhouette_iou, edge_similarity, color_palette_similarity, cyan_region_similarity, symmetry_delta, wing_span_delta, body_mass_delta, usd_prim_count, material_binding_count, wing_feather_count, status, residuals.
+Initial acceptance threshold: usd parses, render exists, usd_prim_count >= 120, wing_feather_count >= 48, material_binding_count >= 4, silhouette_iou >= 0.25, color_palette_similarity >= 0.50.
+
+---
+# Required Falsification & Counterfactuals
+Falsify: MISSING_WING_ARRAY, ZERO_POINT_MESH, MISSING_MATERIAL_BINDING, RENDER_NOT_CREATED, LOW_PRIM_COUNT, LOW_FEATHER_COUNT, TEXTURE_MANIFEST_MISSING, REFERENCE_MEASUREMENTS_MISSING.
+Counterfactuals: DOUBLE_WING_FEATHERS, HALF_WING_FEATHERS, REMOVE_CYAN_BLADES, INCREASE_WHITE_ARMOR_RATIO, DECREASE_CORE_BODY_WIDTH, INCREASE_WING_SPAN, REMOVE_GOLD_VISOR, ADD_RED_MICRO_DECALS.
+
+---
+# Required Gap Checker
+Create scripts/asset_fabric_gap_check.py. Must compute admission status from files and metrics.
+
+---
+# Required Commands
+Implement scripts for: extract_reference_visual_targets.py, ggen sync, render_reference_fabric.py, compare_reference_render.py, asset_fabric_gap_check.py.
+
+---
+# Required Final Response
+Respond ONLY with the exact template format requested:
+Milestone:
+Computed status:
+Computed scoped status:
+Commands run:
+Files created:
+...
+Gap checker result:
+Requirements passed:
+Requirements failed:
+Remaining gaps:
+Agent Jidoka events:
+Residuals:
+Next implementation slice:
+
+---
+# Forbidden
+Do not say "LLMs cannot generate geometry" or "artist must sculpt it". No human surface owns standing. The generated render is the first visual proof.
+</USER_REQUEST>
+
+## 2026-06-20T00:55:24Z
+
+<USER_REQUEST>
+Stop incremental improvement of the current render. Reclassify the current blob/line-wing/duplicate-USD output as a negative fixture. Target AAA_UE4_MECH_PACK_001 using combinatorial maximalism.
+
+Construct the full design-space product for AAA UE4 mech assets: geometry topology, hard-surface detail, PBR materials, textures, rig, sockets, collision, LODs, animation hooks, gameplay byte zones, UE4 import/cook, IP-distance, receipts, and replay.
+
+Run parallel generation swarms across the design-space axes. Generate many candidates, refuse aggressively, and admit only candidates that pass modular USD identity, part-aware morphology, PBR texture completeness, rig/socket validity, UE4 import/cook, generic IP-distance, OCEL, receipts, and deletion replay.
+
+Do not patch emitted USD manually. Patch source law, SPARQL row selection, Tera templates, geometry generators, material generators, texture generators, rig generators, and UE4 import projections.
+
+The crown is not a prettier render. The crown is a replayable UE4-ready mech asset pack with admitted variants.
+</USER_REQUEST>
+

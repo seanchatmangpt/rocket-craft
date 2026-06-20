@@ -1,0 +1,8 @@
+family_name,requires_socket,heat_sensitive,stress_sensitive,leg_damage_sensitive,admission_status
+Brace,false,false,true,false,ADMITTED
+Collapse,false,false,false,false,ADMITTED
+FireWeapon,true,true,true,false,ADMITTED
+Recover,false,false,true,false,ADMITTED
+Repair,true,false,false,false,ADMITTED
+Run,false,false,false,true,ADMITTED
+Walk,false,false,false,true,ADMITTED

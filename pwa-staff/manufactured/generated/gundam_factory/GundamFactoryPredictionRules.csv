@@ -1,0 +1,5 @@
+rule_id,input_field,threshold,predicted_output,confidence_decay_per_tick,status
+PRED-001,heat_class,12,damage_risk_high,1,CANDIDATE
+PRED-002,stress_class,10,socket_failure_risk,2,CANDIDATE
+PRED-003,future_heat+stress,20,lod_promote_candidate,1,SHADOW
+PRED-004,future_damage,13,refuse_fire_weapon,1,CANDIDATE

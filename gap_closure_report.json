@@ -1,0 +1,371 @@
+{
+  "milestone": "GC-MECH-ASSET-FABRIC-001",
+  "status": "VERIFIED",
+  "scoped_status": "REFERENCE_TO_USD_RENDER_VERIFIED_UNDER_SCOPE",
+  "requirements_total": 30,
+  "requirements_passed": 30,
+  "requirements_failed": 0,
+  "failed_requirements": [],
+  "passed_requirements": [
+    {
+      "id": "REFERENCE_MEASUREMENTS_EXIST",
+      "description": "reference_measurements.json exists",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "GGEN_SYNC_PASSES",
+      "description": "ggen sync runs and outputs files",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "USD_ASSEMBLY_EXISTS",
+      "description": "ASSET_ReferenceFabric_001.usda exists",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "USD_MESH_FILES_EXIST",
+      "description": "Part USD files exist",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "USD_PARSES",
+      "description": "USD files are valid and parseable",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "USD_PRIM_COUNT_GE_120",
+      "description": "usd_prim_count >= 120",
+      "expected": ">=120",
+      "actual": "1072",
+      "status": "PASSED"
+    },
+    {
+      "id": "WING_FEATHER_COUNT_GE_48",
+      "description": "wing_feather_count >= 48",
+      "expected": ">=48",
+      "actual": "340",
+      "status": "PASSED"
+    },
+    {
+      "id": "MATERIAL_BINDINGS_GE_4",
+      "description": "material_binding_count >= 4",
+      "expected": ">=4",
+      "actual": "1020",
+      "status": "PASSED"
+    },
+    {
+      "id": "MATERIALX_FILES_GE_4",
+      "description": "4 MaterialX files exist",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "TEXTURE_MANIFEST_EXISTS",
+      "description": "texture_manifest.json exists",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "RENDER_FRONT_EXISTS",
+      "description": "render_front.png exists",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "RENDER_ANGLED_EXISTS",
+      "description": "render_angled.png exists",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "SILHOUETTE_IOU_GE_025",
+      "description": "silhouette_iou >= 0.25",
+      "expected": ">=0.25",
+      "actual": "0.2820123667781105",
+      "status": "PASSED"
+    },
+    {
+      "id": "COLOR_PALETTE_SIMILARITY_GE_050",
+      "description": "color_palette_similarity >= 0.50",
+      "expected": ">=0.50",
+      "actual": "0.7730427124151055",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_PART_GRAPH_SIMILARITY",
+      "description": "part_graph_similarity >= 0.90",
+      "expected": ">=0.90",
+      "actual": "1.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_WING_LAYERS",
+      "description": "wing_layer_count_delta <= 1.0",
+      "expected": "<=1.0",
+      "actual": "0.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_FEATHER_CURVATURE",
+      "description": "feather_panel_curvature_score >= 0.10",
+      "expected": ">=0.10",
+      "actual": "1.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_FEATHER_OVERLAP",
+      "description": "feather_overlap_depth_score >= 0.10",
+      "expected": ">=0.10",
+      "actual": "1.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_CORE_COMPACTNESS",
+      "description": "core_compactness_delta <= 0.15",
+      "expected": "<=0.15",
+      "actual": "0.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_HEAD_TORSO_RATIO",
+      "description": "head_to_torso_ratio_delta <= 0.15",
+      "expected": "<=0.15",
+      "actual": "0.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_BLADE_GEOMETRY",
+      "description": "blade_length_angle_delta <= 15.0",
+      "expected": "<=15.0",
+      "actual": "0.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_ARMOR_SEGMENTATION",
+      "description": "armor_shell_segmentation_score >= 0.04",
+      "expected": ">=0.04",
+      "actual": "1.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_EDGE_DENSITY",
+      "description": "edge_density_distribution similarity >= 0.60",
+      "expected": ">=0.60",
+      "actual": "1.0",
+      "status": "PASSED"
+    },
+    {
+      "id": "MORPHOLOGY_COMPONENTS",
+      "description": "1 <= foreground_component_count <= 5",
+      "expected": "[1,5]",
+      "actual": "1",
+      "status": "PASSED"
+    },
+    {
+      "id": "USD_MODULAR_IDENTITY",
+      "description": "No USD modularity errors",
+      "expected": "0",
+      "actual": "0",
+      "status": "PASSED"
+    },
+    {
+      "id": "FALSIFICATION_CASES_GE_8_PASS",
+      "description": "At least 8 falsification cases successfully pass",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "COUNTERFACTUAL_CASES_GE_8_PASS",
+      "description": "At least 8 counterfactual cases successfully pass",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "OCEL_EXISTS",
+      "description": "asset_manufacturing.ocel.json exists",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "RECEIPTS_EXIST",
+      "description": "asset_receipts.jsonl exists",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    },
+    {
+      "id": "REPORTS_UPDATED",
+      "description": "Markdown/JSON verifier reports are present",
+      "expected": "True",
+      "actual": "True",
+      "status": "PASSED"
+    }
+  ],
+  "falsification_cases": [
+    {
+      "case": "MISSING_WING_ARRAY",
+      "status": "PASSED",
+      "expected": "REFUSED (MISSING_WING_ARRAY)",
+      "actual": "REFUSED (MISSING_WING_ARRAY)"
+    },
+    {
+      "case": "ZERO_POINT_MESH",
+      "status": "PASSED",
+      "expected": "REFUSED (ZERO_POINT_MESH)",
+      "actual": "REFUSED (ZERO_POINT_MESH)"
+    },
+    {
+      "case": "MISSING_MATERIAL_BINDING",
+      "status": "PASSED",
+      "expected": "REFUSED (MISSING_MATERIAL_BINDING)",
+      "actual": "REFUSED (MISSING_MATERIAL_BINDING)"
+    },
+    {
+      "case": "RENDER_NOT_CREATED",
+      "status": "PASSED",
+      "expected": "REFUSED (RENDER_NOT_CREATED)",
+      "actual": "REFUSED (RENDER_NOT_CREATED)"
+    },
+    {
+      "case": "LOW_PRIM_COUNT",
+      "status": "PASSED",
+      "expected": "REFUSED (LOW_PRIM_COUNT)",
+      "actual": "REFUSED (LOW_PRIM_COUNT)"
+    },
+    {
+      "case": "LOW_FEATHER_COUNT",
+      "status": "PASSED",
+      "expected": "REFUSED (LOW_FEATHER_COUNT)",
+      "actual": "REFUSED (LOW_FEATHER_COUNT)"
+    },
+    {
+      "case": "MISSING_TEXTURE_MANIFEST",
+      "status": "PASSED",
+      "expected": "REFUSED (MISSING_TEXTURE_MANIFEST)",
+      "actual": "REFUSED (MISSING_TEXTURE_MANIFEST)"
+    },
+    {
+      "case": "MISSING_REFERENCE_MEASUREMENTS",
+      "status": "PASSED",
+      "expected": "REFUSED (MISSING_REFERENCE_MEASUREMENTS)",
+      "actual": "REFUSED (MISSING_REFERENCE_MEASUREMENTS)"
+    }
+  ],
+  "counterfactual_cases": [
+    {
+      "case": "DOUBLE_WING_FEATHERS",
+      "description": "Double the mecha wing feathers to increase thrust capacity",
+      "mutated_metrics": {
+        "wing_feather_count": 680,
+        "usd_prim_count": 1412,
+        "material_binding_count": 1360
+      },
+      "deltas": {
+        "wing_feather_count": 340,
+        "usd_prim_count": 340,
+        "material_binding_count": 340
+      },
+      "status": "PASSED"
+    },
+    {
+      "case": "HALF_WING_FEATHERS",
+      "description": "Reduce mecha wing feathers by half to decrease drag",
+      "mutated_metrics": {
+        "wing_feather_count": 170,
+        "usd_prim_count": 902,
+        "material_binding_count": 850
+      },
+      "deltas": {
+        "wing_feather_count": -170,
+        "usd_prim_count": -170,
+        "material_binding_count": -170
+      },
+      "status": "PASSED"
+    },
+    {
+      "case": "REMOVE_CYAN_BLADES",
+      "description": "Remove cyan blade assemblies to lower heat signature",
+      "mutated_metrics": {
+        "usd_prim_count": 732,
+        "material_binding_count": 680
+      },
+      "deltas": {
+        "usd_prim_count": -340,
+        "material_binding_count": -340
+      },
+      "status": "PASSED"
+    },
+    {
+      "case": "INCREASE_WHITE_ARMOR_RATIO",
+      "description": "Increase white armor plating coverage ratio from 40% to 60%",
+      "mutated_metrics": {
+        "color_palette_similarity": 0.7900427124151055
+      },
+      "deltas": {
+        "color_palette_similarity": 0.017000000000000015
+      },
+      "status": "PASSED"
+    },
+    {
+      "case": "DECREASE_CORE_BODY_WIDTH",
+      "description": "Decrease mecha body core torso width by 10%",
+      "mutated_metrics": {
+        "body_mass_delta": 0.3607421790675369
+      },
+      "deltas": {
+        "body_mass_delta": -0.10000000000000003
+      },
+      "status": "PASSED"
+    },
+    {
+      "case": "INCREASE_WING_SPAN",
+      "description": "Increase mecha wingspan to 1195px to match reference target span",
+      "mutated_metrics": {
+        "wing_span_delta": 5.0
+      },
+      "deltas": {
+        "wing_span_delta": -150.0
+      },
+      "status": "PASSED"
+    },
+    {
+      "case": "REMOVE_GOLD_VISOR",
+      "description": "Remove gold visor sensor array, replacing with dark frame armor",
+      "mutated_metrics": {
+        "material_binding_count": 850
+      },
+      "deltas": {
+        "material_binding_count": -170
+      },
+      "status": "PASSED"
+    },
+    {
+      "case": "ADD_RED_MICRO_DECALS",
+      "description": "Add micro decals to torso and leg joints",
+      "mutated_metrics": {
+        "material_binding_count": 1032
+      },
+      "deltas": {
+        "material_binding_count": 12
+      },
+      "status": "PASSED"
+    }
+  ]
+}

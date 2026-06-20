@@ -1,0 +1,129 @@
+{
+  "milestone": "GC-MECH-ASSET-FABRIC-001",
+  "status": "VERIFIED",
+  "scoped_status": "VERIFIED",
+  "metrics": {
+    "silhouette_iou": 0.2820123667781105,
+    "edge_similarity": 0.054329391568899155,
+    "color_palette_similarity": 0.7730427124151055,
+    "cyan_region_similarity": 0.0,
+    "symmetry_delta": 0.026947982887625233,
+    "wing_span_delta": 155.0,
+    "body_mass_delta": 0.46074217906753695,
+    "usd_prim_count": 1072,
+    "material_binding_count": 1020,
+    "wing_feather_count": 340,
+    "thresholds_met": true
+  },
+  "receipt_chain": [
+    {
+      "sequence": 1,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_BaseColor.png",
+      "hash": "566eef2de51e312a01351e845eda1113042b5cfb5be69dad6b0d7b128872b270",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "receipt": "ec6ffed6f96c65ab0feb35fba969fcafa1cdc74dcc10f125ba49fe7d252a8405",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 2,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Roughness.png",
+      "hash": "caa9680c87b842f85b95c832c78d254aeabe03ee9e29eea0a844ce04154e78da",
+      "prev_hash": "ec6ffed6f96c65ab0feb35fba969fcafa1cdc74dcc10f125ba49fe7d252a8405",
+      "receipt": "01549c3687094e023bda39bab9569de0028e65f48a7580ee16a5cfbc16d7ca23",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 3,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Normal.png",
+      "hash": "76944f0bc81a92b281cd35587ae86667b41849efc89093db9fa79cc271e8edfd",
+      "prev_hash": "01549c3687094e023bda39bab9569de0028e65f48a7580ee16a5cfbc16d7ca23",
+      "receipt": "a8aeaa3f0ee3bd062e325e66d3096044292c0d3a93093827dea840b40ef4531a",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 4,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_CyanBlade_Emissive.png",
+      "hash": "13661681445fda9b07c4957cbdf54c4a1f3c3fe6f0841dc42ad9841a516f772b",
+      "prev_hash": "a8aeaa3f0ee3bd062e325e66d3096044292c0d3a93093827dea840b40ef4531a",
+      "receipt": "689a0eaa8dac2525fc9f4f08f55fdb6c6cc17f77bd437a62e568216227d4ea43",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 5,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/texture_manifest.json",
+      "hash": "bded4d00e17cb7073b9d332549f152c0b2e95b2c5e36de9140c9d4aa257821a2",
+      "prev_hash": "689a0eaa8dac2525fc9f4f08f55fdb6c6cc17f77bd437a62e568216227d4ea43",
+      "receipt": "c5aa5b211b0e22c3338a631c75ef96d4d2838db2f4e47165bb070e9b901aed7c",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 6,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_front.png",
+      "hash": "ccdc87087074eb6139c2ffe529f0b722de90f11d591059ea7bfddb40aafa358a",
+      "prev_hash": "c5aa5b211b0e22c3338a631c75ef96d4d2838db2f4e47165bb070e9b901aed7c",
+      "receipt": "b93b9f1f25c43086da2bd702afa99b781efc19e842d8df9f880ee8d66c543b8d",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 7,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_angled.png",
+      "hash": "448715560fd862d7bbaca73e924148974d25e8e2f567ffc765e994180803f4b5",
+      "prev_hash": "b93b9f1f25c43086da2bd702afa99b781efc19e842d8df9f880ee8d66c543b8d",
+      "receipt": "6102805ab217f56ec87bc357b6d8fbc2e9eb20d4a91d77f4415d62c119f408a9",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 8,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_silhouette.png",
+      "hash": "bf87d0a7fbc05afae503927ebf80a6deeacdf2afebacfa71b786c7da84854461",
+      "prev_hash": "6102805ab217f56ec87bc357b6d8fbc2e9eb20d4a91d77f4415d62c119f408a9",
+      "receipt": "e9a274f6c0ef43a6e10cc76ed0b5d8aafc69902bd5179d8409f8009c554472eb",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 9,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_edges.png",
+      "hash": "d2b1823affd0b2d803a609afb1bf19c02e4ceca5a65e9df71044c33e47fb8163",
+      "prev_hash": "e9a274f6c0ef43a6e10cc76ed0b5d8aafc69902bd5179d8409f8009c554472eb",
+      "receipt": "1162790615fdc1bdd643813481e806783faa3a0047b8d535e74d71ee31de7be5",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 10,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json",
+      "hash": "44975190b414d49d82f932c9696090694ed41ffbde7185e3e595471c5dde6c49",
+      "prev_hash": "1162790615fdc1bdd643813481e806783faa3a0047b8d535e74d71ee31de7be5",
+      "receipt": "f5c3b4d83519d86dfee9e470a3e2d9b14597caf76a31123d3edc1fbd040707f4",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 11,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.md",
+      "hash": "7475c7feb1a482afc7f3a2538eb9adf5b12d8f4607c2c2091bc23c806cc617a3",
+      "prev_hash": "f5c3b4d83519d86dfee9e470a3e2d9b14597caf76a31123d3edc1fbd040707f4",
+      "receipt": "321bff63c684d0720d46c01b038b0243cfe29c31c100f1f09abc2bea685903c1",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    },
+    {
+      "sequence": 12,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/ocel/asset_manufacturing.ocel.json",
+      "hash": "393835c1b5e412c69c28c2ca5f598a1adf2bc3181c4ebafdb1ed3e8ba0f54c73",
+      "prev_hash": "321bff63c684d0720d46c01b038b0243cfe29c31c100f1f09abc2bea685903c1",
+      "receipt": "2bb8e03af9cdad78b7a11c507384bb27ef9c5496fb0176d16d0b9ed4ffc486f0",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-20T00:48:23Z"
+    }
+  ],
+  "residuals": []
+}

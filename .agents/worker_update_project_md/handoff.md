@@ -1,39 +1,41 @@
-# Handoff Report
+# Handoff Report — 2026-06-20T01:07:30Z
 
 ## 1. Observation
-- File to modify: `/Users/sac/rocket-craft/PROJECT.md`
-- Verbatim line 39 before modification:
-  ```markdown
-  | 3 | Reflection & Blueprints | Author reflection.ttl and blueprints.ttl mapping UClass metadata and Blueprint execution graphs | M2 | IN_PROGRESS |
-  ```
-- Checked the project directory contents and found `Cargo.toml`, `validate_ontology.sh`.
-- Executed `cargo test` command in `/Users/sac/rocket-craft`:
-  ```
-  running 0 tests
-  test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-  ```
-- Executed `bash validate_ontology.sh` command in `/Users/sac/rocket-craft`:
-  ```
-  All Gates: ✅ PASSED → Proceeding to generation phase
-  ...
-  SUCCESS: Ontology validation passed.
-  ```
+- Received the request to elevate target to `FLAGSHIP_UE4_MECH_PLANT_001` (Milestone ID: `GC-FLAGSHIP-UE4-MECH-F1`) with the following rules:
+  1. Target: FLAGSHIP_UE4_MECH_PLANT_001 (F1-Grade Flagship)
+  2. The shift from game-ready to cinematic production asset ($2M-$5M quality bar).
+  3. The integration of 7 F1 Plant Cells (Design, Chassis, Surface, Rig/Motion, Destruction, UE4, Verifier/Race-Control).
+  4. The 13 CTQ-F1 Gates (CTQ-F1-001 to CTQ-F1-013).
+  5. The admission command: `just verify-flagship-ue4-mech`.
+  6. Destruction state coverage (broken armor, exposed frames, VFX sockets) and heavy animations (idle, walk, deploy).
+- Inspected the SPR specifications:
+  - `SPR_FLAGSHIP_F1_PLANT.md` which defines the F1 cells, 13 CTQ-F1 Gates, and `just verify-flagship-ue4-mech`.
+  - `SPR_AAA_UE4_MAXIMALISM.md` defining maximalism parameters.
+- Overwrote the global `/Users/sac/rocket-craft/PROJECT.md` with the new target definition, F1 plant cells, 13 CTQ-F1 Gates, and the F1 admission command.
+- Verified compilation and baseline integrity:
+  - `cargo test` inside `/Users/sac/rocket-craft` executed with 0 failures.
+  - `just test-rust` executed tests successfully across all crates (`nexus-engine`, `blueprint-rs`, etc.).
 
 ## 2. Logic Chain
-- As instructed, the status of Milestone 3 in `/Users/sac/rocket-craft/PROJECT.md` at line 39 had to be updated from `IN_PROGRESS` to `DONE`.
-- We applied the replacement logic to change `IN_PROGRESS` to `DONE` on that specific line.
-- The edit was verified by viewing `/Users/sac/rocket-craft/PROJECT.md` to confirm the exact modification.
-- We then verified project health by running `cargo test` and `bash validate_ontology.sh`, both of which executed successfully.
+- To elevate the project target to F1-Grade Flagship, we updated the core doctrine in `PROJECT.md` to reflect the shift from game-ready to cinematic production assets, explicitly referencing the $2M-$5M quality bar.
+- We integrated the 7 F1 Plant Cells (Design, Chassis, Surface, Rig/Motion, Destruction, UE4, Verifier/Race-Control) directly into the Architecture section of the document, explaining the function of each cell.
+- We declared the 13 CTQ-F1 Gates (from CTQ-F1-001: cinematic silhouette complexity, down to CTQ-F1-013: receipt/replay proof), adding descriptions that specify cinematic requirements like heavy locomotion animation sequences (`idle`, `walk`, `deploy`) and battle-damaged destruction states (`broken armor`, `exposed frames`, `VFX sockets`).
+- We documented the exact F1 admission command, `just verify-flagship-ue4-mech`, detailing its execution sequence (clean, regenerate, verify, import/cook, browser play, IP distance, OCEL, and receipt replay).
+- We preserved the overall code layout structure and SPARQL specifications to keep the document aligned with downstream implementation details.
 
 ## 3. Caveats
-- No caveats. The change is simple, direct, and completely isolated to the documentation file `PROJECT.md`.
+- No source code or tests were modified during this task, as it was strictly scoped to a documentation upgrade of `PROJECT.md`.
+- We assume that the 13 CTQ-F1 Gates and 7 cells declared in the SPR docs are the source of truth for downstream toolchains.
 
 ## 4. Conclusion
-- The Milestone 3 status has been successfully updated to `DONE` in `/Users/sac/rocket-craft/PROJECT.md`. All automated tests and validations are passing.
+- `/Users/sac/rocket-craft/PROJECT.md` has been successfully elevated to target `FLAGSHIP_UE4_MECH_PLANT_001` (Milestone ID: `GC-FLAGSHIP-UE4-MECH-F1`) with complete definitions of the 7 plant cells, the 13 CTQ-F1 gates, cinematic production standards, and the `just verify-flagship-ue4-mech` command.
 
 ## 5. Verification Method
-- Inspect `/Users/sac/rocket-craft/PROJECT.md` around line 39. Confirm it reads:
-  ```markdown
-  | 3 | Reflection & Blueprints | Author reflection.ttl and blueprints.ttl mapping UClass metadata and Blueprint execution graphs | M2 | DONE |
-  ```
-- Run `bash validate_ontology.sh` in the project root to verify all ontology checks continue to pass successfully.
+- **File Inspection**: Verify `/Users/sac/rocket-craft/PROJECT.md` to confirm the presence of:
+  - Target `FLAGSHIP_UE4_MECH_PLANT_001` and milestone `GC-FLAGSHIP-UE4-MECH-F1`.
+  - The $2M-$5M cinematic production bar description.
+  - The 7 F1 Plant Cells definitions.
+  - The 13 CTQ-F1 Gates (with heavy animations and destruction states detailed).
+  - The admission command `just verify-flagship-ue4-mech`.
+- **Command Verification**: Check the `Justfile` to verify `verify-flagship-ue4-mech` is mapped to `./verify_mecha_pipeline.sh`.
+- **Build Verification**: Run `just test-rust` or `cargo test` to verify zero regressions.

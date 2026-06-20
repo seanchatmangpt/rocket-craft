@@ -1,0 +1,19 @@
+{
+  "milestone": "GC-GUNDAM-FACTORY-001",
+  "status": "POWL_GRAMMAR_TRACE_ALIVE_UNDER_SCOPE",
+  "receipt_chain": [
+    {"sequence": 1, "event": "Spawn", "receipt": "99ae32a977e08a79b2fbfab1a8abc6642678adfe361693b0026d6a0d0aad665f", "status": "ADMITTED"},
+    {"sequence": 2, "event": "FactoryEntrance", "receipt": "51d958f0c143fddb3907c7172da0b88676e4acbe08d3ec016b0b4a5c04c91099", "status": "ADMITTED"},
+    {"sequence": 3, "event": "FrameAssembly", "receipt": "8f136cc5e10824fb50d25f12ac13b0d14a19784fdb92f439852aa3538873a46e", "status": "ADMITTED"},
+    {"sequence": 4, "event": "SocketTopology", "receipt": "e2661b1a00a309b7576d8cd8387f138e99ee04bfce5dfe5c3c369e235b05e4e5", "status": "ADMITTED"},
+    {"sequence": 5, "event": "ArmorSkinStation", "receipt": "3e42b7663e19b28974b99a4516d81436a81e768ee4e82011b6e38836d3c9d98e", "status": "ADMITTED"},
+    {"sequence": 6, "event": "RigMotionStation", "receipt": "993e1ae8d008c58bd216b8a8cb6fc4ed4b9878af80938a9e7c9d07f05f6e1909", "status": "ADMITTED"},
+    {"sequence": 7, "event": "VerificationGate", "receipt": "76974391bdab5fea171895ac0bfd02fcee1bacd5dacefebb208bcd906e477012", "status": "ADMITTED"},
+    {"sequence": 8, "event": "ReceiptTerminal", "receipt": "1188d9b9cc88c9adfd46a328a9e6ab3c8e8ef3d8f32032d1306804f32755c0b1", "status": "ADMITTED"},
+    {"sequence": 9, "event": "ExitOrLoop", "receipt": "7b3f9e2fe08a1e5e30e03dbdd49b960ef189eb113f5ffb4460d898b9b7378818", "status": "ADMITTED"}
+  ],
+  "residuals": [
+    "ue4_projection: RESIDUAL — No rendered surface",
+    "signing_layer: RESIDUAL — Chain is tamper-evident, not cryptographically signed"
+  ]
+}

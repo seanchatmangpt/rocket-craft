@@ -1,7 +1,7 @@
-# BRIEFING — 2026-06-19T04:34:25Z
+# BRIEFING — 2026-06-20T00:25:40Z
 
 ## Mission
-Audit current RDF ontologies, SHACL validation shapes, and SPARQL queries to produce a detailed gap analysis report at `/Users/sac/rocket-craft/.agents/orchestrator_swarm_audit/m1_gap_report.md`.
+Explore `/Users/sac/lsp-max` and the workspace to define the architecture for the Asset Manufacturing LSP (`ggen-asset-lsp`), documenting findings in `/Users/sac/rocket-craft/.agents/explorer_m1/handoff.md`.
 
 ## 🔒 My Identity
 - Archetype: explorer
@@ -9,6 +9,7 @@ Audit current RDF ontologies, SHACL validation shapes, and SPARQL queries to pro
 - Working directory: /Users/sac/rocket-craft/.agents/explorer_m1/
 - Original parent: 4aba8fb0-9db3-4e8c-9ad3-b7944b912853
 - Milestone: m1
+- Working directory updated: /Users/sac/rocket-craft/.agents/explorer_m1
 
 ## 🔒 Key Constraints
 - Read-only investigation — do NOT implement
@@ -17,28 +18,16 @@ Audit current RDF ontologies, SHACL validation shapes, and SPARQL queries to pro
 - Verify SPARQL queries have explicit ORDER BY clauses.
 
 ## Current Parent
-- Conversation ID: 4aba8fb0-9db3-4e8c-9ad3-b7944b912853
-- Updated: 2026-06-19T04:34:25Z
+- Conversation ID: a4a75af2-9f76-452d-b0fc-a9adec9d7959
+- Updated: 2026-06-20T00:25:40Z
 
 ## Investigation State
-- **Explored paths**:
-  - `/Users/sac/.ggen/packs/eden_server/ontology/` (`pack.ttl`, `bandai_tps.ttl`, `deltas.ttl`, `egp_racing.ttl`, `mars_market.ttl`, `validation_shapes.ttl`)
-  - `/Users/sac/.ggen/packs/eden_server/queries/` (`extract_assembly_deltas.rq`, `extract_authority_deltas.rq`, `extract_receipt_deltas.rq`, `substrate.rq`)
-  - `/Users/sac/.ggen/packs/eden_server/ggen.toml`
-  - `/Users/sac/.ggen/packs/ue4_ontology/` (`core.ttl`, `blueprints.ttl`, `reflection.ttl`, `subsystems.ttl`, `typestates.ttl`)
-  - `/Users/sac/.ggen/packs/ue4_ontology/shacl/` (`validation.shacl.ttl`)
-  - `/Users/sac/.ggen/packs/ue4_ontology/ggen.toml`
-  - `/Users/sac/rocket-craft/ontology/gundam_nexus.ttl` (contextual)
-- **Key findings**:
-  - Mapped classes, properties, shapes, and rules in both packs.
-  - Documented major R1-R12 gaps: 9/12 gameplay cells, 4/8 states of resolution, all 5 LOD importance classes, all dynamic rendering parameters, all walkthrough closure details, and 5/12 authority dimensions are missing.
-  - Audited SPARQL queries: verified that all queries in `.rq` files and `ggen.toml` manifests contain an explicit `ORDER BY` clause.
-  - Identified that SHACL SPARQL validators in `validation.shacl.ttl` do not have `ORDER BY` clauses.
-- **Unexplored areas**: None.
+- **Explored paths**: [TBD]
+- **Key findings**: [TBD]
+- **Unexplored areas**: `/Users/sac/lsp-max`, `generated/mech_assets/reference_fabric_001/`, generator parameter sources in `/Users/sac/rocket-craft`
 
 ## Key Decisions Made
-- Audited the entire set of queries, rules, schemas, and shapes.
-- Created concrete remediation Turtle/SHACL snippets to speed up future implementation.
+- Initiated exploration of `lsp-max` and the asset directory.
 
 ## Artifact Index
-- /Users/sac/rocket-craft/.agents/orchestrator_swarm_audit/m1_gap_report.md — Detailed gap analysis report.
+- /Users/sac/rocket-craft/.agents/explorer_m1/handoff.md — Architectural report and recommendation for ggen-asset-lsp.

@@ -1,0 +1,74 @@
+{
+    "bounding_box": [
+        0,
+        2,
+        1199,
+        999
+    ],
+    "aspect_ratio": 1.2024048096192386,
+    "wing_span_estimate_px": 1200,
+    "central_torso_mass_estimate": {
+        "torso_pixel_count": 294339,
+        "torso_ratio": 0.300802647284857,
+        "torso_density": 0.8169774451950993,
+        "bounds": [
+            420,
+            780
+        ]
+    },
+    "left_right_symmetry_estimate": 0.9594455577822312,
+    "cyan_weapon_regions": {
+        "total_cyan_count": 8951,
+        "total_cyan_bbox": [
+            46,
+            211,
+            928,
+            546
+        ],
+        "left_cyan_count": 5323,
+        "left_cyan_bbox": [
+            46,
+            211,
+            599,
+            480
+        ],
+        "right_cyan_count": 3628,
+        "right_cyan_bbox": [
+            600,
+            467,
+            928,
+            546
+        ]
+    },
+    "head_visor_highlight_regions": {
+        "head_search_area": [
+            480,
+            2,
+            720,
+            301
+        ],
+        "head_highlight_count": 703,
+        "head_highlight_bbox": [
+            480,
+            145,
+            720,
+            301
+        ],
+        "head_yellow_count": 482,
+        "head_yellow_bbox": [
+            509,
+            248,
+            605,
+            301
+        ],
+        "head_red_count": 221,
+        "head_red_bbox": [
+            480,
+            145,
+            720,
+            293
+        ],
+        "head_cyan_count": 0,
+        "head_cyan_bbox": null
+    }
+}

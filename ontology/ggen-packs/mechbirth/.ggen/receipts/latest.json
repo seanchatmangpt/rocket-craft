@@ -1,0 +1,18 @@
+{
+  "operation_id": "34f0fd47-6a4e-4706-abcc-d43d662b8585",
+  "timestamp": "2026-06-19T18:28:25.331031Z",
+  "input_hashes": [
+    "actuator:ggen-sync@26.6.11",
+    "ggen.toml:9ba2792121584b8e9bf00f35e0447a9c46ab4bfe6d5b087545032195c7e5272a",
+    "schema/mechbirth_lod_geom_motion.ttl:6a729e25f8c94bac04b91576d93b30e4effdfbb2bd7f06345ea32f94ff458352",
+    "queries/extract_lod_classes.sparql:dc0aab1374bb1ed0a80462b48ccde8f17dc03e33f3feeb3a2e781a4770ef1be9",
+    "templates/semantic_lod.rs.tera:a8db083dd300e114ddfcb61267eb410ce898eb4e434a4165a30a698862881545",
+    "queries/extract_motion_families.sparql:b5512300a064bf744b5b1b307c09b6c8f7f24a7668ea636ff693376c765049ec",
+    "templates/motion.rs.tera:2101975b498cc61566607773977f8a62286407892c215ac2dcd9aa5185f53e3b",
+    "queries/extract_part_families.sparql:05793fae8085e095977aa4c6731b1554db4c6f76fec5530014a7e299aa8060bb",
+    "templates/geometry.rs.tera:6816b6ee3c1aea35aaeda7c5dab7e2c6e6cf341012ce44f754193e8b2dcf0449"
+  ],
+  "output_hashes": [],
+  "signature": "8a005ddd0ad0c60753c362188ef8eac1842993d026241f3cd6cf8dd506ea72a6c2177276837f03158cb7b3c6db6a8c6d2af19ed6c270cd52293154c5f6e95508",
+  "previous_receipt_hash": null
+}

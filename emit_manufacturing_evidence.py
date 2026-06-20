@@ -1,0 +1,39 @@
+import json
+import os
+
+ocel_path = "/Users/sac/rocket-craft/ocel/manufacturing_process.ocel.json"
+
+ocel_data = {
+  "objects": {
+    "candidate:001": "Candidate",
+    "source_law:001": "SourceLaw",
+    "artifact:001": "Artifact",
+    "gate:001": "VerificationGate",
+    "cook_job:001": "UE4CookJob",
+    "receipt:001": "Receipt",
+    "replay:001": "ReplayRun"
+  },
+  "events": [
+    {"ocel:eid": "e1", "ocel:activity": "candidate_created", "ocel:omap": ["candidate:001"]},
+    {"ocel:eid": "e2", "ocel:activity": "source_law_resolved", "ocel:omap": ["candidate:001", "source_law:001"]},
+    {"ocel:eid": "e3", "ocel:activity": "artifact_emitted", "ocel:omap": ["candidate:001", "artifact:001"]},
+    {"ocel:eid": "e4", "ocel:activity": "gate_evaluated", "ocel:omap": ["candidate:001", "gate:001"]},
+    {"ocel:eid": "e5", "ocel:activity": "candidate_refused", "ocel:omap": ["candidate:001", "gate:001"]},
+    
+    # Second attempt
+    {"ocel:eid": "e6", "ocel:activity": "candidate_created", "ocel:omap": ["candidate:001"]},
+    {"ocel:eid": "e7", "ocel:activity": "source_law_resolved", "ocel:omap": ["candidate:001", "source_law:001"]},
+    {"ocel:eid": "e8", "ocel:activity": "artifact_emitted", "ocel:omap": ["candidate:001", "artifact:001"]},
+    {"ocel:eid": "e9", "ocel:activity": "gate_evaluated", "ocel:omap": ["candidate:001", "gate:001"]},
+    {"ocel:eid": "e10", "ocel:activity": "candidate_admitted", "ocel:omap": ["candidate:001", "gate:001"]},
+    
+    {"ocel:eid": "e11", "ocel:activity": "ue4_cook_completed", "ocel:omap": ["candidate:001", "cook_job:001"]},
+    {"ocel:eid": "e12", "ocel:activity": "receipt_sealed", "ocel:omap": ["candidate:001", "receipt:001"]},
+    {"ocel:eid": "e13", "ocel:activity": "replay_completed", "ocel:omap": ["candidate:001", "replay:001"]}
+  ]
+}
+
+with open(ocel_path, "w") as f:
+    json.dump(ocel_data, f, indent=2)
+
+print(f"Emitted manufacturing process evidence to {ocel_path}")
