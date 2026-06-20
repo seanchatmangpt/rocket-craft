@@ -25,15 +25,18 @@ import type { LiveReceipt } from './useRocketSessionRealtime';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+// Rich shape served by the /api/game/leaderboard BFF (service role, denormalised
+// stat columns from migration 0018). Direct browser Supabase queries cannot return
+// these without a join + may hit RLS — the BFF is the canonical source.
 export interface LeaderboardRow {
-  rank: number | null;
-  score: number;
-  updated_at: string;
-  players: {
-    id: string;
-    username: string | null;
-    high_score: number;
-  } | null;
+  rank: number;
+  player_id: string;
+  display_name: string | null;
+  total_receipts: number;
+  pass_receipts: number;
+  pass_rate_pct: number | null;
+  last_pass_at: string | null;
+  best_ocel_events: number | null;
 }
 
 export type LeaderboardStatus = 'connecting' | 'live' | 'error';
@@ -51,6 +54,7 @@ export function useRocketRealtimeLeaderboard() {
   const { client } = useRocketSupabase();
 
   const rows = ref<LeaderboardRow[]>([]);
+  const total = ref(0);
   const loading = ref(true);
   const error = ref<string | null>(null);
   const status = ref<LeaderboardStatus>('connecting');
@@ -66,23 +70,20 @@ export function useRocketRealtimeLeaderboard() {
   async function fetchRows() {
     loading.value = true;
     error.value = null;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error: fetchErr } = await (client as any)
-      .from('leaderboard')
-      .select('rank, score, updated_at, players(id, username, high_score)')
-      .order('score', { ascending: false })
-      .limit(100);
-
-    loading.value = false;
-
-    if (fetchErr) {
-      error.value = (fetchErr as { message: string }).message;
-      return;
+    try {
+      // Fetch via the BFF (service role + rich denormalised columns), NOT a direct
+      // browser Supabase query — the channel only tells us WHEN to re-fetch.
+      const data = await $fetch<{ rows: LeaderboardRow[]; total: number }>(
+        '/api/game/leaderboard?limit=100',
+      );
+      rows.value = data.rows ?? [];
+      total.value = data.total ?? rows.value.length;
+      lastUpdate.value = new Date().toLocaleTimeString();
+    } catch (err: unknown) {
+      error.value = err instanceof Error ? err.message : 'Failed to load leaderboard';
+    } finally {
+      loading.value = false;
     }
-
-    rows.value = (data as LeaderboardRow[]) ?? [];
-    lastUpdate.value = new Date().toLocaleTimeString();
   }
 
   // ── Channel subscription ──────────────────────────────────────────────────
@@ -182,6 +183,8 @@ export function useRocketRealtimeLeaderboard() {
   return {
     /** Current ranked leaderboard rows (pre-populated by initial fetch). */
     rows: readonly(rows),
+    /** Total pilot count reported by the BFF (may exceed rows.length). */
+    total: readonly(total),
     /** True while the initial fetch or a triggered re-fetch is in flight. */
     loading: readonly(loading),
     /** Error message from the most recent failed fetch, or null. */

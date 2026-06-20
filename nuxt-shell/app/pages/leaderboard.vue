@@ -1,46 +1,13 @@
 <script setup lang="ts">
+import type { LeaderboardRow } from '~/composables/useRocketRealtimeLeaderboard';
+
 useHead({ title: 'Rocket-Craft — Leaderboard' });
 
-// Live updates: re-fetch when a new PASS receipt fires (trigger already ran by then)
-const { receiptBus } = useRocketSessionRealtime();
-
-interface LeaderboardRow {
-  rank: number;
-  player_id: string;
-  display_name: string | null;
-  total_receipts: number;
-  pass_receipts: number;
-  pass_rate_pct: number | null;
-  last_pass_at: string | null;
-  best_ocel_events: number | null;
-}
-
-const rows = ref<LeaderboardRow[]>([]);
-const total = ref(0);
-const loading = ref(true);
-const error = ref<string | null>(null);
-const lastUpdate = ref<string | null>(null);
-
-async function loadLeaderboard() {
-  loading.value = true;
-  error.value = null;
-  try {
-    const data = await $fetch<{ rows: LeaderboardRow[]; total: number }>('/api/game/leaderboard?limit=100');
-    rows.value = data.rows;
-    total.value = data.total;
-    lastUpdate.value = new Date().toLocaleTimeString();
-  } catch (err: unknown) {
-    error.value = err instanceof Error ? err.message : 'Failed to load leaderboard';
-  } finally {
-    loading.value = false;
-  }
-}
-
-receiptBus.on((receipt) => {
-  if (receipt.verdict === 'PASS') loadLeaderboard();
-});
-
-onMounted(loadLeaderboard);
+// Cross-client live updates: the composable does an initial BFF fetch, subscribes
+// to Supabase postgres_changes on `leaderboard` (so ANOTHER player's proven session
+// updates this view in realtime), and also re-fetches on same-browser PASS receipts.
+// `status` reflects the channel: connecting | live | error.
+const { rows, total, loading, error, status, lastUpdate } = useRocketRealtimeLeaderboard();
 
 const medal = (rank: number) => rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
 const passRate = (r: LeaderboardRow) => r.pass_rate_pct != null ? `${r.pass_rate_pct.toFixed(0)}%` : '—';
@@ -51,7 +18,7 @@ const passRate = (r: LeaderboardRow) => r.pass_rate_pct != null ? `${r.pass_rate
     <header class="lb-header">
       <NuxtLink to="/game" class="back">← Mission Control</NuxtLink>
       <h1>Leaderboard</h1>
-      <span class="live-badge">● LIVE</span>
+      <span class="live-badge" :class="status">{{ status === 'live' ? '● LIVE' : status === 'error' ? '● OFFLINE' : '● …' }}</span>
       <span v-if="lastUpdate" class="update-ts">updated {{ lastUpdate }}</span>
     </header>
 
@@ -88,6 +55,8 @@ const passRate = (r: LeaderboardRow) => r.pass_rate_pct != null ? `${r.pass_rate
 .lb-header h1 { font-size: 1rem; color: #00f0ff; margin: 0; flex: 1; }
 .back { color: #00f0ff; text-decoration: none; font-size: 0.85rem; }
 .live-badge { font-size: 0.7rem; color: #00c853; animation: pulse 2s infinite; }
+.live-badge.connecting { color: #c8a800; }
+.live-badge.error { color: #ff4444; animation: none; }
 .update-ts { font-size: 0.65rem; color: #444; }
 @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.4 } }
 .status { color: #666; text-align: center; padding: 2rem; font-size: 0.85rem; }
