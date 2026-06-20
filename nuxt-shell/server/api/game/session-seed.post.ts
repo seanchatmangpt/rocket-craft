@@ -26,6 +26,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { blake3 } from '@noble/hashes/blake3.js';
+import { canonicalJSON as canonicalize } from '../../utils/canonicalJson';
 
 // ── BLAKE3 helpers ─────────────────────────────────────────────────────────
 
@@ -34,10 +35,9 @@ function blake3Hex(input: string): string {
   return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Canonical OCEL event payload — matches useHashChain.ts canonicalize()
-function canonicalize(obj: Record<string, unknown>): string {
-  return JSON.stringify(obj, Object.keys(obj).sort());
-}
+// Recursive canonical (covers nested attributes; byte-matches Rust canonical_json
+// and the browser canonicalOcelEventHash). Was a top-level-only array replacer that
+// dropped nested attribute keys and diverged from the Rust CLI.
 
 // ── OCEL event chain builder ───────────────────────────────────────────────
 

@@ -27,6 +27,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { blake3 } from '@noble/hashes/blake3.js';
+import { canonicalJSON as canonicalize } from '../../utils/canonicalJson';
 
 interface OcelEventRow {
   id: number;
@@ -52,10 +53,6 @@ interface ReplayEvent extends OcelEventRow {
 function blake3Hex(input: string): string {
   const bytes = blake3(new TextEncoder().encode(input));
   return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function canonicalize(obj: Record<string, unknown>): string {
-  return JSON.stringify(obj, Object.keys(obj).sort());
 }
 
 export default defineEventHandler(async (event) => {

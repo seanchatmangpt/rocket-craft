@@ -20,17 +20,27 @@ function blake3Hex(input: string): string {
     .join('');
 }
 
-// Verbatim replica of server canonicalize() in session-seed/session-replay:
-//   JSON.stringify(obj, Object.keys(obj).sort())
+// Independent replica of the RECURSIVE canonical used by the server
+// (canonicalJSON) AND the Rust CLI (canonical_json). If the browser util drifts
+// from this, the test fails.
+function recursiveCanonical(value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'string') {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) return `[${value.map(recursiveCanonical).join(',')}]`;
+  const o = value as Record<string, unknown>;
+  return `{${Object.keys(o).sort().map((k) => `${JSON.stringify(k)}:${recursiveCanonical(o[k])}`).join(',')}}`;
+}
+
 function serverEventHash(f: OcelEventHashFields): string {
-  const obj: Record<string, unknown> = {
+  return blake3Hex(recursiveCanonical({
     session_id: f.session_id,
     activity: f.activity,
     timestamp_ms: f.timestamp_ms,
     prev_hash: f.prev_hash,
     attributes: f.attributes,
-  };
-  return blake3Hex(JSON.stringify(obj, Object.keys(obj).sort()));
+  }));
 }
 
 const CASES: OcelEventHashFields[] = [
@@ -60,5 +70,21 @@ describe('OCEL event hash cross-implementation contract', () => {
     const base = canonicalOcelEventHash(CASES[0]!);
     const chained = canonicalOcelEventHash({ ...CASES[0]!, prev_hash: 'c'.repeat(64) });
     expect(chained).not.toBe(base);
+  });
+
+  it('NESTED attribute changes now change the hash (recursive canonical covers attributes)', () => {
+    const a = canonicalOcelEventHash({ session_id: 's', activity: 'X', timestamp_ms: 1, prev_hash: null, attributes: { stage_index: 0 } });
+    const b = canonicalOcelEventHash({ session_id: 's', activity: 'X', timestamp_ms: 1, prev_hash: null, attributes: { stage_index: 1 } });
+    // The old top-level array-replacer dropped nested keys → these would have been
+    // EQUAL (a real tamper blind spot). Recursive canonical distinguishes them.
+    expect(a).not.toBe(b);
+  });
+
+  it('pins the exact canonical string (cross-language anchor vs Rust canonical_json)', () => {
+    // This exact string must equal Rust canonical_json(chain_payload) for the same
+    // fields — see rocket-sdk/src/supabase.rs canonical_json test.
+    const expected = '{"activity":"CookStarted","attributes":{"stage_index":0},"prev_hash":null,"session_id":"s","timestamp_ms":1000}';
+    const fields: OcelEventHashFields = { session_id: 's', activity: 'CookStarted', timestamp_ms: 1000, prev_hash: null, attributes: { stage_index: 0 } };
+    expect(canonicalOcelEventHash(fields)).toBe(blake3Hex(expected));
   });
 });

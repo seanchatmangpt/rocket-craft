@@ -945,6 +945,24 @@ mod tests {
     }
 
     #[test]
+    fn canonical_json_matches_cross_language_anchor() {
+        // CROSS-LANGUAGE CONTRACT: this exact string is pinned in the Nuxt test
+        // test/unit/ocelEventHashCrossImpl.test.ts. Browser + server + Rust must all
+        // produce it for the same OCEL chain payload, else event_hash diverges and
+        // server-side replay reports hash_convergent=false for Rust-cooked sessions.
+        let payload = serde_json::json!({
+            "activity": "CookStarted",
+            "attributes": { "stage_index": 0 },
+            "prev_hash": serde_json::Value::Null,
+            "session_id": "s",
+            "timestamp_ms": 1000,
+        });
+        let expected =
+            "{\"activity\":\"CookStarted\",\"attributes\":{\"stage_index\":0},\"prev_hash\":null,\"session_id\":\"s\",\"timestamp_ms\":1000}";
+        assert_eq!(canonical_json(&payload), expected);
+    }
+
+    #[test]
     fn chained_ocel_emitter_seq_increments() {
         let mut emitter = ChainedOcelEmitter::new(None, "obj");
         emitter.emit("A", 0, serde_json::json!({}));
