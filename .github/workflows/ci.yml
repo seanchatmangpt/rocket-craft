@@ -383,6 +383,18 @@ jobs:
           ALLOW_SESSION_SEED: "1"
           NODE_ENV: development
 
+      - name: Real-OCEL conformance gate (mine the actual event log)
+        run: |
+          SID=$(curl -sf -X POST http://localhost:3000/api/game/session-seed \
+            -H 'content-type: application/json' -d '{"create_test_player":true}' \
+            | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).session_id))")
+          curl -sf "http://localhost:3000/api/game/ocel-export?session_id=$SID" -o /tmp/ci-loop-ocel.json
+          # python3 is preinstalled on ubuntu-latest; pm4py is optional (script falls back).
+          python3 scripts/pm4py_conformance.py /tmp/ci-loop-ocel.json --session-id "$SID" --out /tmp/ci-loop-fitness.json
+          cat /tmp/ci-loop-fitness.json
+        env:
+          ALLOW_SESSION_SEED: "1"
+
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
