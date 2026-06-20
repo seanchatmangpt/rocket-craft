@@ -30,35 +30,10 @@
  */
 
 import { createClient } from '@supabase/supabase-js'
-import * as ed from '@noble/ed25519'
 import { emitOtelSpans } from '../../utils/otlp-emitter'
 import { runProofGates } from '../../utils/proofGates'
 import { auditGateRun } from '../../utils/proofGateAudit'
-
-function canonicalJSON(obj: unknown): string {
-  if (obj === null || obj === undefined) return 'null'
-  if (typeof obj === 'number' || typeof obj === 'boolean') return JSON.stringify(obj)
-  if (typeof obj === 'string') return JSON.stringify(obj)
-  if (Array.isArray(obj)) return `[${obj.map(canonicalJSON).join(',')}]`
-  const o = obj as Record<string, unknown>
-  const keys = Object.keys(o).sort()
-  return `{${keys.map(k => `${JSON.stringify(k)}:${canonicalJSON(o[k])}`).join(',')}}`
-}
-
-async function verifyEd25519(
-  payload: unknown,
-  sigB64: string,
-  pubKeyB64: string,
-): Promise<boolean> {
-  try {
-    const sigBytes = Uint8Array.from(atob(sigB64), c => c.charCodeAt(0))
-    const pubBytes = Uint8Array.from(atob(pubKeyB64), c => c.charCodeAt(0))
-    const message = new TextEncoder().encode(canonicalJSON(payload))
-    return await ed.verifyAsync(sigBytes, message, pubBytes)
-  } catch {
-    return false
-  }
-}
+import { verifyReceiptSignature } from '../../utils/ed25519'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
@@ -111,8 +86,14 @@ export default defineEventHandler(async (event) => {
     if (!ed25519_sig) {
       throw createError({ statusCode: 401, message: 'ed25519_sig required: ROCKET_SIGNING_PUBKEY is configured' })
     }
-    const { ed25519_sig: _sig, ...sigPayload } = body
-    const valid = await verifyEd25519(sigPayload, ed25519_sig, pubKeyB64)
+    // Verify against the shared canonical payload (4 fields) — same source of
+    // truth the Rust CLI signs. (Previously verified the whole body → 401 on every
+    // real signature.)
+    const valid = await verifyReceiptSignature(
+      { proven_at, receipt_hash, session_id: session_id ?? null, verdict },
+      ed25519_sig,
+      pubKeyB64,
+    )
     if (!valid) {
       throw createError({ statusCode: 401, message: 'Ed25519 signature verification failed' })
     }
