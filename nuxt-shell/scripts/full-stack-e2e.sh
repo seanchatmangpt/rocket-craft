@@ -119,6 +119,23 @@ log "running headless-loop E2E (MOCK_API=0)..."
 log "running fast Playwright E2E (shell + auth-flow + game-loop)..."
 ( cd "$ROOT" && npx playwright test e2e/shell.spec.ts e2e/auth-flow.spec.ts e2e/game-loop.spec.ts --project=game-loop --workers=2 )
 
+# ── 7a2. Real-OCEL conformance gate: mine the actual event log, not a fixture ──
+# Seed a session, export its REAL OCEL 2.0 log, run pm4py conformance. Van der
+# Aalst doctrine: prove the loop by mining the event evidence, not by trusting
+# the API. Fails the run if fitness < threshold.
+log "running real-OCEL pm4py conformance gate..."
+CONF_SID="$(curl -sf -X POST "$API_BASE_URL/api/game/session-seed" -H 'content-type: application/json' -d '{"create_test_player":true}' \
+  | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).session_id))" 2>/dev/null)"
+if [[ -n "$CONF_SID" ]]; then
+  curl -sf "$API_BASE_URL/api/game/ocel-export?session_id=$CONF_SID" -o /tmp/loop-ocel.json
+  if ! python3 "$ROOT/scripts/pm4py_conformance.py" /tmp/loop-ocel.json --session-id "$CONF_SID" --out /tmp/loop-fitness.json; then
+    log "ERROR: real-OCEL conformance FAILED for session $CONF_SID"; cat /tmp/loop-fitness.json 2>/dev/null; exit 1
+  fi
+  log "real-OCEL conformance: PASS ($(node -e "console.log('fitness='+require('/tmp/loop-fitness.json').fitness)" 2>/dev/null))"
+else
+  log "WARN: could not seed session for conformance gate (non-fatal)"
+fi
+
 # ── 7b. WASM tamper check: re-hash the served binary vs the cook receipt ──────
 if [[ "${SKIP_UE4:-0}" != "1" && -f "$ARCHIVE/cook-receipt.json" ]]; then
   EXPECTED="$(node -e "console.log(require('$ARCHIVE/cook-receipt.json').output_hash||'')" 2>/dev/null)"

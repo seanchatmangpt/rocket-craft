@@ -47,22 +47,37 @@ def extract_events(ocel: dict) -> list:
 
 
 def get_activity(event: dict) -> str:
-    return event.get("activity") or event.get("ocel:activity") or ""
+    # OCEL 2.0 uses "type"; OCEL 1.x uses "ocel:activity"; some exports use "activity".
+    return event.get("activity") or event.get("ocel:activity") or event.get("type") or ""
 
 
 def get_session_id(event: dict):
-    """Try common fields for a session identifier."""
-    attrs = event.get("attributes") or event.get("ocel:vmap") or {}
-    for key in ("session_id", "sessionId", "session-id"):
-        if key in attrs:
-            return str(attrs[key])
-    # OCEL 2.0: check object references
-    for obj_ref in event.get("relationships") or event.get("ocel:omap") or []:
-        if isinstance(obj_ref, dict):
-            oid = obj_ref.get("objectId") or obj_ref.get("id", "")
-        else:
-            oid = str(obj_ref)
-        if "session" in oid.lower():
+    """Return the event's session identifier.
+
+    OCEL 2.0 stores it as the objectId of a relationship whose qualifier is
+    'session' (the objectId is a bare UUID, so matching on the qualifier — not on
+    the string 'session' appearing in the id — is required). Falls back to common
+    attribute keys and OCEL 1.x omap entries.
+    """
+    # OCEL 2.0 relationships: prefer the one qualified as 'session'.
+    rels = event.get("relationships") or []
+    for obj_ref in rels:
+        if isinstance(obj_ref, dict) and obj_ref.get("qualifier") == "session":
+            return obj_ref.get("objectId") or obj_ref.get("id")
+    # attribute-based fallback (attributes may be a dict or an OCEL 2.0 name/value list)
+    attrs = event.get("attributes")
+    if isinstance(attrs, dict):
+        for key in ("session_id", "sessionId", "session-id"):
+            if key in attrs:
+                return str(attrs[key])
+    elif isinstance(attrs, list):
+        for a in attrs:
+            if isinstance(a, dict) and a.get("name") in ("session_id", "sessionId", "session-id"):
+                return str(a.get("value"))
+    # OCEL 1.x omap / any relationship id containing 'session'
+    for obj_ref in event.get("ocel:omap") or rels:
+        oid = obj_ref.get("objectId") or obj_ref.get("id", "") if isinstance(obj_ref, dict) else str(obj_ref)
+        if "session" in str(oid).lower():
             return oid
     return None
 
@@ -108,7 +123,7 @@ def pm4py_conformance(events: list, session_id) -> dict:
     for ev in events:
         pm_event = Event()
         pm_event["concept:name"] = get_activity(ev) or "unknown"
-        pm_event["time:timestamp"] = ev.get("timestamp") or ev.get("ocel:timestamp") or "1970-01-01T00:00:00Z"
+        pm_event["time:timestamp"] = ev.get("timestamp") or ev.get("ocel:timestamp") or ev.get("time") or "1970-01-01T00:00:00Z"
         trace.append(pm_event)
 
     log = EventLog([trace])
