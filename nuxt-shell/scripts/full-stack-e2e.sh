@@ -105,6 +105,11 @@ curl -sf -X POST "$API_BASE_URL/api/test/seed-auth-user" -H 'content-type: appli
   | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const u=JSON.parse(d);console.log('[full-stack-e2e] auth user '+u.user_id+' ('+u.email+')')})" \
   || log "WARN: auth-user seed failed (non-fatal)"
 
+# ── 6b. Reset gameplay tables for a deterministic baseline ────────────────────
+log "resetting gameplay data for deterministic baseline..."
+curl -sf -X POST "$API_BASE_URL/api/test/reset-data" -H 'content-type: application/json' \
+  -d '{"confirm":true}' >/dev/null || log "WARN: reset-data failed (non-fatal)"
+
 # ── 7. Headless-loop E2E (24 tests, real Supabase) ────────────────────────────
 log "running headless-loop E2E (MOCK_API=0)..."
 ( cd "$ROOT" && API_BASE_URL="$API_BASE_URL" MOCK_API=0 npx vitest run tests/e2e/headless-loop.test.ts --reporter=dot )
