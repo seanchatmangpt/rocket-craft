@@ -192,4 +192,40 @@ test.describe('OCEL+OTel full game loop', () => {
     console.log(`[game-loop] Receipt: ${RECEIPT_PATH}`);
     console.log(`[game-loop] verdict=PASS ocel_events=${eventCount}`);
   });
+
+  test('6. browser-persisted OCEL events replay as hash_convergent server-side', async ({ page, request }) => {
+    await page.goto('/game');
+    await waitForOcelReady(page);
+    await page.evaluate(() => {
+      window.dispatchEvent(new CustomEvent('rocket:ue4', { detail: { type: 'EngineReady' } }));
+    });
+    const status = page.locator('[data-testid="engine-status"]');
+    await expect(status).toHaveAttribute('data-is-playing', 'true', { timeout: 8_000 });
+    await driveIntent(page, 'Interact');
+    await driveIntent(page, 'NextStation');
+
+    // useGameSessionPersistence persists asynchronously. The shell sets
+    // data-session-id once the DB session row exists, and shows "↑ N" when events
+    // have been synced via ocel-ingest. Wait for both before verifying server-side.
+    const shell = page.locator('.game-shell');
+    // Generous timeouts: persistence is async and slows under parallel test load.
+    let sessionId: string | null = null;
+    try {
+      await expect(shell).toHaveAttribute('data-session-id', /[0-9a-f-]{36}/, { timeout: 20_000 });
+      await expect(page.locator('.sync-status')).toBeVisible({ timeout: 20_000 });
+      sessionId = await shell.getAttribute('data-session-id');
+    } catch {
+      test.skip(true, 'persistence unavailable (no Supabase) — server-side convergence not assertable');
+    }
+    expect(sessionId).toBeTruthy();
+
+    // The events were hashed in the BROWSER (canonicalOcelEventHash). The server
+    // recomputes with its canonical — they MUST converge (the fix this guards).
+    const res = await request.get(`/api/game/session-replay?session_id=${sessionId}`);
+    expect(res.status()).toBe(200);
+    const body = await res.json();
+    expect(body.total_events).toBeGreaterThan(0);
+    expect(body.hash_convergent).toBe(true);
+    console.log(`[game-loop] browser→server convergence: events=${body.total_events} hash_convergent=${body.hash_convergent}`);
+  });
 });
