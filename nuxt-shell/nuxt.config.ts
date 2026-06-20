@@ -84,6 +84,8 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: process.env.SUPABASE_URL ?? 'http://localhost:54321',
       supabaseAnonKey: process.env.SUPABASE_ANON_KEY ?? '',
+      // Dev/E2E only: open protected routes (/game etc.) without login. Never set in prod.
+      allowAnonGame: process.env.ALLOW_ANON_GAME === '1',
     },
   },
 })

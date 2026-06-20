@@ -22,6 +22,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const config = useRuntimeConfig();
   if (!config.public.supabaseAnonKey) return;
 
+  // Dev/E2E bypass: when ALLOW_ANON_GAME=1, protected routes are open without
+  // login so the game + telemetry can be exercised locally and in Playwright.
+  // NEVER set this in production — auth is enforced whenever the flag is off.
+  if (config.public.allowAnonGame) return;
+
   // Lazy-import to avoid bundling Supabase in the auth guard itself
   const { user } = useRocketSupabase();
 

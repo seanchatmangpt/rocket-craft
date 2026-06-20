@@ -21,7 +21,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import { blake3 } from '@noble/hashes/blake3';
+import { blake3 } from '@noble/hashes/blake3.js';
 const blake3Hex = (s: string): string => Buffer.from(blake3(Buffer.from(s))).toString('hex');
 import { fileURLToPath } from 'url';
 
