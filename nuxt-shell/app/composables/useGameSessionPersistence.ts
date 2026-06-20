@@ -1,18 +1,18 @@
 /**
  * useGameSessionPersistence — persists OCEL events to Supabase with hash chaining.
  *
- * Hash formula: uses useHashChain.computeEventHash (BLAKE3 of canonical JSON object
- * {id, timestamp, type, data, prev_hash}) — same formula as exportHashedOcelLog, so
- * the chain_tip from the exported log matches the last stored event_hash.
+ * All writes go through server-side API routes (service role key), never via the
+ * anon client from the browser. Attack surface summary:
+ *   game_sessions  → POST /api/game/session, PATCH /api/game/session/[id]
+ *   ocel_events    → POST /api/game/ocel-ingest (batched, server-side chain)
+ *   game_receipts  → POST /api/game/cook-receipt (4 proof gates)
  *
- * seq is 0-indexed: first event is seq=0, matching exportHashedOcelLog's enumeration.
- *
- * The composable watches useGameSessionOcel's event array and syncs new events to
- * the game_sessions + ocel_events Supabase tables in real time.
+ * Hash formula: BLAKE3 of canonical JSON {id, timestamp, type, data, prev_hash}
+ * — same formula as exportHashedOcelLog, so chain_tip == last stored event_hash.
+ * seq is 0-indexed: first event is seq=0.
  */
 
 export function useGameSessionPersistence() {
-  const { client } = useRocketSupabase();
   const { events, sessionId, isPlaying } = useGameSessionOcel();
 
   const { computeEventHash } = useHashChain();
@@ -22,35 +22,24 @@ export function useGameSessionPersistence() {
   const syncError = ref<string | null>(null);
   const isSyncing = ref(false);
 
-  // Open a DB session row when the game session starts
+  // Open a DB session row via server API when the game session starts
   watch(sessionId, async (sid) => {
     if (!sid) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (client as any)
-      .from('game_sessions')
-      .insert({
-        player_id: null,
-        session_started_at: new Date().toISOString(),
-        session_ended_at: null,
-        engine_source: 'unknown',
-        is_alive: false,
-        ocel_event_count: 0,
-        receipt_hash: null,
-        metadata: { browser_session_id: sid },
-      })
-      .select('id')
-      .single();
-
-    if (error) {
-      syncError.value = `Failed to create DB session: ${error.message}`;
-      return;
+    try {
+      const result = await $fetch<{ session_id: string; started_at: string }>('/api/game/session', {
+        method: 'POST',
+        body: { browser_session_id: sid, engine_source: 'browser' },
+      });
+      dbSessionId.value = result.session_id;
+      lastHash.value = null;
+      syncedCount.value = 0;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      syncError.value = `Failed to create DB session: ${msg}`;
     }
-    dbSessionId.value = data.id;
-    lastHash.value = null;
-    syncedCount.value = 0;
   });
 
-  // Sync new OCEL events to Supabase as they arrive
+  // Sync new OCEL events to the server as they arrive (batched via ocel-ingest)
   watch(events, async (all) => {
     if (!dbSessionId.value || isSyncing.value) return;
     const unsync = all.slice(syncedCount.value);
@@ -58,10 +47,20 @@ export function useGameSessionPersistence() {
 
     isSyncing.value = true;
     try {
+      // Compute BLAKE3 hashes client-side to maintain chain_tip locally
+      const batch: Array<{
+        session_id: string;
+        activity: string;
+        timestamp_ms: number;
+        object_refs: string[];
+        attributes: Record<string, unknown>;
+        event_hash: string;
+        prev_hash: string | null;
+        seq: number;
+      }> = [];
+
       for (const evt of unsync) {
-        // seq is 0-indexed — matches exportHashedOcelLog enumeration
         const seq = syncedCount.value;
-        // Canonical hash matches exportHashedOcelLog so chain_tip == last stored event_hash
         const hash = await computeEventHash({
           id: evt.id,
           timestamp: new Date(evt.timestamp_ms).toISOString(),
@@ -72,71 +71,57 @@ export function useGameSessionPersistence() {
           },
           prev_hash: lastHash.value,
         });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error } = await (client as any).from('ocel_events').insert({
-          session_id: dbSessionId.value,
+        batch.push({
+          session_id: dbSessionId.value!,
           activity: evt.activity,
           timestamp_ms: evt.timestamp_ms,
-          object_refs: [...evt.object_refs.map(o => o.object_id)],
+          object_refs: evt.object_refs.map(o => o.object_id),
           attributes: evt.attributes as Record<string, unknown>,
-          prev_hash: lastHash.value,
           event_hash: hash,
+          prev_hash: lastHash.value,
           seq,
         });
-        if (error) {
-          syncError.value = `ocel_events insert failed: ${error.message}`;
-          break;
-        }
         lastHash.value = hash;
         syncedCount.value = seq + 1;
       }
 
-      // Update session alive status and count
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (client as any)
-        .from('game_sessions')
-        .update({ is_alive: isPlaying.value, ocel_event_count: syncedCount.value })
-        .eq('id', dbSessionId.value);
+      // Ingest via server route (handles ocel_events insert + continuing chain)
+      await $fetch('/api/game/ocel-ingest', {
+        method: 'POST',
+        body: { session_id: dbSessionId.value, events: batch },
+      }).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        syncError.value = `ocel-ingest failed: ${msg}`;
+      });
 
-      // Fire-and-forget: emit OTel spans via server route (non-fatal if collector down)
-      // seq: syncedCount.value is already past the last processed event; rewind by unsync.length
-      // so seq[0] = (syncedCount - unsync.length), matching the 0-indexed seq stored in ocel_events
-      const batchStartSeq = syncedCount.value - unsync.length;
-      const batch = unsync.map((evt, i) => ({
-        session_id: dbSessionId.value!,
-        activity: evt.activity,
-        timestamp_ms: evt.timestamp_ms,
-        object_refs: evt.object_refs.map(o => o.object_id),
-        attributes: evt.attributes as Record<string, unknown>,
-        event_hash: lastHash.value ?? '',
-        seq: batchStartSeq + i,
-      }));
-      $fetch('/api/game/ocel-ingest', { method: 'POST', body: { session_id: dbSessionId.value, events: batch } })
-        .catch(() => { /* collector down — Supabase is source of truth */ });
+      // Update session alive status and count via PATCH
+      await $fetch(`/api/game/session/${dbSessionId.value}`, {
+        method: 'PATCH',
+        body: { is_alive: isPlaying.value, ocel_event_count: syncedCount.value },
+      }).catch(() => { /* non-fatal — count corrected on close */ });
+
     } finally {
       isSyncing.value = false;
     }
   }, { deep: true });
 
-  // On session end, mark the DB row closed
+  // On session end, mark the DB row closed via PATCH
   async function closeSession(receiptHash?: string) {
     if (!dbSessionId.value) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (client as any)
-      .from('game_sessions')
-      .update({
+    await $fetch(`/api/game/session/${dbSessionId.value}`, {
+      method: 'PATCH',
+      body: {
         session_ended_at: new Date().toISOString(),
         is_alive: false,
         ocel_event_count: syncedCount.value,
         receipt_hash: receiptHash ?? null,
-      })
-      .eq('id', dbSessionId.value);
+      },
+    }).catch(() => { /* non-fatal — session row still valid without end timestamp */ });
   }
 
   // Persist a verified receipt — routes through the server proof gate (cook-receipt.post.ts).
-  // Direct client inserts into game_receipts are removed: the proof gate is the only write
-  // path, ensuring chain verification always runs server-side before any row is stored.
+  // The proof gate is the only write path for game_receipts: it enforces engine_source check,
+  // lifecycle completeness, receipt_hash format, and optional Ed25519 signature.
   async function persistReceipt(receipt: {
     verdict: 'PASS' | 'FAIL' | 'PENDING';
     milestone: string;
