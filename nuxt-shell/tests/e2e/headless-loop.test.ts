@@ -198,6 +198,26 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     console.log('[headless-loop] wasm-crosscheck: NO_DATA for zero hash (expected for headless session)');
   });
 
+  it('Step 6b: wasm-verify independently re-hashes the served binary (tamper detection)', async () => {
+    if (MOCK) return;
+    // Independent tamper check: when a real cooked archive is present, the server
+    // re-hashes Brm.wasm and the verdict is MATCH/MISMATCH; with no archive it is
+    // NO_WASM. A known-wrong expected_hash on a present binary MUST be MISMATCH.
+    const { status, body } = await get('/api/game/wasm-verify?expected_hash=' + '0'.repeat(64));
+    if (status === 503) return;
+    expect(status).toBe(200);
+    expect(['MATCH', 'MISMATCH', 'NO_EXPECTED_HASH', 'NO_WASM']).toContain(body.verdict);
+    if (body.verdict === 'NO_WASM') {
+      expect(body.computed_hash).toBeNull();
+    } else {
+      // Binary present → recomputed hash is real 64-hex, and the all-zero expected
+      // hash can never match it → tamper detection fires.
+      expect(body.computed_hash).toMatch(/^[0-9a-f]{64}$/);
+      expect(body.verdict).toBe('MISMATCH');
+    }
+    console.log(`[headless-loop] wasm-verify: verdict=${body.verdict} size=${body.size_bytes}`);
+  });
+
   it('Step 7: cook-receipt proof gate accepts the seeded session receipt', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await post('/api/game/cook-receipt', {
