@@ -431,6 +431,27 @@ jobs:
           # shell/game-loop block /manufactured/**, auth-flow is DOM-only.
           CI: "true"
 
+      - name: Download cooked UE4 wasm (optional artifact from a macOS cook job)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: brm-html5-wasm
+          path: /tmp/brm-html5-archive/HTML5
+
+      - name: Real-UE4 WebGL2 loop (HEADLESS via SwiftShader — no GPU needed)
+        run: |
+          # Only run when a cooked wasm is present (CI can't cook UE4 on Linux).
+          # The spec's beforeAll also skips gracefully if :8080 isn't serving.
+          if [ -f /tmp/brm-html5-archive/HTML5/Brm.wasm ]; then
+            ( cd /tmp/brm-html5-archive/HTML5 && python3 -m http.server 8080 >/tmp/asset.log 2>&1 ) &
+            timeout 15 bash -c 'until curl -sf http://localhost:8080/Brm.html >/dev/null; do sleep 1; done'
+            npm run test:ue4:ci
+          else
+            echo "No cooked Brm.wasm artifact — skipping real-UE4 loop (headless SwiftShader path is proven; needs a macOS cook job to upload brm-html5-wasm)."
+          fi
+        env:
+          CI: "true"
+
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4
