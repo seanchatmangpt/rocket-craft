@@ -1,13 +1,28 @@
 # NEXT_GATE_STATUS — Synthesis / Final Admission Backstop
 
 **Run date:** 2026-06-20
-**Claim:** `PRE_UE4_HERO_ASSET_ADMITTED`
-**Keystone (DELETE_RESYNC_REPLAY_REPORT.json):** standing=ADMITTED, verdict=VERIFIED, chain_valid=true. Its receipt-chain pillar now verifies end-to-end (162-entry prev_hash-linked BLAKE3_RECEIPT_CHAIN.json, validate_chain passes).
-**IP non-confusion:** CLEAN — hero `asset_fabric.ttl` verdict=ADMIT_ORIGINAL, refused=0.
+**Claim:** `CLAIM_HOLD` — the earlier `PRE_UE4_HERO_ASSET_ADMITTED` claim is **RETRACTED** as overstated.
 
-All three prior blockers (R1 modular-identity DOE, R6 receipt-chain clobber, R4 strict-4dp) are
-resolved at their lawful standards. Every workstream re-verifies ADMITTED on independently
-stat'd + content-checked on-disk evidence.
+> CORRECTION (2026-06-20, post process-review): the independent 4-dimension review
+> (`PROCESS_REVIEW_REPORT.md`, verdict NEEDS_REPAIR) found the top-line ADMITTED was not
+> earned. Per CONTINUE_REPAIR / CLAIM_HOLD, the honest evidence-backed state of the flagship
+> asset is **PARTIAL_ALIVE**. Reasons:
+> 1. The dedicated metric-morphology GRAPH-LAW gate (`METRIC_MORPHOLOGY_REPORT.json`) stands at
+>    `verdict=PARTIAL_ALIVE`, `shacl_conforms=false`, with live `REFUSE_PART_HEIGHT_BAND` refusals
+>    and the unresolved orientation defect (parts stack along Z while `upAxis=Y`). This gate was
+>    omitted from the earlier 9-workstream census.
+> 2. R3 `VISION_POWL_LOOP_ADMISSION_REPORT.json` carries `standing=ADMITTED` with null
+>    verifier evidence, but its generator (`generate_all_reports.py:340`) emits `PARTIAL_ALIVE` —
+>    a standing upgraded without on-disk backing (not regenerable).
+> 3. `NON_CONFUSION_REPORT.json` cited as evidence does not exist on disk (IP is actually backed
+>    by `IP_DISTANCE_EVIDENCE.json`, ADMIT_ORIGINAL/refused=0 — that part stands).
+> 4. The R6 keystone `VERIFIED` means "replay is deterministic," NOT "asset passed quality"
+>    (`thresholds_met=false`, USD400/401 8-vertex mock-mesh + VIS202-208 errors persist).
+
+**What genuinely stands (real evidence):** R2 source-law regenerability (`contamination_free=true`),
+the R6 BLAKE3 receipt-chain cryptography (162 receipts recompute end-to-end), IP non-confusion via
+`IP_DISTANCE_EVIDENCE.json`, and the metric-morphology verifier's *honesty* (it correctly refuses).
+The process is sound; the flagship asset is **PARTIAL_ALIVE**, not admitted.
 
 ## Re-verified per-workstream standing (independently stat'd + content-checked)
 

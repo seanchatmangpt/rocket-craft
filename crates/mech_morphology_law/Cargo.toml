@@ -1,0 +1,22 @@
+[package]
+name = "mech_morphology_law"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+publish = false
+description = "Pre-UE4 hero-asset metric-morphology GRAPH LAW (110/116/117) as a Machine<Law,Phase> typestate with BLAKE3 replay receipts. Doctrine: CONTINUE_REPAIR / CLAIM_HOLD."
+
+[features]
+default = ["std", "serde", "blake3hash"]
+std = ["thiserror"]
+serde = ["dep:serde"]
+blake3hash = ["dep:blake3", "std"]
+
+[dependencies]
+serde     = { workspace = true, optional = true }
+thiserror = { workspace = true, optional = true }
+blake3    = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+proptest   = "1"

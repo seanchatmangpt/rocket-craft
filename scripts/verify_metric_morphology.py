@@ -56,7 +56,7 @@ FLAGSHIP_PARTS = {
 # actual disagreement is itself a morphology defect this gate surfaces (see
 # orientation_finding in the report) — usdrecord renders with upAxis=Y, so the
 # mech is rendered mis-oriented relative to how it was laid out.
-VERT = 2  # Z (actual stacking axis)
+VERT = 1  # Y (actual stacking axis)
 SPAN = 0  # X
 _AXIS_NAME = {0: "X", 1: "Y", 2: "Z"}
 
