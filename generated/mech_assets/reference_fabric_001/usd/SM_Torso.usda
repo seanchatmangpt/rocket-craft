@@ -85,21 +85,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -107,7 +107,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -115,21 +115,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -137,7 +137,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -145,21 +145,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -167,7 +167,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -175,21 +175,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -197,7 +197,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -205,21 +205,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -227,7 +227,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -235,21 +235,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -257,7 +257,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -265,21 +265,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -287,7 +287,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -295,21 +295,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -317,7 +317,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -346,21 +346,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -368,7 +368,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -376,21 +376,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -398,7 +398,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -406,21 +406,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -428,7 +428,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -436,21 +436,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -458,7 +458,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -466,21 +466,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -488,7 +488,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -496,21 +496,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -518,7 +518,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -526,21 +526,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -548,7 +548,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -556,21 +556,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -578,7 +578,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -607,21 +607,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -629,7 +629,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -637,21 +637,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -659,7 +659,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -667,21 +667,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -689,7 +689,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -697,21 +697,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -719,7 +719,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -727,21 +727,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -749,7 +749,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -757,21 +757,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -779,7 +779,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -787,21 +787,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -809,7 +809,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -817,21 +817,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -839,7 +839,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -868,21 +868,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -890,7 +890,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -898,21 +898,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -920,7 +920,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -928,21 +928,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -950,7 +950,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -958,21 +958,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -980,7 +980,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -988,21 +988,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1010,7 +1010,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1018,21 +1018,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1040,7 +1040,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1048,21 +1048,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1070,7 +1070,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1078,21 +1078,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1100,7 +1100,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1252,21 +1252,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1274,7 +1274,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1282,21 +1282,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1304,7 +1304,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1312,21 +1312,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1334,7 +1334,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1342,21 +1342,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1364,7 +1364,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1372,21 +1372,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1394,7 +1394,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1402,21 +1402,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1424,7 +1424,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1432,21 +1432,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1454,7 +1454,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1462,21 +1462,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1484,7 +1484,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1513,21 +1513,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1535,7 +1535,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1543,21 +1543,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1565,7 +1565,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1573,21 +1573,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1595,7 +1595,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1603,21 +1603,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1625,7 +1625,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1633,21 +1633,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1655,7 +1655,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1663,21 +1663,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1685,7 +1685,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1693,21 +1693,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1715,7 +1715,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1723,21 +1723,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1745,7 +1745,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1774,21 +1774,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1796,7 +1796,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1804,21 +1804,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1826,7 +1826,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1834,21 +1834,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1856,7 +1856,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1864,21 +1864,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1886,7 +1886,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1894,21 +1894,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1916,7 +1916,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1924,21 +1924,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1946,7 +1946,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1954,21 +1954,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1976,7 +1976,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -1984,21 +1984,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2006,7 +2006,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2035,21 +2035,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2057,7 +2057,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2065,21 +2065,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2087,7 +2087,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2095,21 +2095,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2117,7 +2117,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2125,21 +2125,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2147,7 +2147,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2155,21 +2155,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2177,7 +2177,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2185,21 +2185,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2207,7 +2207,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2215,21 +2215,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2237,7 +2237,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2245,21 +2245,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_WhiteArmor>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2267,7 +2267,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2296,21 +2296,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (0 * 0.05), 1.0 - (0 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:scale = (1, 1, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_0"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 0 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_0"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (0 * 0.02), 0.4 - (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (0.4, 0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2318,7 +2318,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (0 * 0.02), -0.4 + (0 * 0.02), 0 * 0.08)
+                    double3 xformOp:translate = (-0.4, -0.4, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2326,21 +2326,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (1 * 0.05), 1.0 - (1 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:scale = (0.95, 0.95, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_1"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 1 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_1"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (1 * 0.02), 0.4 - (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (0.38, 0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2348,7 +2348,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (1 * 0.02), -0.4 + (1 * 0.02), 1 * 0.08)
+                    double3 xformOp:translate = (-0.38, -0.38, 0.08)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2356,21 +2356,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (2 * 0.05), 1.0 - (2 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:scale = (0.9, 0.9, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_2"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 2 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_2"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (2 * 0.02), 0.4 - (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (0.36000000000000004, 0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2378,7 +2378,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (2 * 0.02), -0.4 + (2 * 0.02), 2 * 0.08)
+                    double3 xformOp:translate = (-0.36000000000000004, -0.36000000000000004, 0.16)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2386,21 +2386,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (3 * 0.05), 1.0 - (3 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:scale = (0.85, 0.85, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_3"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 3 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_3"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (3 * 0.02), 0.4 - (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (0.34, 0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2408,7 +2408,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (3 * 0.02), -0.4 + (3 * 0.02), 3 * 0.08)
+                    double3 xformOp:translate = (-0.34, -0.34, 0.24)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2416,21 +2416,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (4 * 0.05), 1.0 - (4 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:scale = (0.8, 0.8, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_4"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 4 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_4"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (4 * 0.02), 0.4 - (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (0.32, 0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2438,7 +2438,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (4 * 0.02), -0.4 + (4 * 0.02), 4 * 0.08)
+                    double3 xformOp:translate = (-0.32, -0.32, 0.32)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2446,21 +2446,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_5"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (5 * 0.05), 1.0 - (5 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:scale = (0.75, 0.75, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_5"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 5 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_5"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (5 * 0.02), 0.4 - (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (0.30000000000000004, 0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2468,7 +2468,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (5 * 0.02), -0.4 + (5 * 0.02), 5 * 0.08)
+                    double3 xformOp:translate = (-0.30000000000000004, -0.30000000000000004, 0.4)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2476,21 +2476,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_6"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (6 * 0.05), 1.0 - (6 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:scale = (0.7, 0.7, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_6"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 6 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_6"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (6 * 0.02), 0.4 - (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (0.28, 0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2498,7 +2498,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (6 * 0.02), -0.4 + (6 * 0.02), 6 * 0.08)
+                    double3 xformOp:translate = (-0.28, -0.28, 0.48)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2506,21 +2506,21 @@ def Xform "SM_Torso"
                 def Cube "armor_plate_7"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (1.0 - (7 * 0.05), 1.0 - (7 * 0.05), 0.1)
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:scale = (0.6499999999999999, 0.6499999999999999, 0.1)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_GoldVisor>
                 }
                 def Xform "hardpoint_7"
                 {
-                    double3 xformOp:translate = (0.0, 0.0, 7 * 0.08)
+                    double3 xformOp:translate = (0.0, 0.0, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                 }
                 def Cylinder "armor_piston_7"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (0.4 - (7 * 0.02), 0.4 - (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (0.26, 0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
@@ -2528,7 +2528,7 @@ def Xform "SM_Torso"
                 {
                     double radius = 0.05
                     double height = 1.2
-                    double3 xformOp:translate = (-0.4 + (7 * 0.02), -0.4 + (7 * 0.02), 7 * 0.08)
+                    double3 xformOp:translate = (-0.26, -0.26, 0.56)
                     uniform token[] xformOpOrder = ["xformOp:translate"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_DarkFrame>
                 }
