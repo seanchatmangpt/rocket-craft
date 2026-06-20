@@ -17,20 +17,23 @@ export function useGameSessionPersistence() {
 
   const { computeEventHash } = useHashChain();
   const dbSessionId = ref<string | null>(null);
+  const dbReceiptHash = ref<string | null>(null);
   const lastHash = ref<string | null>(null);
   const syncedCount = ref(0);
   const syncError = ref<string | null>(null);
   const isSyncing = ref(false);
 
-  // Open a DB session row via server API when the game session starts
+  // Open a DB session row via server API when the game session starts.
+  // Also stores the initial receipt_hash returned so receipt-finalize can UPDATE it later.
   watch(sessionId, async (sid) => {
     if (!sid) return;
     try {
-      const result = await $fetch<{ session_id: string; started_at: string }>('/api/game/session', {
+      const result = await $fetch<{ session_id: string; receipt_hash: string; started_at: string }>('/api/game/session', {
         method: 'POST',
         body: { browser_session_id: sid, engine_source: 'browser' },
       });
       dbSessionId.value = result.session_id;
+      dbReceiptHash.value = result.receipt_hash ?? null;
       lastHash.value = null;
       syncedCount.value = 0;
     } catch (err: unknown) {
@@ -174,6 +177,7 @@ export function useGameSessionPersistence() {
 
   return {
     dbSessionId: readonly(dbSessionId),
+    dbReceiptHash: readonly(dbReceiptHash),
     syncedCount: readonly(syncedCount),
     lastHash: readonly(lastHash),
     syncError: readonly(syncError),
