@@ -6,6 +6,11 @@ pub mod crypto;
 pub mod doctor;
 pub mod supabase;
 pub mod audit_affidavit;
+pub mod ui;
+pub mod completions;
+pub mod wizard;
+pub mod cache;
+pub mod watch;
 
 use std::path::{Path, PathBuf};
 use anyhow::Result;

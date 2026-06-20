@@ -107,3 +107,5 @@ test-results/
 
 # Agent Framework
 .agents/
+# rocket build cache
+.rocket-cache.json

@@ -18,8 +18,16 @@ mod compliance;
 use color_eyre::eyre::{eyre, ContextCompat, Result};
 use error::RocketError;
 use compliance::ComplianceEngine;
-use clap::{CommandFactory, Parser, Subcommand};
-use clap_complete::{generate, Shell};
+use clap::{Parser, Subcommand};
+use clap_complete::Shell;
+use rocket_sdk::completions::{
+    self, generate_completions, generate_man_page, generate_subcommand_man_page,
+    install_instructions, render_help, rocket_command_spec, Shell as RocketShell,
+};
+use rocket_sdk::wizard::{
+    detect_env, next_steps, render_env, render_next_steps, StdinPrompter, Wizard,
+};
+use rocket_sdk::watch::{Task, TaskGraph, WatchFilter, WatchLoop, Watcher};
 use colored::*;
 use indicatif::{ProgressBar, ProgressStyle};
 use std::fs;
@@ -42,8 +50,24 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Setup the Unreal Engine environment
-    Setup,
+    /// Validate / configure the UE4 + SDK environment
+    Setup {
+        /// Run the guided interactive onboarding wizard (superset of legacy setup)
+        #[arg(long)]
+        interactive: bool,
+        /// Take all smart defaults; never prompt
+        #[arg(long)]
+        non_interactive: bool,
+    },
+    /// First-run onboarding wizard: detect tools, configure .rocket.json, print next steps
+    Init {
+        /// Take all smart defaults; never prompt
+        #[arg(long)]
+        non_interactive: bool,
+        /// Show what would change without writing .rocket.json
+        #[arg(long)]
+        dry_run: bool,
+    },
     /// Synchronize project manifest with filesystem
     Sync,
     /// Build a project target
@@ -96,8 +120,41 @@ enum Commands {
         /// The shell to generate completions for
         shell: Shell,
     },
-    /// Troubleshoot the environment
-    Doctor,
+    /// Generate troff man pages for rocket (all, or a single subcommand)
+    Man {
+        /// Subcommand to document; omit for the top-level page
+        command: Option<String>,
+    },
+    /// Run environment & project health diagnostics
+    Doctor {
+        /// Emit the report as JSON instead of the pretty table
+        #[arg(long)]
+        json: bool,
+        /// One-line summary only
+        #[arg(long)]
+        quiet: bool,
+        /// Attempt safe auto-fixes (cargo fetch, create missing dirs, …)
+        #[arg(long)]
+        fix: bool,
+        /// With --fix: actually apply fixes instead of only showing them (default is dry-run)
+        #[arg(long)]
+        apply: bool,
+        /// Disable ANSI color output
+        #[arg(long)]
+        no_color: bool,
+    },
+    /// Watch the repo and auto-run tests/lint on change (polling, std-only)
+    Watch {
+        /// Poll interval in milliseconds
+        #[arg(long, default_value_t = 500)]
+        interval_ms: u64,
+        /// Debounce window in milliseconds (coalesces rapid saves)
+        #[arg(long, default_value_t = 300)]
+        debounce_ms: u64,
+        /// Print resolved tasks but do not execute them
+        #[arg(long)]
+        dry_run: bool,
+    },
     /// List all integrated high-level features (Capabilities)
     Capabilities,
     /// Execute a WASM plugin directly
@@ -126,11 +183,42 @@ enum PwaSubcommands {
 
 fn main() -> Result<()> {
     color_eyre::install()?;
-    let cli = Cli::parse();
+
+    // Layer rich, grouped help and "did you mean?" suggestions over clap's parser.
+    let cli = match Cli::try_parse() {
+        Ok(cli) => cli,
+        Err(e) => {
+            use clap::error::ErrorKind;
+            let spec = rocket_command_spec();
+            let color = std::env::var_os("NO_COLOR").is_none();
+            match e.kind() {
+                ErrorKind::DisplayHelp | ErrorKind::MissingSubcommand => {
+                    print!("{}", render_help(&spec, None, color));
+                    std::process::exit(0);
+                }
+                ErrorKind::InvalidSubcommand | ErrorKind::UnknownArgument => {
+                    if let Some(arg) = std::env::args().nth(1) {
+                        print!("{}", render_help(&spec, Some(&arg), color));
+                    } else {
+                        print!("{}", render_help(&spec, None, color));
+                    }
+                    std::process::exit(2);
+                }
+                _ => e.exit(),
+            }
+        }
+    };
 
     match cli.command {
-        Commands::Setup => {
-            setup::run_setup().map_err(|e| eyre!("{}", e))?;
+        Commands::Setup { interactive, non_interactive } => {
+            if interactive || non_interactive {
+                run_wizard(non_interactive, false)?;
+            } else {
+                setup::run_setup().map_err(|e| eyre!("{}", e))?;
+            }
+        }
+        Commands::Init { non_interactive, dry_run } => {
+            run_wizard(non_interactive, dry_run)?;
         }
         Commands::Sync => {
             run_sync()?;
@@ -174,12 +262,39 @@ fn main() -> Result<()> {
             run_logs(file, lines)?;
         }
         Commands::Completions { shell } => {
-            let mut cmd = Cli::command();
-            let bin_name = cmd.get_name().to_string();
-            generate(shell, &mut cmd, bin_name, &mut std::io::stdout());
+            // Route through the SDK's declarative spec so completions, man pages,
+            // and help all share a single source of truth.
+            let sdk_shell = match shell {
+                Shell::Bash => RocketShell::Bash,
+                Shell::Zsh => RocketShell::Zsh,
+                Shell::Fish => RocketShell::Fish,
+                Shell::PowerShell => RocketShell::PowerShell,
+                _ => RocketShell::Bash,
+            };
+            let spec = rocket_command_spec();
+            print!("{}", generate_completions(sdk_shell, &spec));
+            eprintln!("\n# To install:\n{}", install_instructions(sdk_shell));
         }
-        Commands::Doctor => {
-            run_doctor()?;
+        Commands::Man { command } => {
+            let spec = rocket_command_spec();
+            match command {
+                Some(name) => match spec.find_sub(&name) {
+                    Some(sub) => print!("{}", generate_subcommand_man_page(&spec, sub)),
+                    None => {
+                        eprintln!("Unknown command: {name}");
+                        if let Some(s) = completions::did_you_mean(&name, &spec.subcommand_names()) {
+                            eprintln!("Did you mean '{s}'?");
+                        }
+                    }
+                },
+                None => print!("{}", generate_man_page(&spec)),
+            }
+        }
+        Commands::Doctor { json, quiet, fix, apply, no_color } => {
+            run_doctor(json, quiet, fix, apply, no_color)?;
+        }
+        Commands::Watch { interval_ms, debounce_ms, dry_run } => {
+            run_watch(interval_ms, debounce_ms, dry_run)?;
         }
         Commands::Capabilities => {
             run_capabilities()?;
@@ -544,29 +659,102 @@ fn run_pwa(cmd: Option<PwaSubcommands>, dir: &str, _output: Option<String>) -> R
 }
 
 
-fn run_doctor() -> Result<()> {
-    tracing::info!("{}", "Rocket Doctor - Programmatic Diagnostics".bold().cyan());
-    tracing::info!("===========================================");
-
+fn run_doctor(json: bool, quiet: bool, fix: bool, apply: bool, no_color: bool) -> Result<()> {
     let project_root = std::env::current_dir()?;
     let doctor = RocketDoctor::new(project_root);
-    let report = doctor.run_diagnostics();
+    let use_color = !no_color;
 
-    for check in report.checks {
-        let status_str = match check.status {
-            CheckStatus::Pass => "✓".green(),
-            CheckStatus::Warn => "⚠".yellow(),
-            CheckStatus::Fail => "✗".red(),
-        };
-
-        tracing::info!("  {} {}: {}", status_str, check.name.bold(), check.message);
-        if let Some(details) = check.details {
-            tracing::info!("    {}", details.dimmed());
+    // --fix: run safe, whitelisted remediations. Dry-run unless --apply is given.
+    if fix {
+        let dry_run = !apply;
+        let fixes = doctor.run_fixes(dry_run);
+        if fixes.is_empty() {
+            println!("Nothing to fix — environment is healthy.");
         }
+        for f in &fixes {
+            println!("[{:?}] {} -> {}", f.outcome, f.command, f.message);
+        }
+        if dry_run && !fixes.is_empty() {
+            println!("(dry-run: nothing was applied; pass --apply to apply)");
+        }
+        return Ok(());
     }
 
-    tracing::info!("\nReport generated at: {}", report.timestamp);
+    let report = doctor.run_diagnostics();
 
+    if json {
+        println!("{}", report.to_json());
+    } else if quiet {
+        println!("{}", report.compact_summary(use_color));
+    } else {
+        print!("{}", report.pretty(use_color));
+    }
+
+    // Non-zero exit when overall health failed — handy for CI / pre-commit hooks.
+    if report.overall_status() == CheckStatus::Fail {
+        std::process::exit(1);
+    }
+
+    Ok(())
+}
+
+fn run_wizard(non_interactive: bool, dry_run: bool) -> Result<()> {
+    let env = detect_env();
+    println!("{}", render_env(&env));
+
+    let mut wiz = Wizard::new(StdinPrompter, env.clone(), PathBuf::from(".rocket.json"))
+        .non_interactive(non_interactive);
+
+    let plan = wiz.plan().map_err(|e| eyre!("{}", e))?;
+
+    if dry_run {
+        println!("Planned changes (dry run, nothing written):");
+        for c in &plan.changes {
+            println!("  {} : {:?} -> {}", c.key, c.from, c.to);
+        }
+    } else {
+        wiz.apply(&plan).map_err(|e| eyre!("{}", e))?;
+        println!("Wrote {}", plan.config_path.display());
+    }
+
+    println!("{}", render_next_steps(&next_steps(&env, &plan.config)));
+    Ok(())
+}
+
+fn run_watch(interval_ms: u64, debounce_ms: u64, dry_run: bool) -> Result<()> {
+    let root = std::env::current_dir()?;
+    let watcher = Watcher::new(vec![root.clone()], WatchFilter::rocket_defaults());
+    let graph = TaskGraph::new(root);
+    let mut wl = WatchLoop::new(
+        watcher,
+        graph,
+        Duration::from_millis(interval_ms),
+        Duration::from_millis(debounce_ms),
+    );
+
+    println!("rocket watch: polling every {interval_ms}ms (Ctrl-C to stop)");
+    wl.run(|result| {
+        println!(
+            "changed: +{} ~{} -{}",
+            result.changes.created.len(),
+            result.changes.modified.len(),
+            result.changes.deleted.len(),
+        );
+        for task in &result.tasks {
+            match task {
+                Task::Skip { reason, path } => {
+                    println!("  skip {}: {reason}", path.display());
+                }
+                Task::Command { description, program, args } => {
+                    println!("  run  {description}: {program} {}", args.join(" "));
+                    if !dry_run {
+                        let _ = std::process::Command::new(program).args(args).status();
+                    }
+                }
+            }
+        }
+        true
+    });
     Ok(())
 }
 
