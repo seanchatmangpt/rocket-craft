@@ -1,9 +1,40 @@
+import type { RocketIntent } from './useRocketInputBus';
+
+/** Left-stick deadzone — drift below this magnitude is not admitted as an intent. */
+export const GAMEPAD_DEADZONE = 0.25;
+
+/**
+ * Pure mapping: gamepad axes + buttons → RocketIntents. Extracted so the deadzone
+ * and axis/button bindings are unit-tested without the browser Gamepad API.
+ *
+ *   axes[0] = left-stick X (− left / + right), axes[1] = Y (− up / + down)
+ *   buttons[0]=A→Interact, [1]=B→ExitImmersiveMode, [3]=Y→OpenReceiptPanel
+ */
+export function mapGamepadToIntents(
+  axes: readonly number[],
+  buttons: readonly { pressed: boolean }[],
+): RocketIntent[] {
+  const intents: RocketIntent[] = [];
+  const x = axes[0] ?? 0;
+  const y = axes[1] ?? 0;
+
+  if (y < -GAMEPAD_DEADZONE) intents.push({ type: 'MoveForward', value: Math.abs(y), source: 'gamepad:left-stick' });
+  if (y > GAMEPAD_DEADZONE) intents.push({ type: 'MoveBackward', value: y, source: 'gamepad:left-stick' });
+  if (x < -GAMEPAD_DEADZONE) intents.push({ type: 'TurnLeft', value: Math.abs(x), source: 'gamepad:left-stick' });
+  if (x > GAMEPAD_DEADZONE) intents.push({ type: 'TurnRight', value: x, source: 'gamepad:left-stick' });
+
+  if (buttons[0]?.pressed) intents.push({ type: 'Interact', source: 'gamepad:A' });
+  if (buttons[1]?.pressed) intents.push({ type: 'ExitImmersiveMode', source: 'gamepad:B' });
+  if (buttons[3]?.pressed) intents.push({ type: 'OpenReceiptPanel', source: 'gamepad:Y' });
+
+  return intents;
+}
+
 /**
  * useRocketGamepad — maps browser Gamepad API to RocketIntents via VueUse.
  *
  * VueUse useGamepad polls via requestAnimationFrame internally.
  * Must be used in a <ClientOnly> context (gamepad API is browser-only).
- * Deadzone of 0.25 prevents drift noise from being admitted as intents.
  */
 export function useRocketGamepad() {
   const { emit } = useRocketInputBus();
@@ -16,21 +47,7 @@ export function useRocketGamepad() {
   watchEffect(() => {
     const pad = standardPad.value;
     if (!isSupported.value || !pad) return;
-
-    const x = pad.axes[0] ?? 0;
-    const y = pad.axes[1] ?? 0;
-
-    if (y < -0.25) emit({ type: 'MoveForward',  value: Math.abs(y), source: 'gamepad:left-stick' });
-    if (y >  0.25) emit({ type: 'MoveBackward', value: y,           source: 'gamepad:left-stick' });
-    if (x < -0.25) emit({ type: 'TurnLeft',     value: Math.abs(x), source: 'gamepad:left-stick' });
-    if (x >  0.25) emit({ type: 'TurnRight',    value: x,           source: 'gamepad:left-stick' });
-
-    // Button 0 = A/Cross → Interact
-    if (pad.buttons[0]?.pressed) emit({ type: 'Interact', source: 'gamepad:A' });
-    // Button 1 = B/Circle → ExitImmersiveMode
-    if (pad.buttons[1]?.pressed) emit({ type: 'ExitImmersiveMode', source: 'gamepad:B' });
-    // Button 3 = Y/Triangle → OpenReceiptPanel
-    if (pad.buttons[3]?.pressed) emit({ type: 'OpenReceiptPanel', source: 'gamepad:Y' });
+    for (const intent of mapGamepadToIntents(pad.axes, pad.buttons)) emit(intent);
   });
 
   return { isSupported, standardPad };
