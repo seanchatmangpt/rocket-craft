@@ -10,7 +10,7 @@
     "test": "vitest run",
     "build:css": "postcss css/style.css -o dist/style.css",
     "build": "npm run build:css && npm run build:ts",
-    "build:ts": "esbuild src/*.ts --bundle --outdir=dist && esbuild worker.ts --outfile=worker.js && esbuild cache.ts --outfile=cache.js"
+    "build:ts": "node esbuild.config.mjs && esbuild worker.ts --outfile=worker.js && esbuild cache.ts --outfile=cache.js"
   },
   "keywords": [
     "pwa",
