@@ -12,6 +12,14 @@
  */
 import { createClient } from '@supabase/supabase-js';
 import { computeMerkleRoot } from '../../utils/merkle';
+import { checkConformance } from '../../utils/processMining';
+
+const DECLARED_LIFECYCLE = [
+  'GameSessionStarted',
+  'InputAdmitted',
+  'FrameRendered',
+  'GameSessionClosed',
+];
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event);
@@ -30,7 +38,7 @@ export default defineEventHandler(async (event) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createClient<any>(supabaseUrl, serviceKey);
 
-  const [rpcResult, hashesResult] = await Promise.all([
+  const [rpcResult, hashesResult, eventsResult] = await Promise.all([
     sessionId
       ? supabase.rpc('verify_event_chain', { p_session_id: sessionId })
       : supabase.rpc('verify_event_chain', {}),
@@ -41,6 +49,14 @@ export default defineEventHandler(async (event) => {
           .eq('session_id', sessionId)
           .order('seq', { ascending: true })
       : Promise.resolve({ data: [] as Array<{ event_hash: string; seq: number }>, error: null }),
+    // Fetch full event rows for conformance analysis
+    sessionId
+      ? supabase
+          .from('ocel_events')
+          .select('activity, timestamp_ms, seq')
+          .eq('session_id', sessionId)
+          .order('seq', { ascending: true })
+      : Promise.resolve({ data: [] as Array<{ activity: string; timestamp_ms: number; seq: number }>, error: null }),
   ]);
 
   if (rpcResult.error) {
@@ -63,6 +79,10 @@ export default defineEventHandler(async (event) => {
     .filter(Boolean);
   const merkleRoot = computeMerkleRoot(eventHashes);
 
+  // Process conformance: fitness, precision, simplicity against declared lifecycle
+  const miningEvents = (eventsResult.data ?? []) as Array<{ activity: string; timestamp_ms: number; seq: number }>;
+  const conformance = checkConformance(miningEvents, DECLARED_LIFECYCLE);
+
   return {
     overall: allOk ? 'PASS' : 'FAIL',
     sessions_checked: rows.length,
@@ -70,5 +90,15 @@ export default defineEventHandler(async (event) => {
     rows,
     merkle_root: merkleRoot,
     event_count: eventHashes.length,
+    // Van der Aalst 4-dimension conformance: fitness, precision, simplicity, generalization
+    conformance: {
+      fitness: conformance.fitness,
+      precision: conformance.precision,
+      simplicity: conformance.simplicity,
+      generalization: conformance.generalization,
+      overall_score: conformance.overall_score,
+      variants_discovered: conformance.variants_discovered,
+      deviation_points: conformance.deviation_points,
+    },
   };
 });

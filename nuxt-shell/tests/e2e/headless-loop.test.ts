@@ -44,7 +44,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
 
   it('Step 1: session-seed manufactures a lawful OCEL session', async () => {
     if (MOCK) return;
-    const { status, body } = await post('/api/game/session-seed', {});
+    // create_test_player=true so the leaderboard trigger fires in step 14
+    const { status, body } = await post('/api/game/session-seed', { create_test_player: true });
     if (status === 503 || status === 403) {
       // Supabase not configured or production guard — skip gracefully
       console.log(`[headless-loop] session-seed returned ${status} — skipping live steps`);
@@ -58,6 +59,8 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     expect(body.receipt_hash).toHaveLength(64);  // BLAKE3 hex
     expect(body.chain_tip).toHaveLength(64);
     expect(body.ocel_event_count).toBeGreaterThanOrEqual(3);
+    // Leaderboard eligible when player bound
+    expect(body.leaderboard_eligible).toBe(true);
 
     // Lawful lifecycle must include the minimum proof activities
     expect(body.activities).toContain('GameSessionStarted');
@@ -71,6 +74,34 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     console.log(`[headless-loop] Seeded session=${seededSessionId} events=${body.ocel_event_count}`);
   });
 
+  it('Step 1b: idempotency key — second seed with same key returns same session', async () => {
+    if (MOCK || !seededSessionId) return;
+    const idemKey = `headless-idem-${seededSessionId}`;
+
+    // First call: creates a fresh session tagged with the idempotency key
+    const { status: s1, body: b1 } = await post('/api/game/session-seed', {
+      create_test_player: true,
+      idempotency_key: idemKey,
+    });
+    if (s1 === 503 || s1 === 403) return;
+    expect(s1).toBe(200);
+    const firstId = b1.session_id;
+    expect(typeof firstId).toBe('string');
+    expect(b1.idempotent_replay).toBe(false);
+
+    // Second call with same key must return the same session_id, not a new one
+    const { status: s2, body: b2 } = await post('/api/game/session-seed', {
+      create_test_player: true,
+      idempotency_key: idemKey,
+    });
+    if (s2 === 503 || s2 === 403) return;
+    expect(s2).toBe(200);
+    expect(b2.session_id).toBe(firstId);
+    expect(b2.idempotent_replay).toBe(true);
+
+    console.log(`[headless-loop] idempotency: key=${idemKey.slice(-8)} → session=${firstId?.slice(0, 8)}… replay=${b2.idempotent_replay}`);
+  });
+
   it('Step 2: session-replay confirms every event in the seeded chain is intact', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get(`/api/game/session-replay?session_id=${seededSessionId}`);
@@ -82,10 +113,18 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     expect(body.first_break_at).toBeNull();
     expect(body.total_events).toBeGreaterThanOrEqual(3);
 
-    const events = body.events as Array<{ chain_ok: boolean }>;
+    // hash_convergent: server recomputes BLAKE3(canonical_payload) and compares
+    // to stored event_hash — catches tampered hashes even if chain threads correctly
+    expect(body.hash_convergent).toBe(true);
+    expect(body.tamper_evident).toBe(true);
+    expect(body.first_convergence_fail_at).toBeNull();
+
+    const events = body.events as Array<{ chain_ok: boolean; hash_convergent: boolean | null }>;
     const broken = events.filter(e => !e.chain_ok);
+    const nonConvergent = events.filter(e => e.hash_convergent === false);
     expect(broken).toHaveLength(0);
-    console.log(`[headless-loop] session-replay: ${events.length} events, all chain_ok=true`);
+    expect(nonConvergent).toHaveLength(0);
+    console.log(`[headless-loop] session-replay: ${events.length} events, chain_intact=true, tamper_evident=true`);
   });
 
   it('Step 3: receipt-finalize proves the chain with chain_tip as receipt_hash', async () => {
@@ -200,7 +239,7 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     }
   });
 
-  it('Step 10: chain-verify confirms chain intact with merkle_root for the seeded session', async () => {
+  it('Step 10: chain-verify confirms chain intact + conformance scores for the seeded session', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get(`/api/game/chain-verify?session_id=${seededSessionId}`);
     if (status === 503 || status === 500) return;
@@ -210,22 +249,61 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     // merkle_root must be a 64-char hex string (BLAKE3)
     expect(typeof body.merkle_root).toBe('string');
     expect(body.merkle_root).toMatch(/^[0-9a-f]{64}$/);
-    console.log(`[headless-loop] chain-verify: overall=${body.overall} event_count=${body.event_count} merkle_root=${body.merkle_root?.slice(0, 8)}…`);
+    // Van der Aalst 4-dimension conformance: fitness, precision, simplicity, generalization
+    expect(body.conformance).toBeDefined();
+    expect(body.conformance.fitness).toBeGreaterThan(0);
+    expect(body.conformance.precision).toBeGreaterThanOrEqual(0);
+    expect(body.conformance.simplicity).toBeGreaterThanOrEqual(0);
+    // generalization: 4th Van der Aalst metric — activities appear expected number of times
+    expect(typeof body.conformance.generalization).toBe('number');
+    expect(body.conformance.generalization).toBeGreaterThan(0);
+    expect(body.conformance.overall_score).toBeGreaterThan(0);
+    expect(typeof body.conformance.variants_discovered).toBe('number');
+    console.log(`[headless-loop] chain-verify: overall=${body.overall} fitness=${body.conformance?.fitness?.toFixed(2)} precision=${body.conformance?.precision?.toFixed(2)} simplicity=${body.conformance?.simplicity?.toFixed(2)} generalization=${body.conformance?.generalization?.toFixed(2)}`);
   });
 
-  it('Step 11: evidence-pack bundles chain proof with merkle_root and pack_hash', async () => {
+  it('Step 11: evidence-pack v2 — nested content hashes bind ocel + chain_proof + receipt', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await post('/api/game/evidence-pack', { session_id: seededSessionId });
     if (status === 503 || status === 404) return;
     expect(status).toBe(200);
+
+    // Schema version 2.0 — nested content hashes
+    expect(body.schema_version).toBe('2.0');
     expect(body.chain_proof.intact).toBe(true);
-    // manifest.merkle_root must be 64-char hex
-    expect(typeof body.manifest.merkle_root).toBe('string');
+
+    // manifest.merkle_root must be 64-char BLAKE3 hex
     expect(body.manifest.merkle_root).toMatch(/^[0-9a-f]{64}$/);
-    // pack_hash covers entire bundle
-    expect(typeof body.pack_hash).toBe('string');
+
+    // pack_hash must be 64-char BLAKE3 hex (binds all three content hashes)
     expect(body.pack_hash).toMatch(/^[0-9a-f]{64}$/);
-    console.log(`[headless-loop] evidence-pack: pack_hash=${body.pack_hash?.slice(0, 8)}… merkle_root=${body.manifest.merkle_root?.slice(0, 8)}…`);
+
+    // Nested content hashes — the key gap-8 fix
+    // Each section has its own BLAKE3 hash; pack_hash commits to all three
+    expect(body.manifest.ocel_hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(body.manifest.chain_proof_hash).toMatch(/^[0-9a-f]{64}$/);
+    // receipt_content_hash: present when a receipt exists, null otherwise
+    if (body.receipt !== null) {
+      expect(body.manifest.receipt_content_hash).toMatch(/^[0-9a-f]{64}$/);
+    }
+
+    // Verifier contract: recompute ocel_hash from body.ocel and verify it matches manifest
+    // (offline verifier pattern — no DB needed)
+    const { blake3 } = await import('@noble/hashes/blake3.js');
+    function hexOf(s: string) {
+      return Array.from(blake3(new TextEncoder().encode(s))).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    function canonical(o: unknown): string {
+      return JSON.stringify(o, (_, v) =>
+        v && typeof v === 'object' && !Array.isArray(v)
+          ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort())
+          : v
+      );
+    }
+    const recomputedOcelHash = hexOf(canonical(body.ocel));
+    expect(recomputedOcelHash).toBe(body.manifest.ocel_hash);
+
+    console.log(`[headless-loop] evidence-pack v2: pack_hash=${body.pack_hash?.slice(0, 8)}… ocel_hash=${body.manifest.ocel_hash?.slice(0, 8)}… chain_proof_hash=${body.manifest.chain_proof_hash?.slice(0, 8)}…`);
   });
 
   it('Step 12: health-lies returns all_clear=true after a clean seeded session', async () => {
@@ -250,20 +328,26 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     console.log(`[headless-loop] qa-cycle: overall=${body.overall} checks=${body.checks_passed}/${body.checks_total} hash=${body.cycle_receipt_hash?.slice(0, 8)}…`);
   });
 
-  it('Step 14: leaderboard returns valid shape (rows may be empty for headless sessions)', async () => {
+  it('Step 14: leaderboard has ≥1 row because session-seed bound a player', async () => {
     if (MOCK || !seededSessionId) return;
     const { status, body } = await get('/api/game/leaderboard');
     if (status === 503 || status === 500) return;
     expect(status).toBe(200);
     // Shape: { rows: array, total: number|null, limit: number, offset: number, cached_at: string }
-    // Headless sessions have no player_id, so rows may be empty — check shape only
     expect(Array.isArray(body.rows)).toBe(true);
     expect(typeof body.limit).toBe('number');
     expect(typeof body.offset).toBe('number');
     expect(body.total === null || typeof body.total === 'number').toBe(true);
     expect(typeof body.cached_at).toBe('string');
     expect(body.cached_at).toMatch(/^\d{4}-\d{2}-\d{2}T/);
-    console.log(`[headless-loop] leaderboard: rows=${body.rows?.length ?? 0} total=${body.total}`);
+    // Step 1 bound a test player → leaderboard trigger fired → rows > 0
+    // Van der Aalst: pipeline is ALIVE only when evidence reaches the leaderboard
+    expect(body.rows.length).toBeGreaterThanOrEqual(1);
+    const topRow = body.rows[0];
+    expect(typeof topRow.rank).toBe('number');
+    expect(typeof topRow.player_id).toBe('string');
+    expect(typeof topRow.total_receipts).toBe('number');
+    console.log(`[headless-loop] leaderboard: rows=${body.rows?.length ?? 0} top_rank=${topRow?.rank} total=${body.total}`);
   });
 });
 
