@@ -114,6 +114,21 @@ curl -sf -X POST "$API_BASE_URL/api/test/reset-data" -H 'content-type: applicati
 log "running headless-loop E2E (MOCK_API=0)..."
 ( cd "$ROOT" && API_BASE_URL="$API_BASE_URL" MOCK_API=0 npx vitest run tests/e2e/headless-loop.test.ts --reporter=dot )
 
+# ── 7b. WASM tamper check: re-hash the served binary vs the cook receipt ──────
+if [[ "${SKIP_UE4:-0}" != "1" && -f "$ARCHIVE/cook-receipt.json" ]]; then
+  EXPECTED="$(node -e "console.log(require('$ARCHIVE/cook-receipt.json').output_hash||'')" 2>/dev/null)"
+  if [[ -n "$EXPECTED" ]]; then
+    log "verifying served wasm matches cook-receipt output_hash..."
+    VERDICT="$(curl -sf "$API_BASE_URL/api/game/wasm-verify?expected_hash=$EXPECTED&path=$ARCHIVE/Brm.wasm" \
+      | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>console.log(JSON.parse(d).verdict))" 2>/dev/null)"
+    if [[ "$VERDICT" != "MATCH" ]]; then
+      log "ERROR: wasm tamper check FAILED — verdict=$VERDICT (served binary != cooked binary)"
+      exit 1
+    fi
+    log "wasm tamper check: MATCH (served binary is the cooked binary)"
+  fi
+fi
+
 # ── 8. Real-UE4 Playwright (WebGL2, genuine EngineReady) ──────────────────────
 if [[ "${SKIP_UE4:-0}" != "1" ]]; then
   log "running real-UE4 Playwright proof..."
