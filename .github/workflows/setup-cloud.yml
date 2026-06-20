@@ -1,0 +1,158 @@
+name: Setup Cloud Environment
+
+# Reusable workflow — call from other workflows with:
+#
+#   jobs:
+#     setup:
+#       uses: ./.github/workflows/setup-cloud.yml
+#       with:
+#         node-version: '20'       # optional, defaults to '20'
+#         rust-toolchain: 'stable' # optional, defaults to 'stable'
+#         working-directory: '.'   # optional, defaults to repo root
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: "Node.js version to install"
+        type: string
+        default: "20"
+        required: false
+      rust-toolchain:
+        description: "Rust toolchain to install (stable/beta/nightly or a version string)"
+        type: string
+        default: "stable"
+        required: false
+      working-directory:
+        description: "Working directory for the setup (defaults to repo root)"
+        type: string
+        default: "."
+        required: false
+      install-pwa-deps:
+        description: "Whether to run npm ci in pwa-staff/"
+        type: boolean
+        default: true
+        required: false
+    secrets:
+      SUPABASE_URL:
+        description: "Supabase project URL (optional — only needed for Supabase-dependent jobs)"
+        required: false
+      SUPABASE_ANON_KEY:
+        description: "Supabase anonymous key (optional)"
+        required: false
+      SUPABASE_SERVICE_ROLE_KEY:
+        description: "Supabase service-role key (optional — server-side only)"
+        required: false
+    outputs:
+      rust-cache-hit:
+        description: "Whether the Rust build cache was restored"
+        value: ${{ jobs.setup.outputs.rust-cache-hit }}
+      node-cache-hit:
+        description: "Whether the Node module cache was restored"
+        value: ${{ jobs.setup.outputs.node-cache-hit }}
+
+jobs:
+  setup:
+    name: Setup Rust + Node environment
+    runs-on: ubuntu-latest
+
+    outputs:
+      rust-cache-hit: ${{ steps.rust-cache.outputs.cache-hit }}
+      node-cache-hit: ${{ steps.node-cache.outputs.cache-hit }}
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      # -----------------------------------------------------------------------
+      # Checkout
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # Rust toolchain
+      # -----------------------------------------------------------------------
+      - name: Install Rust toolchain (${{ inputs.rust-toolchain }})
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ inputs.rust-toolchain }}
+          components: rustfmt, clippy
+
+      # Rust build artefact cache — keyed on OS + toolchain + all Cargo.lock files
+      - name: Restore Rust build cache
+        id: rust-cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          # Cache all workspace Cargo.lock files so any workspace benefits
+          workspaces: |
+            tools
+            nexus-engine
+            blueprint-rs
+            unify-rs
+            infinity-blade-4/mud
+            chicago-tdd-tools
+            asset-pipeline
+          # Shared key prefix so partial cache hits still help
+          shared-key: "rocket-craft-rust-${{ inputs.rust-toolchain }}"
+          save-if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+
+      # -----------------------------------------------------------------------
+      # Node.js
+      # -----------------------------------------------------------------------
+      - name: Install Node.js ${{ inputs.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: "npm"
+          cache-dependency-path: pwa-staff/package-lock.json
+
+      - name: Record Node cache status
+        id: node-cache
+        # setup-node doesn't expose a cache-hit output directly;
+        # approximate by checking whether node_modules already exists.
+        run: |
+          if [ -d "pwa-staff/node_modules" ]; then
+            echo "cache-hit=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "cache-hit=false" >> "$GITHUB_OUTPUT"
+          fi
+        shell: bash
+
+      # -----------------------------------------------------------------------
+      # PWA dependencies
+      # -----------------------------------------------------------------------
+      - name: Install pwa-staff npm dependencies
+        if: ${{ inputs.install-pwa-deps }}
+        run: npm ci
+        working-directory: pwa-staff
+
+      # -----------------------------------------------------------------------
+      # Environment variable plumbing (Supabase)
+      # Only written when the secrets are supplied to avoid empty-string issues.
+      # -----------------------------------------------------------------------
+      - name: Export Supabase environment variables
+        if: ${{ secrets.SUPABASE_URL != '' }}
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}"           >> "$GITHUB_ENV"
+          echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> "$GITHUB_ENV"
+          if [ -n "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> "$GITHUB_ENV"
+          fi
+        shell: bash
+
+      # -----------------------------------------------------------------------
+      # Sanity-check: print versions
+      # -----------------------------------------------------------------------
+      - name: Print tool versions
+        run: |
+          echo "--- Rust ---"
+          rustc --version
+          cargo --version
+          rustfmt --version
+          cargo clippy --version
+          echo "--- Node ---"
+          node --version
+          npm --version
+        shell: bash

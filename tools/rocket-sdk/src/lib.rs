@@ -1,14 +1,27 @@
+pub mod access_control;
 pub mod audit_affidavit;
-pub mod signing;
+pub mod audit_log;
+pub mod cache;
+pub mod completions;
 pub mod config;
 pub mod crypto;
+pub mod deps;
+pub mod dev;
 pub mod doctor;
 pub mod error;
 pub mod html5;
+pub mod lint;
 pub mod manifest;
+pub mod sbom;
+pub mod secret_scan;
 pub mod setup;
+pub mod signing;
+pub mod status;
 pub mod supabase;
+pub mod ui;
 pub mod wasm;
+pub mod watch;
+pub mod wizard;
 pub use html5::{discover_emsdk_python, Html5Cook, Html5PackageVerifier, Html5PackageReport, Html5Setup, WasmVerdict, CookLogEvent, parse_cook_log};
 
 pub use crate::manifest::Manifest;

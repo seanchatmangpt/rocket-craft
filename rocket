@@ -26,6 +26,13 @@ log_info() { echo -e "${BLUE}${BOLD}[INFO]${RESET} $*"; }
 log_success() { echo -e "${GREEN}${BOLD}[SUCCESS]${RESET} $*"; }
 log_error() { echo -e "${RED}${BOLD}[ERROR]${RESET} $*" >&2; }
 
+# Cloud / CI mode:
+#   ROCKET_CLOUD=1  — skip UE4/Blender doctor checks entirely.
+#   CI=true         — auto-build rocket-cmd when the binary is missing
+#                     (GitHub Actions sets CI=true automatically).
+ROCKET_CLOUD="${ROCKET_CLOUD:-}"
+CI="${CI:-}"
+
 _build_rocket() {
     log_info "Building rocket-cmd (release)..."
     if ! (cd "${PROJECT_ROOT}/tools" && cargo build -p rocket-cmd --release 2>&1); then
@@ -50,8 +57,13 @@ done
 if [ "$_FORCE_REBUILD" = "1" ]; then
     _build_rocket
 elif [ ! -f "${BIN_PATH}" ]; then
-    log_info "Release binary not found — building automatically..."
-    _build_rocket
+    if [ "${CI:-}" = "true" ]; then
+        log_info "CI environment detected and binary missing — building automatically..."
+        _build_rocket
+    else
+        log_info "Release binary not found — building automatically..."
+        _build_rocket
+    fi
 else
     # Warn (but do not rebuild automatically) when .rs source is newer than the binary.
     # Auto-rebuild would be slow on every invocation; explicit --rebuild keeps it opt-in.
@@ -60,6 +72,13 @@ else
     if [ -n "$_stale" ]; then
         log_info "Source changed since last build (e.g. ${_stale##${PROJECT_ROOT}/}). Run './rocket --rebuild <verb>' to rebuild."
     fi
+fi
+
+# In cloud mode, pass ROCKET_CLOUD through to the binary so it can skip
+# UE4/Blender environment checks inside rocket-cmd / rocket-sdk.
+if [ "${ROCKET_CLOUD}" = "1" ]; then
+    export ROCKET_CLOUD
+    log_info "ROCKET_CLOUD=1: UE4/Blender doctor checks will be skipped."
 fi
 
 # Execute the Rust binary directly, passing all command-line arguments

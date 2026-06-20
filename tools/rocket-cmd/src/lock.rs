@@ -41,12 +41,12 @@ impl EcosystemLocker {
     /// Rejects any divergence immediately (Death of MVP, Bounded Construction).
     pub fn enforce_unified_lock(&self) -> Result<()> {
         let cells = [
-            "genie3-rs",
-            "blueprint-rs",
-            "chicago-tdd-tools",
+            "tools",
             "nexus-engine",
-            "wasm-threads",
+            "blueprint-rs",
             "unify-rs",
+            "infinity-blade-4/mud",
+            "chicago-tdd-tools",
             "asset-pipeline",
         ];
 

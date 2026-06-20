@@ -1,4 +1,5 @@
 import { supabase } from './lib/supabaseClient';
+import { supabaseUrl } from './config';
 
 if (typeof window !== 'undefined') {
   if (document.readyState === 'loading') {
@@ -438,7 +439,7 @@ export function initHUD() {
       const score = Math.floor(Math.random() * 501) + 500; // 500-1000
       logToConsole(`Submitting mock score: ${score}...`, 'info');
 
-      const response = await fetch('http://127.0.0.1:54321/functions/v1/submit-score', {
+      const response = await fetch(`${supabaseUrl}/functions/v1/submit-score`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -486,7 +487,7 @@ export function initHUD() {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session) return;
-      const response = await fetch('http://127.0.0.1:54321/functions/v1/submit-score', {
+      const response = await fetch(`${supabaseUrl}/functions/v1/submit-score`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
