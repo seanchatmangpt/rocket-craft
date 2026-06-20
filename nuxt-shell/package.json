@@ -15,6 +15,7 @@
     "test:ci": "bash scripts/test-ci.sh",
     "test:full": "bash scripts/full-stack-e2e.sh",
     "test:e2e": "playwright test",
+    "test:auth": "playwright test e2e/auth-flow.spec.ts --project=game-loop",
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
