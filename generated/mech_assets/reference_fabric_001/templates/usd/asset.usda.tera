@@ -7,75 +7,65 @@
 
 def Xform "ASSET_ReferenceFabric_001"
 {
-    custom string owner_part_id = "ASSET_ReferenceFabric_001"
     def Xform "Torso" (
         prepend references = @./SM_Torso.usda@
     )
     {
-        custom string owner_part_id = "SM_Torso"
     }
 
     def Xform "Head" (
         prepend references = @./SM_Head.usda@
     )
     {
-        custom string owner_part_id = "SM_Head"
     }
 
     def Xform "Wing_Left" (
         prepend references = @./SM_WingArray_Left.usda@
     )
     {
-        custom string owner_part_id = "SM_WingArray_Left"
     }
 
     def Xform "Wing_Right" (
         prepend references = @./SM_WingArray_Right.usda@
     )
     {
-        custom string owner_part_id = "SM_WingArray_Right"
     }
 
     def Xform "Blade_Left" (
         prepend references = @./SM_Blade_Left.usda@
     )
     {
-        custom string owner_part_id = "SM_Blade_Left"
     }
 
     def Xform "Blade_Right" (
         prepend references = @./SM_Blade_Right.usda@
     )
     {
-        custom string owner_part_id = "SM_Blade_Right"
     }
 
     def Xform "Limb_Left" (
         prepend references = @./SM_Limb_Left.usda@
     )
     {
-        custom string owner_part_id = "SM_Limb_Left"
     }
 
     def Xform "Limb_Right" (
         prepend references = @./SM_Limb_Right.usda@
     )
     {
-        custom string owner_part_id = "SM_Limb_Right"
     }
 
     def Xform "Loadout" (
         prepend references = @./SM_Loadout.usda@
     )
     {
-        custom string owner_part_id = "SM_Loadout"
     }
 
     def Scope "Materials"
     {
         {% for row in results %}
         def Material "{{ row.materialLocalName }}" (
-            prepend references = @./{{ row.materialLocalName }}.mtlx@
+            prepend references = @../materialx/{{ row.materialLocalName }}.mtlx@
         )
         {
         }

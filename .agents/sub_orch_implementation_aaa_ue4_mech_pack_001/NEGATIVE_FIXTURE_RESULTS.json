@@ -15,7 +15,7 @@
         "seed": 202,
         "disposition": "REFUSE_MODULAR_USD",
         "errors": [
-            "USD311 ERROR: socket prim contains mesh payload in SM_Torso.usda line 4560"
+            "USD311 ERROR: socket prim contains mesh payload in SM_Torso.usda line 2562"
         ],
         "expected_disposition": "REFUSE_MODULAR_USD",
         "passed": true

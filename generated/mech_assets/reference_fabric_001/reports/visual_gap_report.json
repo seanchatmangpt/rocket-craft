@@ -1,6 +1,6 @@
 {
     "silhouette_iou": 0.33581842910165993,
-    "edge_similarity": 0.09322477132081985,
+    "edge_similarity": 0.09326636791229248,
     "color_palette_similarity": 0.9241565309374815,
     "cyan_region_similarity": 0.0,
     "symmetry_delta": 0.015580467648484309,
@@ -16,7 +16,7 @@
     "core_compactness_delta": 0.35446405837440287,
     "head_to_torso_ratio_delta": 0.016666666666666607,
     "blade_length_angle_delta": 195.0,
-    "armor_shell_segmentation_score": 0.23402108095985646,
+    "armor_shell_segmentation_score": 0.23385288181206548,
     "edge_density_distribution": 0.0,
     "foreground_component_count": 143,
     "usd_errors": [

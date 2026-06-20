@@ -46,10 +46,10 @@ This report covers the end-to-end verification of GC-MECH-ASSET-FABRIC-001:
 | Core Compactness Delta | <= 0.15 | 0.3545 | **FAIL** |
 | Head to Torso Ratio Delta | <= 0.15 | 0.0167 | **PASS** |
 | Blade Length/Angle Delta | <= 15.0 | 195.0000 | **FAIL** |
-| Armor Shell Segmentation Score | >= 0.04 | 0.2340 | **PASS** |
+| Armor Shell Segmentation Score | >= 0.04 | 0.2339 | **PASS** |
 | Edge Density Distribution Similarity | >= 0.60 | 0.0000 | **FAIL** |
 | Foreground Component Count | [1, 5] | 143 | **FAIL** |
-| Edge Similarity | N/A | 0.0932 | **INFO** |
+| Edge Similarity | N/A | 0.0933 | **INFO** |
 | Cyan Region Similarity | N/A | 0.0000 | **INFO** |
 | Symmetry Delta | N/A | 0.0156 | **INFO** |
 | Wing Span Delta | N/A | 237.5000 px | **INFO** |
@@ -65,7 +65,7 @@ This report covers the end-to-end verification of GC-MECH-ASSET-FABRIC-001:
 ## Receipt Chain
 
 The final verifier JSON `verifier_report.json` contains 12 verified sync receipts.
-Latest receipt registered: `210f0d4ba76ec9b83e7cfd418b70b2c1e97a033a14490bf7f4f41fecda4ea738`
+Latest receipt registered: `752841b9fb83e484c1f15e4cfb3725750f7723f7f46ac15ad9779d03f249c3a6`
 
 ---
 

@@ -1,41 +1,16 @@
 # Visual Gap Report — GC-MECH-ASSET-FABRIC-001
 
-This report compiles the actual vs target visual metrics for the manufactured mech asset.
+This report compiles the target expectations from the setup phase.
 
-## Visual Target Comparison
+## Visual Target Expectations
 
-- **Silhouette IoU**: 0.3358 (Target: >= 0.25) - **PASS**
-- **Edge Similarity (Cosine)**: 0.0932
-- **Color Palette Similarity**: 0.9242 (Target: >= 0.50) - **PASS**
-- **Cyan Region Similarity (IoU)**: 0.0000
-- **Symmetry Delta**: 0.0156 (Ref: 0.9594, Render: 0.9439)
-- **Wing Span Delta**: 237.5000 px (Ref: 1200, Render Scaled: 962.5000)
-- **Body Mass Delta**: 0.2414 (Ref: 0.3008, Render: 0.5422)
 
-## Morphology & Modularity Validation
-
-- **Part Graph Similarity**: 1.0000 (Target: >= 0.90) - **PASS**
-- **Wing Layer Count Delta**: 2.0000 (Target: <= 1.0) - **FAIL**
-- **Feather Panel Curvature Score**: 0.0000 (Target: >= 0.10) - **FAIL**
-- **Feather Overlap Depth Score**: 0.0000 (Target: >= 0.10) - **FAIL**
-- **Core Compactness Delta**: 0.3545 (Target: <= 0.15) - **FAIL**
-- **Head to Torso Ratio Delta**: 0.0167 (Target: <= 0.15) - **PASS**
-- **Blade Length/Angle Delta**: 195.0000 (Target: <= 15.0) - **FAIL**
-- **Armor Shell Segmentation Score**: 0.2340 (Target: >= 0.04) - **PASS**
-- **Edge Density Distribution Similarity**: 0.0000 (Target: >= 0.60) - **FAIL**
-- **Foreground Component Count**: 143 (Target: [1, 5]) - **FAIL**
-
-### Diagnostics & Errors
-
-- **Modularity Errors**: USD305 ERROR: mirrored part lacks mirror transform proof
-- **Visual Morphology Errors**: VIS202 ERROR: wing morphology mismatch, VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates, VIS204 ERROR: core body massing exceeds compactness bound, VIS205 ERROR: blade placement/angle mismatch, VIS207 ERROR: edge-density distribution mismatch, VIS208 ERROR: candidate passed coarse silhouette but failed morphology gate
-
-## Ontological / Model Metrics
-
-- **USD Prim Count**: 8376 (Master USDA)
-- **Material Binding Count**: 8160 (Across all referenced layers)
-- **Wing Feather Count**: 0 (Left + Right Panels)
-
-## Verdict
-
-**Status: REFUSED**
+- **Aspect Ratio**: 1.2024
+- **Symmetry**: 0.9594
+- **Bounding Box**: [0, 2, 1199, 999]
+- **Color Proportions**:
+  - **White (Armor)**: 0.4236
+  - **Dark (Frame)**: 0.0345
+  - **Cyan (Blade/Emissive)**: 0.0091
+  - **Gold (Visor/Highlight)**: 0.0019
+  - **Red (Accent)**: 0.0032
