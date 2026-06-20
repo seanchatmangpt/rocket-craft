@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
     const day = row.proven_at.slice(0, 10);
     const bucket = byDay.get(day) ?? { receipts: 0, pass_receipts: 0, fail_receipts: 0, real_ue4_receipts: 0, avg_ocel_events: 0, ocel_total: 0 };
     bucket.receipts++;
-    if (row.verdict === 'PASS') bucket.pass_receipts++;
+    if (row.verdict === 'PASS' || row.verdict === 'PROVEN') bucket.pass_receipts++;
     if (row.verdict === 'FAIL') bucket.fail_receipts++;
     if (row.engine_source === 'rocket_cli' || row.engine_source === 'real_ue4') bucket.real_ue4_receipts++;
     bucket.ocel_total += row.ocel_event_count ?? 0;

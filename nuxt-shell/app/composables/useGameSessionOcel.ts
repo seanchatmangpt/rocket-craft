@@ -70,6 +70,9 @@ export function useGameSessionOcel() {
   const objects = ref<OcelObject[]>([]);
   const sessionId = ref<string | null>(null);
   let rafHandle: number | null = null;
+  // True once REAL frames (from UE4's render loop via the iframe rAF hook) arrive.
+  // When real frames are flowing, the blind interval probe stops — real evidence wins.
+  let realFramesSeen = false;
 
   // ── Derived process verdict ──────────────────────────────────────────────
 
@@ -147,16 +150,28 @@ export function useGameSessionOcel() {
         frame_ts_ms: Date.now(),
         source: 'engine_ready_sync',
       });
-      // Start frame probe (setInterval is reliable in headless; rAF may throttle)
+      // Fallback frame probe: only emits while NO real UE4 frames are arriving.
+      // Once the iframe rAF hook delivers real frames, this probe goes silent so
+      // the OCEL log reflects genuine render evidence, not a fabricated timer.
       if (!rafHandle) {
         rafHandle = window.setInterval(() => {
-          if (sessionId.value) {
+          if (sessionId.value && !realFramesSeen) {
             emitEvent('FrameRendered', [{ object_id: sessionId.value, qualifier: 'session' }], {
               frame_ts_ms: Date.now(),
               source: 'interval_probe',
             });
           }
         }, 500) as unknown as number;
+      }
+    } else if (detail.type === 'FrameRendered') {
+      // REAL frame from UE4's render loop (UE4Canvas rAF hook). Highest-fidelity
+      // evidence — record it and silence the fallback interval probe.
+      if (sessionId.value) {
+        realFramesSeen = true;
+        emitEvent('FrameRendered', [{ object_id: sessionId.value, qualifier: 'session' }], {
+          frame_ts_ms: Date.now(),
+          source: 'ue4_raf',
+        });
       }
     } else if (detail.type === 'EngineError') {
       if (sessionId.value) {

@@ -10,6 +10,7 @@
 
 export type ProjectionEvent =
   | { type: 'EngineReady' }
+  | { type: 'FrameRendered'; frame_ts_ms?: number; source?: string }
   | { type: 'WalkthroughStateChanged'; station: string; receipt?: string }
   | { type: 'StationFocused'; stationId: string }
   | { type: 'ReceiptEmitted'; receipt: string; payload: unknown }
