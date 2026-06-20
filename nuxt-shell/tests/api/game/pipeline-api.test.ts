@@ -104,7 +104,7 @@ describe('POST /api/game/receipt', () => {
 
 // ── /api/game/chain-verify ───────────────────────────────────────────────────
 describe('GET /api/game/chain-verify', () => {
-  it('returns overall + sessions_checked + breaks array', async () => {
+  it('returns overall + sessions_checked + breaks + merkle_root + event_count', async () => {
     if (MOCK) return;
     const { status, body } = await get('/api/game/chain-verify');
     expect([200, 503]).toContain(status);
@@ -114,13 +114,21 @@ describe('GET /api/game/chain-verify', () => {
       expect(body).toHaveProperty('breaks');
       expect(Array.isArray(body.breaks)).toBe(true);
       expect(['PASS', 'FAIL', 'UNKNOWN']).toContain(body.overall);
+      // Merkle root: null (no events) or 64-char hex
+      expect(body.merkle_root === null || /^[0-9a-f]{64}$/.test(body.merkle_root)).toBe(true);
+      expect(typeof body.event_count).toBe('number');
     }
   });
 
-  it('accepts session_id query param without erroring', async () => {
+  it('session_id query: merkle_root is 64-char hex when events exist, null when no events', async () => {
     if (MOCK) return;
-    const { status } = await get('/api/game/chain-verify?session_id=00000000-0000-0000-0000-000000000000');
+    const { status, body } = await get('/api/game/chain-verify?session_id=00000000-0000-0000-0000-000000000000');
     expect([200, 503]).toContain(status);
+    if (status === 200) {
+      // Nonexistent session → 0 events → merkle_root=null
+      expect(body.merkle_root).toBeNull();
+      expect(body.event_count).toBe(0);
+    }
   });
 });
 
@@ -616,6 +624,8 @@ describe('POST /api/game/evidence-pack', () => {
     expect(typeof body.manifest).toBe('object');
     expect(typeof body.manifest.total_events).toBe('number');
     expect(typeof body.manifest.chain_intact).toBe('boolean');
+    // Merkle root: null or 64-char BLAKE3 hex
+    expect(body.manifest.merkle_root === null || /^[0-9a-f]{64}$/.test(body.manifest.merkle_root)).toBe(true);
     expect(Array.isArray(body.ocel.events)).toBe(true);
     expect(Array.isArray(body.chain_proof.events)).toBe(true);
   });
@@ -634,6 +644,9 @@ describe('POST /api/game/evidence-pack', () => {
     expect(body.chain_proof.intact).toBe(true);
     expect(body.chain_proof.first_break_at).toBeNull();
     expect(body.chain_proof.events.length).toBe(ocel_event_count);
+
+    // Merkle root must be a 64-char BLAKE3 hex (seeded session has events)
+    expect(body.manifest.merkle_root).toMatch(/^[0-9a-f]{64}$/);
 
     // All per-event chain_ok
     const brokenLinks = body.chain_proof.events.filter((e: { chain_ok: boolean }) => !e.chain_ok);
