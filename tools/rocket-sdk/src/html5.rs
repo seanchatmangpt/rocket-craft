@@ -155,10 +155,15 @@ impl Html5PackageReport {
     pub fn as_supabase_receipt(&self) -> crate::supabase::CookReceipt {
         use std::collections::HashMap;
 
-        let timestamp_secs = std::time::SystemTime::now()
+        let now = std::time::SystemTime::now();
+        let timestamp_secs = now
             .duration_since(std::time::UNIX_EPOCH)
             .map(|d| d.as_secs())
             .unwrap_or(0);
+        // proven_at must be RFC3339 — the Nuxt proof gate and OCEL timestamp parser require it.
+        let proven_at_rfc3339 = chrono::DateTime::from_timestamp(timestamp_secs as i64, 0)
+            .map(|dt| dt.to_rfc3339())
+            .unwrap_or_else(|| format!("{timestamp_secs}"));
 
         let wasm_mb = self.wasm_files.iter().find_map(|f| {
             if let WasmVerdict::Real { size_bytes } = f.verdict {
@@ -229,7 +234,7 @@ impl Html5PackageReport {
             engine_source: "rocket_cli".into(),
             receipt_hash,
             output_hash,
-            proven_at: format!("{timestamp_secs}"),
+            proven_at: proven_at_rfc3339,
             payload,
         }
     }
@@ -1487,6 +1492,16 @@ mod tests {
         assert_eq!(receipt.verdict, "PASS");
         assert_eq!(receipt.engine_source, "rocket_cli");
         assert_eq!(receipt.milestone, "HTML5CookVerify");
+    }
+
+    #[test]
+    fn as_supabase_receipt_proven_at_is_rfc3339() {
+        let dir = TempDir::new().unwrap();
+        let report = make_real_report(&dir);
+        let receipt = report.as_supabase_receipt();
+        // Must parse as RFC3339, not raw epoch seconds.
+        let parsed = chrono::DateTime::parse_from_rfc3339(&receipt.proven_at);
+        assert!(parsed.is_ok(), "proven_at must be RFC3339, got: {}", receipt.proven_at);
     }
 
     #[test]
