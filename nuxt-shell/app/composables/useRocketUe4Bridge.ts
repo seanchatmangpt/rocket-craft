@@ -17,10 +17,24 @@ export type ProjectionEvent =
   | { type: 'DiagnosticUpdate'; diagnostics: Record<string, unknown> }
   | { type: 'EngineError'; message: string };
 
+/**
+ * Build the JS string sent to UE4 via Module.UE4_ExecuteJavascript. An instrumented
+ * UE4 build defines `rocketIntentReceiver`; the guard makes it a SAFE no-op against
+ * the stock build (which has none). Exported so the delivery contract is tested by
+ * eval-ing it against a mock receiver — guards that admitted input actually reaches
+ * the engine when a receiver exists.
+ */
+export function buildRocketIntentJs(
+  intent: import('./useRocketInputBus').RocketIntent,
+  seq: number,
+): string {
+  const payload = JSON.stringify({ seq, intent });
+  return `if(typeof rocketIntentReceiver==='function'){rocketIntentReceiver(${payload});}`;
+}
+
 export function useRocketUe4Bridge() {
   const isEngineReady = ref(false);
   const lastProjectionEvent = ref<ProjectionEvent | null>(null);
-  const { emit: emitIntent } = useRocketInputBus();
 
   // Listen for projection events FROM UE4 via DOM CustomEvent
   useEventListener(window, 'rocket:ue4', (e: Event) => {
@@ -44,11 +58,8 @@ export function useRocketUe4Bridge() {
       | { UE4_ExecuteJavascript?: (js: string) => void }
       | undefined;
     if (!ue4Module?.UE4_ExecuteJavascript) return;
-    const payload = JSON.stringify({ seq: Date.now(), intent });
     try {
-      ue4Module.UE4_ExecuteJavascript(
-        `if(typeof rocketIntentReceiver==='function'){rocketIntentReceiver(${payload});}`
-      );
+      ue4Module.UE4_ExecuteJavascript(buildRocketIntentJs(intent, Date.now()));
     } catch {
       // Engine may not be ready yet; intent is dropped gracefully
     }

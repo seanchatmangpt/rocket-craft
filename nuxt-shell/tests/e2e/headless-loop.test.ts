@@ -403,6 +403,29 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     console.log(`[headless-loop] stale-cleanup: closed ${cleanup.body.closed_count} session(s); ${sid} → ${after.body.state}`);
   });
 
+  it('Step 11d: a proven session appears on the leaderboard with correct rank/score (E2E)', async () => {
+    if (MOCK) return;
+    // Seed with a bound player → the on_receipt PASS trigger must populate the
+    // leaderboard. Proves the full write→trigger→read path, not just that the
+    // trigger fired (a silently-broken trigger would leave the board empty: 200 + []).
+    const seed = await post('/api/game/session-seed', { create_test_player: true });
+    if (seed.status === 503) return;
+    expect(seed.status).toBe(200);
+    const playerId = seed.body.player_id as string;
+    expect(playerId).toMatch(/[0-9a-f-]{36}/);
+    expect(seed.body.leaderboard_eligible).toBe(true);
+
+    const board = await get('/api/game/leaderboard?limit=100');
+    expect(board.status).toBe(200);
+    const row = (board.body.rows as Array<Record<string, unknown>>).find((r) => r.player_id === playerId);
+    expect(row, 'seeded player must appear on the leaderboard').toBeTruthy();
+    expect(Number(row!.rank)).toBeGreaterThanOrEqual(1);
+    expect(Number(row!.pass_receipts)).toBeGreaterThanOrEqual(1);
+    expect(Number(row!.best_ocel_events)).toBeGreaterThanOrEqual(3);
+    expect(Number(row!.pass_rate_pct)).toBeGreaterThan(0);
+    console.log(`[headless-loop] leaderboard E2E: player ${playerId.slice(0, 8)} rank=${row!.rank} pass_rate=${row!.pass_rate_pct}%`);
+  });
+
   it('Step 12: health-lies returns all_clear=true after a clean seeded session', async () => {
     if (MOCK) return;
     const { status, body } = await get('/api/game/health-lies');
