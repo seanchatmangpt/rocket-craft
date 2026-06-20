@@ -1,4 +1,84 @@
 @prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+@prefix law: <https://ggen.io/ontology/law/> .
 
 :042_torso_grammar a :SourceLaw .
+
+law:TorsoComponent a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Torso Component" .
+
+law:BipedalTorso a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Bipedal Torso" ;
+    rdfs:comment "The core bipedal torso structure for humanoid Mecha." .
+
+law:ChestPlating a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Chest Plating" ;
+    rdfs:comment "Morphologically distinct chest plating preventing abstract blocky bounding boxes." .
+
+law:WaistArticulation a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Waist Articulation" ;
+    rdfs:comment "An articulated waist allowing yaw and pitch, joining the upper torso and pelvis." .
+
+law:PilotBlock a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Pilot Block" ;
+    rdfs:comment "The central protected pilot block within the torso." .
+
+law:AbstractBoundingBox a owl:Class ;
+    rdfs:label "Abstract Bounding Box" ;
+    rdfs:comment "Blocky bounding boxes representing lazy generation. Strictly forbidden as final torso morphology." .
+
+law:hasChestPlating a owl:ObjectProperty ;
+    rdfs:domain law:BipedalTorso ;
+    rdfs:range law:ChestPlating ;
+    rdfs:label "has Chest Plating" .
+
+law:hasWaistArticulation a owl:ObjectProperty ;
+    rdfs:domain law:BipedalTorso ;
+    rdfs:range law:WaistArticulation ;
+    rdfs:label "has Waist Articulation" .
+
+law:hasPilotBlock a owl:ObjectProperty ;
+    rdfs:domain law:BipedalTorso ;
+    rdfs:range law:PilotBlock ;
+    rdfs:label "has Pilot Block" .
+
+law:BipedalTorsoShape a sh:NodeShape ;
+    sh:targetClass law:BipedalTorso ;
+    sh:property [
+        sh:path law:hasChestPlating ;
+        sh:class law:ChestPlating ;
+        sh:minCount 1 ;
+        sh:message "A Bipedal Torso MUST have proper Chest Plating defined."
+    ] ;
+    sh:property [
+        sh:path law:hasWaistArticulation ;
+        sh:class law:WaistArticulation ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A Bipedal Torso MUST have exactly one Waist Articulation point."
+    ] ;
+    sh:property [
+        sh:path law:hasPilotBlock ;
+        sh:class law:PilotBlock ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A Bipedal Torso MUST have exactly one Pilot Block."
+    ] ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:not [
+            sh:hasValue law:AbstractBoundingBox
+        ] ;
+        sh:message "Combinatorial Engine violation: Bipedal Torso CANNOT be an Abstract Bounding Box."
+    ] .

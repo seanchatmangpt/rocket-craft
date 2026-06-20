@@ -112,16 +112,16 @@ mud:prim_head_unit rdf:type mud:GeometryPrimitive ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor .
 
-mud:prim_v_fin_left rdf:type mud:GeometryPrimitive ;
-    mud:belongsToPart mud:v_fin_left ;
+mud:prim_mecha_crown_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:mecha_crown_left ;
     mud:primitiveFamily "fin" ;
     mud:translateX -0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor .
 
-mud:prim_v_fin_right rdf:type mud:GeometryPrimitive ;
-    mud:belongsToPart mud:v_fin_right ;
+mud:prim_mecha_crown_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:mecha_crown_right ;
     mud:primitiveFamily "fin" ;
     mud:translateX 0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;

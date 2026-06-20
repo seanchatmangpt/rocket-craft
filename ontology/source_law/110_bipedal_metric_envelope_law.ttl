@@ -1,0 +1,110 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix eng: <https://rocket-craft.com/ontology/engineering#> .
+@prefix law: <https://rocket-craft.com/ontology/law#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+
+# ==============================================================================
+# The Metric Envelope Law (Bipedal Archetype Boundaries)
+# ------------------------------------------------------------------------------
+# Enforces strict metric proportionality on combinatorial generation.
+# Prevents arbitrary volumetric blocks from passing bipedal morphology checks.
+#
+# Coordinate Frame (Origin: Pelvis Center)
+# Y = Vertical Height
+# X = Left/Right Span
+# Z = Depth
+# Unit = unit:M (Meters)
+# ==============================================================================
+
+law:BipedalMetricEnvelope a sh:NodeShape ;
+    sh:targetClass law:BipedalTorso ;
+    sh:property [
+        sh:path ( eng:hasBodyHeight sosa:hasResult qudt:numericValue ) ;
+        sh:datatype xsd:decimal ;
+        sh:message "A bipedal torso must define a specific metric height in meters." ;
+        sh:minCount 1 ;
+    ] .
+
+law:ShieldProportionShape a sh:NodeShape ;
+    sh:targetClass law:MechaShield ;
+    sh:property [
+        sh:path ( eng:hasShieldHeight sosa:hasResult qudt:numericValue ) ;
+        sh:datatype xsd:decimal ;
+        sh:message "A shield must define its metric height in meters." ;
+        sh:minCount 1 ;
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_DEFAULT_SHIELD_PROPORTION: A default shield must occupy 25%-35% of the total body height." ;
+        sh:select """
+            SELECT $this ?shieldHeight ?bodyHeight
+            WHERE {
+                $this eng:attachedTo ?mecha .
+                ?mecha eng:hasBodyHeight/sosa:hasResult/qudt:numericValue ?bodyHeight .
+                $this eng:hasShieldHeight/sosa:hasResult/qudt:numericValue ?shieldHeight .
+                
+                BIND(?shieldHeight / ?bodyHeight AS ?ratio)
+                
+                # Check normal shield bounds
+                FILTER NOT EXISTS { $this a law:TowerShieldArchetype }
+                FILTER NOT EXISTS { $this a law:SiegeShieldArchetype }
+                FILTER ( ?ratio < 0.25 || ?ratio > 0.35 )
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_TOWER_SHIELD_PROPORTION: A TowerShieldArchetype must occupy 55%-85% of total body height." ;
+        sh:select """
+            SELECT $this ?shieldHeight ?bodyHeight
+            WHERE {
+                $this a law:TowerShieldArchetype .
+                $this eng:attachedTo ?mecha .
+                ?mecha eng:hasBodyHeight/sosa:hasResult/qudt:numericValue ?bodyHeight .
+                $this eng:hasShieldHeight/sosa:hasResult/qudt:numericValue ?shieldHeight .
+                
+                BIND(?shieldHeight / ?bodyHeight AS ?ratio)
+                FILTER ( ?ratio < 0.55 || ?ratio > 0.85 )
+            }
+        """
+    ] .
+
+law:BipedalAnatomyBands a sh:NodeShape ;
+    sh:targetClass law:BipedalTorso ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "ANATOMY_PARADOX: The Head Y_MIN must be structurally higher than the Torso Y_MAX." ;
+        sh:select """
+            SELECT $this ?headMinY ?torsoMaxY
+            WHERE {
+                $this eng:hasPart ?head .
+                ?head a law:MechaCrown .
+                
+                $this eng:hasBoundingBoxYMax/sosa:hasResult/qudt:numericValue ?torsoMaxY .
+                ?head eng:hasBoundingBoxYMin/sosa:hasResult/qudt:numericValue ?headMinY .
+                
+                FILTER ( ?headMinY < ?torsoMaxY )
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "ANATOMY_PARADOX: Legs must descend below the pelvis vertical origin." ;
+        sh:select """
+            SELECT $this ?legMinY
+            WHERE {
+                $this eng:hasPart ?leg .
+                ?leg a law:BipedalLeg .
+                
+                ?leg eng:hasBoundingBoxYMin/sosa:hasResult/qudt:numericValue ?legMinY .
+                
+                # Origin is pelvis center (0.0). Legs must go down into negative Y space.
+                FILTER ( ?legMinY >= 0.0 )
+            }
+        """
+    ] .
