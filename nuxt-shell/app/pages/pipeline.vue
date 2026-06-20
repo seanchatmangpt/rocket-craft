@@ -343,7 +343,7 @@ onUnmounted(() => {
 
     <template v-else>
       <!-- Health score card -->
-      <section class="health-score-card" :style="{ borderColor: healthColor }">
+      <section class="health-score-card" :style="{ borderColor: healthColor }" data-testid="health-score">
         <div class="score-number" :style="{ color: healthColor }">
           {{ healthScore ?? '—' }}
         </div>
@@ -351,9 +351,9 @@ onUnmounted(() => {
       </section>
 
       <!-- Metrics grid -->
-      <section v-if="health" class="metrics-grid">
+      <section v-if="health" class="metrics-grid" data-testid="metrics-grid">
         <div class="metric">
-          <span class="metric-value">{{ health.total_receipts }}</span>
+          <span class="metric-value" data-testid="metric-total-receipts">{{ health.total_receipts }}</span>
           <span class="metric-label">Total Receipts</span>
         </div>
         <div class="metric pass">

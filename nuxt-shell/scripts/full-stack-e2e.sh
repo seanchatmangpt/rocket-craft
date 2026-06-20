@@ -118,7 +118,7 @@ log "running headless-loop E2E (MOCK_API=0)..."
 # ── 7a. Fast Playwright E2E: control plane + real auth + synthetic OCEL loop ───
 # (shell.spec = DOM control plane, auth-flow = real login, game-loop = OCEL collect)
 log "running fast Playwright E2E (shell + auth-flow + game-loop)..."
-( cd "$ROOT" && npx playwright test e2e/shell.spec.ts e2e/auth-flow.spec.ts e2e/game-loop.spec.ts --project=game-loop --workers=2 )
+( cd "$ROOT" && npx playwright test e2e/shell.spec.ts e2e/auth-flow.spec.ts e2e/game-loop.spec.ts e2e/pipeline-dashboard.spec.ts --project=game-loop --workers=2 )
 
 # ── 7a2. Real-OCEL conformance gate: mine the actual event log, not a fixture ──
 # Seed a session, export its REAL OCEL 2.0 log, run pm4py conformance. Van der

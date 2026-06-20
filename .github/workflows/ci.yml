@@ -424,7 +424,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run fast Playwright E2E (control plane + real auth + OCEL loop)
-        run: npx playwright test e2e/shell.spec.ts e2e/auth-flow.spec.ts e2e/game-loop.spec.ts --project=game-loop --workers=2
+        run: npx playwright test e2e/shell.spec.ts e2e/auth-flow.spec.ts e2e/game-loop.spec.ts e2e/pipeline-dashboard.spec.ts --project=game-loop --workers=2
         env:
           # Default Playwright config baseURL is http://localhost:3000 (reuses the
           # running dev server). These specs don't need the UE4 asset server —
