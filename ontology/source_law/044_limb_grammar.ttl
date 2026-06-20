@@ -1,4 +1,34 @@
-@prefix : <http://example.org/law#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix mud:  <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+@prefix gn:   <https://rocket-craft.com/ontology/gn#> .
+@prefix :     <http://example.org/law#> .
 
-:044_limb_grammar a :SourceLaw .
+:044_limb_grammar a :SourceLaw ;
+    rdfs:label "Limb Grammar Law" ;
+    rdfs:comment "Defines the structural ontology for manipulator limbs (arms and legs) required for IK target acquisition." .
+
+mud:Arm a owl:Class ;
+    rdfs:subClassOf mud:Limb ;
+    rdfs:label "Arm" ;
+    rdfs:comment "A manipulator limb designated for grasping, shielding, or weapon operation." .
+
+mud:Leg a owl:Class ;
+    rdfs:subClassOf mud:Limb ;
+    rdfs:label "Leg" ;
+    rdfs:comment "A manipulator limb designated for chassis support and locomotion." .
+
+# -----------------------------------------------------------------------------
+# SHACL RULE: LIMB ANATOMY INTEGRITY
+# -----------------------------------------------------------------------------
+mud:LimbAnatomyShape a sh:NodeShape ;
+    sh:targetClass mud:Arm, mud:Leg ;
+    sh:property [
+        sh:path mud:hasTargetSocket ;
+        sh:class mud:Socket ;
+        sh:message "A limb must define a target socket if it engages in IK."
+    ] .

@@ -385,8 +385,88 @@ mud:EnvelopeShape a sh:NodeShape ;
 # --- Source: 042_torso_grammar.ttl ---
 @prefix : <http://example.org/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+@prefix law: <https://ggen.io/ontology/law/> .
 
 :042_torso_grammar a :SourceLaw .
+
+law:TorsoComponent a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Torso Component" .
+
+law:BipedalTorso a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Bipedal Torso" ;
+    rdfs:comment "The core bipedal torso structure for humanoid Mecha." .
+
+law:ChestPlating a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Chest Plating" ;
+    rdfs:comment "Morphologically distinct chest plating preventing abstract blocky bounding boxes." .
+
+law:WaistArticulation a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Waist Articulation" ;
+    rdfs:comment "An articulated waist allowing yaw and pitch, joining the upper torso and pelvis." .
+
+law:PilotBlock a owl:Class ;
+    rdfs:subClassOf law:TorsoComponent ;
+    rdfs:label "Pilot Block" ;
+    rdfs:comment "The central protected pilot block within the torso." .
+
+law:AbstractBoundingBox a owl:Class ;
+    rdfs:label "Abstract Bounding Box" ;
+    rdfs:comment "Blocky bounding boxes representing lazy generation. Strictly forbidden as final torso morphology." .
+
+law:hasChestPlating a owl:ObjectProperty ;
+    rdfs:domain law:BipedalTorso ;
+    rdfs:range law:ChestPlating ;
+    rdfs:label "has Chest Plating" .
+
+law:hasWaistArticulation a owl:ObjectProperty ;
+    rdfs:domain law:BipedalTorso ;
+    rdfs:range law:WaistArticulation ;
+    rdfs:label "has Waist Articulation" .
+
+law:hasPilotBlock a owl:ObjectProperty ;
+    rdfs:domain law:BipedalTorso ;
+    rdfs:range law:PilotBlock ;
+    rdfs:label "has Pilot Block" .
+
+law:BipedalTorsoShape a sh:NodeShape ;
+    sh:targetClass law:BipedalTorso ;
+    sh:property [
+        sh:path law:hasChestPlating ;
+        sh:class law:ChestPlating ;
+        sh:minCount 1 ;
+        sh:message "A Bipedal Torso MUST have proper Chest Plating defined."
+    ] ;
+    sh:property [
+        sh:path law:hasWaistArticulation ;
+        sh:class law:WaistArticulation ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A Bipedal Torso MUST have exactly one Waist Articulation point."
+    ] ;
+    sh:property [
+        sh:path law:hasPilotBlock ;
+        sh:class law:PilotBlock ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "A Bipedal Torso MUST have exactly one Pilot Block."
+    ] ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:not [
+            sh:hasValue law:AbstractBoundingBox
+        ] ;
+        sh:message "Combinatorial Engine violation: Bipedal Torso CANNOT be an Abstract Bounding Box."
+    ] .
 
 
 # --- Source: 043_head_grammar.ttl ---
@@ -397,10 +477,40 @@ mud:EnvelopeShape a sh:NodeShape ;
 
 
 # --- Source: 044_limb_grammar.ttl ---
-@prefix : <http://example.org/law#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix mud:  <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+@prefix gn:   <https://rocket-craft.com/ontology/gn#> .
+@prefix :     <http://example.org/law#> .
 
-:044_limb_grammar a :SourceLaw .
+:044_limb_grammar a :SourceLaw ;
+    rdfs:label "Limb Grammar Law" ;
+    rdfs:comment "Defines the structural ontology for manipulator limbs (arms and legs) required for IK target acquisition." .
+
+mud:Arm a owl:Class ;
+    rdfs:subClassOf mud:Limb ;
+    rdfs:label "Arm" ;
+    rdfs:comment "A manipulator limb designated for grasping, shielding, or weapon operation." .
+
+mud:Leg a owl:Class ;
+    rdfs:subClassOf mud:Limb ;
+    rdfs:label "Leg" ;
+    rdfs:comment "A manipulator limb designated for chassis support and locomotion." .
+
+# -----------------------------------------------------------------------------
+# SHACL RULE: LIMB ANATOMY INTEGRITY
+# -----------------------------------------------------------------------------
+mud:LimbAnatomyShape a sh:NodeShape ;
+    sh:targetClass mud:Arm, mud:Leg ;
+    sh:property [
+        sh:path mud:hasTargetSocket ;
+        sh:class mud:Socket ;
+        sh:message "A limb must define a target socket if it engages in IK."
+    ] .
 
 
 # --- Source: 045_wing_grammar.ttl ---
@@ -687,10 +797,88 @@ law:GreebleShape a sh:NodeShape ;
 
 
 # --- Source: 074_ik_target_policy.ttl ---
-@prefix : <http://example.org/law#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix mud:  <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+@prefix gn:   <https://rocket-craft.com/ontology/gn#> .
+@prefix :     <http://example.org/law#> .
 
-:074_ik_target_policy a :SourceLaw .
+:074_ik_target_policy a :SourceLaw ;
+    rdfs:label "IK Target Policy Law" ;
+    rdfs:comment "Enforces proper inverse kinematics scaling rules so arms and legs mathematically reach weapon sockets." .
+
+# -----------------------------------------------------------------------------
+# SHACL RULE: KINEMATIC REACH SCALING
+# -----------------------------------------------------------------------------
+# Arms and legs must have sufficient bicep/thigh and forearm/calf length
+# to physically reach the defined socket offset, otherwise IK breaks.
+
+mud:Limb a owl:Class ;
+    rdfs:label "Limb" ;
+    rdfs:comment "A multi-segment limb (e.g. arm or leg) subject to IK scaling." .
+
+mud:upperSegmentLength a owl:DatatypeProperty ;
+    rdfs:label "Upper Segment Length" ;
+    rdfs:domain mud:Limb ;
+    rdfs:range xsd:decimal .
+
+mud:lowerSegmentLength a owl:DatatypeProperty ;
+    rdfs:label "Lower Segment Length" ;
+    rdfs:domain mud:Limb ;
+    rdfs:range xsd:decimal .
+
+mud:hasTargetSocket a owl:ObjectProperty ;
+    rdfs:label "Has Target Socket" ;
+    rdfs:domain mud:Limb ;
+    rdfs:range mud:Socket .
+
+mud:ikReachDistance a owl:DatatypeProperty ;
+    rdfs:label "IK Reach Distance" ;
+    rdfs:domain mud:Socket ;
+    rdfs:range xsd:decimal .
+
+mud:LimbKinematicReachShape a sh:NodeShape ;
+    sh:targetClass mud:Limb ;
+    sh:property [
+        sh:path mud:upperSegmentLength ;
+        sh:datatype xsd:decimal ;
+        sh:minCount 1 ;
+        sh:message "Limb must have an upperSegmentLength to compute IK scaling."
+    ] ;
+    sh:property [
+        sh:path mud:lowerSegmentLength ;
+        sh:datatype xsd:decimal ;
+        sh:minCount 1 ;
+        sh:message "Limb must have a lowerSegmentLength to compute IK scaling."
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "IK PARADOX: Total limb length (upper + lower) must be strictly greater than or equal to the mathematical reach required to engage the target WeaponSocket." ;
+        sh:prefixes [
+            sh:declare [
+                sh:prefix "mud" ;
+                sh:namespace "https://rocket-craft.com/ontology/mud#"^^xsd:anyURI
+            ]
+        ] ;
+        sh:select """
+            SELECT $this ?totalLength ?requiredDistance
+            WHERE {
+                $this mud:hasTargetSocket ?socket .
+                ?socket a mud:WeaponSocket .
+                ?socket mud:ikReachDistance ?requiredDistance .
+                
+                $this mud:upperSegmentLength ?upperLen .
+                $this mud:lowerSegmentLength ?lowerLen .
+                
+                BIND((?upperLen + ?lowerLen) AS ?totalLength)
+                FILTER(?totalLength < ?requiredDistance)
+            }
+        """
+    ] .
 
 
 # --- Source: 075_socket_schema.ttl ---
@@ -1715,16 +1903,16 @@ mud:prim_head_unit rdf:type mud:GeometryPrimitive ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor .
 
-mud:prim_v_fin_left rdf:type mud:GeometryPrimitive ;
-    mud:belongsToPart mud:v_fin_left ;
+mud:prim_mecha_crown_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:mecha_crown_left ;
     mud:primitiveFamily "fin" ;
     mud:translateX -0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor .
 
-mud:prim_v_fin_right rdf:type mud:GeometryPrimitive ;
-    mud:belongsToPart mud:v_fin_right ;
+mud:prim_mecha_crown_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:mecha_crown_right ;
     mud:primitiveFamily "fin" ;
     mud:translateX 0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;

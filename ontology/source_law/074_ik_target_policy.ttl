@@ -1,4 +1,82 @@
-@prefix : <http://example.org/law#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix mud:  <https://rocket-craft.com/ontology/mud#> .
+@prefix core: <https://rocket-craft.com/ontology/core#> .
+@prefix gn:   <https://rocket-craft.com/ontology/gn#> .
+@prefix :     <http://example.org/law#> .
 
-:074_ik_target_policy a :SourceLaw .
+:074_ik_target_policy a :SourceLaw ;
+    rdfs:label "IK Target Policy Law" ;
+    rdfs:comment "Enforces proper inverse kinematics scaling rules so arms and legs mathematically reach weapon sockets." .
+
+# -----------------------------------------------------------------------------
+# SHACL RULE: KINEMATIC REACH SCALING
+# -----------------------------------------------------------------------------
+# Arms and legs must have sufficient bicep/thigh and forearm/calf length
+# to physically reach the defined socket offset, otherwise IK breaks.
+
+mud:Limb a owl:Class ;
+    rdfs:label "Limb" ;
+    rdfs:comment "A multi-segment limb (e.g. arm or leg) subject to IK scaling." .
+
+mud:upperSegmentLength a owl:DatatypeProperty ;
+    rdfs:label "Upper Segment Length" ;
+    rdfs:domain mud:Limb ;
+    rdfs:range xsd:decimal .
+
+mud:lowerSegmentLength a owl:DatatypeProperty ;
+    rdfs:label "Lower Segment Length" ;
+    rdfs:domain mud:Limb ;
+    rdfs:range xsd:decimal .
+
+mud:hasTargetSocket a owl:ObjectProperty ;
+    rdfs:label "Has Target Socket" ;
+    rdfs:domain mud:Limb ;
+    rdfs:range mud:Socket .
+
+mud:ikReachDistance a owl:DatatypeProperty ;
+    rdfs:label "IK Reach Distance" ;
+    rdfs:domain mud:Socket ;
+    rdfs:range xsd:decimal .
+
+mud:LimbKinematicReachShape a sh:NodeShape ;
+    sh:targetClass mud:Limb ;
+    sh:property [
+        sh:path mud:upperSegmentLength ;
+        sh:datatype xsd:decimal ;
+        sh:minCount 1 ;
+        sh:message "Limb must have an upperSegmentLength to compute IK scaling."
+    ] ;
+    sh:property [
+        sh:path mud:lowerSegmentLength ;
+        sh:datatype xsd:decimal ;
+        sh:minCount 1 ;
+        sh:message "Limb must have a lowerSegmentLength to compute IK scaling."
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "IK PARADOX: Total limb length (upper + lower) must be strictly greater than or equal to the mathematical reach required to engage the target WeaponSocket." ;
+        sh:prefixes [
+            sh:declare [
+                sh:prefix "mud" ;
+                sh:namespace "https://rocket-craft.com/ontology/mud#"^^xsd:anyURI
+            ]
+        ] ;
+        sh:select """
+            SELECT $this ?totalLength ?requiredDistance
+            WHERE {
+                $this mud:hasTargetSocket ?socket .
+                ?socket a mud:WeaponSocket .
+                ?socket mud:ikReachDistance ?requiredDistance .
+                
+                $this mud:upperSegmentLength ?upperLen .
+                $this mud:lowerSegmentLength ?lowerLen .
+                
+                BIND((?upperLen + ?lowerLen) AS ?totalLength)
+                FILTER(?totalLength < ?requiredDistance)
+            }
+        """
+    ] .
