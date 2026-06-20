@@ -687,3 +687,48 @@ describe('OTel → OCEL ingest convergence (live)', () => {
     console.log(`[headless-loop] otel→ocel: ingested=${ingest.body.ingested} hash_convergent=${replay.body.hash_convergent}`);
   });
 });
+
+// ── session PATCH endpoint (field whitelist = security) ───────────────────────
+// Guards PATCH /api/game/session/[id]: the browser updates is_alive/event_count
+// through it. The field whitelist is a security boundary — a client must not be
+// able to forge player_id or flip engine_source (e.g. to 'synthetic') via PATCH.
+describe('session PATCH whitelist + guards (live)', () => {
+  async function patch(path: string, body: Record<string, unknown>) {
+    const res = await fetch(`${BASE}${path}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    }).catch(() => ({ status: 500, json: async () => null }));
+    return { status: (res as Response).status, body: await (res as Response).json?.().catch(() => null) };
+  }
+
+  it('updates whitelisted fields and reflects in session-state', async () => {
+    if (MOCK) return;
+    const created = await post('/api/game/session', { browser_session_id: `patch-${Date.now()}`, engine_source: 'rocket_cli' });
+    if (created.status === 503) return;
+    const sid = created.body.session_id as string;
+    const r = await patch(`/api/game/session/${sid}`, { is_alive: false, session_ended_at: new Date().toISOString() });
+    expect(r.status).toBe(200);
+    expect(r.body.updated).toBe(true);
+    const state = await get(`/api/game/session-state?session_id=${sid}`);
+    expect(state.body.is_alive).toBe(false);
+    expect(state.body.state).toBe('Closed'); // is_alive=false + session_ended_at set
+  });
+
+  it('SECURITY: a PATCH of only non-whitelisted fields is stripped → 400 (cannot forge engine_source/player_id)', async () => {
+    if (MOCK) return;
+    const created = await post('/api/game/session', { browser_session_id: `patch-sec-${Date.now()}`, engine_source: 'rocket_cli' });
+    if (created.status === 503) return;
+    const sid = created.body.session_id as string;
+    // These fields are NOT in the whitelist → patch becomes empty → 400, proving they
+    // can never be written via this endpoint (no attribution forging / synthetic bypass).
+    const r = await patch(`/api/game/session/${sid}`, { engine_source: 'synthetic', player_id: '00000000-0000-0000-0000-000000000099', verdict: 'PASS' });
+    expect(r.status).toBe(400);
+  });
+
+  it('rejects a malformed session id and an empty body', async () => {
+    if (MOCK) return;
+    expect((await patch('/api/game/session/not-a-uuid', { is_alive: false })).status).toBe(400);
+    const created = await post('/api/game/session', { browser_session_id: `patch-empty-${Date.now()}` });
+    if (created.status === 503) return;
+    expect((await patch(`/api/game/session/${created.body.session_id}`, {})).status).toBe(400);
+  });
+});
