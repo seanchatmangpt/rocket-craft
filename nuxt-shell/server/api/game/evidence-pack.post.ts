@@ -25,6 +25,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { blake3 } from '@noble/hashes/blake3.js';
 import { computeMerkleRoot } from '../../utils/merkle';
+import { toOcel2 } from '../../utils/ocelFormat';
 
 function blake3Hex(input: string): string {
   const bytes = blake3(new TextEncoder().encode(input));
@@ -130,20 +131,9 @@ export default defineEventHandler(async (event) => {
   const chainTip = rows[rows.length - 1]?.event_hash ?? null;
   const merkleRoot = computeMerkleRoot(rows.map(r => r.event_hash).filter(Boolean));
 
-  // Build OCEL 2.0 section (same format as ocel-export.get.ts)
+  // Build OCEL 2.0 section using shared pure formatter
+  const ocel2 = toOcel2(rows, body.session_id as string);
   const activities = [...new Set(rows.map(r => r.activity))];
-  const ocel2 = {
-    objectTypes: [{ name: 'game_session', attributes: [] }],
-    eventTypes: activities.map(a => ({ name: a, attributes: [] })),
-    objects: [{ id: body.session_id, type: 'game_session', attributes: [] }],
-    events: rows.map(row => ({
-      id: row.id,
-      type: row.activity,
-      time: new Date(row.timestamp_ms).toISOString(),
-      attributes: row.attributes ?? {},
-      relationships: [{ objectId: body.session_id, qualifier: 'session' }],
-    })),
-  };
 
   const receipt = receiptRes.error ? null : (receiptRes.data as ReceiptRow);
 
