@@ -1,4 +1,5 @@
 pub mod crypto;
+pub mod dev;
 pub mod doctor;
 pub mod env;
 pub mod html5;
