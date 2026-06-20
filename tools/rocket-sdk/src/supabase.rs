@@ -196,14 +196,49 @@ impl SupabaseService {
 
     /// Open a `game_sessions` row for a CLI cook run.
     ///
-    /// Creates an `is_alive=true` row with `engine_source='rocket_cli'` and returns
-    /// the UUID string. Pass this to `Html5PackageVerifier::with_cook_session_id()`
-    /// so all OCEL events emitted by the cook pipeline are linked to this session
-    /// and can be verified by `verify_event_chain(session_id)`.
+    /// Routes through `POST /api/game/session` (Nuxt BFF) so the service-role key
+    /// stays server-side and RLS is bypassed correctly. Falls back to direct Supabase
+    /// REST (dev/offline) when Nuxt is unreachable.
     ///
-    /// The caller is responsible for closing the session by calling
-    /// `close_cook_session(session_id, verdict)` after the cook completes.
-    pub async fn create_cook_session(&self, project_name: &str, archive_dir: &str) -> Result<String> {
+    /// Returns the UUID string. The caller must call `close_cook_session()` when done.
+    pub async fn create_cook_session(
+        &self,
+        project_name: &str,
+        archive_dir: &str,
+    ) -> Result<String> {
+        let nuxt = std::env::var("NUXT_BASE_URL")
+            .unwrap_or_else(|_| "http://localhost:3000".to_string());
+
+        // Preferred: BFF route (service-role key, no RLS issues)
+        let bff_body = serde_json::json!({
+            "browser_session_id": format!("cli-{}-{}", project_name, archive_dir),
+            "engine_source": "rocket_cli",
+        });
+        let bff_resp = self
+            .client
+            .post(format!("{nuxt}/api/game/session"))
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&bff_body)?)
+            .send()
+            .await;
+
+        match bff_resp {
+            Ok(r) if r.status().is_success() => {
+                let v: serde_json::Value = r.json().await?;
+                return v["session_id"]
+                    .as_str()
+                    .map(str::to_owned)
+                    .ok_or_else(|| anyhow::anyhow!("create_cook_session BFF: no session_id in response"));
+            }
+            Ok(r) => {
+                tracing::warn!("create_cook_session BFF returned {}; falling back to direct REST", r.status());
+            }
+            Err(e) => {
+                tracing::warn!("create_cook_session BFF unreachable ({e}); falling back to direct REST");
+            }
+        }
+
+        // Fallback: direct Supabase REST (dev/offline — service role key required)
         let body = serde_json::json!({
             "is_alive": true,
             "engine_source": "rocket_cli",
@@ -214,9 +249,9 @@ impl SupabaseService {
             }
         });
         let mut headers = self.rest_headers();
-        // PostgREST: return the inserted row so we can extract the generated UUID.
         headers.insert("Prefer", "return=representation".parse().unwrap());
-        let resp = self.client
+        let resp = self
+            .client
             .post(format!("{}/rest/v1/game_sessions", self.url))
             .headers(headers)
             .json(&body)
@@ -235,16 +270,42 @@ impl SupabaseService {
             .ok_or_else(|| anyhow::anyhow!("create_cook_session: no id returned"))
     }
 
-    /// Close a cook session by setting `is_alive=false` and recording the final verdict.
+    /// Close a cook session via `PATCH /api/game/session/[id]` (Nuxt BFF).
     ///
-    /// Call after `push_cook_receipt` completes. Sets `session_ended_at` and tags
-    /// the receipt hash in the metadata for cross-reference.
+    /// Falls back to direct Supabase REST when Nuxt is unreachable.
     pub async fn close_cook_session(
         &self,
         session_id: &str,
         verdict: &str,
         receipt_hash: Option<&str>,
     ) -> Result<()> {
+        let nuxt = std::env::var("NUXT_BASE_URL")
+            .unwrap_or_else(|_| "http://localhost:3000".to_string());
+
+        let bff_body = serde_json::json!({
+            "is_alive": false,
+            "session_ended_at": chrono::Utc::now().to_rfc3339(),
+            "receipt_hash": receipt_hash,
+        });
+        let bff_resp = self
+            .client
+            .patch(format!("{nuxt}/api/game/session/{session_id}"))
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&bff_body)?)
+            .send()
+            .await;
+
+        match bff_resp {
+            Ok(r) if r.status().is_success() => return Ok(()),
+            Ok(r) => {
+                tracing::warn!("close_cook_session BFF returned {}; falling back to direct REST", r.status());
+            }
+            Err(e) => {
+                tracing::warn!("close_cook_session BFF unreachable ({e}); falling back to direct REST");
+            }
+        }
+
+        // Fallback: direct Supabase REST
         let body = serde_json::json!({
             "is_alive": false,
             "session_ended_at": chrono::Utc::now().to_rfc3339(),
@@ -255,7 +316,8 @@ impl SupabaseService {
                 "closed_by": "rocket html5 cook"
             })
         });
-        let resp = self.client
+        let resp = self
+            .client
             .patch(format!("{}/rest/v1/game_sessions?id=eq.{session_id}", self.url))
             .headers(self.rest_headers())
             .json(&body)
@@ -442,14 +504,52 @@ impl SupabaseService {
     ///
     /// Uses PostgREST bulk insert (JSON array body).  Non-fatal on partial
     /// failure — caller should log but not abort the cook pipeline.
-    pub async fn push_ocel_events(&self, events: &[OcelEventRow]) -> Result<()> {
+    /// Push OCEL events via `POST /api/game/ocel-ingest` (Nuxt BFF).
+    ///
+    /// The BFF performs an idempotent upsert on (session_id, seq) so duplicate
+    /// batches from retried CLI runs do not corrupt the chain. Falls back to direct
+    /// Supabase REST (with merge-duplicates Prefer header) when Nuxt is unreachable.
+    pub async fn push_ocel_events(
+        &self,
+        events: &[OcelEventRow],
+    ) -> Result<()> {
         if events.is_empty() {
             return Ok(());
         }
+
+        let nuxt = std::env::var("NUXT_BASE_URL")
+            .unwrap_or_else(|_| "http://localhost:3000".to_string());
+
+        // Preferred: BFF route (idempotent upsert + OTel spans)
+        let session_id = events.first().and_then(|e| e.session_id.as_deref());
+        if let Some(sid) = session_id {
+            let bff_body = serde_json::json!({
+                "session_id": sid,
+                "events": events,
+            });
+            let bff_resp = self
+                .client
+                .post(format!("{nuxt}/api/game/ocel-ingest"))
+                .header("Content-Type", "application/json")
+                .body(serde_json::to_string(&bff_body)?)
+                .send()
+                .await;
+
+            match bff_resp {
+                Ok(r) if r.status().is_success() => return Ok(()),
+                Ok(r) => {
+                    tracing::warn!("push_ocel_events BFF returned {}; falling back to direct REST", r.status());
+                }
+                Err(e) => {
+                    tracing::warn!("push_ocel_events BFF unreachable ({e}); falling back to direct REST");
+                }
+            }
+        }
+
+        // Fallback: direct Supabase REST with merge-duplicates
         let body = serde_json::to_string(events)
             .context("failed to serialise OCEL events")?;
         let mut headers = self.rest_headers();
-        // Overwrite Prefer so PostgREST performs a bulk insert without returning rows.
         headers.insert("Prefer", "return=minimal,resolution=merge-duplicates".parse().unwrap());
         let resp = self
             .client
@@ -465,6 +565,85 @@ impl SupabaseService {
             anyhow::bail!("ocel_events bulk insert {status}: {body}");
         }
         Ok(())
+    }
+
+    /// Run an AutonomicQA cycle for a session via `POST /api/game/qa-cycle`.
+    ///
+    /// Returns the qa-cycle response: overall (HEALTHY/DEGRADED/CRITICAL),
+    /// checks_passed, checks_total, and cycle_receipt_hash.
+    ///
+    /// Non-fatal: if Nuxt is unreachable, returns Ok(None) so the cook pipeline
+    /// can continue without blocking on QA cycle availability.
+    pub async fn qa_cycle_check(
+        &self,
+        nuxt_base_url: Option<&str>,
+        session_id: &str,
+    ) -> Result<Option<serde_json::Value>> {
+        let nuxt = nuxt_base_url
+            .map(str::to_owned)
+            .or_else(|| std::env::var("NUXT_BASE_URL").ok())
+            .unwrap_or_else(|| "http://localhost:3000".to_string());
+
+        let body = serde_json::json!({ "session_id": session_id });
+        let resp = self
+            .client
+            .post(format!("{nuxt}/api/game/qa-cycle"))
+            .header("Content-Type", "application/json")
+            .body(serde_json::to_string(&body)?)
+            .send()
+            .await;
+
+        match resp {
+            Ok(r) if r.status().is_success() => {
+                let v: serde_json::Value = r.json().await?;
+                Ok(Some(v))
+            }
+            Ok(r) => {
+                tracing::warn!("qa-cycle returned {} (non-fatal)", r.status());
+                Ok(None)
+            }
+            Err(e) => {
+                tracing::warn!("qa-cycle unreachable ({e}) (non-fatal)");
+                Ok(None)
+            }
+        }
+    }
+
+    /// Verify the BLAKE3 event chain + Merkle root for a session.
+    ///
+    /// Calls `GET /api/game/chain-verify?session_id=<sid>` and returns the verdict:
+    ///   overall: "PASS" | "FAIL"
+    ///   merkle_root: 64-char hex | null
+    ///   event_count: usize
+    ///
+    /// Non-fatal: returns Ok(None) when Nuxt is unreachable.
+    pub async fn chain_verify_session(
+        &self,
+        nuxt_base_url: Option<&str>,
+        session_id: &str,
+    ) -> Result<Option<serde_json::Value>> {
+        let nuxt = nuxt_base_url
+            .map(str::to_owned)
+            .or_else(|| std::env::var("NUXT_BASE_URL").ok())
+            .unwrap_or_else(|| "http://localhost:3000".to_string());
+
+        let url = format!("{nuxt}/api/game/chain-verify?session_id={session_id}");
+        let resp = self.client.get(&url).send().await;
+
+        match resp {
+            Ok(r) if r.status().is_success() => {
+                let v: serde_json::Value = r.json().await?;
+                Ok(Some(v))
+            }
+            Ok(r) => {
+                tracing::warn!("chain-verify returned {} (non-fatal)", r.status());
+                Ok(None)
+            }
+            Err(e) => {
+                tracing::warn!("chain-verify unreachable ({e}) (non-fatal)");
+                Ok(None)
+            }
+        }
     }
 
     /// Fetch a session-replay proof from the Nuxt server API.
@@ -777,5 +956,69 @@ mod tests {
         assert_eq!(events[0].seq, 0);
         assert_eq!(events[1].seq, 1);
         assert_eq!(events[2].seq, 2);
+    }
+
+    // ── BFF routing method tests ───────────────────────────────────────────────
+
+    /// push_ocel_events with no session_id on events still attempts BFF (skips BFF path)
+    /// and falls back — verifying the branch logic compiles and the empty-batch guard works.
+    #[tokio::test]
+    async fn push_ocel_events_empty_batch_returns_ok() {
+        let svc = SupabaseService::new("http://localhost:54321".into(), "test-key".into());
+        let result = svc.push_ocel_events(&[]).await;
+        assert!(result.is_ok(), "empty batch should return Ok immediately");
+    }
+
+    /// qa_cycle_check returns Ok(None) when Nuxt is unreachable (non-fatal path).
+    #[tokio::test]
+    async fn qa_cycle_check_non_fatal_on_unreachable() {
+        let svc = SupabaseService::new("http://localhost:54321".into(), "test-key".into());
+        // Port 19999 is almost certainly not listening.
+        let result = svc.qa_cycle_check(Some("http://localhost:19999"), "fake-session").await;
+        assert!(result.is_ok(), "should be Ok(None), not Err");
+        assert!(result.unwrap().is_none(), "unreachable Nuxt → None");
+    }
+
+    /// chain_verify_session returns Ok(None) when Nuxt is unreachable (non-fatal path).
+    #[tokio::test]
+    async fn chain_verify_non_fatal_on_unreachable() {
+        let svc = SupabaseService::new("http://localhost:54321".into(), "test-key".into());
+        let result = svc.chain_verify_session(Some("http://localhost:19999"), "fake-session").await;
+        assert!(result.is_ok(), "should be Ok(None), not Err");
+        assert!(result.unwrap().is_none(), "unreachable Nuxt → None");
+    }
+
+    /// create_cook_session falls back to direct REST when BFF unreachable.
+    /// We expect an error here because direct REST also fails (no real Supabase),
+    /// but the important thing is it doesn't panic and the error is descriptive.
+    #[tokio::test]
+    async fn create_cook_session_falls_back_to_rest_on_bff_unreachable() {
+        // Temporarily set NUXT_BASE_URL to something unreachable so BFF path fails.
+        std::env::set_var("NUXT_BASE_URL", "http://localhost:19999");
+        let svc = SupabaseService::new("http://localhost:19998".into(), "test-key".into());
+        let result = svc.create_cook_session("test-project", "/tmp/test").await;
+        // Both BFF and direct REST fail → we get an Err, but not a panic.
+        assert!(result.is_err(), "should fail when both BFF and REST are unreachable");
+        std::env::remove_var("NUXT_BASE_URL");
+    }
+
+    /// OcelEventRow with a session_id serializes correctly for the BFF body.
+    #[test]
+    fn ocel_event_row_with_session_id_serializes() {
+        let evt = OcelEventRow {
+            session_id: Some("sess-abc-123".into()),
+            activity: "GameSessionStarted".into(),
+            timestamp_ms: 1_750_000_000_000,
+            object_refs: vec!["sess-abc-123".into()],
+            attributes: json!({ "engine": "rocket_cli" }),
+            prev_hash: None,
+            event_hash: "a".repeat(64),
+            seq: 0,
+        };
+        let v = serde_json::to_value(&evt).unwrap();
+        assert_eq!(v["session_id"], "sess-abc-123");
+        assert_eq!(v["activity"], "GameSessionStarted");
+        assert_eq!(v["seq"], 0);
+        assert_eq!(v["event_hash"].as_str().unwrap().len(), 64);
     }
 }

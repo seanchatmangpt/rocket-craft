@@ -247,7 +247,15 @@ impl Html5PackageReport {
         // Build OCEL event rows using ChainedOcelEmitter — single source of truth
         // for the BLAKE3 chain formula, shared with session-seed and browser clients.
         let cook_obj = format!("cook:{}", self.archive_dir.display());
-        let base_ms = receipt.proven_at.parse::<u64>().unwrap_or(0) * 1_000;
+        // proven_at is RFC3339 — parse to epoch ms (not u64 directly).
+        let base_ms = chrono::DateTime::parse_from_rfc3339(&receipt.proven_at)
+            .map(|dt| dt.timestamp_millis() as u64)
+            .unwrap_or_else(|_| {
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_millis() as u64)
+                    .unwrap_or(0)
+            });
         let mut emitter = crate::supabase::ChainedOcelEmitter::new(
             self.cook_session_id.clone(),
             cook_obj,

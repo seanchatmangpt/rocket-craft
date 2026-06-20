@@ -48,10 +48,35 @@ fn push_report_to_supabase(report: &rocket_sdk::Html5PackageReport) {
 
         // Attach session_id before pushing events + receipt.
         let mut owned = report.clone();
-        owned.cook_session_id = session_id;
+        owned.cook_session_id = session_id.clone();
         match owned.push_to_supabase(&svc).await {
             Ok(()) => println!("[supabase] cook receipt pushed → game_receipts"),
             Err(e) => println!("[supabase] warn: push failed (non-fatal) — {e:#}"),
+        }
+
+        // Post-cook: chain-verify + QA cycle (non-fatal — pipeline proof)
+        if let Some(ref sid) = session_id {
+            match svc.chain_verify_session(None, sid).await {
+                Ok(Some(v)) => {
+                    let overall = v["overall"].as_str().unwrap_or("unknown");
+                    let merkle = v["merkle_root"].as_str().unwrap_or("null");
+                    let count = v["event_count"].as_u64().unwrap_or(0);
+                    println!("[chain-verify] {overall} — {count} events, merkle_root={merkle}");
+                }
+                Ok(None) => println!("[chain-verify] skipped (Nuxt unreachable)"),
+                Err(e) => println!("[chain-verify] warn: {e:#}"),
+            }
+            match svc.qa_cycle_check(None, sid).await {
+                Ok(Some(v)) => {
+                    let overall = v["overall"].as_str().unwrap_or("unknown");
+                    let passed = v["checks_passed"].as_u64().unwrap_or(0);
+                    let total = v["checks_total"].as_u64().unwrap_or(0);
+                    let cycle_hash = v["cycle_receipt_hash"].as_str().unwrap_or("none");
+                    println!("[qa-cycle] {overall} — {passed}/{total} checks, cycle_receipt={cycle_hash}");
+                }
+                Ok(None) => println!("[qa-cycle] skipped (Nuxt unreachable)"),
+                Err(e) => println!("[qa-cycle] warn: {e:#}"),
+            }
         }
     });
 }
