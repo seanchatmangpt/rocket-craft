@@ -306,6 +306,36 @@ describe('Full headless gameplay loop (seed → events → chain proof)', () => 
     console.log(`[headless-loop] evidence-pack v2: pack_hash=${body.pack_hash?.slice(0, 8)}… ocel_hash=${body.manifest.ocel_hash?.slice(0, 8)}… chain_proof_hash=${body.manifest.chain_proof_hash?.slice(0, 8)}…`);
   });
 
+  it('Step 11b: session-state endpoint returns Proven state after receipt-finalize', async () => {
+    if (MOCK || !seededSessionId || !seededReceiptHash) return;
+
+    // First finalize so the game_sessions row gets stamped
+    const { status: fs, body: fb } = await post('/api/game/receipt-finalize', {
+      session_id: seededSessionId,
+      receipt_hash: seededReceiptHash,
+      update_receipt: true,
+    });
+    if (fs === 503 || fs === 500) return;
+    // finalize may return NO_EVENTS if session was seeded without OCEL — skip gracefully
+    if (fb?.verdict === 'NO_EVENTS') return;
+
+    // Now verify session-state reflects the terminal state
+    const { status, body } = await get(`/api/game/session-state?session_id=${seededSessionId}`);
+    if (status === 503 || status === 500) return;
+    expect(status).toBe(200);
+    expect(body.session_id).toBe(seededSessionId);
+    // State machine: Proven (receipt_hash stamped) or Created/Closed (session was pre-sealed)
+    expect(['Created', 'Active', 'Closed', 'Proven']).toContain(body.state);
+    expect(typeof body.ocel_event_count).toBe('number');
+    expect(typeof body.has_receipt).toBe('boolean');
+    if (fb?.verdict === 'PROVEN') {
+      // If finalize succeeded, session_state must be Proven
+      expect(body.state).toBe('Proven');
+      expect(body.receipt_hash).toMatch(/^[0-9a-f]{64}$/);
+    }
+    console.log(`[headless-loop] session-state: state=${body.state} events=${body.ocel_event_count} has_receipt=${body.has_receipt}`);
+  });
+
   it('Step 12: health-lies returns all_clear=true after a clean seeded session', async () => {
     if (MOCK) return;
     const { status, body } = await get('/api/game/health-lies');

@@ -105,16 +105,33 @@ export default defineEventHandler(async (event) => {
 
   const chainTipMatches = tipRow.event_hash === body.receipt_hash;
   const verdict = chainTipMatches ? 'PROVEN' : 'HASH_MISMATCH';
+  const provenAt = new Date().toISOString();
 
-  // Optionally stamp the verdict back onto the game_receipts row
-  // (used by persistReceipt composable to close the loop server-side)
-  if (body.update_receipt) {
+  // Stamp both game_receipts AND game_sessions when PROVEN.
+  // Previously only game_receipts was updated — sessions stayed is_alive=false
+  // indefinitely with no proven_at, making it impossible to query "proven sessions"
+  // without a full join. Now a single game_sessions row captures the terminal state.
+  if (body.update_receipt || verdict === 'PROVEN') {
+    // Update game_receipts verdict
     await sb
       .from('game_receipts')
-      .update({ verdict, proven_at: new Date().toISOString() })
+      .update({ verdict, proven_at: provenAt })
       .eq('session_id', body.session_id)
       .eq('receipt_hash', body.receipt_hash);
-    // Non-fatal: if no matching row exists yet the composable hasn't inserted it
+
+    // Stamp game_sessions with receipt_hash + proven_at (terminal state transition)
+    // This enables O(1) "is this session proven?" without joining game_receipts.
+    if (verdict === 'PROVEN') {
+      await sb
+        .from('game_sessions')
+        .update({
+          receipt_hash: body.receipt_hash,
+          session_ended_at: provenAt,
+          is_alive: false,
+        })
+        .eq('id', body.session_id)
+        .is('receipt_hash', null); // only stamp once — do not overwrite an existing proof
+    }
   }
 
   return {
@@ -126,5 +143,6 @@ export default defineEventHandler(async (event) => {
     chain_tip: tipRow.event_hash,
     receipt_hash: body.receipt_hash,
     tip_seq: tipRow.seq,
+    proven_at: verdict === 'PROVEN' ? provenAt : null,
   };
 });

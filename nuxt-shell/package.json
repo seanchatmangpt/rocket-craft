@@ -9,6 +9,10 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test": "vitest run",
+    "test:unit": "vitest run test/unit/",
+    "test:loop": "MOCK_API=0 vitest run tests/e2e/headless-loop.test.ts --reporter=verbose",
+    "test:loop:mock": "MOCK_API=1 vitest run tests/e2e/headless-loop.test.ts --reporter=verbose",
+    "test:ci": "bash scripts/test-ci.sh",
     "test:e2e": "playwright test",
     "typecheck": "nuxt typecheck"
   },

@@ -239,7 +239,7 @@ jobs:
         run: cargo test --workspace
 
   nuxt-shell:
-    name: Nuxt — pipeline API tests (mock)
+    name: Nuxt — unit tests + type-check (mock mode)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -251,19 +251,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11
+          cache: "npm"
+          cache-dependency-path: nuxt-shell/package-lock.json
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Type-check
-        run: npx tsc --noEmit || true
+        run: npx tsc --noEmit
 
-      - name: Unit + API tests (mock mode)
-        run: MOCK_API=1 npx vitest run
+      - name: Unit tests (no server needed)
+        run: npm run test:unit
+
+      - name: Mock-mode loop contracts (MOCK_API=1, no Supabase needed)
+        run: npm run test:loop:mock
         env:
           MOCK_API: "1"
 
@@ -335,13 +336,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 11
+          cache: "npm"
+          cache-dependency-path: nuxt-shell/package-lock.json
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - uses: supabase/setup-cli@v1
         with:
@@ -372,13 +371,14 @@ jobs:
           ALLOW_SESSION_SEED: "1"
           NODE_ENV: development
 
-      - name: Run headless gameplay loop (14 steps)
-        run: npx vitest run tests/e2e/headless-loop.test.ts
+      - name: Run headless gameplay loop (all steps, MOCK_API=0)
+        run: npm run test:loop
         env:
           SUPABASE_URL: http://localhost:54321
           SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
           API_BASE_URL: http://localhost:3000
+          MOCK_API: "0"
           ALLOW_SESSION_SEED: "1"
           NODE_ENV: development
 

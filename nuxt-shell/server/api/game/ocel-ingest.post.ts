@@ -18,6 +18,8 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { emitOtelSpans, type SpanDescriptor } from '../../utils/otlp-emitter';
+import { admitBatch } from '../../utils/ocelAdmission';
+import { invalidateSession } from '../../utils/conformanceCache';
 
 interface OcelEventBatch {
   activity: string;
@@ -42,6 +44,53 @@ export default defineEventHandler(async (event) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = createClient<any>(supabaseUrl, supabaseKey);
 
+  // ── Cross-batch chain-tip verification ─────────────────────────────────────
+  // Fetch the highest-seq event already stored for this session so we can verify
+  // this batch threads correctly onto the existing chain BEFORE any insert.
+  // Without this, a client sending seq [5,6,7] when [0,1,2] exists passes the
+  // intra-batch contiguity check (5→6→7 valid) but leaves a gap at 3-4.
+  const firstEvt = body.events[0]!;
+  const { data: existingTip } = await supabase
+    .from('ocel_events')
+    .select('seq, event_hash')
+    .eq('session_id', body.session_id)
+    .order('seq', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (existingTip) {
+    const expectedNextSeq = (existingTip.seq as number) + 1;
+    const incomingSeq = firstEvt.seq;
+    if (incomingSeq > expectedNextSeq) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: `SEQ GAP: expected next seq ${expectedNextSeq}, got ${incomingSeq}. Cross-batch chain broken for session ${body.session_id}`,
+      });
+    }
+    if (incomingSeq === expectedNextSeq && firstEvt.prev_hash !== (existingTip.event_hash as string)) {
+      throw createError({
+        statusCode: 422,
+        statusMessage: `CHAIN THREAD BROKEN: batch[0].prev_hash does not match stored tip event_hash at seq ${existingTip.seq}`,
+      });
+    }
+    // incomingSeq < expectedNextSeq → replay/duplicate batch; upsert ignoreDuplicates handles it
+  }
+
+  // ── Pre-Admission gate (PATQ law) ──────────────────────────────────────────
+  const admission = admitBatch({
+    session_id: body.session_id,
+    events: body.events,
+    expectedStartSeq: firstEvt.seq,
+    incomingPrevHash: firstEvt.prev_hash ?? null,
+  });
+
+  if (admission.verdict === 'reject') {
+    throw createError({ statusCode: admission.statusCode ?? 400, statusMessage: admission.reason ?? 'Batch rejected by admission gate' });
+  }
+  if (admission.verdict === 'quarantine') {
+    throw createError({ statusCode: 422, statusMessage: `CHAIN TAMPER DETECTED: ${admission.reason}` });
+  }
+
   // 1. Insert events into ocel_events (source of truth)
   const rows = body.events.map(evt => ({
     session_id: body.session_id,
@@ -62,6 +111,9 @@ export default defineEventHandler(async (event) => {
   if (insertErr) {
     throw createError({ statusCode: 500, message: `ocel_events insert failed: ${insertErr.message}` });
   }
+
+  // Invalidate conformance cache for this session — new events change fitness/generalization
+  invalidateSession(body.session_id);
 
   // 2. Emit OTel spans (non-fatal — Supabase is source of truth)
   const descriptors: SpanDescriptor[] = body.events.map(evt => ({

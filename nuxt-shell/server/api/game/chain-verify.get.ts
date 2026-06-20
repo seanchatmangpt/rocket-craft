@@ -13,6 +13,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { computeMerkleRoot } from '../../utils/merkle';
 import { checkConformance } from '../../utils/processMining';
+import { getCachedConformance, cacheConformance } from '../../utils/conformanceCache';
 
 const DECLARED_LIFECYCLE = [
   'GameSessionStarted',
@@ -79,9 +80,13 @@ export default defineEventHandler(async (event) => {
     .filter(Boolean);
   const merkleRoot = computeMerkleRoot(eventHashes);
 
-  // Process conformance: fitness, precision, simplicity against declared lifecycle
+  // Process conformance — check LRU cache first to avoid re-mining on every call
   const miningEvents = (eventsResult.data ?? []) as Array<{ activity: string; timestamp_ms: number; seq: number }>;
-  const conformance = checkConformance(miningEvents, DECLARED_LIFECYCLE);
+  const cached = sessionId ? getCachedConformance(sessionId, DECLARED_LIFECYCLE) : null;
+  const conformance = cached ?? checkConformance(miningEvents, DECLARED_LIFECYCLE);
+  if (sessionId && !cached && miningEvents.length > 0) {
+    cacheConformance(sessionId, DECLARED_LIFECYCLE, conformance);
+  }
 
   return {
     overall: allOk ? 'PASS' : 'FAIL',
