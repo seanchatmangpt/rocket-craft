@@ -10,7 +10,7 @@
  * Van der Aalst doctrine: if the event log cannot prove a lawful process happened,
  * then it did not work.
  */
-import { blake3 } from '@noble/hashes/blake3'
+import { blake3 } from '@noble/hashes/blake3.js'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

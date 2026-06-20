@@ -14,7 +14,7 @@
  * never throw so OTLP unavailability cannot block receipt creation.
  */
 
-import { emitOtelSpan } from '~/server/utils/otlp-emitter';
+import { emitOtelSpan } from '../../utils/otlp-emitter';
 
 const LAWFUL_LIFECYCLE_START = 'GameSessionStarted';
 const LAWFUL_LIFECYCLE_FRAME = 'FrameRendered';

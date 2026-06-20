@@ -1,16 +1,29 @@
 <script setup lang="ts">
 /**
- * UE4Canvas — mounts a UE4 HTML5 game build inside the Nuxt shell.
+ * UE4Canvas — embeds a real UE4 HTML5 game build inside the Nuxt shell.
  *
- * Law: UE4 owns visual projection only. This component:
- * - mounts inside <ClientOnly> (no SSR, no hydration mismatch)
- * - suppresses requestPointerLock so UMG widgets receive first-click
- * - injects the UE4 loader script dynamically into the container div
- * - emits 'ready' when UE4 signals EngineReady via window.rocket:ue4
+ * Why an iframe (not script injection):
+ * The UE4 emscripten loader (`Brm.UE4.js`) resolves asset URLs via
+ * `Module.locateFile(name)` which returns the bare name (`Brm.wasm`, `Brm.js`,
+ * `Brm.data`) — i.e. RELATIVE to the document. Injected into the Nuxt page at
+ * `/game`, those fetches resolve to `/game/Brm.wasm` and 404, because the dev
+ * proxy only forwards `/manufactured/**` to the UE4 asset server. The loader
+ * also assumes a full Brm.html DOM (jQuery, bootstrap, #canvas, progress
+ * ribbons) that the Nuxt page does not provide.
+ *
+ * Embedding the real `/manufactured/Brm.html` in an iframe fixes both: every
+ * relative asset resolves under `/manufactured/` (proxied to the asset server),
+ * and the loader gets the exact DOM it expects. COOP/COEP headers flow through
+ * the proxy so SharedArrayBuffer (wasm-threads) stays enabled.
+ *
+ * Bridge: the iframe is same-origin (served via the Nuxt proxy on :3000), so we
+ * forward UE4's `rocket:ue4` CustomEvents from the iframe window up to the
+ * parent window, keeping `useRocketUe4Bridge` working unchanged.
  */
 
 const props = defineProps<{
-  scriptSrc: string;  // e.g. '/manufactured/Brm.UE4.js'
+  // URL of the real UE4 HTML5 page, served through the /manufactured proxy.
+  src?: string;
   title?: string;
 }>();
 
@@ -19,64 +32,45 @@ const emit = defineEmits<{
   error: [message: string];
 }>();
 
-const container = ref<HTMLDivElement>();
+const gameSrc = computed(() => props.src ?? '/manufactured/Brm.html');
+
+const iframeRef = ref<HTMLIFrameElement>();
 const { canvasContainer, isFullscreen, isSupported: fullscreenSupported, toggle: toggleFullscreen } = useRocketFullscreen();
 const { isEngineReady } = useRocketUe4Bridge();
 
-onMounted(() => {
-  if (!container.value) return;
+let detachBridge: (() => void) | null = null;
 
-  // Suppress pointer lock globally — browser shell owns access, not UE4
-  suppressPointerLock();
+function onIframeLoad() {
+  const frame = iframeRef.value;
+  if (!frame) return;
 
-  // Create canvas element that UE4's loader expects
-  const canvas = document.createElement('canvas');
-  canvas.id = 'canvas';
-  canvas.className = 'emscripten';
-  canvas.tabIndex = 0;
-  canvas.setAttribute('oncontextmenu', 'event.preventDefault()');
-  canvas.style.cssText = 'width:100%;height:100%;display:block;';
-  container.value.appendChild(canvas);
+  // Same-origin (proxied): forward UE4 → bridge events from iframe to parent.
+  let frameWin: Window | null = null;
+  try {
+    frameWin = frame.contentWindow;
+  } catch (err) {
+    // Cross-origin would land here — should not happen with the proxy, but
+    // surface it rather than silently losing the bridge.
+    emit('error', `UE4 iframe is cross-origin; bridge unavailable: ${String(err)}`);
+    return;
+  }
+  if (!frameWin) return;
 
-  // Inject UE4 loader script
-  const script = document.createElement('script');
-  script.src = props.scriptSrc;
-  script.async = true;
-  script.onerror = () => emit('error', `Failed to load ${props.scriptSrc}`);
-  container.value.appendChild(script);
-});
+  const forward = (e: Event) => {
+    const detail = (e as CustomEvent).detail;
+    window.dispatchEvent(new CustomEvent('rocket:ue4', { detail }));
+  };
+  frameWin.addEventListener('rocket:ue4', forward as EventListener);
+  detachBridge = () => frameWin?.removeEventListener('rocket:ue4', forward as EventListener);
+}
 
-// Watch bridge engine-ready state and emit to parent
 watch(isEngineReady, (ready) => {
   if (ready) emit('ready');
 });
 
-function suppressPointerLock() {
-  if (!import.meta.client) return;
-  const noop = () => Promise.resolve();
-  try {
-    Object.defineProperty(HTMLElement.prototype, 'requestPointerLock', {
-      value: noop, writable: false, configurable: false,
-    });
-    Object.defineProperty(Document.prototype, 'exitPointerLock', {
-      value: noop, writable: false, configurable: false,
-    });
-  } catch {
-    HTMLElement.prototype.requestPointerLock = noop;
-  }
-  // Auto-focus canvas on visibility so no click is wasted on focus acquisition
-  const poll = setInterval(() => {
-    const c = document.getElementById('canvas') as HTMLCanvasElement | null;
-    if (c && c.style.display !== 'none') {
-      c.focus();
-      clearInterval(poll);
-    }
-  }, 500);
-  document.addEventListener('click', () => {
-    const c = document.getElementById('canvas');
-    if (c) c.focus();
-  });
-}
+onBeforeUnmount(() => {
+  detachBridge?.();
+});
 </script>
 
 <template>
@@ -86,7 +80,14 @@ function suppressPointerLock() {
     :aria-label="title ?? 'UE4 Game Canvas'"
     role="application"
   >
-    <div ref="container" class="ue4-canvas-container" />
+    <iframe
+      ref="iframeRef"
+      :src="gameSrc"
+      :title="title ?? 'Rocket-Craft World'"
+      class="ue4-frame"
+      allow="autoplay; fullscreen; gamepad; cross-origin-isolated"
+      @load="onIframeLoad"
+    />
 
     <div class="canvas-controls" aria-label="Canvas controls">
       <button
@@ -109,9 +110,11 @@ function suppressPointerLock() {
   background: #000;
   overflow: hidden;
 }
-.ue4-canvas-container {
+.ue4-frame {
   width: 100%;
   height: 100%;
+  border: 0;
+  display: block;
 }
 .canvas-controls {
   position: absolute;
