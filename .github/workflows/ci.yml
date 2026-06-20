@@ -369,6 +369,7 @@ jobs:
           SUPABASE_ANON_KEY: ${{ env.SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
           ALLOW_SESSION_SEED: "1"
+          ALLOW_ANON_GAME: "1"
           NODE_ENV: development
 
       - name: Run headless gameplay loop (all steps, MOCK_API=0)
@@ -381,6 +382,25 @@ jobs:
           MOCK_API: "0"
           ALLOW_SESSION_SEED: "1"
           NODE_ENV: development
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run fast Playwright E2E (control plane + real auth + OCEL loop)
+        run: npx playwright test e2e/shell.spec.ts e2e/auth-flow.spec.ts e2e/game-loop.spec.ts --project=game-loop --workers=2
+        env:
+          # Default Playwright config baseURL is http://localhost:3000 (reuses the
+          # running dev server). These specs don't need the UE4 asset server —
+          # shell/game-loop block /manufactured/**, auth-flow is DOM-only.
+          CI: "true"
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: nuxt-shell/playwright-report/
+          retention-days: 7
 
       - name: Stop Supabase
         if: always()
