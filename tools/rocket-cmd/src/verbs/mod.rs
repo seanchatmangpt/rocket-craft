@@ -3,6 +3,7 @@ pub mod dev;
 pub mod doctor;
 pub mod env;
 pub mod html5;
+pub mod lint;
 pub mod mud;
 pub mod port;
 pub mod project;

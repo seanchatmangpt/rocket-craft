@@ -6,6 +6,7 @@ pub mod dev;
 pub mod doctor;
 pub mod error;
 pub mod html5;
+pub mod lint;
 pub mod manifest;
 pub mod setup;
 pub mod status;
