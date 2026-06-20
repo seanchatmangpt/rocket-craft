@@ -43,6 +43,7 @@ let pollHandle: number | null = null;
 let frameThrottleTs = 0;
 let rafHooked = false;
 let engineReadyDispatched = false;
+let intentKeyCleanup: (() => void) | null = null;
 
 // Throttle FrameRendered to ~4/sec — real frames fire at 30-60Hz, but the OCEL
 // log only needs proof of liveness, not every frame.
@@ -82,6 +83,22 @@ function onEngineReady(frameWin: Window) {
 
   // Hook the render loop for genuine per-frame evidence.
   hookRenderLoop(frameWin as Window & { requestAnimationFrame: typeof requestAnimationFrame });
+
+  // Bridge admitted intents → synthetic keyboard on the iframe canvas, so the
+  // control plane (panel/gamepad/voice/touch) actually drives the STOCK car (which
+  // has no rocketIntentReceiver, but DOES handle native canvas keyboard input).
+  wireIntentKeyboard(frameWin);
+}
+
+function wireIntentKeyboard(frameWin: Window) {
+  if (intentKeyCleanup) return;
+  const onIntent = (e: Event) => {
+    const type = (e as CustomEvent<{ intent?: { type?: string } }>).detail?.intent?.type;
+    if (type) dispatchIntentKeyToCanvas(frameWin, type);
+  };
+  // useRocketInputBus dispatches admitted intents as the 'rocket:intent' DOM event.
+  window.addEventListener('rocket:intent', onIntent);
+  intentKeyCleanup = () => window.removeEventListener('rocket:intent', onIntent);
 }
 
 function onIframeLoad() {
@@ -132,6 +149,8 @@ watch(isEngineReady, (ready) => {
 
 onBeforeUnmount(() => {
   if (pollHandle) { clearInterval(pollHandle); pollHandle = null; }
+  intentKeyCleanup?.();
+  intentKeyCleanup = null;
 });
 </script>
 
