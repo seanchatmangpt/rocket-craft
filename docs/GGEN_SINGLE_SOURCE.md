@@ -44,8 +44,42 @@ joint tree, root, and link set from `121` — no mirror to collapse there.
    priority: it already has a sane generic fallback (file stem), so it is not a real
    drift hazard — the explicit branches only add legacy-name tolerance.
 
+## ⚠ CRITICAL — morphology gate is STALE against current geometry (attended fix needed)
+
+Discovered 2026-06-21 while attempting candidate #1. **The metric/assembly morphology
+gates currently measure ZERO parts** (`measure_all() == {}`), so their `ADMITTED`
+reports on disk are **stale** and must not be trusted.
+
+Root cause: `part_mesh.usda.tera` was changed (parallel swarm) to emit **native USD
+shapes** — `def Cube "armor_plate_N" { double size; xformOp:scale/translate }` and
+`def Cylinder "armor_piston_N" { double radius; double height; xformOp:translate }`,
+nested in `def Xform "prim_NNNN_group"` with a group `translate`/`rotateXYZ`/`scale`.
+This is *real, renderable* geometry (it produces the winged-mech render). But
+`scripts/verify_metric_morphology.py::measure_part` only parses the OLD format
+(`def Mesh` + `point3f[] points`), so it finds nothing.
+
+**Turnkey fix (attended — admission-critical, do NOT do blind):** rewrite
+`measure_part` to compute each part's world bbox from the native shapes:
+- `def Cube`: local AABB `[-size/2, +size/2]³`, then apply the cube's `xformOp:scale`
+  then `xformOp:translate`, then the parent group's `translate`→`rotateXYZ`→`scale`
+  (compose a 3×3 rotation for `rotateXYZ`; transform all 8 corners, take min/max).
+- `def Cylinder`: local AABB `radius` in X/Y, `height/2` in Z (USD default axis = Z),
+  same transform chain.
+Then re-run `verify_metric_morphology.py` and sanity-check the ratios against the
+last-known-good values (head ~0.13, torso ~0.31, limb ~0.62) before trusting the
+verdict. Update the assembly gate's `measure_all` consumer likewise.
+
+Why deferred: a subtle transform bug yields plausible-but-wrong ratios = false
+standing, which is worse than a visibly-broken gate. Needs a human to confirm the
+new geometry semantics and the recomputed ratios are meaningful.
+
+Note: candidate #1 (assembly part-list → graph-driven) was verified to produce
+IDENTICAL output at the ggen level and is ready to land **once this gate is fixed**.
+
 ## Principle
 
 Collapse to single-source where it can be verified safely; **guard** where the fix is
 risky; defer ontology-design-grade refactors to attended passes rather than risk a
 broken generator. The drift guards ensure the remaining mirrors cannot diverge unnoticed.
+A broken gate that reports stale ADMITTED is more dangerous than one that visibly fails —
+prefer the loud failure.

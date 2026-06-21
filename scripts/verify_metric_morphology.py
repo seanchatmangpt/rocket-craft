@@ -475,7 +475,20 @@ def python_hardcoded_blade_scale_must_refuse():
 def main():
     parts = measure_all()
     if not parts:
-        print("FATAL: no flagship USD parts measured", file=sys.stderr)
+        # No measurable parts (e.g. the USD geometry format changed under the
+        # parser). Overwrite the report with an honest UNKNOWN so a STALE
+        # ADMITTED can never mislead a reader who doesn't re-run the gate.
+        msg = ("no flagship USD parts measured — measure_part could not parse the "
+               "current part USD (geometry format mismatch). See "
+               "docs/GGEN_SINGLE_SOURCE.md (CRITICAL section).")
+        print("FATAL: " + msg, file=sys.stderr)
+        out_json = os.path.join(REPO, "METRIC_MORPHOLOGY_REPORT.json")
+        with open(out_json, "w") as f:
+            json.dump({"verdict": "UNKNOWN", "reason": msg,
+                       "parts": [], "shacl_conforms": False,
+                       "replay_verified": False,
+                       "timestamp_utc": datetime.datetime.utcnow().isoformat() + "Z"},
+                      f, indent=2, sort_keys=True)
         return 2
 
     core1 = build_core(parts)
