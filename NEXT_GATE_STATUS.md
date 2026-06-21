@@ -1,7 +1,8 @@
 # NEXT_GATE_STATUS — Synthesis / Final Admission Backstop
 
 **Run date:** 2026-06-20
-**Claim:** `CLAIM_HOLD` — the earlier `PRE_UE4_HERO_ASSET_ADMITTED` claim is **RETRACTED** as overstated.
+**Claim:** `PRE_UE4_MORPHOLOGY_ADMITTED` — metric-morphology graph law passes on honest archetype
+evidence (see Verdict). Full `$5M` visual hero-fidelity remains a separate, higher gate (CLAIM_HOLD).
 
 > CORRECTION (2026-06-20, post process-review): the independent 4-dimension review
 > (`PROCESS_REVIEW_REPORT.md`, verdict NEEDS_REPAIR) found the top-line ADMITTED was not
@@ -60,6 +61,30 @@ The process is sound; the flagship asset is **PARTIAL_ALIVE**, not admitted.
 
 ## Verdict
 
-All 9 workstreams re-verify ADMITTED (R4 at the documented disposition standard), the keystone and
-its 162-entry prev_hash-linked receipt chain validate end-to-end, and IP is clean (ADMIT_ORIGINAL,
-refused=0). Per the admission rule, **claim = PRE_UE4_HERO_ASSET_ADMITTED**.
+**Update (2026-06-21) — morphology falsification test fixed forward.** The earlier REFUSED
+(Python geometry-generator purity violation + untracked evidence destruction) is now REMEDIATED:
+the hardcoded morphology was migrated into source law, the offending `patch_geometry_generator.py`
+is quarantined under `evidence/quarantine/python_morphology_violation/`, the unrecoverable
+`fix_points.py` is scarred into the BLAKE3 chain, and `TTL_MORPHOLOGY_REPLACEMENT_REPORT.json`
+documents the replacement.
+
+The metric-morphology GRAPH-LAW gate — the prior real blocker — now stands at **ADMITTED**
+on honest evidence (`METRIC_MORPHOLOGY_REPORT.json`):
+- `shacl_conforms=true`, verdict ADMITTED, all 8 flagship parts inside **archetype-prior** bands
+  (head 0.08–0.15, torso 0.30–0.45, lateral-limb 0.55–0.85, wing 0.40–0.90, weapon 0.10–0.60) —
+  NOT the earlier shrink-wrapped ±0.01 fits. The bands encode what a hero mech *should* be; the
+  geometry was converged in source law (`104`) to meet them (torso 0.128→0.313, head lifted clear
+  of the taller torso to satisfy head-above-torso anatomy law).
+- `orientation_finding.agree=true` (parts stack along Y matching upAxis=Y).
+- UFO-disc negative fixture still REFUSES (ANATOMY_PARADOX + REFUSE_DEFAULT_SHIELD_PROPORTION).
+- `replay_verified=true`; morphology lives in TTL, regenerable via ggen sync.
+
+Source-law replay `contamination_free=true`; fresh render `thresholds_met=true` (silhouette 0.48,
+color 0.52, vis_errors 0). R1/R2/R3/IP/R4/Materials/R5/R6 stand ADMITTED per the table above.
+
+**Overall: the pre-UE4 hero-asset MORPHOLOGY process is ADMITTED on honest archetype evidence.**
+The asset's metric morphology, source-law regenerability, replay determinism, receipt chain, and
+the Python-violation remediation all carry on-disk verifier backing. Remaining work is fidelity
+(hard-surface detail, material zones) toward full $5M visual hero quality — a higher gate than
+pre-UE4 morphology admission, tracked separately.
+
