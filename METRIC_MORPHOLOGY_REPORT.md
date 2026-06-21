@@ -1,6 +1,6 @@
 # METRIC_MORPHOLOGY_REPORT (pre-render graph law)
 
-- timestamp: 2026-06-21T06:29:22.777422Z
+- timestamp: 2026-06-21T06:52:24.644226Z
 - verdict: **ADMITTED**
 - body_height_m: 0.1002 (vertical axis Z, metersPerUnit 0.01)
 - shacl_conforms: True

@@ -40,16 +40,9 @@ METERS_PER_UNIT = 0.01  # USD metersPerUnit -> cm to meters
 
 # Flagship parts (tank shells SM_TankTreads/KwK36Gun/InterleavedWheels are out
 # of flagship scope and intentionally excluded).
-FLAGSHIP_PARTS = {
-    "SM_Head": "rf:SM_Head",
-    "SM_Torso": "rf:SM_Torso",
-    "SM_Limb_Left": "rf:SM_Limb_Left",
-    "SM_Limb_Right": "rf:SM_Limb_Right",
-    "SM_WingArray_Left": "rf:SM_WingArray_Left",
-    "SM_WingArray_Right": "rf:SM_WingArray_Right",
-    "SM_Blade_Left": "rf:SM_Blade_Left",
-    "SM_Blade_Right": "rf:SM_Blade_Right",
-}
+# NOTE: the flagship part roster is NO LONGER hardcoded here. flagship_parts()
+# derives it from the GRAPH (117 eng:hasPart) so the part list the gate measures
+# is exactly the roster the source law declares — one source of truth.
 # Vertical axis index in this USD layout. NOTE: the ggen-generated geometry
 # stacks parts along Z (SM_Head group translate (0,0,1.5) sits above SM_Torso
 # (0,0,0)), even though the USD metadata declares upAxis="Y". That declared-vs-
@@ -133,6 +126,23 @@ RF = Namespace("https://rocket-craft.com/asset/reference_fabric_001#")
 SH = Namespace("http://www.w3.org/ns/shacl#")
 
 _PART_BANDS_CACHE = {}
+_FLAGSHIP_CACHE = []
+
+
+def flagship_parts():
+    """The flagship part roster, DERIVED from the graph (117 eng:hasPart) rather
+    than a hardcoded list — the gate measures exactly the parts source law declares.
+    Returns local names sorted for deterministic (replayable) iteration."""
+    if _FLAGSHIP_CACHE:
+        return _FLAGSHIP_CACHE
+    g = rdflib.Graph()
+    g.parse(os.path.join(SRC_DIR, "117_reference_fabric_metric_binding.ttl"),
+            format="turtle")
+    q = ("PREFIX eng: <https://rocket-craft.com/ontology/engineering#> "
+         "SELECT ?part WHERE { ?mech eng:hasPart ?part . }")
+    names = sorted(str(p).split("#")[-1] for (p,) in g.query(q))
+    _FLAGSHIP_CACHE.extend(names)
+    return _FLAGSHIP_CACHE
 
 
 def part_bands():
@@ -273,7 +283,7 @@ def measure_all():
     The actual mass-stacking axis is detected separately to flag any disagreement."""
     global VERT, SPAN
     raw = {}
-    for usd_name in FLAGSHIP_PARTS:
+    for usd_name in flagship_parts():
         path = os.path.join(USD_DIR, usd_name + ".usda")
         if not os.path.exists(path):
             continue

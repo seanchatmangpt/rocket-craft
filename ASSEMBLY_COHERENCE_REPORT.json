@@ -1,0 +1,159 @@
+{
+  "contact_tolerance_m": 0.3,
+  "disconnected_joints": [],
+  "floating_parts": [],
+  "foreground_component_count": 3,
+  "foreground_component_count_source": "visual_gap_report.json",
+  "gate": "assembly_coherence",
+  "joint_contacts": [
+    {
+      "child": "SM_Head",
+      "gap_m": 0.0002,
+      "in_contact": true,
+      "joint": "joint_neck",
+      "measured": true,
+      "parent": "SM_Torso"
+    },
+    {
+      "child": "SM_Limb_Left",
+      "gap_m": -0.007,
+      "in_contact": true,
+      "joint": "joint_shoulder_left",
+      "measured": true,
+      "parent": "SM_Torso"
+    },
+    {
+      "child": "SM_Limb_Right",
+      "gap_m": -0.007,
+      "in_contact": true,
+      "joint": "joint_shoulder_right",
+      "measured": true,
+      "parent": "SM_Torso"
+    },
+    {
+      "child": "SM_WingArray_Left",
+      "gap_m": -0.0028,
+      "in_contact": true,
+      "joint": "joint_wing_mount_left",
+      "measured": true,
+      "parent": "SM_Torso"
+    },
+    {
+      "child": "SM_WingArray_Right",
+      "gap_m": -0.0028,
+      "in_contact": true,
+      "joint": "joint_wing_mount_right",
+      "measured": true,
+      "parent": "SM_Torso"
+    },
+    {
+      "child": "SM_Blade_Left",
+      "gap_m": -0.01,
+      "in_contact": true,
+      "joint": "joint_weapon_left",
+      "measured": true,
+      "parent": "SM_Limb_Left"
+    },
+    {
+      "child": "SM_Blade_Right",
+      "gap_m": -0.01,
+      "in_contact": true,
+      "joint": "joint_weapon_right",
+      "measured": true,
+      "parent": "SM_Limb_Right"
+    }
+  ],
+  "max_components_admitted": 3,
+  "negative_fixture": {
+    "conforms": false,
+    "disconnected_joints": [
+      "joint_neck",
+      "joint_shoulder_left",
+      "joint_shoulder_right",
+      "joint_weapon_left",
+      "joint_weapon_right",
+      "joint_wing_mount_left",
+      "joint_wing_mount_right"
+    ],
+    "messages": [
+      "DISCONNECTED_JOINT: joint child link is not in metric contact with its parent link."
+    ],
+    "refused": true
+  },
+  "reachability": [
+    {
+      "chain": [
+        "SM_Torso",
+        "SM_Limb_Left",
+        "SM_Blade_Left"
+      ],
+      "part": "SM_Blade_Left",
+      "reaches_root": true
+    },
+    {
+      "chain": [
+        "SM_Torso",
+        "SM_Limb_Right",
+        "SM_Blade_Right"
+      ],
+      "part": "SM_Blade_Right",
+      "reaches_root": true
+    },
+    {
+      "chain": [
+        "SM_Torso",
+        "SM_Head"
+      ],
+      "part": "SM_Head",
+      "reaches_root": true
+    },
+    {
+      "chain": [
+        "SM_Torso",
+        "SM_Limb_Left"
+      ],
+      "part": "SM_Limb_Left",
+      "reaches_root": true
+    },
+    {
+      "chain": [
+        "SM_Torso",
+        "SM_Limb_Right"
+      ],
+      "part": "SM_Limb_Right",
+      "reaches_root": true
+    },
+    {
+      "chain": [
+        "SM_Torso"
+      ],
+      "part": "SM_Torso",
+      "reaches_root": true
+    },
+    {
+      "chain": [
+        "SM_Torso",
+        "SM_WingArray_Left"
+      ],
+      "part": "SM_WingArray_Left",
+      "reaches_root": true
+    },
+    {
+      "chain": [
+        "SM_Torso",
+        "SM_WingArray_Right"
+      ],
+      "part": "SM_WingArray_Right",
+      "reaches_root": true
+    }
+  ],
+  "receipt_blake3": "blake3:accdd1bef334ed610ffb02ff898d6f1ea5841f107f2bca56ead0060ff4cbcf65",
+  "refusals": [],
+  "replay_verified": true,
+  "root_link": "SM_Torso",
+  "shacl_conforms": true,
+  "shacl_messages": [],
+  "silhouette_connectivity_ok": true,
+  "timestamp_utc": "2026-06-21T06:52:25.274702Z",
+  "verdict": "ADMITTED"
+}
