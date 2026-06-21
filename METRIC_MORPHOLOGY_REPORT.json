@@ -1,8 +1,155 @@
 {
-  "parts": [],
-  "reason": "no flagship USD parts measured \u2014 measure_part could not parse the current part USD (geometry format mismatch). See docs/GGEN_SINGLE_SOURCE.md (CRITICAL section).",
-  "replay_verified": false,
+  "body_height_m": 0.18,
+  "direct_band_refusals": [
+    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Left): ratio 0.0444 outside [0.10,0.60]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Right): ratio 0.0444 outside [0.10,0.60]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Head): ratio 0.4583 outside [0.08,0.15]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Left): ratio 0.4167 outside [0.55,0.85]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Right): ratio 0.4167 outside [0.55,0.85]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Torso): ratio 0.8333 outside [0.30,0.45]"
+  ],
+  "gate": "metric_morphology_pre_render",
+  "measured_along_up_axis": "Y",
+  "meters_per_unit": 0.01,
+  "negative_fixture": {
+    "codes": [
+      "ANATOMY_PARADOX",
+      "REFUSE_DEFAULT_SHIELD_PROPORTION",
+      "REFUSE_PROVENANCE_VIOLATION"
+    ],
+    "conforms": false,
+    "messages": [
+      "ANATOMY_PARADOX: Legs must descend below the pelvis vertical origin.",
+      "ANATOMY_PARADOX: The Head Y_MIN must be structurally higher than the Torso Y_MAX.",
+      "REFUSE_DEFAULT_SHIELD_PROPORTION: A default shield must occupy 25%-35% of the total body height.",
+      "REFUSE_DEFAULT_SHIELD_PROPORTION: a shield exceeding 85% of body height requires a declared *ShieldArchetype exception class.",
+      "REFUSE_PROVENANCE_VIOLATION: Primitive scale exceeds the permitted scale bands defined in source law."
+    ],
+    "refused": true
+  },
+  "orientation_finding": {
+    "actual_stacking_axis": "Z",
+    "agree": false,
+    "declared_up_axis": "Y",
+    "note": "Parts stack along Z but the USD declares upAxis=Y; usdrecord renders with the declared up-axis, so the asset is rendered mis-oriented relative to its layout. Fix the generator to lay parts along Y (or set upAxis=Z)."
+  },
+  "parts": [
+    {
+      "band": [
+        0.1,
+        0.6
+      ],
+      "height_m": 0.008,
+      "height_ratio": 0.0444,
+      "in_band": false,
+      "part": "SM_Blade_Left",
+      "y_max_m": 0.006,
+      "y_min_m": -0.002
+    },
+    {
+      "band": [
+        0.1,
+        0.6
+      ],
+      "height_m": 0.008,
+      "height_ratio": 0.0444,
+      "in_band": false,
+      "part": "SM_Blade_Right",
+      "y_max_m": 0.006,
+      "y_min_m": -0.002
+    },
+    {
+      "band": [
+        0.08,
+        0.15
+      ],
+      "height_m": 0.0825,
+      "height_ratio": 0.4583,
+      "in_band": false,
+      "part": "SM_Head",
+      "y_max_m": 0.0625,
+      "y_min_m": -0.02
+    },
+    {
+      "band": [
+        0.55,
+        0.85
+      ],
+      "height_m": 0.075,
+      "height_ratio": 0.4167,
+      "in_band": false,
+      "part": "SM_Limb_Left",
+      "y_max_m": 0.04,
+      "y_min_m": -0.035
+    },
+    {
+      "band": [
+        0.55,
+        0.85
+      ],
+      "height_m": 0.075,
+      "height_ratio": 0.4167,
+      "in_band": false,
+      "part": "SM_Limb_Right",
+      "y_max_m": 0.04,
+      "y_min_m": -0.035
+    },
+    {
+      "band": [
+        0.3,
+        0.45
+      ],
+      "height_m": 0.15,
+      "height_ratio": 0.8333,
+      "in_band": false,
+      "part": "SM_Torso",
+      "y_max_m": 0.07,
+      "y_min_m": -0.08
+    },
+    {
+      "band": [
+        0.4,
+        0.9
+      ],
+      "height_m": 0.080063,
+      "height_ratio": 0.4448,
+      "in_band": true,
+      "part": "SM_WingArray_Left",
+      "y_max_m": 0.1,
+      "y_min_m": 0.019938
+    },
+    {
+      "band": [
+        0.4,
+        0.9
+      ],
+      "height_m": 0.080063,
+      "height_ratio": 0.4448,
+      "in_band": true,
+      "part": "SM_WingArray_Right",
+      "y_max_m": 0.1,
+      "y_min_m": 0.019938
+    }
+  ],
+  "receipt_blake3": "blake3:22fa645468f41ff5956b8494d781400c97c72a93695bd5f2ccc2b08aa17420cb",
+  "refusals": [
+    "ANATOMY_PARADOX: The Head Y_MIN must be structurally higher than the Torso Y_MAX.",
+    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Left): ratio 0.0444 outside [0.10,0.60]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Blade_Right): ratio 0.0444 outside [0.10,0.60]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Head): ratio 0.4583 outside [0.08,0.15]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Left): ratio 0.4167 outside [0.55,0.85]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Limb_Right): ratio 0.4167 outside [0.55,0.85]",
+    "REFUSE_PART_HEIGHT_BAND(SM_Torso): ratio 0.8333 outside [0.30,0.45]",
+    "REFUSE_PART_HEIGHT_BAND: part height ratio falls outside its declared morphology band."
+  ],
+  "replay_verified": true,
   "shacl_conforms": false,
-  "timestamp_utc": "2026-06-21T11:08:53.999672Z",
-  "verdict": "UNKNOWN"
+  "shacl_messages": [
+    "ANATOMY_PARADOX: The Head Y_MIN must be structurally higher than the Torso Y_MAX.",
+    "REFUSE_PART_HEIGHT_BAND: part height ratio falls outside its declared morphology band."
+  ],
+  "span_axis": "Z",
+  "timestamp_utc": "2026-06-21T12:12:49.746296Z",
+  "verdict": "PARTIAL_ALIVE",
+  "vertical_axis": "Y"
 }

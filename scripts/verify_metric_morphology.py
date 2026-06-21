@@ -70,9 +70,15 @@ def declared_up_axis():
 
 GROUP_RE = re.compile(r'def Xform "(prim_[^"]+)"\s*\{(.*?)\n        \}', re.DOTALL)
 MESH_RE = re.compile(r'def Mesh "([^"]+)"\s*\{(.*?)\n                \}', re.DOTALL)
+# Native USD shapes the geometry generator now emits inside each prim group.
+CUBE_RE = re.compile(r'def Cube "[^"]+"\s*\{(.*?)\n                \}', re.DOTALL)
+CYL_RE = re.compile(r'def Cylinder "[^"]+"\s*\{(.*?)\n                \}', re.DOTALL)
 TRANS_RE = re.compile(r'double3 xformOp:translate = \(([^)]+)\)')
 SCALE_RE = re.compile(r'double3 xformOp:scale = \(([^)]+)\)')
 POINTS_RE = re.compile(r'point3f\[\] points = \[([^\]]+)\]')
+SIZE_RE = re.compile(r'double size = ([-+\d.eE]+)')
+RADIUS_RE = re.compile(r'double radius = ([-+\d.eE]+)')
+HEIGHT_RE = re.compile(r'double height = ([-+\d.eE]+)')
 NUM_RE = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
 
 
@@ -80,25 +86,59 @@ def _vec(m, default):
     return [float(x) for x in m.group(1).split(",")] if m else list(default)
 
 
+def _num(m, default):
+    return float(m.group(1)) if m else default
+
+
+def _corners(half):
+    """8 AABB corners for half-extents (hx, hy, hz)."""
+    return [(sx * half[0], sy * half[1], sz * half[2])
+            for sx in (-1, 1) for sy in (-1, 1) for sz in (-1, 1)]
+
+
 def measure_part(path):
-    """Accumulate nested group->mesh xformOp:translate/scale over points ->
-    world bounding box (USD units). Mirrors compare_reference_render.py regex."""
+    """World bounding box (USD units) of a part's geometry. Handles BOTH the
+    legacy def Mesh + point3f[] points format AND the current native-shape format
+    (def Cube / def Cylinder inside each prim group). Transform semantics are
+    identical to the legacy code: per-shape scale+translate, then the group's
+    scale+translate (rotateXYZ is intentionally ignored, matching the original
+    measure_part — so ratios stay comparable across the format change)."""
     content = open(path).read()
     pts = []
     for _gname, gblock in GROUP_RE.findall(content):
         gtr = _vec(TRANS_RE.search(gblock), (0, 0, 0))
         gsc = _vec(SCALE_RE.search(gblock), (1, 1, 1))
+
+        def emit(local_pts, ssc, str_):
+            for p in local_pts:
+                pts.append([(p[k] * ssc[k] + str_[k]) * gsc[k] + gtr[k]
+                            for k in range(3)])
+
+        # legacy explicit meshes
         for _mname, mblock in MESH_RE.findall(gblock):
-            mtr = _vec(TRANS_RE.search(mblock), (0, 0, 0))
-            msc = _vec(SCALE_RE.search(mblock), (1, 1, 1))
             pm = POINTS_RE.search(mblock)
             if not pm:
                 continue
             nums = [float(n) for n in NUM_RE.findall(pm.group(1))]
-            for i in range(0, len(nums) - 2, 3):
-                p = nums[i:i + 3]
-                w = [(p[k] * msc[k] + mtr[k]) * gsc[k] + gtr[k] for k in range(3)]
-                pts.append(w)
+            mpts = [tuple(nums[i:i + 3]) for i in range(0, len(nums) - 2, 3)]
+            emit(mpts, _vec(SCALE_RE.search(mblock), (1, 1, 1)),
+                 _vec(TRANS_RE.search(mblock), (0, 0, 0)))
+
+        # native cubes: AABB +/- size/2, then cube scale+translate
+        for cblock in CUBE_RE.findall(gblock):
+            h = _num(SIZE_RE.search(cblock), 1.0) / 2.0
+            emit(_corners((h, h, h)),
+                 _vec(SCALE_RE.search(cblock), (1, 1, 1)),
+                 _vec(TRANS_RE.search(cblock), (0, 0, 0)))
+
+        # native cylinders: radius in X/Y, height/2 in Z (USD default axis Z)
+        for cblock in CYL_RE.findall(gblock):
+            r = _num(RADIUS_RE.search(cblock), 0.0)
+            hz = _num(HEIGHT_RE.search(cblock), 0.0) / 2.0
+            emit(_corners((r, r, hz)),
+                 _vec(SCALE_RE.search(cblock), (1, 1, 1)),
+                 _vec(TRANS_RE.search(cblock), (0, 0, 0)))
+
     if not pts:
         return None
     mn = [min(p[k] for p in pts) for k in range(3)]
