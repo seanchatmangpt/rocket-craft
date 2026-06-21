@@ -70,16 +70,10 @@ def declared_up_axis():
     except OSError:
         return "UNKNOWN"
 
-PART_BANDS = {  # (class, lo, hi) ARCHETYPE-PRIOR height-ratio bands mirrored from 116
-    "SM_Head": ("MechaCrown", 0.08, 0.15),
-    "SM_Torso": ("TorsoSegment", 0.30, 0.45),
-    "SM_Limb_Left": ("BipedalLeg", 0.55, 0.85),
-    "SM_Limb_Right": ("BipedalLeg", 0.55, 0.85),
-    "SM_WingArray_Left": ("WingArray", 0.40, 0.90),
-    "SM_WingArray_Right": ("WingArray", 0.40, 0.90),
-    "SM_Blade_Left": ("MechaWeapon", 0.10, 0.60),
-    "SM_Blade_Right": ("MechaWeapon", 0.10, 0.60),
-}
+# NOTE: part height-ratio bands are NO LONGER hand-mirrored here. They are derived
+# from the GRAPH at runtime by part_bands() (117 part-class typing x 116
+# MorphologyBand) — the TTL source law is the single source of truth, so the
+# direct ratio check can never drift from the SHACL law. See part_bands() below.
 
 GROUP_RE = re.compile(r'def Xform "(prim_[^"]+)"\s*\{(.*?)\n        \}', re.DOTALL)
 MESH_RE = re.compile(r'def Mesh "([^"]+)"\s*\{(.*?)\n                \}', re.DOTALL)
@@ -137,6 +131,41 @@ SOSA = Namespace("http://www.w3.org/ns/sosa/")
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 RF = Namespace("https://rocket-craft.com/asset/reference_fabric_001#")
 SH = Namespace("http://www.w3.org/ns/shacl#")
+
+_PART_BANDS_CACHE = {}
+
+
+def part_bands():
+    """Derive (class, lo, hi) height-ratio bands per flagship part FROM THE GRAPH —
+    117 part-class typing joined with 116 MorphologyBand. The TTL source law is the
+    single source of truth, so this direct ratio check can never drift from the
+    SHACL law (which reads the same triples). Replaces the old hand-mirrored dict."""
+    if _PART_BANDS_CACHE:
+        return _PART_BANDS_CACHE
+    g = rdflib.Graph()
+    for f in ("116_metric_morphology_bands.ttl",
+              "117_reference_fabric_metric_binding.ttl"):
+        g.parse(os.path.join(SRC_DIR, f), format="turtle")
+    q = """
+    PREFIX eng: <https://rocket-craft.com/ontology/engineering#>
+    PREFIX law: <https://rocket-craft.com/ontology/law#>
+    SELECT ?part ?cls ?lo ?hi WHERE {
+      ?part eng:attachedTo ?mech ; a ?cls .
+      ?band law:appliesToPartClass ?cls ;
+            law:bandMinRatio ?lo ; law:bandMaxRatio ?hi .
+    } ORDER BY ?part ?cls
+    """
+    for part, cls, lo, hi in g.query(q):
+        name = str(part).split("#")[-1]
+        lo, hi = float(lo), float(hi)
+        if name in _PART_BANDS_CACHE:
+            # part carries multiple banded co-types (e.g. BipedalLeg + BipedalLimb):
+            # keep the TIGHTEST band so a broader co-type can never loosen the law.
+            c, plo, phi = _PART_BANDS_CACHE[name]
+            _PART_BANDS_CACHE[name] = (c, max(plo, lo), min(phi, hi))
+        else:
+            _PART_BANDS_CACHE[name] = (str(cls).split("#")[-1], lo, hi)
+    return _PART_BANDS_CACHE
 
 
 def _obs(g, subj, pred, value):
@@ -276,11 +305,12 @@ def build_core(parts):
 
     per_part = []
     direct_refusals = []
+    PB = part_bands()  # graph-derived bands (116 x 117), single source of truth
     for name in sorted(parts):
         d = parts[name]
         h = d["y_max_m"] - d["y_min_m"]
         ratio = h / body_h if body_h else 0.0
-        _cls, lo, hi = PART_BANDS[name]
+        _cls, lo, hi = PB[name]
         in_band = lo <= ratio <= hi
         per_part.append({
             "part": name,

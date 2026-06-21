@@ -1,5 +1,5 @@
 {
-  "body_height_m": 0.1025,
+  "body_height_m": 0.1002,
   "direct_band_refusals": [],
   "gate": "metric_morphology_pre_render",
   "measured_along_up_axis": "Y",
@@ -33,11 +33,11 @@
         0.6
       ],
       "height_m": 0.023665,
-      "height_ratio": 0.2309,
+      "height_ratio": 0.2362,
       "in_band": true,
       "part": "SM_Blade_Left",
-      "y_max_m": 0.094001,
-      "y_min_m": 0.070336
+      "y_max_m": 0.068001,
+      "y_min_m": 0.044336
     },
     {
       "band": [
@@ -45,11 +45,11 @@
         0.6
       ],
       "height_m": 0.023665,
-      "height_ratio": 0.2309,
+      "height_ratio": 0.2362,
       "in_band": true,
       "part": "SM_Blade_Right",
-      "y_max_m": 0.094001,
-      "y_min_m": 0.070336
+      "y_max_m": 0.068001,
+      "y_min_m": 0.044336
     },
     {
       "band": [
@@ -57,11 +57,11 @@
         0.15
       ],
       "height_m": 0.013,
-      "height_ratio": 0.1268,
+      "height_ratio": 0.1297,
       "in_band": true,
       "part": "SM_Head",
-      "y_max_m": 0.095,
-      "y_min_m": 0.082
+      "y_max_m": 0.0927,
+      "y_min_m": 0.0797
     },
     {
       "band": [
@@ -69,7 +69,7 @@
         0.85
       ],
       "height_m": 0.064,
-      "height_ratio": 0.6244,
+      "height_ratio": 0.6387,
       "in_band": true,
       "part": "SM_Limb_Left",
       "y_max_m": 0.058,
@@ -81,7 +81,7 @@
         0.85
       ],
       "height_m": 0.064,
-      "height_ratio": 0.6244,
+      "height_ratio": 0.6387,
       "in_band": true,
       "part": "SM_Limb_Right",
       "y_max_m": 0.058,
@@ -93,7 +93,7 @@
         0.45
       ],
       "height_m": 0.032049,
-      "height_ratio": 0.3127,
+      "height_ratio": 0.3199,
       "in_band": true,
       "part": "SM_Torso",
       "y_max_m": 0.079525,
@@ -105,7 +105,7 @@
         0.9
       ],
       "height_m": 0.0629,
-      "height_ratio": 0.6137,
+      "height_ratio": 0.6277,
       "in_band": true,
       "part": "SM_WingArray_Left",
       "y_max_m": 0.0554,
@@ -117,20 +117,20 @@
         0.9
       ],
       "height_m": 0.0629,
-      "height_ratio": 0.6137,
+      "height_ratio": 0.6277,
       "in_band": true,
       "part": "SM_WingArray_Right",
       "y_max_m": 0.0554,
       "y_min_m": -0.0075
     }
   ],
-  "receipt_blake3": "blake3:7baa477bca6b3248cd7ddcc72a2c1ad603d54e1595b10939569e0b379381d66c",
+  "receipt_blake3": "blake3:3b75b45855fcd839811feb5c76727e78181eb56540918ee99ead0ea316b9429d",
   "refusals": [],
   "replay_verified": true,
   "shacl_conforms": true,
   "shacl_messages": [],
   "span_axis": "X",
-  "timestamp_utc": "2026-06-21T02:27:40.529523Z",
+  "timestamp_utc": "2026-06-21T06:29:22.777422Z",
   "verdict": "ADMITTED",
   "vertical_axis": "Y"
 }
