@@ -28,15 +28,15 @@
 //! ```rust
 //! use mech_morphology_law::prelude::*;
 //!
-//! // A canonical, in-band bipedal mech admits. body_height = 18; bands from
-//! // ontology 116: head/torso 0.1190-0.1390, leg 0.6207-0.6407. Here head span
-//! // 2.34 -> 0.130, torso 2.34 -> 0.130, leg 11.34 -> 0.630; head above torso
+//! // A canonical, in-band bipedal mech admits. body_height = 18; archetype bands
+//! // from ontology 116: head 0.08-0.15, torso 0.30-0.45, leg 0.55-0.85. Here head
+//! // span 2.34 -> 0.130, torso 6.66 -> 0.370, leg 11.34 -> 0.630; head above torso
 //! // above legs.
 //! let mech = MeasuredMechBuilder::new()
 //!     .body_height(Meters::new(18.0).unwrap())
 //!     .up_axes(UpAxis::new(Axis::Z), UpAxis::new(Axis::Z))
-//!     .part(part_at("SM_Head", PartClass::MechaCrown, 14.16, 16.5))
-//!     .part(part_at("SM_Torso", PartClass::TorsoSegment, 11.5, 13.84))
+//!     .part(part_at("SM_Head", PartClass::MechaCrown, 30.0, 32.34))
+//!     .part(part_at("SM_Torso", PartClass::TorsoSegment, 20.0, 26.66))
 //!     .part(part_at("SM_Limb_Left", PartClass::BipedalLeg, 0.0, 11.34))
 //!     .build()
 //!     .unwrap();

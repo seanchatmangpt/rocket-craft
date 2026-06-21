@@ -24,8 +24,8 @@ fn head_mech(ratio: f64) -> MeasuredMech {
         .part(MeasuredPart::new(
             PartId::new("SM_Torso"),
             PartClass::TorsoSegment,
-            // torso 0.130 (band 0.1190-0.1390), clearly below head (head min z=200).
-            Bbox::new([m(0.0), m(0.0), m(30.0)], [m(1.0), m(1.0), m(43.0)]),
+            // torso 0.370 (archetype band 0.30-0.45), clearly below head (head min z=200).
+            Bbox::new([m(0.0), m(0.0), m(20.0)], [m(1.0), m(1.0), m(57.0)]),
             false,
         ))
         .up_axes(UpAxis::new(Axis::Z), UpAxis::new(Axis::Z))
@@ -35,16 +35,16 @@ fn head_mech(ratio: f64) -> MeasuredMech {
 }
 
 proptest! {
-    // Head band is [0.1190, 0.1390] (ontology 116). Strictly inside -> Admitted.
+    // Head band is [0.0800, 0.1500] (archetype 116). Strictly inside -> Admitted.
     #[test]
-    fn inside_head_band_admits(r in 0.1191f64..0.1389f64) {
+    fn inside_head_band_admits(r in 0.0801f64..0.1499f64) {
         let out = BipedalMetricEnvelopeLaw::new().validate(&head_mech(r));
         prop_assert_eq!(out.standing, Standing::Admitted);
     }
 
     // Strictly below -> a height-band refusal and not Admitted.
     #[test]
-    fn below_head_band_refuses(r in 0.0f64..0.1189f64) {
+    fn below_head_band_refuses(r in 0.0f64..0.0799f64) {
         let out = BipedalMetricEnvelopeLaw::new().validate(&head_mech(r));
         prop_assert_ne!(out.standing.clone(), Standing::Admitted);
         let has_band = out.refusals.iter().any(|c| matches!(c, RefusalCode::RefusePartHeightBand { .. }));
@@ -53,7 +53,7 @@ proptest! {
 
     // Strictly above -> refusal and not Admitted.
     #[test]
-    fn above_head_band_refuses(r in 0.1391f64..2.0f64) {
+    fn above_head_band_refuses(r in 0.1501f64..2.0f64) {
         let out = BipedalMetricEnvelopeLaw::new().validate(&head_mech(r));
         prop_assert_ne!(out.standing.clone(), Standing::Admitted);
         let has_band = out.refusals.iter().any(|c| matches!(c, RefusalCode::RefusePartHeightBand { .. }));

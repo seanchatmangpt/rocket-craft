@@ -17,13 +17,13 @@ fn part(id: &str, class: PartClass, zmin: f64, zmax: f64) -> MeasuredPart {
     )
 }
 
-/// Canonical in-band bipedal mech (bands from ontology 116): head 0.130
-/// (band 0.1190-0.1390), torso 0.130 (0.1190-0.1390), leg 0.630 (0.6207-0.6407).
+/// Canonical in-band bipedal mech (archetype bands from ontology 116): head 0.130
+/// (band 0.08-0.15), torso 0.370 (0.30-0.45), leg 0.630 (0.55-0.85).
 /// Anatomy: head above torso, leg below torso. body_height 18.
 fn in_band_mech() -> MeasuredMech {
     MeasuredMechBuilder::new()
-        .part(part("SM_Head", PartClass::MechaCrown, 14.16, 16.5))
-        .part(part("SM_Torso", PartClass::TorsoSegment, 11.5, 13.84))
+        .part(part("SM_Head", PartClass::MechaCrown, 30.0, 32.34))
+        .part(part("SM_Torso", PartClass::TorsoSegment, 20.0, 26.66))
         .part(part("SM_Limb_Left", PartClass::BipedalLeg, 0.0, 11.34))
         .up_axes(UpAxis::new(Axis::Z), UpAxis::new(Axis::Z))
         .body_height(m(18.0))
@@ -73,28 +73,28 @@ fn ufo_disc_negative_fixture_refused() {
 
 #[test]
 fn band_edges_inclusive_and_exclusive() {
-    // Head band [0.1190, 0.1390] (ontology 116) with body_height 1000 ->
-    // span = ratio*1000. Torso at 0.130 (in band), placed below the head.
+    // Head band [0.0800, 0.1500] (archetype 116) with body_height 1000 ->
+    // span = ratio*1000. Torso at 0.370 (in band), placed below the head.
     let mk = |span: f64| {
         MeasuredMechBuilder::new()
             .part(part("SM_Head", PartClass::MechaCrown, 800.0, 800.0 + span))
-            .part(part("SM_Torso", PartClass::TorsoSegment, 600.0, 730.0)) // 0.130, below head
+            .part(part("SM_Torso", PartClass::TorsoSegment, 300.0, 670.0)) // 0.370, below head
             .up_axes(UpAxis::new(Axis::Z), UpAxis::new(Axis::Z))
             .body_height(m(1000.0))
             .build()
             .unwrap()
     };
     let law = BipedalMetricEnvelopeLaw::new();
-    assert_eq!(law.validate(&mk(119.0)).standing, Standing::Admitted); // 0.1190 inclusive
-    assert_eq!(law.validate(&mk(139.0)).standing, Standing::Admitted); // 0.1390 inclusive
+    assert_eq!(law.validate(&mk(80.0)).standing, Standing::Admitted); // 0.0800 inclusive
+    assert_eq!(law.validate(&mk(150.0)).standing, Standing::Admitted); // 0.1500 inclusive
     assert!(matches!(
-        law.validate(&mk(118.9)).standing,
+        law.validate(&mk(79.9)).standing,
         Standing::PartialAlive { .. }
-    )); // 0.1189 outside
+    )); // 0.0799 outside
     assert!(matches!(
-        law.validate(&mk(139.1)).standing,
+        law.validate(&mk(150.1)).standing,
         Standing::PartialAlive { .. }
-    )); // 0.1391 outside
+    )); // 0.1501 outside
 }
 
 #[test]
@@ -146,8 +146,8 @@ fn rotated_part_blocks_admission() {
 #[test]
 fn archetype_widens_shield_band() {
     let mech = MeasuredMechBuilder::new()
-        .part(part("SM_Head", PartClass::MechaCrown, 14.16, 16.5)) // 0.130 in band, above torso
-        .part(part("SM_Torso", PartClass::TorsoSegment, 11.5, 13.84)) // 0.130 in band
+        .part(part("SM_Head", PartClass::MechaCrown, 30.0, 32.34)) // 0.130 in band, above torso
+        .part(part("SM_Torso", PartClass::TorsoSegment, 20.0, 26.66)) // 0.370 in band
         .part(part("SM_Limb_Left", PartClass::BipedalLeg, 0.0, 11.34)) // 0.630 in band, below torso
         .part(part("SM_Shield", PartClass::Shield, 0.0, 17.1)) // 17.1/18 = 0.95 exception
         .up_axes(UpAxis::new(Axis::Z), UpAxis::new(Axis::Z))

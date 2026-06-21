@@ -39,15 +39,15 @@ pub trait MorphologyLaw {
 fn class_band(class: PartClass) -> Option<Band> {
     let lit = match class {
         // law:HeadHeightBand  (MechaCrown)
-        PartClass::MechaCrown => (0.1190, 0.1390),
+        PartClass::MechaCrown => (0.0800, 0.1500),
         // law:TorsoHeightBand (TorsoSegment)
-        PartClass::TorsoSegment => (0.1190, 0.1390),
+        PartClass::TorsoSegment => (0.3000, 0.4500),
         // law:LegHeightBand / law:LimbHeightBand (BipedalLeg / BipedalLimb)
-        PartClass::BipedalLeg => (0.6207, 0.6407),
+        PartClass::BipedalLeg => (0.5500, 0.8500),
         // law:WingSpanBand vertical ratio band (bandMinRatio/bandMaxRatio)
-        PartClass::WingArray => (0.6113, 0.6313),
+        PartClass::WingArray => (0.4000, 0.9000),
         // law:WeaponHeightBand (MechaWeapon)
-        PartClass::MechaWeapon => (0.2245, 0.2445),
+        PartClass::MechaWeapon => (0.1000, 0.6000),
         // Shields are governed by the tier law, not a single class band.
         // Accessories/Unclassified have no band.
         PartClass::Shield | PartClass::Accessory | PartClass::Unclassified => return None,
@@ -236,13 +236,13 @@ mod tests {
     }
 
     fn in_band_mech() -> MeasuredMech {
-        // body_height 18. Bands (116): head/torso 0.1190-0.1390, leg 0.6207-0.6407.
-        // head span 2.34 -> 0.130; torso span 2.34 -> 0.130; leg span 11.34 -> 0.630.
-        // Anatomy: head(14.16-16.5).min >= torso(11.5-13.84).max; leg(0-11.34).max
-        // <= torso.min(11.5).
+        // body_height 18. Archetype bands (116): head 0.08-0.15, torso 0.30-0.45,
+        // leg 0.55-0.85. head span 2.34 -> 0.130; torso span 6.66 -> 0.370; leg
+        // span 11.34 -> 0.630. Anatomy: head(30-32.34).min >= torso(20-26.66).max;
+        // leg(0-11.34).max <= torso.min(20).
         MeasuredMechBuilder::new()
-            .part(part("SM_Head", PartClass::MechaCrown, 14.16, 16.5))
-            .part(part("SM_Torso", PartClass::TorsoSegment, 11.5, 13.84))
+            .part(part("SM_Head", PartClass::MechaCrown, 30.0, 32.34))
+            .part(part("SM_Torso", PartClass::TorsoSegment, 20.0, 26.66))
             .part(part("SM_Limb_Left", PartClass::BipedalLeg, 0.0, 11.34))
             .up_axes(UpAxis::new(Axis::Z), UpAxis::new(Axis::Z))
             .body_height(Meters::new(18.0).unwrap())
