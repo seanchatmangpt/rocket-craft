@@ -97,6 +97,15 @@ own; a doc that *records what happened at a moment* must stay frozen. Authoring 
 graph-driven reference doc (e.g. a parts/materials reference table emitted from `117`/`104`)
 is net-new ontology+template design — attended-grade, not a safe unattended collapse.
 
+Investigated the parts-reference-doc path concretely (2026-06-21): `--rule`/`--dry-run`
+scoped sync IS supported (could isolate a new doc rule from the contested geometry
+templates), and `ontology/ggen-packs/manufacturing/queries/parts.rq` already projects the
+roster. BUT the data is absent — `all_merged.ttl` holds **zero** `mud:MechPart` instances
+(`owner_part_id` appears only inside the pack's `.rq` files, never in any data `.ttl`). A
+rule satisfying *query-exists* but not *data-exists* would emit a confidently-empty doc
+("0 parts"), which is worse than none. Wiring the mud part-data ontology into the merged
+graph is the attended prerequisite; until then there is no safe additive docs rule to land.
+
 ## Principle
 
 Collapse to single-source where it can be verified safely; **guard** where the fix is
