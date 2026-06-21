@@ -1,3 +1,4 @@
+@prefix law: <https://rocket-craft.com/ontology/law#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix mud: <https://rocket-craft.com/ontology/mud#> .
 
@@ -96,21 +97,229 @@ mud:TP_GoldVisor rdf:type mud:TextureProgram ;
     mud:emissiveTex "M_GoldVisor_Emissive.png" .
 
 # Reference Fabric Primitives
-mud:prim_torso_core rdf:type mud:GeometryPrimitive ;
+mud:prim_torso_chest rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:torso_core ;
-    mud:primitiveFamily "hard_surface_shell" ;
-    mud:translateX 0.0 ; mud:translateY 0.0 ; mud:translateZ 0.0 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:primitiveFamily "chest_armor" ;
+    mud:translateX 0.0 ; mud:translateY 6.35 ; mud:translateZ 0.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "4"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
 
-mud:prim_head_unit rdf:type mud:GeometryPrimitive ;
-    mud:belongsToPart mud:head_unit ;
-    mud:primitiveFamily "hard_surface_shell" ;
-    mud:translateX 0.0 ; mud:translateY 0.0 ; mud:translateZ 1.5 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+mud:prim_torso_waist rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "waist" ;
+    mud:translateX 0.0 ; mud:translateY 6.35 ; mud:translateZ 0.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "3"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
+
+mud:prim_torso_abdomen rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "abdomen" ;
+    mud:translateX 0.0 ; mud:translateY 6.35 ; mud:translateZ 0.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "4"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
+
+mud:prim_torso_frame rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "inner_frame" ;
+    mud:translateX 0.0 ; mud:translateY 6.35 ; mud:translateZ 0.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:socket_head rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 0.0 ; mud:translateY 6.35 ; mud:translateZ 1.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:socket_limb_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -1.0 ; mud:translateY 6.35 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:socket_limb_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 1.0 ; mud:translateY 6.35 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:socket_wing_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -1.0 ; mud:translateY 6.35 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:socket_wing_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 1.0 ; mud:translateY 6.35 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:socket_loadout rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:torso_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 0.0 ; mud:translateY 6.35 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.60246 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_head_helmet rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "helmet_armor" ;
+    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "3"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
+
+mud:prim_head_cheek rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "cheek_guard" ;
+    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_head_face rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "face_plate" ;
+    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_head_neck rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:head_unit ;
+    mud:primitiveFamily "neck_connection" ;
+    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
 
 mud:prim_mecha_crown_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:mecha_crown_left ;
@@ -118,7 +327,15 @@ mud:prim_mecha_crown_left rdf:type mud:GeometryPrimitive ;
     mud:translateX -0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
 
 mud:prim_mecha_crown_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:mecha_crown_right ;
@@ -126,7 +343,15 @@ mud:prim_mecha_crown_right rdf:type mud:GeometryPrimitive ;
     mud:translateX 0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
 
 mud:prim_wing_root_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:wing_root_left ;
@@ -134,87 +359,175 @@ mud:prim_wing_root_left rdf:type mud:GeometryPrimitive ;
     mud:translateX -1.0 ; mud:translateY -0.5 ; mud:translateZ 1.0 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
 
 mud:prim_pwf_left_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.3000 ; mud:translateY -0.5000 ; mud:translateZ 1.4000 ;
-    mud:scaleX 0.5500 ; mud:scaleY 0.0500 ; mud:scaleZ 1.5000 ;
+    mud:translateX -1.3000 ; mud:translateY 2.39 ; mud:translateZ 1.4000 ;
+    mud:scaleX 0.5500 ; mud:scaleY 3.0 ; mud:scaleZ 1.5000 ;
     mud:rotateX 1.0000 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.5526 ; mud:translateY -0.4518 ; mud:translateZ 1.4947 ;
-    mud:scaleX 0.5184 ; mud:scaleY 0.0500 ; mud:scaleZ 1.4263 ;
+    mud:translateX -1.5526 ; mud:translateY 2.39 ; mud:translateZ 1.4947 ;
+    mud:scaleX 0.5184 ; mud:scaleY 3.0 ; mud:scaleZ 1.4263 ;
     mud:rotateX 1.7368 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.8053 ; mud:translateY -0.3813 ; mud:translateZ 1.5895 ;
-    mud:scaleX 0.4868 ; mud:scaleY 0.0500 ; mud:scaleZ 1.3526 ;
+    mud:translateX -1.8053 ; mud:translateY 2.39 ; mud:translateZ 1.5895 ;
+    mud:scaleX 0.4868 ; mud:scaleY 3.0 ; mud:scaleZ 1.3526 ;
     mud:rotateX 2.4737 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.0579 ; mud:translateY -0.2989 ; mud:translateZ 1.6842 ;
-    mud:scaleX 0.4553 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2789 ;
+    mud:translateX -2.0579 ; mud:translateY 2.39 ; mud:translateZ 1.6842 ;
+    mud:scaleX 0.4553 ; mud:scaleY 3.0 ; mud:scaleZ 1.2789 ;
     mud:rotateX 3.2105 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_08 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.3105 ; mud:translateY -0.2077 ; mud:translateZ 1.7789 ;
-    mud:scaleX 0.4237 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2053 ;
+    mud:translateX -2.3105 ; mud:translateY 2.39 ; mud:translateZ 1.7789 ;
+    mud:scaleX 0.4237 ; mud:scaleY 3.0 ; mud:scaleZ 1.2053 ;
     mud:rotateX 3.9474 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_10 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.5632 ; mud:translateY -0.1093 ; mud:translateZ 1.8737 ;
-    mud:scaleX 0.3921 ; mud:scaleY 0.0500 ; mud:scaleZ 1.1316 ;
+    mud:translateX -2.5632 ; mud:translateY 2.39 ; mud:translateZ 1.8737 ;
+    mud:scaleX 0.3921 ; mud:scaleY 3.0 ; mud:scaleZ 1.1316 ;
     mud:rotateX 4.6842 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_12 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.8158 ; mud:translateY -0.0048 ; mud:translateZ 1.9684 ;
-    mud:scaleX 0.3605 ; mud:scaleY 0.0500 ; mud:scaleZ 1.0579 ;
+    mud:translateX -2.8158 ; mud:translateY 2.39 ; mud:translateZ 1.9684 ;
+    mud:scaleX 0.3605 ; mud:scaleY 3.0 ; mud:scaleZ 1.0579 ;
     mud:rotateX 5.4211 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_14 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -3.0684 ; mud:translateY 0.1051 ; mud:translateZ 2.0632 ;
-    mud:scaleX 0.3289 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9842 ;
+    mud:translateX -3.0684 ; mud:translateY 2.39 ; mud:translateZ 2.0632 ;
+    mud:scaleX 0.3289 ; mud:scaleY 3.0 ; mud:scaleZ 0.9842 ;
     mud:rotateX 6.1579 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_16 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -3.3211 ; mud:translateY 0.2198 ; mud:translateZ 2.1579 ;
-    mud:scaleX 0.2974 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9105 ;
+    mud:translateX -3.3211 ; mud:translateY 2.39 ; mud:translateZ 2.1579 ;
+    mud:scaleX 0.2974 ; mud:scaleY 3.0 ; mud:scaleZ 0.9105 ;
     mud:rotateX 6.8947 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_left_18 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -3.5737 ; mud:translateY 0.3389 ; mud:translateZ 2.2526 ;
-    mud:scaleX 0.2658 ; mud:scaleY 0.0500 ; mud:scaleZ 0.8368 ;
+    mud:translateX -3.5737 ; mud:translateY 2.39 ; mud:translateZ 2.2526 ;
+    mud:scaleX 0.2658 ; mud:scaleY 3.0 ; mud:scaleZ 0.8368 ;
     mud:rotateX 7.6316 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -222,7 +535,15 @@ mud:prim_swf_left_00 rdf:type mud:GeometryPrimitive ;
     mud:translateX -1.6000 ; mud:translateY -0.5000 ; mud:translateZ 1.7000 ;
     mud:scaleX 0.4500 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2000 ;
     mud:rotateX 0.5000 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_01 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -230,7 +551,15 @@ mud:prim_swf_left_01 rdf:type mud:GeometryPrimitive ;
     mud:translateX -1.8286 ; mud:translateY -0.4402 ; mud:translateZ 1.8000 ;
     mud:scaleX 0.4186 ; mud:scaleY 0.0500 ; mud:scaleZ 1.1286 ;
     mud:rotateX 1.3571 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -238,7 +567,15 @@ mud:prim_swf_left_02 rdf:type mud:GeometryPrimitive ;
     mud:translateX -2.0571 ; mud:translateY -0.3528 ; mud:translateZ 1.9000 ;
     mud:scaleX 0.3871 ; mud:scaleY 0.0500 ; mud:scaleZ 1.0571 ;
     mud:rotateX 2.2143 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_03 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -246,7 +583,15 @@ mud:prim_swf_left_03 rdf:type mud:GeometryPrimitive ;
     mud:translateX -2.2857 ; mud:translateY -0.2507 ; mud:translateZ 2.0000 ;
     mud:scaleX 0.3557 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9857 ;
     mud:rotateX 3.0714 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -254,7 +599,15 @@ mud:prim_swf_left_04 rdf:type mud:GeometryPrimitive ;
     mud:translateX -2.5143 ; mud:translateY -0.1377 ; mud:translateZ 2.1000 ;
     mud:scaleX 0.3243 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9143 ;
     mud:rotateX 3.9286 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_05 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -262,7 +615,15 @@ mud:prim_swf_left_05 rdf:type mud:GeometryPrimitive ;
     mud:translateX -2.7429 ; mud:translateY -0.0157 ; mud:translateZ 2.2000 ;
     mud:scaleX 0.2929 ; mud:scaleY 0.0500 ; mud:scaleZ 0.8429 ;
     mud:rotateX 4.7857 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -270,7 +631,15 @@ mud:prim_swf_left_06 rdf:type mud:GeometryPrimitive ;
     mud:translateX -2.9714 ; mud:translateY 0.1138 ; mud:translateZ 2.3000 ;
     mud:scaleX 0.2614 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7714 ;
     mud:rotateX 5.6429 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_left_07 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
@@ -278,7 +647,15 @@ mud:prim_swf_left_07 rdf:type mud:GeometryPrimitive ;
     mud:translateX -3.2000 ; mud:translateY 0.2500 ; mud:translateZ 2.4000 ;
     mud:scaleX 0.2300 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7000 ;
     mud:rotateX 6.5000 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_wing_root_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:wing_root_right ;
@@ -286,87 +663,175 @@ mud:prim_wing_root_right rdf:type mud:GeometryPrimitive ;
     mud:translateX 1.0 ; mud:translateY -0.5 ; mud:translateZ 1.0 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
 
 mud:prim_pwf_right_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.3000 ; mud:translateY -0.5000 ; mud:translateZ 1.4000 ;
-    mud:scaleX 0.5500 ; mud:scaleY 0.0500 ; mud:scaleZ 1.5000 ;
+    mud:translateX 1.3000 ; mud:translateY 2.39 ; mud:translateZ 1.4000 ;
+    mud:scaleX 0.5500 ; mud:scaleY 3.0 ; mud:scaleZ 1.5000 ;
     mud:rotateX 1.0000 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.5526 ; mud:translateY -0.4518 ; mud:translateZ 1.4947 ;
-    mud:scaleX 0.5184 ; mud:scaleY 0.0500 ; mud:scaleZ 1.4263 ;
+    mud:translateX 1.5526 ; mud:translateY 2.39 ; mud:translateZ 1.4947 ;
+    mud:scaleX 0.5184 ; mud:scaleY 3.0 ; mud:scaleZ 1.4263 ;
     mud:rotateX 1.7368 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.8053 ; mud:translateY -0.3813 ; mud:translateZ 1.5895 ;
-    mud:scaleX 0.4868 ; mud:scaleY 0.0500 ; mud:scaleZ 1.3526 ;
+    mud:translateX 1.8053 ; mud:translateY 2.39 ; mud:translateZ 1.5895 ;
+    mud:scaleX 0.4868 ; mud:scaleY 3.0 ; mud:scaleZ 1.3526 ;
     mud:rotateX 2.4737 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.0579 ; mud:translateY -0.2989 ; mud:translateZ 1.6842 ;
-    mud:scaleX 0.4553 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2789 ;
+    mud:translateX 2.0579 ; mud:translateY 2.39 ; mud:translateZ 1.6842 ;
+    mud:scaleX 0.4553 ; mud:scaleY 3.0 ; mud:scaleZ 1.2789 ;
     mud:rotateX 3.2105 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_08 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.3105 ; mud:translateY -0.2077 ; mud:translateZ 1.7789 ;
-    mud:scaleX 0.4237 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2053 ;
+    mud:translateX 2.3105 ; mud:translateY 2.39 ; mud:translateZ 1.7789 ;
+    mud:scaleX 0.4237 ; mud:scaleY 3.0 ; mud:scaleZ 1.2053 ;
     mud:rotateX 3.9474 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_10 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.5632 ; mud:translateY -0.1093 ; mud:translateZ 1.8737 ;
-    mud:scaleX 0.3921 ; mud:scaleY 0.0500 ; mud:scaleZ 1.1316 ;
+    mud:translateX 2.5632 ; mud:translateY 2.39 ; mud:translateZ 1.8737 ;
+    mud:scaleX 0.3921 ; mud:scaleY 3.0 ; mud:scaleZ 1.1316 ;
     mud:rotateX 4.6842 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_12 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.8158 ; mud:translateY -0.0048 ; mud:translateZ 1.9684 ;
-    mud:scaleX 0.3605 ; mud:scaleY 0.0500 ; mud:scaleZ 1.0579 ;
+    mud:translateX 2.8158 ; mud:translateY 2.39 ; mud:translateZ 1.9684 ;
+    mud:scaleX 0.3605 ; mud:scaleY 3.0 ; mud:scaleZ 1.0579 ;
     mud:rotateX 5.4211 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_14 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 3.0684 ; mud:translateY 0.1051 ; mud:translateZ 2.0632 ;
-    mud:scaleX 0.3289 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9842 ;
+    mud:translateX 3.0684 ; mud:translateY 2.39 ; mud:translateZ 2.0632 ;
+    mud:scaleX 0.3289 ; mud:scaleY 3.0 ; mud:scaleZ 0.9842 ;
     mud:rotateX 6.1579 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_16 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 3.3211 ; mud:translateY 0.2198 ; mud:translateZ 2.1579 ;
-    mud:scaleX 0.2974 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9105 ;
+    mud:translateX 3.3211 ; mud:translateY 2.39 ; mud:translateZ 2.1579 ;
+    mud:scaleX 0.2974 ; mud:scaleY 3.0 ; mud:scaleZ 0.9105 ;
     mud:rotateX 6.8947 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_pwf_right_18 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 3.5737 ; mud:translateY 0.3389 ; mud:translateZ 2.2526 ;
-    mud:scaleX 0.2658 ; mud:scaleY 0.0500 ; mud:scaleZ 0.8368 ;
+    mud:translateX 3.5737 ; mud:translateY 2.39 ; mud:translateZ 2.2526 ;
+    mud:scaleX 0.2658 ; mud:scaleY 3.0 ; mud:scaleZ 0.8368 ;
     mud:rotateX 7.6316 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -374,7 +839,15 @@ mud:prim_swf_right_00 rdf:type mud:GeometryPrimitive ;
     mud:translateX 1.6000 ; mud:translateY -0.5000 ; mud:translateZ 1.7000 ;
     mud:scaleX 0.4500 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2000 ;
     mud:rotateX 0.5000 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_01 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -382,7 +855,15 @@ mud:prim_swf_right_01 rdf:type mud:GeometryPrimitive ;
     mud:translateX 1.8286 ; mud:translateY -0.4402 ; mud:translateZ 1.8000 ;
     mud:scaleX 0.4186 ; mud:scaleY 0.0500 ; mud:scaleZ 1.1286 ;
     mud:rotateX 1.3571 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -390,7 +871,15 @@ mud:prim_swf_right_02 rdf:type mud:GeometryPrimitive ;
     mud:translateX 2.0571 ; mud:translateY -0.3528 ; mud:translateZ 1.9000 ;
     mud:scaleX 0.3871 ; mud:scaleY 0.0500 ; mud:scaleZ 1.0571 ;
     mud:rotateX 2.2143 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_03 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -398,7 +887,15 @@ mud:prim_swf_right_03 rdf:type mud:GeometryPrimitive ;
     mud:translateX 2.2857 ; mud:translateY -0.2507 ; mud:translateZ 2.0000 ;
     mud:scaleX 0.3557 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9857 ;
     mud:rotateX 3.0714 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -406,7 +903,15 @@ mud:prim_swf_right_04 rdf:type mud:GeometryPrimitive ;
     mud:translateX 2.5143 ; mud:translateY -0.1377 ; mud:translateZ 2.1000 ;
     mud:scaleX 0.3243 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9143 ;
     mud:rotateX 3.9286 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_05 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -414,7 +919,15 @@ mud:prim_swf_right_05 rdf:type mud:GeometryPrimitive ;
     mud:translateX 2.7429 ; mud:translateY -0.0157 ; mud:translateZ 2.2000 ;
     mud:scaleX 0.2929 ; mud:scaleY 0.0500 ; mud:scaleZ 0.8429 ;
     mud:rotateX 4.7857 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -422,7 +935,15 @@ mud:prim_swf_right_06 rdf:type mud:GeometryPrimitive ;
     mud:translateX 2.9714 ; mud:translateY 0.1138 ; mud:translateZ 2.3000 ;
     mud:scaleX 0.2614 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7714 ;
     mud:rotateX 5.6429 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_swf_right_07 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
@@ -430,71 +951,527 @@ mud:prim_swf_right_07 rdf:type mud:GeometryPrimitive ;
     mud:translateX 3.2000 ; mud:translateY 0.2500 ; mud:translateZ 2.4000 ;
     mud:scaleX 0.2300 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7000 ;
     mud:rotateX 6.5000 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "12"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "1"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:QuadraticSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_blade_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:blade_left ;
     mud:primitiveFamily "blade" ;
-    mud:translateX -3.0 ; mud:translateY 0.0 ; mud:translateZ 0.0 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:translateX -3.0 ; mud:translateY 8.193 ; mud:translateZ 0.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 3.41 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "5"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "2"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_blade_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:blade_right ;
     mud:primitiveFamily "blade" ;
-    mud:translateX 3.0 ; mud:translateY 0.0 ; mud:translateZ 0.0 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:translateX 3.0 ; mud:translateY 8.193 ; mud:translateZ 0.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 3.41 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "5"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "2"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_shoulder_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:shoulder_left ;
-    mud:primitiveFamily "hard_surface_shell" ;
-    mud:translateX -1.0 ; mud:translateY 0.0 ; mud:translateZ 1.0 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:primitiveFamily "pauldron" ;
+    mud:translateX -1.0 ; mud:translateY 2.6 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 3.2 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "3"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
 
-mud:prim_arm_left rdf:type mud:GeometryPrimitive ;
+mud:prim_upper_arm_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:arm_left ;
-    mud:primitiveFamily "arm" ;
-    mud:translateX -1.5 ; mud:translateY 0.0 ; mud:translateZ 0.5 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:primitiveFamily "upper_arm" ;
+    mud:translateX -1.5 ; mud:translateY 0.35 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.3 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
 
-mud:prim_leg_left rdf:type mud:GeometryPrimitive ;
-    mud:belongsToPart mud:leg_left ;
-    mud:primitiveFamily "leg" ;
-    mud:translateX -0.5 ; mud:translateY 0.0 ; mud:translateZ -1.0 ;
+mud:prim_elbow_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "elbow" ;
+    mud:translateX -1.5 ; mud:translateY 0.125 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.15 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_forearm_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "forearm" ;
+    mud:translateX -1.5 ; mud:translateY -0.1 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.3 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_wrist_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "wrist" ;
+    mud:translateX -1.5 ; mud:translateY -0.3 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.1 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_hand_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "hand" ;
+    mud:translateX -1.5 ; mud:translateY -0.425 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.15 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_socket_elbow_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -1.5 ; mud:translateY 0.125 ; mud:translateZ 0.5 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_socket_wrist_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -1.5 ; mud:translateY -0.3 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_thigh_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "thigh" ;
+    mud:translateX -0.5 ; mud:translateY 0.35 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.03298 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_knee_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "knee" ;
+    mud:translateX -0.5 ; mud:translateY 0.025 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.00990 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_shin_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "shin" ;
+    mud:translateX -0.5 ; mud:translateY -0.25 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.02638 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_ankle_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "ankle" ;
+    mud:translateX -0.5 ; mud:translateY -0.49 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.00527 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_foot_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "foot" ;
+    mud:translateX -0.5 ; mud:translateY -0.565 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.00462 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_socket_knee_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -0.5 ; mud:translateY 0.025 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.06595 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_socket_ankle_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_left ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -0.5 ; mud:translateY -0.49 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.06595 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_shoulder_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:shoulder_right ;
-    mud:primitiveFamily "hard_surface_shell" ;
-    mud:translateX 1.0 ; mud:translateY 0.0 ; mud:translateZ 1.0 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:primitiveFamily "pauldron" ;
+    mud:translateX 1.0 ; mud:translateY 2.6 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 3.2 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "3"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
 
-mud:prim_arm_right rdf:type mud:GeometryPrimitive ;
+mud:prim_upper_arm_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:arm_right ;
-    mud:primitiveFamily "arm" ;
-    mud:translateX 1.5 ; mud:translateY 0.0 ; mud:translateZ 0.5 ;
-    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:primitiveFamily "upper_arm" ;
+    mud:translateX 1.5 ; mud:translateY 0.35 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.3 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
 
-mud:prim_leg_right rdf:type mud:GeometryPrimitive ;
-    mud:belongsToPart mud:leg_right ;
-    mud:primitiveFamily "leg" ;
-    mud:translateX 0.5 ; mud:translateY 0.0 ; mud:translateZ -1.0 ;
+mud:prim_elbow_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "elbow" ;
+    mud:translateX 1.5 ; mud:translateY 0.125 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.15 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_forearm_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "forearm" ;
+    mud:translateX 1.5 ; mud:translateY -0.1 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.3 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_wrist_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "wrist" ;
+    mud:translateX 1.5 ; mud:translateY -0.3 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.1 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_hand_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "hand" ;
+    mud:translateX 1.5 ; mud:translateY -0.425 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.15 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_socket_elbow_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 1.5 ; mud:translateY 0.125 ; mud:translateZ 0.5 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_socket_wrist_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_right ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 1.5 ; mud:translateY -0.3 ; mud:translateZ 0.5 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_thigh_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "thigh" ;
+    mud:translateX 0.5 ; mud:translateY 0.35 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.03298 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_knee_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "knee" ;
+    mud:translateX 0.5 ; mud:translateY 0.025 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.00990 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_shin_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "shin" ;
+    mud:translateX 0.5 ; mud:translateY -0.25 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.02638 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_ankle_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "ankle" ;
+    mud:translateX 0.5 ; mud:translateY -0.49 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.00527 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_foot_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "foot" ;
+    mud:translateX 0.5 ; mud:translateY -0.565 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.00462 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_socket_knee_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 0.5 ; mud:translateY 0.025 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.06595 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_socket_ankle_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:leg_right ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 0.5 ; mud:translateY -0.49 ; mud:translateZ -1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 0.06595 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
 
 mud:prim_backpack_core rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:backpack_core ;
@@ -502,7 +1479,15 @@ mud:prim_backpack_core rdf:type mud:GeometryPrimitive ;
     mud:translateX 0.0 ; mud:translateY -0.5 ; mud:translateZ 0.5 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_WhiteArmor .
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "32"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "8"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
 
 mud:prim_thruster_cluster rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:thruster_cluster ;
@@ -510,4 +1495,144 @@ mud:prim_thruster_cluster rdf:type mud:GeometryPrimitive ;
     mud:translateX 0.0 ; mud:translateY -0.8 ; mud:translateZ 0.0 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
-    mud:materialBinding mud:M_DarkFrame .
+    mud:materialBinding mud:M_DarkFrame;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_DarkFrame ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+# Loadout wing attachment sockets (no mesh payload)
+mud:prim_socket_wing_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -1.0 ; mud:translateY -0.5 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+mud:prim_socket_wing_right rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:backpack_core ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX 1.0 ; mud:translateY -0.5 ; mud:translateZ 1.0 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+# Forearm shield socket (no mesh payload)
+mud:prim_socket_shield_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "socket" ;
+    mud:translateX -1.7000 ; mud:translateY 0.0 ; mud:translateZ 0.5000 ;
+    mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "1"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "0"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:LowDensityArmor" .
+
+# Sculpted shield components on forearm/hand
+mud:prim_shield_mount_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "shield_mount" ;
+    mud:translateX -1.7500 ; mud:translateY 0.0 ; mud:translateZ 0.5000 ;
+    mud:scaleX 0.3000 ; mud:scaleY 0.3000 ; mud:scaleZ 0.4000 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_DarkFrame;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_DarkFrame ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_shield_handle_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "shield_handle" ;
+    mud:translateX -1.8000 ; mud:translateY 0.0 ; mud:translateZ 0.5000 ;
+    mud:scaleX 0.1000 ; mud:scaleY 0.1000 ; mud:scaleZ 0.4000 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_DarkFrame;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_DarkFrame ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_shield_frame_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "shield_frame" ;
+    mud:translateX -1.9000 ; mud:translateY 0.0 ; mud:translateZ 0.5000 ;
+    mud:scaleX 0.2000 ; mud:scaleY 0.8000 ; mud:scaleZ 0.8000 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_DarkFrame;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_DarkFrame ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_shield_rim_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "shield_rim" ;
+    mud:translateX -2.0000 ; mud:translateY 0.0 ; mud:translateZ 0.5000 ;
+    mud:scaleX 0.0500 ; mud:scaleY 1.2000 ; mud:scaleZ 1.2000 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "6"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:MediumDensityArmor" .
+
+mud:prim_shield_plate_left rdf:type mud:GeometryPrimitive ;
+    mud:belongsToPart mud:arm_left ;
+    mud:primitiveFamily "shield_plate" ;
+    mud:translateX -1.9500 ; mud:translateY 0.0 ; mud:translateZ 0.5000 ;
+    mud:scaleX 0.1000 ; mud:scaleY 1.0000 ; mud:scaleZ 1.0000 ;
+    mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
+    mud:materialBinding mud:M_WhiteArmor;
+    law:hasSubdivisionDensity "3"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:M_WhiteArmor ;
+    law:hasBladeScaleMin "0.0100"^^xsd:decimal ;
+    law:hasBladeScaleMax "50.0000"^^xsd:decimal ;
+    law:hasEdgeCount "4"^^xsd:integer ;
+    law:hasSocketAttachment mud:Socket_None ;
+    law:hasCurvatureSweepClass "law:LinearSweep" ;
+    law:hasArmorDensityBand "law:HighDensityArmor" .
+

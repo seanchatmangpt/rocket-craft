@@ -1,5 +1,5 @@
 {
-  "body_height_m": 0.101495,
+  "body_height_m": 0.1025,
   "direct_band_refusals": [],
   "gate": "metric_morphology_pre_render",
   "measured_along_up_axis": "Y",
@@ -7,14 +7,16 @@
   "negative_fixture": {
     "codes": [
       "ANATOMY_PARADOX",
-      "REFUSE_DEFAULT_SHIELD_PROPORTION"
+      "REFUSE_DEFAULT_SHIELD_PROPORTION",
+      "REFUSE_PROVENANCE_VIOLATION"
     ],
     "conforms": false,
     "messages": [
       "ANATOMY_PARADOX: Legs must descend below the pelvis vertical origin.",
       "ANATOMY_PARADOX: The Head Y_MIN must be structurally higher than the Torso Y_MAX.",
       "REFUSE_DEFAULT_SHIELD_PROPORTION: A default shield must occupy 25%-35% of the total body height.",
-      "REFUSE_DEFAULT_SHIELD_PROPORTION: a shield exceeding 85% of body height requires a declared *ShieldArchetype exception class."
+      "REFUSE_DEFAULT_SHIELD_PROPORTION: a shield exceeding 85% of body height requires a declared *ShieldArchetype exception class.",
+      "REFUSE_PROVENANCE_VIOLATION: Primitive scale exceeds the permitted scale bands defined in source law."
     ],
     "refused": true
   },
@@ -27,47 +29,47 @@
   "parts": [
     {
       "band": [
-        0.2245,
-        0.2445
+        0.1,
+        0.6
       ],
-      "height_m": 0.02387,
-      "height_ratio": 0.2352,
+      "height_m": 0.023665,
+      "height_ratio": 0.2309,
       "in_band": true,
       "part": "SM_Blade_Left",
-      "y_max_m": 0.093995,
-      "y_min_m": 0.070125
+      "y_max_m": 0.094001,
+      "y_min_m": 0.070336
     },
     {
       "band": [
-        0.2245,
-        0.2445
+        0.1,
+        0.6
       ],
-      "height_m": 0.02387,
-      "height_ratio": 0.2352,
+      "height_m": 0.023665,
+      "height_ratio": 0.2309,
       "in_band": true,
       "part": "SM_Blade_Right",
-      "y_max_m": 0.093995,
-      "y_min_m": 0.070125
+      "y_max_m": 0.094001,
+      "y_min_m": 0.070336
     },
     {
       "band": [
-        0.119,
-        0.139
+        0.08,
+        0.15
       ],
       "height_m": 0.013,
-      "height_ratio": 0.1281,
+      "height_ratio": 0.1268,
       "in_band": true,
       "part": "SM_Head",
-      "y_max_m": 0.083,
-      "y_min_m": 0.07
+      "y_max_m": 0.095,
+      "y_min_m": 0.082
     },
     {
       "band": [
-        0.6207,
-        0.6407
+        0.55,
+        0.85
       ],
       "height_m": 0.064,
-      "height_ratio": 0.6306,
+      "height_ratio": 0.6244,
       "in_band": true,
       "part": "SM_Limb_Left",
       "y_max_m": 0.058,
@@ -75,11 +77,11 @@
     },
     {
       "band": [
-        0.6207,
-        0.6407
+        0.55,
+        0.85
       ],
       "height_m": 0.064,
-      "height_ratio": 0.6306,
+      "height_ratio": 0.6244,
       "in_band": true,
       "part": "SM_Limb_Right",
       "y_max_m": 0.058,
@@ -87,23 +89,23 @@
     },
     {
       "band": [
-        0.119,
-        0.139
+        0.3,
+        0.45
       ],
-      "height_m": 0.013,
-      "height_ratio": 0.1281,
+      "height_m": 0.032049,
+      "height_ratio": 0.3127,
       "in_band": true,
       "part": "SM_Torso",
-      "y_max_m": 0.07,
-      "y_min_m": 0.057
+      "y_max_m": 0.079525,
+      "y_min_m": 0.047475
     },
     {
       "band": [
-        0.6113,
-        0.6313
+        0.4,
+        0.9
       ],
       "height_m": 0.0629,
-      "height_ratio": 0.6197,
+      "height_ratio": 0.6137,
       "in_band": true,
       "part": "SM_WingArray_Left",
       "y_max_m": 0.0554,
@@ -111,24 +113,24 @@
     },
     {
       "band": [
-        0.6113,
-        0.6313
+        0.4,
+        0.9
       ],
       "height_m": 0.0629,
-      "height_ratio": 0.6197,
+      "height_ratio": 0.6137,
       "in_band": true,
       "part": "SM_WingArray_Right",
       "y_max_m": 0.0554,
       "y_min_m": -0.0075
     }
   ],
-  "receipt_blake3": "blake3:8a8d306db77aa1746927ac848273ba0842f9d3fb9ecad734fea115e7c6a947ec",
+  "receipt_blake3": "blake3:7baa477bca6b3248cd7ddcc72a2c1ad603d54e1595b10939569e0b379381d66c",
   "refusals": [],
   "replay_verified": true,
   "shacl_conforms": true,
   "shacl_messages": [],
   "span_axis": "X",
-  "timestamp_utc": "2026-06-20T23:59:36.828253Z",
+  "timestamp_utc": "2026-06-21T02:27:40.529523Z",
   "verdict": "ADMITTED",
   "vertical_axis": "Y"
 }

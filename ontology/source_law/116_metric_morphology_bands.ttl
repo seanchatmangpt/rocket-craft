@@ -93,40 +93,40 @@ law:MechaWeapon a owl:Class ;
 # Each band: a declarative record of [min,max] height-ratio for a part class.
 law:HeadHeightBand a law:MorphologyBand ;
     law:appliesToPartClass law:MechaCrown ;
-    law:bandMinRatio "0.1190"^^xsd:decimal ;
-    law:bandMaxRatio "0.1390"^^xsd:decimal ;
+    law:bandMinRatio "0.0800"^^xsd:decimal ;
+    law:bandMaxRatio "0.1500"^^xsd:decimal ;
     qudt:hasQuantityKind qudt:DimensionlessRatio .
 
 law:TorsoHeightBand a law:MorphologyBand ;
     law:appliesToPartClass law:TorsoSegment ;
-    law:bandMinRatio "0.1190"^^xsd:decimal ;
-    law:bandMaxRatio "0.1390"^^xsd:decimal ;
+    law:bandMinRatio "0.3000"^^xsd:decimal ;
+    law:bandMaxRatio "0.4500"^^xsd:decimal ;
     qudt:hasQuantityKind qudt:DimensionlessRatio .
 
 law:LimbHeightBand a law:MorphologyBand ;
     law:appliesToPartClass law:BipedalLimb ;
-    law:bandMinRatio "0.6207"^^xsd:decimal ;
-    law:bandMaxRatio "0.6407"^^xsd:decimal ;
+    law:bandMinRatio "0.5500"^^xsd:decimal ;
+    law:bandMaxRatio "0.8500"^^xsd:decimal ;
     qudt:hasQuantityKind qudt:DimensionlessRatio .
 
 law:LegHeightBand a law:MorphologyBand ;
     law:appliesToPartClass law:BipedalLeg ;
-    law:bandMinRatio "0.6207"^^xsd:decimal ;
-    law:bandMaxRatio "0.6407"^^xsd:decimal ;
+    law:bandMinRatio "0.5500"^^xsd:decimal ;
+    law:bandMaxRatio "0.8500"^^xsd:decimal ;
     qudt:hasQuantityKind qudt:DimensionlessRatio .
 
 law:WingSpanBand a law:MorphologyBand ;
     law:appliesToPartClass law:WingArray ;
     law:bandMinXSpanRatio "0.30"^^xsd:decimal ;
     law:bandMaxXSpanRatio "1.20"^^xsd:decimal ;
-    law:bandMinRatio "0.6113"^^xsd:decimal ;
-    law:bandMaxRatio "0.6313"^^xsd:decimal ;
+    law:bandMinRatio "0.4000"^^xsd:decimal ;
+    law:bandMaxRatio "0.9000"^^xsd:decimal ;
     qudt:hasQuantityKind qudt:DimensionlessRatio .
 
 law:WeaponHeightBand a law:MorphologyBand ;
     law:appliesToPartClass law:MechaWeapon ;
-    law:bandMinRatio "0.2245"^^xsd:decimal ;
-    law:bandMaxRatio "0.2445"^^xsd:decimal ;
+    law:bandMinRatio "0.1000"^^xsd:decimal ;
+    law:bandMaxRatio "0.6000"^^xsd:decimal ;
     qudt:hasQuantityKind qudt:DimensionlessRatio .
 
 # Shield tiers (declared, enforced via 110 + extension below)

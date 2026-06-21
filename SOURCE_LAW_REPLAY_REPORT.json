@@ -1,20 +1,20 @@
 {
   "checks": {
-    "A_head_banner_bijection": true,
-    "B_fresh_equals_head": true,
+    "A_head_banner_bijection": false,
+    "B_fresh_equals_head": false,
     "C_fresh_banner_bijection": true,
     "merge_script_ok": true,
     "working_tree_equals_fresh": true
   },
-  "contamination_free": true,
-  "fresh_banner_count": 113,
-  "fresh_merge_b3": "78eb04e1854a65716ab4cd98aa223057162b4adc3f405184bced9ce7b762540b",
+  "contamination_free": false,
+  "fresh_banner_count": 118,
+  "fresh_merge_b3": "eb9e9e16d042ddc85f3f368b30a9b5cfe68b53a01ab7f7d641b04146fa6ea492",
   "gate": "R2a_source_law_replay",
-  "head_banner_count": 113,
-  "head_merged_b3": "78eb04e1854a65716ab4cd98aa223057162b4adc3f405184bced9ce7b762540b",
-  "next_action": "proceed to render/score gate",
+  "head_banner_count": 116,
+  "head_merged_b3": "1a4dd161768af3aa6046a88bda35b170cdccf9ae78c5d46b120eb7689349e4d7",
+  "next_action": "R2b: triage the HEAD all_merged.ttl delta (HEAD banners=116, fresh banners=118) into ontology/source_law/*.ttl then regenerate",
   "repo": "/Users/sac/rocket-craft",
-  "source_law_count": 113,
+  "source_law_count": 118,
   "source_law_receipts": {
     "001_factory_charter.ttl": "82e82d54b4bca66e07c2cc12adec8adc1d6c634166209be6a44e2af0c839a7d5",
     "002_mgpp_mission_goals_plans_problems.ttl": "9be8b907524710d6630966a87b624dc93f9440ba7d7151a0110641a7fa5c5dbe",
@@ -119,7 +119,7 @@
     "101_armor_baseline_tiger_i.ttl": "9c3a4cfb4ad91800adc04ab0384a53d0fec98ad93631be842de581a1b41372f5",
     "102_tiger_tank_instances.ttl": "0e9fb9c7d06c39d1ada98b937b6b2c0a54bc5f816fc2979b23b8585029ed69fd",
     "103_proportion_priors.ttl": "37044dc5cf6f010ec6581831cbb2dbb87366e3308dac919a83a4d463ed799958",
-    "104_reference_fabric.ttl": "6cb85f2ee853b7ef37e1007b4eee2bd9cc070597335f568c0770ac3898090089",
+    "104_reference_fabric.ttl": "a8707af1f80c4c7a97ad583fe1851968f5a4fd769008eab75ebc21d1af3ef75f",
     "105_kit_subassembly_graph.ttl": "5f62d25ad4e304fc4b93fb11970a06ad94950c03a725f238a61df6a664c0e12a",
     "106_core_combinatorial.ttl": "c26df2f614123845894bfc191e0f038a0b99c56cd08efd9adca72aa2a580347a",
     "106_lore_spec_measurements.ttl": "6ec600cc84922771d1c6b78625fd2ee208fa5a8e80d7c0297b7d0dd7c9c18d58",
@@ -127,10 +127,15 @@
     "108_mech_factory_mud_twin.ttl": "836adb18fb5d75192313342aa4df3a453a31b4d8ea865272cc50f0ed46247e6d",
     "109_mechbirth_ontology.ttl": "2fed62393829bcb2fb5c4af52ab3e37260e939556b5af8badb860b91e13744d9",
     "110_anti_llm_ontology.ttl": "ca238c15168acb6493908673b2ea9617696eb24fcc7c3cea509b92563b8eccc3",
+    "110_bipedal_metric_envelope_law.ttl": "8d3434597825150fa5d3195ab9742298b81095edd6ac46ce373ab4761ea839a8",
     "114_sockets_mounts_extension.ttl": "f9a369d1c19b5a55963d3a9e5b3921862c61c9429960c81948c5ff91843d4793",
-    "115_destruction_ontology.ttl": "d93c4468bf43dcc7951455c0bd1c5638df37288d48c8eea6248e4f95e2ca7499"
+    "115_destruction_ontology.ttl": "d93c4468bf43dcc7951455c0bd1c5638df37288d48c8eea6248e4f95e2ca7499",
+    "116_metric_morphology_bands.ttl": "364326aee9b3e53e2de5ca19f7e2891d73ef491ef8be30b1b257e0ad1a2fa1ec",
+    "117_reference_fabric_metric_binding.ttl": "3327f13c99aa57e8e95abac8576644eb287958c96eb322b33680d6f2c9807661",
+    "118_limb_anatomical_joints.ttl": "d2d7329e11b80e507ea50b633fe64001498648f4840c7775519e12a05685b7b7",
+    "120_morphology_purity_law.ttl": "e73ecf3077bb89b23e1a4fa816bf2dbab1896309dd5ad8325bd86f1734f2b288"
   },
-  "standing": "ADMITTED",
-  "timestamp_utc": "2026-06-20T22:33:34.335989Z",
-  "working_tree_merged_b3": "78eb04e1854a65716ab4cd98aa223057162b4adc3f405184bced9ce7b762540b"
+  "standing": "PARTIAL_ALIVE",
+  "timestamp_utc": "2026-06-21T02:27:39.060010Z",
+  "working_tree_merged_b3": "eb9e9e16d042ddc85f3f368b30a9b5cfe68b53a01ab7f7d641b04146fa6ea492"
 }

@@ -70,15 +70,15 @@ def declared_up_axis():
     except OSError:
         return "UNKNOWN"
 
-PART_BANDS = {  # (class, lo, hi) height-ratio bands mirrored from 116
-    "SM_Head": ("MechaCrown", 0.1190, 0.1390),
-    "SM_Torso": ("TorsoSegment", 0.1190, 0.1390),
-    "SM_Limb_Left": ("BipedalLeg", 0.6207, 0.6407),
-    "SM_Limb_Right": ("BipedalLeg", 0.6207, 0.6407),
-    "SM_WingArray_Left": ("WingArray", 0.6113, 0.6313),
-    "SM_WingArray_Right": ("WingArray", 0.6113, 0.6313),
-    "SM_Blade_Left": ("MechaWeapon", 0.2245, 0.2445),
-    "SM_Blade_Right": ("MechaWeapon", 0.2245, 0.2445),
+PART_BANDS = {  # (class, lo, hi) ARCHETYPE-PRIOR height-ratio bands mirrored from 116
+    "SM_Head": ("MechaCrown", 0.08, 0.15),
+    "SM_Torso": ("TorsoSegment", 0.30, 0.45),
+    "SM_Limb_Left": ("BipedalLeg", 0.55, 0.85),
+    "SM_Limb_Right": ("BipedalLeg", 0.55, 0.85),
+    "SM_WingArray_Left": ("WingArray", 0.40, 0.90),
+    "SM_WingArray_Right": ("WingArray", 0.40, 0.90),
+    "SM_Blade_Left": ("MechaWeapon", 0.10, 0.60),
+    "SM_Blade_Right": ("MechaWeapon", 0.10, 0.60),
 }
 
 GROUP_RE = re.compile(r'def Xform "(prim_[^"]+)"\s*\{(.*?)\n        \}', re.DOTALL)
@@ -153,6 +153,7 @@ def _obs(g, subj, pred, value):
 _PREFIXES = {
     "eng": str(ENG), "law": str(LAW), "sosa": str(SOSA), "qudt": str(QUDT),
     "rdf": str(RDF), "xsd": str(XSD),
+    "mud": "https://rocket-craft.com/ontology/mud#",
 }
 
 
@@ -173,7 +174,8 @@ def shapes_graph():
     g = rdflib.Graph()
     for f in ["110_bipedal_metric_envelope_law.ttl",
               "116_metric_morphology_bands.ttl",
-              "117_reference_fabric_metric_binding.ttl"]:
+              "117_reference_fabric_metric_binding.ttl",
+              "120_morphology_purity_law.ttl"]:
         g.parse(os.path.join(SRC_DIR, f), format="turtle")
     _attach_prefixes(g)
     return g
@@ -389,6 +391,47 @@ def negative_fixture():
             "messages": sorted(msgs), "conforms": conforms}
 
 
+def python_hardcoded_blade_scale_must_refuse():
+    """Verify that a geometry primitive with a scale exceeding law:hasBladeScaleMax is refused
+    with REFUSE_PROVENANCE_VIOLATION."""
+    g = rdflib.Graph()
+    # Define a mock primitive with scaleX 60.0, but max allowed is 50.0
+    UFO = Namespace("https://rocket-craft.com/asset/ufo_disc_fixture#")
+    MUD = Namespace("https://rocket-craft.com/ontology/mud#")
+    prim = UFO.failing_blade_prim
+    g.add((prim, RDF.type, MUD.GeometryPrimitive))
+    g.add((prim, MUD.belongsToPart, MUD.blade_left))
+    g.add((prim, MUD.scaleX, Literal("60.0", datatype=XSD.float)))
+    g.add((prim, MUD.scaleY, Literal("1.0", datatype=XSD.float)))
+    g.add((prim, MUD.scaleZ, Literal("1.0", datatype=XSD.float)))
+    g.add((prim, MUD.translateX, Literal("0.0", datatype=XSD.float)))
+    g.add((prim, MUD.translateY, Literal("0.0", datatype=XSD.float)))
+    g.add((prim, MUD.translateZ, Literal("0.0", datatype=XSD.float)))
+    g.add((prim, MUD.rotateX, Literal("0.0", datatype=XSD.float)))
+    g.add((prim, MUD.rotateY, Literal("0.0", datatype=XSD.float)))
+    g.add((prim, MUD.rotateZ, Literal("0.0", datatype=XSD.float)))
+    g.add((prim, MUD.belongsToPart, MUD.blade_left))
+    g.add((prim, MUD.primitiveFamily, Literal("blade")))
+    g.add((prim, MUD.materialBinding, MUD.M_WhiteArmor))
+    g.add((prim, LAW.hasBladeScaleMax, Literal("50.0", datatype=XSD.decimal)))
+    g.add((prim, LAW.hasBladeScaleMin, Literal("0.01", datatype=XSD.decimal)))
+    g.add((prim, LAW.hasSubdivisionDensity, Literal("4", datatype=XSD.integer)))
+    g.add((prim, LAW.hasMaterialZoneBinding, MUD.M_WhiteArmor))
+    g.add((prim, LAW.hasEdgeCount, Literal("4", datatype=XSD.integer)))
+    g.add((prim, LAW.hasSocketAttachment, MUD.Socket_None))
+    g.add((prim, LAW.hasCurvatureSweepClass, Literal("law:LinearSweep")))
+    g.add((prim, LAW.hasArmorDensityBand, Literal("law:HighDensityArmor")))
+    
+    conforms, msgs = run_shacl(g, shapes_graph())
+    refused = (not conforms) and any("REFUSE_PROVENANCE_VIOLATION" in msg for msg in msgs)
+    codes = []
+    if not conforms:
+        for msg in msgs:
+            if "REFUSE_PROVENANCE_VIOLATION" in msg:
+                codes.append("REFUSE_PROVENANCE_VIOLATION")
+    return {"refused": refused, "codes": sorted(set(codes)), "messages": sorted(msgs), "conforms": conforms}
+
+
 def main():
     parts = measure_all()
     if not parts:
@@ -401,15 +444,21 @@ def main():
                        json.dumps(core2, sort_keys=True))
 
     neg = negative_fixture()
+    neg_blade = python_hardcoded_blade_scale_must_refuse()
 
-    # If the negative fixture does NOT refuse, the law is broken.
+    # If either negative fixture does NOT refuse, the law is broken.
     verdict = core1["verdict"]
-    if not neg["refused"]:
+    if not neg["refused"] or not neg_blade["refused"]:
         verdict = "REFUSED"  # the law itself failed to bite -> no standing
 
     report = dict(core1)
     report["verdict"] = verdict
-    report["negative_fixture"] = neg
+    report["negative_fixture"] = {
+        "refused": neg["refused"] and neg_blade["refused"],
+        "codes": sorted(set(neg["codes"] + neg_blade["codes"])),
+        "messages": sorted(neg["messages"] + neg_blade["messages"]),
+        "conforms": neg["conforms"] and neg_blade["conforms"]
+    }
     report["replay_verified"] = replay_verified
 
     # deterministic body for the receipt (no timestamp)

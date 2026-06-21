@@ -1,0 +1,214 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix eng: <https://rocket-craft.com/ontology/engineering#> .
+@prefix law: <https://rocket-craft.com/ontology/law#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+law:MorphologyPurityOntology a owl:Ontology ;
+    rdfs:label "Morphology Purity and Provenance Law"@en ;
+    rdfs:comment "Enforces that all geometric morphology decisions, subdivision density classes, scale bands, material bindings, and units are derived strictly from source law (TTL/SPARQL), refusing any hardcoded Python control surface code."@en .
+
+# --- Properties for Morphology replaced facts ---
+law:hasSubdivisionDensity rdf:type owl:DatatypeProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range xsd:integer ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio ;
+    rdfs:label "has subdivision density"@en .
+
+law:hasArmorDensityBand rdf:type owl:DatatypeProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range xsd:string ;
+    rdfs:label "has armor density band"@en .
+
+law:hasCurvatureSweepClass rdf:type owl:DatatypeProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range xsd:string ;
+    rdfs:label "has curvature sweep class"@en .
+
+law:hasMaterialZoneBinding rdf:type owl:ObjectProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range mud:Material ;
+    rdfs:label "has material zone binding"@en .
+
+law:hasBladeScaleMin rdf:type owl:DatatypeProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range xsd:decimal ;
+    qudt:hasQuantityKind qudt:Length ;
+    qudt:unit unit:M ;
+    rdfs:label "has blade scale min"@en .
+
+law:hasBladeScaleMax rdf:type owl:DatatypeProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range xsd:decimal ;
+    qudt:hasQuantityKind qudt:Length ;
+    qudt:unit unit:M ;
+    rdfs:label "has blade scale max"@en .
+
+law:hasEdgeCount rdf:type owl:DatatypeProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range xsd:integer ;
+    qudt:hasQuantityKind qudt:DimensionlessRatio ;
+    rdfs:label "has edge count"@en .
+
+law:hasSocketAttachment rdf:type owl:ObjectProperty ;
+    rdfs:domain mud:GeometryPrimitive ;
+    rdfs:range mud:Socket ;
+    rdfs:label "has socket attachment"@en .
+
+# Define Socket None if not present
+mud:Socket_None rdf:type mud:Socket ;
+    rdfs:label "No Socket Attachment" .
+
+# --- SHACL Refusal Shapes ---
+
+# 1. Refuse hardcoded Python morphology / magic geometry constants not backed by TTL
+# Every GeometryPrimitive MUST have all its parameters explicitly declared in the TTL.
+law:GeometryPurityShape a sh:NodeShape ;
+    sh:targetClass mud:GeometryPrimitive ;
+    sh:property [
+        sh:path law:hasSubdivisionDensity ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Geometry primitive lacks an explicit subdivision density class in TTL." ;
+    ] ;
+    sh:property [
+        sh:path law:hasMaterialZoneBinding ;
+        sh:minCount 1 ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Geometry primitive lacks a material zone binding in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:translateX ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Translation X must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:translateY ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Translation Y must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:translateZ ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Translation Z must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:scaleX ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Scale X must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:scaleY ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Scale Y must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:scaleZ ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Scale Z must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:rotateX ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Rotation X must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:rotateY ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Rotation Y must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path mud:rotateZ ;
+        sh:minCount 1 ;
+        sh:datatype xsd:float ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Rotation Z must be defined as an xsd:float in TTL." ;
+    ] ;
+    sh:property [
+        sh:path law:hasEdgeCount ;
+        sh:minCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Edge count must be defined as an xsd:integer in TTL." ;
+    ] ;
+    sh:property [
+        sh:path law:hasSocketAttachment ;
+        sh:minCount 1 ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Socket attachment must be defined in TTL." ;
+    ] ;
+    sh:property [
+        sh:path law:hasCurvatureSweepClass ;
+        sh:minCount 1 ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Curvature sweep class must be defined in TTL." ;
+    ] ;
+    sh:property [
+        sh:path law:hasArmorDensityBand ;
+        sh:minCount 1 ;
+        sh:message "REFUSE_MAGIC_GEOMETRY: Armor density band must be defined in TTL." ;
+    ] .
+
+# 2. Refuse generated USD whose dimensions lack source-law provenance / refuse density escalation not selected by SPARQL
+law:DensityEscalationShape a sh:NodeShape ;
+    sh:targetClass mud:GeometryPrimitive ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_DENSITY_ESCALATION: Subdivision density exceeds the maximum permitted density class (32)." ;
+        sh:select """
+            SELECT $this ?density
+            WHERE {
+                $this law:hasSubdivisionDensity ?density .
+                FILTER ( ?density > 32 )
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_DENSITY_ESCALATION: Subdivision density exceeds permitted band density." ;
+        sh:select """
+            SELECT $this ?density ?band
+            WHERE {
+                $this law:hasSubdivisionDensity ?density .
+                $this law:hasArmorDensityBand ?band .
+                FILTER (
+                    ( ?band = "law:HighDensityArmor" && ?density > 32 ) ||
+                    ( ?band = "law:MediumDensityArmor" && ?density > 16 ) ||
+                    ( ?band = "law:LowDensityArmor" && ?density > 8 )
+                )
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_PROVENANCE_VIOLATION: Primitive scale exceeds the permitted scale bands defined in source law." ;
+        sh:select """
+            SELECT $this ?scaleX ?scaleMax
+            WHERE {
+                $this mud:scaleX ?scaleX .
+                $this law:hasBladeScaleMax ?scaleMax .
+                FILTER ( xsd:decimal(?scaleX) > ?scaleMax )
+            }
+        """
+    ] ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "REFUSE_PROVENANCE_VIOLATION: Primitive scale is less than the minimum permitted scale bands defined in source law." ;
+        sh:select """
+            SELECT $this ?scaleX ?scaleMin
+            WHERE {
+                $this mud:scaleX ?scaleX .
+                $this law:hasBladeScaleMin ?scaleMin .
+                FILTER ( xsd:decimal(?scaleX) < ?scaleMin )
+            }
+        """
+    ] .
