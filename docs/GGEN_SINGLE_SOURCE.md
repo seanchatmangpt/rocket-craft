@@ -77,6 +77,26 @@ resolution (pxr unavailable — would need a manual reference-flatten). Decide w
 Note: candidate #1 (assembly part-list → graph-driven) was verified to produce
 IDENTICAL output at the ggen level and is ready to land independently.
 
+## Docs surface — analyzed 2026-06-21, no safe collapse available
+
+Surveyed every doc for graph-mirror content that ggen could own. Result: **none safe to
+collapse.** Recorded here so the next pass does not re-derive it.
+
+- No ggen rule emits a `.md` today; there is no generated doc to repair.
+- No prose doc hand-restates the morphology bands (`116`) or part roster (`117`) — those
+  facts live only in the TTL + the already-single-sourced Python/Rust gates. (grep hits for
+  `0.55`, height-band hash strings, etc. are coincidental: an automl win-rate target and
+  receipt hashes, not band/roster mirrors.)
+- `GGEN_SOURCE_CAPABILITY_AUDIT.md` and `MECH_FACTORY_MUD_BOOTSTRAP_INVENTORY.md` hand-list
+  ggen output files, which *looks* like a mirror of `ggen.toml`'s `output_file` set — but
+  these are **point-in-time evidence records (historical receipts), not living references.**
+  Regenerating them from the graph would falsify their evidentiary nature. Leave frozen.
+
+The discriminator: a doc that *restates current graph state* is a drift hazard ggen should
+own; a doc that *records what happened at a moment* must stay frozen. Authoring a NEW
+graph-driven reference doc (e.g. a parts/materials reference table emitted from `117`/`104`)
+is net-new ontology+template design — attended-grade, not a safe unattended collapse.
+
 ## Principle
 
 Collapse to single-source where it can be verified safely; **guard** where the fix is
