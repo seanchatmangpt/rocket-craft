@@ -1,0 +1,75 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix core: <https://ggen.io/ontology/core/> .
+@prefix morph: <https://ggen.io/ontology/morphology/> .
+
+morph:MorphologyOntology a owl:Ontology ;
+    rdfs:label "Morphological Rules Ontology" ;
+    rdfs:comment "Extracted morphological rules from loose Python scripts." ;
+    owl:imports <https://ggen.io/ontology/core/> .
+
+morph:SkeletonTopology a owl:Class ;
+    rdfs:subClassOf core:TopologyNode ;
+    rdfs:label "Skeleton Topology" .
+
+morph:Joint a owl:Class ;
+    rdfs:subClassOf morph:SkeletonTopology ;
+    rdfs:label "Joint" .
+
+morph:Root a morph:Joint ; rdfs:label "Root" .
+morph:Pelvis a morph:Joint ; rdfs:label "Root/Pelvis" ; core:hasParent morph:Root .
+morph:Spine_01 a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01" ; core:hasParent morph:Pelvis .
+morph:Spine_02 a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02" ; core:hasParent morph:Spine_01 .
+morph:Neck a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Neck" ; core:hasParent morph:Spine_02 .
+morph:Head a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Neck/Head" ; core:hasParent morph:Neck .
+
+morph:Shoulder_L a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_L" ; core:hasParent morph:Spine_02 .
+morph:UpperArm_L a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_L/UpperArm_L" ; core:hasParent morph:Shoulder_L .
+morph:LowerArm_L a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_L/UpperArm_L/LowerArm_L" ; core:hasParent morph:UpperArm_L .
+morph:Hand_L a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_L/UpperArm_L/LowerArm_L/Hand_L" ; core:hasParent morph:LowerArm_L .
+
+morph:Shoulder_R a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_R" ; core:hasParent morph:Spine_02 .
+morph:UpperArm_R a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_R/UpperArm_R" ; core:hasParent morph:Shoulder_R .
+morph:LowerArm_R a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_R/UpperArm_R/LowerArm_R" ; core:hasParent morph:UpperArm_R .
+morph:Hand_R a morph:Joint ; rdfs:label "Root/Pelvis/Spine_01/Spine_02/Shoulder_R/UpperArm_R/LowerArm_R/Hand_R" ; core:hasParent morph:LowerArm_R .
+
+morph:Thigh_L a morph:Joint ; rdfs:label "Root/Pelvis/Thigh_L" ; core:hasParent morph:Pelvis .
+morph:Calf_L a morph:Joint ; rdfs:label "Root/Pelvis/Thigh_L/Calf_L" ; core:hasParent morph:Thigh_L .
+morph:Foot_L a morph:Joint ; rdfs:label "Root/Pelvis/Thigh_L/Calf_L/Foot_L" ; core:hasParent morph:Calf_L .
+
+morph:Thigh_R a morph:Joint ; rdfs:label "Root/Pelvis/Thigh_R" ; core:hasParent morph:Pelvis .
+morph:Calf_R a morph:Joint ; rdfs:label "Root/Pelvis/Thigh_R/Calf_R" ; core:hasParent morph:Thigh_R .
+morph:Foot_R a morph:Joint ; rdfs:label "Root/Pelvis/Thigh_R/Calf_R/Foot_R" ; core:hasParent morph:Calf_R .
+
+morph:IKTarget a owl:Class ; rdfs:label "IK Target" .
+morph:IK_Hand_L a morph:IKTarget ; morph:bindsTo morph:Hand_L ; morph:poleVector "Elbow_L_Pole" .
+morph:IK_Hand_R a morph:IKTarget ; morph:bindsTo morph:Hand_R ; morph:poleVector "Elbow_R_Pole" .
+morph:IK_Foot_L a morph:IKTarget ; morph:bindsTo morph:Foot_L ; morph:poleVector "Knee_L_Pole" .
+morph:IK_Foot_R a morph:IKTarget ; morph:bindsTo morph:Foot_R ; morph:poleVector "Knee_R_Pole" .
+
+morph:HookPoint a owl:Class ; rdfs:label "Animation Hook Point" .
+morph:WeaponMount_L a morph:HookPoint ; morph:bindsTo morph:Hand_L .
+morph:WeaponMount_R a morph:HookPoint ; morph:bindsTo morph:Hand_R .
+morph:Cockpit_Mount a morph:HookPoint ; morph:bindsTo morph:Spine_01 .
+morph:Jetpack_Mount a morph:HookPoint ; morph:bindsTo morph:Spine_02 .
+
+morph:GeometryMappingRule a owl:Class ;
+    rdfs:label "Geometry Mapping Rule" .
+
+morph:RuleArmorShell a morph:GeometryMappingRule ;
+    morph:sourceType "angular_armor_shell", "tapered_box" ;
+    morph:emits "Cube:armor_plate", "Cylinder:armor_piston" .
+
+morph:RuleFeatherPanel a morph:GeometryMappingRule ;
+    morph:sourceType "layered_swept_feather_panel", "feather_panel" ;
+    morph:emits "Cube:feather_blade", "Cone:feather_tip" .
+
+morph:RuleBladePrism a morph:GeometryMappingRule ;
+    morph:sourceType "beveled_hard_surface_plate", "blade_prism" ;
+    morph:emits "Cube:beveled_plate", "Capsule:blade_edge" .
+
+morph:RuleSubframe a morph:GeometryMappingRule ;
+    morph:sourceType "subframe_core" ;
+    morph:emits "Cylinder:subframe_core", "Sphere:subframe_joint" .
