@@ -165,3 +165,21 @@ clean-pwa:
 verify-flagship-ue4-mech:
     ./verify_mecha_pipeline.sh
 
+# Verify reference-fabric asset in lockstep: ggen sync -> fresh render -> compare
+# Guarantees metrics reflect current source (defeats stale-PNG freshness defect)
+# and gates on the 48 meshProof-derived feather Mesh prims surviving sync.
+verify-asset:
+    ./scripts/verify_asset.sh
+
+# Graph-law morphology gates (pre-render, no GPU) + single-source drift guards.
+# metric morphology + kinematic assembly coherence read bands/roster/joint-tree
+# straight from source law; check-band-sync proves no hand-mirror has drifted.
+verify-morphology:
+    python3 scripts/verify_metric_morphology.py
+    python3 scripts/verify_assembly_coherence.py
+    python3 scripts/check_crate_band_sync.py
+
+# Standalone single-source drift guard (crate band literals vs ontology 116).
+check-band-sync:
+    python3 scripts/check_crate_band_sync.py
+
