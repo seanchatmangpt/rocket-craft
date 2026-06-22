@@ -1,0 +1,87 @@
+{
+  "nodes": [
+    {
+      "id": "Start Vision Snap Loop",
+      "activity": "Start Vision Snap Loop",
+      "frequency": 1
+    },
+    {
+      "id": "Generate Bounded Geometry",
+      "activity": "Generate Bounded Geometry",
+      "frequency": 1
+    },
+    {
+      "id": "Render Visual Projection",
+      "activity": "Render Visual Projection",
+      "frequency": 1
+    },
+    {
+      "id": "Extract Visual Targets",
+      "activity": "Extract Visual Targets",
+      "frequency": 1
+    },
+    {
+      "id": "Measure Semantic vs Visual Gap",
+      "activity": "Measure Semantic vs Visual Gap",
+      "frequency": 1
+    },
+    {
+      "id": "Compute Residuals",
+      "activity": "Compute Residuals",
+      "frequency": 1
+    },
+    {
+      "id": "Verify Playwright Engine Admissibility",
+      "activity": "Verify Playwright Engine Admissibility",
+      "frequency": 1
+    },
+    {
+      "id": "Emit BLAKE3 Receipt",
+      "activity": "Emit BLAKE3 Receipt",
+      "frequency": 1
+    }
+  ],
+  "edges": [
+    {
+      "source": "Start Vision Snap Loop",
+      "target": "Generate Bounded Geometry",
+      "frequency": 1
+    },
+    {
+      "source": "Generate Bounded Geometry",
+      "target": "Render Visual Projection",
+      "frequency": 1
+    },
+    {
+      "source": "Render Visual Projection",
+      "target": "Extract Visual Targets",
+      "frequency": 1
+    },
+    {
+      "source": "Extract Visual Targets",
+      "target": "Measure Semantic vs Visual Gap",
+      "frequency": 1
+    },
+    {
+      "source": "Measure Semantic vs Visual Gap",
+      "target": "Compute Residuals",
+      "frequency": 1
+    },
+    {
+      "source": "Compute Residuals",
+      "target": "Verify Playwright Engine Admissibility",
+      "frequency": 1
+    },
+    {
+      "source": "Verify Playwright Engine Admissibility",
+      "target": "Emit BLAKE3 Receipt",
+      "frequency": 1
+    }
+  ],
+  "start_activities": [
+    "Start Vision Snap Loop"
+  ],
+  "end_activities": [
+    "Emit BLAKE3 Receipt"
+  ]
+}

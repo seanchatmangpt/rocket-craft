@@ -149,7 +149,7 @@
     "REFUSE_PART_HEIGHT_BAND: part height ratio falls outside its declared morphology band."
   ],
   "span_axis": "Z",
-  "timestamp_utc": "2026-06-21T12:12:49.746296Z",
+  "timestamp_utc": "2026-06-21T14:17:35.278485Z",
   "verdict": "PARTIAL_ALIVE",
   "vertical_axis": "Y"
 }

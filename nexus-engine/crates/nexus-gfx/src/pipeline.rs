@@ -253,10 +253,10 @@ impl RenderPipeline<Compiled> {
 }
 
 // ---------------------------------------------------------------------------
-// Standard Gundam Nexus pipeline set
+// Standard Mecha Nexus pipeline set
 // ---------------------------------------------------------------------------
 
-/// Standard Gundam Nexus pipeline set.
+/// Standard Mecha Nexus pipeline set.
 pub struct PipelineSet {
     pub opaque: RenderPipeline<Compiled>,
     pub transparent: RenderPipeline<Compiled>,

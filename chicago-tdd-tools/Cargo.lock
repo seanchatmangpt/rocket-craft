@@ -892,7 +892,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "nexus-gundam"
+name = "nexus-mecha"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -912,7 +912,7 @@ dependencies = [
  "anyhow",
  "blake3",
  "chrono",
- "nexus-gundam",
+ "nexus-mecha",
  "nexus-pmme",
  "nexus-tps",
  "nexus-types",
@@ -942,7 +942,7 @@ name = "nexus-pmme"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "nexus-gundam",
+ "nexus-mecha",
  "nexus-types",
  "serde",
  "serde_json",
@@ -966,7 +966,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
- "nexus-gundam",
+ "nexus-mecha",
  "nexus-types",
  "serde",
  "serde_json",

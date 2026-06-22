@@ -180,24 +180,24 @@ PASS  kind=session  hash=blake3:84ea8041fbfd2f9732e87a7f4b3f30111485a4fb4c32fb09
 [PASS] Mecha F1 Cinematic Walkthrough COMPLETE — pipeline proven
 ```
 
-### G. Gundam Walkthrough Pipeline (`verify_gundam_pipeline.sh`)
-* **Command**: `./verify_gundam_pipeline.sh`
+### G. Mecha Walkthrough Pipeline (`verify_mecha_pipeline.sh`)
+* **Command**: `./verify_mecha_pipeline.sh`
 * **Exit Code**: `1` (Failure)
 * **Verbatim Failures**:
 ```
 Actuated visual delta: 55px
 Non-black rendered pixels: 709499
 Visual proof: motion=false content=true verdict=FAIL
-Receipt successfully signed and written to /Users/sac/rocket-craft/pwa-staff/test-results/gundam-factory-playwright-receipt.json
+Receipt successfully signed and written to /Users/sac/rocket-craft/pwa-staff/test-results/mecha-factory-playwright-receipt.json
 [ANDON PULL] DEFECT DETECTED IN CELL: receipt/audit cell
-  ✘  1 [chromium] › tests-e2e/gundam_factory_walkthrough_projection.spec.ts:12:7 › Gundam Factory Walkthrough Projection E2E › verify gundam factory walkthrough and generate receipt (1.1m)
+  ✘  1 [chromium] › tests-e2e/mecha_factory_walkthrough_projection.spec.ts:12:7 › Mecha Factory Walkthrough Projection E2E › verify mecha factory walkthrough and generate receipt (1.1m)
 
-  1) [chromium] › tests-e2e/gundam_factory_walkthrough_projection.spec.ts:12:7 › Gundam Factory Walkthrough Projection E2E › verify gundam factory walkthrough and generate receipt 
+  1) [chromium] › tests-e2e/mecha_factory_walkthrough_projection.spec.ts:12:7 › Mecha Factory Walkthrough Projection E2E › verify mecha factory walkthrough and generate receipt 
     Error: expect(received).toBeGreaterThan(expected)
     Expected: > 70
     Received:   55
 ```
-*Reason*: The Gundam map transition was loaded, and the input keys were injected, but the visual movement delta of the camera/actor was `55px`, which fell below the required threshold of `70px`.
+*Reason*: The Mecha map transition was loaded, and the input keys were injected, but the visual movement delta of the camera/actor was `55px`, which fell below the required threshold of `70px`.
 
 ### H. HTML5 General Pipeline (`verify_html5_pipeline.sh`)
 * **Command**: `./verify_html5_pipeline.sh`
@@ -222,7 +222,7 @@ Error: Package subpath './blake3' is not defined by "exports" in /Users/sac/rock
 4. **Offline Test Errors**: The failures in vitest under `just test` (USD302, BC 2.2) were caused by strict expectations on assembly naming strings inside individual parts (which pointed to `/ASSET_ReferenceFabric_001/` paths for material bindings) and mesh fingerprint comparisons. The subsequent update to `mecha_offline.test.ts` resolved this assertion.
 5. **Walkthrough Differences**:
    - The mecha walkthrough (`verify_mecha_pipeline.sh`) succeeded because the map transition was clean and visual displacement was measured at `388px` (threshold > 100px).
-   - The Gundam walkthrough (`verify_gundam_pipeline.sh`) failed because the actual displacement was only `55px` (threshold > 70px), meaning the movement actuation did not move the viewer far enough or map load was sluggish.
+   - The Mecha walkthrough (`verify_mecha_pipeline.sh`) failed because the actual displacement was only `55px` (threshold > 70px), meaning the movement actuation did not move the viewer far enough or map load was sluggish.
    - The HTML5 walkthrough (`verify_html5_pipeline.sh`) failed immediately on a syntax import error (`@noble/hashes/blake3` instead of `@noble/hashes/blake3.js`).
 
 ---
@@ -231,7 +231,7 @@ Error: Package subpath './blake3' is not defined by "exports" in /Users/sac/rock
 
 - **Supabase Persistence**: Console logs during the walkthroughs noted database insert failures (`TypeError: fetch failed`) indicating that Supabase backend telemetry functions were not running locally, though they were gracefully bypassed by the test suite.
 - **VaRest Warnings**: The cook log reported `95 blueprint errors` due to VaRest redirects being unresolved. This did not block WebGL execution but suggests some networking UI components were skipped.
-- **Gundam Visual Actuation**: The 55px actuation delta could be due to frame drops, map size/obstacles, or different camera positioning in the `barbarian-1` map.
+- **Mecha Visual Actuation**: The 55px actuation delta could be due to frame drops, map size/obstacles, or different camera positioning in the `barbarian-1` map.
 
 ---
 
@@ -239,7 +239,7 @@ Error: Package subpath './blake3' is not defined by "exports" in /Users/sac/rock
 
 The mecha asset pipeline is structurally and programmatically functional (Status: **PARTIAL_ALIVE** candidates are present).
 - **Core gaps identified**:
-  - Gundam walkthrough fails on visual movement thresholds (actuated delta 55px vs >70px expected).
+  - Mecha walkthrough fails on visual movement thresholds (actuated delta 55px vs >70px expected).
   - General HTML5 pipeline fails on `@noble/hashes/blake3` package subpath export resolution.
   - Vitest E2E checks now pass after test logic adjustment.
 
@@ -261,9 +261,9 @@ To verify these baseline results, execute the following commands in order:
    ```bash
    ./verify_mecha_pipeline.sh
    ```
-4. **Verify Gundam Walkthrough (E2E Playwright - expected to fail)**:
+4. **Verify Mecha Walkthrough (E2E Playwright - expected to fail)**:
    ```bash
-   ./verify_gundam_pipeline.sh
+   ./verify_mecha_pipeline.sh
    ```
 5. **Verify General HTML5 Pipeline (expected to fail)**:
    ```bash

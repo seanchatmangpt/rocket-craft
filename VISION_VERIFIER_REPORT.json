@@ -1,0 +1,66 @@
+{
+  "milestone": "GC-VISION-SNAP-001",
+  "scoped_status": "ALIVE_UNDER_SCOPE",
+  "final_status": "ALIVE_UNDER_SCOPE",
+  "gates": [
+    {
+      "gate": "GATE_0_SOURCE_ADMISSION",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_1_AUTHORITY_LENGTHS",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_2_AUTHORITY_CLASSES",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_3_SCALAR_TABLE_EQUIV",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_4_RECEIPT_CHAIN",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_5_UE4_WASM_PACKAGE",
+      "result": "RESIDUAL",
+      "detail": "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline"
+    },
+    {
+      "gate": "GATE_6_MOTION_DELTA",
+      "result": "RESIDUAL",
+      "detail": "visual_delta: no Playwright browser session in pre-UE4 scope"
+    },
+    {
+      "gate": "GATE_7_RECEIPT",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_8_POWL_TRACE_CONFORMANCE",
+      "result": "PASS",
+      "detail": null
+    }
+  ],
+  "jidoka_events": [],
+  "residuals": [
+    "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline",
+    "visual_delta: no Playwright browser session in pre-UE4 scope",
+    "signing_layer: tamper-evident, not cryptographically signed"
+  ],
+  "inputs": [
+    "ontology/source_law/VisionSnapLoop.powl",
+    "vision_trace.xes"
+  ],
+  "generated_artifacts": [
+    "generated/vision_snap/VisionSnapReceiptManifest.json",
+    "generated/vision_snap/VisionSnapOCELSeed.json"
+  ]
+}

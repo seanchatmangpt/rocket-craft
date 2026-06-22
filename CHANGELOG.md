@@ -26,7 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ### Summary
 
-A transformational week integrating 96 commits across all 7 major workspaces. Major deliverables include: **Gundam Nexus engine** (10-crate Rust formal model, 152 tests), **blueprint-rs** (UE4 Blueprint AST generation, 100+ nodes, T3D round-trip), **unify-rs** (18-crate semantic/MCP/AutoML ecosystem including **unify-automl**), **chicago-tdd-tools** (Classicist BDD framework and the **combinatorial-engine** state space explorer), **Infinity Blade 4 MUD backend** (6-crate Rust server), **WASM threading abstractions** (typestate workers, shared memory), **anti-llm-cheat-lsp** (Rust/C/JS/TS detection), and **asset pipeline autonomy**. All CI gates passing. Zero breaking changes to user-facing APIs.
+A transformational week integrating 96 commits across all 7 major workspaces. Major deliverables include: **Mecha Nexus engine** (10-crate Rust formal model, 152 tests), **blueprint-rs** (UE4 Blueprint AST generation, 100+ nodes, T3D round-trip), **unify-rs** (18-crate semantic/MCP/AutoML ecosystem including **unify-automl**), **chicago-tdd-tools** (Classicist BDD framework and the **combinatorial-engine** state space explorer), **Infinity Blade 4 MUD backend** (6-crate Rust server), **WASM threading abstractions** (typestate workers, shared memory), **anti-llm-cheat-lsp** (Rust/C/JS/TS detection), and **asset pipeline autonomy**. All CI gates passing. Zero breaking changes to user-facing APIs.
 
 ---
 
@@ -38,7 +38,7 @@ A transformational week integrating 96 commits across all 7 major workspaces. Ma
 
 **combinatorial-engine: BDD State Space Exploration (410a8b9)**
 - New binary in `chicago-tdd-tools` workspace (`combinatorial-engine`)
-- Automatic discovery of games: hooks into *Infinity Blade 4 MUD* and *Gundam Nexus* using `chicago_tdd_tools::discover_games()`
+- Automatic discovery of games: hooks into *Infinity Blade 4 MUD* and *Mecha Nexus* using `chicago_tdd_tools::discover_games()`
 - Chess-coordinate-based legal move simulation: walks the state space under the game rules, identifying unhandled panics and illegal transitions
 - Generates JSON reports at `combinatorial_report.json` logging visited states, transitions (source, move, target), and errors/panics
 - Verification suite: `aimbot_behavior.rs`, `coordinate_behavior.rs`, `discovery_behavior.rs` (total 7 tests)
@@ -180,7 +180,7 @@ Test status: All 22 existing tests passing; no regressions.
 
 #### Added
 
-**Gundam Nexus Engine: 10-Crate Rust Formal Model (cb53c60 + supporting commits)**
+**Mecha Nexus Engine: 10-Crate Rust Formal Model (cb53c60 + supporting commits)**
 
 Complete game engine implementation across nexus-engine workspace:
 
@@ -262,7 +262,7 @@ Complete game engine implementation across nexus-engine workspace:
 
 **Infinity Blade 4 MUD Backend (6-crate Rust workspace)**
 
-Standalone Rust text-based MUD server (no Gundam Nexus dependency):
+Standalone Rust text-based MUD server (no Mecha Nexus dependency):
 
 **ib4-core** (fccefe5): Type system
 - `Player`, `Enemy`, `Equipment`, `MagicSpell` types
@@ -473,9 +473,9 @@ Fully autonomous 3D model ingestion pipeline:
    - `invariants`: Add `#[allow(too_many_arguments)]` on property test function
    - `states`: Convert outer doc comment to inner `//!` module doc
 
-2. **Gundam blueprint example** (blueprint-rs/examples/gundam_mech_character.rs)
+2. **Mecha blueprint example** (blueprint-rs/examples/mecha_mech_character.rs)
    - Full UE4 Character Blueprint (parent: Character class)
-   - Variables: `GundamMesh`, `PilotName`, `ArmorPoints`, `BeamSaberActive`
+   - Variables: `MechaMesh`, `PilotName`, `ArmorPoints`, `BeamSaberActive`
    - Events: `BeginPlay`, `EventTick`, custom `ActivateBeamSaber`, `DeactivateBeamSaber`, `TakeMechDamage`
    - Outputs: importable T3D text to stdout
 
@@ -750,7 +750,7 @@ fn my_blueprint() {
 
 ### For Game Engine Developers
 
-**New**: Gundam Nexus provides reference game engine:
+**New**: Mecha Nexus provides reference game engine:
 - `nexus-engine` workspace integrates 10 crates
 - All systems (combat, economy, networking, ECS, graphics, shop, progression)
 - 152 tests ensuring invariants hold
@@ -791,7 +791,7 @@ cargo build
 
 ## Links & Resources
 
-- **Gundam Nexus GDD**: `infinity-blade-4/docs/GDD.md` (or search GUNDAM_GDD in repo docs)
+- **Mecha Nexus GDD**: `infinity-blade-4/docs/GDD.md` (or search MECHA_GDD in repo docs)
 - **Blueprint-rs Guide**: `blueprint-rs/README.md` + examples in `blueprint-rs/examples/`
 - **unify-rs Architecture**: `unify-rs/README.md` + PhD thesis (`11a9d04`)
 - **anti-llm-cheat-lsp Scanner**: `unify-mcp/src/anti_llm_tools.rs` (MCP integration) + original repo TBD

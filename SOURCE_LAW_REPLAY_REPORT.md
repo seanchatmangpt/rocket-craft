@@ -1,20 +1,141 @@
-# SOURCE_LAW_REPLAY_REPORT (R2b)
+# SOURCE_LAW_REPLAY_REPORT (R2a)
 
-- timestamp: 2026-06-20T21:05:00.000000Z
-- standing: **ALIVE_UNDER_SCOPE**
+- timestamp: 2026-06-21T02:28:18.060913Z
+- standing: **ADMITTED**
+- contamination_free: True
+- head_merged_b3: `eb9e9e16d042ddc85f3f368b30a9b5cfe68b53a01ab7f7d641b04146fa6ea492`
+- fresh_merge_b3: `eb9e9e16d042ddc85f3f368b30a9b5cfe68b53a01ab7f7d641b04146fa6ea492`
+- working_tree_merged_b3: `eb9e9e16d042ddc85f3f368b30a9b5cfe68b53a01ab7f7d641b04146fa6ea492`
+- head_banner_count: 118
+- fresh_banner_count: 118
+- source_law_count: 118
 
 ## Checks
 - merge_script_ok: True
-- manual_edits_purged: True
-- visual_metrics_met: True (wing_feather_count: 108, silhouette_iou > 0.50)
-
-## Narrative
-**Object under test:** `ontology/all_merged.ttl` regeneration from `source_law/*.ttl`
-**Observed evidence:** Executed `bash scripts/verify_asset.sh`. The script ran `python3 scripts/merge_ontology.py` and completely wiped all manual edits previously present in `all_merged.ttl`. `ggen sync` then rebuilt the USD files natively from the merged ontology. The `visual_gap_report.json` reported `thresholds_met: True`.
-**Failure:** Historically, `all_merged.ttl` contained thousands of lines of manual edits (primitives, materials) not sourced from `source_law/`.
-**Repair:** Confirmed that prior processes successfully ported manual edits into native source law files, specifically `ontology/source_law/104_reference_fabric.ttl`. A clean regeneration now preserves 100% of the required data graph, and `verify_asset.sh` completes the lockstep verification entirely from `source_law/` through to the final PNG scorecard without any manual `all_merged.ttl` intervention.
-**Receipt required:** `visual_gap_report.json` and a clean `git status` for `all_merged.ttl` matching `merge_ontology.py` output.
-**Residuals:** HTML5/WASM packaging and Playwright actuation proof is not covered by this raw geometry validation and remains a separate acceptance gate.
+- A_head_banner_bijection: True
+- B_fresh_equals_head: True
+- C_fresh_banner_bijection: True
+- working_tree_equals_fresh: True
 
 ## next_action
-R3: Proceed to Playwright / HTML5 WASM packaging step.
+proceed to render/score gate
+
+## source_law receipts (BLAKE3)
+- `82e82d54b4bca66e07c2cc12adec8adc1d6c634166209be6a44e2af0c839a7d5`  001_factory_charter.ttl
+- `9be8b907524710d6630966a87b624dc93f9440ba7d7151a0110641a7fa5c5dbe`  002_mgpp_mission_goals_plans_problems.ttl
+- `53b462a3dfa6bb5a472051af043b5ae5270b6bec3733e517159f1466073f6e72`  003_flagship_ue4_mech_ctq_tree.ttl
+- `8010acdbec33537545c50243c752f4e6891ca60bd75c6e8fce707b7660792308`  004_voice_of_customer_flagship_mech.ttl
+- `e39584f8f32039e5553de687dfb344b1dc9da1a52ff8e2257e92989073eb63ca`  005_target_cost_model.ttl
+- `d937f4a48a5439591a3f9d2eeb0275012da0918cd17c65064f1e636680eb125f`  006_risk_register.ttl
+- `ca68ac2c59d5d94fe52db2f8c3fab6ef978cba8bb6243ad7525acf32de3fab24`  007_communication_plan.ttl
+- `81df23b857b08a90ae1294bb67f9f06cc2d3b457f2880b7a313351718bc9e16e`  008_black_belt_governance.ttl
+- `04955f43becbd452ec1fd243719ff5b9e3b2384e4331a9507413dad3224e0c8c`  009_original_design_axes.ttl
+- `38799dd41c84ecec4779575147ee44f32e1e8c05588a390a92670ce2f035d78f`  010_admission_disposition_taxonomy.ttl
+- `fa215fe296d9c0645d421206c8d2456dffc082516b29df7cd4a37ff8bc0b290b`  011_quality_function_deployment.ttl
+- `e45989fd2b9bfe57586bd044d8db4d82dce5bce4eab60b024c33ae993a235eb5`  012_ctq_to_verifier_matrix.ttl
+- `e34315c1618753deed677fc57a98c2f4b694e284028e329e9d61b575ca0e9120`  013_scorecard_model.ttl
+- `0eca2f5d83dcbe46e7e89c26d78419ee68ab66a31a7412255597b49eb9ce36b6`  014_measurement_system_analysis.ttl
+- `44a6f397d381a2c57848da37c94084ce00b7bc6d47c03e04dd961f1c76292c48`  015_golden_fixture_registry.ttl
+- `f18db872239ae6f7dde13824adfeb3155c8dca3b7f0522edea56240acc60b445`  016_negative_fixture_registry.ttl
+- `3e97b530b04aa7d73c4fed8b2671997ede598c37af2579a1f6707c69faa9acf6`  017_process_capability_model.ttl
+- `b810632d7b3f8518857ab867a332f9776ccb88511cce8946613cd65719c4251b`  018_variation_sources.ttl
+- `5bd693ec0fe0574abe5982040a056fe6dc39bc9201259d825870bbccb857b1bf`  019_control_chart_model.ttl
+- `d9749943855eb198908fe609f88fdd436a8b2ce3f5a2b98217d1ad0fe791d7ac`  020_defect_escape_model.ttl
+- `ed294159a4ec501c33baec8a9de52d6f6fde924c87613743b846ba6edd61e922`  021_concept_generation_space.ttl
+- `2333e6feb3cba7cd8b95b2841d30e8fe2a9ff49a0d28707fe2a3c5dfcf5d9c1c`  022_triz_contradictions.ttl
+- `5c38dd4ccdbf10fa80d8287e4bfbba6640ce184e3a6ec1f50b6e823c7b8ff4d1`  023_transactional_triz_rules.ttl
+- `9e24ce72555fcefb0be7c741a8b63829f1b649f733da593e08beb1d2a7057606`  024_pugh_selection_matrix.ttl
+- `5e4f3b04374509cd6b8ce4268ce195f1ed055ab252a3dd7f7ed4f8a41e7fdaa6`  025_ahp_weight_model.ttl
+- `9ff45b4f28ddfd2c344223a61567aac0e7be4503056bb3554a81ff915b4bf481`  026_design_fmea.ttl
+- `68ba8a5ea39eece38653d339b42c3ffebc3044dcf0b925f56ba6d8ccff8a16ac`  027_monte_carlo_sampling_plan.ttl
+- `36f7356c87e98850b6e81dae133157546b4444e87f8d6e8e8273155112268419`  028_regression_factor_model.ttl
+- `2bfbcfb2e0b3ba85e30d30521a3f832957d29a5034157d4f99687b262a9300d4`  029_multi_vari_factor_model.ttl
+- `fd0db20c908ef6b3de213c16e8bfb949e5cfbd6e031ee3766889f7fa765581f3`  030_transfer_function_hypotheses.ttl
+- `e82b63fd3aba072c7037923bdd41dd94522f8896f9aaf2e29f3b0b1fda4a039b`  031_design_space_domain.ttl
+- `6043a1d6264353a8db30d2d082722eb935dc0856b45400560351913649b64cf4`  032_candidate_seed_space.ttl
+- `c15aa8a07408c3eaade19ac088ad47058928a5d85681ae290c32a9d3ad7f1675`  033_source_law_manifest.ttl
+- `d68592eb2b8650f9723fd9b3062bb0c4ba5da2a5241ca16c431dec5589862872`  034_generator_parameter_domains.ttl
+- `46e9cc3249b37edb91be92393f22da006960d27a712d44b62e173798c601c32d`  035_factor_matrix_schema.ttl
+- `b14275ec4525bbcae571265ad80a4524af3784d9d99721a0a14371f8ef3f58be`  036_part_taxonomy.ttl
+- `be1681e105753b87e7a09a32b2dcdb05b0697ace8efe2c6adb9660b4e9166b24`  037_part_ownership_law.ttl
+- `e54c391ae2ac8b58e233e7ee0c9b7ae9816210e0a5db8a9e418adc5c92fe7855`  038_socket_boundary_law.ttl
+- `606408f4136db3826d6055333dff7c486c446782838d8538beb690532e78a476`  039_assembly_composition_law.ttl
+- `e00f99732e6224c21ce693968d9815388e1c1d91f6917725df624b7e52f5d224`  040_modular_identity_law.ttl
+- `4afea4fc69c96f62b23e07bb1893895fb8ba58d370f83bcf0983687699e736af`  041_chassis_topology_space.ttl
+- `78bdcc1a6843b17316219735822754ed3b55edf982e46458cd7381383e810628`  042_torso_grammar.ttl
+- `0cb799d86c79c38bd3b3be164b60a83ef0707899968e9dc23ce5886418f2347f`  043_head_grammar.ttl
+- `978d20202f19efc2214d854c1754b05f17f466c0fe39f6094fd496a62a8b0fde`  044_limb_grammar.ttl
+- `02c08d552909b8d27cd383b3822e15f1d31bc90c0c447b251e8a8c31b5018092`  045_wing_grammar.ttl
+- `533177351348803cec02a06ab0bc48d1ee28c0b15bb96ee82d08c3ede93c7beb`  046_layered_swept_feather_panel_grammar.ttl
+- `3a0f55b1817f4c952b8d06921942cebb36a4df77fc0b351429a2d5687d9b3b40`  047_angular_armor_shell_grammar.ttl
+- `b6bf7dc61eef55f1d69f453174e5819b993f6dd277c01fdb73d36a670d937eba`  048_beveled_hard_surface_plate_grammar.ttl
+- `50f0d4cc13c1a080fedcdbbe49b2f458712e6ece61ea055b2ca4627e5ea6cdf6`  049_nested_mechanical_subframe_grammar.ttl
+- `f754b2647d3830322ab8c741f29df5570ba4cc5dc276cc4ba4d00ff68dffc1da`  050_weapon_and_tool_mount_grammar.ttl
+- `b733a7aa3c04bf1c4be165f4674a1810e491836f8a095cf1372fd38a4099bac1`  051_surface_material_space.ttl
+- `88855bbb1f22e63af19354dbfa394ab04c2010f5dc79dde62809fc5220f230c9`  052_materialx_binding_law.ttl
+- `68912505b5aee9953d565778ba1519360d77edaf8039a6eb64f098b0cde04436`  053_openpbr_channel_policy.ttl
+- `b18a00da9e5c06ecb049650af640b2b8755f4b7403b50ad422d8910a3a35dfbb`  054_basecolor_generation_policy.ttl
+- `e19ee25126d96ce6a77389db68fbb2eb82995dfe5b046773bcefc13709cdfaa0`  055_normal_map_generation_policy.ttl
+- `c9f0af9d7d9a5b5d4201d3d3cf60385f2d17e7b78d3193beea78f860d64c10df`  056_roughness_generation_policy.ttl
+- `f0ea5e667bea03b560e4cb4c9db7d20c0536b4ecfa0b01fd55d3ef4284834198`  057_metallic_generation_policy.ttl
+- `8c7171876c8d1753a90fbb8609bb3b98af7077e43a3a62cba8d56b0381f61008`  058_ao_generation_policy.ttl
+- `17b60d0f2c27af28d3746b46c21e8c2711e14f24888c8bf0c49dcf8a836c8454`  059_emissive_generation_policy.ttl
+- `10680044764aaad1afc570711cfd58d7fce0aab8370f70924b12a6cd0de87298`  060_mask_generation_policy.ttl
+- `0fa7f610bd440219245fd005187849538331ed436808987501f62b166f2fe561`  061_texture_manifest_law.ttl
+- `5bfe66c8e81ff2ef1dbfeb5526bc82cdfe81ec6448349e4064d9d7bac5c09364`  062_decal_language.ttl
+- `1055be276c5d5c43396cf2094983e75805d67bef43c60d9c4157db8ec6e81b39`  063_panel_line_language.ttl
+- `77528c1a6baf05af98dd8d3637769a30c05fed992b3e430c09cbd890e3ea7ba0`  064_wear_mask_language.ttl
+- `383b4d0480a6ca8dc57b6771c6bd60624441d05a8f984db8113c81cccf190833`  065_damage_mask_language.ttl
+- `3a49b58d4cc6ee139fc32e072cdf10cf5895801ce6d08e6ad1a66407aac445b6`  066_heat_discoloration_language.ttl
+- `8e80025c868d75ea6a1a6a187cc9752a87068edcbbb1e90e23722e95a69b8720`  067_micro_detail_density_law.ttl
+- `87e248a9112ac0adf3d41bf5172ebba28d3d35869375a5ac6e615519652728e8`  068_surface_variation_law.ttl
+- `e357a801fe3fb5e9c22bab1f953b47c6f7d90d0dd7b7680b2ef234353113d8cc`  069_material_variant_space.ttl
+- `0d0261a7f32d7b733a15b221266551c9a8d7493c5edaa64cdd2bdafce49920fa`  070_pbr_completeness_gate.ttl
+- `427afad24b4db9777879ad0a11af0a0628f597501e33b6c5c30a6d3c9cec9d75`  071_rig_skeleton_law.ttl
+- `b252855d6a8d4db0383b27a41093a0e355a2d162167a2dd8ed322b6a5adb99fb`  072_joint_hierarchy_law.ttl
+- `b891017a1e3a0fc6d7e3c435807740ff02689a1fe640ffd2cf0a1a6dec8a2174`  073_joint_limit_policy.ttl
+- `fa7a9833585ed1b1c2255c7c08b1afb8bdc77166f4e84fbb4108c1eb4978212a`  074_ik_target_policy.ttl
+- `8a7d4ec07258444cb315ab82e6ead39a9d23de1e4f7c90634518dfaff6fbcb80`  075_socket_schema.ttl
+- `b7746fbb5bec86e95360eaba6f6307d1a02cb66eb39e94a847d5fd15663660bf`  076_loadout_mount_schema.ttl
+- `ce575cd34585d7a1440fdb3fedcf1cd933a435b0496e5ba6ed340632037ca456`  077_damage_zone_schema.ttl
+- `3e7fe464eed052106a8f8874f17ba221dab1d05a423b6cf334ca193f508d2a03`  078_destruction_state_schema.ttl
+- `19e0b0a3a77e91f9c63ec2802ad31db9c919f3135421296b9f3224e9f22d2107`  079_animation_hook_schema.ttl
+- `e66fd3cc1fd449ca0b36d1ae22c44f9bcae8ba638a1013c2cbfe5df41b2781db`  080_motion_family_space.ttl
+- `c4bd10ce30883b0330fd2099fcda18564158dbcbc33a36c41e5828cd1b9d7201`  081_collision_policy.ttl
+- `71e0726fdda9feb585c5ee140c466a54602956cc05ba64bb1334c7a19f2155b8`  082_lod_policy.ttl
+- `3bdd3e4f13a5f83eceb31145961fcb4ec8f2bfca43ac7b0b33a8ab268d9df7ce`  083_ue4_import_projection.ttl
+- `a38c9ead49709fccf63ebf2b2584a566e382d7b7c8c372f871874f50c1e39bcf`  084_ue4_cook_expectations.ttl
+- `8fa50ebb3731eb66f4313857734b43f4fa13436e7fc8a61e8b24331268395c28`  085_ue4_material_binding_projection.ttl
+- `dcafdae07945aa02b2315a52ea175b7caad2b9a7c12e906015a961716c0d2573`  086_ue4_skeletal_mesh_projection.ttl
+- `c7af5214b3b75f02b4dbc93204504cbb195fc696aa9d325a47d08ef7fddb151b`  087_ue4_test_map_projection.ttl
+- `4bc03cd5da46a41919ec17887d49a9e1345d7aa300d1b617ebbba8da40fec424`  088_playwright_walkthrough_policy.ttl
+- `4d5da4c291684f0a7b896e527d9efdf6398dbb5855c05869ea7f56e8ae919a26`  089_wasm_canvas_verifier_policy.ttl
+- `3bc0b2059796d65918a322bbc321bb7c5beaef42496d357e4386c5ed01a74a40`  090_engine_screenshot_policy.ttl
+- `6d9a6186169898d397a1ff1d6d7ec060ac98d36bbe0e87160536d13827f1f78d`  091_sequential_verifier_funnel.ttl
+- `114b1dee259e0d36c23a3dcdd3c6f55d01b0b59d5afdb3db5c1ca2ebc9c905d1`  092_modular_identity_gate.ttl
+- `946e39b06e544d7fb25aa10b1087ff1a666320da1510619b15011a829f602567`  093_usd_diagnostic_taxonomy.ttl
+- `db239237ea65512b70522e3939237973826515da8fb3e8d288a6db3b1fbedc57`  094_lsp_diagnostic_projection.ttl
+- `6c55c1322c826075a0fe62f6ff37d821ca2ce7e7245d80bb5d7edb1de75c04b6`  095_ai_vision_judge_ctqs.ttl
+- `d37487464cd1cbda58cfdff68d2567d0fc36960458b5cb0c4577e73fd807135d`  096_visual_defect_taxonomy.ttl
+- `8552a2e407bad1e8c0e19bccdbf4a516f10a315384e4f5309d3f7e656663efae`  097_external_expressive_distance_policy.ttl
+- `77e7f5eb57f82deaa2af121c162251692f34ae2f6b3536588d26687dabde5cc2`  098_non_confusion_policy.ttl
+- `9a55370205c94f94b2f74c5acbcf8b49202bf541ef4c03040b2aa9fc99c6d0ff`  099_ip_distance_report_schema.ttl
+- `16535278c9b0e836f3df914d1138b67508481093e54b8af7ac52f146a9eb992b`  100_receipts_ocel_replay_law.ttl
+- `9c3a4cfb4ad91800adc04ab0384a53d0fec98ad93631be842de581a1b41372f5`  101_armor_baseline_tiger_i.ttl
+- `0e9fb9c7d06c39d1ada98b937b6b2c0a54bc5f816fc2979b23b8585029ed69fd`  102_tiger_tank_instances.ttl
+- `37044dc5cf6f010ec6581831cbb2dbb87366e3308dac919a83a4d463ed799958`  103_proportion_priors.ttl
+- `a8707af1f80c4c7a97ad583fe1851968f5a4fd769008eab75ebc21d1af3ef75f`  104_reference_fabric.ttl
+- `5f62d25ad4e304fc4b93fb11970a06ad94950c03a725f238a61df6a664c0e12a`  105_kit_subassembly_graph.ttl
+- `c26df2f614123845894bfc191e0f038a0b99c56cd08efd9adca72aa2a580347a`  106_core_combinatorial.ttl
+- `6ec600cc84922771d1c6b78625fd2ee208fa5a8e80d7c0297b7d0dd7c9c18d58`  106_lore_spec_measurements.ttl
+- `199cfced12bd2a8bc8f191135847e11471e99b35f81014858dd549d730c09a1e`  107_mecha_nexus_primitives.ttl
+- `836adb18fb5d75192313342aa4df3a453a31b4d8ea865272cc50f0ed46247e6d`  108_mech_factory_mud_twin.ttl
+- `2fed62393829bcb2fb5c4af52ab3e37260e939556b5af8badb860b91e13744d9`  109_mechbirth_ontology.ttl
+- `ca238c15168acb6493908673b2ea9617696eb24fcc7c3cea509b92563b8eccc3`  110_anti_llm_ontology.ttl
+- `8d3434597825150fa5d3195ab9742298b81095edd6ac46ce373ab4761ea839a8`  110_bipedal_metric_envelope_law.ttl
+- `f9a369d1c19b5a55963d3a9e5b3921862c61c9429960c81948c5ff91843d4793`  114_sockets_mounts_extension.ttl
+- `d93c4468bf43dcc7951455c0bd1c5638df37288d48c8eea6248e4f95e2ca7499`  115_destruction_ontology.ttl
+- `364326aee9b3e53e2de5ca19f7e2891d73ef491ef8be30b1b257e0ad1a2fa1ec`  116_metric_morphology_bands.ttl
+- `3327f13c99aa57e8e95abac8576644eb287958c96eb322b33680d6f2c9807661`  117_reference_fabric_metric_binding.ttl
+- `d2d7329e11b80e507ea50b633fe64001498648f4840c7775519e12a05685b7b7`  118_limb_anatomical_joints.ttl
+- `e73ecf3077bb89b23e1a4fa816bf2dbab1896309dd5ad8325bd86f1734f2b288`  120_morphology_purity_law.ttl

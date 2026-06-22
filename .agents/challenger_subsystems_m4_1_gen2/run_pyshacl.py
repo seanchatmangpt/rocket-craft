@@ -21,10 +21,10 @@ for f in files:
 # Add the violation manually to data graph
 extra_ttl = """
 @prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
-@prefix gundam: <https://rocket-craft.io/ontology/ue4/gundam#> .
+@prefix mecha: <https://rocket-craft.io/ontology/ue4/mecha#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-gundam:SimBodyZeroMass a ue4:URigidBody ;
+mecha:SimBodyZeroMass a ue4:URigidBody ;
     rdfs:label "SimBodyZeroMass" ;
     ue4:physicsType ue4:PhysType_Simulated ;
     ue4:massKg 0.0 .

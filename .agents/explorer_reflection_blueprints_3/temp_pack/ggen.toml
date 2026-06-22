@@ -12,7 +12,7 @@ imports = [
   "blueprints.ttl",
   "subsystems.ttl",
   "typestates.ttl",
-  "gundam_scenario.ttl"
+  "mecha_scenario.ttl"
 ]
 standard_only = false
 
@@ -131,27 +131,27 @@ ASK {
 """
 
 [[validation.rules]]
-name = "R_Gundam_Scenario"
-description = "Verify that the Gundam player character scenario is structurally and logically connected without dangling links."
+name = "R_Mecha_Scenario"
+description = "Verify that the Mecha player character scenario is structurally and logically connected without dangling links."
 ask = """
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
-PREFIX gn: <https://ggen.io/ontology/gundam-nexus/>
+PREFIX gn: <https://ggen.io/ontology/mecha-nexus/>
 
 ASK {
-  # 1. Gundam subclass of ACharacter
-  ?gundamClass rdfs:subClassOf ue4:ACharacter .
-  ?gundam a ?gundamClass .
+  # 1. Mecha subclass of ACharacter
+  ?mechaClass rdfs:subClassOf ue4:ACharacter .
+  ?mecha a ?mechaClass .
   
   # 2. Attached rendering and physics components
-  ?gundam ue4:hasComponent ?meshComp .
+  ?mecha ue4:hasComponent ?meshComp .
   ?meshComp a ue4:USkeletalMeshComponent .
-  ?gundam ue4:hasComponent ?physComp .
+  ?mecha ue4:hasComponent ?physComp .
   ?physComp a ue4:UBoxComponent .
   
   # 3. Blueprint graph
-  ?gundam ue4:hasBlueprintGraph ?graph .
+  ?mecha ue4:hasBlueprintGraph ?graph .
   ?graph a ue4:UEdGraph .
   
   # 4. Input events and function call calling a reflection function in graph
@@ -164,8 +164,8 @@ ASK {
   ?func a ue4:UFunction .
   
   # 5. Typestate tracking cooking & packaging status
-  ?gundam ue4:hasCookingState ue4:Cooked .
-  ?gundam ue4:hasPackagingState ue4:WasmReady .
+  ?mecha ue4:hasCookingState ue4:Cooked .
+  ?mecha ue4:hasPackagingState ue4:WasmReady .
 }
 """
 

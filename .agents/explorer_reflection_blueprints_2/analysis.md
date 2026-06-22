@@ -369,12 +369,12 @@ Add checks for compilation integrity:
 *   **Case 3.4: Function Signature Generation Validation**: Verify that the generated C++ header file signature (`.h`) matches the compiled RDF graph parameters (`ue4:UFunctionParameter` ordered by `ue4:parameterIndex`).
 *   **Case 3.5: Pin Type Compatibility**: Ensure data pins connected via `ue4:connectedTo` share compatible categories (e.g., float pins connect only to float pins, or object pins represent compatible subclasses).
 
-### Tier 4: Real-World Application Scenarios (Gundam Weapon Fire Loop)
+### Tier 4: Real-World Application Scenarios (Mecha Weapon Fire Loop)
 Define a test scenario to prove execution:
-*   **Case 4.2: Gundam Weapon Actuation Loop**:
-    *   Define a C++ class `AGundamCharacter` with a function `FireWeapon(int32 WeaponIndex, float DamageMultiplier)` exposed via `UFunction`.
+*   **Case 4.2: Mecha Weapon Actuation Loop**:
+    *   Define a C++ class `AMechaCharacter` with a function `FireWeapon(int32 WeaponIndex, float DamageMultiplier)` exposed via `UFunction`.
     *   Declare two parameters: index 0 (`ue4:Input`, int) and index 1 (`ue4:Input`, float).
-    *   Model a Blueprint graph `EventGraph` on a Gundam character blueprint containing an event node and a function call node connected via execution flow.
+    *   Model a Blueprint graph `EventGraph` on a Mecha character blueprint containing an event node and a function call node connected via execution flow.
     *   Verify that `callsFunction` and `mapsToParameter` link the blueprint node pins correctly to the C++ reflection parameters.
     *   Run validation to prove the graph contains no dangling execution flows or type mismatches.
 

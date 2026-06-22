@@ -31,9 +31,9 @@ setup
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
 # World A: Statically Baked
-gundam:WorldA a ue4:UWorld ; rdfs:label "WorldA" .
+mecha:WorldA a ue4:UWorld ; rdfs:label "WorldA" .
 
-gundam:StaticBakeConfigA a ue4:StaticBakingConfiguration ;
+mecha:StaticBakeConfigA a ue4:StaticBakingConfiguration ;
     rdfs:label "StaticBakeConfigA" ;
     ue4:isStaticallyBaked true ;
     ue4:headerOutputPath "Source/Headers" ;
@@ -43,32 +43,32 @@ gundam:StaticBakeConfigA a ue4:StaticBakingConfiguration ;
     ue4:byteClassMatrixOutputPath "Build/Matrices" ;
     ue4:receiptOutputPath "Build/receipt.json" .
 
-gundam:TargetA a ue4:PackagingTarget ;
+mecha:TargetA a ue4:PackagingTarget ;
     rdfs:label "TargetA" ;
-    ue4:targetWorld gundam:WorldA ;
+    ue4:targetWorld mecha:WorldA ;
     ue4:buildConfiguration ue4:Config_Development ;
     ue4:targetRHIProfile ue4:WebGL2_RHI_Profile ;
     ue4:targetPlatformName "HTML5" ;
-    ue4:hasStaticBaking gundam:StaticBakeConfigA .
+    ue4:hasStaticBaking mecha:StaticBakeConfigA .
 
 # World B: Dynamic (Not Statically Baked)
-gundam:WorldB a ue4:UWorld ; rdfs:label "WorldB" .
+mecha:WorldB a ue4:UWorld ; rdfs:label "WorldB" .
 
-gundam:TargetB a ue4:PackagingTarget ;
+mecha:TargetB a ue4:PackagingTarget ;
     rdfs:label "TargetB" ;
-    ue4:targetWorld gundam:WorldB ;
+    ue4:targetWorld mecha:WorldB ;
     ue4:buildConfiguration ue4:Config_Development ;
     ue4:targetRHIProfile ue4:WebGL2_RHI_Profile ;
     ue4:targetPlatformName "HTML5" .
 
 # A node in World B calling VaRest
-gundam:GraphB a ue4:UEdGraph ;
+mecha:GraphB a ue4:UEdGraph ;
     rdfs:label "GraphB" ;
-    ue4:graphOfWorld gundam:WorldB .
+    ue4:graphOfWorld mecha:WorldB .
 
-gundam:VaRestCallNodeB a ue4:UEdGraphNode ;
+mecha:VaRestCallNodeB a ue4:UEdGraphNode ;
     rdfs:label "VaRestCallNodeB" ;
-    ue4:nodeOf gundam:GraphB ;
+    ue4:nodeOf mecha:GraphB ;
     ue4:callsFunction <https://rocket-craft.io/ontology/ue4/VaRest_Call_Function> .
 EOF
 

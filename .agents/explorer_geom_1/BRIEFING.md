@@ -20,12 +20,12 @@ Investigate Turtle ontologies, SPARQL, templates, and tests to detail a concrete
 
 ## Investigation State
 - **Explored paths**: `ontology/all_merged.ttl`, `generated/mech_assets/reference_fabric_001/graph/`, `generated/mech_assets/reference_fabric_001/queries/`, `generated/mech_assets/reference_fabric_001/templates/usd/`, `pwa-staff/mecha_offline.test.ts`, `pwa-staff/tests-e2e/`
-- **Key findings**: Identified that the wing morphology uses 182-primitive layered swept panels from `generate_ttl_morphology.py`, and the E2E Gundam walkthrough failed on 55px actuated movement delta vs 70px target.
+- **Key findings**: Identified that the wing morphology uses 182-primitive layered swept panels from `generate_ttl_morphology.py`, and the E2E Mecha walkthrough failed on 55px actuated movement delta vs 70px target.
 - **Unexplored areas**: None
 
 ## Key Decisions Made
 - Framed clear math formulas for wing sweep rotation/length gradients and torso core shell hierarchy.
-- Outlined precise resolutions for blake3 ESM import extension problems and Gundam walkthrough displacement threshold failures.
+- Outlined precise resolutions for blake3 ESM import extension problems and Mecha walkthrough displacement threshold failures.
 
 ## Artifact Index
 - /Users/sac/rocket-craft/.agents/sub_orch_implementation_aaa_ue4_mech_pack_001/explorer_geom_1_report.md — Detailed recommendations report

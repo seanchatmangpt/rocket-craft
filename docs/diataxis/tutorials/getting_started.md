@@ -92,7 +92,7 @@ The output will return a structured JSON response under `data` containing the `C
     ],
     "workspace_games": [
       "Infinity Blade 4 MUD (ib4-mud)",
-      "Gundam Nexus (nexus-session)"
+      "Mecha Nexus (nexus-session)"
     ]
   }
 }

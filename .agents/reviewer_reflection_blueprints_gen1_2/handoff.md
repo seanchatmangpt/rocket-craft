@@ -208,19 +208,19 @@ To verify these findings:
 1.  **Orphaned Node Bypass Test:**
     Add an orphaned variable node and connect it to a node in a different graph:
     ```turtle
-    gundam:OrphanedVarNode a ue4:UK2Node_VariableGet ;
+    mecha:OrphanedVarNode a ue4:UK2Node_VariableGet ;
         rdfs:label "OrphanedVarNode" ;
-        ue4:referencedProperty gundam:MyProperty .
-    gundam:OrphanedVarPin a ue4:UEdGraphPin ;
-        ue4:pinOf gundam:OrphanedVarNode ;
+        ue4:referencedProperty mecha:MyProperty .
+    mecha:OrphanedVarPin a ue4:UEdGraphPin ;
+        ue4:pinOf mecha:OrphanedVarNode ;
         ue4:pinDirection ue4:Output ;
         ue4:pinCategory "float" ;
-        ue4:connectedTo gundam:SomeOtherGraphPin .
+        ue4:connectedTo mecha:SomeOtherGraphPin .
     ```
     Verify that this graph passes validation despite violating graph isolation.
 2.  **Output Pin Connection Test:**
     Add an output pin connected to two input pins:
     ```turtle
-    gundam:OutputPin ue4:connectedTo gundam:InputPin1 , gundam:InputPin2 .
+    mecha:OutputPin ue4:connectedTo mecha:InputPin1 , mecha:InputPin2 .
     ```
     Verify that validation fails under `InputPinShape`.

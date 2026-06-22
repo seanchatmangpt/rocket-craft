@@ -1,0 +1,98 @@
+{
+    "artifacts": [
+        {
+            "file": "Agent07_Mecha_Materials.mtlx",
+            "blake3_hash": "6cfa69b72ba0a204865a0ecb4f212f6a3d4a8aa9b8b3c4db0a13ee7d1d038d35"
+        },
+        {
+            "file": "final_mech_asset/ASSET_ReferenceFabric_001.usda",
+            "blake3_hash": "a962e0fa7019b6858b0c6c6ad09c157cab2b59f786c3fdb5bbf2f23a8471f5de"
+        },
+        {
+            "file": "final_mech_asset/M_CyanBlade.mtlx",
+            "blake3_hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc"
+        },
+        {
+            "file": "final_mech_asset/M_DarkFrame.mtlx",
+            "blake3_hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc"
+        },
+        {
+            "file": "final_mech_asset/M_GoldVisor.mtlx",
+            "blake3_hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc"
+        },
+        {
+            "file": "final_mech_asset/M_WhiteArmor.mtlx",
+            "blake3_hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc"
+        },
+        {
+            "file": "final_mech_asset/SM_Arm_Left.usda",
+            "blake3_hash": "d24c694bb4dd6c053d7d4a5f0e60583aedcedc9872f4f2f35accaa3237b29cac"
+        },
+        {
+            "file": "final_mech_asset/SM_Arm_Right.usda",
+            "blake3_hash": "05b5b4f8cd3b485137489c5715362e1f848f91619afd796897fb5e677303d166"
+        },
+        {
+            "file": "final_mech_asset/SM_Blade_Left.usda",
+            "blake3_hash": "763d39fa4a8e4928ffa8d9777a65e93153ef88ca20ef72a7e7f7fcf04ac8125c"
+        },
+        {
+            "file": "final_mech_asset/SM_Blade_Right.usda",
+            "blake3_hash": "f6f2c8f72a4efd84bb9f9870b0dd3bcc245d6ef54fe6be65189f45924b088b3a"
+        },
+        {
+            "file": "final_mech_asset/SM_Head.usda",
+            "blake3_hash": "e0ea78a9e7754257901a8a077155ce49a79b76562b69f276c67d7b1452929985"
+        },
+        {
+            "file": "final_mech_asset/SM_Leg_Left.usda",
+            "blake3_hash": "1b86f4b130047eb5555c6f3545be7487bed69a8157105fc407aad66be5f2914a"
+        },
+        {
+            "file": "final_mech_asset/SM_Leg_Right.usda",
+            "blake3_hash": "a6ebb9a2f11e75b3814ec8557188ae60fcc597ca3f42b73bd45ae73f7f52d1ac"
+        },
+        {
+            "file": "final_mech_asset/SM_Loadout.usda",
+            "blake3_hash": "e38a43c45300b0466c8ae760863104060afc59382607d4e63a5dbaf096fcce69"
+        },
+        {
+            "file": "final_mech_asset/SM_Torso.usda",
+            "blake3_hash": "8e98900382a86bd8db8be9652c0f1d0a56ca9935f02d7c843f438db3eaa88703"
+        },
+        {
+            "file": "final_mech_asset/SM_Wing_Left.usda",
+            "blake3_hash": "f3c6a8480a515d85db9d0003c418df69a408d9ae89f67d8806139467c418c274"
+        },
+        {
+            "file": "final_mech_asset/SM_Wing_Right.usda",
+            "blake3_hash": "4c4618de2ed7e40e609097f7517df55a26011ca36b4b46551c0fa7f42b4059a1"
+        },
+        {
+            "file": "final_mech_asset/textures/T_Mech_Masks.png",
+            "blake3_hash": "5c6dc38bac04e2cfc179bde972b3e8adf08e72c2d996af384b0561a62bec03d8"
+        },
+        {
+            "file": "final_mech_asset/textures/T_Mech_Normal.png",
+            "blake3_hash": "f7ed8c314d749c9aba20c4af40e8361d3e57f0bb72b936d85fd7d4e9ce5c9a12"
+        },
+        {
+            "file": "final_mech_asset/textures/T_Mech_PanelLines.png",
+            "blake3_hash": "ffc5ce7c5662724f1d310a50a6e6f4a533b6b2a69310d37550ac88c202e2ede9"
+        },
+        {
+            "file": "final_mech_asset/textures/T_Mech_Roughness.png",
+            "blake3_hash": "6a0ef0e7fc390b53dee4ee09222df5dae00cb536cafa75c5eca0ce369b9fe7ee"
+        },
+        {
+            "file": "final_mech_asset/textures/T_Mech_Wear.png",
+            "blake3_hash": "1603794a7c9b6684c9e48e009aa72c358f5ee4ffe53aa141eb9e406c9dd6a08a"
+        },
+        {
+            "file": "winter_protocol_prelude_mecha.usda",
+            "blake3_hash": "d835797ff7711af191e33a2581a7c9dd078d74b7036d9a651f58053dd8a1b7bb"
+        }
+    ],
+    "receipt_type": "pre-UE4 hero mech asset package",
+    "status": "ADMITTED"
+}

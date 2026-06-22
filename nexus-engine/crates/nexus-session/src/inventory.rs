@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::player::GundamSeries;
+use crate::player::MechaSeries;
 
 // ────────────────────────────────────────────────────────────────────────────
 // Item domain types
@@ -22,10 +22,10 @@ pub enum ItemType {
     Shield,
     Helmet,
     Ring,
-    GunplaHead,
-    GunplaArm,
-    GunplaLeg,
-    GunplaBackpack,
+    MechKitHead,
+    MechKitArm,
+    MechKitLeg,
+    MechKitBackpack,
     PilotSuit,
 }
 
@@ -43,7 +43,7 @@ pub struct Item {
     pub health_bonus: u32,
     pub value_gold: u32,
     pub is_equipped: bool,
-    pub series: Option<GundamSeries>,
+    pub series: Option<MechaSeries>,
     pub special_ability: Option<String>,
 }
 
@@ -306,7 +306,7 @@ mod tests {
     #[test]
     fn find_by_name_missing_returns_none() {
         let inv = Inventory::<5>::new();
-        assert!(inv.find_by_name("Phantom Gundam").is_none());
+        assert!(inv.find_by_name("Phantom Mecha").is_none());
     }
 
     // ── bonus aggregation ─────────────────────────────────────────────────────

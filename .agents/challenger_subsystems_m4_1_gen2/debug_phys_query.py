@@ -8,7 +8,7 @@ GGEN_BIN = "/Users/sac/.local/bin/ggen"
 shutil.copy(CORE_TTL_PATH, BACKUP_PATH)
 
 extra_ttl = """
-gundam:SimBodyZeroMass a ue4:URigidBody ;
+mecha:SimBodyZeroMass a ue4:URigidBody ;
     rdfs:label "SimBodyZeroMass" ;
     ue4:physicsType ue4:PhysType_Simulated ;
     ue4:massKg 0.0 .

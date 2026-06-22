@@ -22,7 +22,7 @@ Analyze imports, prefix declarations, owl:Ontology block, and map Eden manufactu
 - Updated: not yet
 
 ## Investigation State
-- **Explored paths**: `/Users/sac/rocket-craft/ontology/gundam_nexus.ttl`, `/Users/sac/rocket-craft/.agents/orchestrator/plan.md`
+- **Explored paths**: `/Users/sac/rocket-craft/ontology/mecha_nexus.ttl`, `/Users/sac/rocket-craft/.agents/orchestrator/plan.md`
 - **Key findings**: Constructed ontology imports and prefixes, designed standard semantic mappings for assembly tree, reliability twin, and the 5 delta families, verified syntax with `rdflib`.
 - **Unexplored areas**: None (investigation complete).
 

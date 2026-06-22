@@ -32,7 +32,7 @@
    ```
    We appended the following invalid rigid body definition to `core.ttl`:
    ```turtle
-   gundam:SimBodyZeroMass a ue4:URigidBody ;
+   mecha:SimBodyZeroMass a ue4:URigidBody ;
        rdfs:label "SimBodyZeroMass" ;
        ue4:physicsType ue4:PhysType_Simulated ;
        ue4:massKg 0.0 .
@@ -49,7 +49,7 @@
    Constraint Violation in SPARQLConstraintComponent (http://www.w3.org/ns/shacl#SPARQLConstraintComponent):
        Severity: sh:Violation
        Source Shape: ue4:SimulatedBodyMassShape
-       Focus Node: gundam:SimBodyZeroMass
+       Focus Node: mecha:SimBodyZeroMass
        Message: Simulated rigid bodies (PhysType_Simulated) must have a declared mass greater than 0.0 kg to prevent calculation instability (NaNs).
    ```
 

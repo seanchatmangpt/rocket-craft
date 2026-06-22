@@ -59,18 +59,18 @@ def Xform "SM_Blade_Right"
                 def Cube "beveled_plate_0"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (0.6, 0.2, 1.0 - (0 * 0.15))
-                    double3 xformOp:translate = (0.0, 0 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (0 * 5.0, 0, 0)
+                    double3 xformOp:scale = (0.6, 0.2, 1)
+                    double3 xformOp:translate = (0.0, 0, 0.0)
+                    double3 xformOp:rotateXYZ = (0, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
                 def Capsule "blade_edge_0"
                 {
                     double radius = 0.02
-                    double height = 1.0 - (0 * 0.15)
-                    double3 xformOp:translate = (0.3, 0 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (0 * 5.0, 0, 0)
+                    double height = 1
+                    double3 xformOp:translate = (0.3, 0, 0.0)
+                    double3 xformOp:rotateXYZ = (0, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
@@ -78,18 +78,18 @@ def Xform "SM_Blade_Right"
                 def Cube "beveled_plate_1"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (0.6, 0.2, 1.0 - (1 * 0.15))
-                    double3 xformOp:translate = (0.0, 1 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (1 * 5.0, 0, 0)
+                    double3 xformOp:scale = (0.6, 0.2, 0.85)
+                    double3 xformOp:translate = (0.0, 0.05, 0.0)
+                    double3 xformOp:rotateXYZ = (5, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
                 def Capsule "blade_edge_1"
                 {
                     double radius = 0.02
-                    double height = 1.0 - (1 * 0.15)
-                    double3 xformOp:translate = (0.3, 1 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (1 * 5.0, 0, 0)
+                    double height = 0.85
+                    double3 xformOp:translate = (0.3, 0.05, 0.0)
+                    double3 xformOp:rotateXYZ = (5, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
@@ -97,18 +97,18 @@ def Xform "SM_Blade_Right"
                 def Cube "beveled_plate_2"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (0.6, 0.2, 1.0 - (2 * 0.15))
-                    double3 xformOp:translate = (0.0, 2 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (2 * 5.0, 0, 0)
+                    double3 xformOp:scale = (0.6, 0.2, 0.7)
+                    double3 xformOp:translate = (0.0, 0.1, 0.0)
+                    double3 xformOp:rotateXYZ = (10, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
                 def Capsule "blade_edge_2"
                 {
                     double radius = 0.02
-                    double height = 1.0 - (2 * 0.15)
-                    double3 xformOp:translate = (0.3, 2 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (2 * 5.0, 0, 0)
+                    double height = 0.7
+                    double3 xformOp:translate = (0.3, 0.1, 0.0)
+                    double3 xformOp:rotateXYZ = (10, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
@@ -116,18 +116,18 @@ def Xform "SM_Blade_Right"
                 def Cube "beveled_plate_3"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (0.6, 0.2, 1.0 - (3 * 0.15))
-                    double3 xformOp:translate = (0.0, 3 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (3 * 5.0, 0, 0)
+                    double3 xformOp:scale = (0.6, 0.2, 0.55)
+                    double3 xformOp:translate = (0.0, 0.15000000000000002, 0.0)
+                    double3 xformOp:rotateXYZ = (15, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
                 def Capsule "blade_edge_3"
                 {
                     double radius = 0.02
-                    double height = 1.0 - (3 * 0.15)
-                    double3 xformOp:translate = (0.3, 3 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (3 * 5.0, 0, 0)
+                    double height = 0.55
+                    double3 xformOp:translate = (0.3, 0.15000000000000002, 0.0)
+                    double3 xformOp:rotateXYZ = (15, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
@@ -135,18 +135,18 @@ def Xform "SM_Blade_Right"
                 def Cube "beveled_plate_4"
                 {
                     double size = 1.0
-                    double3 xformOp:scale = (0.6, 0.2, 1.0 - (4 * 0.15))
-                    double3 xformOp:translate = (0.0, 4 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (4 * 5.0, 0, 0)
+                    double3 xformOp:scale = (0.6, 0.2, 0.4)
+                    double3 xformOp:translate = (0.0, 0.2, 0.0)
+                    double3 xformOp:rotateXYZ = (20, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }
                 def Capsule "blade_edge_4"
                 {
                     double radius = 0.02
-                    double height = 1.0 - (4 * 0.15)
-                    double3 xformOp:translate = (0.3, 4 * 0.05, 0.0)
-                    double3 xformOp:rotateXYZ = (4 * 5.0, 0, 0)
+                    double height = 0.4
+                    double3 xformOp:translate = (0.3, 0.2, 0.0)
+                    double3 xformOp:rotateXYZ = (20, 0, 0)
                     uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
                     rel material:binding = </ASSET_ReferenceFabric_001/Materials/M_CyanBlade>
                 }

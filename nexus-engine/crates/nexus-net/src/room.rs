@@ -281,6 +281,9 @@ impl GameRoom {
             player2_combo: self.player2.combo_depth,
             turn_number: self.turn_number,
             is_player1_turn: self.is_player1_turn,
+            turret_yaw: 0,
+            turret_pitch: 0,
+            tread_rpm: 0,
         }
     }
 }

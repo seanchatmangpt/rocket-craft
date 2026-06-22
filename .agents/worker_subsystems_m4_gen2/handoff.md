@@ -7,7 +7,7 @@ We observed the following state and behavior in the workspace:
   Custom validation rules:     FAIL (error[GGEN-VALIDATION]: 1 custom validation rule(s) failed (Error severity):
     - query-execution-error: Failed to execute rule RuleNetComponentReplicationOwner: SPARQL query execution failed: Query execution failed for rule RuleNetComponentReplicationOwner: SPARQL parse error: error at 4:33: expected one of Prefix not found
   ```
-- **RuleM Over-Generalization**: When executing baseline validation in the test directory, rule `RuleM` failed because it matched non-rendering subsystems (`gundam:GundamNetworkingHandler` and `gundam:GundamPhysicsHandler`):
+- **RuleM Over-Generalization**: When executing baseline validation in the test directory, rule `RuleM` failed because it matched non-rendering subsystems (`mecha:MechaNetworkingHandler` and `mecha:MechaPhysicsHandler`):
   ```
   Custom validation rules:     FAIL (error[GGEN-VALIDATION]: 1 custom validation rule(s) failed (Error severity):
     - RuleM: WASM WebGL compliance defect: A rendering subsystem operating under a WASM / HTML5 target world must support WebGL 2.0 (OpenGL ES3) or WebGL 1.0.
@@ -18,7 +18,7 @@ We observed the following state and behavior in the workspace:
   Expected error pattern: non-negative integer
   Exit Code: 0
   ```
-- **Successful Validation**: After correcting the prefix, refining `RuleM` to filter on subclasses of `URenderingSubsystem`, adding a SPARQL-based fallback to the parameter index shape, and linking the required subsystems to `GundamWorld` in `core.ttl`, the validation command and test runner completed successfully:
+- **Successful Validation**: After correcting the prefix, refining `RuleM` to filter on subclasses of `URenderingSubsystem`, adding a SPARQL-based fallback to the parameter index shape, and linking the required subsystems to `MechaWorld` in `core.ttl`, the validation command and test runner completed successfully:
   ```
   All validations passed.
   ...

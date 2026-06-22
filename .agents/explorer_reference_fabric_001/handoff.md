@@ -100,12 +100,12 @@ Below are the exact commands executed and the direct output observed from the en
 * **USD Files found in repository**:
   - `pipeline_demo/ASSET_SnowWhite_Prelude.usda`
   - `pipeline_demo/SM_TestArmorPanel.usda`
-  - `snow_white_prelude_mecha.usda`
+  - `winter_protocol_prelude_mecha.usda`
 * **Active render scripts in codebase**:
   - None targeting `usdrecord`.
   - `asset-pipeline/scripts/blender_convert.py` exists but targets OBJ/FBX/STL conversions using Blender background API (not functional without a local Blender executable).
 * **USD Rendering Verification Command**:
-  - Command: `usdrecord snow_white_prelude_mecha.usda test_output.png`
+  - Command: `usdrecord winter_protocol_prelude_mecha.usda test_output.png`
   - Output:
     ```
     Recording time code: EARLIEST
@@ -140,4 +140,4 @@ Below are the exact commands executed and the direct output observed from the en
 ## 5. Verification Method
 1. **Reference Image**: Run `shasum -a 256 "/Users/sac/Documents/Papers/61gOtV1wnAL._AC_SL1200_.jpg"` to verify its integrity.
 2. **`ggen` Path**: Run `which ggen` to ensure it resolves to `/Users/sac/.local/bin/ggen`.
-3. **Headless Render**: Run `usdrecord snow_white_prelude_mecha.usda validation_render.png` from `/Users/sac/rocket-craft` to confirm native USD rendering completes successfully.
+3. **Headless Render**: Run `usdrecord winter_protocol_prelude_mecha.usda validation_render.png` from `/Users/sac/rocket-craft` to confirm native USD rendering completes successfully.

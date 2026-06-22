@@ -1,0 +1,22 @@
+shader M_WhiteArmor_procedural(
+    point Po = P,
+    float scale = 50.0,
+    output color BaseColor = color(1.0, 1.0, 1.0),
+    output float Roughness = 0.2,
+    output float Metallic = 0.8,
+    output normal NormalOut = N
+) {
+    // Micro-scratches and ceramic/metal wear noise
+    float n1 = noise("simplex", Po * scale);
+    float scratch = noise("cell", Po * scale * 5.0);
+    
+    // Slight variation in base color for realism
+    BaseColor = mix(color(0.95, 0.95, 0.95), color(1.0, 1.0, 1.0), n1);
+    
+    // Roughness increases in scratches
+    Roughness = 0.2 + scratch * 0.15;
+    
+    // Perturb normals slightly for imperfections
+    vector displacement = N * (n1 * 0.01 + scratch * 0.005);
+    NormalOut = calculatenormal(P + displacement);
+}

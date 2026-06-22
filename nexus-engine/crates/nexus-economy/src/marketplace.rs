@@ -212,7 +212,7 @@ mod tests {
     fn buy_marks_listing_as_inactive() {
         let mut mp = Marketplace::new();
         let id = mp
-            .list_item(1, "Z Gundam".into(), "SSR".into(), 100)
+            .list_item(1, "Z Mecha".into(), "SSR".into(), 100)
             .unwrap();
         let mut ledger = funded_ledger(2, 500);
         mp.buy(id, 2, &mut ledger).unwrap();

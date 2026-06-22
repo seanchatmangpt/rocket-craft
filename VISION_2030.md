@@ -15,7 +15,7 @@ Rocket Craft is an open-source AAA gaming ecosystem architected around battle-te
 
 - **Six fully-shipped AAA titles** (ShooterGame, SurvivalGame, Brm, InfinityBlade4, RealisticRendering, FullSpectrum) operate independently yet share core infrastructure
 - **Semantic web orchestration** (unify-mcp, unify-rdf, LSP) becomes the lingua franca of AAA game development
-- **Type-safe combinatorial mechanics** (nexus-engine typestate patterns, Gundam duel mechanics) unlock novel, competition-grade gameplay systems
+- **Type-safe combinatorial mechanics** (nexus-engine typestate patterns, Mecha duel mechanics) unlock novel, competition-grade gameplay systems
 - **Global developer ecosystem** with RFC governance, plugin marketplaces, and contributor revenue sharing
 - **Production-grade security, QA, and DevOps** supporting 10M+ concurrent players across Web, console, mobile, and desktop platforms
 
@@ -125,9 +125,9 @@ By 2030, the BDD-driven **combinatorial-engine** and **unify-automl** abstractio
 
 ### 3.2 Vision 2030: Six AAA Titles + Ecosystem
 
-#### 3.2.1 ShooterGame — Gundam Nexus (Competitive PvP Arena)
+#### 3.2.1 ShooterGame — Mecha Nexus (Competitive PvP Arena)
 
-**Identity:** Free-to-play, skill-based 5v5 tactical shooter with Gundam-inspired mecha combat.
+**Identity:** Free-to-play, skill-based 5v5 tactical shooter with Mecha-inspired mecha combat.
 
 **2030 Targets:**
 - 3M DAU globally
@@ -147,7 +147,7 @@ By 2030, the BDD-driven **combinatorial-engine** and **unify-automl** abstractio
 - Seasonal content (dungeons, bosses) shipped every 6 weeks
 - Community-created dungeons (UGC, revenue sharing)
 - Full cross-platform progression (Web ↔ Mobile ↔ Desktop)
-- AI Director system (Gundam nexus-ai, permutation-based difficulty scaling)
+- AI Director system (Mecha nexus-ai, permutation-based difficulty scaling)
 
 **Technical Focus:** Procedural dungeon generation via blueprint-rs + asset-pipeline; permutation testing for balance.
 
@@ -259,7 +259,7 @@ By 2030, Rocket Craft will operate as a **public benefit corporation** (or simil
 
 ## 5. Research Agenda
 
-### 5.1 Gundam Combinatorial Mechanics (nexus-engine)
+### 5.1 Mecha Combinatorial Mechanics (nexus-engine)
 
 **Research Question:** Can we formalize the combinatorics of fighting-game mechanics to unlock novel, competition-grade gameplay?
 
@@ -640,7 +640,7 @@ A web-based marketplace (powered by pwa-staff PWA):
 | Risk | Probability | Impact | Mitigation |
 |------|---|---|---|
 | **Player monetization resistance** | Medium | High | Cosmetics-only model; no P2W mechanics; transparent pricing |
-| **Competitor IP pressure** (e.g., Bandai Namco on Gundam terms) | Medium | High | Diversify away from single IP; "generic" Gundam-inspired mechanics |
+| **Competitor IP pressure** (e.g., Bandai Namco on Mecha terms) | Medium | High | Diversify away from single IP; "generic" Mecha-inspired mechanics |
 | **Creator revenue sustainability** | Medium | Medium | Revenue share guarantees; bounty pool funded from licensing |
 
 ### 10.3 Governance Risks

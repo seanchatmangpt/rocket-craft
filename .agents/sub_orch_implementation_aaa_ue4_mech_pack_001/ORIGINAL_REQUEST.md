@@ -101,7 +101,7 @@ Your mission is to implement the parallel generation swarms and source law for t
 **Context**: Enforcing Modular Identity Andon Hold (SPR_MODULAR_IDENTITY.md).
 **Content**: We have received another operational instruction to maintain the Andon Hold and patch the geometry generation code:
 1. Maintain the Andon Hold. Do NOT launch the 100-seed DOE batch yet.
-2. In your geometry generation swarms, patch `nexus-gundam/src/mech_primitives.rs` and the USD emission path to ensure:
+2. In your geometry generation swarms, patch `nexus-mecha/src/mech_primitives.rs` and the USD emission path to ensure:
    - Every part file is strictly `owner_part_id` scoped.
    - Socket declarations contain NO mesh payloads.
    - Assembly/root references are strictly forbidden inside part-local files.
@@ -109,4 +109,4 @@ Your mission is to implement the parallel generation swarms and source law for t
 4. Emit the required smoke reports, including `MODULAR_IDENTITY_SMOKE_REPORT.json`.
 5. Prove that the 5 required negative fixtures (including `torso_contains_foreign_parts` and `socket_contains_mesh_payload`) are halted at the Chassis station with `REFUSE_MODULAR_USD` and do not consume downstream verification cycles.
 6. When the 3-seed smoke batch passes and all negative fixtures are rejected, you are cleared to release the 100-seed DOE.
-**Action**: Implement the `nexus-gundam/src/mech_primitives.rs` patch, run the smoke batch, verify the negative fixtures are rejected at the Chassis station, emit the reports, and only then proceed to the 100-seed DOE batch.
+**Action**: Implement the `nexus-mecha/src/mech_primitives.rs` patch, run the smoke batch, verify the negative fixtures are rejected at the Chassis station, emit the reports, and only then proceed to the 100-seed DOE batch.

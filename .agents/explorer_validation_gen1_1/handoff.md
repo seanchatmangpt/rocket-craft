@@ -72,9 +72,9 @@ We examined the validation ontology, graph files, and test suites. Direct quotes
           sh:message "A character must have exactly one cooking state of type CookingTypestate." ;
       ] .
   ```
-  And in `/Users/sac/rocket-craft/ggen-validation-tests/gundam_character.ttl` (lines 17-20):
+  And in `/Users/sac/rocket-craft/ggen-validation-tests/mecha_character.ttl` (lines 17-20):
   ```turtle
-  gundam:AGundamCharacter a owl:Class ;
+  mecha:AMechaCharacter a owl:Class ;
       rdfs:subClassOf ue4:ACharacter ;
   ```
 
@@ -107,7 +107,7 @@ We examined the validation ontology, graph files, and test suites. Direct quotes
 ## 2. Logic Chain
 1. **Inverse Property (Observation 1)**: Simple SPARQL engines (like the one in `ggen`) do not perform RDFS/OWL reasoning out-of-the-box. If the instance graph defines parameter structures using `ue4:parameterOf` (as standard in `UFunctionParameterShape`), the triple `?func ue4:hasParameter ?param` will be absent. Consequently, RuleC will always find that the parameter does not belong to the function, producing 100% false positives.
 2. **Symmetry (Observation 2)**: `ue4:connectedTo` is declared symmetric, but if symmetric reasoning is not active in the SPARQL evaluator, a unidirectional triple like `pin_float ue4:connectedTo pin_exec` will fail the matching pattern. Because the check only validates when the subject is the execution pin, this mismatch will be silently admitted.
-3. **Subclass Blindness (Observation 3)**: Standard SHACL engines targeting classes via `sh:targetClass` do not automatically evaluate subclass hierarchies. Since `gundam:AGundamCharacter` is a subclass of `ue4:ACharacter`, instances of custom character models (such as `gundam:MyGundam`) will bypass `ue4:CharacterCookingStateShape` validation entirely in SHACL.
+3. **Subclass Blindness (Observation 3)**: Standard SHACL engines targeting classes via `sh:targetClass` do not automatically evaluate subclass hierarchies. Since `mecha:AMechaCharacter` is a subclass of `ue4:ACharacter`, instances of custom character models (such as `mecha:MyMecha`) will bypass `ue4:CharacterCookingStateShape` validation entirely in SHACL.
 4. **Namespace Discrepancy (Observation 4)**: The SHACL shape enforces that URIs must start with `http://` or `https://`. The SPARQL rule only blocks `urn:`. This means relative or other opaque schemes (e.g., `uuid:`) will cause inconsistencies, failing SHACL while passing SPARQL.
 
 ---

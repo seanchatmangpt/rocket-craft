@@ -3,7 +3,7 @@
     defaultPrim = "SnowWhitePrelude"
     metersPerUnit = 1.0
     upAxis = "Y"
-    doc = "Structural USDA representation for the Snow White Prelude mecha, metric scale (meters)."
+    doc = "Structural USDA representation for the WinterProtocol Prelude mecha, metric scale (meters)."
 )
 
 def Xform "SnowWhitePrelude" (

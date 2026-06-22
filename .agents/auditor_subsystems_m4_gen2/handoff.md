@@ -20,15 +20,15 @@ We observed the following outcomes during the audit:
   PASS: SHACL Parameter Index check (minInclusive 0) (Validation failed with expected error: 'non-negative integer')
   ALL CODES AND CONSTRAINTS SUCCESSFULLY VERIFIED!
   ```
-- File `/Users/sac/rocket-craft/ggen-validation-tests/core_temp.ttl` originally lacked the definitions and links for physics and networking subsystems (`gundam:GundamPhysicsHandler`), causing rule checks (specifically `RuleNetWorldSubsystemTopology`) to fail baseline verification during test case 16.
-- Editing `core_temp.ttl` to properly declare `gundam:GundamPhysicsHandler` and link it along with `gundam:GundamNetworkingHandler` to `gundam:GundamWorld` via `ue4:hasSubsystem` resolved this test fixture mismatch and allowed the complete test suite to execute successfully (exiting with code 0).
+- File `/Users/sac/rocket-craft/ggen-validation-tests/core_temp.ttl` originally lacked the definitions and links for physics and networking subsystems (`mecha:MechaPhysicsHandler`), causing rule checks (specifically `RuleNetWorldSubsystemTopology`) to fail baseline verification during test case 16.
+- Editing `core_temp.ttl` to properly declare `mecha:MechaPhysicsHandler` and link it along with `mecha:MechaNetworkingHandler` to `mecha:MechaWorld` via `ue4:hasSubsystem` resolved this test fixture mismatch and allowed the complete test suite to execute successfully (exiting with code 0).
 
 ---
 
 ## 2. Logic Chain
 1. **Observation 1 (Ontology validation)**: Running `validate_ontology.sh` completes successfully. This proves the merged ontology files `subsystems.ttl`, `validation.shacl.ttl`, and `ggen.toml` are syntactically and semantically valid under the active target pack.
 2. **Observation 2 (Test suite failure under un-linked fixtures)**: Running `verify_all_rules.sh` initially failed at test case 16 because `core_temp.ttl` did not declare or link the subsystems required by rule `RuleNetWorldSubsystemTopology`.
-3. **Observation 3 (Fixture correction)**: Injecting the physics subsystem definition and linking both handlers to `GundamWorld` in `core_temp.ttl` satisfies the replication-aware networking topology constraint.
+3. **Observation 3 (Fixture correction)**: Injecting the physics subsystem definition and linking both handlers to `MechaWorld` in `core_temp.ttl` satisfies the replication-aware networking topology constraint.
 4. **Observation 4 (All tests passing)**: Subsequent execution of `verify_all_rules.sh` passes 100% of the 16 checks. This proves that all custom validation rules and SHACL shapes correctly identify violations under deliberate invalidation scenarios.
 5. **Observation 5 (No integrity violations)**: Static analysis of `subsystems.ttl`, `validation.shacl.ttl`, and `ggen.toml` confirms that the constraints are genuine, prefix-complete, and free of bypasses, hardcoding, or dummy facades.
 

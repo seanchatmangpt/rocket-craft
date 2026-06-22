@@ -25,3 +25,40 @@ Specifically:
 3. Find the generator parameter sources (SPARQL query, Tera template, or Rust parameter row) that generated `reference_fabric_001`. Where do they reside in `/Users/sac/rocket-craft`? What are the file paths? How does the generated USDA file reference or map back to these source generator files?
 4. Document all your findings, and provide a clear recommendation on how to map diagnostics and generate Code Actions pointing to the source generator files.
 5. Write your report to `/Users/sac/rocket-craft/.agents/explorer_m1/handoff.md` and send a message back to the orchestrator summarizing your findings and linking to your report.
+
+## 2026-06-20T20:32:58Z
+Explore the workspace to identify the state of the asset manufacturing pipeline for PRE_UE4_HERO_ASSET_ADMISSION.
+Specifically:
+1. Examine how USD parts (SM_Torso, SM_Head, SM_WingArray_Left, etc.) are currently defined and compiled. Inspect ggen.toml and query definitions.
+2. Examine scripts/verify_asset.sh, scripts/vision_powl_executor.py, scripts/admit_vision_loop.py, and how VisionSnapLoop.powl is run and checked.
+3. Examine the crates/rocket_preue4_verifier source code to understand how it performs pre-UE4 verification and reports on errors.
+4. Locate the existing diagnostics/reports and check if any visual gap reports, modularity checks, or delete-and-resync replay proof scripts already exist.
+5. Identify why generated USD parts share duplicate/identical geometry or contain foreign parts, and what needs to be changed to fix it.
+
+Write your findings and evidence chain in `/Users/sac/rocket-craft/.agents/explorer_m1/handoff.md`.
+Maintain progress in `/Users/sac/rocket-craft/.agents/explorer_m1/progress.md` and keep it updated.
+Do not modify any source code files.
+
+## 2026-06-22T05:27:25Z
+You are the Ecosystem Cataloger (role: explorer).
+Your working directory is `/Users/sac/rocket-craft/.agents/explorer_m1`.
+Your parent conversation ID is `30eea61c-a259-48ef-85ca-8bca6c94e767`.
+
+Your mission is to perform a detailed cataloging and analysis of the Rust libraries and templates in:
+1. `/Users/sac/rocket-craft`
+2. `/Users/sac/lsp-max`
+3. `/Users/sac/praxis`
+
+Identify and document architectural patterns, abstractions, and components:
+- Generative Typestates (how phantom types, zero-sized types, state transition limits are enforced at compile time).
+- `RulePackServer` structures (traits, servers, data types, message layouts, or network hooks).
+- `ggen` µ-pipeline stages (loading, construct, extract, template lowerings, validations, receipts).
+
+Write your findings to `/Users/sac/rocket-craft/.agents/explorer_m1/catalog_report.md`. This report must contain:
+1. Executive Summary: What patterns exist and how they are used.
+2. Rust Libraries Catalog: Table or list of relevant crates, modules, and their purpose.
+3. Code Abstractions: Concrete Rust definitions and traits for typestates, RulePackServer, and ggen.
+4. Praxis Integration Plan: Where and how in `~/praxis` (specifically `~/praxis/template`) these patterns should be injected (e.g. templates, macros, generated modules).
+
+When you are done, write `handoff.md` and send a message back to the parent conversation ID (`30eea61c-a259-48ef-85ca-8bca6c94e767`) with the path to your report.
+

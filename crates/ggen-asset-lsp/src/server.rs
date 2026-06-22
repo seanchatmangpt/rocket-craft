@@ -35,13 +35,14 @@ impl GgenAssetLspServer {
             None => return,
         };
 
-        // Scan the asset_root for all `.usda` files
+        // Scan the asset_root for all `.usda` and `.mtlx` files
         for entry in walkdir::WalkDir::new(&asset_root)
             .into_iter()
             .filter_map(|e| e.ok())
         {
             let path = entry.path();
-            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("usda") {
+            let ext = path.extension().and_then(|s| s.to_str());
+            if path.is_file() && (ext == Some("usda") || ext == Some("mtlx")) {
                 let is_current = path == doc_path;
                 let content = if is_current {
                     if let Some(text) = current_content {

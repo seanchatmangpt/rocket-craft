@@ -1,0 +1,10 @@
+{
+  "quarantined_artifacts": [
+    {
+      "path": "evidence/quarantine/python_morphology_violation/patch_geometry_generator.py",
+      "blake3_hash": "10e8c8c391ec18ba3d41578487729187904701d12452ab899c77f217475c5862",
+      "quarantine_reason": "PYTHON_CONTROL_SURFACE_PURITY violation (hardcoded coordinates and mesh subdivisions in script)",
+      "timestamp": "2026-06-21T00:24:48Z"
+    }
+  ]
+}

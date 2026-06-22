@@ -1,0 +1,26 @@
+shader M_GoldVisor_procedural(
+    point Po = P,
+    float scale = 20.0,
+    output color BaseColor = color(1.0, 0.8431, 0.0),
+    output float Roughness = 0.1,
+    output float Metallic = 1.0,
+    output float Emissive = 0.5,
+    output normal NormalOut = N
+) {
+    // Hexagonal or grid-like subtle visor noise
+    float hex = noise("cell", Po * scale);
+    float dust = noise("perlin", Po * scale * 5.0);
+    
+    // Base Color based on subtle hex interference pattern
+    BaseColor = mix(color(0.9, 0.75, 0.0), color(1.0, 0.9, 0.2), hex);
+    
+    // Emissive glow from beneath the visor
+    Emissive = 0.5 + hex * 0.2;
+    
+    // Very smooth reflective visor, slightly dusty
+    Roughness = 0.05 + dust * 0.1;
+    
+    // Normal is mostly smooth, minor hex bump
+    vector displacement = N * (hex * 0.001);
+    NormalOut = calculatenormal(P + displacement);
+}

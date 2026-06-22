@@ -3,7 +3,7 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
-@prefix gundam: <https://rocket-craft.io/ontology/ue4/gundam#> .
+@prefix mecha: <https://rocket-craft.io/ontology/ue4/mecha#> .
 
 <https://rocket-craft.io/ontology/ue4/>
     a owl:Ontology ;
@@ -134,21 +134,21 @@ ue4:bHidden a owl:DatatypeProperty ;
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
-@prefix gundam: <https://rocket-craft.io/ontology/ue4/gundam#> .
+@prefix mecha: <https://rocket-craft.io/ontology/ue4/mecha#> .
 
-<https://rocket-craft.io/ontology/ue4/gundam#>
+<https://rocket-craft.io/ontology/ue4/mecha#>
     a owl:Ontology ;
-    rdfs:label "Gundam Player Character Scenario Ontology" ;
-    rdfs:comment "Ontology defining the Gundam player character scenario and graph connections." .
+    rdfs:label "Mecha Player Character Scenario Ontology" ;
+    rdfs:comment "Ontology defining the Mecha player character scenario and graph connections." .
 
 # =========================================================================
-# Gundam Classes & Component Classes
+# Mecha Classes & Component Classes
 # =========================================================================
 
-gundam:AGundamCharacter a owl:Class ;
+mecha:AMechaCharacter a owl:Class ;
     rdfs:subClassOf ue4:ACharacter ;
-    rdfs:label "AGundamCharacter" ;
-    rdfs:comment "A specialized character subclass representing a Gundam mobile suit." .
+    rdfs:label "AMechaCharacter" ;
+    rdfs:comment "A specialized character subclass representing a Mecha mobile suit." .
 
 ue4:USkeletalMeshComponent a owl:Class ;
     rdfs:subClassOf ue4:USceneComponent ;
@@ -161,45 +161,45 @@ ue4:UBoxComponent a owl:Class ;
     rdfs:comment "Box collision physics component." .
 
 # =========================================================================
-# Gundam Character & Components Instances
+# Mecha Character & Components Instances
 # =========================================================================
 
-gundam:MyGundam a gundam:AGundamCharacter ;
-    rdfs:label "MyGundam" ;
-    rdfs:comment "The primary Gundam player character instance." ;
-    ue4:hasComponent gundam:GundamMesh ;
-    ue4:hasComponent gundam:GundamCollision ;
-    ue4:hasGraph gundam:GundamInputGraph ;
+mecha:MyMecha a mecha:AMechaCharacter ;
+    rdfs:label "MyMecha" ;
+    rdfs:comment "The primary Mecha player character instance." ;
+    ue4:hasComponent mecha:MechaMesh ;
+    ue4:hasComponent mecha:MechaCollision ;
+    ue4:hasGraph mecha:MechaInputGraph ;
     ue4:bReplicates true ;
-    ue4:hasCookingState gundam:Cooked .
+    ue4:hasCookingState mecha:Cooked .
 
-gundam:GundamMesh a ue4:USkeletalMeshComponent ;
-    rdfs:label "GundamMesh" ;
-    rdfs:comment "Skeletal mesh rendering component for the Gundam." ;
-    ue4:owner gundam:MyGundam .
+mecha:MechaMesh a ue4:USkeletalMeshComponent ;
+    rdfs:label "MechaMesh" ;
+    rdfs:comment "Skeletal mesh rendering component for the Mecha." ;
+    ue4:owner mecha:MyMecha .
 
-gundam:GundamCollision a ue4:UBoxComponent ;
-    rdfs:label "GundamCollision" ;
+mecha:MechaCollision a ue4:UBoxComponent ;
+    rdfs:label "MechaCollision" ;
     rdfs:comment "Collision bounding box for physical interaction." ;
-    ue4:owner gundam:MyGundam .
+    ue4:owner mecha:MyMecha .
 
 # =========================================================================
 # Subsystem Handler
 # =========================================================================
 
-gundam:GundamNetworkingHandler a ue4:UNetworkingSubsystem ;
-    rdfs:label "GundamNetworkingHandler" ;
+mecha:MechaNetworkingHandler a ue4:UNetworkingSubsystem ;
+    rdfs:label "MechaNetworkingHandler" ;
     rdfs:comment "Networking subsystem handler for character replication." .
 
 # =========================================================================
 # Typestates
 # =========================================================================
 
-gundam:Cooked a ue4:CookingTypestate ;
+mecha:Cooked a ue4:CookingTypestate ;
     rdfs:label "Cooked" ;
     rdfs:comment "Asset cooking state: Cooked." .
 
-gundam:WasmReady a ue4:WasmPackagingTypestate ;
+mecha:WasmReady a ue4:WasmPackagingTypestate ;
     rdfs:label "WasmReady" ;
     rdfs:comment "Wasm packaging state: WasmReady." .
 
@@ -207,17 +207,17 @@ gundam:WasmReady a ue4:WasmPackagingTypestate ;
 # World & Level Configuration
 # =========================================================================
 
-gundam:GundamWorld a ue4:UWorld ;
-    rdfs:label "GundamWorld" ;
+mecha:MechaWorld a ue4:UWorld ;
+    rdfs:label "MechaWorld" ;
     rdfs:comment "Persistent world container." ;
-    ue4:hasLevel gundam:GundamLevel ;
-    ue4:hasPackagingState gundam:WasmReady .
+    ue4:hasLevel mecha:MechaLevel ;
+    ue4:hasPackagingState mecha:WasmReady .
 
-gundam:GundamLevel a ue4:ULevel ;
-    rdfs:label "GundamLevel" ;
-    rdfs:comment "Persistent level containing the Gundam character." ;
-    ue4:hasActor gundam:MyGundam ;
-    ue4:isLevelOf gundam:GundamWorld .
+mecha:MechaLevel a ue4:ULevel ;
+    rdfs:label "MechaLevel" ;
+    rdfs:comment "Persistent level containing the Mecha character." ;
+    ue4:hasActor mecha:MyMecha ;
+    ue4:isLevelOf mecha:MechaWorld .
 
 # =========================================================================
 # C++ Reflection: Function Definitions
@@ -247,67 +247,67 @@ ue4:ScaleValueParam a ue4:UFunctionParameter ;
 # Blueprint Graph & Node Network
 # =========================================================================
 
-gundam:GundamInputGraph a ue4:UEdGraph ;
-    rdfs:label "GundamInputGraph" ;
-    rdfs:comment "Blueprint graph handling input events for the Gundam character." ;
-    ue4:hasNode gundam:W_KeyPressedNode ;
-    ue4:hasNode gundam:MoveForwardCallNode .
+mecha:MechaInputGraph a ue4:UEdGraph ;
+    rdfs:label "MechaInputGraph" ;
+    rdfs:comment "Blueprint graph handling input events for the Mecha character." ;
+    ue4:hasNode mecha:W_KeyPressedNode ;
+    ue4:hasNode mecha:MoveForwardCallNode .
 
-gundam:W_KeyPressedNode a ue4:UK2Node_InputKeyEvent ;
+mecha:W_KeyPressedNode a ue4:UK2Node_InputKeyEvent ;
     rdfs:label "W_KeyPressedNode" ;
     rdfs:comment "Keyboard input event for W key." ;
-    ue4:nodeOf gundam:GundamInputGraph ;
-    ue4:hasPin gundam:W_KeyPressedPinOut .
+    ue4:nodeOf mecha:MechaInputGraph ;
+    ue4:hasPin mecha:W_KeyPressedPinOut .
 
-gundam:MoveForwardCallNode a ue4:UK2Node_CallFunction ;
+mecha:MoveForwardCallNode a ue4:UK2Node_CallFunction ;
     rdfs:label "MoveForwardCallNode" ;
     rdfs:comment "Function call node invoking AddMovementInput." ;
-    ue4:nodeOf gundam:GundamInputGraph ;
+    ue4:nodeOf mecha:MechaInputGraph ;
     ue4:callsFunction ue4:AddMovementInput ;
-    ue4:hasPin gundam:MoveForwardPinIn ;
-    ue4:hasPin gundam:MoveForwardDirPin ;
-    ue4:hasPin gundam:MoveForwardScalePin .
+    ue4:hasPin mecha:MoveForwardPinIn ;
+    ue4:hasPin mecha:MoveForwardDirPin ;
+    ue4:hasPin mecha:MoveForwardScalePin .
 
 # Pins for Key Pressed Node
-gundam:W_KeyPressedPinOut a ue4:UEdGraphPin ;
+mecha:W_KeyPressedPinOut a ue4:UEdGraphPin ;
     rdfs:label "W_KeyPressedPinOut" ;
     rdfs:comment "Pressed execution flow output." ;
-    ue4:pinOf gundam:W_KeyPressedNode ;
+    ue4:pinOf mecha:W_KeyPressedNode ;
     ue4:pinDirection ue4:Output ;
     ue4:pinCategory "exec" ;
-    ue4:connectedTo gundam:MoveForwardPinIn .
+    ue4:connectedTo mecha:MoveForwardPinIn .
 
 # Pins for AddMovementInput Call Node
-gundam:MoveForwardPinIn a ue4:UEdGraphPin ;
+mecha:MoveForwardPinIn a ue4:UEdGraphPin ;
     rdfs:label "MoveForwardPinIn" ;
     rdfs:comment "Input execution pin to execute function." ;
-    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinOf mecha:MoveForwardCallNode ;
     ue4:pinDirection ue4:Input ;
     ue4:pinCategory "exec" ;
-    ue4:connectedTo gundam:W_KeyPressedPinOut .
+    ue4:connectedTo mecha:W_KeyPressedPinOut .
 
-gundam:MoveForwardDirPin a ue4:UEdGraphPin ;
+mecha:MoveForwardDirPin a ue4:UEdGraphPin ;
     rdfs:label "MoveForwardDirPin" ;
     rdfs:comment "Input data pin for world direction." ;
-    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinOf mecha:MoveForwardCallNode ;
     ue4:pinDirection ue4:Input ;
     ue4:pinCategory "struct" ;
     ue4:mapsToParameter ue4:WorldDirectionParam .
 
-gundam:MoveForwardScalePin a ue4:UEdGraphPin ;
+mecha:MoveForwardScalePin a ue4:UEdGraphPin ;
     rdfs:label "MoveForwardScalePin" ;
     rdfs:comment "Input data pin for scale value." ;
-    ue4:pinOf gundam:MoveForwardCallNode ;
+    ue4:pinOf mecha:MoveForwardCallNode ;
     ue4:pinDirection ue4:Input ;
     ue4:pinCategory "float" ;
     ue4:mapsToParameter ue4:ScaleValueParam .
 
-gundam:MyCollisionComponent a ue4:UBoxComponent ;
+mecha:MyCollisionComponent a ue4:UBoxComponent ;
     rdfs:label "MyCollisionComponent" ;
-    ue4:hasRigidBody gundam:MyRigidBody ;
+    ue4:hasRigidBody mecha:MyRigidBody ;
     ue4:collisionEnabled ue4:NoCollision .
 
-gundam:MyRigidBody a ue4:URigidBody ;
+mecha:MyRigidBody a ue4:URigidBody ;
     rdfs:label "MyRigidBody" ;
     ue4:physicsType ue4:PhysType_Simulated ;
     ue4:bEnableGravity true ;

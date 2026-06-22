@@ -80,7 +80,7 @@ fn auction_bid_below_starting_price_rejected() {
     let mut ledger = Ledger::new();
     ledger.award_gold(1, 10_000, "bidder gold").unwrap();
 
-    let mut auction = Auction::<OpenForBids>::new(1, 99, "Nu Gundam".to_string(), 500, None, 24);
+    let mut auction = Auction::<OpenForBids>::new(1, 99, "Nu Mecha".to_string(), 500, None, 24);
     let result = auction.place_bid(1, 400, &mut ledger);
     assert!(result.is_err());
     assert_eq!(ledger.total_balance(), 0);
@@ -91,7 +91,7 @@ fn auction_seller_cannot_bid() {
     let mut ledger = Ledger::new();
     ledger.award_gold(42, 10_000, "seller gold").unwrap();
 
-    let mut auction = Auction::<OpenForBids>::new(1, 42, "Zaku II".to_string(), 100, None, 24);
+    let mut auction = Auction::<OpenForBids>::new(1, 42, "GruntUnit II".to_string(), 100, None, 24);
     let result = auction.place_bid(42, 200, &mut ledger);
     assert!(result.is_err());
 }
@@ -104,7 +104,7 @@ fn auction_happy_path_conserves_gold() {
     let seller_id = 99_u64;
     // Seller starts with 0 gold (they give item, receive gold)
     let mut auction =
-        Auction::<OpenForBids>::new(1, seller_id, "Gundam Wing".to_string(), 1000, None, 24);
+        Auction::<OpenForBids>::new(1, seller_id, "Mecha Wing".to_string(), 1000, None, 24);
     auction.place_bid(1, 1000, &mut ledger).unwrap();
     auction.close(&mut ledger).unwrap();
 
@@ -146,7 +146,7 @@ fn auction_outbid_refunds_previous_bidder() {
     ledger.award_gold(2, 10_000, "bidder 2 gold").unwrap();
 
     let mut auction =
-        Auction::<OpenForBids>::new(1, 99, "Destiny Gundam".to_string(), 100, None, 24);
+        Auction::<OpenForBids>::new(1, 99, "Destiny Mecha".to_string(), 100, None, 24);
 
     auction.place_bid(1, 100, &mut ledger).unwrap();
     // At this point player 1 has 9900 (100 in escrow).
@@ -222,7 +222,7 @@ proptest! {
         let mut ledger = Ledger::new();
         ledger.award_gold(1, 10000, "bidder gold").unwrap();
         let mut auction =
-            Auction::<OpenForBids>::new(1, 99, "Nu Gundam".to_string(), starting, None, 24);
+            Auction::<OpenForBids>::new(1, 99, "Nu Mecha".to_string(), starting, None, 24);
         // Bid below starting price should fail.
         let result = auction.place_bid(1, starting - 1, &mut ledger);
         prop_assert!(result.is_err());

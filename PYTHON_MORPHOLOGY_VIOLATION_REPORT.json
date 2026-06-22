@@ -1,0 +1,77 @@
+{
+  "affected_file": "patch_geometry_generator.py",
+  "hardcoded_constants": [
+    {
+      "type": "angular_armor_shell / tapered_box",
+      "density_class": 8,
+      "scale_base": 1.0,
+      "scale_step": 0.05,
+      "translate_step": 0.08,
+      "piston_radius": 0.05,
+      "piston_height": 1.2,
+      "piston_offset": 0.4,
+      "piston_step": 0.02
+    },
+    {
+      "type": "layered_swept_feather_panel / feather_panel",
+      "density_class": 12,
+      "scale_x_base": 0.8,
+      "scale_x_step": 0.05,
+      "scale_y_base": 0.05,
+      "scale_z_base": 1.5,
+      "scale_z_step": 0.1,
+      "translate_x_step": 0.1,
+      "translate_y_step": 0.05,
+      "rotate_y_step": 10.0,
+      "tip_radius": 0.2,
+      "tip_height": 0.5,
+      "tip_height_base": 1.0,
+      "tip_height_step": 0.05
+    },
+    {
+      "type": "beveled_hard_surface_plate / blade_prism",
+      "density_class": 5,
+      "scale_x": 0.6,
+      "scale_y": 0.2,
+      "scale_z_base": 1.0,
+      "scale_z_step": 0.15,
+      "translate_y_step": 0.05,
+      "rotate_x_step": 5.0,
+      "edge_radius": 0.02,
+      "edge_height_base": 1.0,
+      "edge_height_step": 0.15,
+      "edge_translate_x": 0.3
+    },
+    {
+      "type": "subframe / default",
+      "density_class": 6,
+      "core_radius_base": 0.3,
+      "core_radius_step": 0.04,
+      "core_height_base": 0.8,
+      "core_height_step": 0.1,
+      "joint_radius": 0.35,
+      "joint_scale_y": 0.5,
+      "joint_translate_y_base": 0.4,
+      "joint_translate_y_step": 0.05
+    }
+  ],
+  "geometry_decisions_found": [
+    "Density subdivision loops hardcoded in template strings within Python",
+    "Geometry scale, translation, rotation steps and ranges hardcoded in Python",
+    "Material zone bindings (M_DarkFrame, M_CyanBlade) hardcoded in Python",
+    "Hardcoded upAxis and metersPerUnit values"
+  ],
+  "generated_artifacts_influenced": [
+    "generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera",
+    "generated/mech_assets/reference_fabric_001/templates/usd/asset.usda.tera",
+    "generated/mech_assets/reference_fabric_001/templates/materialx/materials.mtlx.tera"
+  ],
+  "claimed_standing_invalidated": "ADMITTED",
+  "required_ttl_replacement_facts": [
+    "blade scale bands, owner part id, socket attachment, edge count",
+    "subdivision density class, armor density band",
+    "curvature or sweep class",
+    "material zone bindings",
+    "metric units via QUDT"
+  ]
+}

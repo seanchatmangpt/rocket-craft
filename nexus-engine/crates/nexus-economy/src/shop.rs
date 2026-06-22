@@ -253,9 +253,9 @@ mod tests {
     #[test]
     fn buy_with_insufficient_funds_returns_payment_failed() {
         let mut shop = Shop::new("Test".to_string(), 1.0);
-        shop.add_item(basic_item("Gundam", 1000, None));
+        shop.add_item(basic_item("Mecha", 1000, None));
         let mut ledger = funded_ledger(1, 50);
-        let err = shop.buy("Gundam", 1, 0, &mut ledger).unwrap_err();
+        let err = shop.buy("Mecha", 1, 0, &mut ledger).unwrap_err();
         assert!(matches!(err, ShopError::PaymentFailed(_)));
         // Ledger unchanged
         assert_eq!(ledger.balance_of(AccountType::PlayerWallet(1)), 50);

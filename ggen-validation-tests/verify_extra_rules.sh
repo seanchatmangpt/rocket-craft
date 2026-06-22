@@ -64,7 +64,7 @@ run_test_case() {
 # 1. Stack size larger than initial heap
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:BadMemoryLayoutStackSize a ue4:WasmMemoryLayout ;
+mecha:BadMemoryLayoutStackSize a ue4:WasmMemoryLayout ;
     rdfs:label "BadMemoryLayoutStackSize" ;
     ue4:wasmStackSize 131072 ;
     ue4:wasmInitialMemory 65536 ; # Stack larger than Initial Memory
@@ -77,22 +77,22 @@ run_test_case "Stack size larger than initial heap" "WASM Memory boundary mismat
 # 2. Shipping config using unoptimized build levels (-O0)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamMemoryLayout a ue4:WasmMemoryLayout ;
-    rdfs:label "GundamMemoryLayout" ;
+mecha:MechaMemoryLayout a ue4:WasmMemoryLayout ;
+    rdfs:label "MechaMemoryLayout" ;
     ue4:wasmStackSize 65536 ;
     ue4:wasmInitialMemory 131072 ;
     ue4:wasmMaximumMemory 131072 ;
     ue4:wasmAllowMemoryGrowth false ;
     ue4:wasmExportedSymbol "_main" .
 
-gundam:UnoptimizedOptLevel a ue4:CompilerOptimizationLevel ;
+mecha:UnoptimizedOptLevel a ue4:CompilerOptimizationLevel ;
     rdfs:label "UnoptimizedOptLevel" ;
     ue4:optFlag "-O0" .
 
-gundam:BadLinkingConfigShipping a ue4:LinkingConfiguration ;
+mecha:BadLinkingConfigShipping a ue4:LinkingConfiguration ;
     rdfs:label "BadLinkingConfigShipping" ;
-    ue4:hasMemoryLayout gundam:GundamMemoryLayout ;
-    ue4:hasOptimizationLevel gundam:UnoptimizedOptLevel ;
+    ue4:hasMemoryLayout mecha:MechaMemoryLayout ;
+    ue4:hasOptimizationLevel mecha:UnoptimizedOptLevel ;
     ue4:buildMode "Shipping" .
 EOF
 run_test_case "Shipping config using unoptimized build levels (-O0)" "Shipping build optimization violation"
@@ -100,7 +100,7 @@ run_test_case "Shipping config using unoptimized build levels (-O0)" "Shipping b
 # 3. Shipping config with bOptimize false
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:BadShippingBuildConfiguration a ue4:BuildConfiguration ;
+mecha:BadShippingBuildConfiguration a ue4:BuildConfiguration ;
     rdfs:label "Shipping" ;
     ue4:bOptimize false ;
     ue4:bEnableSymbols false ;
@@ -111,7 +111,7 @@ run_test_case "Shipping config with bOptimize false" "Shipping configuration vio
 # 4. Static baking missing mandated output paths
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:BadStaticBakeConfig a ue4:StaticBakingConfiguration ;
+mecha:BadStaticBakeConfig a ue4:StaticBakingConfiguration ;
     rdfs:label "BadStaticBakeConfig" ;
     ue4:isStaticallyBaked true ;
     ue4:headerOutputPath "Source/Generated/Headers" . # Missing other paths
@@ -121,7 +121,7 @@ run_test_case "Static baking missing mandated output paths" "Projection Law viol
 # 5. VaRest dynamic API usage in static configurations
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:StaticBakeConfigVaRest a ue4:StaticBakingConfiguration ;
+mecha:StaticBakeConfigVaRest a ue4:StaticBakingConfiguration ;
     rdfs:label "StaticBakeConfigVaRest" ;
     ue4:isStaticallyBaked true ;
     ue4:headerOutputPath "Source/Headers" ;
@@ -131,17 +131,17 @@ gundam:StaticBakeConfigVaRest a ue4:StaticBakingConfiguration ;
     ue4:byteClassMatrixOutputPath "Build/Matrices" ;
     ue4:receiptOutputPath "Build/receipt.json" .
 
-gundam:StaticBakingTargetVaRest a ue4:PackagingTarget ;
+mecha:StaticBakingTargetVaRest a ue4:PackagingTarget ;
     rdfs:label "StaticBakingTargetVaRest" ;
-    ue4:targetWorld gundam:GundamWorld ;
+    ue4:targetWorld mecha:MechaWorld ;
     ue4:buildConfiguration ue4:Config_Development ;
     ue4:targetRHIProfile ue4:WebGL2_RHI_Profile ;
     ue4:targetPlatformName "HTML5" ;
-    ue4:hasStaticBaking gundam:StaticBakeConfigVaRest .
+    ue4:hasStaticBaking mecha:StaticBakeConfigVaRest .
 
-gundam:VaRestCallNodeTemp a ue4:UEdGraphNode ;
+mecha:VaRestCallNodeTemp a ue4:UEdGraphNode ;
     rdfs:label "VaRestCallNodeTemp" ;
-    ue4:nodeOf gundam:GundamInputGraph ;
+    ue4:nodeOf mecha:MechaInputGraph ;
     ue4:callsFunction <https://rocket-craft.io/ontology/ue4/VaRest_Call_Function> .
 EOF
 run_test_case "VaRest dynamic API usage in static configurations" "Statically baked target worlds must not use dynamic VaRest calls"

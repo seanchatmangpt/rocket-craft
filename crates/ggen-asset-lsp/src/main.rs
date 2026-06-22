@@ -5,6 +5,7 @@ mod server;
 mod diagnostics;
 mod code_actions;
 mod ocel;
+pub mod analyzers;
 
 #[derive(Parser, Debug)]
 #[command(name = "ggen-asset-lsp")]

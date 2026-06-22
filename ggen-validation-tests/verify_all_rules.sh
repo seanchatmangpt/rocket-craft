@@ -71,31 +71,31 @@ run_test_case() {
 
 # 1. RuleA (Pin Connection Direction)
 restore
-echo "gundam:MoveForwardPinIn ue4:connectedTo gundam:MoveForwardDirPin ." >> "$CORE_TTL_PATH"
+echo "mecha:MoveForwardPinIn ue4:connectedTo mecha:MoveForwardDirPin ." >> "$CORE_TTL_PATH"
 run_test_case "RuleA (Pin Connection Direction)" "RuleA"
 
 # 2. RuleB (Graph Isolation Check)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
 
-gundam:OtherGraph a ue4:UEdGraph ;
+mecha:OtherGraph a ue4:UEdGraph ;
     rdfs:label "OtherGraph" ;
     rdfs:comment "A separate unconnected graph." .
 
-gundam:OtherNode a ue4:UEdGraphNode ;
+mecha:OtherNode a ue4:UEdGraphNode ;
     rdfs:label "OtherNode" ;
     rdfs:comment "A node in the other graph." ;
-    ue4:nodeOf gundam:OtherGraph ;
-    ue4:hasPin gundam:OtherPin .
+    ue4:nodeOf mecha:OtherGraph ;
+    ue4:hasPin mecha:OtherPin .
 
-gundam:OtherPin a ue4:UEdGraphPin ;
+mecha:OtherPin a ue4:UEdGraphPin ;
     rdfs:label "OtherPin" ;
     rdfs:comment "Pin in other graph." ;
-    ue4:pinOf gundam:OtherNode ;
+    ue4:pinOf mecha:OtherNode ;
     ue4:pinDirection ue4:Input ;
     ue4:pinCategory "exec" .
 
-gundam:W_KeyPressedPinOut ue4:connectedTo gundam:OtherPin .
+mecha:W_KeyPressedPinOut ue4:connectedTo mecha:OtherPin .
 EOF
 run_test_case "RuleB (Graph Isolation Check)" "RuleB"
 
@@ -133,16 +133,16 @@ run_test_case "RuleD (Pin Parameter Direction Match)" "RuleD"
 restore
 content=$(cat "$CORE_TTL_PATH")
 search="ue4:pinCategory \"exec\" ;
-    ue4:connectedTo gundam:W_KeyPressedPinOut"
+    ue4:connectedTo mecha:W_KeyPressedPinOut"
 replace="ue4:pinCategory \"float\" ;
-    ue4:connectedTo gundam:W_KeyPressedPinOut"
+    ue4:connectedTo mecha:W_KeyPressedPinOut"
 echo "${content/$search/$replace}" > "$CORE_TTL_PATH"
 run_test_case "RuleE (Exec vs. Data Pin Separation)" "RuleE"
 
 # 6. RuleF (Character Cooking State)
 restore
 content=$(cat "$CORE_TTL_PATH")
-search="ue4:hasCookingState gundam:Cooked"
+search="ue4:hasCookingState mecha:Cooked"
 replace="rdfs:comment \"Removed cooking state\""
 echo "${content/$search/$replace}" > "$CORE_TTL_PATH"
 run_test_case "RuleF (Character Cooking State)" "RuleF"
@@ -150,7 +150,7 @@ run_test_case "RuleF (Character Cooking State)" "RuleF"
 # 7. RuleG (World Packaging State)
 restore
 content=$(cat "$CORE_TTL_PATH")
-search="ue4:hasPackagingState gundam:WasmReady"
+search="ue4:hasPackagingState mecha:WasmReady"
 replace="rdfs:comment \"Removed packaging state\""
 echo "${content/$search/$replace}" > "$CORE_TTL_PATH"
 run_test_case "RuleG (World Packaging State)" "RuleG"
@@ -158,10 +158,10 @@ run_test_case "RuleG (World Packaging State)" "RuleG"
 # 8. RuleH (Dangling Execution Flow)
 restore
 content=$(cat "$CORE_TTL_PATH")
-search1="ue4:connectedTo gundam:MoveForwardPinIn"
+search1="ue4:connectedTo mecha:MoveForwardPinIn"
 replace1="rdfs:comment \"disconnected output exec\""
 content="${content/$search1/$replace1}"
-search2="ue4:connectedTo gundam:W_KeyPressedPinOut"
+search2="ue4:connectedTo mecha:W_KeyPressedPinOut"
 replace2="rdfs:comment \"disconnected input exec\""
 content="${content/$search2/$replace2}"
 echo "$content" > "$CORE_TTL_PATH"
@@ -169,7 +169,7 @@ run_test_case "RuleH (Dangling Execution Flow)" "RuleH"
 
 # 9. RuleLabel (Class Label)
 restore
-echo -e "\ngundam:NoLabelClass a owl:Class .\n" >> "$CORE_TTL_PATH"
+echo -e "\nmecha:NoLabelClass a owl:Class .\n" >> "$CORE_TTL_PATH"
 run_test_case "RuleLabel (Class Label)" "RuleLabel"
 
 # 10. RuleNamespace (Namespace Sanity)
@@ -180,7 +180,7 @@ run_test_case "RuleNamespace (Namespace Sanity)" "RuleNamespace"
 # 11. SHACL Pin Ownership
 restore
 content=$(cat "$CORE_TTL_PATH")
-search="ue4:pinOf gundam:MoveForwardCallNode ;"
+search="ue4:pinOf mecha:MoveForwardCallNode ;"
 replace="# removed pinOf"
 echo "${content/$search/$replace}" > "$CORE_TTL_PATH"
 run_test_case "SHACL Pin Ownership" "A pin must belong to exactly one UEdGraphNode"
@@ -188,13 +188,13 @@ run_test_case "SHACL Pin Ownership" "A pin must belong to exactly one UEdGraphNo
 # 12. SHACL Input Pin Connection Count Limit
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:OtherKeyPressedPinOut a ue4:UEdGraphPin ;
+mecha:OtherKeyPressedPinOut a ue4:UEdGraphPin ;
     rdfs:label "OtherKeyPressedPinOut" ;
-    ue4:pinOf gundam:W_KeyPressedNode ;
+    ue4:pinOf mecha:W_KeyPressedNode ;
     ue4:pinDirection ue4:Output ;
     ue4:pinCategory "exec" .
 
-gundam:MoveForwardPinIn ue4:connectedTo gundam:OtherKeyPressedPinOut .
+mecha:MoveForwardPinIn ue4:connectedTo mecha:OtherKeyPressedPinOut .
 EOF
 run_test_case "SHACL Input Pin Connection Count Limit" "Input pin connection count limit"
 
@@ -209,17 +209,17 @@ run_test_case "SHACL Pin Category Limit" "limited to standard categories"
 # 14. SHACL Variable Node Property Check
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:BadVarNode a ue4:UK2Node_VariableGet ;
+mecha:BadVarNode a ue4:UK2Node_VariableGet ;
     rdfs:label "BadVarNode" ;
     rdfs:comment "Variable node without referencedProperty." ;
-    ue4:nodeOf gundam:GundamInputGraph .
+    ue4:nodeOf mecha:MechaInputGraph .
 EOF
 run_test_case "SHACL Variable Node Property Check" "A variable getter or setter node must reference exactly one valid UProperty"
 
 # 15. SHACL UEdGraphNode Parentage Check
 restore
 content=$(cat "$CORE_TTL_PATH")
-search="ue4:nodeOf gundam:GundamInputGraph ;"
+search="ue4:nodeOf mecha:MechaInputGraph ;"
 replace="# removed nodeOf"
 echo "${content/$search/$replace}" > "$CORE_TTL_PATH"
 run_test_case "SHACL UEdGraphNode Parentage Check" "A node must belong to exactly one UEdGraph"
@@ -235,8 +235,8 @@ run_test_case "SHACL Parameter Index check (minInclusive 0)" "non-negative integ
 # 17. SHACL Active asset without HTML5 representation (AssetHTML5CookingReadyShape)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamTexture a ue4:UTexture ;
-    rdfs:label "GundamTexture" ;
+mecha:MechaTexture a ue4:UTexture ;
+    rdfs:label "MechaTexture" ;
     rdfs:comment "A texture asset in the persistent world." .
 EOF
 run_test_case "SHACL Active asset cooking ready" "RuleAssetHTML5CookingReady"
@@ -244,19 +244,19 @@ run_test_case "SHACL Active asset cooking ready" "RuleAssetHTML5CookingReady"
 # 18. SHACL WebGL Texture Format Compliance (HTML5TextureFormatShape)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamTexture a ue4:UTexture ;
-    rdfs:label "GundamTexture" ;
+mecha:MechaTexture a ue4:UTexture ;
+    rdfs:label "MechaTexture" ;
     rdfs:comment "A texture asset." .
 
-gundam:GundamTextureRep a ue4:AssetPlatformRepresentation ;
-    rdfs:label "GundamTextureRep" ;
-    ue4:hasAsset gundam:GundamTexture ;
+mecha:MechaTextureRep a ue4:AssetPlatformRepresentation ;
+    rdfs:label "MechaTextureRep" ;
+    ue4:hasAsset mecha:MechaTexture ;
     ue4:targetPlatform ue4:Platform_HTML5 ;
     ue4:hasCookingState ue4:CookState_Cooked ;
-    ue4:hasCompressionProfile gundam:GundamTextureProfile .
+    ue4:hasCompressionProfile mecha:MechaTextureProfile .
 
-gundam:GundamTextureProfile a ue4:TextureCompressionProfile ;
-    rdfs:label "GundamTextureProfile" ;
+mecha:MechaTextureProfile a ue4:TextureCompressionProfile ;
+    rdfs:label "MechaTextureProfile" ;
     ue4:textureFormat ue4:TexFormat_BC7 .
 EOF
 run_test_case "SHACL WebGL Texture Format compliance" "RuleHTML5TextureFormat"
@@ -264,7 +264,7 @@ run_test_case "SHACL WebGL Texture Format compliance" "RuleHTML5TextureFormat"
 # 19. SHACL WASM Memory Initial Memory alignment check (WasmMemoryLayoutShape)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:BadMemoryLayout a ue4:WasmMemoryLayout ;
+mecha:BadMemoryLayout a ue4:WasmMemoryLayout ;
     rdfs:label "BadMemoryLayout" ;
     ue4:wasmStackSize 65536 ;
     ue4:wasmInitialMemory 50000000 ; # Not aligned to 65536
@@ -277,7 +277,7 @@ run_test_case "SHACL WASM Initial Memory page alignment check" "RuleWasmMemoryLa
 # 20. SHACL WASM Memory AllowMemoryGrowth constraint check (WasmMemoryLayoutShape)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:BadMemoryLayout a ue4:WasmMemoryLayout ;
+mecha:BadMemoryLayout a ue4:WasmMemoryLayout ;
     rdfs:label "BadMemoryLayout" ;
     ue4:wasmStackSize 65536 ;
     ue4:wasmInitialMemory 67108864 ; # 64MB (aligned)
@@ -290,7 +290,7 @@ run_test_case "SHACL WASM Fixed Heap bounds check" "RuleWasmMemoryBoundaries"
 # 21. SHACL Static Baking Paths Check (StaticBakingPathsShape)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:StaticBakeConfig a ue4:StaticBakingConfiguration ;
+mecha:StaticBakeConfig a ue4:StaticBakingConfiguration ;
     rdfs:label "StaticBakeConfig" ;
     ue4:isStaticallyBaked true ;
     ue4:headerOutputPath "Source/Generated/Headers" . # Missing other paths
@@ -300,7 +300,7 @@ run_test_case "SHACL Static Baking Paths check" "RuleStaticBakingPaths"
 # 22. SHACL Static Baking VaRest Prohibition (StaticBakingNoVaRestShape)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:StaticBakeConfig a ue4:StaticBakingConfiguration ;
+mecha:StaticBakeConfig a ue4:StaticBakingConfiguration ;
     rdfs:label "StaticBakeConfig" ;
     ue4:isStaticallyBaked true ;
     ue4:headerOutputPath "Source/Headers" ;
@@ -310,18 +310,18 @@ gundam:StaticBakeConfig a ue4:StaticBakingConfiguration ;
     ue4:byteClassMatrixOutputPath "Build/Matrices" ;
     ue4:receiptOutputPath "Build/receipt.json" .
 
-gundam:StaticBakingTarget a ue4:PackagingTarget ;
+mecha:StaticBakingTarget a ue4:PackagingTarget ;
     rdfs:label "StaticBakingTarget" ;
-    ue4:targetWorld gundam:GundamWorld ;
+    ue4:targetWorld mecha:MechaWorld ;
     ue4:buildConfiguration ue4:Config_Development ;
     ue4:targetRHIProfile ue4:WebGL2_RHI_Profile ;
     ue4:targetPlatformName "HTML5" ;
-    ue4:hasStaticBaking gundam:StaticBakeConfig .
+    ue4:hasStaticBaking mecha:StaticBakeConfig .
 
-# Node calling VaRest inside GundamInputGraph
-gundam:VaRestCallNode a ue4:UEdGraphNode ;
+# Node calling VaRest inside MechaInputGraph
+mecha:VaRestCallNode a ue4:UEdGraphNode ;
     rdfs:label "VaRestCallNode" ;
-    ue4:nodeOf gundam:GundamInputGraph ;
+    ue4:nodeOf mecha:MechaInputGraph ;
     ue4:callsFunction <https://rocket-craft.io/ontology/ue4/VaRest_Call_Function> .
 EOF
 run_test_case "SHACL Static Baking VaRest Prohibition check" "RuleStaticBakingNoVaRest"
@@ -329,21 +329,21 @@ run_test_case "SHACL Static Baking VaRest Prohibition check" "RuleStaticBakingNo
 # 23. SHACL Material Instance Parameter Value Type Safety check
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamBaseMaterial a ue4:UMaterial ;
-    rdfs:label "GundamBaseMaterial" ;
-    ue4:definesParameter gundam:GundamScalarParam .
+mecha:MechaBaseMaterial a ue4:UMaterial ;
+    rdfs:label "MechaBaseMaterial" ;
+    ue4:definesParameter mecha:MechaScalarParam .
 
-gundam:GundamScalarParam a ue4:UScalarParameter ;
-    rdfs:label "GundamScalarParam" .
+mecha:MechaScalarParam a ue4:UScalarParameter ;
+    rdfs:label "MechaScalarParam" .
 
-gundam:GundamMaterialInstance a ue4:UMaterialInstance ;
-    rdfs:label "GundamMaterialInstance" ;
-    ue4:parentMaterial gundam:GundamBaseMaterial ;
-    ue4:hasParameterValue gundam:GundamParamVal .
+mecha:MechaMaterialInstance a ue4:UMaterialInstance ;
+    rdfs:label "MechaMaterialInstance" ;
+    ue4:parentMaterial mecha:MechaBaseMaterial ;
+    ue4:hasParameterValue mecha:MechaParamVal .
 
-gundam:GundamParamVal a ue4:UMaterialParameterValue ;
-    rdfs:label "GundamParamVal" ;
-    ue4:parameterName "GundamScalarParam" ;
+mecha:MechaParamVal a ue4:UMaterialParameterValue ;
+    rdfs:label "MechaParamVal" ;
+    ue4:parameterName "MechaScalarParam" ;
     ue4:vectorValue "(R=1.0,G=0.0,B=0.0,A=1.0)" .
 EOF
 run_test_case "SHACL Material Instance Parameter Value Type Safety check" "RuleMaterialInstanceParameterValueType"
@@ -351,59 +351,59 @@ run_test_case "SHACL Material Instance Parameter Value Type Safety check" "RuleM
 # 24. SHACL Unregistered Collision Profile Usage check
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamUnregisteredProfile a ue4:UCollisionProfile ;
-    rdfs:label "GundamUnregisteredProfile" ;
+mecha:MechaUnregisteredProfile a ue4:UCollisionProfile ;
+    rdfs:label "MechaUnregisteredProfile" ;
     ue4:profileName "UnregisteredProfile" ;
     ue4:collisionEnabled ue4:QueryAndPhysics ;
     ue4:collisionObjectType ue4:ECC_Pawn .
 
-gundam:GundamCollision ue4:hasCollisionProfile gundam:GundamUnregisteredProfile .
+mecha:MechaCollision ue4:hasCollisionProfile mecha:MechaUnregisteredProfile .
 EOF
 run_test_case "SHACL Unregistered Collision Profile Usage check" "RuleComponentCollisionProfileRegistration"
 
 # 25. SHACL Server RPC missing validation check
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamServerRPC a ue4:UServerRPC ;
-    rdfs:label "GundamServerRPC" .
+mecha:MechaServerRPC a ue4:UServerRPC ;
+    rdfs:label "MechaServerRPC" .
 
-gundam:AGundamCharacter ue4:hasFunction gundam:GundamServerRPC .
+mecha:AMechaCharacter ue4:hasFunction mecha:MechaServerRPC .
 EOF
 run_test_case "SHACL Server RPC missing validation check" "RuleServerRPCValidationMandatory"
 
 # 26. SHACL RPC validation function class scope violation check
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:AMyNPC a owl:Class ; rdfs:label "AMyNPC" ; rdfs:subClassOf ue4:AActor .
+mecha:AMyNPC a owl:Class ; rdfs:label "AMyNPC" ; rdfs:subClassOf ue4:AActor .
 
-gundam:GundamServerRPCForScope a ue4:UServerRPC ;
-    rdfs:label "GundamServerRPCForScope" ;
+mecha:MechaServerRPCForScope a ue4:UServerRPC ;
+    rdfs:label "MechaServerRPCForScope" ;
     ue4:bWithValidation true ;
-    ue4:validationFunction gundam:GundamValidationFuncWrongScope .
+    ue4:validationFunction mecha:MechaValidationFuncWrongScope .
 
-gundam:GundamValidationFuncWrongScope a ue4:UFunction ;
-    rdfs:label "GundamValidationFuncWrongScope" ;
-    ue4:returnProperty gundam:GundamValidationFuncWrongScopeRet .
+mecha:MechaValidationFuncWrongScope a ue4:UFunction ;
+    rdfs:label "MechaValidationFuncWrongScope" ;
+    ue4:returnProperty mecha:MechaValidationFuncWrongScopeRet .
 
-gundam:GundamValidationFuncWrongScopeRet a ue4:UBoolProperty ;
-    rdfs:label "GundamValidationFuncWrongScopeRet" .
+mecha:MechaValidationFuncWrongScopeRet a ue4:UBoolProperty ;
+    rdfs:label "MechaValidationFuncWrongScopeRet" .
 
-gundam:AGundamCharacter ue4:hasFunction gundam:GundamServerRPCForScope .
-gundam:AMyNPC ue4:hasFunction gundam:GundamValidationFuncWrongScope .
+mecha:AMechaCharacter ue4:hasFunction mecha:MechaServerRPCForScope .
+mecha:AMyNPC ue4:hasFunction mecha:MechaValidationFuncWrongScope .
 EOF
 run_test_case "SHACL RPC validation function class scope check" "RuleRPCValidationClassScope"
 
 # 27. SHACL Kinematic Simulation Disconnect check
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamBodyKinematic a ue4:URigidBody ;
-    rdfs:label "GundamBodyKinematic" ;
+mecha:MechaBodyKinematic a ue4:URigidBody ;
+    rdfs:label "MechaBodyKinematic" ;
     ue4:physicsType ue4:PhysType_Kinematic .
 
-gundam:GundamComponentKinematicSim a ue4:UBoxComponent ;
-    rdfs:label "GundamComponentKinematicSim" ;
+mecha:MechaComponentKinematicSim a ue4:UBoxComponent ;
+    rdfs:label "MechaComponentKinematicSim" ;
     ue4:bSimulatePhysics true ;
-    ue4:hasRigidBody gundam:GundamBodyKinematic .
+    ue4:hasRigidBody mecha:MechaBodyKinematic .
 EOF
 run_test_case "SHACL Kinematic Simulation Disconnect check" "RuleKinematicSimulationDisconnect"
 

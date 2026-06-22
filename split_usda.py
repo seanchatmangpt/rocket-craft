@@ -1,7 +1,7 @@
 import os
 import re
 
-input_file = "snow_white_prelude_mecha.usda"
+input_file = "winter_protocol_prelude_mecha.usda"
 
 with open(input_file, "r") as f:
     lines = f.readlines()
@@ -57,7 +57,7 @@ assembly_content = """#usda 1.0
     defaultPrim = "SnowWhitePrelude"
     metersPerUnit = 1.0
     upAxis = "Y"
-    doc = "Structural USDA representation for the Snow White Prelude mecha, metric scale (meters)."
+    doc = "Structural USDA representation for the WinterProtocol Prelude mecha, metric scale (meters)."
 )
 
 def Xform "SnowWhitePrelude" (

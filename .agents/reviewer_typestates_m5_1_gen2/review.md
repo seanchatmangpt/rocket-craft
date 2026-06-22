@@ -13,7 +13,7 @@ The implemented typestates schema has successfully passed the syntax, manifest, 
 ### [Critical] Finding 1: Stray SHACL Shape Blocks World Instantiation
 - **What**: A stray test shape `ue4:TestWorldShape` unconditionally flags any instance of `ue4:UWorld` as a validation violation.
 - **Where**: `/Users/sac/.ggen/packs/ue4_ontology/shacl/validation.shacl.ttl` (lines 1384–1396)
-- **Why**: The SPARQL query selects any `$this` where `$this a ue4:UWorld`. Since `UWorld` must be instantiated to represent a game world mapping (as seen in `gundam_character.ttl`), this stray validation rule will cause any valid instance graph representing a game world to fail validation. It only passed the current repository validation check because the core ontology doesn't contain any world instances (only class definitions).
+- **Why**: The SPARQL query selects any `$this` where `$this a ue4:UWorld`. Since `UWorld` must be instantiated to represent a game world mapping (as seen in `mecha_character.ttl`), this stray validation rule will cause any valid instance graph representing a game world to fail validation. It only passed the current repository validation check because the core ontology doesn't contain any world instances (only class definitions).
 - **Suggestion**: Remove `ue4:TestWorldShape` entirely from `validation.shacl.ttl`.
 
 ### [Major] Finding 2: Logic Bug in HTML5 Audio Format Validation

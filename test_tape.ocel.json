@@ -1,0 +1,21 @@
+{
+  "ocel:global-event": { "ocel:activity": "__INVALID__" },
+  "ocel:global-object": { "ocel:type": "__INVALID__" },
+  "ocel:global-log": { "ocel:version": "1.0", "ocel:attribute-names": [] },
+  "ocel:events": {
+    "e1": { "ocel:activity": "Start Vision Snap Loop", "ocel:timestamp": "2026-06-20T00:00:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e2": { "ocel:activity": "Generate Bounded Geometry", "ocel:timestamp": "2026-06-20T00:01:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e3": { "ocel:activity": "Render Visual Projection", "ocel:timestamp": "2026-06-20T00:02:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e4": { "ocel:activity": "Extract Visual Targets", "ocel:timestamp": "2026-06-20T00:03:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e5": { "ocel:activity": "Measure Semantic vs Visual Gap", "ocel:timestamp": "2026-06-20T00:04:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e6": { "ocel:activity": "Compute Residuals", "ocel:timestamp": "2026-06-20T00:05:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e7": { "ocel:activity": "Select Bounded Repair Operator", "ocel:timestamp": "2026-06-20T00:06:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e8": { "ocel:activity": "Patch Semantic Law", "ocel:timestamp": "2026-06-20T00:07:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e9": { "ocel:activity": "Regenerate Bounded Geometry", "ocel:timestamp": "2026-06-20T00:08:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e10": { "ocel:activity": "Verify Playwright Engine Admissibility", "ocel:timestamp": "2026-06-20T00:09:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] },
+    "e11": { "ocel:activity": "Emit BLAKE3 Receipt", "ocel:timestamp": "2026-06-20T00:10:00Z", "ocel:vmap": {}, "ocel:omap": ["case1"] }
+  },
+  "ocel:objects": {
+    "case1": { "ocel:type": "loop_execution", "ocel:ovmap": {} }
+  }
+}

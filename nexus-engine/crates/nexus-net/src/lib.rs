@@ -1,4 +1,4 @@
-//! nexus-net — Multiplayer networking for Gundam Nexus.
+//! nexus-net — Multiplayer networking for Mecha Nexus.
 //!
 //! Provides typestate WebSocket connections, duel matchmaking, game room state,
 //! message serialization via serde_json, and async tokio-based infrastructure.

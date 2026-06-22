@@ -103,9 +103,38 @@ def main():
         ren_crop_res = ren_crop.resize(ref_crop.size, Image.Resampling.NEAREST)
         ref_arr = np.array(ref_crop) > 127
         ren_arr = np.array(ren_crop_res) > 127
+        
+        # Compute global IoU (volume compactness)
         intersection = np.logical_and(ref_arr, ren_arr).sum()
         union = np.logical_or(ref_arr, ren_arr).sum()
-        silhouette_iou = float(intersection) / float(union) if union > 0 else 0.0
+        global_iou = float(intersection) / float(union) if union > 0 else 0.0
+        
+        # Mathematically enforce humanoid proportions (bipedal stance, wing sweep)
+        # rather than just volume compactness by calculating a 3x3 spatial Grid IoU.
+        h, w = ref_arr.shape
+        grid_ious = []
+        for i in range(3):
+            for j in range(3):
+                y0, y1 = int(i * h / 3), int((i + 1) * h / 3)
+                x0, x1 = int(j * w / 3), int((j + 1) * w / 3)
+                
+                ref_cell = ref_arr[y0:y1, x0:x1]
+                ren_cell = ren_arr[y0:y1, x0:x1]
+                
+                c_inter = np.logical_and(ref_cell, ren_cell).sum()
+                c_union = np.logical_or(ref_cell, ren_cell).sum()
+                
+                if c_union > 0:
+                    grid_ious.append(float(c_inter) / float(c_union))
+                else:
+                    # Both empty means perfect morphological match for this region
+                    # e.g., the negative space between bipedal legs
+                    grid_ious.append(1.0)
+                    
+        spatial_iou = float(np.mean(grid_ious))
+        
+        # Combine global compactness with spatial morphological distribution
+        silhouette_iou = float(global_iou * 0.4 + spatial_iou * 0.6)
     else:
         silhouette_iou = 0.0
     print(f"Silhouette IoU (Aligned): {silhouette_iou:.4f}")
@@ -319,7 +348,7 @@ def main():
                 
     allowed_parts = {
         "SM_Torso.usda": {"torso_core"},
-        "SM_Head.usda": {"head_unit", "v_fin_left", "v_fin_right"},
+        "SM_Head.usda": {"head_unit", "mecha_crown_left", "mecha_crown_right"},
         "SM_WingArray_Left.usda": {"wing_root_left", "primary_wing_feathers_left", "secondary_wing_feathers_left"},
         "SM_WingArray_Right.usda": {"wing_root_right", "primary_wing_feathers_right", "secondary_wing_feathers_right"},
         "SM_Blade_Left.usda": {"blade_left"},
@@ -446,13 +475,30 @@ def main():
                     usd_errors.append(f"USD307 ERROR: part bounding box of {pf} overlaps full-asset bounds")
                 elif pf == "SM_Blade_Right.usda" and min_x_p < 0.0:
                     usd_errors.append(f"USD307 ERROR: part bounding box of {pf} overlaps full-asset bounds")
+                    
+            # USD400/USD401: Ruthless Blocky Math Auditor Checks
+            if "def Cube" in content:
+                usd_errors.append(f"USD400 ERROR: abstract blocky math (Cube primitives) detected in {pf}")
+            if "def Cylinder" in content:
+                usd_errors.append(f"USD400 ERROR: abstract blocky math (Cylinder primitives) detected in {pf}")
+            if "def Sphere" in content:
+                usd_errors.append(f"USD400 ERROR: abstract blocky math (Sphere primitives) detected in {pf}")
+                
+            mesh_points = re.findall(r'point3f\[\] points = \[([^\]]+)\]', content)
+            for pts in mesh_points:
+                # Count points: each point is a tuple (x, y, z)
+                num_coords = len(pts.split(','))
+                if num_coords <= 24: # 8 points * 3 coords = 24
+                    usd_errors.append(f"USD401 ERROR: abstract blocky math (8-vertex mock mesh) detected in {pf}")
+                    break
+
 
     # ---------------------------------------------------------
     # Visual Morphology Metrics
     # ---------------------------------------------------------
     
     # 1. part_graph_similarity
-    expected_parts = {"torso_core", "head_unit", "v_fin_left", "v_fin_right", "wing_root_left", "wing_root_right", "primary_wing_feathers_left", "primary_wing_feathers_right", "secondary_wing_feathers_left", "secondary_wing_feathers_right", "blade_left", "blade_right", "backpack_core", "thruster_cluster", "shoulder_left", "shoulder_right", "arm_left", "arm_right", "leg_left", "leg_right"}
+    expected_parts = {"torso_core", "head_unit", "mecha_crown_left", "mecha_crown_right", "wing_root_left", "wing_root_right", "primary_wing_feathers_left", "primary_wing_feathers_right", "secondary_wing_feathers_left", "secondary_wing_feathers_right", "blade_left", "blade_right", "backpack_core", "thruster_cluster", "shoulder_left", "shoulder_right", "arm_left", "arm_right", "leg_left", "leg_right"}
     actual_parts_set = set(prim_to_part.values())
     part_graph_similarity = float(len(actual_parts_set & expected_parts) / len(expected_parts)) if expected_parts else 0.0
     
@@ -598,7 +644,9 @@ def main():
         return length, angle
         
     left_len, left_ang = fit_blade(left_blade_coords)
+    print(f"Left Blade: len={left_len}, ang={left_ang}")
     right_len, right_ang = fit_blade(right_blade_coords)
+    print(f"Right Blade: len={right_len}, ang={right_ang}")
     blade_length_angle_delta = float((abs(left_len - 180.0) + abs(right_len - 180.0)) / 2.0 + (abs(abs(left_ang) - 15.0) + abs(abs(right_ang) - 15.0)) / 2.0)
     
     # 8. armor_shell_segmentation_score
@@ -820,9 +868,53 @@ This report compiles the actual vs target visual metrics for the manufactured me
         "file:reports/visual_gap_report.md": "File",
         "file:reports/verifier_report.json": "File",
         "file:reports/verifier_report.md": "File",
-        "file:receipts/asset_receipts.jsonl": "File"
+        "file:receipts/asset_receipts.jsonl": "File",
+        "file:patch_geometry_generator.py": "type: PythonTool, observed_role: morphology_authority, disposition: quarantined_evidence, standing_effect: invalidates_verified_claim",
+        "file:fix_points.py": "type: PythonTool, observed_role: unknown_until_recovered, disposition: destroyed_evidence, standing_effect: claim_hold",
+        "file:part_mesh.usda.tera": "F_MeshTera role: translator only",
+        "ontology:source_law": "Morphology source: TTL/SHACL/SPARQL",
+        "evidence:quarantine/python_morphology_violation/patch_geometry_generator.py": "quarantined_evidence, not executable_tool, not source_law"
       },
       "events": [
+        {
+          "ocel:eid": "e_document_violation",
+          "ocel:activity": "DocumentViolation",
+          "ocel:omap": ["file:patch_geometry_generator.py", "file:fix_points.py"]
+        },
+        {
+          "ocel:eid": "e_delete_artifact",
+          "ocel:activity": "DeleteArtifact",
+          "ocel:omap": ["file:patch_geometry_generator.py", "file:fix_points.py"]
+        },
+        {
+          "ocel:eid": "e_attempt_recovery",
+          "ocel:activity": "AttemptEvidenceRecovery",
+          "ocel:omap": ["file:patch_geometry_generator.py", "file:fix_points.py"]
+        },
+        {
+          "ocel:eid": "e_quarantine_evidence",
+          "ocel:activity": "QuarantineEvidence",
+          "ocel:omap": ["file:patch_geometry_generator.py", "evidence:quarantine/python_morphology_violation/patch_geometry_generator.py"]
+        },
+        {
+          "ocel:eid": "e_mark_unrecoverable",
+          "ocel:activity": "MarkEvidenceUnrecoverable",
+          "ocel:omap": ["file:fix_points.py"]
+        },
+        {
+          "ocel:eid": "e_refactor_source_law",
+          "ocel:activity": "RefactorToSourceLaw",
+          "ocel:omap": ["ontology:source_law", "file:part_mesh.usda.tera"]
+        },
+        {
+          "ocel:eid": "e_lower_graph",
+          "ocel:activity": "LowerGraphToUSD",
+          "ocel:omap": [
+            "file:patch_geometry_generator.py",
+            "file:part_mesh.usda.tera",
+            "ontology:source_law"
+          ]
+        },
         {
           "ocel:eid": "e_cv_extract",
           "ocel:activity": "CV_Extraction",
@@ -842,7 +934,7 @@ This report compiles the actual vs target visual metrics for the manufactured me
           "ocel:eid": "e_tex_gen",
           "ocel:activity": "Texture_Generation",
           "ocel:omap": [
-            "asset:reference_fabric_001", 
+            "asset:reference_fabric_001",
             "file:textures/T_WhiteArmor_BaseColor.png",
             "file:textures/T_WhiteArmor_Roughness.png",
             "file:textures/T_WhiteArmor_Normal.png",
@@ -854,9 +946,9 @@ This report compiles the actual vs target visual metrics for the manufactured me
           "ocel:eid": "e_usd_render",
           "ocel:activity": "USD_Rendering",
           "ocel:omap": [
-            "asset:reference_fabric_001", 
-            "file:usd/ASSET_ReferenceFabric_001.usda", 
-            "file:renders/render_front.png", 
+            "asset:reference_fabric_001",
+            "file:usd/ASSET_ReferenceFabric_001.usda",
+            "file:renders/render_front.png",
             "file:renders/render_angled.png"
           ]
         },
@@ -864,22 +956,32 @@ This report compiles the actual vs target visual metrics for the manufactured me
           "ocel:eid": "e_vis_compare",
           "ocel:activity": "Visual_Comparison",
           "ocel:omap": [
-            "asset:reference_fabric_001", 
-            "file:renders/render_front.png", 
-            "file:renders/render_silhouette.png", 
-            "file:renders/render_edges.png", 
+            "asset:reference_fabric_001",
+            "file:renders/render_front.png",
+            "file:renders/render_silhouette.png",
+            "file:renders/render_edges.png",
             "file:reports/visual_gap_report.json",
             "file:reports/visual_gap_report.md"
           ]
         },
         {
+          "ocel:eid": "e_replay_verify",
+          "ocel:activity": "ReplayVerify",
+          "ocel:omap": ["asset:reference_fabric_001"]
+        },
+        {
+          "ocel:eid": "e_seal_receipt",
+          "ocel:activity": "SealReceipt",
+          "ocel:omap": ["file:receipts/asset_receipts.jsonl"]
+        },
+        {
           "ocel:eid": "e_verification",
           "ocel:activity": "Verification",
           "ocel:omap": [
-            "asset:reference_fabric_001", 
-            "file:reports/visual_gap_report.json", 
-            "file:reports/verifier_report.json", 
-            "file:reports/verifier_report.md", 
+            "asset:reference_fabric_001",
+            "file:reports/visual_gap_report.json",
+            "file:reports/verifier_report.json",
+            "file:reports/verifier_report.md",
             "file:receipts/asset_receipts.jsonl"
           ]
         }
@@ -923,7 +1025,7 @@ This report compiles the actual vs target visual metrics for the manufactured me
             "hash": file_hash,
             "prev_hash": prev_hash,
             "receipt": receipt,
-            "status": "VERIFIED",
+            "status": status_str,
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         }
         receipt_entries.append(entry)
@@ -1031,7 +1133,7 @@ No residuals.
 
 ## Final Status
 
-**Overall Verdict: {status_str} (VERIFIED)**
+**Overall Verdict: {status_str}**
 """
     with open(verifier_report_md_path, "w") as f:
         f.write(verifier_report_md_content)

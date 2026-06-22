@@ -1,116 +1,101 @@
-# Handoff Report - Asset Manufacturing LSP (ggen-asset-lsp) Architecture
+# Handoff Report: Ecosystem Cataloging and Analysis
+
+**Author**: Ecosystem Cataloger (explorer_m1)  
+**Parent Conversation ID**: `30eea61c-a259-48ef-85ca-8bca6c94e767`  
+**Working Directory**: `/Users/sac/rocket-craft/.agents/explorer_m1`  
+**Target Path**: `/Users/sac/rocket-craft/.agents/explorer_m1/catalog_report.md`  
+
+---
 
 ## 1. Observation
 
-Direct observations of the lsp-max framework and the rocket-craft workspace files:
+Direct observations of source files and configurations in `/Users/sac/rocket-craft`, `/Users/sac/lsp-max`, and `/Users/sac/praxis` include:
 
-### 1.1 lsp-max Core and Examples
-* **Location**: `/Users/sac/lsp-max`
-* **Crates Structure**: Standard cargo workspace containing `lsp-max` (server core), `lsp-max-protocol` (types and `max/*` methods), `lsp-max-runtime` (state machine), and `examples/`.
-* **LanguageServer Trait**: Defined in `/Users/sac/lsp-max/src/language_server.rs` with default implementations for all LSP 3.18 methods.
-* **powl-lsp Reference**: `/Users/sac/lsp-max/examples/powl-lsp/src/server.rs` overrides handlers like `initialize`, `did_open`, `did_change`, and `did_save` using `Client` to publish diagnostics (`self.client.publish_diagnostics`).
-* **anti-llm-cheat-lsp Reference**: `/Users/sac/lsp-max/examples/anti-llm-cheat-lsp/src/server.rs` overrides `code_action` (returning `Option<CodeActionResponse>`), which collects Quickfix actions from `recommend::repair_actions` defined in `src/server/recommend.rs`. It attaches originating diagnostics to the code action:
-  ```rust
-  CodeActionOrCommand::CodeAction(CodeAction {
-      title: format!("{}: {}", d.code, brief(&d.required_correction)),
-      kind: Some(CodeActionKind::QUICKFIX),
-      diagnostics: Some(vec![d.to_lsp()]),
-      command: Some(Command {
-          title: "Open receipt ledger".to_string(),
-          command: "anti-llm.openReceiptLedger".to_string(),
-          arguments: None,
-      }),
-      ..Default::default()
-  })
-  ```
+1. **Generative Typestates**:
+   - In `/Users/sac/rocket-craft/crates/mech_morphology_law/src/machine.rs` (lines 16-33):
+     ```rust
+     pub struct Measured;
+     pub struct Validated;
+     pub struct Admitted;
 
-### 1.2 Asset Directory `generated/mech_assets/reference_fabric_001/`
-* **Directories present**: `graph`, `materialx`, `ocel`, `queries`, `receipts`, `reference`, `renders`, `reports`, `templates`, `textures`, `usd` (observed from `list_dir`).
-* **Asset Population**: USD, MaterialX, and report directories are currently empty, as the manufacturing worker agent (`worker_reference_fabric_001_generation`) has not yet generated them.
-* **Reference Targets**: The folder `reference/` contains the following extracted targets (from `extract_reference_visual_targets.py`):
-  * `reference_original.jpg` (SHA-256: `7693fdb87e7fc7f9151550830e6f5447f8ba8d1912f4c39bc06ec71467f14f27`)
-  * `reference_silhouette.png` (binary mask)
-  * `reference_edges.png` (PIL Find Edges map)
-  * `reference_color_histogram.json` (dominant color palette proportions)
-  * `reference_measurements.json`:
-    * aspect_ratio: `1.2024048096192386`
-    * wing_span_estimate_px: `1200`
-    * central_torso_mass_estimate: `torso_pixel_count: 294339, ratio: 0.3008, density: 0.8170`
-    * left_right_symmetry_estimate: `0.9594455577822312`
-    * cyan_weapon_regions and head_visor_highlight_regions metadata.
+     pub struct Machine<L: MorphologyLaw, P> {
+         law: L,
+         mech: MeasuredMech,
+         outcome: Option<LawOutcome>,
+         _phase: PhantomData<P>,
+     }
+     ```
+     Transition methods restrict input states and yield the next state via consumption:
+     - `validate(self)` is defined on `Machine<L, Measured>` and returns `Machine<L, Validated>` (lines 71-79).
+     - `admit(self)` is defined on `Machine<L, Validated>` and returns `Result<Machine<L, Admitted>, ClaimHold>` (lines 102-116).
+   - In `/Users/sac/praxis/template/src/types.rs` (lines 199-266):
+     Standardizes ZST states `Raw`/`Admitted`, `Evidence<T, S, W>` wrappers, and the `Admit` trait with private constructors to enforce compilation boundaries.
 
-### 1.3 Generator Parameter Sources in `rocket-craft`
-* **Ontology**: Merged Turtle file at `/Users/sac/rocket-craft/ontology/all_merged.ttl`. Target source triples for `reference_fabric_001` are planned to be written to:
-  * `generated/mech_assets/reference_fabric_001/graph/asset_fabric.ttl` (mech part grammar)
-  * `generated/mech_assets/reference_fabric_001/graph/generator_parameters.ttl` (120+ primitive instances and parameter bindings)
-  * `generated/mech_assets/reference_fabric_001/graph/visual_targets.ttl` (extracted measurements)
-* **SPARQL Queries**: Planned to be written under `generated/mech_assets/reference_fabric_001/queries/`:
-  * `usd_prims.rq` (selects primitives with transforms/materials, ordered by key)
-  * `materials.rq` (selects material parameters)
-  * `verifier_expectations.rq` (selects target metrics)
-* **Tera Templates**: Planned to be written under `generated/mech_assets/reference_fabric_001/templates/`:
-  * `templates/usd/asset.usda.tera` (generates master USD file)
-  * `templates/usd/part_mesh.usda.tera` (generates mesh geom prims)
-  * `templates/materialx/materials.mtlx.tera` (generates material definitions)
-* **Configuration Mapping**: Declarations are registered in `/Users/sac/rocket-craft/ggen.toml` as `[[generation.rules]]`.
+2. **`RulePackServer` structures**:
+   - In `/Users/sac/lsp-max/src/rule_pack_server.rs` (lines 685-716):
+     The interface demands accessor methods for:
+     ```rust
+     pub trait RulePackServer {
+         fn rule_packs(&self) -> &ValidatedRulePackSet;
+         fn grammar(&self) -> tree_sitter::Language;
+         fn server_name(&self) -> &'static str;
+         fn client(&self) -> &crate::service::Client;
+         fn adapter(&self) -> &AutoLspAdapter;
+         fn workspace_index(&self) -> Option<&WorkspaceIndex> { None }
+     ```
+     Default implementations are provided for text document syncing, regex pattern matching, circuit breakers, dynamic `EvalBudget` (Sync / Background) latency classification, and aggregate conformance scoring (`workspace_conformance`).
+
+3. **`ggen` Pipeline Stages**:
+   - In `/Users/sac/ggen/crates/ggen-core/src/codegen/pipeline.rs` (lines 1459-1491):
+     The micro-pipeline executes sequentially:
+     ```rust
+     pub fn run(&mut self) -> Result<PipelineState> {
+         self.load_ontology()?;
+         self.execute_inference_rules()?;
+         self.execute_shacl_validation()?;
+         self.execute_validation_rules()?;
+         self.execute_generation_rules()?;
+         ...
+     }
+     ```
+     Validation checks include target paths checks (traversal and size limits) in `validate_generated_output` (lines 1536-1568).
+
+4. **Praxis Configuration**:
+   - `/Users/sac/praxis/template/Cargo.toml` specifies standard house dependencies (e.g. `thiserror`, `anyhow`, `blake3`, `linkme`) and a commented out `lsp` feature mapping (lines 36-43).
 
 ---
 
 ## 2. Logic Chain
 
-1. **Diagnostics Surface**: The compiler surface includes generated assets (`.usda`, `.mtlx`) and validation outputs (`usdchecker` logs, `visual_gap_report.json`).
-2. **Line and Range Resolution**:
-   * For `usdchecker` logs (e.g. `Failed verification on prim /World/Torso/Panel_001: Mesh has no normals`), the LSP can scan the generated USDA file for the declaration `def Mesh "Panel_001"` or `def "Panel_001"` to resolve the line number and range, then project a `PublishDiagnostics` error on that line.
-   * For `visual_gap_report.json` errors (e.g. `silhouette_iou < 0.90`), the error represents a global failure of the assembly mesh. The LSP should project this error on the root Xform definition in the master `ASSET_ReferenceFabric_001.usda` file (typically line 1 or the main Xform prim).
-   * For unresolved material bindings or missing payloads, the LSP can parse the generated `.usda` syntax, check paths, and highlight the faulty property lines.
-3. **Traceability to Generator Sources**:
-   * The rule definition in `ggen.toml` links each generated file to its template and SPARQL query.
-   * Inside the template (`part_mesh.usda.tera`), the output is structured by looping over query rows.
-   * Each query row in `usd_prims.rq` corresponds to an RDF resource (instance) in `generator_parameters.ttl` (e.g. `mud:TorsoPrimitive_001`).
-   * By including source metadata (e.g., as comments `# ggen-source: mud:TorsoPrimitive_001` or as custom OpenUSD metadata attributes `custom string ggen:source_uri` on the prim), the LSP can instantly map any generated prim in the `.usda` back to its source RDF resource.
-4. **Code Actions Actuation**:
-   * Quickfix actions must point to the *source* files, not the generated files, since the generated files are overwritten during `ggen sync`.
-   * For a given diagnostic on `/World/Torso/Panel_001` in `SM_Torso.usda`:
-     * The LSP identifies the source RDF resource `mud:TorsoPrimitive_001`.
-     * It searches `generator_parameters.ttl` (and other loaded Turtle files) for the text block defining `mud:TorsoPrimitive_001`.
-     * It constructs an LSP `CodeAction` with a `WorkspaceEdit` that targets `generator_parameters.ttl` at the resolved range, or a `Command` (like `vscode.open` or a custom LSP command) to jump to the Turtle definition or the `part_mesh.usda.tera` template line.
+1. **Typestates**: Generative typestates eliminate invalid state runtime bugs. In `mech_morphology_law`, the transition methods take ownership (`self`) of the state machine, preventing a developer from reusing an unvalidated `Measured` machine. Since the `admit` method is only defined for `Machine<L, Validated>`, it is mathematically impossible to compile code that attempts to admit an unvalidated mecha mesh.
+2. **`RulePackServer`**: Raw `tower-lsp` integrations duplicate scanner, parsing, and diagnostic loop code. By inheriting `RulePackServer`, this boilerplate is entirely absorbed, enabling a new LSP (such as `ggen-asset-lsp`) to be generated from simple TOML/TTL rule pack declarations.
+3. **`ggen` Pipeline**: To guarantee $A = \mu(O^*)$, the pipeline enforces strict validation boundaries (SHACL + SPARQL ASK rules) *prior* to writing files, and records final outputs with BLAKE3 cryptographic receipts. The `ORDER BY` clause in queries prevents nondeterministic compilation.
+4. **Praxis Integration**: Scaffolding these patterns into `template/` allows subsequent crates created with `cargo generate` to natively start with typestate safety, `RulePackServer` language servers, and `ggen` ontology-driven workflows.
 
 ---
 
 ## 3. Caveats
 
-* The asset directory `generated/mech_assets/reference_fabric_001/` currently does not contain the generated USDA and MaterialX files. We assume their schema, structure, and query maps conform to standard GGen compiler projections.
-* Tracing generated prims back to their Turtle sources is highly robust if the templates append metadata comments (e.g., `# ggen-source: <uri>`) or custom attributes to the generated USDA. If this metadata is omitted, the LSP must fall back to resolving the name (e.g. `Panel_001`) via executing the SPARQL query against the merged ontology, which adds runtime overhead.
+- We only performed a read-only investigation. No changes have been written to the `praxis` codebase.
+- The proposed `AppLspServer` in the integration plan was not compiled or tested in a live editor environment.
+- Evaluation budget reclassification logic assumes standard Tokio multithreading concurrency is active.
 
 ---
 
-## 4. Conclusion & Architectural Recommendation
+## 4. Conclusion
 
-We recommend the following architecture for `ggen-asset-lsp`:
-
-### 4.1 Crate Structure
-* Establish `crates/ggen-asset-lsp` depending on `lsp-max`, `lsp-types-max`, `serde_json`, and a basic TTL/SPARQL parser.
-* Implement `AssetLsp` implementing `lsp_max::LanguageServer`.
-
-### 4.2 Diagnostic Resolution and Projections
-* **usdchecker parser**: The server monitors changes to `.usda` files. It parses `usdchecker` output logs and maps warnings/errors to specific prim line numbers in the editor.
-* **Visual Gap parser**: On save, it parses `reports/visual_gap_report.json`. If `status` is `FAILED` or a key metric (e.g. `silhouette_iou`) is below the threshold, it publishes a diagnostic on the root `Xform` prim of the master `.usda` file.
-* **Static Asset Linter**: Detects missing payload references (empty paths or missing files) and invalid material bindings by verifying if the targeted `.mtlx` path exists and contains the material.
-
-### 4.3 Diagnostic Mapping and Code Actions
-* **Turtle Trace Mapping**: The LSP reads `ggen.toml` to link output files to templates/queries, and parses comments (or attributes) in the generated `.usda` files to locate the source RDF resource URI.
-* **LSP Code Actions**:
-  * `Go to Source Parameter`: Traces the prim name to its RDF resource in `generator_parameters.ttl`, resolves its range, and offers a navigation command.
-  * `Go to Generator Template`: Resolves the template path in `ggen.toml` (e.g. `part_mesh.usda.tera`) and maps the prim type to the template file range.
-  * `Fix Material Binding`: If a material binding is missing, queries the ontology for valid material URIs and offers a quickfix edit to change the `mud:materialBinding` property inside `generator_parameters.ttl`.
-
-### 4.4 OCEL Event Integration
-* Emit OCEL event logs (`Validate` and `Repair` activities) on diagnostic evaluation and Code Action execution to feed the process-mining loop.
+A comprehensive ecosystem report has been successfully compiled and written to `/Users/sac/rocket-craft/.agents/explorer_m1/catalog_report.md`. The report documents:
+- Concrete abstractions for generative typestates (ZST phase markers, ZST witness types, and seal patterns).
+- Complete structures for `RulePackServer` (dashmap latency tracking, aggregate conformance vectors, and circuit breakers).
+- Core stages of the `ggen` pipeline (Loading, Construct, SHACL/ASK validation, Extract, Template fan-out, and Receipts).
+- A detailed implementation proposal for injecting these patterns as scaffold choices in `~/praxis/template/`.
 
 ---
 
 ## 5. Verification Method
 
-1. **Verify Report Location**: Check that this report exists at `/Users/sac/rocket-craft/.agents/explorer_m1/handoff.md`.
-2. **Review lsp-max server loop**: Run `cargo check --examples` in `/Users/sac/lsp-max` to confirm that all lsp-max types build successfully.
-3. **Verify reference measurements path**: Verify `/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/reference/reference_measurements.json` contains valid dimensions.
+To independently verify the findings in the report:
+1. **Inspect Report**: Open and read `/Users/sac/rocket-craft/.agents/explorer_m1/catalog_report.md` to confirm detailed lists and code blocks match source locations.
+2. **Inspect Typestates**: Inspect `/Users/sac/rocket-craft/crates/mech_morphology_law/src/machine.rs` lines 46-130 to trace how `validate` and `admit` consume their types.
+3. **Inspect LSP-Max**: Inspect `/Users/sac/lsp-max/src/rule_pack_server.rs` lines 818-1039 to trace rule classification and reclassification loop details.
+4. **Invalidation**: If any of the referenced files are edited or deleted, the findings should be regenerated from the latest versions.

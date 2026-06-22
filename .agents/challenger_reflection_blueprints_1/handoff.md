@@ -60,8 +60,8 @@ Result code: 0
 ### Custom SPARQL Detections
 When running `/tmp/run_empirical_sparql_tests.py`, which executes targeted SPARQL validation queries against the same test cases using `ggen graph query`, all violations are successfully caught:
 ```
-=== TESTING CASE: valid_gundam_pc ===
-  [VERIFICATION] Gundam PC is fully connected: found 2 execution flows
+=== TESTING CASE: valid_mecha_pc ===
+  [VERIFICATION] Mecha PC is fully connected: found 2 execution flows
 
 === TESTING CASE: incompatible_pins ===
   [VIOLATION] Caught by Rule A: Pin Connection Direction Check: found 2 matches
@@ -151,4 +151,4 @@ While the UE4 Reflection and Blueprint Graph Ontology is logically coherent, com
    python3 /tmp/run_empirical_sparql_tests.py
    ```
 2. Inspect the test outcomes printed to `stdout` and logged to `/tmp/sparql_test_results.json`.
-3. Invalidation condition: The test fails if `valid_gundam_pc` triggers any of the rules A-H, or if any of the invalid cases fail to be detected by their respective rules.
+3. Invalidation condition: The test fails if `valid_mecha_pc` triggers any of the rules A-H, or if any of the invalid cases fail to be detected by their respective rules.

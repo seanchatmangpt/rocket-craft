@@ -1,0 +1,1678 @@
+#usda 1.0
+(
+    defaultPrim = "SnowWhitePrelude"
+    metersPerUnit = 1.0
+    upAxis = "Y"
+    doc = "Structural USDA representation for the WinterProtocol Prelude mecha, metric scale (meters)."
+)
+
+def Xform "SnowWhitePrelude" (
+    kind = "assembly"
+)
+{
+    # Base translation to place the mecha off the ground (in flight)
+    double3 xformOp:translate = (0, 15.0, 0)
+    uniform token[] xformOpOrder = ["xformOp:translate"]
+
+    def Xform "Torso" (
+        kind = "component"
+    )
+    {
+        
+        def Cylinder "SpineJoint"
+        {
+            double radius = 0.5
+            double height = 1.5
+            double3 xformOp:translate = (0, -1.0, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "SpineJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.5, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "SpineJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 1.2000000000000002
+            double3 xformOp:translate = (0, -1.0, 0.55)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "SpineJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.55, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "SpineJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.5, -1.125, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "SpineJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 1.2000000000000002
+            double3 xformOp:translate = (0, -1.0, 0.55)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "SpineJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.55, -1.125, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "SpineJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.5, -0.75, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "SpineJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 1.2000000000000002
+            double3 xformOp:translate = (0, -1.0, 0.55)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "SpineJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.55, -0.75, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "SpineJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.5, -0.375, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "SpineJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 1.2000000000000002
+            double3 xformOp:translate = (0, -1.0, 0.55)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "SpineJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.55, -0.375, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "Chest"
+        {
+            double3 xformOp:scale = (1.5, 1.8, 1.2)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Sphere "Sensor"
+        {
+            double radius = 0.4
+            double3 xformOp:translate = (0, 0, 1.2)
+            color3f[] primvars:displayColor = [(0.1, 0.8, 0.6)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "Head" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (0, 2.5, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        
+        def Cylinder "NeckJoint"
+        {
+            double radius = 0.3
+            double height = 0.8
+            double3 xformOp:translate = (0, -0.5, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "NeckJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -0.7666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "NeckJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -0.5, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "NeckJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -0.7666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "NeckJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -0.5666666666666667, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "NeckJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -0.5, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "NeckJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -0.5666666666666667, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "NeckJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -0.36666666666666664, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "NeckJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -0.5, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "NeckJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -0.36666666666666664, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "NeckJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -0.16666666666666657, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "NeckJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -0.5, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "NeckJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -0.16666666666666657, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "CraniumBase"
+        {
+            double3 xformOp:scale = (0.5, 0.7, 0.6)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Cube "CraniumArmor_Top"
+        {
+            double3 xformOp:scale = (0.55, 0.1, 0.65)
+            double3 xformOp:translate = (0, 0.75, 0)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cube "CraniumArmor_Back"
+        {
+            double3 xformOp:scale = (0.55, 0.7, 0.15)
+            double3 xformOp:translate = (0, 0.1, -0.55)
+            double3 xformOp:rotateXYZ = (15, 0, 0)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "Faceplate_Chin"
+        {
+            double3 xformOp:scale = (0.3, 0.2, 0.2)
+            double3 xformOp:translate = (0, -0.4, 0.5)
+            double3 xformOp:rotateXYZ = (-20, 0, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.1, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "Faceplate_Mask"
+        {
+            double3 xformOp:scale = (0.35, 0.3, 0.15)
+            double3 xformOp:translate = (0, -0.1, 0.55)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Sphere "PrimarySensorArray_Eye_L"
+        {
+            double radius = 0.08
+            double3 xformOp:scale = (1.5, 0.5, 0.5)
+            double3 xformOp:translate = (-0.2, 0.2, 0.58)
+            double3 xformOp:rotateXYZ = (0, -15, 10)
+            color3f[] primvars:displayColor = [(0.1, 0.9, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Sphere "PrimarySensorArray_Eye_R"
+        {
+            double radius = 0.08
+            double3 xformOp:scale = (1.5, 0.5, 0.5)
+            double3 xformOp:translate = (0.2, 0.2, 0.58)
+            double3 xformOp:rotateXYZ = (0, 15, -10)
+            color3f[] primvars:displayColor = [(0.1, 0.9, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "PrimarySensorArray_MainCam"
+        {
+            double3 xformOp:scale = (0.1, 0.15, 0.1)
+            double3 xformOp:translate = (0, 0.6, 0.62)
+            color3f[] primvars:displayColor = [(0.1, 0.9, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cube "PrimarySensorArray_RearCam"
+        {
+            double3 xformOp:scale = (0.08, 0.12, 0.08)
+            double3 xformOp:translate = (0, 0.6, -0.65)
+            color3f[] primvars:displayColor = [(0.1, 0.9, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cube "CrownCrest"
+        {
+            double3 xformOp:scale = (0.15, 0.2, 0.15)
+            double3 xformOp:translate = (0, 0.65, 0.6)
+            color3f[] primvars:displayColor = [(0.8, 0.1, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cube "VFinLeft_Primary"
+        {
+            double3 xformOp:scale = (0.05, 0.8, 0.05)
+            double3 xformOp:translate = (-0.4, 0.9, 0.6)
+            double3 xformOp:rotateXYZ = (0, 0, -45)
+            color3f[] primvars:displayColor = [(0.9, 0.8, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "VFinLeft_Secondary"
+        {
+            double3 xformOp:scale = (0.04, 0.4, 0.04)
+            double3 xformOp:translate = (-0.2, 0.8, 0.55)
+            double3 xformOp:rotateXYZ = (0, 0, -30)
+            color3f[] primvars:displayColor = [(0.9, 0.8, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "VFinRight_Primary"
+        {
+            double3 xformOp:scale = (0.05, 0.8, 0.05)
+            double3 xformOp:translate = (0.4, 0.9, 0.6)
+            double3 xformOp:rotateXYZ = (0, 0, 45)
+            color3f[] primvars:displayColor = [(0.9, 0.8, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "VFinRight_Secondary"
+        {
+            double3 xformOp:scale = (0.04, 0.4, 0.04)
+            double3 xformOp:translate = (0.2, 0.8, 0.55)
+            double3 xformOp:rotateXYZ = (0, 0, 30)
+            color3f[] primvars:displayColor = [(0.9, 0.8, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "CheekGuard_Left"
+        {
+            double3 xformOp:scale = (0.1, 0.3, 0.3)
+            double3 xformOp:translate = (-0.5, -0.1, 0.3)
+            double3 xformOp:rotateXYZ = (0, -15, 10)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cube "CheekGuard_Right"
+        {
+            double3 xformOp:scale = (0.1, 0.3, 0.3)
+            double3 xformOp:translate = (0.5, -0.1, 0.3)
+            double3 xformOp:rotateXYZ = (0, 15, -10)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ", "xformOp:scale"]
+        }
+        def Cylinder "EarPod_Left"
+        {
+            double radius = 0.25
+            double height = 0.2
+            double3 xformOp:translate = (-0.55, 0.1, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            color3f[] primvars:displayColor = [(0.3, 0.3, 0.3)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cylinder "EarPod_Right"
+        {
+            double radius = 0.25
+            double height = 0.2
+            double3 xformOp:translate = (0.55, 0.1, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            color3f[] primvars:displayColor = [(0.3, 0.3, 0.3)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cylinder "HeadVulcan_Left"
+        {
+            double radius = 0.03
+            double height = 0.1
+            double3 xformOp:translate = (-0.3, 0.4, 0.55)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cylinder "HeadVulcan_Right"
+        {
+            double radius = 0.03
+            double height = 0.1
+            double3 xformOp:translate = (0.3, 0.4, 0.55)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cylinder "NeckCollar"
+        {
+            double radius = 0.6
+            double height = 0.2
+            double3 xformOp:translate = (0, -0.6, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+    }
+
+    def Xform "LeftArm" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (-2.5, 1.0, 0)
+        double3 xformOp:rotateXYZ = (20, -30, 45)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        
+        def Cylinder "ShoulderJoint"
+        {
+            double radius = 0.3
+            double height = 0.8
+            double3 xformOp:translate = (0.5, 0, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "ShoulderJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.8, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (0.15000000000000002, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.8, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (0.15000000000000002, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.8, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (0.15000000000000002, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.8, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (0.15000000000000002, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "ElbowJoint"
+        {
+            double radius = 0.25
+            double height = 0.6
+            double3 xformOp:translate = (0, -2.6, 0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "ElbowJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.8000000000000003, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.8000000000000003, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ElbowJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.65, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.65, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ElbowJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.5, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.5, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ElbowJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.35, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.35, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderArmor"
+        {
+            double3 xformOp:scale = (1.0, 1.2, 1.0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Cylinder "Bicep"
+        {
+            double radius = 0.4
+            double height = 2.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Forearm"
+        {
+            double radius = 0.35
+            double height = 2.5
+            double3 xformOp:translate = (0, -4.0, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.8, 0.8)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "Manipulator"
+        {
+            double radius = 0.3
+            double3 xformOp:translate = (0, -5.5, 0)
+            color3f[] primvars:displayColor = [(0.3, 0.3, 0.3)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            
+            def Xform "WeaponSocket"
+            {
+                double3 xformOp:translate = (0, -0.5, 0.5)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+
+                def Cylinder "BeamSaberHandle"
+                {
+                    double radius = 0.08
+                    double height = 0.8
+                    double3 xformOp:translate = (0, 0, 0)
+                    double3 xformOp:rotateXYZ = (90, 0, 0)
+                    color3f[] primvars:displayColor = [(0.7, 0.7, 0.7)]
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                }
+                def Cylinder "BeamSaberBlade"
+                {
+                    double radius = 0.15
+                    double height = 6.0
+                    double3 xformOp:translate = (0, 0, 3.4)
+                    double3 xformOp:rotateXYZ = (90, 0, 0)
+                    color3f[] primvars:displayColor = [(0.1, 0.9, 0.7)]
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                }
+            }
+        }
+    }
+
+    def Xform "RightArm" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (2.5, 1.0, 0)
+        double3 xformOp:rotateXYZ = (20, 30, -45)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        
+        def Cylinder "ShoulderJoint"
+        {
+            double radius = 0.3
+            double height = 0.8
+            double3 xformOp:translate = (-0.5, 0, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "ShoulderJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (-0.2, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (-0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.8500000000000001, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (-0.2, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (-0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.8500000000000001, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (-0.2, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (-0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.8500000000000001, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (-0.2, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ShoulderJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (-0.5, 0, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ShoulderJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.8500000000000001, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "ElbowJoint"
+        {
+            double radius = 0.25
+            double height = 0.6
+            double3 xformOp:translate = (0, -2.6, 0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "ElbowJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.8000000000000003, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.8000000000000003, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ElbowJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.65, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.65, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ElbowJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.5, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.5, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ElbowJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.25, -2.35, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "ElbowJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -2.6, 0.3)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "ElbowJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.3, -2.35, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "ShoulderArmor"
+        {
+            double3 xformOp:scale = (1.0, 1.2, 1.0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:scale"]
+        }
+        def Cylinder "Bicep"
+        {
+            double radius = 0.4
+            double height = 2.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.5, 0.5, 0.5)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Forearm"
+        {
+            double radius = 0.35
+            double height = 2.5
+            double3 xformOp:translate = (0, -4.0, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.8, 0.8)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Sphere "Manipulator"
+        {
+            double radius = 0.3
+            double3 xformOp:translate = (0, -5.5, 0)
+            color3f[] primvars:displayColor = [(0.3, 0.3, 0.3)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+            
+            def Xform "WeaponSocket"
+            {
+                double3 xformOp:translate = (0, -0.5, 0.5)
+                uniform token[] xformOpOrder = ["xformOp:translate"]
+                
+                def Cube "MesserZwergBusterRifle"
+                {
+                    double3 xformOp:scale = (0.2, 0.4, 3.0)
+                    double3 xformOp:translate = (0, 0, 2.0)
+                    color3f[] primvars:displayColor = [(0.2, 0.2, 0.25)]
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+                }
+                def Cylinder "BusterBarrel"
+                {
+                    double radius = 0.1
+                    double height = 4.0
+                    double3 xformOp:translate = (0, 0, 5.0)
+                    double3 xformOp:rotateXYZ = (90, 0, 0)
+                    color3f[] primvars:displayColor = [(0.6, 0.6, 0.6)]
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+                }
+            }
+        }
+    }
+
+    def Xform "LeftLeg" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (-1.0, -2.5, 0)
+        double3 xformOp:rotateXYZ = (-20, 0, -5)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        
+        def Cylinder "HipJoint"
+        {
+            double radius = 0.4
+            double height = 0.8
+            double3 xformOp:translate = (0, 0, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "HipJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "HipJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "HipJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "HipJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "KneeJoint"
+        {
+            double radius = 0.35
+            double height = 0.8
+            double3 xformOp:translate = (0, -3.1, 0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "KneeJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -3.3666666666666667, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -3.3666666666666667, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "KneeJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -3.166666666666667, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -3.166666666666667, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "KneeJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -2.966666666666667, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -2.966666666666667, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "KneeJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -2.7666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -2.7666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "AnkleJoint"
+        {
+            double radius = 0.3
+            double height = 0.6
+            double3 xformOp:translate = (0, -7.1, 0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "AnkleJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -7.3, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -7.3, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "AnkleJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -7.1499999999999995, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -7.1499999999999995, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "AnkleJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -7.0, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -7.0, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "AnkleJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -6.85, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -6.85, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Thigh"
+        {
+            double radius = 0.6
+            double height = 3.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Calf"
+        {
+            double radius = 0.8
+            double height = 4.0
+            double3 xformOp:translate = (0, -5.0, 0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "RightLeg" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (1.0, -2.5, 0)
+        double3 xformOp:rotateXYZ = (10, 0, 5)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+        
+        def Cylinder "HipJoint"
+        {
+            double radius = 0.4
+            double height = 0.8
+            double3 xformOp:translate = (0, 0, 0)
+            double3 xformOp:rotateXYZ = (0, 0, 90)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "HipJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, -0.26666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "HipJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, -0.06666666666666665, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "HipJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, 0.13333333333333336, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "HipJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.4, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "HipJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, 0, 0.45)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "HipJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.45, 0.3333333333333334, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "KneeJoint"
+        {
+            double radius = 0.35
+            double height = 0.8
+            double3 xformOp:translate = (0, -3.1, 0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "KneeJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -3.3666666666666667, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -3.3666666666666667, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "KneeJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -3.166666666666667, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -3.166666666666667, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "KneeJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -2.966666666666667, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -2.966666666666667, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "KneeJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.35, -2.7666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "KneeJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.6400000000000001
+            double3 xformOp:translate = (0, -3.1, 0.39999999999999997)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "KneeJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.39999999999999997, -2.7666666666666666, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+
+        def Cylinder "AnkleJoint"
+        {
+            double radius = 0.3
+            double height = 0.6
+            double3 xformOp:translate = (0, -7.1, 0)
+            double3 xformOp:rotateXYZ = (90, 0, 0)
+            color3f[] primvars:displayColor = [(0.2, 0.2, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Cube "AnkleJointGreeble_0"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -7.3, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_0"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_0"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -7.3, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "AnkleJointGreeble_1"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -7.1499999999999995, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_1"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_1"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -7.1499999999999995, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "AnkleJointGreeble_2"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -7.0, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_2"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_2"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -7.0, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cube "AnkleJointGreeble_3"
+        {
+            double3 xformOp:scale = (0.1, 0.05, 0.1)
+            double3 xformOp:translate = (0.3, -6.85, 0)
+            color3f[] primvars:displayColor = [(0.7, 0.4, 0.1)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+        }
+        def Cylinder "AnkleJointPiston_3"
+        {
+            double radius = 0.05
+            double height = 0.48
+            double3 xformOp:translate = (0, -7.1, 0.35)
+            double3 xformOp:rotateXYZ = (0, 0, 0)
+            color3f[] primvars:displayColor = [(0.4, 0.4, 0.4)]
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+        }
+        def Sphere "AnkleJointRotator_3"
+        {
+            double radius = 0.08
+            double3 xformOp:translate = (-0.35, -6.85, 0)
+            color3f[] primvars:displayColor = [(0.8, 0.6, 0.2)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Thigh"
+        {
+            double radius = 0.6
+            double height = 3.0
+            double3 xformOp:translate = (0, -1.5, 0)
+            color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+        def Cylinder "Calf"
+        {
+            double radius = 0.8
+            double height = 4.0
+            double3 xformOp:translate = (0, -5.0, 0)
+            color3f[] primvars:displayColor = [(0.85, 0.85, 0.85)]
+            uniform token[] xformOpOrder = ["xformOp:translate"]
+        }
+    }
+
+    def Xform "Backpack_Wings" (
+        kind = "component"
+    )
+    {
+        double3 xformOp:translate = (0, 0.0, -1.5)
+        uniform token[] xformOpOrder = ["xformOp:translate"]
+
+        # Main Feathers / Primary Wing Binders
+        def Xform "LeftPrimaryWing"
+        {
+            double3 xformOp:translate = (-2.0, 2.0, -1.0)
+            double3 xformOp:rotateXYZ = (20, 30, -30)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "WingBase"
+            {
+                double3 xformOp:scale = (6.0, 2.0, 0.2)
+                color3f[] primvars:displayColor = [(0.95, 0.95, 0.95)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+        def Xform "RightPrimaryWing"
+        {
+            double3 xformOp:translate = (2.0, 2.0, -1.0)
+            double3 xformOp:rotateXYZ = (20, -30, 30)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "WingBase"
+            {
+                double3 xformOp:scale = (6.0, 2.0, 0.2)
+                color3f[] primvars:displayColor = [(0.95, 0.95, 0.95)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+
+        # Sub-wings / Drei Zwerg binders
+        def Xform "LeftSubWing"
+        {
+            double3 xformOp:translate = (-3.0, -2.0, -0.5)
+            double3 xformOp:rotateXYZ = (-10, 45, -45)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "SubWingBase"
+            {
+                double3 xformOp:scale = (5.0, 1.5, 0.15)
+                color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+        def Xform "RightSubWing"
+        {
+            double3 xformOp:translate = (3.0, -2.0, -0.5)
+            double3 xformOp:rotateXYZ = (-10, -45, 45)
+            uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+
+            def Cube "SubWingBase"
+            {
+                double3 xformOp:scale = (5.0, 1.5, 0.15)
+                color3f[] primvars:displayColor = [(0.9, 0.9, 0.9)]
+                uniform token[] xformOpOrder = ["xformOp:scale"]
+            }
+        }
+    }
+}

@@ -22,10 +22,12 @@ def validate_no_overlap():
         'final_mech_asset/SM_Torso.usda',
         'final_mech_asset/SM_Blade_Left.usda',
         'final_mech_asset/SM_Blade_Right.usda',
-        'final_mech_asset/SM_WingArray_Left.usda',
-        'final_mech_asset/SM_WingArray_Right.usda',
-        'final_mech_asset/SM_Limb_Left.usda',
-        'final_mech_asset/SM_Limb_Right.usda',
+        'final_mech_asset/SM_Wing_Left.usda',
+        'final_mech_asset/SM_Wing_Right.usda',
+        'final_mech_asset/SM_Arm_Left.usda',
+        'final_mech_asset/SM_Leg_Left.usda',
+        'final_mech_asset/SM_Arm_Right.usda',
+        'final_mech_asset/SM_Leg_Right.usda',
         'final_mech_asset/SM_Head.usda',
     ]
     

@@ -7,7 +7,7 @@ use std::path::PathBuf;
 
 use chicago_tdd_tools::{
     coordinate::{
-        GundamCoordinateSystem, GundamSessionSimulation, InfinityBladeCoordinateSystem,
+        MechaCoordinateSystem, MechaSessionSimulation, InfinityBladeCoordinateSystem,
         SessionState,
     },
     discover_games, explore_state_space,
@@ -55,7 +55,7 @@ fn run_engine(cli: Cli) -> Result<()> {
     println!("Executing discover_games()...");
     let discovered = discover_games();
     let mut found_ib4 = false;
-    let mut found_gundam = false;
+    let mut found_mecha = false;
 
     for game in &discovered {
         println!(
@@ -65,14 +65,14 @@ fn run_engine(cli: Cli) -> Result<()> {
         if game.name == "Infinity Blade 4 MUD" {
             found_ib4 = true;
         }
-        if game.name == "Gundam Nexus" {
-            found_gundam = true;
+        if game.name == "Mecha Nexus" {
+            found_mecha = true;
         }
     }
 
-    if !found_ib4 || !found_gundam {
+    if !found_ib4 || !found_mecha {
         anyhow::bail!(
-            "Could not discover both 'Infinity Blade 4 MUD' and 'Gundam Nexus'. Discovered: {:?}",
+            "Could not discover both 'Infinity Blade 4 MUD' and 'Mecha Nexus'. Discovered: {:?}",
             discovered
         );
     }
@@ -81,8 +81,8 @@ fn run_engine(cli: Cli) -> Result<()> {
     let ib4_sys = InfinityBladeCoordinateSystem;
     let ib4_state = GameSession::new("SirisAimbot");
 
-    let gundam_sys = GundamCoordinateSystem;
-    let gundam_state = GundamSessionSimulation {
+    let mecha_sys = MechaCoordinateSystem;
+    let mecha_state = MechaSessionSimulation {
         state: SessionState::Connecting,
         profile: PlayerProfile::new(1001, "PilotAimbot".to_string()),
         inventory: Vec::new(),
@@ -92,8 +92,8 @@ fn run_engine(cli: Cli) -> Result<()> {
     println!("Exploring Infinity Blade 4 MUD state space...");
     let ib4_result = explore_state_space(&ib4_sys, ib4_state, 1000);
 
-    println!("Exploring Gundam Nexus state space...");
-    let gundam_result = explore_state_space(&gundam_sys, gundam_state, 1000);
+    println!("Exploring Mecha Nexus state space...");
+    let mecha_result = explore_state_space(&mecha_sys, mecha_state, 1000);
 
     // 4. Print clean human-readable output to standard output
     println!("\n========================================");
@@ -114,19 +114,19 @@ fn run_engine(cli: Cli) -> Result<()> {
         }
     }
 
-    println!("\nGame: Gundam Nexus");
+    println!("\nGame: Mecha Nexus");
     println!(
         "Visited States Count: {}",
-        gundam_result.visited_states_count
+        mecha_result.visited_states_count
     );
-    println!("Transitions Count: {}", gundam_result.transitions.len());
+    println!("Transitions Count: {}", mecha_result.transitions.len());
     println!("Transitions:");
-    for (src, mv, dst) in &gundam_result.transitions {
+    for (src, mv, dst) in &mecha_result.transitions {
         println!("  {} --({})--> {}", src, mv, dst);
     }
-    if !gundam_result.errors.is_empty() {
+    if !mecha_result.errors.is_empty() {
         println!("Errors:");
-        for err in &gundam_result.errors {
+        for err in &mecha_result.errors {
             println!("  [ERR] {}", err);
         }
     }
@@ -142,9 +142,9 @@ fn run_engine(cli: Cli) -> Result<()> {
             target: dst.clone(),
         });
     }
-    for (src, mv, dst) in &gundam_result.transitions {
+    for (src, mv, dst) in &mecha_result.transitions {
         transitions.push(ReportTransition {
-            game: "Gundam Nexus".to_string(),
+            game: "Mecha Nexus".to_string(),
             source: src.clone(),
             mv: mv.clone(),
             target: dst.clone(),
@@ -161,16 +161,16 @@ fn run_engine(cli: Cli) -> Result<()> {
         },
     );
     games.insert(
-        "Gundam Nexus".to_string(),
+        "Mecha Nexus".to_string(),
         GameSummary {
-            visited_states_count: gundam_result.visited_states_count,
-            transition_count: gundam_result.transitions.len(),
-            errors: gundam_result.errors,
+            visited_states_count: mecha_result.visited_states_count,
+            transition_count: mecha_result.transitions.len(),
+            errors: mecha_result.errors,
         },
     );
 
     let report = CombinatorialReport {
-        total_states_visited: ib4_result.visited_states_count + gundam_result.visited_states_count,
+        total_states_visited: ib4_result.visited_states_count + mecha_result.visited_states_count,
         transition_count: transitions.len(),
         transitions,
         games,

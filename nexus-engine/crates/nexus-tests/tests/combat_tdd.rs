@@ -20,7 +20,7 @@ fn make_room_player(id: u64, hp: f32, attack: f32, magic: f32) -> RoomPlayer {
     RoomPlayer {
         player_id: id,
         name: format!("Player{}", id),
-        suit_id: "RX-78-2".to_string(),
+        suit_id: "XM-01-2".to_string(),
         hp: Hp::new(hp),
         max_hp: Hp::new(hp),
         attack: Damage::new(attack),

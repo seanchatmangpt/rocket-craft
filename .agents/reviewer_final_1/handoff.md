@@ -122,7 +122,7 @@ In `/Users/sac/.ggen/packs/ue4_ontology/shacl/validation.shacl.ttl`:
 
 - **USceneComponent Subclass Rendering Shapes**:
   - Observation 2 shows that explicit shapes are added targeting `ue4:USkeletalMeshComponent` and `ue4:UBoxComponent` directly.
-  - In SHACL processors without RDFS reasoning, targeting `ue4:USceneComponent` will not automatically match instances explicitly typed as subclasses (e.g. `gundam:GundamMesh a ue4:USkeletalMeshComponent`).
+  - In SHACL processors without RDFS reasoning, targeting `ue4:USceneComponent` will not automatically match instances explicitly typed as subclasses (e.g. `mecha:MechaMesh a ue4:USkeletalMeshComponent`).
   - By replicating the rendering property shapes directly on these subclasses, the validator will properly check `interactionDistanceClass`, `materialClass`, `instancingClass`, and `silhouetteImportanceClass` on the subclass instances, avoiding validation bypass.
 
 - **Non-negative Parameter Index**:

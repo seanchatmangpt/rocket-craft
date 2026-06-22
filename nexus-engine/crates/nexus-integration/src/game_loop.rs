@@ -95,7 +95,7 @@ impl PlayerState {
             combo_depth: 0,
             qip_scar_stacks: 0,
             trans_am_gauge: 0.0,
-            suit_id: "RX-78-2".to_string(),
+            suit_id: "XM-01-2".to_string(),
         }
     }
 

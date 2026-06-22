@@ -1,0 +1,11 @@
+#usda 1.0
+(
+    upAxis = "Y"
+)
+def Xform "Model" (
+    references = @/Users/sac/rocket-craft/winter_protocol_prelude_mecha.usda@
+)
+{
+    double3 xformOp:rotateXYZ = (15, 45, 0)
+    uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
+}

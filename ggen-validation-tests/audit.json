@@ -28,7 +28,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactorySteps_h",
+      "name": "MechaFactorySteps_h",
       "duration_ms": 2,
       "triples_added": null,
       "status": "success",
@@ -36,7 +36,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactorySteps_rs",
+      "name": "MechaFactorySteps_rs",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -44,7 +44,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryProjectionRows_csv",
+      "name": "MechaFactoryProjectionRows_csv",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -52,7 +52,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactorySocketTopology_csv",
+      "name": "MechaFactorySocketTopology_csv",
       "duration_ms": 4,
       "triples_added": null,
       "status": "success",
@@ -60,7 +60,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactorySkinLayers_csv",
+      "name": "MechaFactorySkinLayers_csv",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -68,7 +68,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryMotionFamilies_csv",
+      "name": "MechaFactoryMotionFamilies_csv",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -76,7 +76,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryLODClasses_csv",
+      "name": "MechaFactoryLODClasses_csv",
       "duration_ms": 4,
       "triples_added": null,
       "status": "success",
@@ -84,7 +84,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryAuthorityClasses_csv",
+      "name": "MechaFactoryAuthorityClasses_csv",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -92,7 +92,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryTransitionTable_csv",
+      "name": "MechaFactoryTransitionTable_csv",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -100,7 +100,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryPredictionRules_csv",
+      "name": "MechaFactoryPredictionRules_csv",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -108,7 +108,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryReceiptManifest_json",
+      "name": "MechaFactoryReceiptManifest_json",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -116,7 +116,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryProjectionManifest_json",
+      "name": "MechaFactoryProjectionManifest_json",
       "duration_ms": 5,
       "triples_added": null,
       "status": "success",
@@ -124,7 +124,7 @@
     },
     {
       "step_type": "render",
-      "name": "GundamFactoryOCELSeed_json",
+      "name": "MechaFactoryOCELSeed_json",
       "duration_ms": 3,
       "triples_added": null,
       "status": "success",
@@ -141,82 +141,82 @@
   ],
   "outputs": [
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.h",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySteps.h",
       "content_hash": "a41f4e17330f314eb027d2aa1bb97a6a09cdcc484c365484ed9f3025e1709043",
       "size_bytes": 441,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.h"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySteps.h"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.rs",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySteps.rs",
       "content_hash": "2d1bad3d0b4f829733806983cba52f76983b2237b160246e67d83e9f9cf7a5e8",
       "size_bytes": 855,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySteps.rs"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySteps.rs"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionRows.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryProjectionRows.csv",
       "content_hash": "bf4fdc61b77ffc7aeb4a30f52a5ae46556d7a6f13d099e710c256756011651d3",
       "size_bytes": 1589,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionRows.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryProjectionRows.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySocketTopology.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySocketTopology.csv",
       "content_hash": "fb728136a4235ce38a7e3cdc795dd7c3df917efa703c372e4c99f2181e053dd2",
       "size_bytes": 344,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySocketTopology.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySocketTopology.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySkinLayers.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySkinLayers.csv",
       "content_hash": "ee3ba66a54859e9ed96a1e9e0f0588d87b9c2509101a17bf07811d248d14a88c",
       "size_bytes": 353,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactorySkinLayers.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactorySkinLayers.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryMotionFamilies.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryMotionFamilies.csv",
       "content_hash": "d09836ac14b53e2d7353665faee9e7cab492b89c345b1b94f8291a49fdeeffd0",
       "size_bytes": 370,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryMotionFamilies.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryMotionFamilies.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryLODClasses.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryLODClasses.csv",
       "content_hash": "e9917393a5ebb25835ceb967f769fbc4b6f275ff22dc88b6ff4c8836b54b0b86",
       "size_bytes": 182,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryLODClasses.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryLODClasses.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryAuthorityClasses.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryAuthorityClasses.csv",
       "content_hash": "e5b20abb29bd42613a1d44bfd2b60e451ebf6dafa18885926950ad05f6630613",
       "size_bytes": 338,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryAuthorityClasses.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryAuthorityClasses.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryTransitionTable.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryTransitionTable.csv",
       "content_hash": "07e61110f8d7092ee4df04a4549877e9e25d745983093e0cacb8403ca44f495b",
       "size_bytes": 346,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryTransitionTable.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryTransitionTable.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryPredictionRules.csv",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryPredictionRules.csv",
       "content_hash": "7af38ce6fc7954325d9337cbbbc65c6e2827836d1e56cc149436721f3e2c9630",
       "size_bytes": 307,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryPredictionRules.csv"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryPredictionRules.csv"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryReceiptManifest.json",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryReceiptManifest.json",
       "content_hash": "f517a4362325803ff6bbc6484dc889ca8f8d89eb2d4997adb4f33a11168811fb",
       "size_bytes": 1620,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryReceiptManifest.json"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryReceiptManifest.json"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionManifest.json",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryProjectionManifest.json",
       "content_hash": "dfe9cf77f26f55cda2303f427d3bcc21680ef932c4401efc6d2a0c2e57a76dff",
       "size_bytes": 3400,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryProjectionManifest.json"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryProjectionManifest.json"
     },
     {
-      "path": "/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryOCELSeed.json",
+      "path": "/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryOCELSeed.json",
       "content_hash": "983f782fc16bdcb539ac633fe1280f2c6808eaa3289eb88aea1f1cc25a3131ea",
       "size_bytes": 5127,
-      "source_rule": "rule-/Users/sac/rocket-craft/generated/gundam_factory/GundamFactoryOCELSeed.json"
+      "source_rule": "rule-/Users/sac/rocket-craft/generated/mecha_factory/MechaFactoryOCELSeed.json"
     },
     {
       "path": "/Users/sac/rocket-craft/ggen-validation-tests/./README.md",

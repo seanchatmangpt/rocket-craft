@@ -144,7 +144,7 @@ log_info "[6/5] Cross-checking cook-receipt hash vs game receipt hash..."
 COOK_RECEIPT="$ARCHIVE_DIR/cook-receipt.json"
 if [ -f "$COOK_RECEIPT" ] && [ -f "$RECEIPT" ]; then
   COOK_HASH=$(python3 -c "import json; d=json.load(open('$COOK_RECEIPT')); print(d.get('output_hash',''))" 2>/dev/null || echo "")
-  GAME_HASH=$(python3 -c "import json; d=json.load(open('$RECEIPT')); print(d.get('output_hash',''))" 2>/dev/null || echo "")
+  GAME_HASH=$(python3 -c "import json; d=json.load(open('$RECEIPT')); print(d.get('output_hash','').replace('blake3:', ''))" 2>/dev/null || echo "")
   if [ -z "$COOK_HASH" ] || [ -z "$GAME_HASH" ]; then
     log_warn "Cook-to-game hash cross-check skipped — one or both output_hash fields missing"
     log_warn "  cook receipt output_hash: '${COOK_HASH:-<empty>}'"

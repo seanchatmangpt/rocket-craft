@@ -9,7 +9,7 @@
     "blueprints.ttl:a46d053a19be547cf23cc19cb3c141725b547a31ab8150d63a06b8aef34a8b7c",
     "subsystems.ttl:cab38c3c3a821345b350a9105b8ecb825149d570893f48e258c04e32a8a5da0c",
     "typestates.ttl:18fc26e7586d7f390b82fcd9c5da4f69783573fa18d960861b9d187482a2cd59",
-    "gundam_scenario.ttl:5223db4bdbd125aa9755540a6507d267dddebe496a72cd2d5e02794abd954ce2"
+    "mecha_scenario.ttl:5223db4bdbd125aa9755540a6507d267dddebe496a72cd2d5e02794abd954ce2"
   ],
   "output_hashes": [],
   "signature": "fcf23d9d556e0b03e30f57932bdc8d9f7fa28c0d4e79b5f39e76f378ac370cac45a4e077eb6039b5f31ede07b8aa0782309c3d90b7bbfbe7f59a9591f12bd50b",

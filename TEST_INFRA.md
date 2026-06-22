@@ -137,7 +137,7 @@ Enforces structural rules, quality constraints, and extreme inputs.
 1. **Empty Meshes** - Verify that mesh files with zero vertices or points are rejected.
 2. **Duplicate Fingerprints** - Verify that duplicate asset fingerprints trigger confusion errors.
 3. **Bounding Box Overlaps** - Verify bounding box intersections between distinct components are within valid margins.
-4. **V-fin IP Proximities** - Verify that V-fin antenna distances do not collide.
+4. **Mecha Crown IP Proximities** - Verify that Mecha Crown antenna distances do not collide.
 5. **Zero-Volume Components** - Verify that components have non-zero volume/mass.
 
 ---

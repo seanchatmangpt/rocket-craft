@@ -13,7 +13,7 @@ chrono = { version = "0.4", features = ["serde"] }
 nexus-types = { path = "../nexus-types" }
 nexus-pmme = { path = "../nexus-pmme" }
 nexus-tps = { path = "../nexus-tps" }
-nexus-gundam = { path = "../nexus-gundam" }
+nexus-mecha = { path = "../nexus-mecha" }
 wasm4pm = { path = "/Users/sac/dev/wasm4pm/wasm4pm", features = ["cloud"] }
 wasm4pm-compat = { path = "/Users/sac/dev/wasm4pm-compat" }
 

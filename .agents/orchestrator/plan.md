@@ -1,35 +1,32 @@
-# Project: Asset Manufacturing LSP (ggen-asset-lsp)
-# Scope: Complete LSP server implementation using lsp-max for USDA/MaterialX diagnostics, visual proof routing, generator code actions, and OCEL integration.
+# Project: BIPEDAL_KIT_COHERENCE & HIGH_FIDELITY_SCULPTING
+# Scope: Mathematically sculpt blocky Mecha geometry into a high-fidelity, photorealistic 3D asset matching the Wing Gundam Snow White Prelude reference image. Implement SHACL-based bipedal kit coherence constraints, compile the mecha graph, and verify via Playwright actuation.
 
 ## Architecture
-The `ggen-asset-lsp` treats 3D assets (USD, MaterialX, textures, rigs, renders, receipts) as a diagnosable compiler surface. It maps asset pipeline errors and headless render results directly into LSP diagnostics and routes quick-fixes to generator parameter sources.
-
-- **Workspace Path**: `/Users/sac/rocket-craft`
-- **Crate Path**: `crates/ggen-asset-lsp`
-- **Asset Scope**: `generated/mech_assets/reference_fabric_001/`
-- **External Framework**: `/Users/sac/lsp-max`
+The procedural sculpting is driven by `ggen` geometry templates (`part_mesh.usda.tera` and queries) mapping to the mecha source graph. SHACL rules in `ontology/source_law/` validate the structural connectivity (kit coherence) and proportions of the bipedal model.
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|---|---|---|---|
-| 1 | Exploration & Architecture Definition | Inspect lsp-max framework and examples, locate reference assets, define diagnostics mapping rules. | None | DONE |
-| 2 | Crate Setup & Workspace Cargo Setup | Create crates/ggen-asset-lsp, update root Cargo.toml, configure dependencies on lsp-max. | M1 | DONE |
-| 3 | Core LSP Server & Diagnostics | Implement LSP server shell, USD/MaterialX parsing, visual gap report routing. | M2 | DONE |
-| 4 | Code Actions & OCEL Integration | Implement generator code actions, emit OCEL events for validation/repair lifecycles. | M3 | DONE |
-| 5 | E2E Verification | Run review rounds and challenger tests on the core LSP server. | M4 | DONE |
-| 6 | Morphology & Modularity Updates | Implement VIS200 morphology and USD300 modularity diagnostics (fingerprints, part boundaries, transform proofs). | M5 | IN_PROGRESS |
-| 7 | Final Forensic Audit & Handoff | Run the Forensic Auditor to check for integrity violations and prepare the final handoff. | M6 | PLANNED |
+| 1 | Exploration & Gap Analysis | Inspect reference image, check current geometry templates, and identify anatomy and morphology gaps. | None | PLANNED |
+| 2 | Kit Coherence Graph Constraints | Formulate SHACL shapes for neck/pelvis/joints and add kit coherence constraints to source law. | M1 | PLANNED |
+| 3 | High-Fidelity Geometry Templates | Enhance `part_mesh.usda.tera` with layered armor, curved overlapping feathers, cheeks, neck, and joint sockets. | M2 | PLANNED |
+| 4 | SHACL Validation | Compile the mecha graph and run `validate_shacl.py` to ensure all coherence and envelope constraints pass. | M3 | PLANNED |
+| 5 | Visual Pipeline & Playwright Gate | Run verify scripts, generate fresh renders, and execute Playwright actuation validation. | M4 | PLANNED |
+| 6 | Forensic Audit & Handoff | Spawn Forensic Auditor to verify verdict cleanliness and compile final reports. | M5 | PLANNED |
 
-## Interface & Diagnostic Contracts
-### Diagnostics Rules
-- **Missing Payload**: A prim of type `Mesh` or similar that should reference a payload, but lacks a valid reference (e.g. `payload = @mesh.usd@` missing).
-- **Missing Material Binding**: A prim lacking a material binding, or referencing a non-existent material.
-- **Unreceipted USD Prim**: Prims that do not have associated cryptographic receipts.
-- **Visual Gap Routing**: If `visual_gap_report.json` indicates silhouette IOU < threshold, project error on the root Xform/Mesh in USDA.
-- **usdchecker Logs**: Project usdchecker errors onto the matching USDA lines.
-
-### Code Actions
-- Targets the **source** (e.g., `template.usda.tera`, SPARQL queries, or Rust parameter row), NOT the generated USDA.
-
-### OCEL Events
-- Emit OCEL events (e.g. `validate`, `repair`) whenever validation or repairs are executed.
+## Interface & Kit Coherence Constraints
+### Kit Coherence Rules (BIPEDAL_KIT_COHERENCE)
+- head_y_min > torso_y_max
+- neck connects head to torso
+- shoulder sockets attach arms to torso
+- elbow exists between shoulder and wrist
+- wrist connects to manipulator
+- weapon must be held by manipulator, not float
+- pelvis exists below torso
+- hip sockets attach thighs
+- knee exists between thigh and shin
+- ankle exists between shin and foot
+- feet contact lower body ground band
+- shield attaches to forearm or hand
+- wing binders attach to backpack, not arbitrary torso slabs
+- wing feathers are segmented curved panels, not flat slabs

@@ -10,4 +10,4 @@ thiserror = { workspace = true }
 sha2 = { workspace = true }
 chrono = { workspace = true }
 nexus-types = { workspace = true }
-nexus-gundam = { workspace = true }
+nexus-mecha = { workspace = true }

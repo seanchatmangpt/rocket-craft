@@ -1,0 +1,23 @@
+{
+  "gate": "SPARQL_EXTRACTION_VERIFICATION",
+  "status": "PASSED",
+  "sparql_queries_checked": [
+    "select_parts_and_dimensions",
+    "select_scale_bands",
+    "select_density_rules"
+  ],
+  "morphology_variables_extracted": [
+    "densityClass",
+    "scaleX",
+    "scaleY",
+    "scaleZ",
+    "translateX",
+    "translateY",
+    "translateZ",
+    "rotateX",
+    "rotateY",
+    "rotateZ"
+  ],
+  "python_side_edits_detected": false,
+  "verdict": "All morphology variables are extracted directly via target-oriented SPARQL queries without Python-side hardcoding or modification."
+}

@@ -72,7 +72,6 @@ RESYNC_SUBDIRS = ["usd", "renders", "materialx", "textures", "reports", "ocel", 
 # artifacts under test.
 CANONICAL_REBUILD_STEPS = [
     ["python3", "scripts/merge_ontology.py"],
-    ["python3", "patch_geometry_generator.py"],
     ["ggen", "sync"],
     ["python3", "scripts/verify_metric_morphology.py"],
     ["python3", "scripts/generate_procedural_textures.py"],

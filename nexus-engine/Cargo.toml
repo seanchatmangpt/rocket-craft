@@ -11,7 +11,7 @@ members = [
     "crates/nexus-tests",
     "crates/nexus-shop",
     "crates/nexus-integration",
-    "crates/nexus-gundam",
+    "crates/nexus-mecha",
     "crates/nexus-pmme",
     "crates/nexus-tps",
     "crates/nexus-mud",
@@ -63,7 +63,7 @@ nexus-gfx = { path = "crates/nexus-gfx" }
 nexus-shop = { path = "crates/nexus-shop" }
 nexus-net = { path = "crates/nexus-net" }
 nexus-integration = { path = "crates/nexus-integration" }
-nexus-gundam = { path = "crates/nexus-gundam" }
+nexus-mecha = { path = "crates/nexus-mecha" }
 nexus-pmme = { path = "crates/nexus-pmme" }
 nexus-tps = { path = "crates/nexus-tps" }
 nexus-mud = { path = "crates/nexus-mud" }

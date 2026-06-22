@@ -8,6 +8,7 @@ header = """@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix core: <https://ggen.io/ontology/core/> .
 @prefix mud: <https://rocket-craft.com/ontology/mud#> .
+@prefix law: <https://rocket-craft.com/ontology/law#> .
 
 mud:GeneratorParametersOntology a owl:Ontology ;
     rdfs:label "Generator Parameters Ontology" ;
@@ -74,10 +75,20 @@ mud:GeometryPrimitive rdf:type owl:Class ;
 primitives = []
 count = 0
 
-def add_prim(part, type_, tx, ty, tz, sx, sy, sz, rx, ry, rz, mat):
+def add_prim(part, type_, tx, ty, tz, sx, sy, sz, rx, ry, rz, mat, density=None, scale_min=0.01, scale_max=50.0, edge_count=4, socket="mud:Socket_None", sweep="law:LinearSweep", armor_band="law:MediumDensityArmor"):
     global count
     count += 1
     prim_id = f"prim_{count:04d}"
+    if density is None:
+        if type_ in ["tapered_box", "angular_armor_shell"]:
+            density = 8
+        elif type_ in ["feather_panel", "layered_swept_feather_panel"]:
+            density = 12
+        elif type_ in ["blade_prism", "blade"]:
+            density = 5
+        else:
+            density = 6
+            
     ttl = f"""
 mud:{prim_id} rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:{part} ;
@@ -91,7 +102,15 @@ mud:{prim_id} rdf:type mud:GeometryPrimitive ;
     mud:rotateX "{rx:.4f}"^^xsd:float ;
     mud:rotateY "{ry:.4f}"^^xsd:float ;
     mud:rotateZ "{rz:.4f}"^^xsd:float ;
-    mud:materialBinding mud:{mat} ."""
+    mud:materialBinding mud:{mat} ;
+    law:hasSubdivisionDensity "{density}"^^xsd:integer ;
+    law:hasMaterialZoneBinding mud:{mat} ;
+    law:hasBladeScaleMin "{scale_min:.4f}"^^xsd:decimal ;
+    law:hasBladeScaleMax "{scale_max:.4f}"^^xsd:decimal ;
+    law:hasEdgeCount "{edge_count}"^^xsd:integer ;
+    law:hasSocketAttachment {socket} ;
+    law:hasCurvatureSweepClass "{sweep}" ;
+    law:hasArmorDensityBand "{armor_band}" ."""
     primitives.append(ttl)
 
 # --- 1. Torso Core (10 primitives) ---

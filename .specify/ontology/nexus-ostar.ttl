@@ -7,7 +7,7 @@
 
 # ---------------------------------------------------------------------------
 # Nexus Ostar Ontology
-# Domain: Infinity Blade 4 & Gundam Nexus
+# Domain: Infinity Blade 4 & Mecha Nexus
 # The Chatman Equation: A = \mu(O^*)
 # ---------------------------------------------------------------------------
 
@@ -40,10 +40,10 @@ ostar:IB4_CombatMachine a ostar:TypestateMachine ;
     ostar:hasState ostar:Idle, ostar:Attack, ostar:Parry ;
     ostar:targetGame "InfinityBlade4" .
 
-ostar:Gundam_NetworkMachine a ostar:TypestateMachine ;
-    rdfs:label "Gundam Nexus Network Typestate" ;
+ostar:Mecha_NetworkMachine a ostar:TypestateMachine ;
+    rdfs:label "Mecha Nexus Network Typestate" ;
     ostar:hasState ostar:Idle, ostar:Attack, ostar:Parry ;
-    ostar:targetGame "GundamNexus" .
+    ostar:targetGame "MechaNexus" .
 
 # --- Mathematical Transition Bounds ---
 

@@ -1,0 +1,93 @@
+{
+  "powl_path": "ontology/source_law/VisionSnapLoop.powl",
+  "lawful_spine": [
+    "Start Vision Snap Loop",
+    "Generate Bounded Geometry",
+    "Render Visual Projection",
+    "Extract Visual Targets",
+    "Measure Semantic vs Visual Gap",
+    "Compute Residuals",
+    "Verify Playwright Engine Admissibility",
+    "Emit BLAKE3 Receipt"
+  ],
+  "executed_trace": [
+    "Start Vision Snap Loop",
+    "Generate Bounded Geometry",
+    "Render Visual Projection",
+    "Extract Visual Targets",
+    "Measure Semantic vs Visual Gap",
+    "Compute Residuals",
+    "Verify Playwright Engine Admissibility",
+    "Emit BLAKE3 Receipt"
+  ],
+  "step_status": [
+    {
+      "activity": "Start Vision Snap Loop",
+      "position": 0,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    },
+    {
+      "activity": "Generate Bounded Geometry",
+      "position": 1,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    },
+    {
+      "activity": "Render Visual Projection",
+      "position": 2,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    },
+    {
+      "activity": "Extract Visual Targets",
+      "position": 3,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    },
+    {
+      "activity": "Measure Semantic vs Visual Gap",
+      "position": 4,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    },
+    {
+      "activity": "Compute Residuals",
+      "position": 5,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    },
+    {
+      "activity": "Verify Playwright Engine Admissibility",
+      "position": 6,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    },
+    {
+      "activity": "Emit BLAKE3 Receipt",
+      "position": 7,
+      "executed": true,
+      "rc": 0,
+      "order_ok": true
+    }
+  ],
+  "conformance": {
+    "engine": "wpm audit (discover+conformance not built; token-replay unavailable)",
+    "verdict": "TRUTHFUL",
+    "fitness": 1.0,
+    "precision": 1.0,
+    "deviating_traces": 0,
+    "fitting_traces": 1,
+    "raw": "\nVision 2030 Conformance Audit Report\n\nAudit Verdict:            TRUTHFUL\nFitness Score:            1.0000\nPrecision Score:          1.0000\n\nTotal Traces Audited:     1\nFitting Traces:           1\nDeviating Traces:         0\n\nDoctrine: If the code says it worked but the event log cannot prove a lawful process happened, then it did not work.\n"
+  },
+  "declared_xes": "generated/vision_snap/declared_vision.xes",
+  "trace_xes": "vision_trace.xes",
+  "ocel_seed": "generated/vision_snap/VisionSnapOCELSeed.json"
+}

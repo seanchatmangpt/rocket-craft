@@ -1,6 +1,6 @@
 # METRIC_MORPHOLOGY_REPORT (pre-render graph law)
 
-- timestamp: 2026-06-21T12:12:49.746296Z
+- timestamp: 2026-06-21T14:17:35.278485Z
 - verdict: **PARTIAL_ALIVE**
 - body_height_m: 0.18 (vertical axis Z, metersPerUnit 0.01)
 - shacl_conforms: False

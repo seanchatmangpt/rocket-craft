@@ -2,7 +2,7 @@
 
 **Date:** June 17, 2026
 **Status:** Accepted
-**Context:** GMF (Gundam Nexus Manufacturing Facility) Implementation
+**Context:** GMF (Mecha Nexus Manufacturing Facility) Implementation
 
 ---
 

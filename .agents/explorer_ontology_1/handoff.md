@@ -13,7 +13,7 @@
   - SOSA: `https://raw.githubusercontent.com/w3c/sdw/gh-pages/ssn/integrated/sosa.ttl`
   - QUDT: `http://qudt.org/schema/qudt/`
   - FIBO: `https://spec.edmcouncil.org/fibo/ontology/`
-- **Existing Ontology (`/Users/sac/rocket-craft/ontology/gundam_nexus.ttl`)**: Established namespace formatting:
+- **Existing Ontology (`/Users/sac/rocket-craft/ontology/mecha_nexus.ttl`)**: Established namespace formatting:
   ```turtle
   @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
   @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .

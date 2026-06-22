@@ -10,7 +10,7 @@ NPS asks whether a person would recommend an experience. Semantic LOD explains w
 
 A detractor is often not reacting to objective failure alone. They are reacting to semantic mismatch: too much detail where they needed clarity, too little detail where they needed confidence, or the wrong detail at the wrong level of concern.
 
-This principle unifies the entire Eden, GMF, Gundam Nexus, TPS, RDF, ggen, byte-authority, and Chatman Equation architecture.
+This principle unifies the entire Eden, GMF, Mecha Nexus, TPS, RDF, ggen, byte-authority, and Chatman Equation architecture.
 
 ## Core Claim
 
@@ -18,7 +18,7 @@ The best systems do not maximize detail.
 
 They maximize meaningful resolution.
 
-A Gundam does not need equal detail everywhere. In a 5v5 fight, the player notices silhouette, head, eyes, shoulders, hands, weapons, feet, damage state, and front-facing motion. The back of a calf, hidden internal bolts, and rear panel seams can be much lower resolution unless inspected directly.
+A Mecha does not need equal detail everywhere. In a 5v5 fight, the player notices silhouette, head, eyes, shoulders, hands, weapons, feet, damage state, and front-facing motion. The back of a calf, hidden internal bolts, and rear panel seams can be much lower resolution unless inspected directly.
 
 This is not just rendering optimization. It is human-value optimization.
 
@@ -68,9 +68,9 @@ Information presented is misaligned with the user’s current intent.
 
 This makes NPS a semantic compression metric. High NPS means the system consistently compresses complexity into the right resolution for the user.
 
-## Gundam Nexus
+## Mecha Nexus
 
-A Gundam model may be constructed from a thousand-part kit, but the player does not perceive a thousand equal parts during battle.
+A Mecha model may be constructed from a thousand-part kit, but the player does not perceive a thousand equal parts during battle.
 
 The player perceives:
 
@@ -318,7 +318,7 @@ The player does not recommend Eden because it has the most polygons.
 
 They recommend it because it feels impossibly rich while staying understandable.
 
-They recommend it because the Gundam looks right.
+They recommend it because the Mecha looks right.
 
 They recommend it because the fight reads clearly.
 
@@ -366,4 +366,4 @@ ggen manufactures it.
 
 Receipts prove it.
 
-That is the unifying theory of Eden, GMF, Gundam Nexus, TPS, Industry 4.0/5.0, Process Intelligence, byte-authority servers, RDF manufacturing, and the Chatman Equation.
+That is the unifying theory of Eden, GMF, Mecha Nexus, TPS, Industry 4.0/5.0, Process Intelligence, byte-authority servers, RDF manufacturing, and the Chatman Equation.

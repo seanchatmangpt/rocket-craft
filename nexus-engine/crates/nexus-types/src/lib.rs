@@ -1,4 +1,4 @@
-//! `nexus-types` — foundational primitive types for the Gundam Nexus Rust formal model.
+//! `nexus-types` — foundational primitive types for the Mecha Nexus Rust formal model.
 //!
 //! Every other crate in the `nexus-engine` workspace depends on this crate.
 //! It deliberately has no dependencies on the rest of the workspace so that
@@ -32,7 +32,7 @@ pub use math::{Aabb, Mat4, Quat, Transform, Vec2, Vec3};
 pub use states::{
     AttackDir, Attacking, AuctionClosed, Authenticated, BidAccepted, BidRejected,
     CombatStateMarker, Connecting, Dead, Disconnected, Dodging, EconomyStateMarker, GachaRarity,
-    GundamSeries, Idle, InLobby, InMatch, MagicType, ParryOutcome, Parrying, PendingBid, Rarity,
+    MechaSeries, Idle, InLobby, InMatch, MagicType, ParryOutcome, Parrying, PendingBid, Rarity,
     Series, SessionStateMarker, Spectating, Stunned, TitanType,
 };
 pub use units::{Armor, ComboMultiplier, Damage, Gold, Hp, Mana, TimeDilation, Typed, Xp};

@@ -1,0 +1,32 @@
+{
+  "gate": "TTL_MORPHOLOGY_REPLACEMENT_ADMISSION",
+  "status": "COMPLETED",
+  "migration_source": "evidence/quarantine/python_morphology_violation/patch_geometry_generator.py",
+  "migration_target": "ontology/source_law/104_reference_fabric.ttl",
+  "migrated_parameters": [
+    {
+      "parameter": "subdivision_density",
+      "source_expression": "density_class = 8, 12, 5, 6",
+      "ttl_binding": "mud:densityClass",
+      "qudt_unit": "unit:UNITLESS"
+    },
+    {
+      "parameter": "translateY",
+      "source_expression": "translate_y_step, joint_translate_y_base",
+      "ttl_binding": "mud:translateY",
+      "qudt_unit": "unit:M"
+    },
+    {
+      "parameter": "scaleY",
+      "source_expression": "scale_y_base, joint_scale_y",
+      "ttl_binding": "mud:scaleY",
+      "qudt_unit": "unit:UNITLESS"
+    }
+  ],
+  "rejected_overrides": {
+    "file": "fix_points.py",
+    "status": "REJECTED_AS_ILLEGAL",
+    "rationale": "Point overrides bypass the compiler type system and violate the Prime Directive of TTL Source Law Authority."
+  },
+  "timestamp": "2026-06-21T00:50:00Z"
+}

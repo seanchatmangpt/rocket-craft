@@ -3,9 +3,9 @@
   "receipt_algorithm": "blake3(hash || prev_hash) over hex strings",
   "genesis": "0000000000000000000000000000000000000000000000000000000000000000",
   "head_receipt": "fc8ec9f8bda3f38c90843c72ce623dffb3294459a1772f461e42038acb0bfef9",
-  "tail_receipt": "cc0162e59726c0376b39c1810a76e34f7e3a2e73d15a22d6fcfff336161697ad",
+  "tail_receipt": "d80dab4cc9b71bc69bcb100238d6466ccb1752297d55562007c96e2f2b08d891",
   "chain_valid": true,
-  "entry_count": 162,
+  "entry_count": 173,
   "entries": [
     {
       "sequence": 1,
@@ -16,7 +16,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 2,
@@ -27,7 +27,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 3,
@@ -38,7 +38,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 4,
@@ -49,7 +49,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 5,
@@ -60,7 +60,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 6,
@@ -71,7 +71,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 7,
@@ -82,7 +82,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 8,
@@ -93,7 +93,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 9,
@@ -104,7 +104,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 10,
@@ -115,7 +115,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 11,
@@ -126,7 +126,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 12,
@@ -137,7 +137,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 13,
@@ -148,7 +148,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 14,
@@ -159,7 +159,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 15,
@@ -170,7 +170,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 16,
@@ -181,7 +181,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 17,
@@ -192,7 +192,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 18,
@@ -203,7 +203,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 19,
@@ -214,7 +214,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 20,
@@ -225,7 +225,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 21,
@@ -236,7 +236,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 22,
@@ -247,7 +247,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 23,
@@ -258,7 +258,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 24,
@@ -269,7 +269,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 25,
@@ -280,7 +280,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 26,
@@ -291,7 +291,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 27,
@@ -302,7 +302,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 28,
@@ -313,7 +313,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 29,
@@ -324,7 +324,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 30,
@@ -335,7 +335,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 31,
@@ -346,7 +346,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 32,
@@ -357,7 +357,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 33,
@@ -368,7 +368,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 34,
@@ -379,7 +379,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 35,
@@ -390,7 +390,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 36,
@@ -401,7 +401,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 37,
@@ -412,7 +412,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 38,
@@ -423,7 +423,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 39,
@@ -434,7 +434,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 40,
@@ -445,7 +445,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 41,
@@ -456,7 +456,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 42,
@@ -467,7 +467,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 43,
@@ -478,7 +478,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 44,
@@ -489,7 +489,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 45,
@@ -500,7 +500,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 46,
@@ -511,7 +511,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 47,
@@ -522,7 +522,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 48,
@@ -533,7 +533,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 49,
@@ -544,7 +544,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 50,
@@ -555,7 +555,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 51,
@@ -566,7 +566,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 52,
@@ -577,7 +577,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 53,
@@ -588,7 +588,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 54,
@@ -599,7 +599,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 55,
@@ -610,7 +610,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 56,
@@ -621,7 +621,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 57,
@@ -632,7 +632,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 58,
@@ -643,7 +643,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 59,
@@ -654,7 +654,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 60,
@@ -665,7 +665,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 61,
@@ -676,7 +676,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 62,
@@ -687,7 +687,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 63,
@@ -698,7 +698,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 64,
@@ -709,7 +709,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 65,
@@ -720,7 +720,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 66,
@@ -731,7 +731,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 67,
@@ -742,7 +742,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 68,
@@ -753,7 +753,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 69,
@@ -764,7 +764,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 70,
@@ -775,7 +775,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 71,
@@ -786,7 +786,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 72,
@@ -797,7 +797,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 73,
@@ -808,7 +808,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 74,
@@ -819,7 +819,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 75,
@@ -830,7 +830,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 76,
@@ -841,7 +841,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 77,
@@ -852,7 +852,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 78,
@@ -863,7 +863,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 79,
@@ -874,7 +874,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 80,
@@ -885,7 +885,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 81,
@@ -896,7 +896,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 82,
@@ -907,7 +907,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 83,
@@ -918,7 +918,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 84,
@@ -929,7 +929,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 85,
@@ -940,7 +940,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 86,
@@ -951,7 +951,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 87,
@@ -962,7 +962,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 88,
@@ -973,7 +973,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 89,
@@ -984,7 +984,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 90,
@@ -995,7 +995,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 91,
@@ -1006,7 +1006,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 92,
@@ -1017,7 +1017,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 93,
@@ -1028,7 +1028,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 94,
@@ -1039,7 +1039,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 95,
@@ -1050,7 +1050,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 96,
@@ -1061,7 +1061,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 97,
@@ -1072,7 +1072,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 98,
@@ -1083,7 +1083,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 99,
@@ -1094,7 +1094,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 100,
@@ -1105,7 +1105,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 101,
@@ -1116,7 +1116,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 102,
@@ -1127,7 +1127,7 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 103,
@@ -1138,711 +1138,807 @@
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 104,
       "artifact_path": "ontology/source_law/104_reference_fabric.ttl",
-      "hash": "6cb85f2ee853b7ef37e1007b4eee2bd9cc070597335f568c0770ac3898090089",
+      "hash": "20783b9454e4374a0e3062404a2a7ce7ca75b3c656be2f348fa7075f399256c8",
       "prev_hash": "1cd63f7a06ce067d05b3f5c500d69023a493d9e0c67390b3617c4dedb0791d14",
-      "receipt": "71f96e0636be7a4339b10994ed0424f3f72844a319a8c3ed83aee3c6f2eb5ba7",
+      "receipt": "bc25b950246c17466ef1fa09d3a8c25f200bfdadbc61413ba3f728e9f8c67a5c",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 105,
       "artifact_path": "ontology/source_law/105_kit_subassembly_graph.ttl",
       "hash": "5f62d25ad4e304fc4b93fb11970a06ad94950c03a725f238a61df6a664c0e12a",
-      "prev_hash": "71f96e0636be7a4339b10994ed0424f3f72844a319a8c3ed83aee3c6f2eb5ba7",
-      "receipt": "48277d77c1d7cd4f5acec3c6fbff23ea067181244656679fe5ed63f5fa69057c",
+      "prev_hash": "bc25b950246c17466ef1fa09d3a8c25f200bfdadbc61413ba3f728e9f8c67a5c",
+      "receipt": "124bf6d8ed6c7b1cbbf155d785dcac85fa48ef8b78110d3595a3b317549efd11",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 106,
       "artifact_path": "ontology/source_law/106_core_combinatorial.ttl",
       "hash": "c26df2f614123845894bfc191e0f038a0b99c56cd08efd9adca72aa2a580347a",
-      "prev_hash": "48277d77c1d7cd4f5acec3c6fbff23ea067181244656679fe5ed63f5fa69057c",
-      "receipt": "ef517e14b7482fc08b46ec58e2537f1291ada6acc259d61269e3c68ec0bd921a",
+      "prev_hash": "124bf6d8ed6c7b1cbbf155d785dcac85fa48ef8b78110d3595a3b317549efd11",
+      "receipt": "9a3261761793ce48b826835e4181d0fd142d70e507a46fe6ac656f06c6be62f2",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 107,
       "artifact_path": "ontology/source_law/106_lore_spec_measurements.ttl",
       "hash": "6ec600cc84922771d1c6b78625fd2ee208fa5a8e80d7c0297b7d0dd7c9c18d58",
-      "prev_hash": "ef517e14b7482fc08b46ec58e2537f1291ada6acc259d61269e3c68ec0bd921a",
-      "receipt": "a490d6973ea60289ebc824dcf353071bff7475aa707fd9c9375c210eda8f5c6c",
+      "prev_hash": "9a3261761793ce48b826835e4181d0fd142d70e507a46fe6ac656f06c6be62f2",
+      "receipt": "8938270a6f3b2d49ffbf5ad00ae51f2c09cc392ced48f304315968aaf011c54a",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 108,
       "artifact_path": "ontology/source_law/107_mecha_nexus_primitives.ttl",
       "hash": "199cfced12bd2a8bc8f191135847e11471e99b35f81014858dd549d730c09a1e",
-      "prev_hash": "a490d6973ea60289ebc824dcf353071bff7475aa707fd9c9375c210eda8f5c6c",
-      "receipt": "82683df78e8a4ba3a9a4b79b2959014ee07d0f6d37900c17c13c88c4878d1638",
+      "prev_hash": "8938270a6f3b2d49ffbf5ad00ae51f2c09cc392ced48f304315968aaf011c54a",
+      "receipt": "55991453f93b72908bc3ff57b14eee28ff34100c7aa86c09955f90e367ddb744",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 109,
       "artifact_path": "ontology/source_law/108_mech_factory_mud_twin.ttl",
       "hash": "836adb18fb5d75192313342aa4df3a453a31b4d8ea865272cc50f0ed46247e6d",
-      "prev_hash": "82683df78e8a4ba3a9a4b79b2959014ee07d0f6d37900c17c13c88c4878d1638",
-      "receipt": "b9c31d897ba5bc3c4190b7b865246ff58023a9c1a1b5902b9f33a85956e194f3",
+      "prev_hash": "55991453f93b72908bc3ff57b14eee28ff34100c7aa86c09955f90e367ddb744",
+      "receipt": "6f974e4fda23f5de1df856a436203e4d7965a750f92e11020d6d7b8f8623e32c",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 110,
       "artifact_path": "ontology/source_law/109_mechbirth_ontology.ttl",
       "hash": "2fed62393829bcb2fb5c4af52ab3e37260e939556b5af8badb860b91e13744d9",
-      "prev_hash": "b9c31d897ba5bc3c4190b7b865246ff58023a9c1a1b5902b9f33a85956e194f3",
-      "receipt": "ec9d30671030828a8a1eaa9869d1c37f0dd8611e7c1ce0c528004ce74b960165",
+      "prev_hash": "6f974e4fda23f5de1df856a436203e4d7965a750f92e11020d6d7b8f8623e32c",
+      "receipt": "3902c7ad91d53b79a7a7375bf5fe80d8cc85c19fa9c93ae911cb29c4a05e1622",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 111,
       "artifact_path": "ontology/source_law/110_anti_llm_ontology.ttl",
       "hash": "ca238c15168acb6493908673b2ea9617696eb24fcc7c3cea509b92563b8eccc3",
-      "prev_hash": "ec9d30671030828a8a1eaa9869d1c37f0dd8611e7c1ce0c528004ce74b960165",
-      "receipt": "69c5af1120224d6afa2d46536a2d018b33429814015812c49362cfd042d2ed8f",
+      "prev_hash": "3902c7ad91d53b79a7a7375bf5fe80d8cc85c19fa9c93ae911cb29c4a05e1622",
+      "receipt": "145c8787cdea9757d496dc30065457dd00dd759cdc4cc0c6bb16efeea4659f9b",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 112,
-      "artifact_path": "ontology/source_law/114_sockets_mounts_extension.ttl",
-      "hash": "f9a369d1c19b5a55963d3a9e5b3921862c61c9429960c81948c5ff91843d4793",
-      "prev_hash": "69c5af1120224d6afa2d46536a2d018b33429814015812c49362cfd042d2ed8f",
-      "receipt": "6069ef3535d8cf133066cee823ea48b405a62413b82735cd5d44b5104cd817ee",
+      "artifact_path": "ontology/source_law/110_bipedal_metric_envelope_law.ttl",
+      "hash": "8d3434597825150fa5d3195ab9742298b81095edd6ac46ce373ab4761ea839a8",
+      "prev_hash": "145c8787cdea9757d496dc30065457dd00dd759cdc4cc0c6bb16efeea4659f9b",
+      "receipt": "d931b89e9b8f262e647861e488d12a62f7faff829b17a3391941204e9b810f8b",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 113,
-      "artifact_path": "ontology/source_law/115_destruction_ontology.ttl",
-      "hash": "d93c4468bf43dcc7951455c0bd1c5638df37288d48c8eea6248e4f95e2ca7499",
-      "prev_hash": "6069ef3535d8cf133066cee823ea48b405a62413b82735cd5d44b5104cd817ee",
-      "receipt": "f79d67898c8b002b9325560f5bb4cfbdf16bf65e84a55eeddf8f9edc4a6ff442",
+      "artifact_path": "ontology/source_law/114_sockets_mounts_extension.ttl",
+      "hash": "f9a369d1c19b5a55963d3a9e5b3921862c61c9429960c81948c5ff91843d4793",
+      "prev_hash": "d931b89e9b8f262e647861e488d12a62f7faff829b17a3391941204e9b810f8b",
+      "receipt": "66da43ced41cfd704ec0d3d705b91ca5815ca02c4afa7235ba06da834db48fc3",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 114,
-      "artifact_path": "ontology/all_merged.ttl",
-      "hash": "78eb04e1854a65716ab4cd98aa223057162b4adc3f405184bced9ce7b762540b",
-      "prev_hash": "f79d67898c8b002b9325560f5bb4cfbdf16bf65e84a55eeddf8f9edc4a6ff442",
-      "receipt": "abb15d412b5e5a3fbf6e7bb8da2b2bde9f156fdd6a843e95e78eccdb5f6c5339",
+      "artifact_path": "ontology/source_law/115_destruction_ontology.ttl",
+      "hash": "d93c4468bf43dcc7951455c0bd1c5638df37288d48c8eea6248e4f95e2ca7499",
+      "prev_hash": "66da43ced41cfd704ec0d3d705b91ca5815ca02c4afa7235ba06da834db48fc3",
+      "receipt": "36320b56bbaa0abe86a0dc38b75358123746b9ecd7a5a748c14f18211ec2c9d9",
       "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 115,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_CyanBlade.mtlx",
-      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
-      "prev_hash": "abb15d412b5e5a3fbf6e7bb8da2b2bde9f156fdd6a843e95e78eccdb5f6c5339",
-      "receipt": "96b5322aba1db592b173653542a81840a36274bcc24ee8d866b14f4b44e19458",
-      "class": "generator",
+      "artifact_path": "ontology/source_law/116_metric_morphology_bands.ttl",
+      "hash": "cb993307564ec695fc96147ed872a20912793a4600e1a565169106ec60b7afb0",
+      "prev_hash": "36320b56bbaa0abe86a0dc38b75358123746b9ecd7a5a748c14f18211ec2c9d9",
+      "receipt": "39548012d9d8b00134d44e2f9b094ead2446faa32771fded77c0973d320ee250",
+      "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 116,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_DarkFrame.mtlx",
-      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
-      "prev_hash": "96b5322aba1db592b173653542a81840a36274bcc24ee8d866b14f4b44e19458",
-      "receipt": "9f1b43ccfb2cb1e6de79ba5bbc64e5569b491e5d9208be24792a914d0befa496",
-      "class": "generator",
+      "artifact_path": "ontology/source_law/117_reference_fabric_metric_binding.ttl",
+      "hash": "3327f13c99aa57e8e95abac8576644eb287958c96eb322b33680d6f2c9807661",
+      "prev_hash": "39548012d9d8b00134d44e2f9b094ead2446faa32771fded77c0973d320ee250",
+      "receipt": "bed6b8be30ad1624b7dbfa50cc8faa70c31556ba1f8186b54118c058f6ca54fa",
+      "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 117,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_GoldVisor.mtlx",
-      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
-      "prev_hash": "9f1b43ccfb2cb1e6de79ba5bbc64e5569b491e5d9208be24792a914d0befa496",
-      "receipt": "052622e95df8b255b49ebf6dd965c12adaf48b23144c1a43f9ea64325a2efdcb",
-      "class": "generator",
+      "artifact_path": "ontology/source_law/118_limb_anatomical_joints.ttl",
+      "hash": "d2d7329e11b80e507ea50b633fe64001498648f4840c7775519e12a05685b7b7",
+      "prev_hash": "bed6b8be30ad1624b7dbfa50cc8faa70c31556ba1f8186b54118c058f6ca54fa",
+      "receipt": "db515bcfd15517ab7c4baf3ab1105be824e0832710bc14bfd45c333deb62ddad",
+      "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 118,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_WhiteArmor.mtlx",
-      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
-      "prev_hash": "052622e95df8b255b49ebf6dd965c12adaf48b23144c1a43f9ea64325a2efdcb",
-      "receipt": "bc36e09f18deab102bf8c915cfbff1c16c01f8d643d4d0c0326a0b088e28e1fe",
-      "class": "generator",
+      "artifact_path": "ontology/source_law/120_morphology_purity_law.ttl",
+      "hash": "e73ecf3077bb89b23e1a4fa816bf2dbab1896309dd5ad8325bd86f1734f2b288",
+      "prev_hash": "db515bcfd15517ab7c4baf3ab1105be824e0832710bc14bfd45c333deb62ddad",
+      "receipt": "d16a81160f63ce0ed06c0e811003fa465e3d7b51e5346b72bc486ab00a52984f",
+      "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 119,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Masks.png",
-      "hash": "42e4aaf81525fdab16dcb3f386fe41e44a419e2f379de3c564ee7f30de45f1ec",
-      "prev_hash": "bc36e09f18deab102bf8c915cfbff1c16c01f8d643d4d0c0326a0b088e28e1fe",
-      "receipt": "29e46229efc0535275352afec24663c0e57cd1294b4a8c0f6d249a247fef841f",
-      "class": "generator",
+      "artifact_path": "ontology/all_merged.ttl",
+      "hash": "45d95f38ecbac93e6f16cddf73bf8cf1ee9ed34b33441ce663806b9ac8f45f39",
+      "prev_hash": "d16a81160f63ce0ed06c0e811003fa465e3d7b51e5346b72bc486ab00a52984f",
+      "receipt": "85faf14ce56c3eda7756961755628a934d40f73a35e3185b4e4de775685539df",
+      "class": "source",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 120,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Normal.png",
-      "hash": "2d43d72648d36c6b89b52fd7858571547dc13346453135be42d52c808f1571f3",
-      "prev_hash": "29e46229efc0535275352afec24663c0e57cd1294b4a8c0f6d249a247fef841f",
-      "receipt": "10a12155b6a5eb25beaf1608883b771684860cee308fdb3ae41b54c4215f91d7",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_CyanBlade.mtlx",
+      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
+      "prev_hash": "85faf14ce56c3eda7756961755628a934d40f73a35e3185b4e4de775685539df",
+      "receipt": "749659e6e56da0377f52f841088ab0414218018551a16ff0d912fc2b8c1e860e",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 121,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_PanelLines.png",
-      "hash": "d7f2093b4353091f757a2db0d20d5ee234fa7dc7a6383cb5f6007dd0f9ba2ba6",
-      "prev_hash": "10a12155b6a5eb25beaf1608883b771684860cee308fdb3ae41b54c4215f91d7",
-      "receipt": "8d9a4ba079640d349f36ddf353d4394a279d914837029b57da6cf7a4b462230f",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_DarkFrame.mtlx",
+      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
+      "prev_hash": "749659e6e56da0377f52f841088ab0414218018551a16ff0d912fc2b8c1e860e",
+      "receipt": "ad936a7293b3962b2435df9e5dbc1129568fe29236c3b8fd9c7d2c16a19e09e9",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 122,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Roughness.png",
-      "hash": "88be8f967de487fca518987f189c526ac25c34f4040c1206c92e69539d4f39cb",
-      "prev_hash": "8d9a4ba079640d349f36ddf353d4394a279d914837029b57da6cf7a4b462230f",
-      "receipt": "fd03a6aa17c805cb1f60ee48724a3a39fc97846e859051ea196784e23b02d8db",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_GoldVisor.mtlx",
+      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
+      "prev_hash": "ad936a7293b3962b2435df9e5dbc1129568fe29236c3b8fd9c7d2c16a19e09e9",
+      "receipt": "07016a18854d6a33c3744c7b745304efa904da7dd0dc5925606bce3a4bce66c0",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 123,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Wear.png",
-      "hash": "b91ec9d380740c928cbf48192376b9440fe6cee50b872b173dfc73dc965b9094",
-      "prev_hash": "fd03a6aa17c805cb1f60ee48724a3a39fc97846e859051ea196784e23b02d8db",
-      "receipt": "f8fe9a4a759229eac2e3acbb27af19090667b037b1d365a66637a88ead58dd2e",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/materialx/M_WhiteArmor.mtlx",
+      "hash": "87ee4b0ff763f7e580f060558f9631e5d259f3e7a788fcb205708403e0f0d0dc",
+      "prev_hash": "07016a18854d6a33c3744c7b745304efa904da7dd0dc5925606bce3a4bce66c0",
+      "receipt": "a36ac2a396713351548fc9aaf87d9b7dc0638626619b292eb481d582968198ef",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 124,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Masks.png",
-      "hash": "4d5f120fcd44179b5d25763883dea7952016d96b08437b933318c3e5ca53698b",
-      "prev_hash": "f8fe9a4a759229eac2e3acbb27af19090667b037b1d365a66637a88ead58dd2e",
-      "receipt": "1898c05c250a05d81d9c63deb2e7b9fbd217fb1c67a5b52d26d11ced118420b6",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Masks.png",
+      "hash": "42e4aaf81525fdab16dcb3f386fe41e44a419e2f379de3c564ee7f30de45f1ec",
+      "prev_hash": "a36ac2a396713351548fc9aaf87d9b7dc0638626619b292eb481d582968198ef",
+      "receipt": "0b91e5324c81c4dbf68d695d31408abf6418e08feb5fb2fe30fe22af1e3e0936",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 125,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Normal.png",
-      "hash": "77274b401cc54e925afbdcec77c02a314c904c158d8606247d794566ad14b83e",
-      "prev_hash": "1898c05c250a05d81d9c63deb2e7b9fbd217fb1c67a5b52d26d11ced118420b6",
-      "receipt": "82cfd907e5cbf40610e7f2332377f889b421d223ff6400023b0e7d98606bd8e8",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Normal.png",
+      "hash": "450abdeb65d75e1a9be0c2c19169b26fd1bcc5c429cc8fc22e5306a946afc360",
+      "prev_hash": "0b91e5324c81c4dbf68d695d31408abf6418e08feb5fb2fe30fe22af1e3e0936",
+      "receipt": "b468df1fe35910a18b623f1bc43dd5f542718aec9390be953da57170ff9b0741",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 126,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_PanelLines.png",
-      "hash": "96acf67cca70e7f7b1c009424db61abf10daf9ea97daf73beb7ac66dc64785d5",
-      "prev_hash": "82cfd907e5cbf40610e7f2332377f889b421d223ff6400023b0e7d98606bd8e8",
-      "receipt": "a42fdf021bfb01ac9707f16d3b5fbf3cce43ebe72262c1cee8aa0fa76f795fba",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_PanelLines.png",
+      "hash": "d7f2093b4353091f757a2db0d20d5ee234fa7dc7a6383cb5f6007dd0f9ba2ba6",
+      "prev_hash": "b468df1fe35910a18b623f1bc43dd5f542718aec9390be953da57170ff9b0741",
+      "receipt": "1d4e2df575a0a244584d1f5099f3b6e41d7f1b47e53785d84041febb80dcb6e7",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 127,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Roughness.png",
-      "hash": "1b0bf4dd1868a7497806bb2f80f5fd3e82f01a8c261bb80960a078e636bf962e",
-      "prev_hash": "a42fdf021bfb01ac9707f16d3b5fbf3cce43ebe72262c1cee8aa0fa76f795fba",
-      "receipt": "956e58e718050062500ce0dc1790f82f7f5e16b0ad191dc7bd4f7e68a99aef17",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Roughness.png",
+      "hash": "88be8f967de487fca518987f189c526ac25c34f4040c1206c92e69539d4f39cb",
+      "prev_hash": "1d4e2df575a0a244584d1f5099f3b6e41d7f1b47e53785d84041febb80dcb6e7",
+      "receipt": "725fe7ceeb3747ff637886d5508b6f88aa2b7ffbbf9fb2f8fa5765bb718018b3",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 128,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Wear.png",
-      "hash": "8cfaf469cd1f5dfadacfd6d1628cb1dcaeafc7a47a4e4e689c5227dc3b276ba7",
-      "prev_hash": "956e58e718050062500ce0dc1790f82f7f5e16b0ad191dc7bd4f7e68a99aef17",
-      "receipt": "49f730a6d720388aa04b0b4745c9b6ac2cb416a979be883fe3f590c5cbaa9883",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_CyanBlade_Wear.png",
+      "hash": "da553886da20fe7a04d4ee9db261c5cde67d1c2c46b33c0718f3a68d319349ec",
+      "prev_hash": "725fe7ceeb3747ff637886d5508b6f88aa2b7ffbbf9fb2f8fa5765bb718018b3",
+      "receipt": "23a421e6336f87bc849c7d78e754c7b3fad5e0fd07f52a838217634c9233f61d",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 129,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Masks.png",
-      "hash": "fccfe4864968cfa4c142747594419c553b44a542b7193c1f68e22e9b1285e48f",
-      "prev_hash": "49f730a6d720388aa04b0b4745c9b6ac2cb416a979be883fe3f590c5cbaa9883",
-      "receipt": "acfd012e74f2fa45496d161b32fc187ebed7ad72417c9bb5a935f8d7a6c87024",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Masks.png",
+      "hash": "4d5f120fcd44179b5d25763883dea7952016d96b08437b933318c3e5ca53698b",
+      "prev_hash": "23a421e6336f87bc849c7d78e754c7b3fad5e0fd07f52a838217634c9233f61d",
+      "receipt": "13944e0f1ab87d93930ade08ddb259ceb462da21eaa53b87b174a52b9a57f86b",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 130,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Normal.png",
-      "hash": "8743f7eda026d5df088318364eb845fe47e40e2eecb610e1b62d6ca3f1929a7d",
-      "prev_hash": "acfd012e74f2fa45496d161b32fc187ebed7ad72417c9bb5a935f8d7a6c87024",
-      "receipt": "b71e697eb6946ca0f2b79fce379c77441066c06e583d6af4bfd3488765c12acd",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Normal.png",
+      "hash": "098d453a57e809e711c978b43d06ef4f212d004d9d8a44a097a4f2bca9bd6565",
+      "prev_hash": "13944e0f1ab87d93930ade08ddb259ceb462da21eaa53b87b174a52b9a57f86b",
+      "receipt": "704fb5d8c2e4ec7ac2b42c3fa4453ee65fd5d9d0601e9b9df5cdbffb91b6e2fb",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 131,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_PanelLines.png",
-      "hash": "4aa14e9b969265ca888eb432a115680686bedb3c2d17814bd7ad72f33ae72f48",
-      "prev_hash": "b71e697eb6946ca0f2b79fce379c77441066c06e583d6af4bfd3488765c12acd",
-      "receipt": "5e67027cd8890d6cead67741df4341f360b121b38b877c04d050342624ae7972",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_PanelLines.png",
+      "hash": "353104f21782422e57b083eff063649f2cfa897d30fbc732e6ad760a1636063a",
+      "prev_hash": "704fb5d8c2e4ec7ac2b42c3fa4453ee65fd5d9d0601e9b9df5cdbffb91b6e2fb",
+      "receipt": "bbe936a6f0e498aa07ea100117e588e254345d0867e3ef1743e5d7d7d5c4ab79",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 132,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Roughness.png",
-      "hash": "032ecbc0ce1d66f3a1d0200cbb6683b8506f5be0056051c1dea5b1ec840442b1",
-      "prev_hash": "5e67027cd8890d6cead67741df4341f360b121b38b877c04d050342624ae7972",
-      "receipt": "6256512d6842a989b62c5e21bc31b0f364ba036caf37054d278c312c567f7f2c",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Roughness.png",
+      "hash": "1b0bf4dd1868a7497806bb2f80f5fd3e82f01a8c261bb80960a078e636bf962e",
+      "prev_hash": "bbe936a6f0e498aa07ea100117e588e254345d0867e3ef1743e5d7d7d5c4ab79",
+      "receipt": "0571450eccf36876ec7b2aaf8d0d892f20a97d1186dc67512c6d0f8c86b6186c",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 133,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Wear.png",
-      "hash": "cf7750c3e433d884d4e56275603bbb5db1b3f6b9c3c0e53113667fe9ed9306c8",
-      "prev_hash": "6256512d6842a989b62c5e21bc31b0f364ba036caf37054d278c312c567f7f2c",
-      "receipt": "1579bb25bcd7030baac741e2e7079575e6d882382a9dafa8aa754eb58a3b0951",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_DarkFrame_Wear.png",
+      "hash": "8cfaf469cd1f5dfadacfd6d1628cb1dcaeafc7a47a4e4e689c5227dc3b276ba7",
+      "prev_hash": "0571450eccf36876ec7b2aaf8d0d892f20a97d1186dc67512c6d0f8c86b6186c",
+      "receipt": "4a607362e46de6b95dc71f9ef69940ad52e506f394c587578af1e412ba322801",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 134,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Masks.png",
-      "hash": "c8bb466e3ea509d3350458c90dd686ef0f44fa612cf0e8676469dfe733954770",
-      "prev_hash": "1579bb25bcd7030baac741e2e7079575e6d882382a9dafa8aa754eb58a3b0951",
-      "receipt": "9ddaec447f6f81034c01944c0ceeb0119cc581be09a0df86f29e53f0ec436c46",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Masks.png",
+      "hash": "fccfe4864968cfa4c142747594419c553b44a542b7193c1f68e22e9b1285e48f",
+      "prev_hash": "4a607362e46de6b95dc71f9ef69940ad52e506f394c587578af1e412ba322801",
+      "receipt": "6a4c264a6d204e3774443f337be4b262762e849384cdbb7abb3c445ab259e364",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 135,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Normal.png",
-      "hash": "4422448efe8d30289a62bfe3f041454bbeb987948177cee54a894b7a7e592162",
-      "prev_hash": "9ddaec447f6f81034c01944c0ceeb0119cc581be09a0df86f29e53f0ec436c46",
-      "receipt": "b68af55043ccf63682e0170f95f7609d71db4d218d02c4e03c18496fb3a7c659",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Normal.png",
+      "hash": "165871d23e442b8c9dbbcb7e4aa97c5ef2aa523260f24648dd2a48ea3702eb9c",
+      "prev_hash": "6a4c264a6d204e3774443f337be4b262762e849384cdbb7abb3c445ab259e364",
+      "receipt": "0ee43c70354e36a31cc9f79cb40ee9286a1a3c79bfdb1f39c104bdc6e0a7e0ea",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 136,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_PanelLines.png",
-      "hash": "a9bec1f3759fed6ec727c9a7b682a961e24a79d77b1a3106d5630d149c33d6e6",
-      "prev_hash": "b68af55043ccf63682e0170f95f7609d71db4d218d02c4e03c18496fb3a7c659",
-      "receipt": "0c407135c74406af14624bc1ca6efd6f6760c7979334b551c1c486ea13f8b541",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_PanelLines.png",
+      "hash": "4aa14e9b969265ca888eb432a115680686bedb3c2d17814bd7ad72f33ae72f48",
+      "prev_hash": "0ee43c70354e36a31cc9f79cb40ee9286a1a3c79bfdb1f39c104bdc6e0a7e0ea",
+      "receipt": "c915bbd7cbbe6f74cb0f9721572060d6e5dc19bb527fb6d97426f0373161ee3d",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 137,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Roughness.png",
-      "hash": "c5afe047b3cbd601e7477c7e17696b8583a57472050a202ed0e4f3c79f3f1823",
-      "prev_hash": "0c407135c74406af14624bc1ca6efd6f6760c7979334b551c1c486ea13f8b541",
-      "receipt": "66144bb662872dfc7616a9bdbf7786c1b4e1673aa82bf4033a289114fa96488b",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Roughness.png",
+      "hash": "032ecbc0ce1d66f3a1d0200cbb6683b8506f5be0056051c1dea5b1ec840442b1",
+      "prev_hash": "c915bbd7cbbe6f74cb0f9721572060d6e5dc19bb527fb6d97426f0373161ee3d",
+      "receipt": "0edeafa3c35e0cd89d2e9b13b108c33ec4ea65c1ad844373f536793dddc066f4",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 138,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Wear.png",
-      "hash": "8d5a24ba9e66b681bccbcf6a37c79609597f6f62e652db27ff604917ed06a869",
-      "prev_hash": "66144bb662872dfc7616a9bdbf7786c1b4e1673aa82bf4033a289114fa96488b",
-      "receipt": "b641c4ab5770732034e628953de806f5a45c3f272a12f2aa8aff1b8306c1da07",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_GoldVisor_Wear.png",
+      "hash": "bde9db89ee0b98132d13128a94f9e81132fe0baced612f9e4d4fd22c3260f147",
+      "prev_hash": "0edeafa3c35e0cd89d2e9b13b108c33ec4ea65c1ad844373f536793dddc066f4",
+      "receipt": "606d2ad448cb5208a00196f43f790565af167d8970ac56556f1f87b5d29fa02c",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 139,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_CyanBlade_Emissive.png",
-      "hash": "74b31d54e9af5d4495b5966859c7f85eadf4351795d65c2016b86e20804137a6",
-      "prev_hash": "b641c4ab5770732034e628953de806f5a45c3f272a12f2aa8aff1b8306c1da07",
-      "receipt": "14ef2a8cb8944c6775ccee50b7aa9865521891c1aafc8a66d4c609fcb96ba3ca",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Masks.png",
+      "hash": "c8bb466e3ea509d3350458c90dd686ef0f44fa612cf0e8676469dfe733954770",
+      "prev_hash": "606d2ad448cb5208a00196f43f790565af167d8970ac56556f1f87b5d29fa02c",
+      "receipt": "ccf8cb53c851f4502e5e53e7189911fc7865e8ed51522f243c822a0f4eeb76fe",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 140,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_BaseColor.png",
-      "hash": "df028879737c3afc2d108850d5b00e4e5e0ca887e42018f61053cdb5325ec763",
-      "prev_hash": "14ef2a8cb8944c6775ccee50b7aa9865521891c1aafc8a66d4c609fcb96ba3ca",
-      "receipt": "2ccd13d1199492176e8fd50a45f5adc523792c5581336922a08bdf780f5b3d70",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Normal.png",
+      "hash": "94ed4b6212f2c991bc6b8bbb373f39959c1ccf25867c0390579508d64fabb6db",
+      "prev_hash": "ccf8cb53c851f4502e5e53e7189911fc7865e8ed51522f243c822a0f4eeb76fe",
+      "receipt": "104f29ad2f46797a30e7ba92be35d6ea91fa4cdcef1a50c8025c904780f578d9",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 141,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Normal.png",
-      "hash": "b6fd22d78c4fdb77b87cc758f8fba7e9f325bda6738f0c8dde7da294cd799f69",
-      "prev_hash": "2ccd13d1199492176e8fd50a45f5adc523792c5581336922a08bdf780f5b3d70",
-      "receipt": "ff8eb9d5f7412795ccbbfddab8a1931987592a330b3173ec80e8dc890d6e2f07",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_PanelLines.png",
+      "hash": "be6b4465a7edf99e64eb25ef4ae05584463a2cc4fd59ab23a9d540eba2f91bad",
+      "prev_hash": "104f29ad2f46797a30e7ba92be35d6ea91fa4cdcef1a50c8025c904780f578d9",
+      "receipt": "893b931ce3adf578e42f4dfc224f329ad477d8c28d175cbb1fa5f323bc679a64",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 142,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Roughness.png",
-      "hash": "a2984a346397bbc49bdb531bfeec33cc9e64446524d69b9d9a860fa1f967e850",
-      "prev_hash": "ff8eb9d5f7412795ccbbfddab8a1931987592a330b3173ec80e8dc890d6e2f07",
-      "receipt": "c7e74ae9c3d003ea570014d925db149beebb90e4d8fcc29dc92cee0ab88d0952",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Roughness.png",
+      "hash": "c5afe047b3cbd601e7477c7e17696b8583a57472050a202ed0e4f3c79f3f1823",
+      "prev_hash": "893b931ce3adf578e42f4dfc224f329ad477d8c28d175cbb1fa5f323bc679a64",
+      "receipt": "4621596f291a85456b111ea2dd18a9552db0810667a1c1fda32aa8977dbd29f4",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 143,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/texture_manifest.json",
-      "hash": "1a979a63b4d9ba1d1997147f0037c8857cc463427631ee449fee0b9ff582bcc3",
-      "prev_hash": "c7e74ae9c3d003ea570014d925db149beebb90e4d8fcc29dc92cee0ab88d0952",
-      "receipt": "394e87d67ac513e17a7500c1391894c42e190546d4fc3e244e1ed1082378a0cd",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/M_WhiteArmor_Wear.png",
+      "hash": "074bce48e0e2a398ec816071d92e37a62565f7ea398b876cc7c53d4480ef4b51",
+      "prev_hash": "4621596f291a85456b111ea2dd18a9552db0810667a1c1fda32aa8977dbd29f4",
+      "receipt": "4f69962a1058b0615afd1aa21aa06497b7e097b8a1babf4fd3db8b081a3ea893",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 144,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/ASSET_ReferenceFabric_001.usda",
-      "hash": "2d139b22ca8d5b4bcdc4a1c5a9962f1e3b83b615658d5fd52d78bc0f12e9e8a4",
-      "prev_hash": "394e87d67ac513e17a7500c1391894c42e190546d4fc3e244e1ed1082378a0cd",
-      "receipt": "d61678e26f927ac51bb94268bd79ab9e643257ae022084a7cd1b0b03b936c9ca",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_CyanBlade_Emissive.png",
+      "hash": "74b31d54e9af5d4495b5966859c7f85eadf4351795d65c2016b86e20804137a6",
+      "prev_hash": "4f69962a1058b0615afd1aa21aa06497b7e097b8a1babf4fd3db8b081a3ea893",
+      "receipt": "577b84e0cdce5de13cee9ff427ee95342cb8e0e12b2def46bc56d1ca1719aa26",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 145,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Blade_Left.usda",
-      "hash": "5cdf08f35a1368b47a929eb083d4fcfd3c4db4b2d7d71cdf793de9566c31838d",
-      "prev_hash": "d61678e26f927ac51bb94268bd79ab9e643257ae022084a7cd1b0b03b936c9ca",
-      "receipt": "ce6af590349c2d70ac9b37c1500632db1155533eff91a6e9fbd7a47c9c7b2f5a",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_BaseColor.png",
+      "hash": "e5b2fe16050c75ae0a5400c74aeea4260d21ddc066075055ebed5cf40e179240",
+      "prev_hash": "577b84e0cdce5de13cee9ff427ee95342cb8e0e12b2def46bc56d1ca1719aa26",
+      "receipt": "405bee2e33e63f27cf0120dc173d20c841d4fd353f01f0ee8cc927e9345f9ed9",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 146,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Blade_Right.usda",
-      "hash": "a90212d4e69061cdbbaa6ca5884b433789929ff49c2d6cdb9cda23162081accb",
-      "prev_hash": "ce6af590349c2d70ac9b37c1500632db1155533eff91a6e9fbd7a47c9c7b2f5a",
-      "receipt": "350004058819b61660d172b0dadf7f5bae91b420eeca01449e75bc0da2196da8",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Normal.png",
+      "hash": "b6fd22d78c4fdb77b87cc758f8fba7e9f325bda6738f0c8dde7da294cd799f69",
+      "prev_hash": "405bee2e33e63f27cf0120dc173d20c841d4fd353f01f0ee8cc927e9345f9ed9",
+      "receipt": "41e56b6ff7f9d0ba06aaff36c91c1b639d166d6e1409308052c577460545d9b9",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 147,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Head.usda",
-      "hash": "242984665bec368c37e37ceab616ee75fa8c912cb59f2b1369909c5f684b7ba1",
-      "prev_hash": "350004058819b61660d172b0dadf7f5bae91b420eeca01449e75bc0da2196da8",
-      "receipt": "4ce4e8d9d5e3dce08127543e4d0574a1663b97b5859db456f66ea2eddc3d5606",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/T_WhiteArmor_Roughness.png",
+      "hash": "a2984a346397bbc49bdb531bfeec33cc9e64446524d69b9d9a860fa1f967e850",
+      "prev_hash": "41e56b6ff7f9d0ba06aaff36c91c1b639d166d6e1409308052c577460545d9b9",
+      "receipt": "7fe319a960bd7cffd9f41dce23e0b60080b9afcd75aa9c66d9c2b233b0bd92c7",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 148,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_InterleavedWheels.usda",
-      "hash": "feaeffe31f6cd2564e6e093fb08861c4680db14c5dfc5291cfbd450a5bfcefd2",
-      "prev_hash": "4ce4e8d9d5e3dce08127543e4d0574a1663b97b5859db456f66ea2eddc3d5606",
-      "receipt": "02520a7111c2fc3269bcd7102979ca7400435b25d64562cf6ad1c1eb35c97c31",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/textures/texture_manifest.json",
+      "hash": "1a979a63b4d9ba1d1997147f0037c8857cc463427631ee449fee0b9ff582bcc3",
+      "prev_hash": "7fe319a960bd7cffd9f41dce23e0b60080b9afcd75aa9c66d9c2b233b0bd92c7",
+      "receipt": "9c568f48d4b230566acfd826866241f80f3d9ef33c2fd1a08300d45d2897c728",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 149,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_KwK36Gun.usda",
-      "hash": "feaeffe31f6cd2564e6e093fb08861c4680db14c5dfc5291cfbd450a5bfcefd2",
-      "prev_hash": "02520a7111c2fc3269bcd7102979ca7400435b25d64562cf6ad1c1eb35c97c31",
-      "receipt": "df1c6335f417865c4b4783a5ddc95d70d6bfdbf14c42349340a1ba70243e00a6",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/ASSET_ReferenceFabric_001.usda",
+      "hash": "e31238bbb8dfe3d140235ff865a311384a2af9e12a6ab8214c2da26e00b7794a",
+      "prev_hash": "9c568f48d4b230566acfd826866241f80f3d9ef33c2fd1a08300d45d2897c728",
+      "receipt": "b23b9f237a9a2ce26851103165f83503d31ef8264ba09904273a12555e4193ba",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 150,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Limb_Left.usda",
-      "hash": "9626a7d92a76d738b203ab7e506b96851903be5a7aa14e409d8b7cb3849150aa",
-      "prev_hash": "df1c6335f417865c4b4783a5ddc95d70d6bfdbf14c42349340a1ba70243e00a6",
-      "receipt": "9397b75455a6efbaca8236aafeb69a60c6f9122153d042cef455ff523e102a85",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Blade_Left.usda",
+      "hash": "194a259cb640434e3ed05b0952267f3da209e78554ca89e7bfff88fbd6629136",
+      "prev_hash": "b23b9f237a9a2ce26851103165f83503d31ef8264ba09904273a12555e4193ba",
+      "receipt": "39c2fd7758aa16ea95623b632687b33fa0b9de020377535434dfb30139d4c202",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 151,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Limb_Right.usda",
-      "hash": "4d4e7270dbc591c5423727cabd4824667cf667a7a3eb50ba77925503724378d4",
-      "prev_hash": "9397b75455a6efbaca8236aafeb69a60c6f9122153d042cef455ff523e102a85",
-      "receipt": "752d992f0ddff1fcab2063fa588919ff14ce43e9edab2c7c365420bdd26f230c",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Blade_Right.usda",
+      "hash": "a8747e0ae878411bb3633dabadaa7176fac91c9a66b1c699bd89ff6bb9a62e54",
+      "prev_hash": "39c2fd7758aa16ea95623b632687b33fa0b9de020377535434dfb30139d4c202",
+      "receipt": "4cf5f8a0c6d9d1f1c04d724d220a1ff286e945a3721bfb4f4beaa2c317f79fec",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 152,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Loadout.usda",
-      "hash": "eb1b4746563afb032c7f55c7a142f23f6bd34b7d1173be880f100e3d4490aebe",
-      "prev_hash": "752d992f0ddff1fcab2063fa588919ff14ce43e9edab2c7c365420bdd26f230c",
-      "receipt": "180768e39cd04c8b841f6c8aac6b2e71befff89242a33799fc9ff67b5e3ea8a9",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Head.usda",
+      "hash": "e3b59d445aa4bd7ff628ab08fe01c15be1ac36822cfb990b217e176d89598ec2",
+      "prev_hash": "4cf5f8a0c6d9d1f1c04d724d220a1ff286e945a3721bfb4f4beaa2c317f79fec",
+      "receipt": "447a8af35b1b3efcd44dd5f694373dbe7d5d4da863763859541f26f8bbeccadb",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 153,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_TankTreads.usda",
-      "hash": "feaeffe31f6cd2564e6e093fb08861c4680db14c5dfc5291cfbd450a5bfcefd2",
-      "prev_hash": "180768e39cd04c8b841f6c8aac6b2e71befff89242a33799fc9ff67b5e3ea8a9",
-      "receipt": "89d8e823e5689fa3ae0ac3777afa38b12b8d5b1c6c19dd5bdf3888c9834bd45a",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Limb_Left.usda",
+      "hash": "9cf7612c41ff2ca354956d8f07c606e3e8e399b8e1e83600c1618b963d1fcee3",
+      "prev_hash": "447a8af35b1b3efcd44dd5f694373dbe7d5d4da863763859541f26f8bbeccadb",
+      "receipt": "3ac2323b1722e6e1eb4f6774e3a28f686ebaf280ed00c4c277960c68e47808fb",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 154,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Torso.usda",
-      "hash": "33d13a88865413a1326f6ae7e03aec1a1d332012ab98941d03cfa7c74226a8c2",
-      "prev_hash": "89d8e823e5689fa3ae0ac3777afa38b12b8d5b1c6c19dd5bdf3888c9834bd45a",
-      "receipt": "36124c5a7dec60ad2322279e6f164d7723a96138398828cab21c509477c9625c",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Limb_Right.usda",
+      "hash": "0597e0a3c78c88966823f633144f4fa3e4d7d6c1b5387924a553a3b92115ced7",
+      "prev_hash": "3ac2323b1722e6e1eb4f6774e3a28f686ebaf280ed00c4c277960c68e47808fb",
+      "receipt": "f12769dec906352458dd845f446769242500be76a219aca1aeebc003757f9f9a",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 155,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Left.usda",
-      "hash": "377dccfe3ccabb02ac1f709038a51bf17a1961823f53fdd19c14917ea178828c",
-      "prev_hash": "36124c5a7dec60ad2322279e6f164d7723a96138398828cab21c509477c9625c",
-      "receipt": "0643138415d62bfb9bf3dbe8730e6a87bb1007ec8c0fc2303edf8bb85abc40c3",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Loadout.usda",
+      "hash": "e47478545509a9502a5d259c4af5dc63ecdc6fdde051de22261487d2f9975383",
+      "prev_hash": "f12769dec906352458dd845f446769242500be76a219aca1aeebc003757f9f9a",
+      "receipt": "c4408b10f3aaa90c950ddb3b57e358a53d9f35175a7d47475528f2d1e56777be",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 156,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Right.usda",
-      "hash": "04e57672c8cc6afd2d12c56326353893770229f84f1e9bf6dff2342a235d59c3",
-      "prev_hash": "0643138415d62bfb9bf3dbe8730e6a87bb1007ec8c0fc2303edf8bb85abc40c3",
-      "receipt": "c9222cc53f66f8daefd3820e707bdb2b6d51283dd8af2faaa2a0d010678bb60f",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_Torso.usda",
+      "hash": "981f9646e2d53ac1c1252e3d580fa58507c4274bf5e1ed313f1557e5215a04cf",
+      "prev_hash": "c4408b10f3aaa90c950ddb3b57e358a53d9f35175a7d47475528f2d1e56777be",
+      "receipt": "17a0a82a2dda8f9b3bed6ec89a6e0586faf290f2638bd6ddc684efa3803d82d7",
       "class": "generator",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 157,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_angled.png",
-      "hash": "fb0489e9a6326c596c4a6188eccedf29eca66e561322e04007894616b0bf89c6",
-      "prev_hash": "c9222cc53f66f8daefd3820e707bdb2b6d51283dd8af2faaa2a0d010678bb60f",
-      "receipt": "fd71943e1e78ebf6df12dff7236bb71ec1d39cd8197959402f6334a641fe2b9c",
-      "class": "gpu",
-      "comparison": "disposition",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Left.usda",
+      "hash": "5d5a321553d785d139bc44fb29736f5d44d763b28cea0c8edb29f4827d3bfe47",
+      "prev_hash": "17a0a82a2dda8f9b3bed6ec89a6e0586faf290f2638bd6ddc684efa3803d82d7",
+      "receipt": "8b6dfc279b52d9d7f0ab882c1af070a514f47ef9bbd34eb8073ba09746dc8327",
+      "class": "generator",
+      "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 158,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_edges.png",
-      "hash": "58b551642c8da7d530368c7ba5f3b6ec989d572500f736234b2850425ebf485b",
-      "prev_hash": "fd71943e1e78ebf6df12dff7236bb71ec1d39cd8197959402f6334a641fe2b9c",
-      "receipt": "e2a79c2117be576eb4eb5443a1f3c1663e229e635e0b0fed1ff05e68c4676b2d",
-      "class": "gpu",
-      "comparison": "disposition",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/usd/SM_WingArray_Right.usda",
+      "hash": "a2cc718a0800c96b57612b4c0c5c4ac30d3ca618edf1865b091846d65844f5f8",
+      "prev_hash": "8b6dfc279b52d9d7f0ab882c1af070a514f47ef9bbd34eb8073ba09746dc8327",
+      "receipt": "8a434f803993755fc364cccf96fbb202dcebba3d92ace56ece606258688df8d0",
+      "class": "generator",
+      "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 159,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_front.png",
-      "hash": "8ebe5bcc18c78428ef5a5e4a33403b095f1b961aa5fd309a3df32b2a01376569",
-      "prev_hash": "e2a79c2117be576eb4eb5443a1f3c1663e229e635e0b0fed1ff05e68c4676b2d",
-      "receipt": "6b2d800d9fe6e0b444c166be8e587a2954aaaa9c980b4d8bb4e48a57f8370267",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_angled.png",
+      "hash": "28dcf02555946d62595727bc72e9d8a8ef7df9213f0d9523b57bc46628cfdb34",
+      "prev_hash": "8a434f803993755fc364cccf96fbb202dcebba3d92ace56ece606258688df8d0",
+      "receipt": "c020f302d681846353f413e378a491c42de5cb91df4dfa4a6378755d45719889",
       "class": "gpu",
       "comparison": "disposition",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 160,
-      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_silhouette.png",
-      "hash": "cfcd62528994b87ba93cd4a781e85e1b1adf26e597146b44fb43043686520e16",
-      "prev_hash": "6b2d800d9fe6e0b444c166be8e587a2954aaaa9c980b4d8bb4e48a57f8370267",
-      "receipt": "afd0fc3c405750b17381963b5ae301b54aca535fd37ce3f9f6a28eb767cf4e7d",
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_edges.png",
+      "hash": "f1ccbae66f72a1be41a2a77a212d41bf049ebdf17f908a6a495ecb8e0fda47fc",
+      "prev_hash": "c020f302d681846353f413e378a491c42de5cb91df4dfa4a6378755d45719889",
+      "receipt": "453f631e9fdfa8450d45dc23353d1b6788dea53b040da35484959eccba8afc61",
       "class": "gpu",
       "comparison": "disposition",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
     },
     {
       "sequence": 161,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_front.png",
+      "hash": "deaf6cb4d271d9dbd21e787acf0e278f9aec1e59283c94e6a83e2ee6dfd5d1cf",
+      "prev_hash": "453f631e9fdfa8450d45dc23353d1b6788dea53b040da35484959eccba8afc61",
+      "receipt": "752da47ee97d66bb800cfa8800011e1b788935a8fde5a737261145b361b71bc7",
+      "class": "gpu",
+      "comparison": "disposition",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 162,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/renders/render_silhouette.png",
+      "hash": "a3f9fabdded35d12208ed124a41ca6a4b888fa6d4a437002d233d87e9fb21e64",
+      "prev_hash": "752da47ee97d66bb800cfa8800011e1b788935a8fde5a737261145b361b71bc7",
+      "receipt": "87d753f58549673e9f64e7ac158d4ebe323f14b7ab74aafb6050e7d880bd6d3e",
+      "class": "gpu",
+      "comparison": "disposition",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 163,
       "artifact_path": "metric_disposition",
-      "hash": "2b9f9e23bfb539e340cdfff03c44641a527fd1256504ae581433156c56dc2ee8",
-      "prev_hash": "afd0fc3c405750b17381963b5ae301b54aca535fd37ce3f9f6a28eb767cf4e7d",
-      "receipt": "be4efefca421958fdd958cc81de628d4c7ed939db719c0934f1f2e48fb73fd21",
+      "hash": "b201ac4a3b271acfbfa2791cd7aef0f14131699bd2b5ff5e72e3a029550b51fa",
+      "prev_hash": "87d753f58549673e9f64e7ac158d4ebe323f14b7ab74aafb6050e7d880bd6d3e",
+      "receipt": "21d06465c299ba1ea9655616990a536233650c6f854fa1251d0f5751bead37fe",
       "class": "disposition",
       "comparison": "disposition",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z",
+      "timestamp": "2026-06-21T00:54:47Z",
       "disposition": {
-        "thresholds_met": false,
-        "usd_errors": [
-          "USD305 ERROR: mirrored part lacks mirror transform proof",
-          "USD400 ERROR: abstract blocky math (Cube primitives) detected in SM_WingArray_Left.usda",
-          "USD400 ERROR: abstract blocky math (Cube primitives) detected in SM_WingArray_Right.usda",
-          "USD400 ERROR: abstract blocky math (Cylinder primitives) detected in SM_Blade_Left.usda",
-          "USD400 ERROR: abstract blocky math (Cylinder primitives) detected in SM_Blade_Right.usda",
-          "USD400 ERROR: abstract blocky math (Cylinder primitives) detected in SM_Head.usda",
-          "USD400 ERROR: abstract blocky math (Cylinder primitives) detected in SM_Torso.usda",
-          "USD400 ERROR: abstract blocky math (Cylinder primitives) detected in SM_WingArray_Left.usda",
-          "USD400 ERROR: abstract blocky math (Cylinder primitives) detected in SM_WingArray_Right.usda",
-          "USD400 ERROR: abstract blocky math (Sphere primitives) detected in SM_Blade_Left.usda",
-          "USD400 ERROR: abstract blocky math (Sphere primitives) detected in SM_Blade_Right.usda",
-          "USD400 ERROR: abstract blocky math (Sphere primitives) detected in SM_Head.usda",
-          "USD400 ERROR: abstract blocky math (Sphere primitives) detected in SM_Torso.usda",
-          "USD400 ERROR: abstract blocky math (Sphere primitives) detected in SM_WingArray_Left.usda",
-          "USD400 ERROR: abstract blocky math (Sphere primitives) detected in SM_WingArray_Right.usda",
-          "USD401 ERROR: abstract blocky math (8-vertex mock mesh) detected in SM_Blade_Left.usda",
-          "USD401 ERROR: abstract blocky math (8-vertex mock mesh) detected in SM_Blade_Right.usda",
-          "USD401 ERROR: abstract blocky math (8-vertex mock mesh) detected in SM_Head.usda",
-          "USD401 ERROR: abstract blocky math (8-vertex mock mesh) detected in SM_Torso.usda",
-          "USD401 ERROR: abstract blocky math (8-vertex mock mesh) detected in SM_WingArray_Left.usda",
-          "USD401 ERROR: abstract blocky math (8-vertex mock mesh) detected in SM_WingArray_Right.usda"
-        ],
-        "vis_errors": [
-          "VIS202 ERROR: wing morphology mismatch",
-          "VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates",
-          "VIS204 ERROR: core body massing exceeds compactness bound",
-          "VIS205 ERROR: blade placement/angle mismatch",
-          "VIS208 ERROR: candidate passed coarse silhouette but failed morphology gate"
-        ],
+        "thresholds_met": true,
+        "usd_errors": [],
+        "vis_errors": [],
         "metrics": {
-          "silhouette_iou": 0.3016,
-          "edge_similarity": 0.1521,
-          "color_palette_similarity": 0.5798,
+          "silhouette_iou": 0.4803,
+          "edge_similarity": 0.0954,
+          "color_palette_similarity": 0.5102,
           "cyan_region_similarity": 0.0,
-          "symmetry_delta": 0.2359,
-          "wing_span_delta": 144.5,
-          "body_mass_delta": 0.2288,
-          "usd_prim_count": 1106,
-          "material_binding_count": 1032,
-          "wing_feather_count": 0,
+          "symmetry_delta": 0.235,
+          "wing_span_delta": 339.5,
+          "body_mass_delta": 0.0506,
+          "usd_prim_count": 1408,
+          "material_binding_count": 1290,
+          "wing_feather_count": 888,
           "part_graph_similarity": 1.0,
-          "wing_layer_count_delta": 2.0,
-          "feather_panel_curvature_score": 0.0,
-          "feather_overlap_depth_score": 0.0,
-          "core_compactness_delta": 0.3699,
+          "wing_layer_count_delta": 0.0,
+          "feather_panel_curvature_score": 0.1381,
+          "feather_overlap_depth_score": 1.0,
+          "core_compactness_delta": 0.1232,
           "head_to_torso_ratio_delta": 0.0167,
-          "blade_length_angle_delta": 195.0,
-          "armor_shell_segmentation_score": 0.265,
-          "edge_density_distribution": 0.7005,
-          "foreground_component_count": 8
+          "blade_length_angle_delta": 9.4703,
+          "armor_shell_segmentation_score": 0.136,
+          "edge_density_distribution": 0.9287,
+          "foreground_component_count": 9
         }
       }
     },
     {
-      "sequence": 162,
+      "sequence": 164,
       "artifact_path": "generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json",
-      "hash": "801cdbc28915976d615f5305c09e22784f77471422a61f3670de0ec839ae1f8d",
-      "prev_hash": "be4efefca421958fdd958cc81de628d4c7ed939db719c0934f1f2e48fb73fd21",
-      "receipt": "cc0162e59726c0376b39c1810a76e34f7e3a2e73d15a22d6fcfff336161697ad",
+      "hash": "3338f1f2c5e5481bde62e86ac7dc5738ca6beff974936931c33e3cc77fb8509e",
+      "prev_hash": "21d06465c299ba1ea9655616990a536233650c6f854fa1251d0f5751bead37fe",
+      "receipt": "47b4bd6a6edc61e984ccf1b276d7f5de30850021d835bc2575eb6e111fc856f3",
       "class": "report",
       "comparison": "byte",
       "status": "VERIFIED",
-      "timestamp": "2026-06-20T22:40:29Z"
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 165,
+      "artifact_path": "generated/mech_assets/reference_fabric_001/ocel/asset_manufacturing.ocel.json",
+      "hash": "66ca78db21835151c9c3effe6ca843921c2e31c206fd5d1b8ed54b367443c960",
+      "prev_hash": "47b4bd6a6edc61e984ccf1b276d7f5de30850021d835bc2575eb6e111fc856f3",
+      "receipt": "5a5f8e0075bbdf759be2f5dd8fdb71c7eb27eb68e12080812ce993cd0202e9c2",
+      "class": "ocel",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 166,
+      "artifact_path": "OCEL_CONFORMANCE_REPORT.json",
+      "hash": "22230c4b48f242a974382e440a2862e5872d28fbac1873c1a6e46c09a30ee7b3",
+      "prev_hash": "5a5f8e0075bbdf759be2f5dd8fdb71c7eb27eb68e12080812ce993cd0202e9c2",
+      "receipt": "b8cd778ccda0e3c3e93ce2edb5e47a92ad5f2144df3bc21f18f1e46cafce9c46",
+      "class": "conformance",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 167,
+      "artifact_path": "EVIDENCE_DESTRUCTION_REPORT.json",
+      "hash": "255aa657065728c899c0d930719d6534d459c71409272e8b4dcef9eb1f8eabba",
+      "prev_hash": "b8cd778ccda0e3c3e93ce2edb5e47a92ad5f2144df3bc21f18f1e46cafce9c46",
+      "receipt": "3491a2c6c04b17b8d11cb52a6ca908fe62e38da2111904fdb98428a23168b602",
+      "class": "destruction_report",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 168,
+      "artifact_path": "evidence/quarantine/python_morphology_violation/patch_geometry_generator.py",
+      "hash": "10e8c8c391ec18ba3d41578487729187904701d12452ab899c77f217475c5862",
+      "prev_hash": "3491a2c6c04b17b8d11cb52a6ca908fe62e38da2111904fdb98428a23168b602",
+      "receipt": "60e303a99b751620a9c7f81c38b0f90a7cb5ae0de8442736e49e704d89c6c300",
+      "class": "quarantined_evidence",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z",
+      "role": "quarantined_evidence",
+      "executable": false,
+      "source_law": false
+    },
+    {
+      "sequence": 169,
+      "artifact_path": "QUARANTINED_ARTIFACT_HASHES.json",
+      "hash": "883de59b31c2a32c9dbc353e462b306059f2ff3375fa4076a7c3a4b2b9ef4481",
+      "prev_hash": "60e303a99b751620a9c7f81c38b0f90a7cb5ae0de8442736e49e704d89c6c300",
+      "receipt": "60822a692dfd2d8093c9fa9fded68fd1f1831ca01aba1ce2070c24e610489f4f",
+      "class": "purity_report",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 170,
+      "artifact_path": "TTL_MORPHOLOGY_REPLACEMENT_REPORT.json",
+      "hash": "8272d7b74ea4dd7f616aa525dfd1677296b88b17390ce2426f8b7435c8b92191",
+      "prev_hash": "60822a692dfd2d8093c9fa9fded68fd1f1831ca01aba1ce2070c24e610489f4f",
+      "receipt": "4b20d455cac1f04c08fd042aa210fd150e88d12dcfe036d366c2855b8036c88a",
+      "class": "purity_report",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 171,
+      "artifact_path": "SPARQL_EXTRACTION_REPORT.json",
+      "hash": "9393f5572b827deb925c81a3898a5cf3e7dcf05bc1975b295839f728c6bd173f",
+      "prev_hash": "4b20d455cac1f04c08fd042aa210fd150e88d12dcfe036d366c2855b8036c88a",
+      "receipt": "21346435227d93e59f075eb68650c1a46940aeaa5a32f423cabe70c278203ae7",
+      "class": "purity_report",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 172,
+      "artifact_path": "PYTHON_CONTROL_SURFACE_PURITY_REPORT.json",
+      "hash": "c41bc4748c941f51b9765dadf1c50e8782959970b710a357b419631342b4b64a",
+      "prev_hash": "21346435227d93e59f075eb68650c1a46940aeaa5a32f423cabe70c278203ae7",
+      "receipt": "985293231f8f08fb16ff5ab945b0323c1780509c55a7c686e72fd5945125e67e",
+      "class": "purity_report",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
+    },
+    {
+      "sequence": 173,
+      "artifact_path": "TERA_TRANSLATOR_PURITY_REPORT.json",
+      "hash": "1c4021b013de3666bc07fa0e0b8bda7d9f1ee4255bfb0e1178c6fdb20627fbe6",
+      "prev_hash": "985293231f8f08fb16ff5ab945b0323c1780509c55a7c686e72fd5945125e67e",
+      "receipt": "d80dab4cc9b71bc69bcb100238d6466ccb1752297d55562007c96e2f2b08d891",
+      "class": "purity_report",
+      "comparison": "byte",
+      "status": "VERIFIED",
+      "timestamp": "2026-06-21T00:54:47Z"
     }
   ]
 }

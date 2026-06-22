@@ -5,7 +5,7 @@
 - **RDF Ontologies location**:
   - Found under `/Users/sac/rocket-craft/ontology/`:
     - `core.ttl` (lines 1-100+) containing general classes.
-    - `gundam_nexus.ttl` containing Gundam domain vocabulary.
+    - `mecha_nexus.ttl` containing Mecha domain vocabulary.
     - `mech_factory_mud.ttl` containing station ontology models.
     - `mechbirth.ttl` containing level of detail and motion families.
     - `all_merged.ttl` containing the fully combined graph.

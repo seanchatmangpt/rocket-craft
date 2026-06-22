@@ -1,9 +1,9 @@
-# Gundam Player Character Scenario — Concrete RDF Model & Validation Analysis
+# Mecha Player Character Scenario — Concrete RDF Model & Validation Analysis
 
 ## 1. Executive Summary
 
-This report defines the concrete RDF model for the **Gundam Player Character Scenario** (Tier 4 of `TEST_INFRA.md`). Using RDF triples in Turtle (`.ttl`) format, we map out a complete character blueprint use case:
-*   A Gundam subclass of `ACharacter`.
+This report defines the concrete RDF model for the **Mecha Player Character Scenario** (Tier 4 of `TEST_INFRA.md`). Using RDF triples in Turtle (`.ttl`) format, we map out a complete character blueprint use case:
+*   A Mecha subclass of `ACharacter`.
 *   Attached skeletal mesh rendering and box collision physics components.
 *   A Blueprint execution graph defining input axis event processing and flow sequencing to a function call.
 *   A reflected C++ function (`AddMovementInput`) mapped in the reflection registry.
@@ -13,14 +13,14 @@ This report defines the concrete RDF model for the **Gundam Player Character Sce
 We verified the syntactic, structural, and logical validity of this model using the `ggen` compiler. In a controlled testbed environment, we confirmed that:
 1.  The model parses with zero syntax errors.
 2.  The model conforms to all global SHACL shapes (e.g. `ue4:ClassLabelShape`, `ue4:NamespaceSanityShape`).
-3.  The model is structurally closed and passes a custom SPARQL validation rule (`R_Gundam_Scenario`) that mathematically asserts the execution flow from the input event to the reflection call.
+3.  The model is structurally closed and passes a custom SPARQL validation rule (`R_Mecha_Scenario`) that mathematically asserts the execution flow from the input event to the reflection call.
 4.  The validation system correctly catches defects, aborting build steps when typestate constraints are violated.
 
 ---
 
 ## 2. Concrete RDF Turtle Model
 
-The following turtle model was written to `gundam_scenario.ttl` to represent the scenario:
+The following turtle model was written to `mecha_scenario.ttl` to represent the scenario:
 
 ```turtle
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -28,21 +28,21 @@ The following turtle model was written to `gundam_scenario.ttl` to represent the
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix ue4: <https://rocket-craft.io/ontology/ue4/> .
-@prefix gn: <https://ggen.io/ontology/gundam-nexus/> .
+@prefix gn: <https://ggen.io/ontology/mecha-nexus/> .
 
-<https://rocket-craft.io/ontology/ue4/gundam_scenario#>
+<https://rocket-craft.io/ontology/ue4/mecha_scenario#>
     a owl:Ontology ;
-    rdfs:label "Gundam Player Character Scenario Model" ;
-    rdfs:comment "RDF Triples representing the complete Gundam player character scenario for E2E testing." .
+    rdfs:label "Mecha Player Character Scenario Model" ;
+    rdfs:comment "RDF Triples representing the complete Mecha player character scenario for E2E testing." .
 
 # =========================================================================
 # Class Extensions (Feature Declarations)
 # =========================================================================
 
-gn:AGundam a owl:Class ;
+gn:AMecha a owl:Class ;
     rdfs:subClassOf ue4:ACharacter ;
-    rdfs:label "AGundam" ;
-    rdfs:comment "A Gundam player character class represented in the RDF ontology." .
+    rdfs:label "AMecha" ;
+    rdfs:comment "A Mecha player character class represented in the RDF ontology." .
 
 ue4:USkeletalMeshComponent a owl:Class ;
     rdfs:subClassOf ue4:USceneComponent ;
@@ -175,28 +175,28 @@ ue4:ParamScaleValue a ue4:UProperty ;
 # Scenario Character and Component Instances
 # =========================================================================
 
-gn:GundamPlayerCharacter a gn:AGundam ;
-    rdfs:label "GundamPlayerCharacter" ;
-    rdfs:comment "Primary Gundam character possessed by the player." ;
-    ue4:hasComponent gn:GundamSkeletalMesh ;
-    ue4:hasComponent gn:GundamBoxCollision ;
-    ue4:hasRootComponent gn:GundamBoxCollision ;
-    ue4:hasBlueprintGraph gn:GundamGraph ;
+gn:MechaPlayerCharacter a gn:AMecha ;
+    rdfs:label "MechaPlayerCharacter" ;
+    rdfs:comment "Primary Mecha character possessed by the player." ;
+    ue4:hasComponent gn:MechaSkeletalMesh ;
+    ue4:hasComponent gn:MechaBoxCollision ;
+    ue4:hasRootComponent gn:MechaBoxCollision ;
+    ue4:hasBlueprintGraph gn:MechaGraph ;
     ue4:hasCookingState ue4:Cooked ;
     ue4:hasPackagingState ue4:WasmReady ;
     ue4:bReplicates true .
 
-gn:GundamSkeletalMesh a ue4:USkeletalMeshComponent ;
-    rdfs:label "GundamSkeletalMesh" ;
-    rdfs:comment "Visual skeletal mesh representing the physical model of the Gundam." ;
-    ue4:owner gn:GundamPlayerCharacter ;
+gn:MechaSkeletalMesh a ue4:USkeletalMeshComponent ;
+    rdfs:label "MechaSkeletalMesh" ;
+    rdfs:comment "Visual skeletal mesh representing the physical model of the Mecha." ;
+    ue4:owner gn:MechaPlayerCharacter ;
     ue4:bIsActive true ;
     ue4:bHidden false .
 
-gn:GundamBoxCollision a ue4:UBoxComponent ;
-    rdfs:label "GundamBoxCollision" ;
+gn:MechaBoxCollision a ue4:UBoxComponent ;
+    rdfs:label "MechaBoxCollision" ;
     rdfs:comment "Physics collision bounds for root character interaction." ;
-    ue4:owner gn:GundamPlayerCharacter ;
+    ue4:owner gn:MechaPlayerCharacter ;
     ue4:bIsActive true ;
     ue4:bHidden false .
 
@@ -204,8 +204,8 @@ gn:GundamBoxCollision a ue4:UBoxComponent ;
 # Blueprint Graph, Nodes, and Connection Instances
 # =========================================================================
 
-gn:GundamGraph a ue4:UEdGraph ;
-    rdfs:label "GundamGraph" ;
+gn:MechaGraph a ue4:UEdGraph ;
+    rdfs:label "MechaGraph" ;
     rdfs:comment "Blueprint event graph processing inputs and movement logic." ;
     ue4:hasNode gn:NodeMoveForwardEvent ;
     ue4:hasNode gn:NodeCallAddMovementInput .
@@ -256,9 +256,9 @@ gn:PinCallAddMovementInputScale a ue4:UEdGraphPin ;
 # Subsystem Instances
 # =========================================================================
 
-gn:GundamNetworkingHandler a ue4:UNetworkingSubsystem ;
-    rdfs:label "GundamNetworkingHandler" ;
-    rdfs:comment "Networking subsystem instanced to handle replication of the Gundam player state." ;
+gn:MechaNetworkingHandler a ue4:UNetworkingSubsystem ;
+    rdfs:label "MechaNetworkingHandler" ;
+    rdfs:comment "Networking subsystem instanced to handle replication of the Mecha player state." ;
     ue4:hasSubsystemLifecycle ue4:LifecycleActive .
 ```
 
@@ -273,27 +273,27 @@ To ensure that all character elements (mesh, physics, graph, reflection hooks, t
 
 ```toml
 [[validation.rules]]
-name = "R_Gundam_Scenario"
-description = "Verify that the Gundam player character scenario is structurally and logically connected without dangling links."
+name = "R_Mecha_Scenario"
+description = "Verify that the Mecha player character scenario is structurally and logically connected without dangling links."
 ask = """
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ue4: <https://rocket-craft.io/ontology/ue4/>
-PREFIX gn: <https://ggen.io/ontology/gundam-nexus/>
+PREFIX gn: <https://ggen.io/ontology/mecha-nexus/>
 
 ASK {
-  # 1. Gundam subclass of ACharacter
-  ?gundamClass rdfs:subClassOf ue4:ACharacter .
-  ?gundam a ?gundamClass .
+  # 1. Mecha subclass of ACharacter
+  ?mechaClass rdfs:subClassOf ue4:ACharacter .
+  ?mecha a ?mechaClass .
   
   # 2. Attached rendering and physics components
-  ?gundam ue4:hasComponent ?meshComp .
+  ?mecha ue4:hasComponent ?meshComp .
   ?meshComp a ue4:USkeletalMeshComponent .
-  ?gundam ue4:hasComponent ?physComp .
+  ?mecha ue4:hasComponent ?physComp .
   ?physComp a ue4:UBoxComponent .
   
   # 3. Blueprint graph
-  ?gundam ue4:hasBlueprintGraph ?graph .
+  ?mecha ue4:hasBlueprintGraph ?graph .
   ?graph a ue4:UEdGraph .
   
   # 4. Input events and function call calling a reflection function in graph
@@ -306,8 +306,8 @@ ASK {
   ?func a ue4:UFunction .
   
   # 5. Typestate tracking cooking & packaging status
-  ?gundam ue4:hasCookingState ue4:Cooked .
-  ?gundam ue4:hasPackagingState ue4:WasmReady .
+  ?mecha ue4:hasCookingState ue4:Cooked .
+  ?mecha ue4:hasPackagingState ue4:WasmReady .
 }
 """
 ```
@@ -351,7 +351,7 @@ All validations passed.
 ```
 
 ### 3.3 Negative Verification Test (Failure Injection)
-To guarantee the custom SPARQL rule executes a functional check and does not allow false positives, we modified the typestate mapping in `gundam_scenario.ttl` to simulate a pipeline failure:
+To guarantee the custom SPARQL rule executes a functional check and does not allow false positives, we modified the typestate mapping in `mecha_scenario.ttl` to simulate a pipeline failure:
 
 ```turtle
 # Invalid / Uncooked Cooking State
@@ -361,7 +361,7 @@ ue4:hasCookingState ue4:NotCooked ;
 Re-running validation results in an immediate halt and generation abort:
 ```bash
 Custom validation rules: FAIL (error[GGEN-VALIDATION]: 1 custom validation rule(s) failed (Error severity):
-  - R_Gundam_Scenario: Verify that the Gundam player character scenario is structurally and logically connected without dangling links.
+  - R_Mecha_Scenario: Verify that the Mecha player character scenario is structurally and logically connected without dangling links.
   = generation aborted before writing files)
 
 Some validations failed.
@@ -379,9 +379,9 @@ This confirms that the validation layer acts as a strict guard at **GATE 0 (Sour
 
 ### 4.1 Component Mapping Rationale
 Unreal Engine defines physical representation modularly via components. 
-*   `USkeletalMeshComponent` maps the visual structure of the Gundam. It inherits from `USceneComponent`, giving it a relative coordinate transform.
+*   `USkeletalMeshComponent` maps the visual structure of the Mecha. It inherits from `USceneComponent`, giving it a relative coordinate transform.
 *   `UBoxComponent` provides collision bounds for movement actuation. It also inherits from `USceneComponent`.
-*   By setting `ue4:hasRootComponent gn:GundamBoxCollision`, we structurally declare the collision component as the transform basis of the actor.
+*   By setting `ue4:hasRootComponent gn:MechaBoxCollision`, we structurally declare the collision component as the transform basis of the actor.
 *   `ue4:owner` acts as the inverse link of `ue4:hasComponent`, ensuring that elements can be bidirectional-queried during compilation.
 
 ### 4.2 Blueprint Graph Execution & Reflection Binding
@@ -395,7 +395,7 @@ Unreal Engine's Blueprint VM relies on execution nodes and pins to pass signals 
 
 ### 4.3 Typestate & Subsystem Tracing
 *   The client packaging process requires assets to be cooked and linked. The `CookingTypestate` status `ue4:Cooked` and `WasmPackagingTypestate` status `ue4:WasmReady` guarantee that this class definition is safe for HTML5/WASM export.
-*   By subclassing `ue4:UNetworkingSubsystem` as `gn:GundamNetworkingHandler`, we ensure that server replication parameters (`ue4:bReplicates true`) are automatically monitored and synchronized across the network.
+*   By subclassing `ue4:UNetworkingSubsystem` as `gn:MechaNetworkingHandler`, we ensure that server replication parameters (`ue4:bReplicates true`) are automatically monitored and synchronized across the network.
 
 ---
 
@@ -408,13 +408,13 @@ To enforce DfLSS (Design for Lean Six Sigma) principles on the ontology layers, 
 *   **Scope**: Character inheritance, component attachments, blueprint graph execution nodes, reflection function calling, subsystem replication, and typestate constraints.
 
 ### 5.2 Measure
-*   **Ontology Files**: 6 files integrated (`core.ttl`, `reflection.ttl`, `blueprints.ttl`, `subsystems.ttl`, `typestates.ttl`, and `gundam_scenario.ttl`).
+*   **Ontology Files**: 6 files integrated (`core.ttl`, `reflection.ttl`, `blueprints.ttl`, `subsystems.ttl`, `typestates.ttl`, and `mecha_scenario.ttl`).
 *   **Triples Defined**: ~85 statements representing the scenario.
-*   **Validation Rules Check**: 5 SPARQL rules (`R1`, `R2`, `R3`, `R4`, `R_Gundam_Scenario`) + 3 SHACL NodeShapes (`ClassLabelShape`, `ClassCommentShape`, `NamespaceSanityShape`).
+*   **Validation Rules Check**: 5 SPARQL rules (`R1`, `R2`, `R3`, `R4`, `R_Mecha_Scenario`) + 3 SHACL NodeShapes (`ClassLabelShape`, `ClassCommentShape`, `NamespaceSanityShape`).
 *   **Compilation Time**: 3ms.
 
 ### 5.3 Analyze
-*   **Orphan Node Prevention**: Every class inherits from `ue4:UObject` (e.g. `gn:AGundam` $\rightarrow$ `ue4:ACharacter` $\rightarrow$ `ue4:APawn` $\rightarrow$ `ue4:AActor` $\rightarrow$ `ue4:UObject`), preventing tree fragmentation.
+*   **Orphan Node Prevention**: Every class inherits from `ue4:UObject` (e.g. `gn:AMecha` $\rightarrow$ `ue4:ACharacter` $\rightarrow$ `ue4:APawn` $\rightarrow$ `ue4:AActor` $\rightarrow$ `ue4:UObject`), preventing tree fragmentation.
 *   **Execution Safety**: The SPARQL query establishes a closed verification loop. If any link is broken (e.g., event node doesn't sequence to the function node, or the function node does not call a valid C++ reflection metadata function), the rule fails immediately.
 
 ### 5.4 Improve

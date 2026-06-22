@@ -36,18 +36,18 @@ Direct observations from the ontology and test files:
         66:     sh:targetClass ue4:UEdGraphPin ;
         ...
         ```
-*   **File Path:** `/Users/sac/rocket-craft/ggen-validation-tests/gundam_character.ttl`
+*   **File Path:** `/Users/sac/rocket-craft/ggen-validation-tests/mecha_character.ttl`
     *   *Mismatched categories connected together (lines 140-156):*
         ```turtle
-        141: gundam:W_KeyPressedPinOut a ue4:UEdGraphPin ;
+        141: mecha:W_KeyPressedPinOut a ue4:UEdGraphPin ;
         ...
         146:     ue4:pinCategory "exec" ;
-        147:     ue4:connectedTo gundam:MoveForwardPinIn .
+        147:     ue4:connectedTo mecha:MoveForwardPinIn .
         ...
-        150: gundam:MoveForwardPinIn a ue4:UEdGraphPin ;
+        150: mecha:MoveForwardPinIn a ue4:UEdGraphPin ;
         ...
         155:     ue4:pinCategory "float" ;
-        156:     ue4:connectedTo gundam:W_KeyPressedPinOut .
+        156:     ue4:connectedTo mecha:W_KeyPressedPinOut .
         ```
 
 ---

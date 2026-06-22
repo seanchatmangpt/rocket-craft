@@ -13,7 +13,7 @@
 - `boroa: <http://example.org/ontology/boro-building-ai#>`
 - `borob: <http://example.org/ontology/boro-building-handcrafted#>`
 - `bos: <https://businessos.dev/>`
-- `bu: <http://example.disney.com/bu#>`
+- `bu: <http://example.globalcorp.com/bu#>`
 - `building: <http://ies.data.gov.uk/ontology/ies-building1#>`
 - `cap: <urn:unrdf:doc:capability:>`
 - `cc: <http://web.resource.org/cc/>`
@@ -37,7 +37,7 @@
 - `dct: <http://purl.org/dc/terms/>`
 - `dcterms: <http://purl.org/dc/terms/>`
 - `dctype: <http://purl.org/dc/dcmitype/>`
-- `disney: <http://example.disney.com/canon#>`
+- `globalcorp: <http://example.globalcorp.com/canon#>`
 - `doc: <http://unrdf.dev/cli/doc#>`
 - `doc: <urn:unrdf:doc:>`
 - `event: <http://purl.org/NET/c4dm/event.owl#>`
@@ -150,7 +150,7 @@ This project actively projects the following variables into code/templates:
 - `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/validation-artifact_deal.ttl` (5709 bytes)
 - `/Users/sac/unrdf/generated/businessos-revops/businessos/deals/workflow-model_deal.ttl` (5654 bytes)
 - `/Users/sac/unrdf/hooks/health-check.ask.rq` (196 bytes)
-- `/Users/sac/unrdf/ontologies/disney-governed-universe.ttl` (14631 bytes)
+- `/Users/sac/unrdf/ontologies/globalcorp-governed-universe.ttl` (14631 bytes)
 - `/Users/sac/unrdf/open-ontologies/benchmark/data/assessment.ttl` (1686 bytes)
 - `/Users/sac/unrdf/open-ontologies/benchmark/data/characteristics-and-measures.ttl` (804 bytes)
 - `/Users/sac/unrdf/open-ontologies/benchmark/data/communication.ttl` (1330 bytes)

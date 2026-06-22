@@ -2,91 +2,136 @@
     {
         "seed": 101,
         "file": "SM_Torso.usda",
-        "fingerprint": "1813c0d2a33b36573011ee5aeb4f1288a82ff6e6fb2b2f23764ac2851e7d66a4"
+        "fingerprint": "c8d34f6fc39e04919f12652000b850a963e559976f63c27bbb29ff9c43beb991"
     },
     {
         "seed": 101,
         "file": "SM_Head.usda",
-        "fingerprint": "55ac85d8ca860df7a6e45f52bd7ad7287d1101f01843251bcef76843972205ea"
+        "fingerprint": "79bd6178f739c1f2c092634a6c1db93c4014e38579d06d63b1f3e62c59c5934b"
     },
     {
         "seed": 101,
         "file": "SM_WingArray_Left.usda",
-        "fingerprint": "7b7b23eb62bd9eb1fdba21dde684060abf894433dfe6f617f476731bf5d8badb"
+        "fingerprint": "367a700942dd66c8fbea6d4567617227d35f95a5a52ed87ba20ab261552d23a4"
     },
     {
         "seed": 101,
         "file": "SM_WingArray_Right.usda",
-        "fingerprint": "3ab7f0511bed4023a2e0823f7a5bed1e8f20083a91ff247ceb2c5bdb7a6e3d92"
+        "fingerprint": "94d8e454733a3a4830563c8af35e271ddb66c7dc85f8a1900bdecbc93610c4ba"
     },
     {
         "seed": 101,
         "file": "SM_Blade_Left.usda",
-        "fingerprint": "d987957a8d2bf3d61a7c855725daae55f29186dcf370eee67d534024bce448f8"
+        "fingerprint": "852c9853075464a8ac1f766501ede88b73c6604a8616ffb71109436005ce03f4"
     },
     {
         "seed": 101,
         "file": "SM_Blade_Right.usda",
-        "fingerprint": "510eb95fba032284756cf2a92307871835396b7e0822089b42061fc9592c6b23"
+        "fingerprint": "5c616ff20e30383251516c831055757d4022276e24479104b1e02647b665e0a4"
+    },
+    {
+        "seed": 101,
+        "file": "SM_Limb_Left.usda",
+        "fingerprint": "df1380bc98095754a4c18ca570747a180a4b7ea1b7d12163ebeeec8c93f72f47"
+    },
+    {
+        "seed": 101,
+        "file": "SM_Limb_Right.usda",
+        "fingerprint": "9c8aba42fb3ce9d55a368b1091e031cb035a92dc09ca05fd52490758c97b053f"
+    },
+    {
+        "seed": 101,
+        "file": "SM_Loadout.usda",
+        "fingerprint": "a4a39d99f9180969560f33de690900a04f3aa49d5b5d5d8b6875e3eaaf7bc141"
     },
     {
         "seed": 102,
         "file": "SM_Torso.usda",
-        "fingerprint": "1813c0d2a33b36573011ee5aeb4f1288a82ff6e6fb2b2f23764ac2851e7d66a4"
+        "fingerprint": "c8d34f6fc39e04919f12652000b850a963e559976f63c27bbb29ff9c43beb991"
     },
     {
         "seed": 102,
         "file": "SM_Head.usda",
-        "fingerprint": "55ac85d8ca860df7a6e45f52bd7ad7287d1101f01843251bcef76843972205ea"
+        "fingerprint": "79bd6178f739c1f2c092634a6c1db93c4014e38579d06d63b1f3e62c59c5934b"
     },
     {
         "seed": 102,
         "file": "SM_WingArray_Left.usda",
-        "fingerprint": "7b7b23eb62bd9eb1fdba21dde684060abf894433dfe6f617f476731bf5d8badb"
+        "fingerprint": "367a700942dd66c8fbea6d4567617227d35f95a5a52ed87ba20ab261552d23a4"
     },
     {
         "seed": 102,
         "file": "SM_WingArray_Right.usda",
-        "fingerprint": "3ab7f0511bed4023a2e0823f7a5bed1e8f20083a91ff247ceb2c5bdb7a6e3d92"
+        "fingerprint": "94d8e454733a3a4830563c8af35e271ddb66c7dc85f8a1900bdecbc93610c4ba"
     },
     {
         "seed": 102,
         "file": "SM_Blade_Left.usda",
-        "fingerprint": "d987957a8d2bf3d61a7c855725daae55f29186dcf370eee67d534024bce448f8"
+        "fingerprint": "852c9853075464a8ac1f766501ede88b73c6604a8616ffb71109436005ce03f4"
     },
     {
         "seed": 102,
         "file": "SM_Blade_Right.usda",
-        "fingerprint": "510eb95fba032284756cf2a92307871835396b7e0822089b42061fc9592c6b23"
+        "fingerprint": "5c616ff20e30383251516c831055757d4022276e24479104b1e02647b665e0a4"
+    },
+    {
+        "seed": 102,
+        "file": "SM_Limb_Left.usda",
+        "fingerprint": "df1380bc98095754a4c18ca570747a180a4b7ea1b7d12163ebeeec8c93f72f47"
+    },
+    {
+        "seed": 102,
+        "file": "SM_Limb_Right.usda",
+        "fingerprint": "9c8aba42fb3ce9d55a368b1091e031cb035a92dc09ca05fd52490758c97b053f"
+    },
+    {
+        "seed": 102,
+        "file": "SM_Loadout.usda",
+        "fingerprint": "a4a39d99f9180969560f33de690900a04f3aa49d5b5d5d8b6875e3eaaf7bc141"
     },
     {
         "seed": 103,
         "file": "SM_Torso.usda",
-        "fingerprint": "1813c0d2a33b36573011ee5aeb4f1288a82ff6e6fb2b2f23764ac2851e7d66a4"
+        "fingerprint": "c8d34f6fc39e04919f12652000b850a963e559976f63c27bbb29ff9c43beb991"
     },
     {
         "seed": 103,
         "file": "SM_Head.usda",
-        "fingerprint": "55ac85d8ca860df7a6e45f52bd7ad7287d1101f01843251bcef76843972205ea"
+        "fingerprint": "79bd6178f739c1f2c092634a6c1db93c4014e38579d06d63b1f3e62c59c5934b"
     },
     {
         "seed": 103,
         "file": "SM_WingArray_Left.usda",
-        "fingerprint": "7b7b23eb62bd9eb1fdba21dde684060abf894433dfe6f617f476731bf5d8badb"
+        "fingerprint": "367a700942dd66c8fbea6d4567617227d35f95a5a52ed87ba20ab261552d23a4"
     },
     {
         "seed": 103,
         "file": "SM_WingArray_Right.usda",
-        "fingerprint": "3ab7f0511bed4023a2e0823f7a5bed1e8f20083a91ff247ceb2c5bdb7a6e3d92"
+        "fingerprint": "94d8e454733a3a4830563c8af35e271ddb66c7dc85f8a1900bdecbc93610c4ba"
     },
     {
         "seed": 103,
         "file": "SM_Blade_Left.usda",
-        "fingerprint": "d987957a8d2bf3d61a7c855725daae55f29186dcf370eee67d534024bce448f8"
+        "fingerprint": "852c9853075464a8ac1f766501ede88b73c6604a8616ffb71109436005ce03f4"
     },
     {
         "seed": 103,
         "file": "SM_Blade_Right.usda",
-        "fingerprint": "510eb95fba032284756cf2a92307871835396b7e0822089b42061fc9592c6b23"
+        "fingerprint": "5c616ff20e30383251516c831055757d4022276e24479104b1e02647b665e0a4"
+    },
+    {
+        "seed": 103,
+        "file": "SM_Limb_Left.usda",
+        "fingerprint": "df1380bc98095754a4c18ca570747a180a4b7ea1b7d12163ebeeec8c93f72f47"
+    },
+    {
+        "seed": 103,
+        "file": "SM_Limb_Right.usda",
+        "fingerprint": "9c8aba42fb3ce9d55a368b1091e031cb035a92dc09ca05fd52490758c97b053f"
+    },
+    {
+        "seed": 103,
+        "file": "SM_Loadout.usda",
+        "fingerprint": "a4a39d99f9180969560f33de690900a04f3aa49d5b5d5d8b6875e3eaaf7bc141"
     }
 ]

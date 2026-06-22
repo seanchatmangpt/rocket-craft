@@ -170,9 +170,9 @@ pub enum TitanType {
     GodKing,
 }
 
-/// Gundam anime franchise series tag for unit provenance.
+/// Mecha anime franchise series tag for unit provenance.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub enum GundamSeries {
+pub enum MechaSeries {
     WitchFromMercury,
     Seed,
     Unicorn,
@@ -184,7 +184,7 @@ pub enum GundamSeries {
     BuildFighters,
 }
 
-pub type Series = GundamSeries;
+pub type Series = MechaSeries;
 
 /// Gacha pull rarity tier for banner drops.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]

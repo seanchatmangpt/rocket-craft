@@ -400,7 +400,7 @@ mod tests {
     #[test]
     fn ssr_pull_resets_pity_counter() {
         // Force an SSR by setting pity to 90 before the pull.
-        let banner = banner_with(vec![ssr_item("RX-78", false)], vec![], vec![r_item("gm")]);
+        let banner = banner_with(vec![ssr_item("XM-01", false)], vec![], vec![r_item("gm")]);
         let mut engine = GachaEngine::new(0);
         let mut s = session();
         s.pulls_since_last_ssr = 89; // next pull = 90 → guaranteed SSR
@@ -415,7 +415,7 @@ mod tests {
 
     #[test]
     fn ssr_increments_ssr_count() {
-        let banner = banner_with(vec![ssr_item("RX-78", false)], vec![], vec![r_item("gm")]);
+        let banner = banner_with(vec![ssr_item("XM-01", false)], vec![], vec![r_item("gm")]);
         let mut engine = GachaEngine::new(0);
         let mut s = session();
         s.pulls_since_last_ssr = 89; // force SSR
@@ -428,8 +428,8 @@ mod tests {
     #[test]
     fn ten_pull_always_returns_exactly_10_results() {
         let banner = banner_with(
-            vec![ssr_item("RX-78", false)],
-            vec![sr_item("Zaku II")],
+            vec![ssr_item("XM-01", false)],
+            vec![sr_item("GruntUnit II")],
             vec![r_item("gm"), r_item("ball")],
         );
         let mut engine = GachaEngine::new(999);
@@ -442,7 +442,7 @@ mod tests {
     fn ten_pull_advances_total_pulls_by_10() {
         let banner = banner_with(
             vec![ssr_item("Wing", false)],
-            vec![sr_item("Zaku II")],
+            vec![sr_item("GruntUnit II")],
             vec![r_item("gm")],
         );
         let mut engine = GachaEngine::new(777);

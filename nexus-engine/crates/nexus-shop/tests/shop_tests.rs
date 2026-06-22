@@ -9,8 +9,8 @@ fn make_test_banner() -> Banner {
         banner_type: BannerType::Standard,
         items: vec![
             GachaItem {
-                id: "nu-gundam".to_string(),
-                name: "Nu Gundam".to_string(),
+                id: "nu-mecha".to_string(),
+                name: "Nu Mecha".to_string(),
                 rarity: GachaRarity::SSR,
                 banner_id: "test-banner".to_string(),
                 is_rate_up: true,
@@ -24,7 +24,7 @@ fn make_test_banner() -> Banner {
             },
             GachaItem {
                 id: "rx78".to_string(),
-                name: "RX-78-2".to_string(),
+                name: "XM-01-2".to_string(),
                 rarity: GachaRarity::SR,
                 banner_id: "test-banner".to_string(),
                 is_rate_up: false,

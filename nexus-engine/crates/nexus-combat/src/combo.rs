@@ -70,7 +70,7 @@ impl<const N: usize> ComboChain<N> {
 /// Standard 5-hit combo chain (most mobile suits).
 pub type StandardCombo = ComboChain<5>;
 
-/// Trans-Am 7-hit combo chain (Gundam 00 special; Trans-Am zone activates at depth 4).
+/// Trans-Am 7-hit combo chain (Mecha 00 special; Trans-Am zone activates at depth 4).
 pub type TransAmCombo = ComboChain<7>;
 
 #[cfg(test)]

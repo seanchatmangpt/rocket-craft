@@ -41,14 +41,14 @@ pub enum GmfEventKind {
     ReceiptVerified,
     ReceiptRefused,
 
-    // ── Heat / thermal (MechWarrior-inspired) ──────────────────────────────
+    // ── Heat / thermal (ArmorFrame-inspired) ──────────────────────────────
     ThermalLoadObserved,
     ThermalOverload,
     ThermalCoolingApplied,
     WeaponGroupFired,
     HeatSafetyOverridden,
 
-    // ── Location-based damage (BattleTech-inspired) ─────────────────────────
+    // ── Location-based damage (ArmorFrame-inspired) ─────────────────────────
     DamageObserved,
     PartDestroyed,
     JointDegraded,
@@ -89,7 +89,7 @@ pub enum GmfEventKind {
     InfrastructureRepaired,
     CivilizationHealthUpdated,
 
-    // ── Mission (MechWarrior 5 mercenary company-inspired) ─────────────────
+    // ── Mission (ArmorFrame 5 mercenary company-inspired) ─────────────────
     MissionContractAccepted,
     MissionCompleted,
     LanceDeployed,
@@ -269,7 +269,7 @@ pub fn assembly_receipt_event(
         .with_attr("gates_passed", receipt.passed_gates.len() as i64)
 }
 
-/// Emit a thermal overload event (MechWarrior heat → wasm4pm HealthStatus).
+/// Emit a thermal overload event (ArmorFrame heat → wasm4pm HealthStatus).
 pub fn thermal_overload_event(
     part_object_id: impl Into<String>,
     zone_object_id: impl Into<String>,
@@ -284,7 +284,7 @@ pub fn thermal_overload_event(
         .with_attr("threshold_exceeded", true)
 }
 
-/// Emit a damage observed event (BattleTech location-based damage → OCEL).
+/// Emit a damage observed event (ArmorFrame location-based damage → OCEL).
 pub fn damage_observed_event(
     part_slot: PartSlot,
     part_object_id: impl Into<String>,

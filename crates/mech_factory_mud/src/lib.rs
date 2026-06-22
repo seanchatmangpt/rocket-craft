@@ -15,3 +15,4 @@ pub mod verifier;
 pub mod walkthrough;
 pub mod world;
 pub mod export;
+pub mod generated_constants;

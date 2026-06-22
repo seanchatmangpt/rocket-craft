@@ -67,18 +67,18 @@ mud:PartFamily a owl:Class ;
     rdfs:label "Part Family" ;
     rdfs:comment "Mechanized part families generated at stations." .
 
-mud:Frame a mud:PartFamily ; rdfs:label "Frame" ; core:isBounded true ; core:compilesToZST true .
-mud:Shoulder a mud:PartFamily ; rdfs:label "Shoulder" ; core:isBounded true ; core:compilesToZST true .
-mud:Arm a mud:PartFamily ; rdfs:label "Arm" ; core:isBounded true ; core:compilesToZST true .
-mud:Leg a mud:PartFamily ; rdfs:label "Leg" ; core:isBounded true ; core:compilesToZST true .
-mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true .
-mud:ArmorPanel a mud:PartFamily ; rdfs:label "ArmorPanel" ; core:isBounded true ; core:compilesToZST true .
-mud:WeaponMount a mud:PartFamily ; rdfs:label "WeaponMount" ; core:isBounded true ; core:compilesToZST true .
-mud:CoolingVent a mud:PartFamily ; rdfs:label "CoolingVent" ; core:isBounded true ; core:compilesToZST true .
-mud:SkinLayer a mud:PartFamily ; rdfs:label "SkinLayer" ; core:isBounded true ; core:compilesToZST true .
-mud:MotionFamily a mud:PartFamily ; rdfs:label "MotionFamily" ; core:isBounded true ; core:compilesToZST true .
-mud:LODVariant a mud:PartFamily ; rdfs:label "LODVariant" ; core:isBounded true ; core:compilesToZST true .
-mud:ReceiptTerminalPart a mud:PartFamily ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true .
+mud:Frame a mud:PartFamily ; rdfs:label "Frame" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:Shoulder a mud:PartFamily ; rdfs:label "Shoulder" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:Arm a mud:PartFamily ; rdfs:label "Arm" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:Leg a mud:PartFamily ; rdfs:label "Leg" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:Socket a mud:PartFamily ; rdfs:label "Socket" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:ArmorPanel a mud:PartFamily ; rdfs:label "ArmorPanel" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:WeaponMount a mud:PartFamily ; rdfs:label "WeaponMount" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:CoolingVent a mud:PartFamily ; rdfs:label "CoolingVent" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:SkinLayer a mud:PartFamily ; rdfs:label "SkinLayer" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:MotionFamily a mud:PartFamily ; rdfs:label "MotionFamily" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:LODVariant a mud:PartFamily ; rdfs:label "LODVariant" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
+mud:ReceiptTerminalPart a mud:PartFamily ; rdfs:label "ReceiptTerminal" ; core:isBounded true ; core:compilesToZST true ; core:hasByteClass mud:DamageClass .
 
 # ---------------------------------------------------------
 # Stations

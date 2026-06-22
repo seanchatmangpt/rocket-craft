@@ -40,7 +40,7 @@ Refactor the entire `eden_server` ontology registry to Level 5 Combinatorial Max
 - **Files modified**:
   - `/Users/sac/.ggen/packs/eden_server/ontology/pack.ttl` — Refactored to OWL 2 DL, type mappings, and annotations
   - `/Users/sac/.ggen/packs/eden_server/ontology/deltas.ttl` — Refactored delta metadata and type mappings
-  - `/Users/sac/.ggen/packs/eden_server/ontology/bandai_tps.ttl` — Refactored Gunpla grades and materials
+  - `/Users/sac/.ggen/packs/eden_server/ontology/bandai_tps.ttl` — Refactored MechKit grades and materials
   - `/Users/sac/.ggen/packs/eden_server/ontology/egp_racing.ttl` — Refactored telemetry and racing parts
   - `/Users/sac/.ggen/packs/eden_server/ontology/mars_market.ttl` — Refactored dimensional asset and financial properties
   - `/Users/sac/.ggen/packs/eden_server/ontology/validation_shapes.ttl` — Added SHACL shapes for byte-class boundaries, tire counts, and proofs

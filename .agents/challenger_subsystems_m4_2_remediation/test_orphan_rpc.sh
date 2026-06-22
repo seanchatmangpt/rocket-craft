@@ -30,22 +30,22 @@ setup
 # 1. Orphaned RPC (no hasFunction relationship to any class)
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:AMyNPC a owl:Class ; rdfs:label "AMyNPC" ; rdfs:subClassOf ue4:AActor .
+mecha:AMyNPC a owl:Class ; rdfs:label "AMyNPC" ; rdfs:subClassOf ue4:AActor .
 
-gundam:GundamServerRPCOrphaned a ue4:UServerRPC ;
-    rdfs:label "GundamServerRPCOrphaned" ;
+mecha:MechaServerRPCOrphaned a ue4:UServerRPC ;
+    rdfs:label "MechaServerRPCOrphaned" ;
     ue4:bWithValidation true ;
-    ue4:validationFunction gundam:GundamValidationFuncWrongScope .
+    ue4:validationFunction mecha:MechaValidationFuncWrongScope .
 
-gundam:GundamValidationFuncWrongScope a ue4:UFunction ;
-    rdfs:label "GundamValidationFuncWrongScope" ;
-    ue4:returnProperty gundam:GundamValidationFuncWrongScopeRet .
+mecha:MechaValidationFuncWrongScope a ue4:UFunction ;
+    rdfs:label "MechaValidationFuncWrongScope" ;
+    ue4:returnProperty mecha:MechaValidationFuncWrongScopeRet .
 
-gundam:GundamValidationFuncWrongScopeRet a ue4:UBoolProperty ;
-    rdfs:label "GundamValidationFuncWrongScopeRet" .
+mecha:MechaValidationFuncWrongScopeRet a ue4:UBoolProperty ;
+    rdfs:label "MechaValidationFuncWrongScopeRet" .
 
-# We intentionally do NOT define AGundamCharacter hasFunction GundamServerRPCOrphaned
-gundam:AMyNPC ue4:hasFunction gundam:GundamValidationFuncWrongScope .
+# We intentionally do NOT define AMechaCharacter hasFunction MechaServerRPCOrphaned
+mecha:AMyNPC ue4:hasFunction mecha:MechaValidationFuncWrongScope .
 EOF
 
 echo "Running validation with orphaned RPC..."

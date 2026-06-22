@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log xes.version="1.0" xmlns="http://www.xes-standard.org/" xmlns:xes="http://www.xes-standard.org/">
+  <trace>
+    <string key="concept:name" value="case1"/>
+    <event>
+      <string key="concept:name" value="Start Vision Snap Loop"/>
+      <date key="time:timestamp" value="2026-06-20T00:10:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Generate Bounded Geometry"/>
+      <date key="time:timestamp" value="2026-06-20T00:11:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Render Visual Projection"/>
+      <date key="time:timestamp" value="2026-06-20T00:12:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Extract Visual Targets"/>
+      <date key="time:timestamp" value="2026-06-20T00:13:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Measure Semantic vs Visual Gap"/>
+      <date key="time:timestamp" value="2026-06-20T00:14:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Compute Residuals"/>
+      <date key="time:timestamp" value="2026-06-20T00:15:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Select Bounded Repair Operator"/>
+      <date key="time:timestamp" value="2026-06-20T00:16:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Patch Semantic Law"/>
+      <date key="time:timestamp" value="2026-06-20T00:17:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Regenerate Bounded Geometry"/>
+      <date key="time:timestamp" value="2026-06-20T00:18:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Compute Residuals"/>
+      <date key="time:timestamp" value="2026-06-20T00:19:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Verify Playwright Engine Admissibility"/>
+      <date key="time:timestamp" value="2026-06-20T00:20:00"/>
+    </event>
+  </trace>
+</log>

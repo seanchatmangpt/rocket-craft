@@ -1,7 +1,7 @@
 with open("/Users/sac/rocket-craft/ggen-validation-tests/core.ttl", "rb") as f:
     content = f.read()
     
-start = content.find(b"gundam:GundamWorld")
+start = content.find(b"mecha:MechaWorld")
 if start != -1:
     chunk = content[start:start+500]
     print("Hex dump:")

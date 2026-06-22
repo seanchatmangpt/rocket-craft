@@ -36,12 +36,12 @@ pub struct Bid {
 /// let auction = Auction::new(
 ///     1,
 ///     101,
-///     "Gundam Armor Fragment".to_string(),
+///     "Mecha Armor Fragment".to_string(),
 ///     150,
 ///     Some(200),
 ///     24
 /// );
-/// assert_eq!(auction.item_name, "Gundam Armor Fragment");
+/// assert_eq!(auction.item_name, "Mecha Armor Fragment");
 /// ```
 pub struct Auction<S> {
     pub id: u64,
@@ -495,7 +495,7 @@ mod tests {
         let a = AuctionBuilder::new()
             .id(1)
             .seller_id(10)
-            .item_name("Gundam".into())
+            .item_name("Mecha".into())
             .starting_price(50)
             .duration_hours(24)
             .build()

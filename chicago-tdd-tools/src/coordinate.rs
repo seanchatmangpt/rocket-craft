@@ -181,14 +181,14 @@ pub enum SessionState {
 }
 
 #[derive(Debug, Clone)]
-pub struct GundamSessionSimulation {
+pub struct MechaSessionSimulation {
     pub state: SessionState,
     pub profile: PlayerProfile,
     pub inventory: Vec<Item>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum GundamMove {
+pub enum MechaMove {
     Authenticate(bool),
     Reject,
     EnterLobby,
@@ -204,11 +204,11 @@ pub enum GundamMove {
     InventoryRemove(usize),
 }
 
-pub struct GundamCoordinateSystem;
+pub struct MechaCoordinateSystem;
 
-impl GameCoordinateSystem for GundamCoordinateSystem {
-    type State = GundamSessionSimulation;
-    type Move = GundamMove;
+impl GameCoordinateSystem for MechaCoordinateSystem {
+    type State = MechaSessionSimulation;
+    type Move = MechaMove;
 
     fn state_to_coordinate(&self, state: &Self::State) -> String {
         let state_char = match &state.state {
@@ -239,41 +239,41 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
         let mut moves = Vec::new();
         match &state.state {
             SessionState::Connecting => {
-                moves.push(GundamMove::Authenticate(true));
-                moves.push(GundamMove::Authenticate(false));
-                moves.push(GundamMove::Reject);
+                moves.push(MechaMove::Authenticate(true));
+                moves.push(MechaMove::Authenticate(false));
+                moves.push(MechaMove::Reject);
             }
             SessionState::Authenticated => {
-                moves.push(GundamMove::EnterLobby);
-                moves.push(GundamMove::Disconnect);
+                moves.push(MechaMove::EnterLobby);
+                moves.push(MechaMove::Disconnect);
             }
             SessionState::InLobby => {
-                moves.push(GundamMove::EnterMatch(42));
-                moves.push(GundamMove::Spectate(42));
-                moves.push(GundamMove::Disconnect);
-                moves.push(GundamMove::ApplyXP(100));
+                moves.push(MechaMove::EnterMatch(42));
+                moves.push(MechaMove::Spectate(42));
+                moves.push(MechaMove::Disconnect);
+                moves.push(MechaMove::ApplyXP(100));
                 if state.profile.gold >= 10 {
-                    moves.push(GundamMove::SpendGold(10));
+                    moves.push(MechaMove::SpendGold(10));
                 } else if state.profile.gold > 0 {
-                    moves.push(GundamMove::SpendGold(state.profile.gold));
+                    moves.push(MechaMove::SpendGold(state.profile.gold));
                 }
                 if state.inventory.len() < 5 {
-                    moves.push(GundamMove::InventoryAdd);
+                    moves.push(MechaMove::InventoryAdd);
                 }
                 for i in 0..state.inventory.len() {
-                    moves.push(GundamMove::InventoryRemove(i));
+                    moves.push(MechaMove::InventoryRemove(i));
                 }
             }
             SessionState::InMatch { .. } => {
-                moves.push(GundamMove::MatchComplete);
-                moves.push(GundamMove::Disconnect);
+                moves.push(MechaMove::MatchComplete);
+                moves.push(MechaMove::Disconnect);
             }
             SessionState::Spectating { .. } => {
-                moves.push(GundamMove::LeaveSpectate);
-                moves.push(GundamMove::Disconnect);
+                moves.push(MechaMove::LeaveSpectate);
+                moves.push(MechaMove::Disconnect);
             }
             SessionState::Disconnected => {
-                moves.push(GundamMove::Reconnect);
+                moves.push(MechaMove::Reconnect);
             }
         }
         moves
@@ -282,43 +282,43 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
     fn apply_move(&self, state: &Self::State, mv: &Self::Move) -> Result<Self::State> {
         let mut next = state.clone();
         match (&state.state, mv) {
-            (SessionState::Connecting, GundamMove::Authenticate(true)) => {
+            (SessionState::Connecting, MechaMove::Authenticate(true)) => {
                 next.state = SessionState::Authenticated;
             }
-            (SessionState::Connecting, GundamMove::Authenticate(false)) => {
+            (SessionState::Connecting, MechaMove::Authenticate(false)) => {
                 return Err(anyhow::anyhow!("Authentication failed"));
             }
-            (SessionState::Connecting, GundamMove::Reject) => {
+            (SessionState::Connecting, MechaMove::Reject) => {
                 next.state = SessionState::Disconnected;
             }
-            (SessionState::Authenticated, GundamMove::EnterLobby) => {
+            (SessionState::Authenticated, MechaMove::EnterLobby) => {
                 next.state = SessionState::InLobby;
             }
-            (SessionState::Authenticated, GundamMove::Disconnect) => {
+            (SessionState::Authenticated, MechaMove::Disconnect) => {
                 next.state = SessionState::Disconnected;
             }
-            (SessionState::InLobby, GundamMove::EnterMatch(match_id)) => {
+            (SessionState::InLobby, MechaMove::EnterMatch(match_id)) => {
                 next.state = SessionState::InMatch {
                     match_id: *match_id,
                 };
             }
-            (SessionState::InLobby, GundamMove::Spectate(match_id)) => {
+            (SessionState::InLobby, MechaMove::Spectate(match_id)) => {
                 next.state = SessionState::Spectating {
                     match_id: *match_id,
                 };
             }
-            (SessionState::InLobby, GundamMove::Disconnect) => {
+            (SessionState::InLobby, MechaMove::Disconnect) => {
                 next.state = SessionState::Disconnected;
             }
-            (SessionState::InLobby, GundamMove::ApplyXP(amount)) => {
+            (SessionState::InLobby, MechaMove::ApplyXP(amount)) => {
                 next.profile.apply_xp_gain(*amount);
             }
-            (SessionState::InLobby, GundamMove::SpendGold(amount)) => {
+            (SessionState::InLobby, MechaMove::SpendGold(amount)) => {
                 next.profile
                     .spend_gold(*amount)
                     .map_err(|e| anyhow::anyhow!("Spend gold failed: {}", e))?;
             }
-            (SessionState::InLobby, GundamMove::InventoryAdd) => {
+            (SessionState::InLobby, MechaMove::InventoryAdd) => {
                 if next.inventory.len() < 5 {
                     let count = next.inventory.len() as u64;
                     next.inventory.push(Item {
@@ -330,26 +330,26 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
                     return Err(anyhow::anyhow!("Inventory full"));
                 }
             }
-            (SessionState::InLobby, GundamMove::InventoryRemove(slot)) => {
+            (SessionState::InLobby, MechaMove::InventoryRemove(slot)) => {
                 if *slot < next.inventory.len() {
                     next.inventory.remove(*slot);
                 } else {
                     return Err(anyhow::anyhow!("Invalid inventory slot"));
                 }
             }
-            (SessionState::InMatch { .. }, GundamMove::MatchComplete) => {
+            (SessionState::InMatch { .. }, MechaMove::MatchComplete) => {
                 next.state = SessionState::InLobby;
             }
-            (SessionState::InMatch { .. }, GundamMove::Disconnect) => {
+            (SessionState::InMatch { .. }, MechaMove::Disconnect) => {
                 next.state = SessionState::Disconnected;
             }
-            (SessionState::Spectating { .. }, GundamMove::LeaveSpectate) => {
+            (SessionState::Spectating { .. }, MechaMove::LeaveSpectate) => {
                 next.state = SessionState::InLobby;
             }
-            (SessionState::Spectating { .. }, GundamMove::Disconnect) => {
+            (SessionState::Spectating { .. }, MechaMove::Disconnect) => {
                 next.state = SessionState::Disconnected;
             }
-            (SessionState::Disconnected, GundamMove::Reconnect) => {
+            (SessionState::Disconnected, MechaMove::Reconnect) => {
                 next.state = SessionState::Connecting;
             }
             (current_state, invalid_move) => {
@@ -365,19 +365,19 @@ impl GameCoordinateSystem for GundamCoordinateSystem {
 
     fn move_to_notation(&self, mv: &Self::Move) -> String {
         match mv {
-            GundamMove::Authenticate(val) => format!("auth:{}", val),
-            GundamMove::Reject => "reject".to_string(),
-            GundamMove::EnterLobby => "enter_lobby".to_string(),
-            GundamMove::EnterMatch(match_id) => format!("enter_match:{}", match_id),
-            GundamMove::Spectate(match_id) => format!("spectate:{}", match_id),
-            GundamMove::Disconnect => "disconnect".to_string(),
-            GundamMove::ApplyXP(amount) => format!("apply_xp:{}", amount),
-            GundamMove::SpendGold(amount) => format!("spend_gold:{}", amount),
-            GundamMove::MatchComplete => "match_complete".to_string(),
-            GundamMove::LeaveSpectate => "leave_spectate".to_string(),
-            GundamMove::Reconnect => "reconnect".to_string(),
-            GundamMove::InventoryAdd => "inventory_add".to_string(),
-            GundamMove::InventoryRemove(slot) => format!("inventory_remove:{}", slot),
+            MechaMove::Authenticate(val) => format!("auth:{}", val),
+            MechaMove::Reject => "reject".to_string(),
+            MechaMove::EnterLobby => "enter_lobby".to_string(),
+            MechaMove::EnterMatch(match_id) => format!("enter_match:{}", match_id),
+            MechaMove::Spectate(match_id) => format!("spectate:{}", match_id),
+            MechaMove::Disconnect => "disconnect".to_string(),
+            MechaMove::ApplyXP(amount) => format!("apply_xp:{}", amount),
+            MechaMove::SpendGold(amount) => format!("spend_gold:{}", amount),
+            MechaMove::MatchComplete => "match_complete".to_string(),
+            MechaMove::LeaveSpectate => "leave_spectate".to_string(),
+            MechaMove::Reconnect => "reconnect".to_string(),
+            MechaMove::InventoryAdd => "inventory_add".to_string(),
+            MechaMove::InventoryRemove(slot) => format!("inventory_remove:{}", slot),
         }
     }
 }
@@ -388,48 +388,48 @@ mod tests {
     use nexus_session::player::PlayerProfile;
 
     // ── get_hp_class (private, tested via state_to_coordinate indirectly) ──────
-    // We test the observable behavior through GundamCoordinateSystem::state_to_coordinate.
+    // We test the observable behavior through MechaCoordinateSystem::state_to_coordinate.
 
     fn profile() -> PlayerProfile {
         PlayerProfile::new(1, "Amuro".into())
     }
 
-    fn connecting_sim() -> GundamSessionSimulation {
-        GundamSessionSimulation {
+    fn connecting_sim() -> MechaSessionSimulation {
+        MechaSessionSimulation {
             state: SessionState::Connecting,
             profile: profile(),
             inventory: vec![],
         }
     }
 
-    fn lobby_sim() -> GundamSessionSimulation {
-        GundamSessionSimulation {
+    fn lobby_sim() -> MechaSessionSimulation {
+        MechaSessionSimulation {
             state: SessionState::InLobby,
             profile: profile(),
             inventory: vec![],
         }
     }
 
-    // ── GundamCoordinateSystem::state_to_coordinate ───────────────────────────
+    // ── MechaCoordinateSystem::state_to_coordinate ───────────────────────────
 
     #[test]
     fn connecting_coordinate_starts_with_sc() {
-        let sys = GundamCoordinateSystem;
+        let sys = MechaCoordinateSystem;
         let coord = sys.state_to_coordinate(&connecting_sim());
         assert!(coord.starts_with("sC:"), "got: {coord}");
     }
 
     #[test]
     fn lobby_coordinate_starts_with_sl() {
-        let sys = GundamCoordinateSystem;
+        let sys = MechaCoordinateSystem;
         let coord = sys.state_to_coordinate(&lobby_sim());
         assert!(coord.starts_with("sL:"), "got: {coord}");
     }
 
     #[test]
     fn in_match_coordinate_includes_match_id() {
-        let sys = GundamCoordinateSystem;
-        let sim = GundamSessionSimulation {
+        let sys = MechaCoordinateSystem;
+        let sim = MechaSessionSimulation {
             state: SessionState::InMatch { match_id: 99 },
             profile: profile(),
             inventory: vec![],
@@ -440,119 +440,119 @@ mod tests {
 
     #[test]
     fn coordinate_includes_level_and_gold() {
-        let sys = GundamCoordinateSystem;
+        let sys = MechaCoordinateSystem;
         let coord = sys.state_to_coordinate(&lobby_sim());
         assert!(coord.contains("lv1"), "got: {coord}");
         assert!(coord.contains("g100"), "PlayerProfile starts with gold=100; got: {coord}");
     }
 
-    // ── GundamCoordinateSystem::get_legal_moves ───────────────────────────────
+    // ── MechaCoordinateSystem::get_legal_moves ───────────────────────────────
 
     #[test]
     fn connecting_legal_moves_include_authenticate() {
-        let sys = GundamCoordinateSystem;
+        let sys = MechaCoordinateSystem;
         let moves = sys.get_legal_moves(&connecting_sim());
-        assert!(moves.contains(&GundamMove::Authenticate(true)));
-        assert!(moves.contains(&GundamMove::Authenticate(false)));
-        assert!(moves.contains(&GundamMove::Reject));
+        assert!(moves.contains(&MechaMove::Authenticate(true)));
+        assert!(moves.contains(&MechaMove::Authenticate(false)));
+        assert!(moves.contains(&MechaMove::Reject));
     }
 
     #[test]
     fn lobby_legal_moves_include_enter_match_and_spectate() {
-        let sys = GundamCoordinateSystem;
+        let sys = MechaCoordinateSystem;
         let moves = sys.get_legal_moves(&lobby_sim());
-        assert!(moves.contains(&GundamMove::EnterMatch(42)));
-        assert!(moves.contains(&GundamMove::Spectate(42)));
-        assert!(moves.contains(&GundamMove::Disconnect));
+        assert!(moves.contains(&MechaMove::EnterMatch(42)));
+        assert!(moves.contains(&MechaMove::Spectate(42)));
+        assert!(moves.contains(&MechaMove::Disconnect));
     }
 
     #[test]
     fn disconnected_legal_moves_only_reconnect() {
-        let sys = GundamCoordinateSystem;
-        let sim = GundamSessionSimulation {
+        let sys = MechaCoordinateSystem;
+        let sim = MechaSessionSimulation {
             state: SessionState::Disconnected,
             profile: profile(),
             inventory: vec![],
         };
         let moves = sys.get_legal_moves(&sim);
         assert_eq!(moves.len(), 1);
-        assert_eq!(moves[0], GundamMove::Reconnect);
+        assert_eq!(moves[0], MechaMove::Reconnect);
     }
 
-    // ── GundamCoordinateSystem::apply_move ────────────────────────────────────
+    // ── MechaCoordinateSystem::apply_move ────────────────────────────────────
 
     #[test]
     fn authenticate_true_transitions_to_authenticated() {
-        let sys = GundamCoordinateSystem;
-        let next = sys.apply_move(&connecting_sim(), &GundamMove::Authenticate(true)).unwrap();
+        let sys = MechaCoordinateSystem;
+        let next = sys.apply_move(&connecting_sim(), &MechaMove::Authenticate(true)).unwrap();
         assert_eq!(next.state, SessionState::Authenticated);
     }
 
     #[test]
     fn authenticate_false_returns_error() {
-        let sys = GundamCoordinateSystem;
-        let result = sys.apply_move(&connecting_sim(), &GundamMove::Authenticate(false));
+        let sys = MechaCoordinateSystem;
+        let result = sys.apply_move(&connecting_sim(), &MechaMove::Authenticate(false));
         assert!(result.is_err());
     }
 
     #[test]
     fn reject_transitions_to_disconnected() {
-        let sys = GundamCoordinateSystem;
-        let next = sys.apply_move(&connecting_sim(), &GundamMove::Reject).unwrap();
+        let sys = MechaCoordinateSystem;
+        let next = sys.apply_move(&connecting_sim(), &MechaMove::Reject).unwrap();
         assert_eq!(next.state, SessionState::Disconnected);
     }
 
     #[test]
     fn enter_match_from_lobby() {
-        let sys = GundamCoordinateSystem;
-        let next = sys.apply_move(&lobby_sim(), &GundamMove::EnterMatch(42)).unwrap();
+        let sys = MechaCoordinateSystem;
+        let next = sys.apply_move(&lobby_sim(), &MechaMove::EnterMatch(42)).unwrap();
         assert_eq!(next.state, SessionState::InMatch { match_id: 42 });
     }
 
     #[test]
     fn match_complete_returns_to_lobby() {
-        let sys = GundamCoordinateSystem;
-        let in_match = GundamSessionSimulation {
+        let sys = MechaCoordinateSystem;
+        let in_match = MechaSessionSimulation {
             state: SessionState::InMatch { match_id: 1 },
             profile: profile(),
             inventory: vec![],
         };
-        let next = sys.apply_move(&in_match, &GundamMove::MatchComplete).unwrap();
+        let next = sys.apply_move(&in_match, &MechaMove::MatchComplete).unwrap();
         assert_eq!(next.state, SessionState::InLobby);
     }
 
     #[test]
     fn invalid_move_for_state_returns_error() {
-        let sys = GundamCoordinateSystem;
+        let sys = MechaCoordinateSystem;
         // MatchComplete is invalid in Connecting state
-        let result = sys.apply_move(&connecting_sim(), &GundamMove::MatchComplete);
+        let result = sys.apply_move(&connecting_sim(), &MechaMove::MatchComplete);
         assert!(result.is_err());
     }
 
-    // ── GundamCoordinateSystem::move_to_notation ──────────────────────────────
+    // ── MechaCoordinateSystem::move_to_notation ──────────────────────────────
 
     #[test]
     fn notation_for_authenticate_true() {
-        let sys = GundamCoordinateSystem;
-        assert_eq!(sys.move_to_notation(&GundamMove::Authenticate(true)), "auth:true");
+        let sys = MechaCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&MechaMove::Authenticate(true)), "auth:true");
     }
 
     #[test]
     fn notation_for_enter_match() {
-        let sys = GundamCoordinateSystem;
-        assert_eq!(sys.move_to_notation(&GundamMove::EnterMatch(7)), "enter_match:7");
+        let sys = MechaCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&MechaMove::EnterMatch(7)), "enter_match:7");
     }
 
     #[test]
     fn notation_for_inventory_remove() {
-        let sys = GundamCoordinateSystem;
-        assert_eq!(sys.move_to_notation(&GundamMove::InventoryRemove(2)), "inventory_remove:2");
+        let sys = MechaCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&MechaMove::InventoryRemove(2)), "inventory_remove:2");
     }
 
     #[test]
     fn notation_for_disconnect() {
-        let sys = GundamCoordinateSystem;
-        assert_eq!(sys.move_to_notation(&GundamMove::Disconnect), "disconnect");
+        let sys = MechaCoordinateSystem;
+        assert_eq!(sys.move_to_notation(&MechaMove::Disconnect), "disconnect");
     }
 
     // ── SessionState enum properties ──────────────────────────────────────────

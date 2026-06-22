@@ -1,0 +1,76 @@
+{
+    "asset_name": "Mech_Flagship_Reference_Fabric_001",
+    "version": "1.0",
+    "materials": [
+        {
+            "name": "M_WhiteArmor",
+            "base_color": "#FFFFFF",
+            "roughness": 0.2,
+            "metallic": 0.8,
+            "emissive": 0.0,
+            "programs": {
+                "osl": "M_WhiteArmor.osl",
+                "combiner": "generate_textures.py"
+            },
+            "output_maps": [
+                "M_WhiteArmor_BaseColor.png",
+                "M_WhiteArmor_Roughness.png",
+                "M_WhiteArmor_Metallic.png",
+                "M_WhiteArmor_Normal.png"
+            ]
+        },
+        {
+            "name": "M_DarkFrame",
+            "base_color": "#222222",
+            "roughness": 0.8,
+            "metallic": 0.1,
+            "emissive": 0.0,
+            "programs": {
+                "osl": "M_DarkFrame.osl",
+                "combiner": "generate_textures.py"
+            },
+            "output_maps": [
+                "M_DarkFrame_BaseColor.png",
+                "M_DarkFrame_Roughness.png",
+                "M_DarkFrame_Metallic.png",
+                "M_DarkFrame_Normal.png"
+            ]
+        },
+        {
+            "name": "M_CyanBlade",
+            "base_color": "#00FFFF",
+            "roughness": 0.1,
+            "metallic": 0.9,
+            "emissive": 1.0,
+            "programs": {
+                "osl": "M_CyanBlade.osl",
+                "combiner": "generate_textures.py"
+            },
+            "output_maps": [
+                "M_CyanBlade_BaseColor.png",
+                "M_CyanBlade_Roughness.png",
+                "M_CyanBlade_Metallic.png",
+                "M_CyanBlade_Emissive.png",
+                "M_CyanBlade_Normal.png"
+            ]
+        },
+        {
+            "name": "M_GoldVisor",
+            "base_color": "#FFD700",
+            "roughness": 0.1,
+            "metallic": 1.0,
+            "emissive": 0.5,
+            "programs": {
+                "osl": "M_GoldVisor.osl",
+                "combiner": "generate_textures.py"
+            },
+            "output_maps": [
+                "M_GoldVisor_BaseColor.png",
+                "M_GoldVisor_Roughness.png",
+                "M_GoldVisor_Metallic.png",
+                "M_GoldVisor_Emissive.png",
+                "M_GoldVisor_Normal.png"
+            ]
+        }
+    ]
+}

@@ -41,6 +41,13 @@ pub enum ClientMessage {
     },
     SurrenderMatch,
 
+    // -- Vehicle / Tank Control --
+    VehicleControl {
+        turret_yaw: i8,
+        turret_pitch: i8,
+        tread_rpm: i8,
+    },
+
     // -- Heartbeat --
     Ping {
         seq: u32,
@@ -116,6 +123,11 @@ pub struct MatchStateSnapshot {
     pub player2_combo: u32,
     pub turn_number: u32,
     pub is_player1_turn: bool,
+    
+    // Vehicle Byte-Class Telemetry (SIMD-ready)
+    pub turret_yaw: i8,
+    pub turret_pitch: i8,
+    pub tread_rpm: i8,
 }
 
 /// A single combat decision made by one player on their turn.
@@ -256,10 +268,31 @@ mod tests {
             match_id: 7, player1_hp: 500.0, player2_hp: 250.0,
             player1_combo: 3, player2_combo: 0,
             turn_number: 5, is_player1_turn: false,
+            turret_yaw: 10, turret_pitch: -5, tread_rpm: 100,
         };
         assert_eq!(snap.match_id, 7);
         assert_eq!(snap.turn_number, 5);
         assert!(!snap.is_player1_turn);
+        assert_eq!(snap.turret_yaw, 10);
+    }
+
+    #[test]
+    fn vehicle_control_round_trips() {
+        let msg = ClientMessage::VehicleControl {
+            turret_yaw: 120,
+            turret_pitch: -15,
+            tread_rpm: 60,
+        };
+        let json = ser(&msg);
+        let dec: ClientMessage = serde_json::from_str(&json).unwrap();
+        match dec {
+            ClientMessage::VehicleControl { turret_yaw, turret_pitch, tread_rpm } => {
+                assert_eq!(turret_yaw, 120);
+                assert_eq!(turret_pitch, -15);
+                assert_eq!(tread_rpm, 60);
+            }
+            _ => panic!("wrong variant"),
+        }
     }
 
     // ── Task C1: Prevent Authority Stream Inflation ────────────────────────────

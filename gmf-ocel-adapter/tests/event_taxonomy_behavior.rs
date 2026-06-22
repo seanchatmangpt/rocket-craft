@@ -96,7 +96,7 @@ fn jidoka_collision_emits_correct_halt_code() {
     assert_eq!(ev.attributes["halt_code"].as_str(), Some("collision_volume_intersects"));
 }
 
-// ── Thermal overload (MechWarrior heat loop) ────────────────────────────────
+// ── Thermal overload (ArmorFrame heat loop) ────────────────────────────────
 
 #[test]
 fn thermal_overload_event_activity_name_is_correct() {
@@ -120,7 +120,7 @@ fn thermal_overload_event_references_part_and_zone() {
     assert!(ids.contains(&"zone_proving_ground"));
 }
 
-// ── Location-based damage (BattleTech) ─────────────────────────────────────
+// ── Location-based damage (ArmorFrame) ─────────────────────────────────────
 
 #[test]
 fn damage_observed_event_activity_name_is_correct() {

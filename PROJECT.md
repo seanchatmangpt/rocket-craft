@@ -84,7 +84,7 @@ Every generated asset must pass all 13 gates to be admitted:
 - **CTQ-F1-011: In-Engine Presentation Proof**
   Playwright-driven verification in browser-native UE4 HTML5/WASM runtime. Captures baseline, actuate keyboard inputs, and verifies visual delta movements.
 - **CTQ-F1-012: IP-Distance/Non-Confusion Proof**
-  Mathematical verification that the asset is outside protected trademark centroids (e.g., Gundam, Evangelion, MechWarrior) while anchored in the project's original support-first grammar.
+  Mathematical verification that the asset is outside protected trademark centroids (e.g., Mecha, BiotechMech, ArmorFrame) while anchored in the project's original support-first grammar.
 - **CTQ-F1-013: Receipt/Replay Proof**
   Constructs a tamper-evident BLAKE3 receipt chain mapping `Prompt -> Contract -> USD -> Cook -> Playwright screenshot delta`. Re-running the pipeline under the same seed must produce identical receipt hashes.
 

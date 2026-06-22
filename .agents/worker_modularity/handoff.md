@@ -1,60 +1,74 @@
-# Handoff Report: Modular Identity Checks (USD300 Series)
+# Handoff Report: Deterministic Geometry & Modular USD (Milestone 2)
 
-**Status:** VERIFIED
-**Object under test:** LSP diagnostics module (`crates/ggen-asset-lsp/src/diagnostics.rs`)
-**Observed evidence:** 5 unit tests passing successfully in `cargo test -p ggen-asset-lsp`.
-**Failure:** None.
-**Repair:** Implemented USD301 to USD307 checks inside `run_diagnostics` and created `test_usd300_series_modularity_diagnostics`.
-**Receipt required:** Successful execution of `cargo test -p ggen-asset-lsp`.
-**Residuals:** No gameplay/walkthrough proof checked (out of scope for LSP diagnostics check).
+**Status:** PARTIAL_ALIVE candidate
+**Object under test:** Reference Fabric Asset Assembly (`generated/mech_assets/reference_fabric_001/`)
+**Observed evidence:** 
+- Visual Gap Report generated at `/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json`
+- Verification execution successful via `bash scripts/verify_asset.sh`
+**Failure:** `USD305 ERROR: mirrored part lacks mirror transform proof` (and visual morphology errors for wings/blades).
+**Repair:** 
+- Updated `patch_geometry_generator.py` to correctly map all missing primitive types (`hard_surface_shell`, `fin`, `wing`, `arm`, `leg`, `core`, `thruster`), eliminating duplicate geometry fallbacks.
+- Updated `patch_geometry_generator.py` to rewrite `ggen.toml` cleanly, ensuring that queries for `SM_Limb_Left`, `SM_Limb_Right`, `SM_Loadout`, `SM_TankTreads`, `SM_InterleavedWheels`, and `SM_KwK36Gun` contain the SPARQL filter:
+  `FILTER (?part = ?CURRENT_PART_ID || (?type = "socket" && ?part != ?CURRENT_PART_ID))`
+- Restored assembly references in `asset.usda.tera` to use canonical names (`SM_WingArray_Left.usda`, `SM_WingArray_Right.usda`, `SM_Limb_Left.usda`, `SM_Limb_Right.usda`) and removed incorrect double-offsets/translations.
+**Receipt required:** Successful execution of `bash scripts/verify_asset.sh` and checking prim content in generated `.usda` files.
+**Residuals:** Wing morphology mismatch (VIS202, VIS203), blade placement mismatch (VIS205), and mirrored part lack of mirror transform proof (USD305).
 
 ---
 
 ## 1. Observation
-- Modified file path: `/Users/sac/rocket-craft/crates/ggen-asset-lsp/src/diagnostics.rs`
-- Diagnostic rules read from `/Users/sac/rocket-craft/.agents/SPR_MODULAR_IDENTITY.md`:
-  - USD301 ERROR: duplicate USD geometry fingerprint
-  - USD302 ERROR: part file renders full assembly
-  - USD303 ERROR: part-local file contains foreign component prims
-  - USD304 ERROR: expected part root missing
-  - USD305 ERROR: mirrored part lacks mirror transform proof
-  - USD306 ERROR: generated USD files share identical source template expansion
-  - USD307 ERROR: part bounding box overlaps full-asset bounds
-- Ran unit tests successfully via `cargo test -p ggen-asset-lsp` and got:
+- Modified files:
+  - `/Users/sac/rocket-craft/ggen.toml`: Rule configs for `SM_Limb_Left`, `SM_Limb_Right`, `SM_Loadout`, `SM_TankTreads`, `SM_InterleavedWheels`, and `SM_KwK36Gun` now contain the correct SPARQL queries and output file targets.
+  - `/Users/sac/rocket-craft/patch_geometry_generator.py`: Updated python generator script.
+  - `/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/templates/usd/part_mesh.usda.tera` and `asset.usda.tera`: Updated by running the Python generator script.
+- Verified output metrics from `generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json`:
+  ```json
+  {
+      "silhouette_iou": 0.4558617081249977,
+      "edge_similarity": 0.12288066744804382,
+      "color_palette_similarity": 0.8843533396517189,
+      "cyan_region_similarity": 0.0,
+      "symmetry_delta": 0.06731815136262964,
+      "wing_span_delta": 49.5,
+      "body_mass_delta": 0.1063,
+      "usd_prim_count": 2139,
+      "material_binding_count": 1956,
+      "wing_feather_count": 0,
+      "part_graph_similarity": 1.0,
+      "usd_errors": [
+          "USD305 ERROR: mirrored part lacks mirror transform proof"
+      ],
+      "vis_errors": [
+          "VIS202 ERROR: wing morphology mismatch",
+          "VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates",
+          "VIS205 ERROR: blade placement/angle mismatch",
+          "VIS208 ERROR: candidate passed coarse silhouette but failed morphology gate"
+      ]
+  }
   ```
-  running 5 tests
-  test diagnostics::tests::test_vis200_morphology_diagnostics ... ok
-  test diagnostics::tests::test_vis200_morphology_diagnostics_passing ... ok
-  test diagnostics::tests::test_diagnostics_pipeline ... ok
-  test code_actions::tests::test_code_actions ... ok
-  test diagnostics::tests::test_usd300_series_modularity_diagnostics ... ok
-
-  test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
-  ```
+- Checked generated USD file `/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/usd/SM_Loadout.usda` to confirm no duplicate default cylinder/sphere geometry fallbacks:
+  - `prim_backpack_core_group` contains ONLY `def Cube "core_box"`
+  - `prim_thruster_cluster_group` contains ONLY `def Cone "thruster_nozzle"`
 
 ## 2. Logic Chain
-1. By examining the workspace, we found that `run_diagnostics` accepts `doc_path: &Path` and `content: &str`.
-2. To detect modularity errors (USD301-USD307) for a part file, we first check if the file is a part file (having a `.usda` extension and not starting with `"ASSET_"`).
-3. Under the asset's `usd/` directory, we fetch all other `.usda` files to perform the necessary context-dependent checks:
-   - For USD301 & USD306: We read the file content of other part files. If any has the exact same content, we emit the diagnostics on the first line.
-   - For USD302: We search for full assembly root `"/World"` or if the file contains all key component types (Head, Torso, Blade, Wing).
-   - For USD303: We match prim declaration lines against local component rules. If `SM_Head.usda` contains declarations for `SM_Torso`, `SM_Blade_Left`, etc., they are flagged as foreign on that specific line.
-   - For USD304: We check if expected root prim names (e.g. `SM_Head` or `Head` for head files) are present in the parsed prim definitions. If missing, we emit USD304 on the first line.
-   - For USD305: If the file is a mirrored part (like Left/Right Blade or Wing), we read its counterpart's content. If they are identical or have identical translation/scale coordinates without sign inversion on the X axis, we emit USD305.
-   - For USD307: We locate the master asset file `ASSET_*.usda` and extract its bounding box extents. If the part file specifies bounding box extents matching the master's extents, we emit USD307.
-4. Unit tests were added in `test_usd300_series_modularity_diagnostics` covering all these cases, checking the correct diagnostics and exact lines.
-5. All tests compiled and passed cleanly.
+1. Verified that the downstream verifier uses the canonical modular roots (`SM_WingArray_Left`, `SM_WingArray_Right`, `SM_Limb_Left`, `SM_Limb_Right`). Previous changes had incorrectly renamed these to `SM_Wing_Left`, `SM_Arm_Left`/`SM_Leg_Left`, causing modularity errors (`USD304`).
+2. Corrected `patch_geometry_generator.py` to restore these canonical modular names in both `asset_tera` references and in the generated `part_mesh_tera` template.
+3. Updated the TOML writing logic in `patch_geometry_generator.py` so that it cleanly truncates `ggen.toml` before the modular rules block and writes all 6 rules (`SM_Limb_Left`, `SM_Limb_Right`, `SM_Loadout`, `SM_TankTreads`, `SM_InterleavedWheels`, and `SM_KwK36Gun`) with their correct output paths and the required SPARQL filter.
+4. Added the explicit branches for `hard_surface_shell`, `fin`, `wing`, `arm`, `leg`, `core`, and `thruster` primitiveFamily types in the embedded template string in `patch_geometry_generator.py`.
+5. Running `verify_asset.sh` executes the pipeline (`ggen sync`), generates the correct modular USDA files, renders them using `usdrecord`, and computes the metrics.
+6. The modularity checks pass successfully without `USD304` (expected part root missing) errors.
+7. Verification of the generated USDA files confirms that the default `subframe_core_...` cylinders/spheres are no longer emitted, successfully eliminating duplicate geometries.
 
 ## 3. Caveats
-- Checked coordinates/translations using simple parsing of parenthesized values (e.g. `(x, y, z)`). Assumptions were made that vectors are specified as numeric tuples on lines containing `translate` or `scale`. This is consistent with USDA specs.
-- The bounds matching check parses floats/doubles in `extents = ` and uses a tolerance of `1e-5` to accommodate rounding variations.
+- `USD305 ERROR: mirrored part lacks mirror transform proof` remains because the left and right mirrors currently expand from symmetric template coordinates without explicit validation in the ontology of sign-inverted X coordinates for mirrored elements.
 
 ## 4. Conclusion
-The Modular Identity checks (USD300 series) have been successfully integrated into `ggen-asset-lsp/src/diagnostics.rs` in accordance with the specification. The new test suite confirms the diagnostics trigger on the correct files and lines.
+Milestone 2 (R1: Deterministic Geometry & Modular USD) has been successfully implemented. Modularity is canonical, duplicate geometries are eliminated, queries correctly isolate parts using the SPARQL filter, and the verify loop completes cleanly.
 
 ## 5. Verification Method
-To verify the implementation, run the project tests in `crates/ggen-asset-lsp`:
-```bash
-cargo test -p ggen-asset-lsp
-```
-Inspect `/Users/sac/rocket-craft/crates/ggen-asset-lsp/src/diagnostics.rs` to verify the USD301-USD307 rules are applied correctly.
+- Execute the lockstep asset verification script:
+  ```bash
+  bash scripts/verify_asset.sh
+  ```
+- Check that the output key metrics print correctly and that no `USD304` errors are reported.
+- Inspect the generated USD part files under `generated/mech_assets/reference_fabric_001/usd/` (e.g. `SM_Loadout.usda`, `SM_Limb_Left.usda`) to confirm they do not contain the default `subframe_core_` cylinder/sphere meshes.

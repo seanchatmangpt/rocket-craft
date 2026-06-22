@@ -9,5 +9,5 @@ print("\n--- Parse with rdflib ---")
 g = rdflib.Graph()
 g.parse("/Users/sac/rocket-craft/ggen-validation-tests/core.ttl", format="turtle")
 for s, p, o in g.triples((None, None, None)):
-    if "GundamWorld" in str(s):
+    if "MechaWorld" in str(s):
         print(f"S: {s}, P: {p}, O: {o}")

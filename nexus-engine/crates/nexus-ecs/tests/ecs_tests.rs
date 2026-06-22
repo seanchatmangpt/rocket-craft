@@ -55,7 +55,7 @@ fn trans_am_expires_after_correct_turns() {
     world.attach_suit(
         entity,
         "00-Raiser".to_string(),
-        GundamSeries::DoubleO,
+        MechaSeries::DoubleO,
         SpecialAbility::TransAm,
     );
 

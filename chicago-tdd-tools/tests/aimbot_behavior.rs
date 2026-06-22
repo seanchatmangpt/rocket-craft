@@ -1,7 +1,7 @@
 use anyhow::Result;
 use chicago_tdd_tools::aimbot::explore_state_space;
 use chicago_tdd_tools::coordinate::{
-    GameCoordinateSystem, GundamCoordinateSystem, GundamSessionSimulation,
+    GameCoordinateSystem, MechaCoordinateSystem, MechaSessionSimulation,
     InfinityBladeCoordinateSystem, SessionState,
 };
 use ib4_mud::session::GameSession;
@@ -83,9 +83,9 @@ fn test_explore_state_space_with_infinity_blade() {
 }
 
 #[test]
-fn test_explore_state_space_with_gundam_nexus() {
-    let system = GundamCoordinateSystem;
-    let mut initial = GundamSessionSimulation {
+fn test_explore_state_space_with_mecha_nexus() {
+    let system = MechaCoordinateSystem;
+    let mut initial = MechaSessionSimulation {
         state: SessionState::Connecting,
         profile: PlayerProfile::new(1001, "PilotAimbot".to_string()),
         inventory: Vec::new(),

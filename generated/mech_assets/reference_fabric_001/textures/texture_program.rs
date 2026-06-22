@@ -14,23 +14,43 @@ pub struct TextureProgram {
 pub const TEXTURE_PROGRAMS: &[TextureProgram] = &[
 
     TextureProgram {
-        name: "tex_prog_armor",
-        target_material: "M_WhiteArmor",
-        base_color_tex: Some("T_WhiteArmor_BaseColor.png"),
-        roughness_tex: Some("T_WhiteArmor_Roughness.png"),
-        normal_tex: Some("T_WhiteArmor_Normal.png"),
-        emissive_tex: None,
-        resolution: 2048,
+        name: "TP_CyanBlade",
+        target_material: "M_CyanBlade",
+        base_color_tex: Some("M_CyanBlade_BaseColor.png"),
+        roughness_tex: Some("M_CyanBlade_Roughness.png"),
+        normal_tex: Some("M_CyanBlade_Normal.png"),
+        emissive_tex: Some("M_CyanBlade_Emissive.png"),
+        resolution: 512,
     },
 
     TextureProgram {
-        name: "tex_prog_blade",
-        target_material: "M_CyanBlade",
-        base_color_tex: None,
-        roughness_tex: None,
-        normal_tex: None,
-        emissive_tex: Some("T_CyanBlade_Emissive.png"),
-        resolution: 2048,
+        name: "TP_DarkFrame",
+        target_material: "M_DarkFrame",
+        base_color_tex: Some("M_DarkFrame_BaseColor.png"),
+        roughness_tex: Some("M_DarkFrame_Roughness.png"),
+        normal_tex: Some("M_DarkFrame_Normal.png"),
+        emissive_tex: None,
+        resolution: 512,
+    },
+
+    TextureProgram {
+        name: "TP_GoldVisor",
+        target_material: "M_GoldVisor",
+        base_color_tex: Some("M_GoldVisor_BaseColor.png"),
+        roughness_tex: Some("M_GoldVisor_Roughness.png"),
+        normal_tex: Some("M_GoldVisor_Normal.png"),
+        emissive_tex: Some("M_GoldVisor_Emissive.png"),
+        resolution: 512,
+    },
+
+    TextureProgram {
+        name: "TP_WhiteArmor",
+        target_material: "M_WhiteArmor",
+        base_color_tex: Some("M_WhiteArmor_BaseColor.png"),
+        roughness_tex: Some("M_WhiteArmor_Roughness.png"),
+        normal_tex: Some("M_WhiteArmor_Normal.png"),
+        emissive_tex: None,
+        resolution: 512,
     },
 
 ];

@@ -1,0 +1,22 @@
+shader M_DarkFrame_procedural(
+    point Po = P,
+    float scale = 25.0,
+    output color BaseColor = color(0.1333, 0.1333, 0.1333),
+    output float Roughness = 0.8,
+    output float Metallic = 0.1,
+    output normal NormalOut = N
+) {
+    // Cast iron / rough mechanical frame texture
+    float grit = noise("perlin", Po * scale * 2.0);
+    float wear = noise("simplex", Po * scale * 0.5);
+    
+    // Base Color variation (oily / dark metallic look)
+    BaseColor = mix(color(0.1, 0.1, 0.1), color(0.15, 0.15, 0.15), grit);
+    
+    // Edge wear variation
+    Roughness = 0.8 - wear * 0.2;
+    
+    // Bump mapping for rough frame feel
+    vector displacement = N * (grit * 0.05);
+    NormalOut = calculatenormal(P + displacement);
+}

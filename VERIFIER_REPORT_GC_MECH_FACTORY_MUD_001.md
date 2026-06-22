@@ -72,7 +72,7 @@ Trace events: 15
 Receipt count: 15
 Falsification: PASS
 Counterfactual: PASS
-Tests passed: 55
+Tests passed: 51
 Replay: PASS
 Verify: PASS
 

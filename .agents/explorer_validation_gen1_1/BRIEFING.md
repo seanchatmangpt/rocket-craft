@@ -24,7 +24,7 @@ Analyze UE4 ontology SHACL shapes and ggen.toml validation rules, verifying robu
   - `/Users/sac/.ggen/packs/ue4_ontology/ggen.toml`
   - `/Users/sac/.ggen/packs/ue4_ontology/reflection.ttl`
   - `/Users/sac/.ggen/packs/ue4_ontology/blueprints.ttl`
-  - `/Users/sac/rocket-craft/ggen-validation-tests/gundam_character.ttl`
+  - `/Users/sac/rocket-craft/ggen-validation-tests/mecha_character.ttl`
   - `/Users/sac/rocket-craft/ggen-validation-tests/verify_all_rules.sh`
 - **Key findings**: Identified multiple critical flaws across SHACL targets, SPARQL queries (lack of symmetry, inverse reasoning failure, blank node errors, weak namespaces), and missing checks (cycles, node graph parentage).
 - **Unexplored areas**: None. Entire validation scope has been investigated.

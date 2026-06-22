@@ -30,8 +30,8 @@ setup
 # 2. bSimulatePhysics is true but has NO hasRigidBody relation
 restore
 cat << 'EOF' >> "$CORE_TTL_PATH"
-gundam:GundamComponentNoBody a ue4:UBoxComponent ;
-    rdfs:label "GundamComponentNoBody" ;
+mecha:MechaComponentNoBody a ue4:UBoxComponent ;
+    rdfs:label "MechaComponentNoBody" ;
     ue4:bSimulatePhysics true .
     # No hasRigidBody relation defined!
 EOF

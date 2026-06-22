@@ -64,13 +64,13 @@ And the exit status is `0`.
 
 ### [Low] Challenge 1: Mismatched Node Matching between SHACL Shape and RuleH
 - **Assumption challenged**: That the SHACL shape `InputExecPinConnectedShape` validates execution pin connection completeness on all function call nodes.
-- **Attack scenario**: A user defines a custom function call node using a subclass of `UK2Node_CallFunction` (e.g. `gundam:MyNode a ue4:UK2Node_CommutativeAssociativeBinaryOperator`) but leaves an input execution pin disconnected.
+- **Attack scenario**: A user defines a custom function call node using a subclass of `UK2Node_CallFunction` (e.g. `mecha:MyNode a ue4:UK2Node_CommutativeAssociativeBinaryOperator`) but leaves an input execution pin disconnected.
 - **Blast radius**: The SHACL rule will not detect this because `InputExecPinConnectedShape` specifically targets the exact class `ue4:UK2Node_CallFunction` rather than using transitively defined sub-classes (`rdfs:subClassOf*`). However, `RuleH` in `ggen.toml` checks `?node a/rdfs:subClassOf* ue4:UK2Node`, so the CLI validation rule would catch it, but the SHACL shape specifically would miss it.
 - **Mitigation**: Update the SPARQL query in `validation.shacl.ttl` for `ue4:InputExecPinConnectedShape` to navigate the class hierarchy transitively using `a/rdfs:subClassOf* ue4:UK2Node_CallFunction`.
 
 ### [Low] Challenge 2: Typestate Verification Dependency on SubClassOf declarations
 - **Assumption challenged**: That characters and worlds will always be validated for having exactly one cooking/packaging state.
-- **Attack scenario**: A character instance is defined using a custom class (e.g. `gundam:MyCustomCharacter a gundam:ACustomCharacter`) but the subclass definition `gundam:ACustomCharacter rdfs:subClassOf ue4:ACharacter` is missing or omitted from the RDF graph.
+- **Attack scenario**: A character instance is defined using a custom class (e.g. `mecha:MyCustomCharacter a mecha:ACustomCharacter`) but the subclass definition `mecha:ACustomCharacter rdfs:subClassOf ue4:ACharacter` is missing or omitted from the RDF graph.
 - **Blast radius**: The SPARQL query for `RuleF` and `RuleG` will not select the instance, causing it to bypass the cooking/packaging state requirement entirely.
 - **Mitigation**: Ensure that SHACL shapes or separate schema-validation checks enforce that any custom subclass representing an actor or pawn is transitively linked to `ue4:ACharacter` or `ue4:UWorld` before running validation.
 

@@ -46,21 +46,21 @@
       "id": "USD_PRIM_COUNT_GE_120",
       "description": "usd_prim_count >= 120",
       "expected": ">=120",
-      "actual": "1072",
+      "actual": "1087",
       "status": "PASSED"
     },
     {
       "id": "WING_FEATHER_COUNT_GE_48",
       "description": "wing_feather_count >= 48",
       "expected": ">=48",
-      "actual": "340",
+      "actual": "864",
       "status": "PASSED"
     },
     {
       "id": "MATERIAL_BINDINGS_GE_4",
       "description": "material_binding_count >= 4",
       "expected": ">=4",
-      "actual": "1020",
+      "actual": "976",
       "status": "PASSED"
     },
     {
@@ -95,14 +95,14 @@
       "id": "SILHOUETTE_IOU_GE_025",
       "description": "silhouette_iou >= 0.25",
       "expected": ">=0.25",
-      "actual": "0.2820123667781105",
+      "actual": "0.4064061942691686",
       "status": "PASSED"
     },
     {
       "id": "COLOR_PALETTE_SIMILARITY_GE_050",
       "description": "color_palette_similarity >= 0.50",
       "expected": ">=0.50",
-      "actual": "0.7730427124151055",
+      "actual": "0.8818952778924449",
       "status": "PASSED"
     },
     {
@@ -123,7 +123,7 @@
       "id": "MORPHOLOGY_FEATHER_CURVATURE",
       "description": "feather_panel_curvature_score >= 0.10",
       "expected": ">=0.10",
-      "actual": "1.0",
+      "actual": "0.18410041841004182",
       "status": "PASSED"
     },
     {
@@ -137,42 +137,42 @@
       "id": "MORPHOLOGY_CORE_COMPACTNESS",
       "description": "core_compactness_delta <= 0.15",
       "expected": "<=0.15",
-      "actual": "0.0",
+      "actual": "0.10909393926940464",
       "status": "PASSED"
     },
     {
       "id": "MORPHOLOGY_HEAD_TORSO_RATIO",
       "description": "head_to_torso_ratio_delta <= 0.15",
       "expected": "<=0.15",
-      "actual": "0.0",
+      "actual": "0.016666666666666607",
       "status": "PASSED"
     },
     {
       "id": "MORPHOLOGY_BLADE_GEOMETRY",
       "description": "blade_length_angle_delta <= 15.0",
       "expected": "<=15.0",
-      "actual": "0.0",
+      "actual": "5.608335775166283",
       "status": "PASSED"
     },
     {
       "id": "MORPHOLOGY_ARMOR_SEGMENTATION",
       "description": "armor_shell_segmentation_score >= 0.04",
       "expected": ">=0.04",
-      "actual": "1.0",
+      "actual": "0.11520409239531695",
       "status": "PASSED"
     },
     {
       "id": "MORPHOLOGY_EDGE_DENSITY",
       "description": "edge_density_distribution similarity >= 0.60",
       "expected": ">=0.60",
-      "actual": "1.0",
+      "actual": "0.6793008711487907",
       "status": "PASSED"
     },
     {
       "id": "MORPHOLOGY_COMPONENTS",
       "description": "1 <= foreground_component_count <= 5",
       "expected": "[1,5]",
-      "actual": "1",
+      "actual": "3",
       "status": "PASSED"
     },
     {
@@ -273,14 +273,14 @@
       "case": "DOUBLE_WING_FEATHERS",
       "description": "Double the mecha wing feathers to increase thrust capacity",
       "mutated_metrics": {
-        "wing_feather_count": 680,
-        "usd_prim_count": 1412,
-        "material_binding_count": 1360
+        "wing_feather_count": 1728,
+        "usd_prim_count": 1951,
+        "material_binding_count": 1840
       },
       "deltas": {
-        "wing_feather_count": 340,
-        "usd_prim_count": 340,
-        "material_binding_count": 340
+        "wing_feather_count": 864,
+        "usd_prim_count": 864,
+        "material_binding_count": 864
       },
       "status": "PASSED"
     },
@@ -288,14 +288,14 @@
       "case": "HALF_WING_FEATHERS",
       "description": "Reduce mecha wing feathers by half to decrease drag",
       "mutated_metrics": {
-        "wing_feather_count": 170,
-        "usd_prim_count": 902,
-        "material_binding_count": 850
+        "wing_feather_count": 432,
+        "usd_prim_count": 655,
+        "material_binding_count": 544
       },
       "deltas": {
-        "wing_feather_count": -170,
-        "usd_prim_count": -170,
-        "material_binding_count": -170
+        "wing_feather_count": -432,
+        "usd_prim_count": -432,
+        "material_binding_count": -432
       },
       "status": "PASSED"
     },
@@ -303,8 +303,8 @@
       "case": "REMOVE_CYAN_BLADES",
       "description": "Remove cyan blade assemblies to lower heat signature",
       "mutated_metrics": {
-        "usd_prim_count": 732,
-        "material_binding_count": 680
+        "usd_prim_count": 747,
+        "material_binding_count": 636
       },
       "deltas": {
         "usd_prim_count": -340,
@@ -316,7 +316,7 @@
       "case": "INCREASE_WHITE_ARMOR_RATIO",
       "description": "Increase white armor plating coverage ratio from 40% to 60%",
       "mutated_metrics": {
-        "color_palette_similarity": 0.7900427124151055
+        "color_palette_similarity": 0.8988952778924449
       },
       "deltas": {
         "color_palette_similarity": 0.017000000000000015
@@ -327,10 +327,10 @@
       "case": "DECREASE_CORE_BODY_WIDTH",
       "description": "Decrease mecha body core torso width by 10%",
       "mutated_metrics": {
-        "body_mass_delta": 0.3607421790675369
+        "body_mass_delta": 0.04755986980815943
       },
       "deltas": {
-        "body_mass_delta": -0.10000000000000003
+        "body_mass_delta": -0.1
       },
       "status": "PASSED"
     },
@@ -338,10 +338,10 @@
       "case": "INCREASE_WING_SPAN",
       "description": "Increase mecha wingspan to 1195px to match reference target span",
       "mutated_metrics": {
-        "wing_span_delta": 5.0
+        "wing_span_delta": 0.0
       },
       "deltas": {
-        "wing_span_delta": -150.0
+        "wing_span_delta": -39.5
       },
       "status": "PASSED"
     },
@@ -349,7 +349,7 @@
       "case": "REMOVE_GOLD_VISOR",
       "description": "Remove gold visor sensor array, replacing with dark frame armor",
       "mutated_metrics": {
-        "material_binding_count": 850
+        "material_binding_count": 806
       },
       "deltas": {
         "material_binding_count": -170
@@ -360,7 +360,7 @@
       "case": "ADD_RED_MICRO_DECALS",
       "description": "Add micro decals to torso and leg joints",
       "mutated_metrics": {
-        "material_binding_count": 1032
+        "material_binding_count": 988
       },
       "deltas": {
         "material_binding_count": 12

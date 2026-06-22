@@ -1,4 +1,4 @@
-//! TPS Branchless Mech Parts Generator for Gundam Nexus
+//! TPS Branchless Mech Parts Generator for Mecha Nexus
 
 use sha2::{Digest, Sha256};
 

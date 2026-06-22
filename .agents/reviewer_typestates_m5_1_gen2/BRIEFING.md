@@ -40,7 +40,7 @@ Examine correctness, completeness, robustness, and interface conformance of the 
   - SHACL shapes (`validation.shacl.ttl`)
   - GGen config (`ggen.toml`)
   - Test suites (`verify_all_rules.sh`, `verify_extra_rules.sh`)
-  - Test scenario graph (`core.ttl`, `gundam_character.ttl`)
+  - Test scenario graph (`core.ttl`, `mecha_character.ttl`)
 - **Verdict**: request_changes
 - **Unverified claims**: none
 

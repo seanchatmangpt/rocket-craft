@@ -12,7 +12,7 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 """
 
 QUERIES_TO_TEST = [
-    # Test 1: Simple check if gundam:GundamWorld has type ue4:UWorld
+    # Test 1: Simple check if mecha:MechaWorld has type ue4:UWorld
     """
     ASK {
       FILTER NOT EXISTS {

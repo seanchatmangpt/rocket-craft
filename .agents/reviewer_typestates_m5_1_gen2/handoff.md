@@ -48,11 +48,11 @@
   ```turtle
   # Rule F: Character must have exactly 1 hasCookingState of type CookingTypestate
   ```
-  And in `/Users/sac/rocket-craft/ggen-validation-tests/gundam_character.ttl` (line 43):
+  And in `/Users/sac/rocket-craft/ggen-validation-tests/mecha_character.ttl` (line 43):
   ```turtle
-  gundam:MyGundam a gundam:AGundamCharacter ;
+  mecha:MyMecha a mecha:AMechaCharacter ;
       ...
-      ue4:hasCookingState gundam:Cooked .
+      ue4:hasCookingState mecha:Cooked .
   ```
 
 - **O6 (Test Script Typos)**: In `verify_extra_rules.sh` (line 136), observed:
@@ -68,7 +68,7 @@
 
 ## 2. Logic Chain
 
-1. **LC1 (Stray Test World Shape Defect)**: From **O3**, the shape `ue4:TestWorldShape` selects any instance of `ue4:UWorld` and returns it as a violation. In a game scenario, a world graph MUST contain a `UWorld` instance (as seen in `gundam_character.ttl` where `gundam:GundamWorld a ue4:UWorld` is defined). Therefore, any valid game instance graph representing a world will trigger this shape and fail validation. The script passed in **O2** only because the base ontology contains class declarations but no instances.
+1. **LC1 (Stray Test World Shape Defect)**: From **O3**, the shape `ue4:TestWorldShape` selects any instance of `ue4:UWorld` and returns it as a violation. In a game scenario, a world graph MUST contain a `UWorld` instance (as seen in `mecha_character.ttl` where `mecha:MechaWorld a ue4:UWorld` is defined). Therefore, any valid game instance graph representing a world will trigger this shape and fail validation. The script passed in **O2** only because the base ontology contains class declarations but no instances.
 2. **LC2 (Audio Validator Defect)**: From **O4**, the boolean logic evaluates to `(Format != OggVorbis) AND (Format == PCM AND Size > 512KB)`. If the format is set to `Bink` or `ADPCM` (unsupported on HTML5/WASM), the second operand `Format == PCM` is false, causing the entire check to evaluate to false (no violation). Thus, arbitrary unsupported formats can bypass validation and compile.
 3. **LC3 (Conceptual Typestate Error)**: From **O5**, characters are dynamic gameplay actor entities spawned in levels at runtime. They are not compiled static files. The asset representations they reference (like static/skeletal meshes) are cooked. Forcing characters to have a `CookingTypestate` is a conceptual error that forces test graphs to declare dummy `hasCookingState` triples on pawns while leaving the actual meshes/textures without cooking states.
 4. **LC4 (Extra Rules Verification Failure)**: From **O6**, because of the mismatch between the string `"Static baking"` in the test script and `"Statically baked"` in the validation rules, running `./verify_extra_rules.sh` with a clean baseline fails Test 5 (VaRest dynamic API usage) because the output does not match the expected regex.

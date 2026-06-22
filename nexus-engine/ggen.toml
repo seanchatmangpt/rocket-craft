@@ -82,11 +82,11 @@ output_file = "crates/nexus-session/src/generated_session.rs"
 mode = "Overwrite"
 
 [[generation.rules]]
-name = "generate-gundam-nexus"
+name = "generate-mecha-nexus"
 query = { inline = """
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX gn: <https://rocket-craft.io/ontology/gundam-nexus/>
+PREFIX gn: <https://rocket-craft.io/ontology/mecha-nexus/>
 
 SELECT ?name (GROUP_CONCAT(?type; separator=",") AS ?types)
 WHERE {
@@ -213,8 +213,8 @@ WHERE {
 GROUP BY ?name
 ORDER BY ?name
 """ }
-template = { file = "templates/gundam_nexus.rs.tera" }
-output_file = "crates/nexus-gundam/src/mech_primitives.rs"
+template = { file = "templates/mecha_nexus.rs.tera" }
+output_file = "crates/nexus-mecha/src/mech_primitives.rs"
 mode = "Overwrite"
 
 # Secondary rule: extract canonical lore-grounded specs for mobility defaults.
@@ -222,7 +222,7 @@ mode = "Overwrite"
 [[generation.rules]]
 name = "generate-mobility-specs"
 query = { inline = """
-PREFIX gn: <https://rocket-craft.io/ontology/gundam-nexus/>
+PREFIX gn: <https://rocket-craft.io/ontology/mecha-nexus/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
@@ -244,7 +244,7 @@ WHERE {
 ORDER BY ?name
 """ }
 template = { file = "templates/mobility_defaults.rs.tera" }
-output_file = "crates/nexus-gundam/src/mobility_defaults.rs"
+output_file = "crates/nexus-mecha/src/mobility_defaults.rs"
 mode = "Overwrite"
 
 [sync]

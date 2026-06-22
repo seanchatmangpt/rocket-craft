@@ -102,10 +102,10 @@ To ensure Milestone 1 passes all verification gates, the following alignment ste
     - Torso core volume must be $\ge 2.0 \times$ head volume.
 - **MaterialX Completeness**: Verify all 4 material files exist and define baseColor, roughness, metalness, and emission.
 
-### B. E2E Playwright Walkthrough (Mecha & Gundam)
+### B. E2E Playwright Walkthrough (Mecha & Mecha)
 - **Mecha Walkthrough**: Succeeded at $388\text{px}$ visual delta (verdict: PASS). Keep current key sequence (W + Space).
-- **Gundam Walkthrough**: Currently fails because actuated visual delta is $55\text{px}$ (under the $70\text{px}$ threshold). 
-  - *Recommendation*: The movement actuation duration (8 seconds) is correct, but the camera position in the `barbarian-1` map is either obstructed or far from moving assets. Update the level transition script in `gundam_factory_walkthrough_projection.spec.ts` to either move the camera spawn forward or increase the viewer's run speed using engine console variables (`m.WalkSpeed` or `CharacterSpeed 600`) before movement key injection.
+- **Mecha Walkthrough**: Currently fails because actuated visual delta is $55\text{px}$ (under the $70\text{px}$ threshold). 
+  - *Recommendation*: The movement actuation duration (8 seconds) is correct, but the camera position in the `barbarian-1` map is either obstructed or far from moving assets. Update the level transition script in `mecha_factory_walkthrough_projection.spec.ts` to either move the camera spawn forward or increase the viewer's run speed using engine console variables (`m.WalkSpeed` or `CharacterSpeed 600`) before movement key injection.
 - **HTML5 General Pipeline**: Playwright fails to resolve `@noble/hashes/blake3` without the file extension.
   - *Recommendation*: Update import paths in `tests-e2e/tps-dflss.spec.ts` (and any other TypeScript files) to use `@noble/hashes/blake3.js` instead of `@noble/hashes/blake3` to satisfy ESM export constraints.
 

@@ -17,7 +17,7 @@
 
 ## Remaining Work
 - The current milestone is complete and fully verified.
-- The next milestone (next falsifier) is `GC-GUNDAM-FACTORY-002: SEMANTIC_LOD_MECH_ASSEMBLY_AND_RUNTIME_STATE`.
+- The next milestone (next falsifier) is `GC-MECHA-FACTORY-002: SEMANTIC_LOD_MECH_ASSEMBLY_AND_RUNTIME_STATE`.
 
 ## Key Artifacts
 - `/Users/sac/rocket-craft/.agents/orchestrator_mud_gap_closure/progress.md` — Liveness and status checklist

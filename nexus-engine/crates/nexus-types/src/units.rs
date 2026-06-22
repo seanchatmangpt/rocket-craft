@@ -173,7 +173,7 @@ impl Sub for Gold {
 // ---------------------------------------------------------------------------
 
 impl Hp {
-    /// Maximum legal hit-point value in the Gundam Nexus ruleset.
+    /// Maximum legal hit-point value in the Mecha Nexus ruleset.
     pub const MAX: Hp = Typed(100_000.0, PhantomData);
     /// Zero HP — entity is dead.
     pub const ZERO: Hp = Typed(0.0, PhantomData);

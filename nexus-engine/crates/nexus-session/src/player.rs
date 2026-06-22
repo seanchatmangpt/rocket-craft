@@ -1,4 +1,4 @@
-pub use nexus_types::{GundamSeries, MagicType};
+pub use nexus_types::{MechaSeries, MagicType};
 use serde::{Deserialize, Serialize};
 
 use crate::session::SessionError;
@@ -16,7 +16,7 @@ pub enum NewtypeRank {
     Coordinator,
 }
 
-// GundamSeries imported from nexus_types
+// MechaSeries imported from nexus_types
 
 // MagicType imported from nexus_types
 
@@ -24,7 +24,7 @@ pub enum NewtypeRank {
 // PlayerProfile
 // ────────────────────────────────────────────────────────────────────────────
 
-/// Full profile for a Gundam Nexus player, covering base stats, progression,
+/// Full profile for a Mecha Nexus player, covering base stats, progression,
 /// duel records, and Newtype/Series metadata.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerProfile {
@@ -56,10 +56,10 @@ pub struct PlayerProfile {
     pub magic_unlocks: Vec<MagicType>,
     pub qip_scar_stacks: u32,
 
-    // Gundam Nexus
+    // Mecha Nexus
     pub newtype_rank: NewtypeRank,
     pub pilot_suit: Option<String>,
-    pub active_series: Option<GundamSeries>,
+    pub active_series: Option<MechaSeries>,
     pub duel_rating: u32,
     pub duel_wins: u32,
     pub duel_losses: u32,

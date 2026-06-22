@@ -14,12 +14,12 @@ This handoff report verifies the correctness, completeness, and robustness of th
   SUCCESS: Ontology validation passed.
   ```
 - **Temporary Test Workspace**: The ontology pack was duplicated to `/Users/sac/rocket-craft/ggen-validation-tests` for isolated destructive testing.
-- **Scenario Implementation**: The Gundam Player Character Scenario was implemented in `/Users/sac/rocket-craft/ggen-validation-tests/core.ttl` including the character class, skeletal mesh component, box collision component, input graph, nodes, pins, function signatures (`AddMovementInput`), parameters, networking subsystem replication flag, and typestates (Cooking: `Cooked`, WasmPackaging: `WasmReady`).
+- **Scenario Implementation**: The Mecha Player Character Scenario was implemented in `/Users/sac/rocket-craft/ggen-validation-tests/core.ttl` including the character class, skeletal mesh component, box collision component, input graph, nodes, pins, function signatures (`AddMovementInput`), parameters, networking subsystem replication flag, and typestates (Cooking: `Cooked`, WasmPackaging: `WasmReady`).
 - **GGen Validation Engine Behavior**:
   - GGen's SHACL parser successfully caught structural violations (e.g. missing `pinOf` property under the `UEdGraphPinShape` node shape):
     ```
     SHACL validation:     FAIL (error[GGEN-SHACL-VALIDATION]: 1 SHACL validation violation(s) failed:
-      - Focus node 'https://rocket-craft.io/ontology/ue4/gundam#MoveForwardPinIn': A pin must belong to exactly one UEdGraphNode.
+      - Focus node 'https://rocket-craft.io/ontology/ue4/mecha#MoveForwardPinIn': A pin must belong to exactly one UEdGraphNode.
     ```
   - Standard SPARQL-based SHACL shapes (e.g. `ExecPinConnectionShape`) and meta-modeling target classes (e.g. `owl:Class` targeting) did not trigger violations within GGen's internal SHACL engine.
   - Custom SPARQL rules defined as ASK queries in `ggen.toml` executed flawlessly and succeeded in aborting the sync command on violation:
@@ -43,7 +43,7 @@ This handoff report verifies the correctness, completeness, and robustness of th
 ## 2. Logic Chain
 
 1. **Gate 0 Validation**: The baseline passing confirms that `validate_ontology.sh` uses `ggen sync --validate-only true` to run all validation rules, serving as the pre-flight gate.
-2. **Structural Checks (SHACL)**: By removing `ue4:pinOf` from `gundam:MoveForwardPinIn`, we directly observed a SHACL violation matching `UEdGraphPinShape`, proving that core cardinality constraints are actively verified by GGen's SHACL shape processor.
+2. **Structural Checks (SHACL)**: By removing `ue4:pinOf` from `mecha:MoveForwardPinIn`, we directly observed a SHACL violation matching `UEdGraphPinShape`, proving that core cardinality constraints are actively verified by GGen's SHACL shape processor.
 3. **Semantic Checks (SPARQL)**: Since GGen's SHACL engine ignores SPARQL constraints, we mapped RuleA-RuleH, RuleLabel, and RuleNamespace to custom validation rules in `ggen.toml` as SPARQL ASK queries. We demonstrated that GGen runs them correctly, and when any rule returns `false`, it fails quality gates and aborts compilation.
 4. **Scenarios Verification**:
   - **RuleA (Direction)**: Connecting two inputs (Output-to-Output or Input-to-Input) was caught by RuleA.

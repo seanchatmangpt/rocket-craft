@@ -68,28 +68,28 @@ impl ArBridgeRegistry {
             redeemed_nonces: std::collections::HashSet::new(),
             kit_database: vec![],
         };
-        registry.register_kit("HG-AERIAL-001", "XVX-016_Gundam-Aerial", KitTier::Hg, "WFM");
-        registry.register_kit("RG-NU-001", "RX-93_Nu-Gundam", KitTier::Rg, "UC");
+        registry.register_kit("HG-AERIAL-001", "XVX-016_Mecha-Aerial", KitTier::Hg, "WFM");
+        registry.register_kit("RG-NU-001", "RX-93_Nu-Mecha", KitTier::Rg, "UC");
         registry.register_kit(
             "MG-WING-ZERO-001",
             "XXXG-00W0_Wing-Zero",
             KitTier::Mg,
             "WING",
         );
-        registry.register_kit("PG-UNICORN-001", "RX-0_Unicorn-Gundam", KitTier::Pg, "UC");
+        registry.register_kit("PG-UNICORN-001", "XM-02_Unicorn-Mecha", KitTier::Pg, "UC");
         registry.register_kit(
             "MG-FREEDOM-001",
-            "ZGMF-X10A_Freedom-Gundam",
+            "ZGMF-X10A_Freedom-Mecha",
             KitTier::Mg,
             "SEED",
         );
         registry.register_kit(
             "PG-FREEDOM-001",
-            "ZGMF-X10A_Freedom-Gundam",
+            "ZGMF-X10A_Freedom-Mecha",
             KitTier::Pg,
             "SEED",
         );
-        registry.register_kit("RG-ZETA-001", "MSZ-006_Zeta-Gundam", KitTier::Rg, "UC");
+        registry.register_kit("RG-ZETA-001", "MSZ-006_Zeta-Mecha", KitTier::Rg, "UC");
         registry.register_kit(
             "MG-BARBATOS-001",
             "ASW-G-08_Barbatos-Lupus-Rex",

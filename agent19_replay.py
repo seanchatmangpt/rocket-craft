@@ -4,7 +4,7 @@ import json
 import shutil
 import hashlib
 
-GGEN_MANIFEST = "ggen-validation-tests/ggen.toml"
+GGEN_MANIFEST = "ggen.toml"
 GGEN_BIN = "/Users/sac/.local/bin/ggen"
 GENERATED_DIR = "generated"
 

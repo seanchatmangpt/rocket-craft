@@ -195,9 +195,9 @@ Rocket Craft targets **Unreal Engine 4.27** (not 5.x) with mandatory **HTML5/WAS
 
 **Consequence**: Game design must account for these limits up-front. Any feature requiring destruction or procedural geometry requires a native (Win64/Mobile) code path.
 
-### 3.2 Gundam Nexus — Formal Rust Model
+### 3.2 Mecha Nexus — Formal Rust Model
 
-**nexus-engine** (10-crate workspace) is the **authoritative formal model** of Gundam Nexus game logic. UE4 C++ implementation mirrors this Rust code.
+**nexus-engine** (10-crate workspace) is the **authoritative formal model** of Mecha Nexus game logic. UE4 C++ implementation mirrors this Rust code.
 
 **Architecture**:
 
@@ -741,7 +741,7 @@ cargo fuzz -p rocket-sdk -- fuzzing_corpus/
 
 ### Q4 2027
 - [ ] **Production hardening**: Security audit, performance tuning, documentation finalized
-- [ ] **Launch Initial Equilibrium**: Gundam Nexus public beta (HTML5 browser, one map, 2v2 duels)
+- [ ] **Launch Initial Equilibrium**: Mecha Nexus public beta (HTML5 browser, one map, 2v2 duels)
 - [ ] **Monitoring & observability**: OpenTelemetry metrics exported to production dashboard
 
 ---
@@ -949,7 +949,7 @@ Fails if any crate has a cycle. Run in GitHub Actions on every push.
 ### 2027: Scaling & Optimization
 - **Q1-Q2**: Matchmaking, asset streaming LODs, unified test CI, performance baseline.
 - **Q3-Q4**: Multi-player E2E, Blueprint DSL, IB4 GodKing, Supabase edge functions.
-- **Target**: Public Equilibrium launch (Gundam Nexus, 2v2 duels, one map).
+- **Target**: Public Equilibrium launch (Mecha Nexus, 2v2 duels, one map).
 
 ### 2028: Consolidation & Polish
 - **Q1-Q2**: Production hardening, security audit, documentation finalization, monitoring.

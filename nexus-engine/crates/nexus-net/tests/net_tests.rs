@@ -170,7 +170,7 @@ fn matchmaking_pairs_players_within_rating() {
 fn matchmaking_does_not_pair_players_too_far_apart() {
     let mut queue = MatchmakingQueue::new();
 
-    let p1 = make_entry(1, "Amuro", "NuGundam", 1000);
+    let p1 = make_entry(1, "Amuro", "NuMecha", 1000);
     let p2 = make_entry(2, "Char", "Sazabi", 1500); // 500 rating gap
 
     let r1 = queue.enqueue(p1);
@@ -233,7 +233,7 @@ fn make_player(id: u64, name: &str, suit: &str, hp: f32) -> RoomPlayer {
 
 #[test]
 fn room_tracks_hp_and_win_condition() {
-    let p1 = make_player(1, "Amuro", "NuGundam", 100.0);
+    let p1 = make_player(1, "Amuro", "NuMecha", 100.0);
     let p2 = make_player(2, "Char", "Sazabi", 100.0);
     let mut room = GameRoom::new(1, p1, p2);
     room.state = RoomState::Active;

@@ -55,7 +55,7 @@ We observed the following definitions and test cases in the workspace:
   # 15. SHACL UEdGraphNode Parentage Check
   restore
   content=$(cat "$CORE_TTL_PATH")
-  search="ue4:nodeOf gundam:GundamInputGraph ;"
+  search="ue4:nodeOf mecha:MechaInputGraph ;"
   replace="# removed nodeOf"
   content="${content/$search/$replace}"
   echo "${content}" > "$CORE_TTL_PATH"

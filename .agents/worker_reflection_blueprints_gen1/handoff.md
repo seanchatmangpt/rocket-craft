@@ -14,7 +14,7 @@
 - Observed that the test suite ran against a duplicate copy of the ontology files under `/Users/sac/rocket-craft/ggen-validation-tests/` instead of `/Users/sac/.ggen/packs/ue4_ontology/`.
 - Observed that the SHACL validator does not implement SPARQL-based targets (`sh:SPARQLTarget`) or SPARQL constraints (`sh:sparql`), as `SHACL validation: PASS` was outputted despite connections violating target/constraint rules.
 - Observed that the SHACL validator resolved pinDirection list constraints incorrectly when prefix names were used in `sh:in` list syntax, producing violations like:
-  `Focus node 'https://rocket-craft.io/ontology/ue4/gundam#W_KeyPressedPinOut': A pin must have exactly one direction, strictly Input or Output.`
+  `Focus node 'https://rocket-craft.io/ontology/ue4/mecha#W_KeyPressedPinOut': A pin must have exactly one direction, strictly Input or Output.`
 
 ## 2. Logic Chain
 - To refactor `reflection.ttl`, we explicitly added the `UObject` declaration, updated `USoftClassProperty`'s superclass, added numeric property subclasses, defined collection inner properties, declared the domain union for `delegateSignature`, added metadata support, and added structured flags.

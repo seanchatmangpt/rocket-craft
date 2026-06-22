@@ -418,8 +418,8 @@ describe('Mecha E2E Test Suite - Offline Pipeline Gates (Tiers 1-3)', () => {
       expect(rightX).toBeGreaterThan(0);
     });
 
-    it('BC 2.4: V-fin antenna separation', () => {
-      // Head has V-fin antennas mapped. Torso is core, head is top.
+    it('BC 2.4: Mecha Crown antenna separation', () => {
+      // Head has Mecha Crown antennas mapped. Torso is core, head is top.
       const head = readUsda('SM_Head.usda');
       expect(head).toContain('prim_');
     });
@@ -433,6 +433,45 @@ describe('Mecha E2E Test Suite - Offline Pipeline Gates (Tiers 1-3)', () => {
           const scales = scaleMatch![1].split(',').map(Number);
           const vol = scales[0] * scales[1] * scales[2];
           expect(vol).toBeGreaterThan(0);
+        }
+      });
+    });
+
+    it('BC 2.6: Explicitly fail on abstract non-bipedal geometry', () => {
+      const files = fs.readdirSync(USD_DIR);
+      const invalidGeometries = ['TankTreads', 'InterleavedWheels', 'KwK36', 'abstract', 'non_bipedal'];
+      
+      files.forEach(file => {
+        invalidGeometries.forEach(invalid => {
+          if (file.toLowerCase().includes(invalid.toLowerCase())) {
+            throw new Error(`Abstract non-bipedal geometry detected in file name: ${file}`);
+          }
+        });
+        
+        if (file.endsWith('.usda')) {
+          const content = readUsda(file);
+          invalidGeometries.forEach(invalid => {
+            if (content.toLowerCase().includes(invalid.toLowerCase())) {
+              throw new Error(`Abstract non-bipedal geometry detected in USD output: ${invalid} in ${file}`);
+            }
+          });
+        }
+      });
+    });
+
+    it('BC 2.7: Explicitly fail on intersecting center-lines', () => {
+      const files = fs.readdirSync(USD_DIR).filter(f => f.endsWith('.usda'));
+      files.forEach(file => {
+        const content = readUsda(file);
+        const match = content.match(/double3 xformOp:translate\s*=\s*\(([^)]+)\)/);
+        if (match) {
+          const x = Number(match[1].split(',')[0]);
+          if (file.includes('_Left') && x >= 0) {
+            throw new Error(`Intersecting center-lines detected: ${file} (Left) has X >= 0 (${x})`);
+          }
+          if (file.includes('_Right') && x <= 0) {
+            throw new Error(`Intersecting center-lines detected: ${file} (Right) has X <= 0 (${x})`);
+          }
         }
       });
     });

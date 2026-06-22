@@ -7,7 +7,7 @@
     ".specify/schema/combined.ttl:938731e0ffe06eaba87288eb0988a1015fa7ebea72559cd9e52164e53725bc5f",
     "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a",
     "templates/machine.rs.tera:e1b9ae476e7b54745a0a2f18c3c20630d306570014b29476e0ba05563903252a",
-    "templates/gundam_nexus.rs.tera:b60a0b56fbda7b2d185012778cefb345dab36effd091a84bdf4bb6232656caa9"
+    "templates/mecha_nexus.rs.tera:b60a0b56fbda7b2d185012778cefb345dab36effd091a84bdf4bb6232656caa9"
   ],
   "output_hashes": [],
   "signature": "9f88ebc61f169fd880ea8788703f3135296f6b9f272efb1a9d7d2824b9bceb7673315c5d2862a100f4353b8f28d2d2458e73e089379258911f11744cfa757f09",

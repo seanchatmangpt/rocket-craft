@@ -4,31 +4,31 @@
   "version": "1.0.0",
   "protected_clusters": [
     {
-      "franchise": "Gundam",
+      "franchise": "Mecha",
       "signatures": [
         "V-fin antenna (especially dual yellow sweeping upward)",
         "Tricolor scheme (white dominant, blue torso, red abdominal/waist, yellow vents/accents)",
-        "RX-78, Zaku, mobile suit specific nomenclatures",
-        "Anaheim Electronics, Zeon, Federation source identifiers",
+        "XM-01, GruntUnit, mobile suit specific nomenclatures",
+        "Anaheim Electronics, ColonyRebels, EarthAlliance source identifiers",
         "Red glowing mono-eye on spherical green/red head"
       ],
       "trade_dress_threshold": 0.75
     },
     {
-      "franchise": "Evangelion",
+      "franchise": "BiotechMech",
       "signatures": [
         "Organic/biomechanical limb proportions (excessively long/slender)",
         "Purple and neon green color blocking (Unit-01)",
         "Horned singular headpiece (Unit-01)",
         "Red glowing chest core",
-        "NERV source identifiers or hexagon UI themes"
+        "CommandCenter source identifiers or hexagon UI themes"
       ],
       "trade_dress_threshold": 0.8
     },
     {
-      "franchise": "MechWarrior/BattleTech",
+      "franchise": "ArmorFrame/ArmorFrame",
       "signatures": [
-        "Walking tank morphology without humanoid arms (e.g., Timber Wolf / Mad Cat)",
+        "Walking tank morphology without humanoid arms (e.g., Alpha Walker / Feral Walker)",
         "Chicken-walker reversed knee joints combined with missile box shoulders",
         "Inner Sphere / Clan source identifiers"
       ],
@@ -36,7 +36,7 @@
     }
   ],
   "prohibited_provenance": [
-    "Scans of physical model kits (Gunpla, Robot Spirits)",
+    "Scans of physical model kits (MechKit, ActionFigures)",
     "Rips of game assets from official titles",
     "Concept art traced from official line art",
     "Generative AI outputs prompted with 'in the style of [Franchise]'"

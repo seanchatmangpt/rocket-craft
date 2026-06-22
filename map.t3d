@@ -91,6 +91,19 @@ Begin Map
          RootComponent=StaticMeshComponent0
          ActorLabel="Floor_Extra Lab"
       End Actor
+      Begin Actor Class=StaticMeshActor Name=Place_tiger_bay Archetype=StaticMeshActor'/Script/Engine.Default__StaticMeshActor'
+         Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0 Archetype=StaticMeshComponent'/Script/Engine.Default__StaticMeshActor:StaticMeshComponent0'
+         End Object
+         Begin Object Name="StaticMeshComponent0"
+            StaticMesh=StaticMesh'/Engine/BasicShapes/Cube.Cube'
+            RelativeLocation=(X=3000.000000,Y=0.000000,Z=-200.000000)
+            RelativeRotation=(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+            RelativeScale3D=(X=10.000000,Y=10.000000,Z=1.000000)
+         End Object
+         StaticMeshComponent=StaticMeshComponent0
+         RootComponent=StaticMeshComponent0
+         ActorLabel="Floor_Tiger Tank Assembly Bay"
+      End Actor
       Begin Actor Class=BP_RoboticWelder_C Name=Actor_bot_1 Archetype=BP_RoboticWelder_C'/Game/BP_RoboticWelder.Default__BP_RoboticWelder_C'
          Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0
          End Object
@@ -103,6 +116,32 @@ Begin Map
          StaticMeshComponent=StaticMeshComponent0
          RootComponent=StaticMeshComponent0
          ActorLabel="Welder Bot"
+      End Actor
+      Begin Actor Class=BP_Mechanic_C Name=Actor_bot_tiger_mech Archetype=BP_Mechanic_C'/Game/BP_Mechanic.Default__BP_Mechanic_C'
+         Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0
+         End Object
+         Begin Object Name="StaticMeshComponent0"
+            StaticMesh=StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'
+            RelativeLocation=(X=3000.000000,Y=0.000000,Z=0.000000)
+            RelativeRotation=(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+            RelativeScale3D=(X=1.000000,Y=1.000000,Z=2.000000)
+         End Object
+         StaticMeshComponent=StaticMeshComponent0
+         RootComponent=StaticMeshComponent0
+         ActorLabel="Tiger Lead Mechanic"
+      End Actor
+      Begin Actor Class=BP_GermanTigerTank_C Name=Object_prop_tiger Archetype=BP_GermanTigerTank_C'/Game/BP_GermanTigerTank.Default__BP_GermanTigerTank_C'
+         Begin Object Class=StaticMeshComponent Name=StaticMeshComponent0 ObjName=StaticMeshComponent0
+         End Object
+         Begin Object Name="StaticMeshComponent0"
+            StaticMesh=StaticMesh'/Engine/BasicShapes/Sphere.Sphere'
+            RelativeLocation=(X=3000.000000,Y=0.000000,Z=0.000000)
+            RelativeRotation=(Pitch=0.000000,Yaw=0.000000,Roll=0.000000)
+            RelativeScale3D=(X=1.000000,Y=1.000000,Z=1.000000)
+         End Object
+         StaticMeshComponent=StaticMeshComponent0
+         RootComponent=StaticMeshComponent0
+         ActorLabel="Tiger Tank Hull"
       End Actor
    End Level
 End Map

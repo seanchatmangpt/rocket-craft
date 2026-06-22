@@ -3,10 +3,11 @@
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix mb:   <https://ggen.io/ontology/mechbirth/> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
 
 # ─────────────────────────────────────────────────────────────────────────────
 # MECHBIRTH ONTOLOGY — O* (Admitted Truth Graph)
-# GC-MECHBIRTH-002 / GC-GUNDAM-FACTORY-001
+# GC-MECHBIRTH-002 / GC-MECHA-FACTORY-001
 #
 # This file IS the source of truth. All Rust, C++, and SPARQL artifacts are
 # projections (A = μ(O*)). Do not derive laws from the Rust code.

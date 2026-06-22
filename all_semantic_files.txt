@@ -2409,7 +2409,7 @@
 /Users/sac/gitvan/test/fixtures/workflows/test-workflow.ttl
 /Users/sac/unrdf-clean/packages/kgc-probe/src/vocabulary.ttl
 /Users/sac/unrdf-clean/packages/kgc-probe/test-output/observations.ttl
-/Users/sac/unrdf/ontologies/disney-governed-universe.ttl
+/Users/sac/unrdf/ontologies/globalcorp-governed-universe.ttl
 /Users/sac/unrdf/packages/cli/examples/sync/ontology/schema.ttl
 /Users/sac/unrdf/examples/openapi/ontology/blog-api.ttl
 /Users/sac/unrdf/examples/rdf-kgn/data/sample-data.ttl
@@ -2418,7 +2418,7 @@
 /Users/sac/unrdf-clean/tools/test-warnings.ttl
 /Users/sac/unrdf-clean/test/fixtures/test-universe.ttl
 /Users/sac/unrdf/packages/cli/test/fixtures/person.ttl
-/Users/sac/unrdf-clean/ontologies/disney-governed-universe.ttl
+/Users/sac/unrdf-clean/ontologies/globalcorp-governed-universe.ttl
 /Users/sac/unrdf-clean/examples/rdf-kgn/data/sample-data.ttl
 /Users/sac/unrdf-clean/examples/rdf-kgn/data/sample-ontology.ttl
 /Users/sac/unrdf-clean/examples/rdf-kgn/data/sample-shapes.ttl

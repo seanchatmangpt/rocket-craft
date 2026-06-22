@@ -15,7 +15,7 @@ Direct observations and execution outputs for each command run during baseline v
     - `BC 2.2: Unique fingerprints check` (due to identical initial 200 characters).
     - *Note*: `pwa-staff/mecha_offline.test.ts` was modified at `Jun 19 18:10:29 2026` to adjust these assertions, allowing subsequent standalone test runs to pass.
 - **verify_mecha_pipeline.sh**: Exited with code `0`. Standalone mecha walkthrough E2E proof passed (actuated visual delta: 388px, verdict: PASS). Receipt validated.
-- **verify_gundam_pipeline.sh**: Exited with code `1` (Failure). Actuated visual delta was `55px` (expected > 70px), triggering a verdict failure in receipt validation.
+- **verify_mecha_pipeline.sh**: Exited with code `1` (Failure). Actuated visual delta was `55px` (expected > 70px), triggering a verdict failure in receipt validation.
 - **verify_html5_pipeline.sh**: Exited with code `1` (Failure). Playwright crashed with:
   `Error: Package subpath './blake3' is not defined by "exports" in /Users/sac/rocket-craft/pwa-staff/node_modules/@noble/hashes/package.json` at `tests-e2e/tps-dflss.spec.ts`.
 
@@ -27,7 +27,7 @@ Direct observations and execution outputs for each command run during baseline v
 2. **Offline test failure**: The initial vitest test failure was caused by expectations on string content and fingerprints of USDA files, which have since been updated/relaxed in `pwa-staff/mecha_offline.test.ts`.
 3. **Walkthrough differences**:
    - The mecha E2E walkthrough succeeded with `388px` visual delta, proving mecha UI is fully operational.
-   - The Gundam walkthrough failed on `55px` vs `70px` visual delta threshold, indicating map/camera load sluggishness or short movement range.
+   - The Mecha walkthrough failed on `55px` vs `70px` visual delta threshold, indicating map/camera load sluggishness or short movement range.
    - The HTML5 walkthrough failed on import paths (`@noble/hashes/blake3` instead of `@noble/hashes/blake3.js`).
 
 ---
@@ -43,7 +43,7 @@ Direct observations and execution outputs for each command run during baseline v
 
 The mecha asset pipeline is structurally functional (Status: **PARTIAL_ALIVE** candidates are present).
 - **Core gaps identified**:
-  - Gundam E2E walkthrough fails on visual movement thresholds (delta 55px vs >70px expected).
+  - Mecha E2E walkthrough fails on visual movement thresholds (delta 55px vs >70px expected).
   - General HTML5 pipeline fails on `@noble/hashes/blake3` package subpath export resolution.
 
 ---
@@ -54,5 +54,5 @@ Execute the following commands from `/Users/sac/rocket-craft/`:
 1. `python3 scripts/mud_gap_check.py` (Verify MUD logic)
 2. `python3 scripts/asset_fabric_gap_check.py` (Verify Asset Fabric rules)
 3. `./verify_mecha_pipeline.sh` (Verify Mecha Walkthrough - passes)
-4. `./verify_gundam_pipeline.sh` (Verify Gundam Walkthrough - fails)
+4. `./verify_mecha_pipeline.sh` (Verify Mecha Walkthrough - fails)
 5. `./verify_html5_pipeline.sh` (Verify general HTML5 pipeline - fails)

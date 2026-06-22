@@ -37,35 +37,35 @@ This report covers the end-to-end verification of GC-MECH-ASSET-FABRIC-001:
 
 | Metric | Target | Actual | Verdict |
 |---|---|---|---|
-| Silhouette IoU | >= 0.25 | 0.3358 | **PASS** |
-| Color Palette Similarity | >= 0.50 | 0.9242 | **PASS** |
+| Silhouette IoU | >= 0.25 | 0.5698 | **PASS** |
+| Color Palette Similarity | >= 0.50 | 0.4854 | **FAIL** |
 | Part Graph Similarity | >= 0.90 | 1.0000 | **PASS** |
-| Wing Layer Count Delta | <= 1.0 | 2.0000 | **FAIL** |
-| Feather Panel Curvature Score | >= 0.10 | 0.0000 | **FAIL** |
-| Feather Overlap Depth Score | >= 0.10 | 0.0000 | **FAIL** |
-| Core Compactness Delta | <= 0.15 | 0.3545 | **FAIL** |
+| Wing Layer Count Delta | <= 1.0 | 0.0000 | **PASS** |
+| Feather Panel Curvature Score | >= 0.10 | 0.1381 | **PASS** |
+| Feather Overlap Depth Score | >= 0.10 | 1.0000 | **PASS** |
+| Core Compactness Delta | <= 0.15 | 0.1235 | **PASS** |
 | Head to Torso Ratio Delta | <= 0.15 | 0.0167 | **PASS** |
-| Blade Length/Angle Delta | <= 15.0 | 195.0000 | **FAIL** |
-| Armor Shell Segmentation Score | >= 0.04 | 0.2339 | **PASS** |
-| Edge Density Distribution Similarity | >= 0.60 | 0.0000 | **FAIL** |
-| Foreground Component Count | [1, 5] | 143 | **FAIL** |
-| Edge Similarity | N/A | 0.0933 | **INFO** |
-| Cyan Region Similarity | N/A | 0.0000 | **INFO** |
-| Symmetry Delta | N/A | 0.0156 | **INFO** |
-| Wing Span Delta | N/A | 237.5000 px | **INFO** |
-| Body Mass Delta | N/A | 0.2414 | **INFO** |
+| Blade Length/Angle Delta | <= 15.0 | 155.7950 | **FAIL** |
+| Armor Shell Segmentation Score | >= 0.04 | 0.1178 | **PASS** |
+| Edge Density Distribution Similarity | >= 0.60 | 0.9383 | **PASS** |
+| Foreground Component Count | [1, 5] | 3 | **PASS** |
+| Edge Similarity | N/A | 0.0961 | **INFO** |
+| Cyan Region Similarity | N/A | 0.0390 | **INFO** |
+| Symmetry Delta | N/A | 0.2347 | **INFO** |
+| Wing Span Delta | N/A | 492.0000 px | **INFO** |
+| Body Mass Delta | N/A | 0.0848 | **INFO** |
 
 ### Diagnostics & Errors
 
-- **Modularity Errors**: USD305 ERROR: mirrored part lacks mirror transform proof
-- **Visual Morphology Errors**: VIS202 ERROR: wing morphology mismatch, VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates, VIS204 ERROR: core body massing exceeds compactness bound, VIS205 ERROR: blade placement/angle mismatch, VIS207 ERROR: edge-density distribution mismatch, VIS208 ERROR: candidate passed coarse silhouette but failed morphology gate
+- **Modularity Errors**: None
+- **Visual Morphology Errors**: VIS205 ERROR: blade placement/angle mismatch, VIS208 ERROR: candidate passed coarse silhouette but failed morphology gate
 
 ---
 
 ## Receipt Chain
 
 The final verifier JSON `verifier_report.json` contains 12 verified sync receipts.
-Latest receipt registered: `752841b9fb83e484c1f15e4cfb3725750f7723f7f46ac15ad9779d03f249c3a6`
+Latest receipt registered: `c1b2d7debc96a9f479977c170fc9e2eb788e496662f0a0e5ec7ed728dbae81ac`
 
 ---
 
@@ -77,4 +77,4 @@ No residuals.
 
 ## Final Status
 
-**Overall Verdict: REFUSED (VERIFIED)**
+**Overall Verdict: REFUSED**

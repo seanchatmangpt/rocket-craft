@@ -689,7 +689,7 @@ Every workspace (or directory) has a `CLAUDE.md` file documenting:
 
 **Examples:**
 - `/CLAUDE.md` — overall monorepo guidance
-- `nexus-engine/CLAUDE.md` — Gundam Nexus engine (10 crates)
+- `nexus-engine/CLAUDE.md` — Mecha Nexus engine (10 crates)
 - `unify-rs/CLAUDE.md` — semantic web layer (17 crates)
 - `pwa-staff/CLAUDE.md` — PWA frontend
 - `chicago-tdd-tools/CLAUDE.md` — TDD framework

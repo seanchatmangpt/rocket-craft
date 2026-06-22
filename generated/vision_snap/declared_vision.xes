@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log xes.version="1.0" xmlns="http://www.xes-standard.org/">
+  <trace>
+    <string key="concept:name" value="declared-lawful"/>
+    <event>
+      <string key="concept:name" value="Start Vision Snap Loop"/>
+      <date key="time:timestamp" value="2026-06-20T00:10:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Generate Bounded Geometry"/>
+      <date key="time:timestamp" value="2026-06-20T00:11:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Render Visual Projection"/>
+      <date key="time:timestamp" value="2026-06-20T00:12:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Extract Visual Targets"/>
+      <date key="time:timestamp" value="2026-06-20T00:13:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Measure Semantic vs Visual Gap"/>
+      <date key="time:timestamp" value="2026-06-20T00:14:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Compute Residuals"/>
+      <date key="time:timestamp" value="2026-06-20T00:15:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Verify Playwright Engine Admissibility"/>
+      <date key="time:timestamp" value="2026-06-20T00:16:00"/>
+    </event>
+    <event>
+      <string key="concept:name" value="Emit BLAKE3 Receipt"/>
+      <date key="time:timestamp" value="2026-06-20T00:17:00"/>
+    </event>
+  </trace>
+</log>

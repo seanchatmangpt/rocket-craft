@@ -41,7 +41,7 @@ impl LinearRgb {
         ]
     }
     // Beam saber colors per series
-    pub const NU_GUNDAM_GREEN: LinearRgb = LinearRgb {
+    pub const NU_MECHA_GREEN: LinearRgb = LinearRgb {
         r: 0.0,
         g: 1.0,
         b: 0.3,
@@ -166,7 +166,7 @@ mod tests {
     #[test]
     fn beam_saber_constants_are_valid_linear_colors() {
         let consts = [
-            LinearRgb::NU_GUNDAM_GREEN,
+            LinearRgb::NU_MECHA_GREEN,
             LinearRgb::WING_ZERO_GOLD,
             LinearRgb::UNICORN_NT_D_RED,
             LinearRgb::FREEDOM_BLUE,

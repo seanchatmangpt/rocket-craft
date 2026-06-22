@@ -7,7 +7,7 @@
 - `api: <https://example.org/blog-api/ontology#>`
 - `auth: <urn:unrdf:doc:auth:>`
 - `blog: <https://example.org/blog#>`
-- `bu: <http://example.disney.com/bu#>`
+- `bu: <http://example.globalcorp.com/bu#>`
 - `cap: <urn:unrdf:doc:capability:>`
 - `ce: <http://unrdf.org/chatman-equation#>`
 - `ce: <urn:chatman:equation:>`
@@ -22,7 +22,7 @@
 - `dc: <http://purl.org/dc/terms/>`
 - `dcat: <http://www.w3.org/ns/dcat#>`
 - `dcterms: <http://purl.org/dc/terms/>`
-- `disney: <http://example.disney.com/canon#>`
+- `globalcorp: <http://example.globalcorp.com/canon#>`
 - `doc: <urn:unrdf:doc:>`
 - `ex: <http://example.org/>`
 - `ex: <http://example.org/instances#>`
@@ -133,7 +133,7 @@ This project actively projects the following variables into code/templates:
 - `/Users/sac/unrdf-clean/examples/rdf-kgn/data/sample-ontology.ttl` (1193 bytes)
 - `/Users/sac/unrdf-clean/examples/rdf-kgn/data/sample-shapes.ttl` (1609 bytes)
 - `/Users/sac/unrdf-clean/hooks/health-check.ask.rq` (196 bytes)
-- `/Users/sac/unrdf-clean/ontologies/disney-governed-universe.ttl` (14631 bytes)
+- `/Users/sac/unrdf-clean/ontologies/globalcorp-governed-universe.ttl` (14631 bytes)
 - `/Users/sac/unrdf-clean/packages/chatman-equation/data/achievements.ttl` (13353 bytes)
 - `/Users/sac/unrdf-clean/packages/chatman-equation/data/lineage.ttl` (12982 bytes)
 - `/Users/sac/unrdf-clean/packages/chatman-equation/examples/turtle/ontology.ttl` (2388 bytes)

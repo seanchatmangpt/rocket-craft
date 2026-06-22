@@ -1,0 +1,106 @@
+{
+  "engine": "Agent 17 IP Distance / Non-Confusion Agent",
+  "policy_id": "IP_DIST_MECHA_001",
+  "hash_algorithm": "blake3",
+  "baseline_usage": {
+    "id": "ipd:MetricBaselineOnly",
+    "usable_for_metric_baseline": true,
+    "usable_for_generation": false
+  },
+  "evaluations": [
+    {
+      "candidate": "/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/graph/asset_fabric.ttl",
+      "candidate_id": "asset_fabric.ttl",
+      "is_hero": true,
+      "status": "ADMITTED",
+      "verdict": "ADMIT_ORIGINAL",
+      "proximity_score": 0.0,
+      "per_cluster_proximity": [
+        {
+          "cluster": "Mecha",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.75
+        },
+        {
+          "cluster": "BiotechMech",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.8
+        },
+        {
+          "cluster": "ArmorFrame/ArmorFrame",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.8
+        }
+      ],
+      "baseline_usage": {
+        "id": "ipd:MetricBaselineOnly",
+        "usable_for_metric_baseline": true,
+        "usable_for_generation": false
+      },
+      "refusal_reasons": []
+    },
+    {
+      "candidate": "/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/graph/generator_parameters.ttl",
+      "candidate_id": "generator_parameters.ttl",
+      "is_hero": false,
+      "status": "ADMITTED",
+      "verdict": "ADMIT_ORIGINAL",
+      "proximity_score": 0.1,
+      "per_cluster_proximity": [
+        {
+          "cluster": "Mecha",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.75
+        },
+        {
+          "cluster": "BiotechMech",
+          "proximity_score": 0.1,
+          "trade_dress_threshold": 0.8
+        },
+        {
+          "cluster": "ArmorFrame/ArmorFrame",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.8
+        }
+      ],
+      "baseline_usage": {
+        "id": "ipd:MetricBaselineOnly",
+        "usable_for_metric_baseline": true,
+        "usable_for_generation": false
+      },
+      "refusal_reasons": []
+    },
+    {
+      "candidate": "/Users/sac/rocket-craft/generated/mech_assets/reference_fabric_001/graph/visual_targets.ttl",
+      "candidate_id": "visual_targets.ttl",
+      "is_hero": false,
+      "status": "ADMITTED",
+      "verdict": "ADMIT_ORIGINAL",
+      "proximity_score": 0.0,
+      "per_cluster_proximity": [
+        {
+          "cluster": "Mecha",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.75
+        },
+        {
+          "cluster": "BiotechMech",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.8
+        },
+        {
+          "cluster": "ArmorFrame/ArmorFrame",
+          "proximity_score": 0.0,
+          "trade_dress_threshold": 0.8
+        }
+      ],
+      "baseline_usage": {
+        "id": "ipd:MetricBaselineOnly",
+        "usable_for_metric_baseline": true,
+        "usable_for_generation": false
+      },
+      "refusal_reasons": []
+    }
+  ],
+  "blake3_hash": "f1771d5ea012edfaf0461cfaed8733d3568494be7939f22b8633986873dc6c50"
+}

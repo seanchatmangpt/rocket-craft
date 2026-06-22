@@ -57,7 +57,7 @@ pub fn system_tick_projectiles(world: &mut World, dt: f32) {
 mod tests {
     use super::*;
     use crate::components::*;
-    use nexus_types::{AttackDir, GundamSeries, MagicType};
+    use nexus_types::{AttackDir, MechaSeries, MagicType};
 
     // ── system_tick_ai ────────────────────────────────────────────────────────
 
@@ -111,7 +111,7 @@ mod tests {
         let mut world = World::new();
         world.spawn((MobileSuit {
             suit_id: "RX-93".into(),
-            series: GundamSeries::UniversalCentury,
+            series: MechaSeries::UniversalCentury,
             special_ability: SpecialAbility::FinFunnels,
             is_trans_am_active: true,
             trans_am_turns_remaining: 3,
@@ -127,7 +127,7 @@ mod tests {
         let mut world = World::new();
         world.spawn((MobileSuit {
             suit_id: "RX-93".into(),
-            series: GundamSeries::UniversalCentury,
+            series: MechaSeries::UniversalCentury,
             special_ability: SpecialAbility::FinFunnels,
             is_trans_am_active: true,
             trans_am_turns_remaining: 0,
@@ -142,8 +142,8 @@ mod tests {
     fn tick_trans_am_ignores_inactive_suits() {
         let mut world = World::new();
         world.spawn((MobileSuit {
-            suit_id: "RX-78".into(),
-            series: GundamSeries::UniversalCentury,
+            suit_id: "XM-01".into(),
+            series: MechaSeries::UniversalCentury,
             special_ability: SpecialAbility::None,
             is_trans_am_active: false,
             trans_am_turns_remaining: 5,

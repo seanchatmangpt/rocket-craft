@@ -50,7 +50,7 @@ cd tools && cargo test --all
 cd tools && cargo clippy -- -D warnings
 cd tools && cargo fmt
 
-# nexus-engine (Gundam Nexus game engine, 10 crates)
+# nexus-engine (Mecha Nexus game engine, 10 crates)
 cd nexus-engine && cargo test --all
 cd nexus-engine && cargo test -p nexus-combat
 cd nexus-engine && cargo test <test_name>   # run a single test by name
@@ -131,7 +131,7 @@ The `rocket-sdk` formalises this as `Machine<L: Law, P>` where `L` is a trait th
 
 `BlueprintBuilder` → `T3dSerializer` / `JsonSerializer` → `.uasset`-compatible T3D text output.
 
-### Gundam Nexus Engine (`nexus-engine`)
+### Mecha Nexus Engine (`nexus-engine`)
 
 10-crate workspace; `nexus-types` has zero internal dependencies and is the root of the dependency graph. Load order: `nexus-types` → `nexus-combat`, `nexus-session`, `nexus-economy`, `nexus-ecs`, `nexus-gfx`, `nexus-shop`, `nexus-net` → `nexus-integration` → `nexus-tests`.
 

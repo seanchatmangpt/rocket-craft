@@ -173,7 +173,7 @@ MAINTAIN ANDON HOLD: DO NOT RELEASE THE 100-SEED DOE YET.
 We must enforce that the factory does not even inspect downstream quality until upstream ownership is correct.
 
 1. Read the updated `/Users/sac/rocket-craft/.agents/SPR_MODULAR_IDENTITY.md`.
-2. Patch `nexus-gundam/src/mech_primitives.rs` and the USD emission path so every part file is `owner_part_id` scoped, socket declarations contain NO mesh payloads, and assembly/root references are forbidden inside part-local files.
+2. Patch `nexus-mecha/src/mech_primitives.rs` and the USD emission path so every part file is `owner_part_id` scoped, socket declarations contain NO mesh payloads, and assembly/root references are forbidden inside part-local files.
 3. Run the 3-seed `MODULAR_IDENTITY_SMOKE` batch.
 4. Emit the 6 required reports (`MODULAR_IDENTITY_SMOKE_REPORT.json`, etc.).
 5. Prove the 5 required negative fixtures (`torso_contains_foreign_parts`, `socket_contains_mesh_payload`, etc.) are halted at the Chassis station with `REFUSE_MODULAR_USD`.

@@ -4,7 +4,7 @@ In this tutorial, you will learn how to set up, execute, and analyze results fro
 
 This engine is part of the `chicago-tdd-tools` crate. It implements a formal state-traversal algorithm (called the "aimbot") to recursively explore the state space of game sessions, mapping out all possible state transitions.
 
-By the end of this tutorial, you will have compiled the engine, executed a state exploration sweep for two distinct games (`Infinity Blade 4 MUD` and `Gundam Nexus`), and inspected the generated JSON transition report.
+By the end of this tutorial, you will have compiled the engine, executed a state exploration sweep for two distinct games (`Infinity Blade 4 MUD` and `Mecha Nexus`), and inspected the generated JSON transition report.
 
 ---
 
@@ -37,7 +37,7 @@ This compiles the `combinatorial-engine` binary inside your cargo debug build pa
 
 Now, run the compiled engine with default options. The engine will:
 1. Scan the workspace to discover games.
-2. Initialize the state systems for both `Infinity Blade 4 MUD` and `Gundam Nexus`.
+2. Initialize the state systems for both `Infinity Blade 4 MUD` and `Mecha Nexus`.
 3. Traverse up to **1,000 states** using the BFS aimbot explorer.
 4. Print the traversed transitions to standard output.
 5. Save a detailed JSON report to `combinatorial_report.json` in your current working directory.
@@ -57,7 +57,7 @@ Look at your terminal. The output is structured in five parts:
    ```text
    Executing discover_games()...
      Discovered game: Infinity Blade 4 MUD (crate: ib4-mud)
-     Discovered game: Gundam Nexus (crate: nexus-session)
+     Discovered game: Mecha Nexus (crate: nexus-session)
    ```
 2. **Exploration In-Progress Logs**: Tells you the traversal has started.
 3. **Infinity Blade 4 MUD Results**: Prints the visited states count, total transitions, and the notation of moves:
@@ -70,9 +70,9 @@ Look at your terminal. The output is structured in five parts:
      b1:Full:LT:Full:ep1:aNone:cT:cb0 --(attack:overhead)--> b1:Full:LT:Mid:ep1:aNone:cT:cb1
      ...
    ```
-4. **Gundam Nexus Results**: Shows multiplayer session state transitions (Connecting -> Authenticating -> Lobby -> Match):
+4. **Mecha Nexus Results**: Shows multiplayer session state transitions (Connecting -> Authenticating -> Lobby -> Match):
    ```text
-   Game: Gundam Nexus
+   Game: Mecha Nexus
    Visited States Count: 182
    Transitions Count: 489
    Transitions:
@@ -123,14 +123,14 @@ Here is what the schema looks like:
       "target": "b1:Full:LT:Full:ep1:aNone:cT:cb0"
     },
     {
-      "game": "Gundam Nexus",
+      "game": "Mecha Nexus",
       "source": "sC:m0:lv1:xp0:i0:g1001",
       "move": "auth:true",
       "target": "sA:m0:lv1:xp0:i0:g1001"
     }
   ],
   "games": {
-    "Gundam Nexus": {
+    "Mecha Nexus": {
       "visited_states_count": 182,
       "transition_count": 489,
       "errors": []

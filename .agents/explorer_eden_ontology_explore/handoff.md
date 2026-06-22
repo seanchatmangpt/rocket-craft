@@ -75,7 +75,7 @@ The directory contains a two-level structure with `ontology` and `queries` subdi
             owl:someValuesFrom tps:FoundryProcess
         ] .
     ```
-- **Scale and Origin Constraints (Gunpla Grade Disjointness)**:
+- **Scale and Origin Constraints (MechKit Grade Disjointness)**:
   - Subclasses of `tps:ScaleGrade`: `tps:GradeHG`, `tps:GradeRG`, `tps:GradeMG`, `tps:GradePG`
   - Cardinality Constraint on `eden:MechRoot`:
     ```turtle

@@ -1,0 +1,80 @@
+{
+  "ocel:global-event": {
+    "ocel:activity": "__INVALID__"
+  },
+  "ocel:global-object": {
+    "ocel:type": "VisionSnap"
+  },
+  "ocel:objects": {
+    "VisionSnap-001": {
+      "ocel:type": "VisionSnap",
+      "ocel:ovmap": {}
+    }
+  },
+  "ocel:events": {
+    "e0": {
+      "ocel:activity": "Start Vision Snap Loop",
+      "ocel:timestamp": "2026-06-20T00:10:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    },
+    "e1": {
+      "ocel:activity": "Generate Bounded Geometry",
+      "ocel:timestamp": "2026-06-20T00:11:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    },
+    "e2": {
+      "ocel:activity": "Render Visual Projection",
+      "ocel:timestamp": "2026-06-20T00:12:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    },
+    "e3": {
+      "ocel:activity": "Extract Visual Targets",
+      "ocel:timestamp": "2026-06-20T00:13:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    },
+    "e4": {
+      "ocel:activity": "Measure Semantic vs Visual Gap",
+      "ocel:timestamp": "2026-06-20T00:14:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    },
+    "e5": {
+      "ocel:activity": "Compute Residuals",
+      "ocel:timestamp": "2026-06-20T00:15:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    },
+    "e6": {
+      "ocel:activity": "Verify Playwright Engine Admissibility",
+      "ocel:timestamp": "2026-06-20T00:16:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    },
+    "e7": {
+      "ocel:activity": "Emit BLAKE3 Receipt",
+      "ocel:timestamp": "2026-06-20T00:17:00",
+      "ocel:omap": [
+        "VisionSnap-001"
+      ],
+      "ocel:vmap": {}
+    }
+  }
+}

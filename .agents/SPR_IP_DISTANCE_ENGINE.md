@@ -37,7 +37,7 @@ Outputs:
 
 ## Falsification Gates
 Refuse candidate and patch generator law if:
-1. Neutral viewer identifies it as "basically Gundam/Eva/MechWarrior."
+1. Neutral viewer identifies it as "basically Mecha/Eva/ArmorFrame."
 2. Source-identifying terms, marks, or confusing names are present.
 3. Visual classifier places candidate closer to a franchise cluster than original cluster.
 4. Candidate is a collage of recognizable protected signatures.
@@ -57,4 +57,4 @@ The LSP must emit generic admission diagnostics. Specific protected-cluster iden
 LSP code actions must target the source law without naming the franchise:
 - GOOD: `Regenerate head topology from support-role axis.`
 - GOOD: `Shift silhouette away from external cluster centroid.`
-- BAD: `Move away from Gundam V-fin.`
+- BAD: `Move away from Mecha V-fin.`

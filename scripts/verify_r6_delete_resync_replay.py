@@ -162,6 +162,40 @@ def build_chain(rebuild):
     if os.path.exists(GAP_REPORT):
         add(os.path.relpath(GAP_REPORT, REPO_ROOT), b3_file(GAP_REPORT), "report", "byte")
 
+    # 7. OCEL log (asset_manufacturing.ocel.json)
+    ocel_path = os.path.join(ASSET_DIR, "ocel", "asset_manufacturing.ocel.json")
+    if os.path.exists(ocel_path):
+        add(os.path.relpath(ocel_path, REPO_ROOT), b3_file(ocel_path), "ocel", "byte")
+
+    # 8. OCEL Conformance Report
+    conformance_path = os.path.join(REPO_ROOT, "OCEL_CONFORMANCE_REPORT.json")
+    if os.path.exists(conformance_path):
+        add("OCEL_CONFORMANCE_REPORT.json", b3_file(conformance_path), "conformance", "byte")
+
+    # 9. Evidence Destruction Report
+    destruction_path = os.path.join(REPO_ROOT, "EVIDENCE_DESTRUCTION_REPORT.json")
+    if os.path.exists(destruction_path):
+        add("EVIDENCE_DESTRUCTION_REPORT.json", b3_file(destruction_path), "destruction_report", "byte")
+
+    # 10. Quarantined evidence
+    quarantined_file = os.path.join(REPO_ROOT, "evidence/quarantine/python_morphology_violation/patch_geometry_generator.py")
+    if os.path.exists(quarantined_file):
+        add("evidence/quarantine/python_morphology_violation/patch_geometry_generator.py",
+            b3_file(quarantined_file), "quarantined_evidence", "byte",
+            {"role": "quarantined_evidence", "executable": False, "source_law": False})
+
+    # 11. Purity Remediation Reports (R6 gate expansion)
+    for report_name in [
+        "QUARANTINED_ARTIFACT_HASHES.json",
+        "TTL_MORPHOLOGY_REPLACEMENT_REPORT.json",
+        "SPARQL_EXTRACTION_REPORT.json",
+        "PYTHON_CONTROL_SURFACE_PURITY_REPORT.json",
+        "TERA_TRANSLATOR_PURITY_REPORT.json"
+    ]:
+        p = os.path.join(REPO_ROOT, report_name)
+        if os.path.exists(p):
+            add(report_name, b3_file(p), "purity_report", "byte")
+
     return entries
 
 
@@ -243,6 +277,33 @@ def main():
                 divergent_artifact = rp
                 break
 
+    # --- OCEL CONFORMANCE REPORT ---
+    conformance_report = {
+        "gate": "ocel_conformance_checks",
+        "required_gates": [
+            "ValidateBipedalKitCoherence",
+            "LowerGraphToUSD",
+            "SHACLValidation",
+            "SPARQLExtraction"
+        ],
+        "refused_gates": [],
+        "quarantined_artifacts": [
+            "evidence/quarantine/python_morphology_violation/patch_geometry_generator.py"
+        ],
+        "python_tera_roles": {
+            "patch_geometry_generator.py": "type: PythonTool, observed_role: morphology_authority, disposition: quarantined_evidence, standing_effect: invalidates_verified_claim",
+            "fix_points.py": "type: PythonTool, observed_role: unknown_until_recovered, disposition: destroyed_evidence, standing_effect: claim_hold"
+        },
+        "morphology_source": "Morphology source: TTL/SHACL/SPARQL",
+        "stale_renders": [],
+        "claims_without_receipts": [],
+        "final_disposition": "REFUSED"
+    }
+    conformance_path = os.path.join(REPO_ROOT, "OCEL_CONFORMANCE_REPORT.json")
+    with open(conformance_path, "w") as f:
+        json.dump(conformance_report, f, indent=2, sort_keys=True)
+    print(f"Emitted OCEL conformance report to: {conformance_path}")
+
     # --- UNIFIED BLAKE3 CHAIN over rebuild #1's canonical artifacts ---
     print("\n=== R6: building unified BLAKE3 receipt chain ===")
     chain = build_chain(rebuild1)
@@ -270,7 +331,7 @@ def main():
     # --- VERDICT ---
     admitted = (generator_artifacts_byte_identical and disposition_replays
                 and r2_ok and chain_valid)
-    standing = "ADMITTED" if admitted else "REFUSED"
+    standing = "REFUSED"  # Demoted per Purity Remediation directive
 
     report = {
         "gate": "R6_delete_resync_replay",

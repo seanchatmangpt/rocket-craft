@@ -351,7 +351,7 @@ pub enum MudCommand {
     Exits,
 }
 
-/// The Gundam Nexus Manufacturing Facility MUD Engine.
+/// The Mecha Nexus Manufacturing Facility MUD Engine.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MudEngine {
     pub current_zone: Zone,
@@ -788,7 +788,7 @@ impl MudEngine {
         engine.emit_event(
             "factory.entered",
             "mission_room",
-            "Agent entered the Gundam Manufacturing Facility MUD strategic space.",
+            "Agent entered the Mecha Manufacturing Facility MUD strategic space.",
         );
         engine
     }
@@ -1765,7 +1765,7 @@ impl MudEngine {
         let lineage_hash = hasher.finalize().to_hex().to_string();
 
         let assembly_rec = AssemblyReceipt {
-            mech_id: "Gundam-Nexus-Admitted-01".to_string(),
+            mech_id: "Mecha-Nexus-Admitted-01".to_string(),
             parts_hashes,
             lineage_hash: lineage_hash.clone(),
             timestamp: Utc::now(),

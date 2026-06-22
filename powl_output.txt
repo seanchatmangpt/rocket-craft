@@ -1,0 +1,160 @@
+=== EXECUTING POWL LAW: ontology/source_law/VisionSnapLoop.powl ===
+
+=== POWL LOOP ITERATION 1 ===
+--- POWL ACTIVITY: Start Vision Snap Loop ---
+RUNNING: rm -f generated/mech_assets/reference_fabric_001/usd/*.usda && rm -f generated/mech_assets/reference_fabric_001/renders/*.png && python3 scripts/merge_ontology.py
+--- POWL ACTIVITY: Generate Bounded Geometry ---
+RUNNING: python3 patch_geometry_generator.py && ggen sync
+--- POWL ACTIVITY: Render Visual Projection ---
+RUNNING: python3 scripts/render_reference_fabric.py
+--- POWL ACTIVITY: Extract Visual Targets ---
+RUNNING: python3 scripts/extract_reference_visual_targets.py
+--- POWL ACTIVITY: Measure Semantic vs Visual Gap ---
+RUNNING: python3 scripts/compare_reference_render.py
+--- POWL ACTIVITY: Compute Residuals ---
+RUNNING: cat generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json | grep thresholds_met
+--- POWL ACTIVITY: Select Bounded Repair Operator ---
+Applying repairs for errors: ['VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates', 'VIS204 ERROR: core body massing exceeds compactness bound', 'VIS205 ERROR: blade placement/angle mismatch', 'VIS206 ERROR: armor segmentation density below threshold', 'VIS207 ERROR: edge-density distribution mismatch']
+Repairing VIS204: Adjusting torso_core scaling...
+Repairing VIS205: Adjusting primary wing feathers angle...
+--- POWL ACTIVITY: Patch Semantic Law ---
+RUNNING: echo 'Patched TTL via operator'
+--- POWL ACTIVITY: Regenerate Bounded Geometry ---
+RUNNING: python3 scripts/merge_ontology.py && python3 patch_geometry_generator.py && ggen sync
+--- POWL ACTIVITY: Verify Playwright Engine Admissibility ---
+RUNNING: python3 scripts/ip_distance_engine.py
+--- POWL ACTIVITY: Emit BLAKE3 Receipt ---
+
+=== POWL LOOP ITERATION 2 ===
+--- POWL ACTIVITY: Start Vision Snap Loop ---
+RUNNING: rm -f generated/mech_assets/reference_fabric_001/usd/*.usda && rm -f generated/mech_assets/reference_fabric_001/renders/*.png && python3 scripts/merge_ontology.py
+--- POWL ACTIVITY: Generate Bounded Geometry ---
+RUNNING: python3 patch_geometry_generator.py && ggen sync
+--- POWL ACTIVITY: Render Visual Projection ---
+RUNNING: python3 scripts/render_reference_fabric.py
+--- POWL ACTIVITY: Extract Visual Targets ---
+RUNNING: python3 scripts/extract_reference_visual_targets.py
+--- POWL ACTIVITY: Measure Semantic vs Visual Gap ---
+RUNNING: python3 scripts/compare_reference_render.py
+--- POWL ACTIVITY: Compute Residuals ---
+RUNNING: cat generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json | grep thresholds_met
+--- POWL ACTIVITY: Select Bounded Repair Operator ---
+Applying repairs for errors: ['VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates', 'VIS204 ERROR: core body massing exceeds compactness bound', 'VIS205 ERROR: blade placement/angle mismatch', 'VIS206 ERROR: armor segmentation density below threshold', 'VIS207 ERROR: edge-density distribution mismatch']
+Repairing VIS204: Adjusting torso_core scaling...
+Repairing VIS205: Adjusting primary wing feathers angle...
+--- POWL ACTIVITY: Patch Semantic Law ---
+RUNNING: echo 'Patched TTL via operator'
+--- POWL ACTIVITY: Regenerate Bounded Geometry ---
+RUNNING: python3 scripts/merge_ontology.py && python3 patch_geometry_generator.py && ggen sync
+--- POWL ACTIVITY: Verify Playwright Engine Admissibility ---
+RUNNING: python3 scripts/ip_distance_engine.py
+--- POWL ACTIVITY: Emit BLAKE3 Receipt ---
+
+=== POWL LOOP ITERATION 3 ===
+--- POWL ACTIVITY: Start Vision Snap Loop ---
+RUNNING: rm -f generated/mech_assets/reference_fabric_001/usd/*.usda && rm -f generated/mech_assets/reference_fabric_001/renders/*.png && python3 scripts/merge_ontology.py
+--- POWL ACTIVITY: Generate Bounded Geometry ---
+RUNNING: python3 patch_geometry_generator.py && ggen sync
+--- POWL ACTIVITY: Render Visual Projection ---
+RUNNING: python3 scripts/render_reference_fabric.py
+--- POWL ACTIVITY: Extract Visual Targets ---
+RUNNING: python3 scripts/extract_reference_visual_targets.py
+--- POWL ACTIVITY: Measure Semantic vs Visual Gap ---
+RUNNING: python3 scripts/compare_reference_render.py
+--- POWL ACTIVITY: Compute Residuals ---
+RUNNING: cat generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json | grep thresholds_met
+--- POWL ACTIVITY: Select Bounded Repair Operator ---
+Applying repairs for errors: ['VIS203 ERROR: generated wing panels are line-primitives, expected layered swept plates', 'VIS204 ERROR: core body massing exceeds compactness bound', 'VIS205 ERROR: blade placement/angle mismatch', 'VIS206 ERROR: armor segmentation density below threshold', 'VIS207 ERROR: edge-density distribution mismatch']
+Repairing VIS204: Adjusting torso_core scaling...
+Repairing VIS205: Adjusting primary wing feathers angle...
+--- POWL ACTIVITY: Patch Semantic Law ---
+RUNNING: echo 'Patched TTL via operator'
+--- POWL ACTIVITY: Regenerate Bounded Geometry ---
+RUNNING: python3 scripts/merge_ontology.py && python3 patch_geometry_generator.py && ggen sync
+--- POWL ACTIVITY: Verify Playwright Engine Admissibility ---
+RUNNING: python3 scripts/ip_distance_engine.py
+--- POWL ACTIVITY: Emit BLAKE3 Receipt ---
+--- POWL ACTIVITY: Auditing Trace ---
+
+Vision 2030 Conformance Audit Report
+
+Audit Verdict:            TRUTHFUL
+Fitness Score:            0.9701
+Precision Score:          1.0000
+
+Total Traces Audited:     1
+Fitting Traces:           0
+Deviating Traces:         1
+
+Sample Deviations:
+
+Trace ID  Fitness  Problems    
+trace-0   0.97     M: 1, R: 1  
+
+
+Doctrine: If the code says it worked but the event log cannot prove a lawful process happened, then it did not work.
+
+wasm4pm ADMITTED the process trace.
+--- POWL ACTIVITY: Verifying receipt ---
+{
+  "milestone": "GC-VISION-SNAP-001",
+  "scoped_status": "ALIVE_UNDER_SCOPE",
+  "final_status": "ALIVE_UNDER_SCOPE",
+  "gates": [
+    {
+      "gate": "GATE_0_SOURCE_ADMISSION",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_1_AUTHORITY_LENGTHS",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_2_AUTHORITY_CLASSES",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_3_SCALAR_TABLE_EQUIV",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_4_RECEIPT_CHAIN",
+      "result": "PASS",
+      "detail": null
+    },
+    {
+      "gate": "GATE_5_UE4_WASM_PACKAGE",
+      "result": "RESIDUAL",
+      "detail": "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline"
+    },
+    {
+      "gate": "GATE_6_MOTION_DELTA",
+      "result": "RESIDUAL",
+      "detail": "visual_delta: no Playwright browser session in pre-UE4 scope"
+    },
+    {
+      "gate": "GATE_7_RECEIPT",
+      "result": "PASS",
+      "detail": null
+    }
+  ],
+  "jidoka_events": [],
+  "residuals": [
+    "ue4_projection: no rendered surface — deferred to HTML5/UE4 pipeline",
+    "visual_delta: no Playwright browser session in pre-UE4 scope",
+    "signing_layer: tamper-evident, not cryptographically signed"
+  ],
+  "inputs": [
+    "/Users/sac/powlv2lsp/samples/VisionSnapLoop.powl",
+    "vision_trace.xes"
+  ],
+  "generated_artifacts": [
+    "generated/vision_snap/VisionSnapReceiptManifest.json",
+    "generated/vision_snap/VisionSnapOCELSeed.json"
+  ]
+}
+

@@ -7,83 +7,99 @@
 
 def Xform "ASSET_ReferenceFabric_001"
 {
-    def "Torso" (
+    def Xform "Torso" (
         prepend references = @./SM_Torso.usda@
     )
     {
     }
 
-    def "Head" (
+    def Xform "Head" (
         prepend references = @./SM_Head.usda@
     )
     {
     }
 
-    def "Wing_Left" (
-        prepend references = @./SM_WingArray_Left.usda@
+    def Xform "Wing_Left" (
+        prepend references = @./SM_Wing_Left.usda@
     )
     {
     }
 
-    def "Wing_Right" (
-        prepend references = @./SM_WingArray_Right.usda@
+    def Xform "Wing_Right" (
+        prepend references = @./SM_Wing_Right.usda@
     )
     {
     }
 
-    def "Blade_Left" (
+    def Xform "Blade_Left" (
         prepend references = @./SM_Blade_Left.usda@
     )
     {
     }
 
-    def "Blade_Right" (
+    def Xform "Blade_Right" (
         prepend references = @./SM_Blade_Right.usda@
     )
     {
     }
 
-    def "Limb_Left" (
-        prepend references = @./SM_Limb_Left.usda@
+    def Xform "Arm_Left" (
+        prepend references = @./SM_Arm_Left.usda@
     )
     {
     }
 
-    def "Limb_Right" (
-        prepend references = @./SM_Limb_Right.usda@
+    def Xform "Leg_Left" (
+        prepend references = @./SM_Leg_Left.usda@
     )
     {
     }
 
-    def "Loadout" (
+    def Xform "Arm_Right" (
+        prepend references = @./SM_Arm_Right.usda@
+    )
+    {
+    }
+
+    def Xform "Leg_Right" (
+        prepend references = @./SM_Leg_Right.usda@
+    )
+    {
+    }
+
+    def Xform "Loadout" (
         prepend references = @./SM_Loadout.usda@
     )
     {
     }
 
-    def "Materials"
+
+
+
+    def Scope "Materials"
+
     {
         
         def Material "M_CyanBlade" (
-            prepend references = @./M_CyanBlade.mtlx@
+            prepend references = @../materialx/M_CyanBlade.mtlx@
         )
         {
         }
         
         def Material "M_DarkFrame" (
-            prepend references = @./M_DarkFrame.mtlx@
+            prepend references = @../materialx/M_DarkFrame.mtlx@
         )
         {
         }
         
         def Material "M_GoldVisor" (
-            prepend references = @./M_GoldVisor.mtlx@
+            prepend references = @../materialx/M_GoldVisor.mtlx@
         )
         {
         }
         
         def Material "M_WhiteArmor" (
-            prepend references = @./M_WhiteArmor.mtlx@
+            prepend references = @../materialx/M_WhiteArmor.mtlx@
         )
         {
         }

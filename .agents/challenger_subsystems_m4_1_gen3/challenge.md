@@ -36,25 +36,25 @@ While the validation suite is highly effective and successfully catches all 25 c
 ## Stress Test Results
 
 - **Scenario 1: Non-void RPC Return Value**
-  - **Input**: A `ue4:URPC` function instance `gundam:BadRPCReturn` containing `ue4:returnProperty`.
+  - **Input**: A `ue4:URPC` function instance `mecha:BadRPCReturn` containing `ue4:returnProperty`.
   - **Expected behavior**: Validation fails, identifying the non-void return property on the RPC.
   - **Actual behavior**: Validation fails with custom validation rule error `RuleRPCReturnTypeVoid`. SHACL validation reports `PASS`.
   - **Verdict**: PASS (caught by `ggen.toml` rule).
 
 - **Scenario 2: Unregistered Collision Profile**
-  - **Input**: A component `gundam:GundamCollision` configured with collision profile `gundam:GundamUnregisteredProfile` which is not registered in the world's physics subsystem.
+  - **Input**: A component `mecha:MechaCollision` configured with collision profile `mecha:MechaUnregisteredProfile` which is not registered in the world's physics subsystem.
   - **Expected behavior**: Validation fails, rejecting the unregistered collision profile.
   - **Actual behavior**: Validation fails with custom validation rule error `RuleComponentCollisionProfileRegistration`.
   - **Verdict**: PASS.
 
 - **Scenario 3: Server RPC Missing Validation**
-  - **Input**: A server RPC `gundam:GundamServerRPC` that does not specify `WithValidation` or a `validationFunction`.
+  - **Input**: A server RPC `mecha:MechaServerRPC` that does not specify `WithValidation` or a `validationFunction`.
   - **Expected behavior**: Validation fails, enforcing mandatory validation for Server RPCs.
   - **Actual behavior**: Validation fails with custom validation rule error `RuleServerRPCValidationMandatory`.
   - **Verdict**: PASS.
 
 - **Scenario 4: Material Instance Parameter Value Type Mismatch**
-  - **Input**: A material instance `gundam:GundamMaterialInstance` assigning a vector value `(R=1.0,G=0.0,B=0.0,A=1.0)` to a scalar parameter `GundamScalarParam`.
+  - **Input**: A material instance `mecha:MechaMaterialInstance` assigning a vector value `(R=1.0,G=0.0,B=0.0,A=1.0)` to a scalar parameter `MechaScalarParam`.
   - **Expected behavior**: Validation fails, enforcing type safety on material parameters.
   - **Actual behavior**: Validation fails with custom validation rule error `RuleMaterialInstanceParameterValueType`.
   - **Verdict**: PASS.

@@ -1,12 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Playwright config for Mecha Walkthrough (GC-AAA-UE4-MECH-001).
+// Playwright config for Mecha Factory Walkthrough (milestone GC-MECHA-FACTORY-001).
 // Serves the cooked package via `rocket html5 serve` on port 8080.
 // Run with: TARGET_GAME_URL=/Brm.html npx playwright test --config playwright.mecha.config.ts
 
 export default defineConfig({
   testDir: './tests-e2e',
-  testMatch: '**/mecha_walkthrough.spec.ts',
+  testMatch: '**/mecha_factory_walkthrough_projection.spec.ts',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,

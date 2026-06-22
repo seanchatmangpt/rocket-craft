@@ -12,7 +12,7 @@ In a profound rejection of the "cyberpunk" era of software engineering—defined
 
 Every game in the Rocket Craft 2030 suite is governed by a single unifying theorem: **The Chatman Equation ($A = \mu(O^*)$)**. 
 
-"We didn't write the combat logic for *Infinity Blade 4* or the matchmaking states for *Gundam Nexus*," said Chatman. "We wrote the mathematical laws of those universes in RDF/Turtle ontologies. We defined the boundaries. Then, `ggen` executed SPARQL queries against those laws to instantly project branchless, zero-cost Rust executables and Unreal Engine 4 WebGL architectures. The code is just a shadow of the truth."
+"We didn't write the combat logic for *Infinity Blade 4* or the matchmaking states for *Mecha Nexus*," said Chatman. "We wrote the mathematical laws of those universes in RDF/Turtle ontologies. We defined the boundaries. Then, `ggen` executed SPARQL queries against those laws to instantly project branchless, zero-cost Rust executables and Unreal Engine 4 WebGL architectures. The code is just a shadow of the truth."
 
 By enforcing this equation, Rocket Craft guarantees that if the underlying ontology is mathematically sound, the resulting game cannot contain an illegal state. 
 

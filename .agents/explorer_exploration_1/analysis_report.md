@@ -14,7 +14,7 @@ This report documents the workspace structure and mecha asset generation pipelin
 The semantic authority and topological relationships are represented using Turtle (`.ttl`) format files located in the `ontology/` directory:
 - **`ontology/all_merged.ttl`**: The primary merged ontology containing the unified semantic graph.
 - **`ontology/core.ttl`**: The base schema containing the core types and properties (e.g. Pawn, Character, ActorComponent, physical attributes).
-- **`ontology/gundam_nexus.ttl`**: Domain-specific extensions for the Gundam/mecha models.
+- **`ontology/mecha_nexus.ttl`**: Domain-specific extensions for the Mecha/mecha models.
 - **`ontology/mech_factory_mud.ttl`**: Ontology defining MUD (Multi-User Dungeon) factory digital twin concepts, including rooms, paths, stations, processes, and validation bounds.
 - **`ontology/mechbirth.ttl`**: The semantic rules governing mecha generation, including geometry, Level of Detail (LOD) classes, phase ordering, and transition bounds.
 - **`ontology/anti_llm.ttl`**: A set of defensive prompt engineering rules and rules against mock laundering captured in semantic form.
@@ -122,7 +122,7 @@ Visual verification evaluates the procedural assets against visual targets:
   - `just test`: Runs all Rust package tests (including `asset-pipeline`) and Vitest TypeScript tests.
   - `just ci`: Enforces styling checks, Rust clippy, testing, TypeScript compilation, and receipt validation.
   - `just build-rocket`: Builds the `rocket-cmd` CLI utility located in `tools/rocket-cmd/`.
-- Pipeline integration testing is driven by **`verify_html5_pipeline.sh`** and **`verify_gundam_pipeline.sh`**:
+- Pipeline integration testing is driven by **`verify_html5_pipeline.sh`** and **`verify_mecha_pipeline.sh`**:
   - Verification verifies cooked WASM files using `./rocket wasm verify`.
   - Launches local server via `./rocket html5 serve`.
   - Runs Playwright tests (e.g. `tests-e2e/tps-dflss.spec.ts`) against local browser instances to capture visual screenshots and actuate user input.

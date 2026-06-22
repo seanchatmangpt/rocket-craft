@@ -1951,3 +1951,18 @@ ue4:TestWorldShape
         """ ;
     ] .
 
+# =========================================================================
+# TANK CLASSES
+# =========================================================================
+
+ue4:GermanTigerTank a rdfs:Class, owl:Class, sh:NodeShape ;
+    rdfs:label "GermanTigerTank" ;
+    sh:targetClass ue4:GermanTigerTank .
+
+ue4:Turret_88mm a rdfs:Class, owl:Class, sh:NodeShape ;
+    rdfs:label "Turret_88mm" ;
+    sh:targetClass ue4:Turret_88mm .
+
+ue4:InterleavedRoadWheels a rdfs:Class, owl:Class, sh:NodeShape ;
+    rdfs:label "InterleavedRoadWheels" ;
+    sh:targetClass ue4:InterleavedRoadWheels .

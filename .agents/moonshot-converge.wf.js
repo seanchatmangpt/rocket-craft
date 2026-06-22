@@ -1,6 +1,6 @@
 export const meta = {
   name: 'moonshot-converge',
-  description: 'Converge mech silhouette + surface detail toward the winged reference via a parallel parameter-variant tournament (worktree-isolated ggen sync -> usdrecord -> IoU/edge), then graft the winning feature-graph parameters onto the live tree',
+  description: 'Converge mech morphology toward the winged reference via a SEQUENTIAL parameter-variant tournament on the live tree (snapshot -> ggen sync -> usdrecord -> IoU/edge -> restore), then graft the winning feature-graph parameters. No git worktrees (repo carries multi-GB UE4 binaries; disk-safe).',
   phases: [
     { title: 'Baseline' },
     { title: 'Explore' },
@@ -10,104 +10,111 @@ export const meta = {
 }
 
 const ROOT = '/Users/sac/rocket-craft'
+const BAK = '/tmp/moonshot_src_snapshot'
 
 const METRIC = {
   type: 'object',
-  required: ['silhouette_iou', 'edge_similarity', 'color_palette_similarity'],
+  required: ['silhouette_iou', 'edge_similarity', 'color_palette_similarity', 'snapshot_done'],
   properties: {
     silhouette_iou: { type: 'number' },
     edge_similarity: { type: 'number' },
     color_palette_similarity: { type: 'number' },
+    wing_feather_count: { type: 'number' },
+    snapshot_done: { type: 'boolean', description: 'authoritative source files copied to the snapshot dir' },
+    notes: { type: 'string' },
   },
 }
 
 const VARIANT = {
   type: 'object',
-  required: ['strategy', 'silhouette_iou', 'edge_similarity', 'color_palette_similarity', 'ran_clean', 'diff', 'summary'],
+  required: ['strategy', 'silhouette_iou', 'edge_similarity', 'color_palette_similarity', 'ran_clean', 'restored', 'diff', 'summary'],
   properties: {
     strategy: { type: 'string' },
     silhouette_iou: { type: 'number' },
     edge_similarity: { type: 'number' },
     color_palette_similarity: { type: 'number' },
-    ran_clean: { type: 'boolean', description: 'ggen sync + render + compare all exited 0 in the isolated worktree' },
-    diff: { type: 'string', description: 'unified git diff of the source-law TTL / Tera changes that produced these metrics' },
+    morphology_progress: { type: 'string', description: 'which morphology metrics (wing_feather_count, feather_panel_curvature, blade_length_angle_delta, symmetry_delta, USD305 mirror-proof) moved and by how much' },
+    ran_clean: { type: 'boolean' },
+    restored: { type: 'boolean', description: 'live tree restored from snapshot after measuring' },
+    diff: { type: 'string', description: 'unified diff of the source-law TTL / Tera change' },
     summary: { type: 'string' },
   },
 }
 
 const FINAL = {
   type: 'object',
-  required: ['silhouette_iou', 'edge_similarity', 'color_palette_similarity', 'modular_gate', 'ran_clean', 'metrics_are_real', 'notes'],
+  required: ['silhouette_iou', 'edge_similarity', 'color_palette_similarity', 'thresholds_met', 'modular_gate', 'ran_clean', 'metrics_are_real', 'notes'],
   properties: {
     silhouette_iou: { type: 'number' },
     edge_similarity: { type: 'number' },
     color_palette_similarity: { type: 'number' },
+    thresholds_met: { type: 'boolean' },
     modular_gate: { type: 'string' },
     ran_clean: { type: 'boolean' },
-    metrics_are_real: { type: 'boolean', description: 'true iff a fresh independent re-run of compare reproduced the numbers and the scorer is not hardcoded' },
+    metrics_are_real: { type: 'boolean', description: 'true iff a fresh independent compare re-run reproduced the numbers AND scorer/renderer are byte-identical to git HEAD' },
     notes: { type: 'string' },
   },
 }
 
 phase('Baseline')
 const base = await agent(
-`Repo ${ROOT}. Establish the current convergence baseline. Run:
-  cd ${ROOT} && ggen sync && python3 scripts/render_reference_fabric.py && python3 scripts/compare_reference_render.py
-Then read generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json and report silhouette_iou / edge_similarity / color_palette_similarity. Read scripts/compare_reference_render.py and scripts/render_reference_fabric.py enough to understand exactly which knobs (camera, threshold, alignment) affect the score so later variants don't game it. Do not edit anything.`,
+`Repo ${ROOT}. (1) Snapshot the AUTHORITATIVE convergence source files so variants can restore cleanly: \`mkdir -p ${BAK} && cp generated/mech_assets/reference_fabric_001/templates/usd/*.tera ${BAK}/\` and also copy any ontology/source_law/*.ttl + ontology/ggen-packs files that the asset USD pipeline reads (identify them from ggen.toml). Record the exact file list to ${BAK}/manifest.txt.
+(2) Establish the honest reproducible baseline: \`cd ${ROOT} && ggen sync && python3 scripts/render_reference_fabric.py && python3 scripts/compare_reference_render.py\`, then read generated/mech_assets/reference_fabric_001/reports/visual_gap_report.json. Report silhouette_iou / edge_similarity / color_palette_similarity / wing_feather_count. Do not hardcode. The known true baseline is ~0.322 / 0.101 / 0.876 with wing_feather_count=0 and thresholds_met=0 (morphology gate FAILS) — confirm or correct it.`,
   { schema: METRIC, phase: 'Baseline' })
 
 phase('Explore')
-// Each strategy attacks a different axis of the reference (winged Gundam: swept feather wings,
-// posed silhouette, sharp hard-surface profiles, engraved surface detail). Worktree-isolated so
-// each runs the full ggen sync -> render -> compare loop without colliding on generated/.
+// SEQUENTIAL on the live tree. Each variant restores from ${BAK} first, applies its change,
+// measures, then restores again — so no two variants ever overlap and disk stays flat.
+// Morphology is the real wall, so strategies target the morphology metrics, not just pose.
+// ROUND 3 — baseline is the Round-2 graft (silhouette 0.374 / edge 0.093 / color 0.951, cyan renders,
+// USD305 PASS). The REAL structural blocker is now exposed: foreground_component_count=22 (needs [1,5])
+// — the silhouette is 22 disconnected blobs, not one connected mech. That same scatter drives
+// VIS204 core_compactness (0.382, needs <=0.15). Fuse the parts -> both gates move together.
 const STRATEGIES = [
-  { name: 'wing-spine-arc', detail: 'Tune the feather-array placement spine + pitch sweep so the two wing arrays read as the large swept feather fans of the reference (wide, upward-back swept, ~18-22 feathers each, tip-scale falloff). Edit the pattern-along-curve rule + spine curve in the source-law TTL.' },
-  { name: 'assembly-pose', detail: 'The parts currently render as an exploded scatter. Author the assembly composition transforms so part files compose into a single coherent posed mech silhouette (torso centered, head atop, wings rising behind, limbs/blades placed). This should be the biggest silhouette_iou win.' },
-  { name: 'feather-profile', detail: 'Sharpen the feather/blade cross-section profile curve to the tapered pointed-feather profile of the reference instead of a blunt blade. Edit the loft profile sketch in the feather feature tree.' },
-  { name: 'hardsurface-bevels', detail: 'Add beveled hard-surface plate detail + chamfers to torso/head/limb shells (047_angular_armor_shell_grammar / 048 beveled plate grammar) so profiles read as flagship hard-surface, lifting edge_similarity.' },
-  { name: 'panel-line-density', detail: 'Increase engraved panel-line / vent density and depth across all parts so edge_similarity rises substantially. Build on whatever surface grammar exists; if absent, author it.' },
-  { name: 'head-torso-silhouette', detail: 'Reshape head crest + torso chest profile toward the V-fin head and layered chest of the reference. Edit torso/head grammar profiles.' },
+  { name: 'connect-silhouette', detail: 'foreground_component_count=22, needs [1,5]. The rendered silhouette is many disconnected islands. In asset.usda.tera, aggressively compose the parts so their silhouettes OVERLAP into ONE connected mass: pull wings/blades/limbs/loadout inward toward the torso until adjacent parts touch/overlap in the front projection (the reference is one connected winged figure, not floating pieces). Target foreground_component_count <=5 WITHOUT dropping silhouette_iou below 0.35.' },
+  { name: 'core-compactness-v2', detail: 'VIS204 core_compactness_delta=0.382 needs <=0.15. Round 2 found pose-scale alone could not move it without collapsing IoU. Try a DIFFERENT lever: tighten the TORSO/CORE shell massing in the grammar (reduce inter-prim gaps within the torso so the core reads as a solid compact mass) rather than scaling the whole assembly. Drive compactness down while keeping the wings spread.' },
+  { name: 'blade-angle', detail: 'VIS205 blade_length_angle_delta=135 (needs <=15). Cyan now renders, so this is geometric: correct the blade mount ANGLE and LENGTH in the blade grammar / assembly pose so the twin beam-sabers extend at the reference angle. Aim to halve the delta at least.' },
+  { name: 'merge-feathers', detail: 'The 48 feathers likely contribute many of the 22 silhouette components. Make the per-wing feathers overlap enough to read as ONE connected swept panel mass per wing (reduce inter-feather gaps) so each wing is 1 component, not ~20 islands. Helps foreground_component_count AND keeps curvature/overlap passing.' },
+  { name: 'edge-push', detail: 'Push edge_similarity past 0.11 with crisper raised-ridge panel relief, without regressing VIS206/VIS207 or color. Build on the Round-2 groove reshape (width 0.015, depth 0.22, protrusion 0.16).' },
 ]
 
-const variants = await parallel(STRATEGIES.map((s) => () => agent(
-`You are in an ISOLATED git worktree copy of ${ROOT} — edit and run freely, you cannot affect other agents. Pipeline: \`ggen sync\` renders Tera templates from the RDF source-law graph (ontology/source_law/*.ttl + ontology/ggen-packs) into generated/mech_assets/reference_fabric_001/usd/*.usda; scripts/render_reference_fabric.py runs usdrecord (Metal); scripts/compare_reference_render.py writes visual_gap_report.json with silhouette_iou/edge_similarity/color_palette_similarity. The reference is a white winged Gundam (swept feather wings, V-fin head, layered chest, twin beam swords).
+const variants = []
+for (const s of STRATEGIES) {
+  const v = await agent(
+`Repo ${ROOT}. SEQUENTIAL tournament variant — you run on the LIVE tree, so you MUST isolate yourself:
+  STEP 1 restore clean baseline: \`cp ${BAK}/*.tera generated/mech_assets/reference_fabric_001/templates/usd/ \` and restore any TTLs per ${BAK}/manifest.txt.
+  STEP 2 apply ONLY your strategy "${s.name}": ${s.detail}
+         Edit the AUTHORITATIVE source (ggen-pack template / source_law TTL), never files that ggen sync overwrites blindly.
+  STEP 3 measure: \`cd ${ROOT} && ggen sync && python3 scripts/render_reference_fabric.py && python3 scripts/compare_reference_render.py\`; read visual_gap_report.json.
+  STEP 4 capture \`git diff\` (and diff vs ${BAK} for the .tera) of your change.
+  STEP 5 RESTORE the baseline again from ${BAK} and confirm the working tree matches the snapshot (so the next variant starts clean).
+Baseline metrics: ${JSON.stringify({ s: base.silhouette_iou, e: base.edge_similarity, c: base.color_palette_similarity })}. Do NOT edit scripts/compare_reference_render.py or scripts/render_reference_fabric.py and do NOT hardcode metrics — verify will diff them against HEAD. Report your metrics, morphology progress, the diff, and restored=true.`,
+    { schema: VARIANT, phase: 'Explore', label: s.name })
+  if (v) variants.push(v)
+}
 
-Baseline metrics: ${JSON.stringify(base)}.
-
-Your strategy "${s.name}": ${s.detail}
-
-Author the change in the AUTHORITATIVE source-law TTL / ggen-pack template (never edit files under generated/ — they are ggen sync outputs). Then run:
-  cd . && ggen sync && python3 scripts/render_reference_fabric.py && python3 scripts/compare_reference_render.py
-Read the report. Iterate up to 3 times to maximize improvement on YOUR axis without regressing the others badly. Do NOT touch the scorer scripts and do NOT hardcode metrics — that is cheating and will be caught. Return your final metrics and \`git diff\` of your source changes.`,
-  { schema: VARIANT, isolation: 'worktree', phase: 'Explore', label: s.name })))
-
-const ranked = variants.filter(Boolean).filter((v) => v.ran_clean)
+const ranked = variants.filter((v) => v.ran_clean)
   .map((v) => ({ ...v, score: (v.silhouette_iou - base.silhouette_iou) + 2 * (v.edge_similarity - base.edge_similarity) }))
-  .filter((v) => v.score > 0)
   .sort((a, b) => b.score - a.score)
 
-log(`Explore done: ${ranked.length}/${variants.length} variants improved on baseline. Top: ${ranked.slice(0, 3).map((v) => `${v.strategy}(iou=${v.silhouette_iou?.toFixed(3)},edge=${v.edge_similarity?.toFixed(3)})`).join(', ')}`)
-
-if (!ranked.length) {
-  return { base, result: 'NO_VARIANT_IMPROVED', variants: variants.filter(Boolean) }
-}
+log(`Explore: ${ranked.length}/${variants.length} ran clean. Top: ${ranked.slice(0, 3).map((v) => `${v.strategy}(iou=${v.silhouette_iou?.toFixed(3)},edge=${v.edge_similarity?.toFixed(3)})`).join(', ')}`)
 
 phase('Graft')
 const graft = await agent(
-`Repo ${ROOT} (the LIVE working tree, which already contains the finish-runner foundation: owner_part_id stamping + base surface grammar). Below are the winning source-law diffs from worktree-isolated tournament variants, ranked best-first. Apply the BEST COMPATIBLE COMBINATION onto the live tree — prefer assembly-pose + wing-spine + the strongest surface/profile wins; resolve overlaps sensibly; skip any diff that conflicts destructively with a better one.
+`Repo ${ROOT}. Restore the clean baseline from ${BAK} first. Then apply the BEST COMPATIBLE COMBINATION of these tournament winners — prioritize morphology wins (wing-feathers, mirror-proof, assembly-pose-v2) since the gate is blocked on morphology, not pose alone:
 
-${ranked.slice(0, 5).map((v, i) => `### #${i + 1} ${v.strategy} (silhouette_iou=${v.silhouette_iou}, edge_similarity=${v.edge_similarity})\n${v.summary}\n\n\`\`\`diff\n${(v.diff || '').slice(0, 6000)}\n\`\`\``).join('\n\n')}
+${ranked.slice(0, 5).map((v, i) => `### #${i + 1} ${v.strategy} (iou=${v.silhouette_iou}, edge=${v.edge_similarity}) — ${v.morphology_progress || ''}\n${v.summary}\n\`\`\`diff\n${(v.diff || '').slice(0, 5000)}\n\`\`\``).join('\n\n')}
 
-After applying, run: cd ${ROOT} && ggen sync && python3 scripts/render_reference_fabric.py && python3 scripts/compare_reference_render.py. Report the combined metrics honestly. If the combination regressed below the best single variant, back out the conflicting piece and re-run. Do not edit the scorer.`,
+Apply, then \`ggen sync && python3 scripts/render_reference_fabric.py && python3 scripts/compare_reference_render.py\`. If a combined piece regresses below the best single variant, back it out and re-run. Report combined metrics + whether thresholds_met / morphology gate improved. Leave the winning combination IN PLACE on the live tree (do not restore). Do not touch the scorer.`,
   { schema: FINAL, phase: 'Graft' })
 
 phase('Verify')
 const final = await agent(
-`Repo ${ROOT}. Adversarially verify the grafted result is REAL, not gamed:
-1. Re-run scripts/compare_reference_render.py fresh and confirm the numbers reproduce.
-2. Diff scripts/compare_reference_render.py and scripts/render_reference_fabric.py against git HEAD — confirm the scorer/renderer were NOT modified (any change there invalidates the result).
-3. Confirm owner_part_id is still complete on emitted USD and the modular-identity gate is still DOE_RELEASED (run ggen-asset-lsp diagnostics / run_mecha_doe.py smoke).
-4. Report final silhouette_iou / edge_similarity / color vs baseline ${JSON.stringify(base)}, and set metrics_are_real honestly.`,
+`Repo ${ROOT}. Adversarially verify the grafted result is REAL:
+1. Re-run python3 scripts/compare_reference_render.py fresh; confirm numbers reproduce exactly.
+2. \`git hash-object scripts/compare_reference_render.py scripts/render_reference_fabric.py\` vs HEAD — confirm scorer+renderer UNCHANGED (any change invalidates the result).
+3. Confirm owner_part_id complete on emitted USD and modular gate via run_mecha_doe.py smoke = DOE_RELEASED.
+4. Report final metrics vs baseline ${JSON.stringify({ s: base.silhouette_iou, e: base.edge_similarity, c: base.color_palette_similarity })}, thresholds_met honestly, and set metrics_are_real truthfully (false if anything fails to reproduce).`,
   { schema: FINAL, phase: 'Verify' })
 
 return { base, grafted: graft, verified: final, top_variants: ranked.slice(0, 3) }

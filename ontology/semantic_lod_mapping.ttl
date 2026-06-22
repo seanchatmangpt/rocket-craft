@@ -3,6 +3,7 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix mud: <https://rocket-craft.com/ontology/mud#> .
 @prefix factory: <http://example.org/factory#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 # Semantic LOD Mapping: High-Poly USD -> Byte-Class Network Payloads
 # Formalizing the Projection Law: Server owns authority (bytes), Client owns pixels (USD)
@@ -76,3 +77,10 @@ mud:backpack_core
     mud:ue4TargetSurface "SM_Loadout.usda" ;
     mud:hasNetworkPayload mud:DamageClass, mud:HeatClass, mud:FatigueClass ;
     mud:lodClass "SECONDARY" .
+
+# Tiger Tank
+mud:tiger_tank_hull 
+    mud:ue4TargetSurface "tiger_tank_skeleton.usda" ;
+    mud:hasNetworkPayload mud:DamageClass, mud:StressClass, mud:FatigueClass, mud:SocketHealthClass ;
+    mud:massTons "54"^^xsd:integer ;
+    mud:lodClass "CROWN" .

@@ -21,7 +21,9 @@ domain_terms = [
     "admitted",
     "candidate",
     "completed",
-    "admitted",
+    "mock_laundering",
+    "generate_image",
+    "ai_image_generation"
 ]
 
 [paths]

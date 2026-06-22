@@ -2,7 +2,7 @@
 
 ## Purpose
 
-10-crate Rust workspace implementing the backend engine for **Gundam Nexus**, a
+10-crate Rust workspace implementing the backend engine for **Mecha Nexus**, a
 multiplayer mobile game. Covers combat simulation, ECS world, economy/marketplace,
 WebSocket networking, 3D math utilities, gacha shop, and full integration tests.
 All crates use `workspace.dependencies` — add new deps there first, then inherit
@@ -132,7 +132,7 @@ Shared versions declared in `Cargo.toml` `[workspace.dependencies]`:
 
 ## Relation to the Monorepo
 
-- **`gundam-nexus/`** (sibling) — game design documents; the GDD and mobile suit
+- **`mecha-nexus/`** (sibling) — game design documents; the GDD and mobile suit
   specs that define what nexus-engine must implement.
 - **`unify-rs/unify-mcp`** — the MCP server may expose nexus game state as resources.
 - **`tools/rocket-sdk`** — build/audit tooling can be invoked against this workspace

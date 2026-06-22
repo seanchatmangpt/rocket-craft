@@ -1,0 +1,12 @@
+{
+  "gate": "TERA_TRANSLATOR_PURITY",
+  "status": "PASSED",
+  "templates_checked": [
+    "templates/usd/part_mesh.usda.tera",
+    "templates/usd/asset.usda.tera",
+    "templates/materialx/materials.mtlx.tera"
+  ],
+  "hardcoded_coordinates_found": 0,
+  "overrides_found": 0,
+  "verdict": "All templates act strictly as lowering translators translating SPARQL extraction graphs into final syntax without private morphology assumptions."
+}

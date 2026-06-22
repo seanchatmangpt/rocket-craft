@@ -2051,7 +2051,7 @@ mud:socket_loadout rdf:type mud:GeometryPrimitive ;
 mud:prim_head_helmet rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:head_unit ;
     mud:primitiveFamily "helmet_armor" ;
-    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:translateX 0.0000 ; mud:translateY 8.6200 ; mud:translateZ 0.3000 ;
     mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2067,7 +2067,7 @@ mud:prim_head_helmet rdf:type mud:GeometryPrimitive ;
 mud:prim_head_cheek rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:head_unit ;
     mud:primitiveFamily "cheek_guard" ;
-    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:translateX 0.0000 ; mud:translateY 8.6200 ; mud:translateZ 0.3000 ;
     mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2083,7 +2083,7 @@ mud:prim_head_cheek rdf:type mud:GeometryPrimitive ;
 mud:prim_head_face rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:head_unit ;
     mud:primitiveFamily "face_plate" ;
-    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:translateX 0.0000 ; mud:translateY 8.6200 ; mud:translateZ 0.3000 ;
     mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2099,7 +2099,7 @@ mud:prim_head_face rdf:type mud:GeometryPrimitive ;
 mud:prim_head_neck rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:head_unit ;
     mud:primitiveFamily "neck_connection" ;
-    mud:translateX 0.0 ; mud:translateY 8.85 ; mud:translateZ 1.5 ;
+    mud:translateX 0.0000 ; mud:translateY 8.6200 ; mud:translateZ 0.3000 ;
     mud:scaleX 1.0 ; mud:scaleY 0.65 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2115,7 +2115,7 @@ mud:prim_head_neck rdf:type mud:GeometryPrimitive ;
 mud:prim_mecha_crown_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:mecha_crown_left ;
     mud:primitiveFamily "fin" ;
-    mud:translateX -0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
+    mud:translateX -0.2000 ; mud:translateY -0.0300 ; mud:translateZ 0.6000 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2131,7 +2131,7 @@ mud:prim_mecha_crown_left rdf:type mud:GeometryPrimitive ;
 mud:prim_mecha_crown_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:mecha_crown_right ;
     mud:primitiveFamily "fin" ;
-    mud:translateX 0.2 ; mud:translateY 0.2 ; mud:translateZ 1.8 ;
+    mud:translateX 0.2000 ; mud:translateY -0.0300 ; mud:translateZ 0.6000 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2147,7 +2147,7 @@ mud:prim_mecha_crown_right rdf:type mud:GeometryPrimitive ;
 mud:prim_wing_root_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:wing_root_left ;
     mud:primitiveFamily "wing" ;
-    mud:translateX -1.0 ; mud:translateY -0.5 ; mud:translateZ 1.0 ;
+    mud:translateX -0.5000 ; mud:translateY -0.5000 ; mud:translateZ 0.4000 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2163,7 +2163,7 @@ mud:prim_wing_root_left rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.3000 ; mud:translateY 2.39 ; mud:translateZ 1.4000 ;
+    mud:translateX -0.8000 ; mud:translateY 2.3900 ; mud:translateZ 0.8000 ;
     mud:scaleX 0.5500 ; mud:scaleY 3.0 ; mud:scaleZ 1.5000 ;
     mud:rotateX 1.0000 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2179,7 +2179,7 @@ mud:prim_pwf_left_00 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.5526 ; mud:translateY 2.39 ; mud:translateZ 1.4947 ;
+    mud:translateX -1.0526 ; mud:translateY 2.3900 ; mud:translateZ 0.8947 ;
     mud:scaleX 0.5184 ; mud:scaleY 3.0 ; mud:scaleZ 1.4263 ;
     mud:rotateX 1.7368 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2195,7 +2195,7 @@ mud:prim_pwf_left_02 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.8053 ; mud:translateY 2.39 ; mud:translateZ 1.5895 ;
+    mud:translateX -1.3053 ; mud:translateY 2.3900 ; mud:translateZ 0.9895 ;
     mud:scaleX 0.4868 ; mud:scaleY 3.0 ; mud:scaleZ 1.3526 ;
     mud:rotateX 2.4737 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2211,7 +2211,7 @@ mud:prim_pwf_left_04 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.0579 ; mud:translateY 2.39 ; mud:translateZ 1.6842 ;
+    mud:translateX -1.5579 ; mud:translateY 2.3900 ; mud:translateZ 1.0842 ;
     mud:scaleX 0.4553 ; mud:scaleY 3.0 ; mud:scaleZ 1.2789 ;
     mud:rotateX 3.2105 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2227,7 +2227,7 @@ mud:prim_pwf_left_06 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_08 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.3105 ; mud:translateY 2.39 ; mud:translateZ 1.7789 ;
+    mud:translateX -1.8105 ; mud:translateY 2.3900 ; mud:translateZ 1.1789 ;
     mud:scaleX 0.4237 ; mud:scaleY 3.0 ; mud:scaleZ 1.2053 ;
     mud:rotateX 3.9474 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2243,7 +2243,7 @@ mud:prim_pwf_left_08 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_10 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.5632 ; mud:translateY 2.39 ; mud:translateZ 1.8737 ;
+    mud:translateX -2.0632 ; mud:translateY 2.3900 ; mud:translateZ 1.2737 ;
     mud:scaleX 0.3921 ; mud:scaleY 3.0 ; mud:scaleZ 1.1316 ;
     mud:rotateX 4.6842 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2259,7 +2259,7 @@ mud:prim_pwf_left_10 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_12 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.8158 ; mud:translateY 2.39 ; mud:translateZ 1.9684 ;
+    mud:translateX -2.3158 ; mud:translateY 2.3900 ; mud:translateZ 1.3684 ;
     mud:scaleX 0.3605 ; mud:scaleY 3.0 ; mud:scaleZ 1.0579 ;
     mud:rotateX 5.4211 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2275,7 +2275,7 @@ mud:prim_pwf_left_12 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_14 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -3.0684 ; mud:translateY 2.39 ; mud:translateZ 2.0632 ;
+    mud:translateX -2.5684 ; mud:translateY 2.3900 ; mud:translateZ 1.4632 ;
     mud:scaleX 0.3289 ; mud:scaleY 3.0 ; mud:scaleZ 0.9842 ;
     mud:rotateX 6.1579 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2291,7 +2291,7 @@ mud:prim_pwf_left_14 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_16 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -3.3211 ; mud:translateY 2.39 ; mud:translateZ 2.1579 ;
+    mud:translateX -2.8211 ; mud:translateY 2.3900 ; mud:translateZ 1.5579 ;
     mud:scaleX 0.2974 ; mud:scaleY 3.0 ; mud:scaleZ 0.9105 ;
     mud:rotateX 6.8947 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2307,7 +2307,7 @@ mud:prim_pwf_left_16 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_left_18 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -3.5737 ; mud:translateY 2.39 ; mud:translateZ 2.2526 ;
+    mud:translateX -3.0737 ; mud:translateY 2.3900 ; mud:translateZ 1.6526 ;
     mud:scaleX 0.2658 ; mud:scaleY 3.0 ; mud:scaleZ 0.8368 ;
     mud:rotateX 7.6316 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2323,7 +2323,7 @@ mud:prim_pwf_left_18 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.6000 ; mud:translateY -0.5000 ; mud:translateZ 1.7000 ;
+    mud:translateX -1.1000 ; mud:translateY -0.5000 ; mud:translateZ 1.1000 ;
     mud:scaleX 0.4500 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2000 ;
     mud:rotateX 0.5000 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2339,7 +2339,7 @@ mud:prim_swf_left_00 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_01 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -1.8286 ; mud:translateY -0.4402 ; mud:translateZ 1.8000 ;
+    mud:translateX -1.3286 ; mud:translateY -0.4402 ; mud:translateZ 1.2000 ;
     mud:scaleX 0.4186 ; mud:scaleY 0.0500 ; mud:scaleZ 1.1286 ;
     mud:rotateX 1.3571 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2355,7 +2355,7 @@ mud:prim_swf_left_01 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.0571 ; mud:translateY -0.3528 ; mud:translateZ 1.9000 ;
+    mud:translateX -1.5571 ; mud:translateY -0.3528 ; mud:translateZ 1.3000 ;
     mud:scaleX 0.3871 ; mud:scaleY 0.0500 ; mud:scaleZ 1.0571 ;
     mud:rotateX 2.2143 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2371,7 +2371,7 @@ mud:prim_swf_left_02 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_03 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.2857 ; mud:translateY -0.2507 ; mud:translateZ 2.0000 ;
+    mud:translateX -1.7857 ; mud:translateY -0.2507 ; mud:translateZ 1.4000 ;
     mud:scaleX 0.3557 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9857 ;
     mud:rotateX 3.0714 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2387,7 +2387,7 @@ mud:prim_swf_left_03 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.5143 ; mud:translateY -0.1377 ; mud:translateZ 2.1000 ;
+    mud:translateX -2.0143 ; mud:translateY -0.1377 ; mud:translateZ 1.5000 ;
     mud:scaleX 0.3243 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9143 ;
     mud:rotateX 3.9286 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2403,7 +2403,7 @@ mud:prim_swf_left_04 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_05 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.7429 ; mud:translateY -0.0157 ; mud:translateZ 2.2000 ;
+    mud:translateX -2.2429 ; mud:translateY -0.0157 ; mud:translateZ 1.6000 ;
     mud:scaleX 0.2929 ; mud:scaleY 0.0500 ; mud:scaleZ 0.8429 ;
     mud:rotateX 4.7857 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2419,7 +2419,7 @@ mud:prim_swf_left_05 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -2.9714 ; mud:translateY 0.1138 ; mud:translateZ 2.3000 ;
+    mud:translateX -2.4714 ; mud:translateY 0.1138 ; mud:translateZ 1.7000 ;
     mud:scaleX 0.2614 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7714 ;
     mud:rotateX 5.6429 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2435,7 +2435,7 @@ mud:prim_swf_left_06 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_left_07 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_left ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX -3.2000 ; mud:translateY 0.2500 ; mud:translateZ 2.4000 ;
+    mud:translateX -2.7000 ; mud:translateY 0.2500 ; mud:translateZ 1.8000 ;
     mud:scaleX 0.2300 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7000 ;
     mud:rotateX 6.5000 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2451,7 +2451,7 @@ mud:prim_swf_left_07 rdf:type mud:GeometryPrimitive ;
 mud:prim_wing_root_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:wing_root_right ;
     mud:primitiveFamily "wing" ;
-    mud:translateX 1.0 ; mud:translateY -0.5 ; mud:translateZ 1.0 ;
+    mud:translateX 0.5000 ; mud:translateY -0.5000 ; mud:translateZ 0.4000 ;
     mud:scaleX 1.0 ; mud:scaleY 1.0 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2467,7 +2467,7 @@ mud:prim_wing_root_right rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.3000 ; mud:translateY 2.39 ; mud:translateZ 1.4000 ;
+    mud:translateX 0.8000 ; mud:translateY 2.3900 ; mud:translateZ 0.8000 ;
     mud:scaleX 0.5500 ; mud:scaleY 3.0 ; mud:scaleZ 1.5000 ;
     mud:rotateX 1.0000 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2483,7 +2483,7 @@ mud:prim_pwf_right_00 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.5526 ; mud:translateY 2.39 ; mud:translateZ 1.4947 ;
+    mud:translateX 1.0526 ; mud:translateY 2.3900 ; mud:translateZ 0.8947 ;
     mud:scaleX 0.5184 ; mud:scaleY 3.0 ; mud:scaleZ 1.4263 ;
     mud:rotateX 1.7368 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2499,7 +2499,7 @@ mud:prim_pwf_right_02 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.8053 ; mud:translateY 2.39 ; mud:translateZ 1.5895 ;
+    mud:translateX 1.3053 ; mud:translateY 2.3900 ; mud:translateZ 0.9895 ;
     mud:scaleX 0.4868 ; mud:scaleY 3.0 ; mud:scaleZ 1.3526 ;
     mud:rotateX 2.4737 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2515,7 +2515,7 @@ mud:prim_pwf_right_04 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.0579 ; mud:translateY 2.39 ; mud:translateZ 1.6842 ;
+    mud:translateX 1.5579 ; mud:translateY 2.3900 ; mud:translateZ 1.0842 ;
     mud:scaleX 0.4553 ; mud:scaleY 3.0 ; mud:scaleZ 1.2789 ;
     mud:rotateX 3.2105 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2531,7 +2531,7 @@ mud:prim_pwf_right_06 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_08 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.3105 ; mud:translateY 2.39 ; mud:translateZ 1.7789 ;
+    mud:translateX 1.8105 ; mud:translateY 2.3900 ; mud:translateZ 1.1789 ;
     mud:scaleX 0.4237 ; mud:scaleY 3.0 ; mud:scaleZ 1.2053 ;
     mud:rotateX 3.9474 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2547,7 +2547,7 @@ mud:prim_pwf_right_08 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_10 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.5632 ; mud:translateY 2.39 ; mud:translateZ 1.8737 ;
+    mud:translateX 2.0632 ; mud:translateY 2.3900 ; mud:translateZ 1.2737 ;
     mud:scaleX 0.3921 ; mud:scaleY 3.0 ; mud:scaleZ 1.1316 ;
     mud:rotateX 4.6842 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2563,7 +2563,7 @@ mud:prim_pwf_right_10 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_12 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.8158 ; mud:translateY 2.39 ; mud:translateZ 1.9684 ;
+    mud:translateX 2.3158 ; mud:translateY 2.3900 ; mud:translateZ 1.3684 ;
     mud:scaleX 0.3605 ; mud:scaleY 3.0 ; mud:scaleZ 1.0579 ;
     mud:rotateX 5.4211 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2579,7 +2579,7 @@ mud:prim_pwf_right_12 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_14 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 3.0684 ; mud:translateY 2.39 ; mud:translateZ 2.0632 ;
+    mud:translateX 2.5684 ; mud:translateY 2.3900 ; mud:translateZ 1.4632 ;
     mud:scaleX 0.3289 ; mud:scaleY 3.0 ; mud:scaleZ 0.9842 ;
     mud:rotateX 6.1579 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2595,7 +2595,7 @@ mud:prim_pwf_right_14 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_16 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 3.3211 ; mud:translateY 2.39 ; mud:translateZ 2.1579 ;
+    mud:translateX 2.8211 ; mud:translateY 2.3900 ; mud:translateZ 1.5579 ;
     mud:scaleX 0.2974 ; mud:scaleY 3.0 ; mud:scaleZ 0.9105 ;
     mud:rotateX 6.8947 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2611,7 +2611,7 @@ mud:prim_pwf_right_16 rdf:type mud:GeometryPrimitive ;
 mud:prim_pwf_right_18 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:primary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 3.5737 ; mud:translateY 2.39 ; mud:translateZ 2.2526 ;
+    mud:translateX 3.0737 ; mud:translateY 2.3900 ; mud:translateZ 1.6526 ;
     mud:scaleX 0.2658 ; mud:scaleY 3.0 ; mud:scaleZ 0.8368 ;
     mud:rotateX 7.6316 ; mud:rotateY 58.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2627,7 +2627,7 @@ mud:prim_pwf_right_18 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_00 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.6000 ; mud:translateY -0.5000 ; mud:translateZ 1.7000 ;
+    mud:translateX 1.1000 ; mud:translateY -0.5000 ; mud:translateZ 1.1000 ;
     mud:scaleX 0.4500 ; mud:scaleY 0.0500 ; mud:scaleZ 1.2000 ;
     mud:rotateX 0.5000 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2643,7 +2643,7 @@ mud:prim_swf_right_00 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_01 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 1.8286 ; mud:translateY -0.4402 ; mud:translateZ 1.8000 ;
+    mud:translateX 1.3286 ; mud:translateY -0.4402 ; mud:translateZ 1.2000 ;
     mud:scaleX 0.4186 ; mud:scaleY 0.0500 ; mud:scaleZ 1.1286 ;
     mud:rotateX 1.3571 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2659,7 +2659,7 @@ mud:prim_swf_right_01 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_02 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.0571 ; mud:translateY -0.3528 ; mud:translateZ 1.9000 ;
+    mud:translateX 1.5571 ; mud:translateY -0.3528 ; mud:translateZ 1.3000 ;
     mud:scaleX 0.3871 ; mud:scaleY 0.0500 ; mud:scaleZ 1.0571 ;
     mud:rotateX 2.2143 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2675,7 +2675,7 @@ mud:prim_swf_right_02 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_03 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.2857 ; mud:translateY -0.2507 ; mud:translateZ 2.0000 ;
+    mud:translateX 1.7857 ; mud:translateY -0.2507 ; mud:translateZ 1.4000 ;
     mud:scaleX 0.3557 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9857 ;
     mud:rotateX 3.0714 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2691,7 +2691,7 @@ mud:prim_swf_right_03 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_04 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.5143 ; mud:translateY -0.1377 ; mud:translateZ 2.1000 ;
+    mud:translateX 2.0143 ; mud:translateY -0.1377 ; mud:translateZ 1.5000 ;
     mud:scaleX 0.3243 ; mud:scaleY 0.0500 ; mud:scaleZ 0.9143 ;
     mud:rotateX 3.9286 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2707,7 +2707,7 @@ mud:prim_swf_right_04 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_05 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.7429 ; mud:translateY -0.0157 ; mud:translateZ 2.2000 ;
+    mud:translateX 2.2429 ; mud:translateY -0.0157 ; mud:translateZ 1.6000 ;
     mud:scaleX 0.2929 ; mud:scaleY 0.0500 ; mud:scaleZ 0.8429 ;
     mud:rotateX 4.7857 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2723,7 +2723,7 @@ mud:prim_swf_right_05 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_06 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 2.9714 ; mud:translateY 0.1138 ; mud:translateZ 2.3000 ;
+    mud:translateX 2.4714 ; mud:translateY 0.1138 ; mud:translateZ 1.7000 ;
     mud:scaleX 0.2614 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7714 ;
     mud:rotateX 5.6429 ; mud:rotateY 74.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2739,7 +2739,7 @@ mud:prim_swf_right_06 rdf:type mud:GeometryPrimitive ;
 mud:prim_swf_right_07 rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:secondary_wing_feathers_right ;
     mud:primitiveFamily "feather_panel" ;
-    mud:translateX 3.2000 ; mud:translateY 0.2500 ; mud:translateZ 2.4000 ;
+    mud:translateX 2.7000 ; mud:translateY 0.2500 ; mud:translateZ 1.8000 ;
     mud:scaleX 0.2300 ; mud:scaleY 0.0500 ; mud:scaleZ 0.7000 ;
     mud:rotateX 6.5000 ; mud:rotateY 76.0000 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2755,7 +2755,7 @@ mud:prim_swf_right_07 rdf:type mud:GeometryPrimitive ;
 mud:prim_blade_left rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:blade_left ;
     mud:primitiveFamily "blade" ;
-    mud:translateX -3.0 ; mud:translateY 8.193 ; mud:translateZ 0.0 ;
+    mud:translateX -1.1000 ; mud:translateY 5.5930 ; mud:translateZ -1.0000 ;
     mud:scaleX 1.0 ; mud:scaleY 3.41 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -2771,7 +2771,7 @@ mud:prim_blade_left rdf:type mud:GeometryPrimitive ;
 mud:prim_blade_right rdf:type mud:GeometryPrimitive ;
     mud:belongsToPart mud:blade_right ;
     mud:primitiveFamily "blade" ;
-    mud:translateX 3.0 ; mud:translateY 8.193 ; mud:translateZ 0.0 ;
+    mud:translateX 1.1000 ; mud:translateY 5.5930 ; mud:translateZ -1.0000 ;
     mud:scaleX 1.0 ; mud:scaleY 3.41 ; mud:scaleZ 1.0 ;
     mud:rotateX 0.0 ; mud:rotateY 0.0 ; mud:rotateZ 0.0 ;
     mud:materialBinding mud:M_WhiteArmor;
@@ -5179,6 +5179,210 @@ law:DensityEscalationShape a sh:NodeShape ;
                 FILTER ( xsd:decimal(?scaleX) < ?scaleMin )
             }
         """
+    ] .
+
+
+# --- Source: 121_kinematic_connectivity_law.ttl ---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix eng: <https://rocket-craft.com/ontology/engineering#> .
+@prefix law: <https://rocket-craft.com/ontology/law#> .
+@prefix ro: <http://purl.obolibrary.org/obo/> .
+@prefix rf: <https://rocket-craft.com/asset/reference_fabric_001#> .
+
+# ==============================================================================
+# 121 - Kinematic Connectivity Law (assembly coherence, NOT per-part size)
+# ------------------------------------------------------------------------------
+# The metric-morphology gate (110/116/117) measures per-part bounding-box RATIOS.
+# It is blind to PLACEMENT: a mech whose parts float apart with large gaps (an
+# "exploded blockout") still passes every ratio band. This law closes that hole.
+#
+# Connectivity is GRAPH LAW grounded in PUBLIC relations from the OBO Relations
+# Ontology (RO) and Basic Formal Ontology (BFO):
+#   ro:connected_to  = http://purl.obolibrary.org/obo/RO_0002170
+#   bfo:part_of      = http://purl.obolibrary.org/obo/BFO_0000050
+# law:articulatesWith is a sub-property of ro:connected_to for kinematic joints
+# (URDF/CORA-style link+joint tree). A coherent bipedal figure is a single
+# connected component: every non-root link reaches the Torso root through joints,
+# and each joint's child link is in metric CONTACT with its parent link.
+# ==============================================================================
+
+<https://rocket-craft.com/ontology/law#121_kinematic_connectivity_law>
+    a owl:Ontology ;
+    rdfs:label "Kinematic Connectivity Law"@en ;
+    rdfs:comment "Assembly-coherence law: bipedal kinematic tree rooted at the torso, grounded in OBO RO connected_to / BFO part_of; refuses floating or disconnected parts."@en ;
+    owl:imports <https://rocket-craft.com/ontology/law#117_reference_fabric_metric_binding> .
+
+# --- Public relations (declared by their real IRIs) --------------------------
+ro:RO_0002170 a owl:ObjectProperty ;
+    rdfs:label "connected_to"@en ;
+    rdfs:comment "OBO Relations Ontology: c connected_to c' (mereotopological contact)."@en .
+
+ro:BFO_0000050 a owl:ObjectProperty ;
+    rdfs:label "part_of"@en ;
+    rdfs:comment "Basic Formal Ontology: part_of."@en .
+
+# --- Kinematic vocabulary (URDF/CORA-style link + joint tree) ----------------
+law:KinematicLink a owl:Class ;
+    rdfs:label "Kinematic Link"@en ;
+    rdfs:comment "A rigid body in the kinematic tree (a flagship mech part)."@en .
+
+law:Joint a owl:Class ;
+    rdfs:label "Joint"@en ;
+    rdfs:comment "A kinematic joint connecting a parent link to a child link."@en .
+
+law:RootLink a owl:Class ;
+    rdfs:subClassOf law:KinematicLink ;
+    rdfs:label "Root Link"@en ;
+    rdfs:comment "The root of the kinematic tree (the torso). Has no parent joint."@en .
+
+law:articulatesWith a owl:ObjectProperty ;
+    rdfs:subPropertyOf ro:RO_0002170 ;
+    rdfs:label "articulates with"@en ;
+    rdfs:comment "Kinematic joint connectivity; a sub-property of ro:connected_to. parentLink articulatesWith childLink."@en .
+
+law:parentLink a owl:ObjectProperty ;
+    rdfs:domain law:Joint ; rdfs:range law:KinematicLink ;
+    rdfs:label "parent link"@en .
+
+law:childLink a owl:ObjectProperty ;
+    rdfs:domain law:Joint ; rdfs:range law:KinematicLink ;
+    rdfs:label "child link"@en .
+
+# --- The flagship bipedal kinematic tree (rooted at the Torso) ----------------
+# Every flagship part is a KinematicLink; the Torso is the RootLink. Joints form
+# a tree:  Torso -> Head, Limb_L, Limb_R, Wing_L, Wing_R ;  Limb_* -> Blade_*.
+rf:SM_Torso          a law:RootLink, law:KinematicLink .
+rf:SM_Head           a law:KinematicLink .
+rf:SM_Limb_Left      a law:KinematicLink .
+rf:SM_Limb_Right     a law:KinematicLink .
+rf:SM_WingArray_Left  a law:KinematicLink .
+rf:SM_WingArray_Right a law:KinematicLink .
+rf:SM_Blade_Left     a law:KinematicLink .
+rf:SM_Blade_Right    a law:KinematicLink .
+
+rf:joint_neck a law:Joint ;
+    rdfs:label "neck_joint"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_Head ;
+    law:articulatesWith rf:SM_Head .
+rf:SM_Torso law:articulatesWith rf:SM_Head .
+
+rf:joint_shoulder_left a law:Joint ;
+    rdfs:label "shoulder_mount_left"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_Limb_Left ;
+    law:articulatesWith rf:SM_Limb_Left .
+rf:SM_Torso law:articulatesWith rf:SM_Limb_Left .
+
+rf:joint_shoulder_right a law:Joint ;
+    rdfs:label "shoulder_mount_right"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_Limb_Right ;
+    law:articulatesWith rf:SM_Limb_Right .
+rf:SM_Torso law:articulatesWith rf:SM_Limb_Right .
+
+rf:joint_wing_mount_left a law:Joint ;
+    rdfs:label "wing_mount_left"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_WingArray_Left ;
+    law:articulatesWith rf:SM_WingArray_Left .
+rf:SM_Torso law:articulatesWith rf:SM_WingArray_Left .
+
+rf:joint_wing_mount_right a law:Joint ;
+    rdfs:label "wing_mount_right"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_WingArray_Right ;
+    law:articulatesWith rf:SM_WingArray_Right .
+rf:SM_Torso law:articulatesWith rf:SM_WingArray_Right .
+
+rf:joint_weapon_left a law:Joint ;
+    rdfs:label "weapon_joint_left"@en ;
+    law:parentLink rf:SM_Limb_Left ; law:childLink rf:SM_Blade_Left ;
+    law:articulatesWith rf:SM_Blade_Left .
+rf:SM_Limb_Left law:articulatesWith rf:SM_Blade_Left .
+
+rf:joint_weapon_right a law:Joint ;
+    rdfs:label "weapon_joint_right"@en ;
+    law:parentLink rf:SM_Limb_Right ; law:childLink rf:SM_Blade_Right ;
+    law:articulatesWith rf:SM_Blade_Right .
+rf:SM_Limb_Right law:articulatesWith rf:SM_Blade_Right .
+
+# --- SHACL refusals ----------------------------------------------------------
+# (a) FLOATING_PART: a KinematicLink that is neither the RootLink nor the child
+#     of some Joint is unreachable from the tree -> refuse. (Reachability of the
+#     full parent chain to the Torso root is asserted procedurally by
+#     scripts/verify_assembly_coherence.py, which walks the parentLink graph;
+#     this shape catches the local "no parent joint at all" violation.)
+law:FloatingPartShape a sh:NodeShape ;
+    rdfs:label "Floating Part Shape"@en ;
+    sh:targetClass law:KinematicLink ;
+    sh:sparql [
+        sh:message "FLOATING_PART: kinematic link is not the root and has no parent joint -> not reachable from the Torso root." ;
+        sh:prefixes <https://rocket-craft.com/ontology/law#121_kinematic_connectivity_law> ;
+        sh:select """
+            SELECT $this WHERE {
+                FILTER NOT EXISTS { $this a law:RootLink }
+                FILTER NOT EXISTS { ?j a law:Joint ; law:childLink $this }
+            }
+        """ ;
+    ] .
+
+# (b) DISCONNECTED_JOINT: a joint whose child link is not in metric contact with
+#     its parent link. Contact is a geometric predicate (bbox overlap within a
+#     tolerance) supplied at gate time as law:inContactWith by
+#     scripts/verify_assembly_coherence.py. A joint lacking the contact assertion
+#     between its declared parent and child is refused.
+law:hasContactTolerance a owl:DatatypeProperty ;
+    rdfs:label "contact tolerance (meters)"@en ; rdfs:range xsd:decimal .
+
+law:inContactWith a owl:ObjectProperty ;
+    rdfs:subPropertyOf ro:RO_0002170 ;
+    rdfs:label "in metric contact with"@en ;
+    rdfs:comment "Asserted at gate time when two links' bounding boxes overlap/touch within tolerance."@en .
+
+law:DisconnectedJointShape a sh:NodeShape ;
+    rdfs:label "Disconnected Joint Shape"@en ;
+    sh:targetClass law:Joint ;
+    sh:sparql [
+        sh:message "DISCONNECTED_JOINT: joint child link is not in metric contact with its parent link." ;
+        sh:prefixes <https://rocket-craft.com/ontology/law#121_kinematic_connectivity_law> ;
+        sh:select """
+            SELECT $this WHERE {
+                $this law:parentLink ?parent ; law:childLink ?child .
+                FILTER NOT EXISTS { ?parent law:inContactWith ?child }
+                FILTER NOT EXISTS { ?child law:inContactWith ?parent }
+            }
+        """ ;
+    ] .
+
+
+# --- Source: 122_anti_mock_laundering_law.ttl ---
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix antillm: <https://ggen.io/ontology/anti_llm/> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+antillm:MockLaunderingViolation a owl:Class ;
+    rdfs:subClassOf antillm:ForbiddenImplication ;
+    rdfs:label "Mock Laundering Violation" ;
+    rdfs:comment "A critical Jidoka failure where an LLM generates a fake artifact (e.g., an AI 2D image) to simulate standing without invoking the true Playwright execution and receiving a BLAKE3 receipt." .
+
+antillm:MockAssetShape a sh:NodeShape ;
+    sh:targetClass core:Asset ;
+    sh:property [
+        sh:path antillm:playwrightDeltaReceipt ;
+        sh:minCount 1 ;
+        sh:class antillm:Receipt ;
+        sh:message "ASSET_ADMISSION_REJECTED: All core:Asset nodes MUST be physically backed by a Playwright visual delta receipt. Mock image generation is explicitly forbidden." ;
+    ] ;
+    sh:property [
+        sh:path antillm:blake3Hash ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[a-f0-9]{64}$" ;
+        sh:message "ASSET_ADMISSION_REJECTED: Asset lacks a valid BLAKE3 cryptographic hash sealing its rendering process." ;
     ] .
 
 

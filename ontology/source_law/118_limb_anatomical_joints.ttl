@@ -1,0 +1,63 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix mud: <https://rocket-craft.com/ontology/mud#> .
+
+# Sockets for anatomical connection (must not contain mesh payloads)
+mud:Socket_Elbow_Left rdf:type mud:Socket ;
+    rdfs:label "Left Elbow Socket" .
+
+mud:Socket_Wrist_Left rdf:type mud:Socket ;
+    rdfs:label "Left Wrist Socket" .
+
+mud:Socket_Knee_Left rdf:type mud:Socket ;
+    rdfs:label "Left Knee Socket" .
+
+mud:Socket_Ankle_Left rdf:type mud:Socket ;
+    rdfs:label "Left Ankle Socket" .
+
+mud:Socket_Elbow_Right rdf:type mud:Socket ;
+    rdfs:label "Right Elbow Socket" .
+
+mud:Socket_Wrist_Right rdf:type mud:Socket ;
+    rdfs:label "Right Wrist Socket" .
+
+mud:Socket_Knee_Right rdf:type mud:Socket ;
+    rdfs:label "Right Knee Socket" .
+
+mud:Socket_Ankle_Right rdf:type mud:Socket ;
+    rdfs:label "Right Ankle Socket" .
+
+# Pegs representing connection ends
+mud:Peg_Forearm_Elbow_Left rdf:type mud:Peg ;
+    rdfs:label "Left Forearm Elbow Peg" ;
+    mud:insertsIntoSocket mud:Socket_Elbow_Left .
+
+mud:Peg_Hand_Wrist_Left rdf:type mud:Peg ;
+    rdfs:label "Left Hand Wrist Peg" ;
+    mud:insertsIntoSocket mud:Socket_Wrist_Left .
+
+mud:Peg_Shin_Knee_Left rdf:type mud:Peg ;
+    rdfs:label "Left Shin Knee Peg" ;
+    mud:insertsIntoSocket mud:Socket_Knee_Left .
+
+mud:Peg_Foot_Ankle_Left rdf:type mud:Peg ;
+    rdfs:label "Left Foot Ankle Peg" ;
+    mud:insertsIntoSocket mud:Socket_Ankle_Left .
+
+mud:Peg_Forearm_Elbow_Right rdf:type mud:Peg ;
+    rdfs:label "Right Forearm Elbow Peg" ;
+    mud:insertsIntoSocket mud:Socket_Elbow_Right .
+
+mud:Peg_Hand_Wrist_Right rdf:type mud:Peg ;
+    rdfs:label "Right Hand Wrist Peg" ;
+    mud:insertsIntoSocket mud:Socket_Wrist_Right .
+
+mud:Peg_Shin_Knee_Right rdf:type mud:Peg ;
+    rdfs:label "Right Shin Knee Peg" ;
+    mud:insertsIntoSocket mud:Socket_Knee_Right .
+
+mud:Peg_Foot_Ankle_Right rdf:type mud:Peg ;
+    rdfs:label "Right Foot Ankle Peg" ;
+    mud:insertsIntoSocket mud:Socket_Ankle_Right .

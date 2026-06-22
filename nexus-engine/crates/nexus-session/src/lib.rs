@@ -21,7 +21,7 @@ pub mod session;
 
 pub use inventory::{Inventory, NpcInventory, PlayerInventory, ShopInventory};
 pub use npc::{Npc, NpcDialogueTree, NpcState};
-pub use player::{GundamSeries, NewtypeRank, PlayerProfile};
+pub use player::{MechaSeries, NewtypeRank, PlayerProfile};
 pub use session::{
     PlayerSession, PlayerSessionBuilder, SessionBuildError, SessionState, SessionTransitionError,
 };

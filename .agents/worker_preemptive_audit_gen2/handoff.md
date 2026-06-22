@@ -2,7 +2,7 @@
 
 ## 1. Observation
 - Verbatim parser errors in `verify_all_rules.sh` trace:
-  `Custom validation rules:     FAIL (Failed to load Turtle: Parser error at line 2 between columns 1 and 24: The prefix gundam: has not been declared)`
+  `Custom validation rules:     FAIL (Failed to load Turtle: Parser error at line 2 between columns 1 and 24: The prefix mecha: has not been declared)`
 - In `/Users/sac/.ggen/packs/ue4_ontology/typestates.ttl` (lines 31-42), we observed:
   ```turtle
   ue4:hasCookingState a rdf:Property ;

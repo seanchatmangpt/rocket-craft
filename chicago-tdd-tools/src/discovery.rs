@@ -22,14 +22,14 @@ pub fn discover_games() -> Vec<DiscoveredGame> {
         details: format!("Discovered player session for: {}", ib4_session.player.name),
     });
 
-    // 2. Discover Gundam Nexus
+    // 2. Discover Mecha Nexus
     // Verify that the PlayerSession can be instantiated in Connecting state.
     let nexus_sess = PlayerSession::new(1001, "NexusTester".to_string());
     discovered.push(DiscoveredGame {
-        name: "Gundam Nexus".to_string(),
+        name: "Mecha Nexus".to_string(),
         crate_name: "nexus-session".to_string(),
         details: format!(
-            "Discovered Gundam pilot session: {} (ID: {})",
+            "Discovered Mecha pilot session: {} (ID: {})",
             nexus_sess.username, nexus_sess.player_id
         ),
     });
@@ -55,10 +55,10 @@ mod tests {
     }
 
     #[test]
-    fn gundam_nexus_entry_has_correct_crate_name() {
+    fn mecha_nexus_entry_has_correct_crate_name() {
         let games = discover_games();
         let nexus = games.iter().find(|g| g.crate_name == "nexus-session").unwrap();
-        assert_eq!(nexus.name, "Gundam Nexus");
+        assert_eq!(nexus.name, "Mecha Nexus");
     }
 
     #[test]

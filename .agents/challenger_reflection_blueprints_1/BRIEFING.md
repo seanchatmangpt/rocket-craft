@@ -24,12 +24,12 @@ Empirically verify the correctness and robustness of the implemented UE4 Reflect
 ## Review Scope
 - **Files to review**: `ontology/` contents, `validate_ontology.sh`, `TEST_INFRA.md`
 - **Interface contracts**: `PROJECT.md`, `GEMINI.md`, `AGENTS.md`
-- **Review criteria**: SHACL validation correctness, SPARQL validation coverage, Blueprint graph compatibility rules, Gundam PC Scenario.
+- **Review criteria**: SHACL validation correctness, SPARQL validation coverage, Blueprint graph compatibility rules, Mecha PC Scenario.
 
 ## Key Decisions Made
 - Created temporary test pack `/tmp/ue4_ontology_test` to test validation rules against the baseline ontology configuration.
 - Developed direct SPARQL validation harness `/tmp/run_empirical_sparql_tests.py` to run constraints that are bypassed or ignored by `ggen`'s internal validator.
-- Constructed a valid Gundam Player Character Scenario instance and successfully verified the execution/pin flow connectivity.
+- Constructed a valid Mecha Player Character Scenario instance and successfully verified the execution/pin flow connectivity.
 
 ## Artifact Index
 - `/tmp/run_empirical_tests.py` — Python script executing validation runs against a copied pack.
@@ -40,7 +40,7 @@ Empirically verify the correctness and robustness of the implemented UE4 Reflect
 ## Attack Surface
 - **Hypotheses tested**:
   - Verification of whether `ggen sync --validate-only true` catches invalid blueprint pin connections, graph isolation, namespace sanity, missing labels, and typestates.
-  - Verification of whether direct SPARQL rules catch structural defects in the Gundam Player Character scenario.
+  - Verification of whether direct SPARQL rules catch structural defects in the Mecha Player Character scenario.
 - **Vulnerabilities found**:
   - `sh:sparql` constraints are completely ignored by `ggen`'s SHACL validator, disabling all 5 blueprint validation shapes.
   - Single SHACL NodeShape targeting multiple classes (e.g. `rdfs:Class , owl:Class`) gets overwritten in the `BTreeMap` registry, checking only the last one.

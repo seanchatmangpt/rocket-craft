@@ -90,6 +90,7 @@ if ! arch -x86_64 bash "$UAT_SH" BuildCookRun \
     -platform=HTML5 \
     -clientconfig=Development \
     -cook -build -stage -pak -package -archive \
+    -nocompileeditor \
     -IgnoreCookErrors \
     -archivedirectory="$ARCHIVE_DIR" \
     >> "$UAT_LOG" 2>&1; then
@@ -135,6 +136,21 @@ echo "STAGE 5 COMPLETE"
 log "STAGE 5 COMPLETE"
 
 # ── Stage 6 hand-off ────────────────────────────────────────────────────────
+# Include tiger tank geometry in the packaging step
+TIGER_USDA="$SCRIPT_DIR/tiger_tank_skeleton.usda"
+if [[ -f "$TIGER_USDA" ]]; then
+    log "Including $TIGER_USDA in the package..."
+    cp "$TIGER_USDA" "$ARCHIVE_DIR/"
+else
+    log "Warning: $TIGER_USDA not found, skipping..."
+fi
+
+WINTER_USDA="$SCRIPT_DIR/winter_protocol_prelude_mecha.usda"
+if [[ -f "$WINTER_USDA" ]]; then
+    log "Including $WINTER_USDA in the package..."
+    cp "$WINTER_USDA" "$ARCHIVE_DIR/"
+fi
+
 # Automatically run Stage 6 (post-build serve + Playwright proof) now that
 # StagedBuilds/HTML5/ has been populated by RunUAT above.
 STAGE6="$SCRIPT_DIR/verify_html5_pipeline.sh"

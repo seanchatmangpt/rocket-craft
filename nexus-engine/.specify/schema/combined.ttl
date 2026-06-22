@@ -2,7 +2,7 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix sm: <https://rocket-craft.io/ontology/state-machine/> .
-@prefix gn: <https://rocket-craft.io/ontology/gundam-nexus/> .
+@prefix gn: <https://rocket-craft.io/ontology/mecha-nexus/> .
 
 
 # State Machine Class
@@ -449,11 +449,11 @@ gn:LunaTitanium a gn:Resource, gn:ArmorType ;
 gn:NanoComposite a gn:ArmorType ;
     rdfs:label "NanoComposite" .
 
-gn:GundamFrame a gn:FrameType ;
-    rdfs:label "GundamFrame" .
+gn:MechaFrame a gn:FrameType ;
+    rdfs:label "MechaFrame" .
 
-gn:ZakuFrame a gn:FrameType ;
-    rdfs:label "ZakuFrame" .
+gn:GruntUnitFrame a gn:FrameType ;
+    rdfs:label "GruntUnitFrame" .
 
 gn:GMFrame a gn:FrameType ;
     rdfs:label "GMFrame" .

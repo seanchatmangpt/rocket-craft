@@ -20,7 +20,7 @@ pub mod logging;
 pub use aimbot::{TraversalResult, explore_state_space};
 pub use cli::ClapNoun;
 pub use coordinate::{
-    GameCoordinateSystem, GundamCoordinateSystem, GundamMove, GundamSessionSimulation,
+    GameCoordinateSystem, MechaCoordinateSystem, MechaMove, MechaSessionSimulation,
     InfinityBladeCoordinateSystem, SessionState,
 };
 pub use discovery::{DiscoveredGame, discover_games};

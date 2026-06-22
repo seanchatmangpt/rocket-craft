@@ -1,0 +1,170 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix eng: <https://rocket-craft.com/ontology/engineering#> .
+@prefix law: <https://rocket-craft.com/ontology/law#> .
+@prefix ro: <http://purl.obolibrary.org/obo/> .
+@prefix rf: <https://rocket-craft.com/asset/reference_fabric_001#> .
+
+# ==============================================================================
+# 121 - Kinematic Connectivity Law (assembly coherence, NOT per-part size)
+# ------------------------------------------------------------------------------
+# The metric-morphology gate (110/116/117) measures per-part bounding-box RATIOS.
+# It is blind to PLACEMENT: a mech whose parts float apart with large gaps (an
+# "exploded blockout") still passes every ratio band. This law closes that hole.
+#
+# Connectivity is GRAPH LAW grounded in PUBLIC relations from the OBO Relations
+# Ontology (RO) and Basic Formal Ontology (BFO):
+#   ro:connected_to  = http://purl.obolibrary.org/obo/RO_0002170
+#   bfo:part_of      = http://purl.obolibrary.org/obo/BFO_0000050
+# law:articulatesWith is a sub-property of ro:connected_to for kinematic joints
+# (URDF/CORA-style link+joint tree). A coherent bipedal figure is a single
+# connected component: every non-root link reaches the Torso root through joints,
+# and each joint's child link is in metric CONTACT with its parent link.
+# ==============================================================================
+
+<https://rocket-craft.com/ontology/law#121_kinematic_connectivity_law>
+    a owl:Ontology ;
+    rdfs:label "Kinematic Connectivity Law"@en ;
+    rdfs:comment "Assembly-coherence law: bipedal kinematic tree rooted at the torso, grounded in OBO RO connected_to / BFO part_of; refuses floating or disconnected parts."@en ;
+    owl:imports <https://rocket-craft.com/ontology/law#117_reference_fabric_metric_binding> .
+
+# --- Public relations (declared by their real IRIs) --------------------------
+ro:RO_0002170 a owl:ObjectProperty ;
+    rdfs:label "connected_to"@en ;
+    rdfs:comment "OBO Relations Ontology: c connected_to c' (mereotopological contact)."@en .
+
+ro:BFO_0000050 a owl:ObjectProperty ;
+    rdfs:label "part_of"@en ;
+    rdfs:comment "Basic Formal Ontology: part_of."@en .
+
+# --- Kinematic vocabulary (URDF/CORA-style link + joint tree) ----------------
+law:KinematicLink a owl:Class ;
+    rdfs:label "Kinematic Link"@en ;
+    rdfs:comment "A rigid body in the kinematic tree (a flagship mech part)."@en .
+
+law:Joint a owl:Class ;
+    rdfs:label "Joint"@en ;
+    rdfs:comment "A kinematic joint connecting a parent link to a child link."@en .
+
+law:RootLink a owl:Class ;
+    rdfs:subClassOf law:KinematicLink ;
+    rdfs:label "Root Link"@en ;
+    rdfs:comment "The root of the kinematic tree (the torso). Has no parent joint."@en .
+
+law:articulatesWith a owl:ObjectProperty ;
+    rdfs:subPropertyOf ro:RO_0002170 ;
+    rdfs:label "articulates with"@en ;
+    rdfs:comment "Kinematic joint connectivity; a sub-property of ro:connected_to. parentLink articulatesWith childLink."@en .
+
+law:parentLink a owl:ObjectProperty ;
+    rdfs:domain law:Joint ; rdfs:range law:KinematicLink ;
+    rdfs:label "parent link"@en .
+
+law:childLink a owl:ObjectProperty ;
+    rdfs:domain law:Joint ; rdfs:range law:KinematicLink ;
+    rdfs:label "child link"@en .
+
+# --- The flagship bipedal kinematic tree (rooted at the Torso) ----------------
+# Every flagship part is a KinematicLink; the Torso is the RootLink. Joints form
+# a tree:  Torso -> Head, Limb_L, Limb_R, Wing_L, Wing_R ;  Limb_* -> Blade_*.
+rf:SM_Torso          a law:RootLink, law:KinematicLink .
+rf:SM_Head           a law:KinematicLink .
+rf:SM_Limb_Left      a law:KinematicLink .
+rf:SM_Limb_Right     a law:KinematicLink .
+rf:SM_WingArray_Left  a law:KinematicLink .
+rf:SM_WingArray_Right a law:KinematicLink .
+rf:SM_Blade_Left     a law:KinematicLink .
+rf:SM_Blade_Right    a law:KinematicLink .
+
+rf:joint_neck a law:Joint ;
+    rdfs:label "neck_joint"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_Head ;
+    law:articulatesWith rf:SM_Head .
+rf:SM_Torso law:articulatesWith rf:SM_Head .
+
+rf:joint_shoulder_left a law:Joint ;
+    rdfs:label "shoulder_mount_left"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_Limb_Left ;
+    law:articulatesWith rf:SM_Limb_Left .
+rf:SM_Torso law:articulatesWith rf:SM_Limb_Left .
+
+rf:joint_shoulder_right a law:Joint ;
+    rdfs:label "shoulder_mount_right"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_Limb_Right ;
+    law:articulatesWith rf:SM_Limb_Right .
+rf:SM_Torso law:articulatesWith rf:SM_Limb_Right .
+
+rf:joint_wing_mount_left a law:Joint ;
+    rdfs:label "wing_mount_left"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_WingArray_Left ;
+    law:articulatesWith rf:SM_WingArray_Left .
+rf:SM_Torso law:articulatesWith rf:SM_WingArray_Left .
+
+rf:joint_wing_mount_right a law:Joint ;
+    rdfs:label "wing_mount_right"@en ;
+    law:parentLink rf:SM_Torso ; law:childLink rf:SM_WingArray_Right ;
+    law:articulatesWith rf:SM_WingArray_Right .
+rf:SM_Torso law:articulatesWith rf:SM_WingArray_Right .
+
+rf:joint_weapon_left a law:Joint ;
+    rdfs:label "weapon_joint_left"@en ;
+    law:parentLink rf:SM_Limb_Left ; law:childLink rf:SM_Blade_Left ;
+    law:articulatesWith rf:SM_Blade_Left .
+rf:SM_Limb_Left law:articulatesWith rf:SM_Blade_Left .
+
+rf:joint_weapon_right a law:Joint ;
+    rdfs:label "weapon_joint_right"@en ;
+    law:parentLink rf:SM_Limb_Right ; law:childLink rf:SM_Blade_Right ;
+    law:articulatesWith rf:SM_Blade_Right .
+rf:SM_Limb_Right law:articulatesWith rf:SM_Blade_Right .
+
+# --- SHACL refusals ----------------------------------------------------------
+# (a) FLOATING_PART: a KinematicLink that is neither the RootLink nor the child
+#     of some Joint is unreachable from the tree -> refuse. (Reachability of the
+#     full parent chain to the Torso root is asserted procedurally by
+#     scripts/verify_assembly_coherence.py, which walks the parentLink graph;
+#     this shape catches the local "no parent joint at all" violation.)
+law:FloatingPartShape a sh:NodeShape ;
+    rdfs:label "Floating Part Shape"@en ;
+    sh:targetClass law:KinematicLink ;
+    sh:sparql [
+        sh:message "FLOATING_PART: kinematic link is not the root and has no parent joint -> not reachable from the Torso root." ;
+        sh:prefixes <https://rocket-craft.com/ontology/law#121_kinematic_connectivity_law> ;
+        sh:select """
+            SELECT $this WHERE {
+                FILTER NOT EXISTS { $this a law:RootLink }
+                FILTER NOT EXISTS { ?j a law:Joint ; law:childLink $this }
+            }
+        """ ;
+    ] .
+
+# (b) DISCONNECTED_JOINT: a joint whose child link is not in metric contact with
+#     its parent link. Contact is a geometric predicate (bbox overlap within a
+#     tolerance) supplied at gate time as law:inContactWith by
+#     scripts/verify_assembly_coherence.py. A joint lacking the contact assertion
+#     between its declared parent and child is refused.
+law:hasContactTolerance a owl:DatatypeProperty ;
+    rdfs:label "contact tolerance (meters)"@en ; rdfs:range xsd:decimal .
+
+law:inContactWith a owl:ObjectProperty ;
+    rdfs:subPropertyOf ro:RO_0002170 ;
+    rdfs:label "in metric contact with"@en ;
+    rdfs:comment "Asserted at gate time when two links' bounding boxes overlap/touch within tolerance."@en .
+
+law:DisconnectedJointShape a sh:NodeShape ;
+    rdfs:label "Disconnected Joint Shape"@en ;
+    sh:targetClass law:Joint ;
+    sh:sparql [
+        sh:message "DISCONNECTED_JOINT: joint child link is not in metric contact with its parent link." ;
+        sh:prefixes <https://rocket-craft.com/ontology/law#121_kinematic_connectivity_law> ;
+        sh:select """
+            SELECT $this WHERE {
+                $this law:parentLink ?parent ; law:childLink ?child .
+                FILTER NOT EXISTS { ?parent law:inContactWith ?child }
+                FILTER NOT EXISTS { ?child law:inContactWith ?parent }
+            }
+        """ ;
+    ] .

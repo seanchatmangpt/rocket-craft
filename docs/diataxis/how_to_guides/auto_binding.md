@@ -115,7 +115,7 @@ Verify that `CustomHeroSystem` is listed in the `components` array:
     ],
     "workspace_games": [
       "Infinity Blade 4 MUD (ib4-mud)",
-      "Gundam Nexus (nexus-session)"
+      "Mecha Nexus (nexus-session)"
     ]
   }
 }

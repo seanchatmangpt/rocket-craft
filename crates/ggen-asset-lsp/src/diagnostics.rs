@@ -1016,6 +1016,14 @@ pub fn run_diagnostics(doc_path: &Path, content: &str) -> Vec<Diagnostic> {
         }
     }
 
+    if is_usda {
+        let usd_analyzer = crate::analyzers::usd_analyzer::UsdAnalyzer::new(content);
+        diagnostics.extend(usd_analyzer.diagnostics());
+    } else if doc_path.extension().and_then(|s| s.to_str()) == Some("mtlx") {
+        let mtlx_analyzer = crate::analyzers::mtlx_analyzer::MtlxAnalyzer::new(content);
+        diagnostics.extend(mtlx_analyzer.diagnostics());
+    }
+
     diagnostics
 }
 

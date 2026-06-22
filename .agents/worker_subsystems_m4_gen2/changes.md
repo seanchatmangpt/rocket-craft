@@ -23,8 +23,8 @@ The following files were modified to implement and merge the Subsystem Topologie
 
 4. **Validation Tests Suite Configuration and Files (`/Users/sac/rocket-craft/ggen-validation-tests/`)**
    - Synchronized the test suite configuration by writing the merged `subsystems.ttl`, `shacl/validation.shacl.ttl`, and `ggen.toml` to the `ggen-validation-tests/` directory.
-   - Restored `core.ttl` to a clean baseline state and added the definition of `gundam:GundamPhysicsHandler` (physics subsystem).
-   - Linked `gundam:GundamWorld` to both `gundam:GundamNetworkingHandler` and `gundam:GundamPhysicsHandler` via `ue4:hasSubsystem` triples. This satisfies the custom validation rules and SHACL shapes constraints for baseline compliance.
+   - Restored `core.ttl` to a clean baseline state and added the definition of `mecha:MechaPhysicsHandler` (physics subsystem).
+   - Linked `mecha:MechaWorld` to both `mecha:MechaNetworkingHandler` and `mecha:MechaPhysicsHandler` via `ue4:hasSubsystem` triples. This satisfies the custom validation rules and SHACL shapes constraints for baseline compliance.
 
 ---
 

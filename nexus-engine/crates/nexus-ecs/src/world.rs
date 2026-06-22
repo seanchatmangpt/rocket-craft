@@ -115,7 +115,7 @@ impl GameWorld {
         &mut self,
         entity: Entity,
         suit_id: String,
-        series: GundamSeries,
+        series: MechaSeries,
         ability: SpecialAbility,
     ) {
         self.inner

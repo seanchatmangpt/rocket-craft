@@ -1,6 +1,6 @@
 # System Architecture Overview
 
-This document explains the high-level design decisions, structural patterns, and architectural layout of the Rocket-Craft ecosystem. It connects the Rust SDK/CLI spines, the Gundam Nexus game engine, the semantic RDF registry, the Model Context Protocol (MCP) server, and the TPS/DfLSS World Manufacturing Pipeline.
+This document explains the high-level design decisions, structural patterns, and architectural layout of the Rocket-Craft ecosystem. It connects the Rust SDK/CLI spines, the Mecha Nexus game engine, the semantic RDF registry, the Model Context Protocol (MCP) server, and the TPS/DfLSS World Manufacturing Pipeline.
 
 ---
 

@@ -1,6 +1,6 @@
 use anyhow::Result;
 use chicago_tdd_tools::coordinate::{
-    GameCoordinateSystem, GundamCoordinateSystem, GundamMove, GundamSessionSimulation,
+    GameCoordinateSystem, MechaCoordinateSystem, MechaMove, MechaSessionSimulation,
     InfinityBladeCoordinateSystem, SessionState,
 };
 use ib4_core::types::{AttackDir, MagicType};
@@ -114,11 +114,11 @@ fn test_infinity_blade_coordinate_system_in_combat() -> Result<()> {
 }
 
 #[test]
-fn test_gundam_coordinate_system_transitions() -> Result<()> {
-    let system = GundamCoordinateSystem;
+fn test_mecha_coordinate_system_transitions() -> Result<()> {
+    let system = MechaCoordinateSystem;
     let profile = PlayerProfile::new(101, "Heero".to_string());
 
-    let mut sim = GundamSessionSimulation {
+    let mut sim = MechaSessionSimulation {
         state: SessionState::Connecting,
         profile,
         inventory: Vec::new(),
@@ -133,25 +133,25 @@ fn test_gundam_coordinate_system_transitions() -> Result<()> {
     assert_eq!(
         legal_moves,
         vec![
-            GundamMove::Authenticate(true),
-            GundamMove::Authenticate(false),
-            GundamMove::Reject,
+            MechaMove::Authenticate(true),
+            MechaMove::Authenticate(false),
+            MechaMove::Reject,
         ]
     );
 
     // Test notation
     assert_eq!(
-        system.move_to_notation(&GundamMove::Authenticate(true)),
+        system.move_to_notation(&MechaMove::Authenticate(true)),
         "auth:true"
     );
-    assert_eq!(system.move_to_notation(&GundamMove::Reject), "reject");
+    assert_eq!(system.move_to_notation(&MechaMove::Reject), "reject");
 
     // Authenticate failed move should return error
-    let fail_res = system.apply_move(&sim, &GundamMove::Authenticate(false));
+    let fail_res = system.apply_move(&sim, &MechaMove::Authenticate(false));
     assert!(fail_res.is_err());
 
     // Reject move should transition to Disconnected
-    let reject_sim = system.apply_move(&sim, &GundamMove::Reject)?;
+    let reject_sim = system.apply_move(&sim, &MechaMove::Reject)?;
     assert_eq!(reject_sim.state, SessionState::Disconnected);
     assert_eq!(
         system.state_to_coordinate(&reject_sim),
@@ -159,73 +159,73 @@ fn test_gundam_coordinate_system_transitions() -> Result<()> {
     );
 
     // 2. Authenticate successful move -> Authenticated state
-    sim = system.apply_move(&sim, &GundamMove::Authenticate(true))?;
+    sim = system.apply_move(&sim, &MechaMove::Authenticate(true))?;
     assert_eq!(sim.state, SessionState::Authenticated);
     assert_eq!(system.state_to_coordinate(&sim), "sA:m0:lv1:xp0:i0:g100");
     assert_eq!(
         system.get_legal_moves(&sim),
-        vec![GundamMove::EnterLobby, GundamMove::Disconnect]
+        vec![MechaMove::EnterLobby, MechaMove::Disconnect]
     );
 
     // 3. EnterLobby -> InLobby state
-    sim = system.apply_move(&sim, &GundamMove::EnterLobby)?;
+    sim = system.apply_move(&sim, &MechaMove::EnterLobby)?;
     assert_eq!(sim.state, SessionState::InLobby);
     assert_eq!(system.state_to_coordinate(&sim), "sL:m0:lv1:xp0:i0:g100");
 
     // Legal moves in Lobby: EnterMatch, Spectate, Disconnect, ApplyXP, SpendGold (10 since gold=100), InventoryAdd
     let lobby_moves = system.get_legal_moves(&sim);
-    assert!(lobby_moves.contains(&GundamMove::EnterMatch(42)));
-    assert!(lobby_moves.contains(&GundamMove::Spectate(42)));
-    assert!(lobby_moves.contains(&GundamMove::Disconnect));
-    assert!(lobby_moves.contains(&GundamMove::ApplyXP(100)));
-    assert!(lobby_moves.contains(&GundamMove::SpendGold(10)));
-    assert!(lobby_moves.contains(&GundamMove::InventoryAdd));
+    assert!(lobby_moves.contains(&MechaMove::EnterMatch(42)));
+    assert!(lobby_moves.contains(&MechaMove::Spectate(42)));
+    assert!(lobby_moves.contains(&MechaMove::Disconnect));
+    assert!(lobby_moves.contains(&MechaMove::ApplyXP(100)));
+    assert!(lobby_moves.contains(&MechaMove::SpendGold(10)));
+    assert!(lobby_moves.contains(&MechaMove::InventoryAdd));
 
     // 4. ApplyXP -> increases XP, checks level/coordinate
-    sim = system.apply_move(&sim, &GundamMove::ApplyXP(400))?;
+    sim = system.apply_move(&sim, &MechaMove::ApplyXP(400))?;
     // XP 400 is enough to level up (xp required for level 2 is 100 * 2^2 = 400)
     assert_eq!(sim.profile.level, 2);
     assert_eq!(system.state_to_coordinate(&sim), "sL:m0:lv2:xp400:i0:g100");
 
     // 5. SpendGold -> decreases gold
-    sim = system.apply_move(&sim, &GundamMove::SpendGold(10))?;
+    sim = system.apply_move(&sim, &MechaMove::SpendGold(10))?;
     assert_eq!(sim.profile.gold, 90);
     assert_eq!(system.state_to_coordinate(&sim), "sL:m0:lv2:xp400:i0:g90");
 
     // 6. EnterMatch(42) -> InMatch { match_id: 42 }
-    sim = system.apply_move(&sim, &GundamMove::EnterMatch(42))?;
+    sim = system.apply_move(&sim, &MechaMove::EnterMatch(42))?;
     assert_eq!(sim.state, SessionState::InMatch { match_id: 42 });
     assert_eq!(system.state_to_coordinate(&sim), "sM:m42:lv2:xp400:i0:g90");
     assert_eq!(
         system.get_legal_moves(&sim),
-        vec![GundamMove::MatchComplete, GundamMove::Disconnect]
+        vec![MechaMove::MatchComplete, MechaMove::Disconnect]
     );
 
     // 7. MatchComplete -> InLobby
-    sim = system.apply_move(&sim, &GundamMove::MatchComplete)?;
+    sim = system.apply_move(&sim, &MechaMove::MatchComplete)?;
     assert_eq!(sim.state, SessionState::InLobby);
 
     // 8. Spectate(77) -> Spectating { match_id: 77 }
-    sim = system.apply_move(&sim, &GundamMove::Spectate(77))?;
+    sim = system.apply_move(&sim, &MechaMove::Spectate(77))?;
     assert_eq!(sim.state, SessionState::Spectating { match_id: 77 });
     assert_eq!(system.state_to_coordinate(&sim), "sS:m77:lv2:xp400:i0:g90");
     assert_eq!(
         system.get_legal_moves(&sim),
-        vec![GundamMove::LeaveSpectate, GundamMove::Disconnect]
+        vec![MechaMove::LeaveSpectate, MechaMove::Disconnect]
     );
 
     // 9. LeaveSpectate -> InLobby
-    sim = system.apply_move(&sim, &GundamMove::LeaveSpectate)?;
+    sim = system.apply_move(&sim, &MechaMove::LeaveSpectate)?;
     assert_eq!(sim.state, SessionState::InLobby);
 
     // 10. Disconnect -> Disconnected
-    sim = system.apply_move(&sim, &GundamMove::Disconnect)?;
+    sim = system.apply_move(&sim, &MechaMove::Disconnect)?;
     assert_eq!(sim.state, SessionState::Disconnected);
     assert_eq!(system.state_to_coordinate(&sim), "sD:m0:lv2:xp400:i0:g90");
-    assert_eq!(system.get_legal_moves(&sim), vec![GundamMove::Reconnect]);
+    assert_eq!(system.get_legal_moves(&sim), vec![MechaMove::Reconnect]);
 
     // 11. Reconnect -> Connecting
-    sim = system.apply_move(&sim, &GundamMove::Reconnect)?;
+    sim = system.apply_move(&sim, &MechaMove::Reconnect)?;
     assert_eq!(sim.state, SessionState::Connecting);
 
     Ok(())

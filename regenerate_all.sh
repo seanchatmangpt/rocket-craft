@@ -7,4 +7,5 @@ python3 sync_source_law.py
 python3 emit_manufacturing_evidence.py
 python3 gen_skeleton.py
 python3 split_usda.py
+python3 patch_geometry_generator.py
 python3 scripts/run_mecha_doe.py

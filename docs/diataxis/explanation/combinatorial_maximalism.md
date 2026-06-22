@@ -37,7 +37,7 @@ Tracks combat encounters using Siris stats:
 
 *Example Coordinate*: `b1:Full:LT:Full:ep1:aNone:cT:cb0`
 
-#### 2. Gundam Nexus Coordinate Scheme
+#### 2. Mecha Nexus Coordinate Scheme
 Tracks pilot session lifecycle:
 - **Format**: `s{state_char}:{match_id_str}:lv{level}:xp{xp}:i{inventory_len}:g{gold}`
 

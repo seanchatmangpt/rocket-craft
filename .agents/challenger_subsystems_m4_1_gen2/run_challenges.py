@@ -15,13 +15,13 @@ TEST_CASES = [
         "name": "Challenge Case 1: Material Instance Loop (Acyclicity)",
         "description": "Construct a loop between two material instances.",
         "extra_ttl": """
-gundam:MaterialInstLoopA a ue4:UMaterialInstance ;
+mecha:MaterialInstLoopA a ue4:UMaterialInstance ;
     rdfs:label "MaterialInstLoopA" ;
-    ue4:parentMaterial gundam:MaterialInstLoopB .
+    ue4:parentMaterial mecha:MaterialInstLoopB .
 
-gundam:MaterialInstLoopB a ue4:UMaterialInstance ;
+mecha:MaterialInstLoopB a ue4:UMaterialInstance ;
     rdfs:label "MaterialInstLoopB" ;
-    ue4:parentMaterial gundam:MaterialInstLoopA .
+    ue4:parentMaterial mecha:MaterialInstLoopA .
 """,
         "expected_error_sparql": "RuleJ",
         "expected_error_shacl": "Material inheritance loop detected"
@@ -30,11 +30,11 @@ gundam:MaterialInstLoopB a ue4:UMaterialInstance ;
         "name": "Challenge Case 2: Material Instance Rootedness (No Base Material)",
         "description": "Construct a material instance parent chain that does not end in a base UMaterial.",
         "extra_ttl": """
-gundam:MaterialInstOrphan a ue4:UMaterialInstance ;
+mecha:MaterialInstOrphan a ue4:UMaterialInstance ;
     rdfs:label "MaterialInstOrphan" ;
-    ue4:parentMaterial gundam:MaterialInstParentOrphan .
+    ue4:parentMaterial mecha:MaterialInstParentOrphan .
 
-gundam:MaterialInstParentOrphan a ue4:UMaterialInstance ;
+mecha:MaterialInstParentOrphan a ue4:UMaterialInstance ;
     rdfs:label "MaterialInstParentOrphan" .
 """,
         "expected_error_sparql": "RuleK",
@@ -57,14 +57,14 @@ ue4:NegativeParam a ue4:UFunctionParameter ;
         "name": "Challenge Case 4: Missing Collision on Simulated Gravity Body",
         "description": "Create a simulated rigid body with gravity enabled, but with NoCollision enabled on its scene component.",
         "extra_ttl": """
-gundam:SimBodyNoColl a ue4:URigidBody ;
+mecha:SimBodyNoColl a ue4:URigidBody ;
     rdfs:label "SimBodyNoColl" ;
     ue4:physicsType ue4:PhysType_Simulated ;
     ue4:bEnableGravity true .
 
-gundam:SimCompNoColl a ue4:USceneComponent ;
+mecha:SimCompNoColl a ue4:USceneComponent ;
     rdfs:label "SimCompNoColl" ;
-    ue4:hasRigidBody gundam:SimBodyNoColl ;
+    ue4:hasRigidBody mecha:SimBodyNoColl ;
     ue4:collisionEnabled ue4:NoCollision .
 """,
         "expected_error_sparql": "", # Only validated via SHACL shape
@@ -74,14 +74,14 @@ gundam:SimCompNoColl a ue4:USceneComponent ;
         "name": "Challenge Case 4b: Missing Collision on Simulated Gravity Body (Default NoCollision via lack of properties)",
         "description": "Create a simulated rigid body with gravity enabled, but with no collision properties declared (which defaults to NoCollision).",
         "extra_ttl": """
-gundam:SimBodyNoCollDefault a ue4:URigidBody ;
+mecha:SimBodyNoCollDefault a ue4:URigidBody ;
     rdfs:label "SimBodyNoCollDefault" ;
     ue4:physicsType ue4:PhysType_Simulated ;
     ue4:bEnableGravity true .
 
-gundam:SimCompNoCollDefault a ue4:USceneComponent ;
+mecha:SimCompNoCollDefault a ue4:USceneComponent ;
     rdfs:label "SimCompNoCollDefault" ;
-    ue4:hasRigidBody gundam:SimBodyNoCollDefault .
+    ue4:hasRigidBody mecha:SimBodyNoCollDefault .
 """,
         "expected_error_sparql": "", # Only validated via SHACL shape
         "expected_error_shacl": "Simulated rigid bodies with gravity enabled must have active collision"
@@ -90,7 +90,7 @@ gundam:SimCompNoCollDefault a ue4:USceneComponent ;
         "name": "Challenge Case 5: Simulated Body Mass <= 0.0 (Zero Mass)",
         "description": "Create a simulated rigid body with mass Kg set to 0.0.",
         "extra_ttl": """
-gundam:SimBodyZeroMass a ue4:URigidBody ;
+mecha:SimBodyZeroMass a ue4:URigidBody ;
     rdfs:label "SimBodyZeroMass" ;
     ue4:physicsType ue4:PhysType_Simulated ;
     ue4:massKg 0.0 .
@@ -102,7 +102,7 @@ gundam:SimBodyZeroMass a ue4:URigidBody ;
         "name": "Challenge Case 5b: Simulated Body Mass Missing",
         "description": "Create a simulated rigid body with missing mass.",
         "extra_ttl": """
-gundam:SimBodyNoMass a ue4:URigidBody ;
+mecha:SimBodyNoMass a ue4:URigidBody ;
     rdfs:label "SimBodyNoMass" ;
     ue4:physicsType ue4:PhysType_Simulated .
 """,
@@ -113,7 +113,7 @@ gundam:SimBodyNoMass a ue4:URigidBody ;
         "name": "Challenge Case 6: Primary and Fallback RHI loop",
         "description": "Configure a rendering subsystem with primary and fallback RHI being the same.",
         "extra_ttl": """
-gundam:RhiLoopSubsystem a ue4:URenderingSubsystem ;
+mecha:RhiLoopSubsystem a ue4:URenderingSubsystem ;
     rdfs:label "RhiLoopSubsystem" ;
     ue4:primaryRHI ue4:RHI_DirectX11 ;
     ue4:fallbackRHI ue4:RHI_DirectX11 ;
@@ -126,15 +126,15 @@ gundam:RhiLoopSubsystem a ue4:URenderingSubsystem ;
         "name": "Challenge Case 7: WASM World Rendering Subsystem WebGL Fallback Missing",
         "description": "Create a world with WasmPackagingTypestate, but its rendering subsystem does not support WebGL.",
         "extra_ttl": """
-gundam:WasmNoWebGLSubsystem a ue4:URenderingSubsystem ;
+mecha:WasmNoWebGLSubsystem a ue4:URenderingSubsystem ;
     rdfs:label "WasmNoWebGLSubsystem" ;
     ue4:primaryRHI ue4:RHI_DirectX11 ;
     ue4:supportsRHI ue4:RHI_DirectX11 .
 
-gundam:WasmNoWebGLWorld a ue4:UWorld ;
+mecha:WasmNoWebGLWorld a ue4:UWorld ;
     rdfs:label "WasmNoWebGLWorld" ;
-    ue4:hasSubsystem gundam:WasmNoWebGLSubsystem ;
-    ue4:hasPackagingState gundam:WasmReady .
+    ue4:hasSubsystem mecha:WasmNoWebGLSubsystem ;
+    ue4:hasPackagingState mecha:WasmReady .
 """,
         "expected_error_sparql": "RuleM",
         "expected_error_shacl": "WASM WebGL compliance defect"

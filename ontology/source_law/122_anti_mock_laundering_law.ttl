@@ -1,0 +1,28 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix antillm: <https://ggen.io/ontology/anti_llm/> .
+@prefix core: <https://ggen.io/ontology/core/> .
+
+antillm:MockLaunderingViolation a owl:Class ;
+    rdfs:subClassOf antillm:ForbiddenImplication ;
+    rdfs:label "Mock Laundering Violation" ;
+    rdfs:comment "A critical Jidoka failure where an LLM generates a fake artifact (e.g., an AI 2D image) to simulate standing without invoking the true Playwright execution and receiving a BLAKE3 receipt." .
+
+antillm:MockAssetShape a sh:NodeShape ;
+    sh:targetClass core:Asset ;
+    sh:property [
+        sh:path antillm:playwrightDeltaReceipt ;
+        sh:minCount 1 ;
+        sh:class antillm:Receipt ;
+        sh:message "ASSET_ADMISSION_REJECTED: All core:Asset nodes MUST be physically backed by a Playwright visual delta receipt. Mock image generation is explicitly forbidden." ;
+    ] ;
+    sh:property [
+        sh:path antillm:blake3Hash ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[a-f0-9]{64}$" ;
+        sh:message "ASSET_ADMISSION_REJECTED: Asset lacks a valid BLAKE3 cryptographic hash sealing its rendering process." ;
+    ] .

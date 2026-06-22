@@ -1,4 +1,4 @@
-pub use nexus_types::{AttackDir, GundamSeries, MagicType};
+pub use nexus_types::{AttackDir, MechaSeries, MagicType};
 use serde::{Deserialize, Serialize};
 
 // === Transform Components ===
@@ -126,18 +126,18 @@ pub struct EnemyId(pub u64);
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MobileSuit {
     pub suit_id: String,
-    pub series: GundamSeries,
+    pub series: MechaSeries,
     pub special_ability: SpecialAbility,
     pub is_trans_am_active: bool,
     pub trans_am_turns_remaining: u32,
     pub nt_d_active: bool,
 }
 
-// GundamSeries imported from nexus_types
+// MechaSeries imported from nexus_types
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum SpecialAbility {
-    FinFunnels,         // Nu Gundam: auto-parry assists
+    FinFunnels,         // Nu Mecha: auto-parry assists
     NtD,                // Unicorn: NT-D burst 30s
     TransAm,            // 00: combo overdrive at depth 4+
     ZeroSystem,         // Wing: berserker mode

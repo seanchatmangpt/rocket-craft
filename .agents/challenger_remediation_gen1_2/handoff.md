@@ -1,7 +1,7 @@
-# Handoff Report: Gundam Player Character Scenario Verification (Tier 4 E2E)
+# Handoff Report: Mecha Player Character Scenario Verification (Tier 4 E2E)
 
 ## 1. Observation
-We observed the following regarding the Gundam Player Character Scenario (Tier 4 E2E) in the `rocket-craft` repository:
+We observed the following regarding the Mecha Player Character Scenario (Tier 4 E2E) in the `rocket-craft` repository:
 
 1. **Test Infrastructure & File Locations:**
    - The test script `verify_all_rules.sh` is located at `/Users/sac/rocket-craft/ggen-validation-tests/verify_all_rules.sh`.
@@ -23,7 +23,7 @@ We observed the following regarding the Gundam Player Character Scenario (Tier 4
    - Restoring the clean baseline file `core_temp.ttl` over `core.ttl` via `cp ggen-validation-tests/core_temp.ttl ggen-validation-tests/core.ttl` resolved the corruption. Re-running the script resulted in all 16 validation rules passing.
 
 3. **Active Pack Validation:**
-   - Overwriting `/Users/sac/.ggen/packs/ue4_ontology/core.ttl` with the Gundam Player Character ontology (`core_temp.ttl`) and running `/Users/sac/rocket-craft/validate_ontology.sh` succeeded completely:
+   - Overwriting `/Users/sac/.ggen/packs/ue4_ontology/core.ttl` with the Mecha Player Character ontology (`core_temp.ttl`) and running `/Users/sac/rocket-craft/validate_ontology.sh` succeeded completely:
      ```
      All validations passed.
      ...
@@ -33,12 +33,12 @@ We observed the following regarding the Gundam Player Character Scenario (Tier 4
      ```
 
 4. **Defect Injection Verification:**
-   - **Multiple Cooking States (RuleF):** Injecting an extra cooking state to `gundam:MyGundam` generated the expected error `RuleF`:
+   - **Multiple Cooking States (RuleF):** Injecting an extra cooking state to `mecha:MyMecha` generated the expected error `RuleF`:
      ```
      Custom validation rules:     FAIL (error[GGEN-VALIDATION]: 1 custom validation rule(s) failed (Error severity):
        - RuleF: Character Cooking State Constraint: A character must have exactly one cooking state of type CookingTypestate.
      ```
-   - **Invalid Connection (RuleA):** Connecting two Input pins directly (`gundam:MoveForwardPinIn ue4:connectedTo gundam:MoveForwardDirPin .`) generated the expected error `RuleA`:
+   - **Invalid Connection (RuleA):** Connecting two Input pins directly (`mecha:MoveForwardPinIn ue4:connectedTo mecha:MoveForwardDirPin .`) generated the expected error `RuleA`:
      ```
      Custom validation rules:     FAIL (error[GGEN-VALIDATION]: 1 custom validation rule(s) failed (Error severity):
        - RuleA: Pin Connection Direction Check: A pin cannot be connected to another pin of the same direction.
@@ -52,21 +52,21 @@ We observed the following regarding the Gundam Player Character Scenario (Tier 4
 ## 2. Logic Chain
 - **Observation:** `verify_all_rules.sh` fails on `RuleD` because it encounters `RuleC` errors from previous uncleaned edits.
 - **Inference:** The script's `setup` routine copies the active (uncleaned) `core.ttl` to `core.ttl.bak`. Therefore, `restore` copies the corrupted file back, rendering the cleanup loop ineffective if the file was modified before the script was invoked.
-- **Action:** Restoring `core_temp.ttl` to `core.ttl` resets the state. Once reset, the test script runs completely cleanly, proving that the Gundam player character scenario, component declarations, and input actuation flows are ontologically sound and valid by default.
-- **Defect Testing Action:** We copied the Gundam scenario ontology into the active production pack directory `/Users/sac/.ggen/packs/ue4_ontology` and tested the compilation/validation harness directly.
+- **Action:** Restoring `core_temp.ttl` to `core.ttl` resets the state. Once reset, the test script runs completely cleanly, proving that the Mecha player character scenario, component declarations, and input actuation flows are ontologically sound and valid by default.
+- **Defect Testing Action:** We copied the Mecha scenario ontology into the active production pack directory `/Users/sac/.ggen/packs/ue4_ontology` and tested the compilation/validation harness directly.
 - **Observation:** Injecting an extra cooking state triggered `RuleF` validation failure, and injecting an input-to-input connection triggered `RuleA` validation failure.
 - **Conclusion:** The validation rules (`RuleA` and `RuleF` in `ggen.toml`) are working exactly as defined, and successfully halt the pipeline and flag failures on paradoxes or semantic violations.
 
 ---
 
 ## 3. Caveats
-- We assumed that `core_temp.ttl` represents the authoritative clean state of the Gundam scenario ontology.
+- We assumed that `core_temp.ttl` represents the authoritative clean state of the Mecha scenario ontology.
 - We observed that the `ggen sync --validate-only true` command exits with exit code 0 even when custom validation rules fail. This means that wrapper scripts (like `validate_ontology.sh`) cannot rely purely on the command's exit code to detect validation errors in this mode; they must parse the standard output or inspect the output JSON for `"status": "error"`.
 
 ---
 
 ## 4. Conclusion
-The Gundam Player Character Scenario (Tier 4 E2E) validates correctly under the `validate_ontology.sh` harness. Injecting defects successfully triggers the appropriate custom validation rules (`RuleF` and `RuleA`). The ontology model is structurally complete, robust, and correctly enforces standard rules.
+The Mecha Player Character Scenario (Tier 4 E2E) validates correctly under the `validate_ontology.sh` harness. Injecting defects successfully triggers the appropriate custom validation rules (`RuleF` and `RuleA`). The ontology model is structurally complete, robust, and correctly enforces standard rules.
 
 ---
 
@@ -81,14 +81,14 @@ To independently verify these findings, perform the following:
    *Expected output:* `ALL CODES AND CONSTRAINTS SUCCESSFULLY VERIFIED!` and exit code `0`.
 
 2. **Verify validate_ontology.sh under Defect Injection (Multiple Cooking States):**
-   - Copy Gundam ontology to pack:
+   - Copy Mecha ontology to pack:
      ```bash
      cp /Users/sac/.ggen/packs/ue4_ontology/core.ttl /Users/sac/.ggen/packs/ue4_ontology/core.ttl.bak
      cp ggen-validation-tests/core_temp.ttl /Users/sac/.ggen/packs/ue4_ontology/core.ttl
      ```
    - Inject multiple cooking states:
      ```bash
-     echo -e "\ngundam:MyGundam ue4:hasCookingState gundam:Cooked2 .\ngundam:Cooked2 a ue4:CookingTypestate ; rdfs:label \"Cooked2\" ." >> /Users/sac/.ggen/packs/ue4_ontology/core.ttl
+     echo -e "\nmecha:MyMecha ue4:hasCookingState mecha:Cooked2 .\nmecha:Cooked2 a ue4:CookingTypestate ; rdfs:label \"Cooked2\" ." >> /Users/sac/.ggen/packs/ue4_ontology/core.ttl
      ```
    - Run validation:
      ```bash

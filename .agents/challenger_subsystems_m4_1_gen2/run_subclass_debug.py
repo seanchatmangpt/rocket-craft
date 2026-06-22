@@ -35,8 +35,8 @@ try:
     # (it is already in subsystems.ttl)
     
     # 4. What if we just change the query? But we can't easily change query without editing ggen.toml.
-    # Let's see what happens if we make GundamNetworkingHandler have type UNetworkingSubsystem,
-    # and also hasSubsystem in GundamWorld.
+    # Let's see what happens if we make MechaNetworkingHandler have type UNetworkingSubsystem,
+    # and also hasSubsystem in MechaWorld.
     
 finally:
     if os.path.exists(BACKUP_PATH):

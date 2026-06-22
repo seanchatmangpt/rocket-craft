@@ -1,0 +1,55 @@
+{
+  "engine": "scripts/ip_distance_engine.py (Agent 17 IP Distance / Non-Confusion)",
+  "timestamp": "2026-06-20T22:18:18.674474+00:00",
+  "hash_algorithm": "blake3",
+  "baseline_usage": {
+    "id": "ipd:MetricBaselineOnly",
+    "usable_for_metric_baseline": true,
+    "usable_for_generation": false
+  },
+  "global_admission_threshold": 0.7,
+  "shacl_validation": {
+    "shapes": [
+      "097_external_expressive_distance_policy.ttl",
+      "098_non_confusion_policy.ttl",
+      "099_ip_distance_report_schema.ttl"
+    ],
+    "conforms": true,
+    "tool": "pyshacl"
+  },
+  "candidates_evaluated": 3,
+  "admitted": 3,
+  "refused": 0,
+  "verdict": "ADMIT_ORIGINAL",
+  "hero_candidate": {
+    "candidate_id": "asset_fabric.ttl",
+    "status": "ADMITTED",
+    "verdict": "ADMIT_ORIGINAL",
+    "proximity_score": 0.0,
+    "per_cluster_proximity": [
+      {
+        "cluster": "Mecha",
+        "proximity_score": 0.0,
+        "trade_dress_threshold": 0.75
+      },
+      {
+        "cluster": "BiotechMech",
+        "proximity_score": 0.0,
+        "trade_dress_threshold": 0.8
+      },
+      {
+        "cluster": "ArmorFrame/ArmorFrame",
+        "proximity_score": 0.0,
+        "trade_dress_threshold": 0.8
+      }
+    ]
+  },
+  "expressive_proximity_flags": [],
+  "replay_verified": true,
+  "artifacts": {
+    "ip_distance_report": "generated/ip_distance_engine/IP_DISTANCE_REPORT.json",
+    "non_confusion_report": "generated/ip_distance_engine/NON_CONFUSION_REPORT.json",
+    "admission_receipt": "generated/ip_distance_engine/ADMISSION_RECEIPT.jsonl"
+  },
+  "blake3_hash": "bb9ad60535a7d784165c9238f2006eada76206dee8baa524988134373f125647"
+}

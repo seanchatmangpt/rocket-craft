@@ -13,7 +13,7 @@
                 <https://rocket-craft.io/ontology/ue4/blueprints#> ,
                 <https://rocket-craft.io/ontology/ue4/subsystems#> ,
                 <https://rocket-craft.io/ontology/ue4/typestates#> ,
-                <https://rocket-craft.io/ontology/ue4/gundam_scenario#> .
+                <https://rocket-craft.io/ontology/ue4/mecha_scenario#> .
 
 # =========================================================================
 # Core C++ Classes

@@ -700,20 +700,20 @@ This is how large worlds become manufacturable.
 
 ---
 
-## 9. Gundam Insight: Semantic Features, Not Part Count
+## 9. Mecha Insight: Semantic Features, Not Part Count
 
-The Gundam insight clarifies Semantic LOD.
+The Mecha insight clarifies Semantic LOD.
 
 A 1,000-part kit does not mean 1,000 equally important runtime objects.
 
 Humans perceive semantic hierarchy.
 
-In a Gundam, the most salient features are:
+In a Mecha, the most salient features are:
 
 ```text
 head
 eyes
-V-fin
+Mecha Crown
 weapon
 hands
 feet

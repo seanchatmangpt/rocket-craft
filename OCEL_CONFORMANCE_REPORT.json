@@ -1,0 +1,21 @@
+{
+  "claims_without_receipts": [],
+  "final_disposition": "REFUSED",
+  "gate": "ocel_conformance_checks",
+  "morphology_source": "Morphology source: TTL/SHACL/SPARQL",
+  "python_tera_roles": {
+    "fix_points.py": "type: PythonTool, observed_role: unknown_until_recovered, disposition: destroyed_evidence, standing_effect: claim_hold",
+    "patch_geometry_generator.py": "type: PythonTool, observed_role: morphology_authority, disposition: quarantined_evidence, standing_effect: invalidates_verified_claim"
+  },
+  "quarantined_artifacts": [
+    "evidence/quarantine/python_morphology_violation/patch_geometry_generator.py"
+  ],
+  "refused_gates": [],
+  "required_gates": [
+    "ValidateBipedalKitCoherence",
+    "LowerGraphToUSD",
+    "SHACLValidation",
+    "SPARQLExtraction"
+  ],
+  "stale_renders": []
+}

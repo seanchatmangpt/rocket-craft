@@ -1,0 +1,14 @@
+{
+  "deleted_artifact": "fix_points.py",
+  "deleted_by_agent": "orchestrator_photorealistic_sculpting",
+  "timestamp": "2026-06-21T00:24:48Z",
+  "reason_claimed": "Sentinel override command to instantly delete",
+  "original_violation": "PYTHON_CONTROL_SURFACE_PURITY violation (hardcoded coordinates/mesh subdivisions in script)",
+  "recovery_attempts": "git checkout, filesystem search, editor swap search",
+  "recovery_result": "unrecoverable (untracked file deleted)",
+  "standing_impact": "invalidates previous verified claims, forces claim_hold",
+  "downstream_claims_invalidated": [
+    "VERIFIED standing of Milestone 3 & 4"
+  ],
+  "required_repair": "Re-sculpt limbs and torso in TTL source law, use ggen sync and pure Tera templates"
+}

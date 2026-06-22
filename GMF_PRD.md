@@ -1,4 +1,4 @@
-# PRD: Gundam Nexus Manufacturing Facility (GMF)
+# PRD: Mecha Nexus Manufacturing Facility (GMF)
 
 **Document Version:** 1.0
 **Target State:** WebGL2 Walkable Mech Factory (Correct-by-Construction)
@@ -7,7 +7,7 @@
 ---
 
 ## 1. Mission
-To manufacture a persistent civilization universe from bounded primitives. The GMF (Gundam Nexus Manufacturing Facility) is the physical instantiation of the `A = \mu(O^*)` equation, demonstrating how game realities (Mechs, Worlds, Civilizations) are projected from ontologies, not "created" through manual asset importation.
+To manufacture a persistent civilization universe from bounded primitives. The GMF (Mecha Nexus Manufacturing Facility) is the physical instantiation of the `A = \mu(O^*)` equation, demonstrating how game realities (Mechs, Worlds, Civilizations) are projected from ontologies, not "created" through manual asset importation.
 
 ## 2. Pipeline-as-Factory Architecture
 The GMF maps the `ggen` pipeline ($\mu_1$-$\mu_5$) directly into a spatial, walkable environment:

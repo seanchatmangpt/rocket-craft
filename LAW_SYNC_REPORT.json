@@ -1,6 +1,8 @@
 {
   "ttl_files_loaded": 100,
   "ttl_files_parsed": 100,
+  "ttl_files_stubbed": 0,
+  "ttl_files_preserved": 100,
   "unresolved_references": 0,
   "contradictions": 0,
   "required_ctqs_present": true,

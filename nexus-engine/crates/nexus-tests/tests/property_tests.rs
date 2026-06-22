@@ -108,7 +108,7 @@ proptest! {
         let mut auction = Auction::<OpenForBids>::new(
             1,
             seller_id,
-            "Gundam Part".to_string(),
+            "Mecha Part".to_string(),
             current,
             None,
             24,

@@ -58,12 +58,12 @@ pub enum SessionBuildError {
 ///
 /// let session = PlayerSessionBuilder::new()
 ///     .player_id(12345)
-///     .username("gundam_pilot".to_string())
+///     .username("mecha_pilot".to_string())
 ///     .build()
 ///     .unwrap();
 ///
 /// assert_eq!(session.player_id, 12345);
-/// assert_eq!(session.username, "gundam_pilot");
+/// assert_eq!(session.username, "mecha_pilot");
 /// ```
 #[derive(Debug, Clone)]
 pub struct PlayerSessionBuilder {

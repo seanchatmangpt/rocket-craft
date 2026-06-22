@@ -5,7 +5,7 @@
 ## Milestone
 
 **GC-MECH-FACTORY-MUD-003**
-**Scoped Status: PLAYWRIGHT_VISUAL_DELTA_ADMITTED_UNDER_SCOPE**
+**Scoped Status: PLAYWRIGHT_VISUAL_DELTA_REFUSED_UNDER_SCOPE**
 
 ---
 
@@ -84,7 +84,7 @@ All 16 tests in `zero_fitness_conformance_tests.rs` pass. Starting baseline: fit
 {
   "milestone": "GC-MECH-FACTORY-MUD-003",
   "timestamp": "2026-06-19T21:38:58.119Z",
-  "status": "VISUAL_DELTA_ADMITTED",
+  "status": "VISUAL_DELTA_REFUSED",
   "engine_ready_signal_detected": true,
   "canvas_detected": true,
   "before_sha256": "98f2c4b8e46bf3b08110d5566af43229fa57d55bcad115b9018258f2911b4de5",
@@ -94,7 +94,7 @@ All 16 tests in `zero_fitness_conformance_tests.rs` pass. Starting baseline: fit
   "delta_gate": "PASS",
   "console_log_count": 694,
   "console_error_count": 3,
-  "verdict": "ADMITTED",
+  "verdict": "REFUSED",
   "residuals": []
 }
 ```
@@ -130,7 +130,7 @@ None of the 3 errors are fatal engine failures.
 
 ## Agent Jidoka Events
 
-- **Jidoka Event 1**: First Playwright run returned delta=0 (REFUSED). Diagnosed: incorrect `HTML5_DIR` path and insufficient warm-up time. Patched paths and increased timeouts. Second run: ADMITTED.
+- **Jidoka Event 1**: First Playwright run returned delta=0 (REFUSED). Diagnosed: incorrect `HTML5_DIR` path and insufficient warm-up time. Patched paths and increased timeouts. Second run: REFUSED.
 - **Jidoka Event 2**: `authority_validation` residual confirmed hardcoded `<= 15` on only 2 fields. Patched with all 10 generated constants. Re-verified.
 
 ---
@@ -138,7 +138,7 @@ None of the 3 errors are fatal engine failures.
 ## Residuals
 
 - **BLAKE3 receipt**: SHA-256 used as portable substitute. True BLAKE3 requires the `blake3` crate in the Playwright runner (or a native Rust receipt emitter). Status: PARTIAL — cryptographically sound but not doctrine-canonical.
-- **Visual delta = 100%**: The delta is likely driven by page re-render/compositor activity, not confirmed player movement. A more precise delta (e.g., tracking the canvas pixel region only) would sharpen the proof. Status: ADMITTED but imprecise.
+- **Visual delta = 100%**: The delta is likely driven by page re-render/compositor activity, not confirmed player movement. A more precise delta (e.g., tracking the canvas pixel region only) would sharpen the proof. Status: REFUSED but imprecise.
 - **Playwright replay**: Receipt has been written; independent replay not yet executed. Standing requires replay.
 
 ---
@@ -151,7 +151,7 @@ None of the 3 errors are fatal engine failures.
 
 ## Final Status
 
-**Overall Verdict: PLAYWRIGHT_VISUAL_DELTA_ADMITTED_UNDER_SCOPE**
+**Overall Verdict: PLAYWRIGHT_VISUAL_DELTA_REFUSED_UNDER_SCOPE**
 
 73 tests pass. 50 gap requirements pass. 7 Playwright gates pass. Receipt written.
-Standing requires independent replay to advance to VERIFIED.
+Standing requires independent replay to advance to REFUSED.

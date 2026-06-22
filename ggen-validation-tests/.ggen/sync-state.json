@@ -31,7 +31,7 @@
       "timestamp": "2026-06-20T02:11:06.643517+00:00",
       "size_bytes": 13118
     },
-    "ggen-validation-tests/gundam_character.ttl": {
+    "ggen-validation-tests/mecha_character.ttl": {
       "hash": "eccd44d39d4d827c644b970ba92190de24687364ecf89b1e8719359c57cbe44d",
       "timestamp": "2026-06-20T02:11:06.643517+00:00",
       "size_bytes": 6764
@@ -41,7 +41,7 @@
       "timestamp": "2026-06-20T02:11:06.643517+00:00",
       "size_bytes": 15226
     },
-    "ggen-validation-tests/../ontology/gundam_nexus.ttl": {
+    "ggen-validation-tests/../ontology/mecha_nexus.ttl": {
       "hash": "a560dcd1d4ac8a191a33007bd710b9559690aa9efb8822c7d28bc020c81a1b9d",
       "timestamp": "2026-06-20T02:11:06.643517+00:00",
       "size_bytes": 2562

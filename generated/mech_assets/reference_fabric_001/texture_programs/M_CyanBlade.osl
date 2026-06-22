@@ -1,0 +1,26 @@
+shader M_CyanBlade_procedural(
+    point Po = P,
+    float scale = 100.0,
+    output color BaseColor = color(0.0, 1.0, 1.0),
+    output float Roughness = 0.1,
+    output float Metallic = 0.9,
+    output float Emissive = 1.0,
+    output normal NormalOut = N
+) {
+    // High frequency energy plasma noise
+    float energy = noise("simplex", Po * scale);
+    float pulse = noise("perlin", Po * scale * 0.1);
+    
+    // Core is brighter, edges fade
+    BaseColor = mix(color(0.0, 0.8, 0.8), color(0.8, 1.0, 1.0), energy);
+    
+    // Emissive pulsing effect
+    Emissive = 1.0 + pulse * 0.5;
+    
+    // Extremely smooth surface for the energy blade containment field
+    Roughness = 0.05 + energy * 0.05;
+    
+    // Minor normal perturbation for energy ripples
+    vector displacement = N * (energy * 0.002);
+    NormalOut = calculatenormal(P + displacement);
+}

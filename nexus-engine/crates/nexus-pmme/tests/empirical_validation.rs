@@ -1,4 +1,4 @@
-use nexus_gundam::mech_primitives::{Earth, RotationLimits, AABB};
+use nexus_mecha::mech_primitives::{Earth, RotationLimits, AABB};
 use nexus_pmme::{
     generate_spec, CulturalProfile, FunctionalRole, Gate, MechAssemblySpec, PlanetaryValues,
     Unvalidated,

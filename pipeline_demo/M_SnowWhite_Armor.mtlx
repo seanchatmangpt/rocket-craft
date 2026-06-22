@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.38" colorspace="lin_rec709">
-  <!-- Lookdev target for Snow White Prelude Armor Panels -->
+  <!-- Lookdev target for WinterProtocol Prelude Armor Panels -->
   <nodegraph name="NG_SnowWhite_Armor">
     <!-- UDIM Support Enabled for high-res feather/armor texturing -->
     <image name="tex_basecolor" type="color3">

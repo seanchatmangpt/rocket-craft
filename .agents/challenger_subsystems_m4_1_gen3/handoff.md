@@ -26,9 +26,9 @@
 - **Error Injection Verification**:
   - Appended a non-void RPC to `core.ttl`:
     ```turtle
-    gundam:BadRPCReturn a ue4:URPC ;
+    mecha:BadRPCReturn a ue4:URPC ;
         rdfs:label "BadRPCReturn" ;
-        ue4:returnProperty gundam:SomeReturnProp .
+        ue4:returnProperty mecha:SomeReturnProp .
     ```
   - Executed validation command: `/Users/sac/.local/bin/ggen sync --manifest /Users/sac/rocket-craft/ggen-validation-tests/ggen.toml --validate-only true`
   - Result output:
@@ -43,7 +43,7 @@
 
 ## 2. Logic Chain
 - **Step 1**: The verification scripts `verify_all_rules.sh` and `verify_extra_rules.sh` test 25 and 5 edge cases, respectively. Running these scripts returned clean exit code 0 and matched all expected validation errors.
-- **Step 2**: The injected non-void RPC test case (`gundam:BadRPCReturn`) was successfully caught by the `RuleRPCReturnTypeVoid` validation rule inside `ggen.toml` (Step 1 Observation).
+- **Step 2**: The injected non-void RPC test case (`mecha:BadRPCReturn`) was successfully caught by the `RuleRPCReturnTypeVoid` validation rule inside `ggen.toml` (Step 1 Observation).
 - **Step 3**: The SHACL validation engine reported `PASS` despite the presence of `ue4:RPCReturnTypeVoidShape` in `validation.shacl.ttl` (Step 1 Observation).
 - **Step 4**: Therefore, SHACL SPARQL-based constraints (`sh:sparql`) are not being evaluated/enforced by `ggen`'s SHACL engine, and safety verification depends on the `ggen.toml` custom SPARQL rules.
 

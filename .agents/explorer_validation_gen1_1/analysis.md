@@ -55,8 +55,8 @@ This analysis evaluates the 10 custom validation rules (RuleA-H, RuleLabel, Rule
 * **SPARQL Rule**: `RuleF`
 * **Objective**: A character must have exactly one cooking state of type `CookingTypestate`.
 * **Findings**:
-  * **Critical Flaw (SHACL Subclass Target Omission)**: The SHACL shape targets `ue4:ACharacter` via `sh:targetClass`. Standard SHACL does not perform RDFS/OWL subclass inheritance for target classes. A custom subclass like `gundam:AGundamCharacter` will **never be validated by the SHACL shape** unless it is explicitly typed with `ue4:ACharacter`.
-  * **Critical Flaw (SPARQL Multiplicity Failure)**: The SPARQL query in `ggen.toml` checks if a character has *at least one* cooking state (using `FILTER NOT EXISTS` containing another `FILTER NOT EXISTS`). If a character is assigned **multiple** cooking states (e.g. both `gundam:Cooked` and `gundam:Uncooked`), the SPARQL query still finds one, evaluates to valid, and **fails to flag the multiple-state defect**.
+  * **Critical Flaw (SHACL Subclass Target Omission)**: The SHACL shape targets `ue4:ACharacter` via `sh:targetClass`. Standard SHACL does not perform RDFS/OWL subclass inheritance for target classes. A custom subclass like `mecha:AMechaCharacter` will **never be validated by the SHACL shape** unless it is explicitly typed with `ue4:ACharacter`.
+  * **Critical Flaw (SPARQL Multiplicity Failure)**: The SPARQL query in `ggen.toml` checks if a character has *at least one* cooking state (using `FILTER NOT EXISTS` containing another `FILTER NOT EXISTS`). If a character is assigned **multiple** cooking states (e.g. both `mecha:Cooked` and `mecha:Uncooked`), the SPARQL query still finds one, evaluates to valid, and **fails to flag the multiple-state defect**.
 
 ### RuleG: World Packaging State Constraint
 * **SHACL Shape**: `ue4:WorldPackagingStateShape`

@@ -33,7 +33,7 @@ Under this equation, if the ontology ($O^*$) was flawless, the resulting softwar
 ## 3. Combinatorial Maximalism and the Death of the MVP
 The strategic masterstroke of Rocket Craft was the rejection of the MVP. Chatman argued that if $A$ is a deterministic projection of $O^*$, projecting one game costs the exact same computational effort as projecting one million games.
 
-Through **Combinatorial Maximalism**, the system's "Aimbot" exhausted the entire bounded state space of the ontology before compilation. Instead of manually tuning the monetization and combat mechanics of a game like *Gundam Nexus*, the engine brute-forced hundreds of thousands of permutations in-memory, discarding imbalanced states until a perfect mathematical equilibrium was achieved. 
+Through **Combinatorial Maximalism**, the system's "Aimbot" exhausted the entire bounded state space of the ontology before compilation. Instead of manually tuning the monetization and combat mechanics of a game like *Mecha Nexus*, the engine brute-forced hundreds of thousands of permutations in-memory, discarding imbalanced states until a perfect mathematical equilibrium was achieved. 
 
 The games were verifiably balanced candidates on Day One. QA was entirely automated via Playwright manufacturing loops that yielded unforgeable BLAKE3 process-evidence receipts. The cost of producing a flawless AAA title dropped to near zero.
 

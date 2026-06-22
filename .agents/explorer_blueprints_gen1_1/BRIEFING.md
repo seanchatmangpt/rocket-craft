@@ -20,7 +20,7 @@ Analyze /Users/sac/.ggen/packs/ue4_ontology/blueprints.ttl to verify coverage, c
 - Updated: 2026-06-19T04:44:50Z
 
 ## Investigation State
-- **Explored paths**: blueprints.ttl, core.ttl, reflection.ttl, typestates.ttl, subsystems.ttl, validation.shacl.ttl, gundam_character.ttl, ggen.toml
+- **Explored paths**: blueprints.ttl, core.ttl, reflection.ttl, typestates.ttl, subsystems.ttl, validation.shacl.ttl, mecha_character.ttl, ggen.toml
 - **Key findings**:
     - Identified redundancies in connection properties (`linkedTo`/`connectedTo`) and call properties (`callsFunction`/`calledFunction`) that bypass SHACL validation.
     - Found a lack of connection cardinality constraints on input pins (max 1 connection).

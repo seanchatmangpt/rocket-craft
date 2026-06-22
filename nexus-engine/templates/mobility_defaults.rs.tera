@@ -1,14 +1,14 @@
-// Mobility Default implementations — lore-grounded from UC Gundam tech manuals.
+// Mobility Default implementations — lore-grounded from UC Mecha tech manuals.
 // Physical quantities use QUDT 2.1 units (https://qudt.org/).
-// Source of truth: nexus-engine/.specify/schema/gundam_nexus.ttl
+// Source of truth: nexus-engine/.specify/schema/mecha_nexus.ttl
 
-use crate::generated_gundam::{Mobility, Walking, Flight, Hover, Aquatic, Space};
-use crate::generated_gundam::AABB;
+use crate::generated_mecha::{Mobility, Walking, Flight, Hover, Aquatic, Space};
+use crate::generated_mecha::AABB;
 
 {% for row in results %}
 {% if row.name == "Walking" %}
 impl Default for Mobility {
-    /// Canonical baseline: RX-78-2 Gundam (UC 0079) bipedal locomotion.
+    /// Canonical baseline: XM-01-2 Mecha (UC 0079) bipedal locomotion.
     /// mass={{ row.mass_kg | default(value="60000") }} kg (QUDT unit:KiloGM)
     /// max_speed={{ row.max_speed_ms | default(value="45.83") }} m/s = 165 km/h (QUDT unit:M-PER-SEC)
     fn default() -> Self {
@@ -24,7 +24,7 @@ impl Default for Mobility {
 }
 
 impl Default for Walking {
-    /// Canonical bipedal walking: RX-78-2 Gundam (2 legs, 165 km/h ground speed)
+    /// Canonical bipedal walking: XM-01-2 Mecha (2 legs, 165 km/h ground speed)
     fn default() -> Self {
         Self {
             physical: Mobility::default(),
@@ -35,7 +35,7 @@ impl Default for Walking {
 {% endif %}
 {% if row.name == "Flight" %}
 impl Default for Flight {
-    /// Canonical flight: Wing Gundam (AC 195) — 7,150 kg, Mach 1+, 14.4m wing span
+    /// Canonical flight: Wing Mecha (AC 195) — 7,150 kg, Mach 1+, 14.4m wing span
     fn default() -> Self {
         Self {
             physical: Mobility {

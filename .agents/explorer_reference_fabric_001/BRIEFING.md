@@ -25,7 +25,7 @@ Investigate the environment (reference image, ggen repository setup, Python libr
   - Reference image path: `/Users/sac/Documents/Papers/61gOtV1wnAL._AC_SL1200_.jpg`
   - Repository files: `Justfile`, `Makefile`, `ggen.toml`, `asset-pipeline/scripts/blender_convert.py`
   - Python environments: Xcode Python 3.9.6, Homebrew Python, system pip3 list, Homebrew pip3 list
-  - USD files: `pipeline_demo/ASSET_SnowWhite_Prelude.usda`, `pipeline_demo/SM_TestArmorPanel.usda`, `snow_white_prelude_mecha.usda`
+  - USD files: `pipeline_demo/ASSET_SnowWhite_Prelude.usda`, `pipeline_demo/SM_TestArmorPanel.usda`, `winter_protocol_prelude_mecha.usda`
   - Native tools: `/usr/bin/usdrecord`, `/usr/bin/usdcat`, etc.
 - **Key findings**:
   - Image verified at `/Users/sac/Documents/Papers/61gOtV1wnAL._AC_SL1200_.jpg` with SHA-256 `7693fdb87e7fc7f9151550830e6f5447f8ba8d1912f4c39bc06ec71467f14f27`.
