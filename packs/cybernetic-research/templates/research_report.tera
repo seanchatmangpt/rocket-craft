@@ -1,0 +1,15 @@
+# Cybernetic Research Validation Report
+# Manufactured via the BIG BANG Pipeline
+
+This document proves that the research findings have been formalized into a semantic ontology, and perfectly projected back into an artifact via the zero-trust pipeline.
+
+## Discovered Cybernetic Principles
+
+{% for row in results %}
+### {{ row.class | default(value="Unknown Class") }}
+- **Label:** {{ row.label | default(value="None") }}
+- **Comment:** {{ row.comment | default(value="None") }}
+{% endfor %}
+
+## Attestation
+This output was generated deterministically using a strict `ORDER BY` query, obeying guardrail E0013.

@@ -133,3 +133,4 @@ test-results/
 
 # Agent Framework
 .agents/clone-ue4-html5.sh
+cybernetic-validation/.ggen/

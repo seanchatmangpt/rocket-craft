@@ -1,0 +1,71 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix cyb: <https://rocket-craft.com/ontology/cybernetic#> .
+
+# Core Architecture
+cyb:CyberneticLoop a rdfs:Class ;
+    rdfs:label "Human-to-AGI Cybernetic Loop" ;
+    rdfs:comment "The overarching zero-trust pipeline." .
+
+# Poka-Yoke / Andon
+cyb:AndonCord a rdfs:Class ;
+    rdfs:label "Andon Cord" ;
+    rdfs:comment "Stop-the-line mechanism for critical defects." .
+
+cyb:RedSignal a cyb:AndonCord ;
+    rdfs:label "Red Signal" ;
+    cyb:haltsPipeline "true"^^xsd:boolean .
+
+# Cleanroom Surfaces
+cyb:CleanroomSurface a rdfs:Class ;
+    rdfs:label "Cleanroom Surface" .
+
+cyb:TimeSurface a cyb:CleanroomSurface ;
+    rdfs:label "Frozen/Stepped Time" .
+cyb:RngSurface a cyb:CleanroomSurface ;
+    rdfs:label "Seeded RNG" .
+cyb:FsSurface a cyb:CleanroomSurface ;
+    rdfs:label "Ephemeral FS" .
+cyb:NetSurface a cyb:CleanroomSurface ;
+    rdfs:label "Offline Net" .
+cyb:ProcSurface a cyb:CleanroomSurface ;
+    rdfs:label "Non-Root Proc" .
+
+# Constitution Laws
+cyb:ConstitutionalLaw a rdfs:Class ;
+    rdfs:label "Constitutional Law" .
+
+cyb:NoRetrocausation a cyb:ConstitutionalLaw .
+cyb:TypeSoundness a cyb:ConstitutionalLaw .
+cyb:GuardSoundness a cyb:ConstitutionalLaw .
+cyb:ProjectionDeterminism a cyb:ConstitutionalLaw .
+cyb:SLOPreservation a cyb:ConstitutionalLaw .
+cyb:ImmutabilityOfSnapshots a cyb:ConstitutionalLaw .
+cyb:AtomicPromotion a cyb:ConstitutionalLaw .
+
+# ZST Typestates
+cyb:BranchlessTypestate a rdfs:Class ;
+    rdfs:label "Zero-Sized Type State" .
+
+cyb:Pending a cyb:BranchlessTypestate .
+cyb:Hot a cyb:BranchlessTypestate .
+cyb:Spent a cyb:BranchlessTypestate .
+
+# World Contract Guardrails
+cyb:Guardrail a rdfs:Class ;
+    rdfs:label "World Contract Guardrail" .
+
+cyb:E0013 a cyb:Guardrail ;
+    rdfs:label "Strict Determinism (ORDER BY requirement)" .
+cyb:E0010 a cyb:Guardrail ;
+    rdfs:label "Anti-Mocking (No VALUES in external files)" .
+
+# Cryptographic Receipts
+cyb:ExecutionProof a rdfs:Class ;
+    rdfs:label "Execution Proof" ;
+    rdfs:comment "Determinism signature coupling inputs to outputs." .
+
+cyb:SigmaReceipt a rdfs:Class ;
+    rdfs:label "Sigma Receipt" ;
+    rdfs:comment "Ed25519 PKI signed validation receipt." .

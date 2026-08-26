@@ -1,0 +1,36 @@
+[project]
+name = "cybernetic-validation"
+version = "1.0.0"
+description = "Validate the discovered architectural principles of the cybernetic programming loop."
+
+[ontology]
+source = "../packs/cybernetic-research/ontology/cybernetic.ttl"
+
+[[packs]]
+name = "research-pack"
+registry = "local"
+path = "../packs/cybernetic-research"
+
+[validation]
+strict_mode = false
+
+[[inference.rules]]
+name = "measure_ontology"
+construct = """
+CONSTRUCT {
+  ?class <https://rocket-craft.com/ontology/cybernetic#isMeasured> "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
+}
+WHERE {
+  ?class <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+}
+"""
+
+[generation]
+output_dir = "."
+
+[[generation.rules]]
+name = "validate_research"
+query = { pack = "research-pack", output = "queries", file = "extract_principles.rq" }
+template = { pack = "research-pack", output = "templates", file = "research_report.tera" }
+output_file = "VALIDATION_REPORT.md"
+mode = "Overwrite"

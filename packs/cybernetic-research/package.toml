@@ -1,0 +1,8 @@
+[pack]
+name = "cybernetic-research"
+version = "1.0.0"
+
+[pack.outputs]
+ontology = "ontology"
+queries = "queries"
+templates = "templates"
