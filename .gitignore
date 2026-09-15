@@ -134,3 +134,6 @@ test-results/
 # Agent Framework — abandoned multi-agent worker briefing/progress scratch
 .agents/
 cybernetic-validation/.ggen/
+
+# macOS Finder metadata
+.DS_Store
