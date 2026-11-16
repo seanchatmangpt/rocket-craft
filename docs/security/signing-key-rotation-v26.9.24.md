@@ -20,3 +20,11 @@ checkout's new public key is published below for anyone verifying its future rec
 | `ggen-validation-tests/.ggen/keys` | `c6c65fa86a1eb33301d6d382c3722de6f2b30c8647f806de72be888f83e42699` | `d8c839427ee0a025a775e3267310116287c8a702ed046b16bcfbfb46f3f760e2` | `a39f76d582c0542becaa5231475ce42305e9df65be67066a68b4cc4d0c58d4d4` |
 | `nexus-engine/.ggen/keys` | `37897afe9151842af2ecebbefc626a1e10b688d82cb73135c9ef5e239a476605` | `a1d8b8dfece8f5afcf223294c59d515d9283a98234e1fc8b154dcaa0f3c136b1` | `edc4e456e2d3b06455564cb44ee8313834df4494fe6a5c9ebd31f2a76040933e` |
 | `ontology/ggen-packs/mechbirth/.ggen/keys` | `682c2c080edd85c5f5f6da17be534ba430e83c69fed6eb9cb004592b0e11d9c4` | `75b4129b60ccc8ce3a3324e09c57d0f617bc0ce9c98db6f058346c211e1a923b` | `d38818579aa0a41b185a186e93fb6506e40576818793ff834cf9a7241326bcfe` |
+| `ontology/.ggen/keys` (branch-only) | `f0285cc0fca702e5382457801830bd541f859f015dbd83f0101dff195406dd4e` | `317f5ea872332e4d4915417a21022194ab0ae62c80930cb0372c2df8d6ecd9a6` | `295b3e0ab22f2d4aed92f61ada88d81bd016f5a8ac75e16568aeb4c4bdc1a4ab` |
+
+**Branch-only row (`ontology/.ggen/keys`, 9605a9d7).** This pair was tracked on the
+`claude/pre-ue4-admission-unblock` branch only (added in 009d5bb6) and was never merged outside it, so the
+fleet rotation above did not cover it — it is untracked by 9605a9d7, not fleet-rotated. It is listed here
+because 009d5bb6 is also reachable from `origin/chore/remove-ds-store`, so the old private half is exposed on
+that remote branch: receipts signed with it carry no signing authority. Both halves now leave the index and a
+key-dir `.gitignore` covers them; the checkout's fresh pair is never committed.
